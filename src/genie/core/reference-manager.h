@@ -108,18 +108,6 @@ class ReferenceManager {
          *
          * @return
          */
-        size_t getDataStart() const;
-
-        /**
-         *
-         * @return
-         */
-        size_t getDataEnd() const;
-
-        /**
-         *
-         * @return
-         */
         size_t getGlobalStart() const;
 
         /**
@@ -147,14 +135,6 @@ class ReferenceManager {
          * @param dat
          */
         void mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat);
-
-        /**
-         *
-         * @param start
-         * @param end
-         * @param _mgr
-         */
-        void mapSection(size_t start, size_t end, ReferenceManager* _mgr);
 
         /**
          *
@@ -197,12 +177,6 @@ class ReferenceManager {
 
         /**
          *
-         * @param pos
-         */
-        void unMapAt(size_t pos);
-
-        /**
-         *
          */
         struct Stepper {
          private:
@@ -225,11 +199,6 @@ class ReferenceManager {
              */
             void inc(size_t off = 1);
 
-            /**
-             *
-             * @param pos
-             */
-            void setPos(size_t pos);
 
             /**
              *
@@ -250,13 +219,6 @@ class ReferenceManager {
          */
         Stepper getStepper() const;
 
-        /**
-         *
-         * @param start
-         * @param end
-         * @return
-         */
-        ReferenceExcerpt getSubExcerpt(size_t start, size_t end) const;
 
         /**
          *
@@ -274,7 +236,8 @@ class ReferenceManager {
     explicit ReferenceManager(size_t csize);
 
     /**
-     *
+     * @brief
+     * @param index
      * @param ref
      */
     void addRef(size_t index, std::unique_ptr<Reference> ref);

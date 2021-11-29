@@ -6,6 +6,7 @@
 
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
+#include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
@@ -75,7 +76,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
-                        std::cerr << "Decompressing AU " << ret.getID() << " of class " << lut[int(ret.getClass())];
+                        std::cerr << "Decompressing AU " << ret.getID() << " of class "
+                                  << lut[static_cast<size_t>(ret.getClass())];
                         UTILS_DIE_IF(ret.getClass() == genie::core::record::ClassType::CLASS_HM,
                                      "Class HM not supported");
                         if (ret.getClass() == genie::core::record::ClassType::CLASS_U) {
@@ -88,8 +90,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                                 } else {
                                     UTILS_DIE(
                                         "Computed ref not supported: " +
-                                        std::to_string(
-                                            (int)parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm()));
+                                        std::to_string(static_cast<int>(
+                                            parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm())));
                                 }
                             }
                         } else {
@@ -102,8 +104,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                                 } else {
                                     UTILS_DIE(
                                         "Computed ref not supported: " +
-                                        std::to_string(
-                                            (int)parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm()));
+                                        std::to_string(static_cast<int>(
+                                            parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm())));
                                 }
                             }
                         }

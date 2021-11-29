@@ -45,9 +45,10 @@ class Importer : public core::FormatImporter {
 
  public:
     /**
-     *
+     * @brief
      * @param _blockSize
      * @param _file_1
+     * @param _unsupported
      */
     Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported);
 
