@@ -22,14 +22,15 @@ namespace fasta {
 Manager::Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr)
     : core::ReferenceSource(mgr), reader(fasta, fai) {
     auto ref = generateRefHandles();
+    int i = 0;
     for (auto& r : ref) {
-        mgr->addRef(std::move(r));
+        mgr->addRef(i++, std::move(r));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::set<std::string> Manager::getSequences() const { return reader.getSequences(); }
+std::map<size_t, std::string> Manager::getSequences() const { return reader.getSequences(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +49,8 @@ std::vector<std::unique_ptr<core::Reference>> Manager::generateRefHandles() {
     auto seqs = getSequences();
     std::vector<std::unique_ptr<core::Reference>> ret;
     for (const auto& s : seqs) {
-        size_t length = getLength(s);
-        ret.emplace_back(util::make_unique<Reference>(s, length, this));
+        size_t length = getLength(s.second);
+        ret.emplace_back(util::make_unique<Reference>(s.second, length, this));
     }
     return ret;
 }

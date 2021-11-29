@@ -50,6 +50,7 @@ class Config {
     std::string outputFile;       //!< @brief
     bool forceOverwrite;
     bool help;
+    bool no_ref;
     uint32_t num_threads;
 
  private:

@@ -11,11 +11,15 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 #include "apps/genie/transcode-sam/transcoding.h"
+#include "genie/core/cigar-tokenizer.h"
 #include "genie/core/record/record.h"
+#include "genie/format/fasta/manager.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +52,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
  * @param nref
  * @return
  */
-void sam_to_mgrec_phase1(Config& options, int& nref);
+std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options, int& nref);
 
 /**
  * @brief
@@ -65,7 +69,7 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
  * @param nref
  * @return
  */
-void sam_to_mgrec_phase2(Config& options, int nref);
+void sam_to_mgrec_phase2(Config& options, int nref, const std::vector<std::pair<std::string, size_t>>& refs);
 
 /**
  * @brief
@@ -87,6 +91,37 @@ void transcode_sam2mpg(Config& options);
  * @return
  */
 void transcode_mpg2sam(Config& options);
+
+/**
+ * @brief
+ */
+class RefInfo {
+ private:
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;    //!< @brief
+    std::unique_ptr<genie::format::fasta::Manager> fastaMgr;  //!< @brief
+    std::unique_ptr<std::istream> fastaFile;                  //!< @brief
+    std::unique_ptr<std::istream> faiFile;                    //!< @brief
+    bool valid;                                               //!< @brief
+
+ public:
+    /**
+     * @brief
+     * @param fasta_name
+     */
+    explicit RefInfo(const std::string& fasta_name);
+
+    /**
+     * @brief
+     * @return
+     */
+    bool isValid() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::ReferenceManager* getMgr();
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

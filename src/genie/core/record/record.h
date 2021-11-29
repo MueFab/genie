@@ -53,6 +53,11 @@ class Record {
     /**
      * @brief
      */
+    void patchRefID(size_t refID);
+
+    /**
+     * @brief
+     */
     Record();
 
     /**
@@ -119,7 +124,6 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     std::vector<Segment>& getSegments();
@@ -143,7 +147,6 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     const std::vector<AlignmentBox>& getAlignments() const;
@@ -234,6 +237,13 @@ class Record {
      * @return
      */
     size_t getMappedLength(size_t alignment, size_t split) const;
+
+    /**
+     * @brief
+     * @param id
+     * @param b
+     */
+    void setAlignment(size_t id, AlignmentBox&& b);
 
     /**
      * @brief

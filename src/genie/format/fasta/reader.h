@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <set>
 #include <string>
 #include "genie/format/fasta/fai-file.h"
@@ -39,7 +40,7 @@ class FastaReader {
      *
      * @return
      */
-    std::set<std::string> getSequences() const;
+    std::map<size_t, std::string> getSequences() const;
 
     /**
      *

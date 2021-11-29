@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
@@ -45,7 +46,7 @@ class Manager : public core::ReferenceSource {
      *
      * @return
      */
-    std::set<std::string> getSequences() const;
+    std::map<size_t, std::string> getSequences() const;
 
     /**
      *

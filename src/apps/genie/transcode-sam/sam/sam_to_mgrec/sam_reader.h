@@ -11,6 +11,7 @@
 
 #include <htslib/sam.h>
 #include <string>
+#include <utility>
 #include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 #include "boost/optional/optional.hpp"
@@ -56,7 +57,7 @@ class SamReader {
      * @brief
      * @return
      */
-    int getNumRef();
+    std::vector<std::pair<std::string, size_t>> getRefs();
 
     /**
      * @brief

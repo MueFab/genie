@@ -49,7 +49,15 @@ SamReader::~SamReader() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int SamReader::getNumRef() { return sam_hdr_nref(sam_header); }
+std::vector<std::pair<std::string, size_t>> SamReader::getRefs() {
+    std::vector<std::pair<std::string, size_t>> ret;
+    auto num_ref = sam_hdr_nref(sam_header);
+    ret.reserve(num_ref);
+    for (int i = 0; i < num_ref; ++i) {
+        ret.emplace_back(sam_hdr_tid2name(sam_header, i), sam_hdr_tid2len(sam_header, i));
+    }
+    return ret;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
