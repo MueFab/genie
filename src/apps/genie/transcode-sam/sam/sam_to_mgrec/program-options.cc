@@ -187,11 +187,12 @@ void Config::validate() {
         std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)" << std::endl;
     }
 
-    UTILS_DIE_IF(fasta_file_path.empty() && !no_ref,
+    UTILS_DIE_IF(fasta_file_path.empty() && !no_ref && inputFile.size() > 4 &&
+                     outputFile.substr(outputFile.size() - 4) != ".sam",
                  "You did not pass a reference file. "
                  "Reference based compression might not work and record classes N and P can't be detected. "
                  "Are you sure? If yes, pass '--no_ref'.");
-    if (no_ref) {
+    if (no_ref || outputFile.substr(outputFile.size() - 4) == ".sam") {
         fasta_file_path = "";
     } else {
         validateReference(fasta_file_path);
