@@ -39,10 +39,11 @@ class ReferenceManager {
     };
 
     std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!<
-    std::deque<std::pair<std::string, size_t>> cacheInfo;                 //!<
-    std::mutex cacheInfoLock;                                             //!<
-    uint64_t cacheSize;                                                   //!<
-    static const uint64_t CHUNK_SIZE;                                     //!<
+    std::map<size_t, std::string> indices;
+    std::deque<std::pair<std::string, size_t>> cacheInfo;  //!<
+    std::mutex cacheInfoLock;                              //!<
+    uint64_t cacheSize;                                    //!<
+    static const uint64_t CHUNK_SIZE;                      //!<
 
     /**
      *
@@ -71,6 +72,8 @@ class ReferenceManager {
      * @return
      */
     std::string ID2Ref(size_t id);
+
+    bool refKnown(size_t id);
 
     /**
      *
@@ -274,7 +277,7 @@ class ReferenceManager {
      *
      * @param ref
      */
-    void addRef(std::unique_ptr<Reference> ref);
+    void addRef(size_t index, std::unique_ptr<Reference> ref);
 
     /**
      *
