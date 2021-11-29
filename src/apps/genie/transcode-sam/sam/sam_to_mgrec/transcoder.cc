@@ -228,8 +228,7 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>& refNames,
-                RefInfo& ref) {
+void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>&, RefInfo& ref) {
     if (r.getClassID() == genie::core::record::ClassType::CLASS_U) {
         return;
     }
@@ -242,7 +241,7 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
     for (auto& a : r.getAlignments()) {
         auto pos = a.getPosition();
         auto refSeq = ref.getMgr()
-                          ->load(refNames[r.getAlignmentSharedData().getSeqID()].first, pos,
+                          ->load(ref.getMgr()->ID2Ref(r.getAlignmentSharedData().getSeqID()), pos,
                                  pos + r.getMappedLength(alignment_ctr, 0))
                           .getString(pos, pos + r.getMappedLength(alignment_ctr, 0));
         auto cigar = a.getAlignment().getECigar();
@@ -267,10 +266,9 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                 const auto& split =
                     dynamic_cast<const genie::core::record::alignment_split::SameRec&>(*a.getAlignmentSplits().front());
                 pos = a.getPosition() + split.getDelta();
-                refSeq = ref.getMgr()
-                             ->load(refNames[r.getAlignmentSharedData().getSeqID()].first, pos,
-                                    pos + r.getMappedLength(alignment_ctr, 1))
-                             .getString(pos, pos + r.getMappedLength(alignment_ctr, 1));
+                auto ex = ref.getMgr()->load(ref.getMgr()->ID2Ref(r.getAlignmentSharedData().getSeqID()), pos,
+                                             pos + r.getMappedLength(alignment_ctr, 1));
+                refSeq = ex.getString(pos, pos + r.getMappedLength(alignment_ctr, 1));
                 cigar = split.getAlignment().getECigar();
                 seq = r.getSegments()[r.isRead1First()].getSequence();
 
@@ -286,8 +284,7 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                 }
 
                 newBox.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(
-                    split.getDelta(),
-                    std::move(alg)));
+                    split.getDelta(), std::move(alg)));
             } else {
                 newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
             }
@@ -302,6 +299,19 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
 void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std::pair<std::string, size_t>>& refs) {
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
     RefInfo refinf(options.fasta_file_path);
+
+    std::vector<size_t> sam_hdr_to_fasta_lut;
+    for (size_t i = 0; i < refs.size(); ++i) {
+        bool found = false;
+        for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
+            if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
+                sam_hdr_to_fasta_lut.push_back(j);
+                found = true;
+                break;
+            }
+        }
+        UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
+    }
 
     std::unique_ptr<std::ostream> total_output;
     std::ostream* out_stream = &std::cout;
@@ -334,6 +344,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         auto* reader = heap.top();
         heap.pop();
         auto rec = reader->moveRecord();
+        rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
 
         fix_ecigar(rec, refs, refinf);
 
