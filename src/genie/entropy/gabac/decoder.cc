@@ -46,8 +46,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     }
     int32_t typeNum = -1;
     for (size_t i = 0; i < num_tokentype_descriptors; ++i) {
-        UTILS_DIE_IF(offset >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
-        const size_t READAHEAD = 11;
+        const size_t READAHEAD = std::min<size_t>(11, remainingData.getRawSize() - offset - 1);
+        UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
         util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
                                               remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
