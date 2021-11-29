@@ -197,8 +197,8 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
     if (!pOpts.inputRefFile.empty()) {
-        if (file_extension(pOpts.inputRefFile) == "fasta") {
-            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
+        if (file_extension(pOpts.inputRefFile) == "fasta" || file_extension(pOpts.inputRefFile) == "fa") {
+            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.find_last_of('.') + 1) + "fai";
             auto fasta_file = genie::util::make_unique<std::ifstream>(pOpts.inputRefFile);
             if (!ghc::filesystem::exists(fai)) {
                 std::cerr << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
