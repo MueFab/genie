@@ -5,6 +5,7 @@
  */
 
 #include "genie/entropy/gabac/decoder.h"
+#include <algorithm>
 #include <iostream>
 #include <tuple>
 #include <utility>

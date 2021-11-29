@@ -124,7 +124,6 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     std::vector<Segment>& getSegments();
@@ -148,7 +147,6 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     const std::vector<AlignmentBox>& getAlignments() const;

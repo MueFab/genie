@@ -5,6 +5,8 @@
  */
 
 #include "genie/read/refcoder/encoder.h"
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
