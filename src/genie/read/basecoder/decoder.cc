@@ -139,7 +139,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
 
     const auto MSCORE = (uint32_t)container.pull(core::GenSub::MSCORE);
 
-    const auto RGROUP = container.isEnd(core::GenSub::RGROUP) ? 0 : container.pull(core::GenSub::RGROUP);
+    // const auto RGROUP = container.isEnd(core::GenSub::RGROUP) ? 0 : container.pull(core::GenSub::RGROUP);
 
     position += container.pull(core::GenSub::POS_MAPPING_FIRST);
     const auto POSITION = position;
@@ -153,8 +153,8 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
-    std::get<1>(ret) = core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "",
-                                            std::to_string(RGROUP), FLAGS);
+    std::get<1>(ret) =
+        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "Genie", FLAGS);
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(ret).addSegment(std::move(segment));
