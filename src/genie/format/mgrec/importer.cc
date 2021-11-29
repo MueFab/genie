@@ -36,14 +36,14 @@ bool isECigarSupported(const std::string& ecigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::isRecordSupported(const core::record::Record& rec) {
+    if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+        rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
+        discarded_missing_pair_U++;
+        return false;
+    }
     for (const auto& a : rec.getAlignments()) {
         if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
             discarded_HM++;
-            return false;
-        }
-        if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
-            rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
-            discarded_missing_pair_U++;
             return false;
         }
         if (!isECigarSupported(a.getAlignment().getECigar())) {
