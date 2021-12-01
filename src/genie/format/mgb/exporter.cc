@@ -87,7 +87,12 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         }
         au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
     }
-    std::cerr << "Writing AU " << au.getID() << "..." << std::endl;
+    std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
+    std::cerr << "Writing AU " << au.getID() << ": class " << lut[(int)au.getClass()];
+    if (au.getClass() != genie::core::record::ClassType::CLASS_U) {
+        std::cerr << ", Sequence " << au.getAlignmentInfo().getRefID();
+    }
+    std::cerr << ", " << au.getReadCount() << " records..." << std::endl;
     au.write(writer);
     id_ctr++;
     getStats().addDouble("time-mgb-export", watch.check());
