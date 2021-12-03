@@ -17,9 +17,8 @@ namespace external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Fasta::Fasta(std::string _ref_uri, ChecksumAlgorithm check, std::string firstChecksum)
-    : ExternalRef(std::move(_ref_uri), check, ReferenceType::FASTA_REF),
-      ref_type_other_checksums({std::move(firstChecksum)}) {}
+Fasta::Fasta(std::string _ref_uri, ChecksumAlgorithm check)
+    : ExternalRef(std::move(_ref_uri), check, ReferenceType::FASTA_REF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

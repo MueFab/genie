@@ -34,6 +34,7 @@ set(source_files
         classifier-bypass.cc
         classifier-regroup.cc
         constants.cc
+        flowgraph.cc
         flowgraph-convert.cc
         flowgraph-decode.cc
         flowgraph-encode.cc
@@ -66,7 +67,8 @@ set(source_files
         meta/external-ref/raw.cc
         meta/external-ref/mpeg.cc
         meta/blockheader/enabled.cc
-        meta/blockheader/disabled.cc)
+        meta/blockheader/disabled.cc
+        )
 
 add_library(genie-core ${source_files})
 

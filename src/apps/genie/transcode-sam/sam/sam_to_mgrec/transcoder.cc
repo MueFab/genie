@@ -36,16 +36,25 @@ RefInfo::RefInfo(const std::string& fasta_name)
     }
 
     std::string fai_name = fasta_name.substr(0, fasta_name.find_last_of('.')) + ".fai";
+    std::string sha_name = fasta_name.substr(0, fasta_name.find_last_of('.')) + ".sha256";
     if (!ghc::filesystem::exists(fai_name)) {
         std::ifstream fasta_in(fasta_name);
         std::ofstream fai_out(fai_name);
         genie::format::fasta::FastaReader::index(fasta_in, fai_out);
     }
+    if (!ghc::filesystem::exists(sha_name)) {
+        std::ifstream fasta_in(fasta_name);
+        std::ifstream fai_in(fai_name);
+        genie::format::fasta::FaiFile faifile(fai_in);
+        std::ofstream sha_out(sha_name);
+        genie::format::fasta::FastaReader::hash(faifile, fai_in, sha_out);
+    }
 
     fastaFile = genie::util::make_unique<std::ifstream>(fasta_name);
     faiFile = genie::util::make_unique<std::ifstream>(fai_name);
+    shaFile = genie::util::make_unique<std::ifstream>(sha_name);
 
-    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, refMgr.get());
+    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(), fasta_name);
     valid = true;
 }
 

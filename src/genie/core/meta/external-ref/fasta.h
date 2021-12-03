@@ -35,7 +35,7 @@ class Fasta : public ExternalRef {
      * @param check
      * @param firstChecksum
      */
-    Fasta(std::string _ref_uri, ChecksumAlgorithm check, std::string firstChecksum);
+    Fasta(std::string _ref_uri, ChecksumAlgorithm check);
 
     /**
      * @brief

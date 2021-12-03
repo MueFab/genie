@@ -203,6 +203,12 @@ class FlowGraphEncode : public FlowGraph {
      * @return
      */
     core::stats::PerfStats getStats() override;
+
+    /**
+     *
+     * @return
+     */
+    core::meta::Dataset getMeta() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/dataset.h"
 #include "genie/core/stats/perf-stats.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +33,12 @@ class FlowGraph {
      *
      */
     virtual void stop(bool) {}
+
+    /**
+     *
+     * @return
+     */
+    virtual core::meta::Dataset getMeta() const;
 
     /**
      *
