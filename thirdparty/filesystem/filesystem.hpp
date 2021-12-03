@@ -45,6 +45,11 @@
 #ifndef GHC_FILESYSTEM_H
 #define GHC_FILESYSTEM_H
 
+#ifdef _WIN32
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#endif
+
 // #define BSD manifest constant only in
 // sys/param.h
 #ifndef _WIN32
@@ -6013,5 +6018,9 @@ GHC_INLINE recursive_directory_iterator end(const recursive_directory_iterator&)
 // cleanup some macros
 #undef GHC_INLINE
 #undef GHC_EXPAND_IMPL
+
+#ifdef _WIN32
+#pragma warning( pop )
+#endif
 
 #endif  // GHC_FILESYSTEM_H

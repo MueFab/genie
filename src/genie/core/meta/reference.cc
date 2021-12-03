@@ -103,9 +103,7 @@ const std::vector<Sequence>& Reference::getSequences() const { return seqs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::addSequence(Sequence s) {
-    seqs.emplace_back(std::move(s));
-}
+void Reference::addSequence(Sequence s) { seqs.emplace_back(std::move(s)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

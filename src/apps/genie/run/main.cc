@@ -209,15 +209,16 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
 
     std::string json_uri_path;
-    if(ghc::filesystem::exists(pOpts.inputFile + ".json")) {
+    if (ghc::filesystem::exists(pOpts.inputFile + ".json")) {
         genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
-        if(data.getReference()) {
-            std::string uri = dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data.getReference()->getBase()).getURI();
+        if (data.getReference()) {
+            std::string uri =
+                dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data.getReference()->getBase()).getURI();
             std::string scheme = "file://";
             UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme, "Unknown URI scheme: " + uri);
             std::string path = uri.substr(scheme.length());
             std::cerr << "Extracted reference URI: " << uri << std::endl;
-            if(ghc::filesystem::exists(path)) {
+            if (ghc::filesystem::exists(path)) {
                 std::cerr << "Reference URI valid." << std::endl;
                 json_uri_path = path;
             } else {

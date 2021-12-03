@@ -9,7 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/meta/reference.h"
 #include <algorithm>
 #include <deque>
 #include <map>
@@ -18,6 +17,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "genie/core/meta/reference.h"
 #include "genie/core/reference-collection.h"
 #include "genie/util/make-unique.h"
 
@@ -200,7 +200,6 @@ class ReferenceManager {
              */
             void inc(size_t off = 1);
 
-
             /**
              *
              * @return
@@ -219,7 +218,6 @@ class ReferenceManager {
          * @return
          */
         Stepper getStepper() const;
-
 
         /**
          *

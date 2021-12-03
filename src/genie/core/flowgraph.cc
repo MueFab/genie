@@ -14,8 +14,7 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::meta::Dataset genie::core::FlowGraph::getMeta() const {
-    return {0, genie::util::make_unique<genie::core::meta::blockheader::Enabled>(false, false),
-            "", ""};
+    return {0, genie::util::make_unique<genie::core::meta::blockheader::Enabled>(false, false), "", ""};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

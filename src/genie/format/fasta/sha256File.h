@@ -1,11 +1,11 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#ifndef GENIE_SHA256FILE_H
-#define GENIE_SHA256FILE_H
+#ifndef SRC_GENIE_FORMAT_FASTA_SHA256FILE_H_
+#define SRC_GENIE_FORMAT_FASTA_SHA256FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,13 +35,9 @@ class Sha256File {
     static std::vector<std::pair<std::string, std::string>> read(std::istream& file);
 
  public:
-    explicit Sha256File(std::istream& stream) {
-        data = read(stream);
-    }
+    explicit Sha256File(std::istream& stream) { data = read(stream); }
 
-    const std::vector<std::pair<std::string, std::string>>& getData() const {
-        return data;
-    }
+    const std::vector<std::pair<std::string, std::string>>& getData() const { return data; }
 
     /**
      * @brief
@@ -75,7 +71,7 @@ class Sha256File {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SHA256FILE_H
+#endif  // SRC_GENIE_FORMAT_FASTA_SHA256FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

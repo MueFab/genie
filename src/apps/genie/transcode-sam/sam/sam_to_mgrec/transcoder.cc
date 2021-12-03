@@ -54,7 +54,8 @@ RefInfo::RefInfo(const std::string& fasta_name)
     faiFile = genie::util::make_unique<std::ifstream>(fai_name);
     shaFile = genie::util::make_unique<std::ifstream>(sha_name);
 
-    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(), fasta_name);
+    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
+                                                                       fasta_name);
     valid = true;
 }
 
