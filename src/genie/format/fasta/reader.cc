@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <istream>
 #include <string>
+#include <utility>
 #include <vector>
 #include "genie/util/runtime-exception.h"
 
@@ -116,7 +117,7 @@ core::meta::Reference FastaReader::getMeta() const {
     auto* f_ptr = f.get();
     core::meta::Reference ret(basename, 0, 0, 0, std::move(f), "");
     for (const auto& s : hashFile.getData()) {
-        ret.addSequence(genie::core::meta::Sequence(s.first, fai.getLength(s.first), id++));
+        ret.addSequence(genie::core::meta::Sequence(s.first, fai.getLength(s.first), static_cast<uint16_t>(id++)));
         f_ptr->addChecksum(s.second);
     }
     return ret;

@@ -163,8 +163,9 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
-
     if (inputFile.substr(0, 2) != "-.") {
+        inputFile = ghc::filesystem::canonical(inputFile).string();
+        std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
         std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
                   << std::endl;
     } else {
@@ -174,6 +175,8 @@ void ProgramOptions::validate() {
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
         if (inputSupFile.substr(0, 2) != "-.") {
+            inputSupFile = ghc::filesystem::canonical(inputSupFile).string();
+            std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
             std::cerr << "Input supplementary file: " << inputSupFile << " with size "
                       << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
         } else {
@@ -185,6 +188,8 @@ void ProgramOptions::validate() {
 
     validateOutputFile(outputFile, forceOverwrite);
     if (outputFile.substr(0, 2) != "-.") {
+        outputFile = ghc::filesystem::weakly_canonical(outputFile).string();
+        std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
         std::cerr << "Output file: " << outputFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {
@@ -193,7 +198,9 @@ void ProgramOptions::validate() {
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
-        if (outputFile.substr(0, 2) != "-.") {
+        if (outputSupFile.substr(0, 2) != "-.") {
+            outputSupFile = ghc::filesystem::weakly_canonical(outputSupFile).string();
+            std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
             std::cerr << "Output supplementary file: " << outputSupFile << " with "
                       << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
                       << std::endl;

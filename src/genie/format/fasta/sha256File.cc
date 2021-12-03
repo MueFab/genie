@@ -1,10 +1,11 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #include "genie/format/fasta/sha256File.h"
+#include <algorithm>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,11 +44,11 @@ void Sha256File::write(std::ostream& file, const std::vector<std::pair<std::stri
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string Sha256File::hex2bytes(const std::string& hex) {
-    int len = hex.length();
+    int len = static_cast<int>(hex.length());
     std::string newString;
     for (int i = 0; i < len; i += 2) {
         std::string byte = hex.substr(i, 2);
-        char chr = (char)(int)strtol(byte.c_str(), nullptr, 16);
+        char chr = static_cast<char>(static_cast<int>(strtol(byte.c_str(), nullptr, 16)));
         newString.push_back(chr);
     }
     return newString;
