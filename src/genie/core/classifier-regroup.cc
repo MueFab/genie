@@ -206,6 +206,16 @@ record::Chunk ClassifierRegroup::getChunk() {
 
     ret = std::move(finishedChunks.front());
     finishedChunks.erase(finishedChunks.begin());
+
+#define AU_DEBUG_WRITE 0
+#if AU_DEBUG_WRITE
+    static int i = 0;
+    std::ofstream tmpOut("AU_" + std::to_string(i++) + ".mgrec");
+    util::BitWriter bw(&tmpOut);
+    for (const auto &r : ret.getData()) {
+        r.write(bw);
+    }
+#endif
     return ret;
 }
 
@@ -256,14 +266,19 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                           dynamic_cast<const core::record::alignment_split::SameRec&>(
                               *r.getAlignments().front().getAlignmentSplits().front())
                               .getDelta();
+                    end = std::max(end, r.getAlignments().front().getPosition() + r.getMappedLength(0, 0));
                 }
                 record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().getSeqID()),
                                                       r.getAlignments().front().getPosition(), end);
             }
         }
 
+        if(currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().empty()) {
+            currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef() = record_reference;
+        } else {
+            currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
+        }
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
-        currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
         if (currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().size() == auSize) {
             auto& classblock = currentChunks[refBased][paired][(uint8_t)classtype - 1];
             queueFinishedChunk(classblock);

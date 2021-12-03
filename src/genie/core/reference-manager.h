@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "genie/core/meta/reference.h"
 #include <algorithm>
 #include <deque>
 #include <map>

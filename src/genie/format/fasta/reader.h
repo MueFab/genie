@@ -12,7 +12,11 @@
 #include <map>
 #include <set>
 #include <string>
+#include "genie/core/meta/external-ref/fasta.h"
+#include "genie/core/meta/reference.h"
 #include "genie/format/fasta/fai-file.h"
+#include "genie/format/fasta/sha256File.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,8 +29,10 @@ namespace fasta {
  */
 class FastaReader {
  private:
+    Sha256File hashFile;
     FaiFile fai;          //!<
     std::istream* fasta;  //!<
+    std::string path;
 
  public:
     /**
@@ -34,7 +40,7 @@ class FastaReader {
      * @param fastaFile
      * @param faiFile
      */
-    FastaReader(std::istream& fastaFile, std::istream& faiFile);
+    FastaReader(std::istream& fastaFile, std::istream& faiFile, std::istream& sha256File, std::string _path);
 
     /**
      *
@@ -60,10 +66,23 @@ class FastaReader {
 
     /**
      *
+     * @return
+     */
+    core::meta::Reference getMeta() const;
+
+    /**
+     *
      * @param fasta
      * @param fai
      */
     static void index(std::istream& fasta, std::ostream& fai);
+
+    /**
+     *
+     * @param fasta
+     * @param fai
+     */
+    static void hash(const FaiFile& fai, std::istream& fasta, std::ostream& hash);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

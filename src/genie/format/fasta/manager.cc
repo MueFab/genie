@@ -19,8 +19,9 @@ namespace fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Manager::Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr)
-    : core::ReferenceSource(mgr), reader(fasta, fai) {
+Manager::Manager(std::istream& fasta, std::istream& fai, std::istream& sha, core::ReferenceManager* mgr,
+                 std::string path)
+    : core::ReferenceSource(mgr), reader(fasta, fai, sha, std::move(path)) {
     auto ref = generateRefHandles();
     int i = 0;
     for (auto& r : ref) {
@@ -54,6 +55,10 @@ std::vector<std::unique_ptr<core::Reference>> Manager::generateRefHandles() {
     }
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::meta::Reference Manager::getMeta() const { return reader.getMeta(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

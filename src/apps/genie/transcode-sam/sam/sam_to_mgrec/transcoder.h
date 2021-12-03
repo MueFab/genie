@@ -101,6 +101,7 @@ class RefInfo {
     std::unique_ptr<genie::format::fasta::Manager> fastaMgr;  //!< @brief
     std::unique_ptr<std::istream> fastaFile;                  //!< @brief
     std::unique_ptr<std::istream> faiFile;                    //!< @brief
+    std::unique_ptr<std::istream> shaFile;                    //!< @brief
     bool valid;                                               //!< @brief
 
  public:

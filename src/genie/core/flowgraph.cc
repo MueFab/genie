@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/reference-source.h"
+#include "genie/core/flowgraph.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,12 +13,9 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceSource::ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-genie::core::meta::Reference ReferenceSource::getMeta() const {
-    return {"", 0, 0, 0, util::make_unique<meta::InternalRef>(0, 0), "Placeholder"};
+core::meta::Dataset genie::core::FlowGraph::getMeta() const {
+    return {0, genie::util::make_unique<genie::core::meta::blockheader::Enabled>(false, false),
+            "", ""};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

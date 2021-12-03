@@ -25,12 +25,11 @@ namespace meta {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch, std::unique_ptr<RefBase> base,
-                     Sequence seq1, std::string metadata)
+                     std::string metadata)
     : reference_name(std::move(name)),
       reference_major_version(major),
       reference_minor_version(minor),
       reference_patch_version(patch),
-      seqs({std::move(seq1)}),
       ref(std::move(base)),
       reference_metadata_value(std::move(metadata)) {}
 
@@ -101,6 +100,12 @@ uint32_t Reference::getPatchVersion() const { return reference_patch_version; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<Sequence>& Reference::getSequences() const { return seqs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Reference::addSequence(Sequence s) {
+    seqs.emplace_back(std::move(s));
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

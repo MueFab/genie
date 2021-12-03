@@ -214,6 +214,7 @@ void validateOutputFile(const std::string &file, bool forced) {
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
+        inputFile = ghc::filesystem::canonical(inputFile);
         std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
                   << std::endl;
     } else {
@@ -226,6 +227,7 @@ void ProgramOptions::validate() {
                   << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
     }
     if (!inputRefFile.empty()) {
+        inputRefFile = ghc::filesystem::canonical(inputRefFile);
         validateInputFile(inputRefFile);
         std::cerr << "Input reference file: " << inputRefFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputRefFile)) << std::endl;
@@ -239,12 +241,14 @@ void ProgramOptions::validate() {
 
     std::cerr << std::endl;
 
+    workingDirectory = ghc::filesystem::canonical(workingDirectory);
     validateWorkingDir(workingDirectory);
     std::cerr << "Working directory: " << workingDirectory << " with "
               << size_string(ghc::filesystem::space(workingDirectory).available) << " available" << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    if (inputFile.substr(0, 2) != "-.") {
+    if (outputFile.substr(0, 2) != "-.") {
+        outputFile = ghc::filesystem::canonical(outputFile);
         std::cerr << "Output file: " << outputFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {

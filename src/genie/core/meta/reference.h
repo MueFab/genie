@@ -46,8 +46,7 @@ class Reference {
      * @param seq1
      * @param metadata
      */
-    Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch, std::unique_ptr<RefBase> base,
-              Sequence seq1, std::string metadata);
+    Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch, std::unique_ptr<RefBase> base, std::string metadata);
 
     /**
      * @brief
@@ -90,6 +89,12 @@ class Reference {
      * @return
      */
     const std::vector<Sequence>& getSequences() const;
+
+    /**
+     * @brief
+     * @param s
+     */
+    void addSequence(Sequence s);
 
     /**
      * @brief

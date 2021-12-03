@@ -90,9 +90,44 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
     std::cerr << "Writing AU " << au.getID() << ": class " << lut[(int)au.getClass()];
     if (au.getClass() != genie::core::record::ClassType::CLASS_U) {
-        std::cerr << ", Sequence " << au.getAlignmentInfo().getRefID();
+        std::cerr << ", Position [" << au.getAlignmentInfo().getRefID() << "-" << au.getAlignmentInfo().getStartPos()
+                  << ":" << au.getAlignmentInfo().getEndPos() << "]";
     }
-    std::cerr << ", " << au.getReadCount() << " records..." << std::endl;
+    std::cerr << ", " << au.getReadCount() << " records";
+    auto& tmp_ps = parameter_stash[au.getParameterID()];
+
+    if (au.getClass() == genie::core::record::ClassType::CLASS_U) {
+        if (!tmp_ps.isComputedReference()) {
+            std::cerr << " (Low Latency)";
+        } else {
+            if (tmp_ps.getComputedRef().getAlgorithm() ==
+                core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
+                std::cerr << " (Global Assembly)";
+            } else {
+                UTILS_DIE(
+                    "Computed ref not supported: " +
+                    std::to_string(static_cast<int>(
+                        tmp_ps.getComputedRef().getAlgorithm())));
+            }
+        }
+    } else {
+        if (!tmp_ps.isComputedReference()) {
+            std::cerr << " (Reference)";
+        } else {
+            if (tmp_ps.getComputedRef().getAlgorithm() ==
+                core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
+                std::cerr << " (Local Assembly)";
+            } else {
+                UTILS_DIE(
+                    "Computed ref not supported: " +
+                    std::to_string(static_cast<int>(
+                        tmp_ps.getComputedRef().getAlgorithm())));
+            }
+        }
+    }
+    std::cerr << "..." << std::endl;
+
+
     au.write(writer);
     id_ctr++;
     getStats().addDouble("time-mgb-export", watch.check());
