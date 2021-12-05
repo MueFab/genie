@@ -214,6 +214,8 @@ void validateOutputFile(const std::string &file, bool forced) {
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
+        inputFile = ghc::filesystem::canonical(inputFile).string();
+        std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
         std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
                   << std::endl;
     } else {
@@ -222,11 +224,15 @@ void ProgramOptions::validate() {
 
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
+        inputSupFile = ghc::filesystem::canonical(inputSupFile).string();
+        std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
         std::cerr << "Input supplementary file: " << inputSupFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
     }
     if (!inputRefFile.empty()) {
         validateInputFile(inputRefFile);
+        inputRefFile = ghc::filesystem::canonical(inputRefFile).string();
+        std::replace(inputRefFile.begin(), inputRefFile.end(), '\\', '/');
         std::cerr << "Input reference file: " << inputRefFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputRefFile)) << std::endl;
     }
@@ -240,11 +246,15 @@ void ProgramOptions::validate() {
     std::cerr << std::endl;
 
     validateWorkingDir(workingDirectory);
+    workingDirectory = ghc::filesystem::canonical(workingDirectory).string();
+    std::replace(workingDirectory.begin(), workingDirectory.end(), '\\', '/');
     std::cerr << "Working directory: " << workingDirectory << " with "
               << size_string(ghc::filesystem::space(workingDirectory).available) << " available" << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    if (inputFile.substr(0, 2) != "-.") {
+    if (outputFile.substr(0, 2) != "-.") {
+        outputFile = ghc::filesystem::weakly_canonical(outputFile).string();
+        std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
         std::cerr << "Output file: " << outputFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {
@@ -253,6 +263,8 @@ void ProgramOptions::validate() {
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
+        outputSupFile = ghc::filesystem::weakly_canonical(outputSupFile).string();
+        std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
         std::cerr << "Output supplementary file: " << outputSupFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
                   << std::endl;

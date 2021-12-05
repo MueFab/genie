@@ -198,6 +198,17 @@ core::stats::PerfStats FlowGraphEncode::getStats() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+core::meta::Dataset FlowGraphEncode::getMeta() const {
+    core::meta::Dataset ret = {0, genie::util::make_unique<genie::core::meta::blockheader::Enabled>(false, false), "",
+                               ""};
+    if (!refSources.empty()) {
+        ret.setReference(this->refSources.front()->getMeta());
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

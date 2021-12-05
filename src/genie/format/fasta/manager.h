@@ -40,7 +40,7 @@ class Manager : public core::ReferenceSource {
      * @param fai
      * @param mgr
      */
-    Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr);
+    Manager(std::istream& fasta, std::istream& fai, std::istream& sha, core::ReferenceManager* mgr, std::string path);
 
     /**
      *
@@ -54,6 +54,12 @@ class Manager : public core::ReferenceSource {
      * @return
      */
     uint64_t getLength(const std::string& seq) const;
+
+    /**
+     *
+     * @return
+     */
+    genie::core::meta::Reference getMeta() const override;
 
     /**
      *
