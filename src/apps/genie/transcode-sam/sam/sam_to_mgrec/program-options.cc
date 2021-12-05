@@ -158,6 +158,8 @@ std::string parent_dir(const std::string &path) {
 void Config::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
+        inputFile = ghc::filesystem::canonical(inputFile).string();
+        std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
         std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
                   << std::endl;
     } else {
@@ -168,6 +170,8 @@ void Config::validate() {
 
     validateOutputFile(outputFile, forceOverwrite);
     if (outputFile.substr(0, 2) != "-.") {
+        outputFile = ghc::filesystem::weakly_canonical(outputFile).string();
+        std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
         std::cerr << "Output file: " << outputFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {
@@ -196,6 +200,7 @@ void Config::validate() {
         fasta_file_path = "";
     } else {
         validateReference(fasta_file_path);
+        fasta_file_path = ghc::filesystem::canonical(fasta_file_path).string();
     }
 
     std::cerr << std::endl;

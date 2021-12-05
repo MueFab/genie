@@ -50,7 +50,7 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
 
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
-        temp_dir = working_dir + "/" + random_str + '/';
+        temp_dir = working_dir + "/" + random_str;
         if (!ghc::filesystem::exists(temp_dir)) break;
     }
     UTILS_DIE_IF(!ghc::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");

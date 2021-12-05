@@ -107,17 +107,28 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
               std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
     std::string fai = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "fai";
+    std::string sha = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "sha256";
     auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
     if (!ghc::filesystem::exists(fai)) {
         std::cerr << "Indexing " << fastaFile << " ..." << std::endl;
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
     }
+    if (!ghc::filesystem::exists(sha)) {
+        std::cerr << "Calculaing hashes " << fastaFile << " ..." << std::endl;
+        std::ofstream sha_file(sha);
+        std::ifstream fai_file(fai);
+        genie::format::fasta::FaiFile fai_reader(fai_file);
+        genie::format::fasta::FastaReader::hash(fai_reader, *fasta_file, sha_file);
+    }
     auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+    auto sha_file = genie::util::make_unique<std::ifstream>(sha);
     inputFiles.push_back(std::move(fasta_file));
     inputFiles.push_back(std::move(fai_file));
+    inputFiles.push_back(std::move(sha_file));
     flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-        **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
+        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+        fastaFile));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -196,22 +207,53 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
     constexpr size_t BLOCKSIZE = 256000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
-    if (!pOpts.inputRefFile.empty()) {
-        if (file_extension(pOpts.inputRefFile) == "fasta" || file_extension(pOpts.inputRefFile) == "fa") {
-            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.find_last_of('.') + 1) + "fai";
-            auto fasta_file = genie::util::make_unique<std::ifstream>(pOpts.inputRefFile);
+
+    std::string json_uri_path;
+    if (ghc::filesystem::exists(pOpts.inputFile + ".json")) {
+        genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
+        if (data.getReference()) {
+            std::string uri =
+                dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data.getReference()->getBase()).getURI();
+            std::string scheme = "file://";
+            UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme, "Unknown URI scheme: " + uri);
+            std::string path = uri.substr(scheme.length());
+            std::cerr << "Extracted reference URI: " << uri << std::endl;
+            if (ghc::filesystem::exists(path)) {
+                std::cerr << "Reference URI valid." << std::endl;
+                json_uri_path = path;
+            } else {
+                std::cerr << "Reference URI invalid. Falling back to CLI reference." << std::endl;
+                json_uri_path = pOpts.inputRefFile;
+            }
+        }
+    }
+    if (!json_uri_path.empty()) {
+        if (file_extension(json_uri_path) == "fasta" || file_extension(json_uri_path) == "fa") {
+            std::string fai = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "fai";
+            std::string sha = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "sha256";
+            auto fasta_file = genie::util::make_unique<std::ifstream>(json_uri_path);
             if (!ghc::filesystem::exists(fai)) {
-                std::cerr << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
+                std::cerr << "Indexing " << json_uri_path << " ..." << std::endl;
                 std::ofstream fai_file(fai);
                 genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
             }
+            if (!ghc::filesystem::exists(sha)) {
+                std::cerr << "Calculating hashes " << json_uri_path << " ..." << std::endl;
+                std::ofstream sha_file(sha);
+                std::ifstream fai_file(fai);
+                genie::format::fasta::FaiFile fai_reader(fai_file);
+                genie::format::fasta::FastaReader::hash(fai_reader, *fasta_file, sha_file);
+            }
             auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+            auto sha_file = genie::util::make_unique<std::ifstream>(sha);
             inputFiles.push_back(std::move(fasta_file));
             inputFiles.push_back(std::move(fai_file));
+            inputFiles.push_back(std::move(sha_file));
             flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-                **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
-        } else if (file_extension(pOpts.inputRefFile) == "mgb") {
-            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputRefFile));
+                **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+                json_uri_path));
+        } else if (file_extension(json_uri_path) == "mgb") {
+            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(json_uri_path));
             flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
                 *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
         }
@@ -254,6 +296,12 @@ int main(int argc, char* argv[]) {
     }
 
     flowGraph->run();
+
+    if (getOperation(pOpts.inputFile, pOpts.outputFile) == OperationCase::ENCODE) {
+        std::ofstream jsonfile(pOpts.outputFile + ".json");
+        auto jsonstring = flowGraph->getMeta().toJson().dump(4);
+        jsonfile.write(jsonstring.data(), jsonstring.length());
+    }
 
     auto stats = flowGraph->getStats();
     stats.addDouble("time-total", watch.check());

@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include "genie/core/meta/internal-ref.h"
 #include "genie/core/reference-manager.h"
 #include "genie/core/reference.h"
 
@@ -24,13 +25,24 @@ namespace core {
  */
 class ReferenceSource {
  protected:
-    ReferenceManager* refMgr;  //!<
+    ReferenceManager* refMgr;  //!< @brief
  public:
     /**
-     *
+     * @brief
      * @param mgr
      */
     explicit ReferenceSource(ReferenceManager* mgr);
+
+    /**
+     * @brief
+     * @return
+     */
+    virtual genie::core::meta::Reference getMeta() const;
+
+    /**
+     * @brief
+     */
+    virtual ~ReferenceSource() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
