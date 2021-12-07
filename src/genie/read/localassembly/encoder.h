@@ -9,11 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include "genie/core/read-encoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/read/basecoder/encoder.h"
+#include "genie/read/basecoder/encoderstub.h"
 #include "genie/read/localassembly/local-reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,105 +25,75 @@ namespace read {
 namespace localassembly {
 
 /**
- * @brief Module using local assembly to encode aligned reads
+ * @brief Module using a local computed reference to encode records
  */
-class Encoder : public core::ReadEncoder {
+class Encoder : public basecoder::EncoderStub {
  private:
-    bool debug;                //!< @brief If true, debugging information will be printed to std::cerr
-    uint32_t cr_buf_max_size;  //!< @brief Buffer size for local assembly reference memory
+    bool debug;                //!< @brief print debug output
+    uint32_t cr_buf_max_size;  //!< @brief maximum amount of bases in the local assembly
 
     /**
-     * @brief Internal local assembly state (not exposed publicly)
+     * @brief Internal encoding state (not exposed publicly)
      */
-    struct LaeState {
+    struct LAEncodingState : public basecoder::EncoderStub::EncodingState {
         /**
-         * @brief Construct internal variables with default values
-         * @param cr_buf_max_size Buffer size for local assembly reference memory
-         * @param startingPos Starting position of access unit
+         * @brief Construct form raw data
+         * @param data Chunk of data to construct from
+         * @param _cr_buf_max_size  LA parameter
          */
-        explicit LaeState(size_t cr_buf_max_size, uint64_t startingPos);
-        LocalReference refCoder;            //!< @brief Building the local reference
-        basecoder::Encoder readCoder;       //!< @brief Generating the descriptor streams
-        bool pairedEnd;                     //!< @brief Current guess regarding pairing
-        size_t readLength;                  //!< @brief Current guess regarding read length
-        core::record::ClassType classType;  //!< @brief Current guess regarding class type
-        uint64_t minPos;                    //!< @brief
-        uint64_t maxPos;                    //!< @brief
+        explicit LAEncodingState(const core::record::Chunk& data, uint32_t _cr_buf_max_size);
+        LocalReference refCoder;  //!< @brief Local assembly
     };
-
     /**
-     * @brief Print debug information to the terminal
-     * @param state Current local assembly state
-     * @param ref1 Reference sequence for the first aligned record in a pair
-     * @param ref2 Reference sequence for second record in a pair, if any
-     * @param r The record we are currently processing
+     * @brief Print current local assembly state
+     * @param state Current state
+     * @param ref1 Reference of first segment
+     * @param ref2 Reference of second segment
+     * @param r Current record
      */
-    void printDebug(const Encoder::LaeState& state, const std::string& ref1, const std::string& ref2,
+    void printDebug(const LAEncodingState& state, const std::string& ref1, const std::string& ref2,
                     const core::record::Record& r) const;
 
     /**
-     * @brief Updates the assembly itself. The local reference will be updated and descriptor streams extended
-     * @param r The record we will be updating with
-     * @param srec Paired alignment extracted from the record
-     * @param state Current local assembly state
+     * @brief Pack encoded data into an access unit
+     * @param id Multithreading id
+     * @param qv Encoded quality values
+     * @param rname Encoded record names
+     * @param state Encoding state
+     * @return Access unit with parameters
      */
-    void updateAssembly(const core::record::Record& r, Encoder::LaeState& state) const;
+    core::AccessUnit pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+                          EncodingState& state) override;
 
     /**
-     * @brief Checks if there is an additional alignment available and converts it into the correct format
-     * @param state Current local assembly state
-     * @param r Current record
-     * @return Preprocessed alignment for pair
+     * @brief Calculate references for record from local assembly
+     * @param r Record to calculate for
+     * @param state Encoding state
+     * @return Pair of references. If unpaired, second ref remains empty.
      */
-    const core::record::alignment_split::SameRec& getPairedAlignment(const Encoder::LaeState& state,
-                                                                     const core::record::Record& r) const;
+    std::pair<std::string, std::string> getReferences(const core::record::Record& r, EncodingState& state) override;
 
     /**
-     * @brief Update guesses regarding read length, pairing ...
-     * @param state Current local assembly state
-     * @param r Current input record
+     * @brief Create a new encoding state form chunk of data
+     * @param data Chunk to create from
+     * @return LAEncodingState
      */
-    void updateGuesses(const core::record::Record& r, Encoder::LaeState& state) const;
-
-    /**
-     * @brief Generate a full RawAccessUnit and parameter set as a last step of encoding
-     * @param id Block identifier for the current data
-     * @param state The state used throughout the current encoding
-     * @return RawAccessUnit ready for entropy core
-     */
-    core::AccessUnit pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                          std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
-                          Encoder::LaeState& state) const;
+    std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
 
  public:
     /**
-     * @brief Process one chunk of data
-     * @param t The input data
-     * @param id The current block identifier
-     */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
-
-    /**
-     * @brief Initialize the module
-     * @param _cr_buf_max_size Buffer size for local assembly reference memory. Will end up in parameter set
-     * @param _debug If additional debugging information shall be printed
+     * @brief Create encoder with specified parameters
+     * @param _cr_buf_max_size Maximum assembly buffer size
+     * @param _debug If true, debug information is printed
      */
     Encoder(uint32_t _cr_buf_max_size, bool _debug);
 
     /**
-     * @brief
-     * @param cigar
-     * @return
+     * @brief Downgrade class N to class M and then proceed with encoding
+     * @param t Data chunk
+     * @param id Multithreading id
      */
-    static uint64_t getLengthOfCigar(const std::string& cigar);
-
-    /**
-     * @brief
-     * @param position
-     * @param cigar
-     * @param state
-     */
-    void updateAUBoundaries(uint64_t position, const std::string& cigar, LaeState& state) const;
+    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -93,7 +93,7 @@ class FaiFile {
 
  private:
     std::map<std::string, FaiSequence> seqs;  //!< @brief
-    std::map<size_t, std::string> indices; //!< @brief
+    std::map<size_t, std::string> indices;    //!< @brief
 
     /**
      * @brief

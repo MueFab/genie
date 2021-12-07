@@ -65,11 +65,11 @@ class MismatchDecoder : public core::MismatchDecoder {
     std::vector<util::DataBlock> trnsfSubseqData;
 
  private:
-    uint64_t numSubseqSymbolsTotal;  //!< @brief
-    uint64_t numSubseqSymbolsDecoded; //!< @brief
+    uint64_t numSubseqSymbolsTotal;    //!< @brief
+    uint64_t numSubseqSymbolsDecoded;  //!< @brief
 
-    std::vector<TransformedSymbolsDecoder> trnsfSymbolsDecoder; //!< @brief
-    size_t numTrnsfSubseqs; //!< @brief
+    std::vector<TransformedSymbolsDecoder> trnsfSymbolsDecoder;  //!< @brief
+    size_t numTrnsfSubseqs;                                      //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
