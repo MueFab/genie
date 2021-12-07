@@ -25,18 +25,18 @@ namespace mgb {
 class Importer;
 
 /**
- *
+ * @brief
  */
 class DataUnitFactory {
  private:
-    std::map<size_t, core::parameter::ParameterSet> parameters;  //!<
-    core::ReferenceManager* refmgr;                              //!<
-    Importer* importer;                                          //!<
-    bool referenceOnly;                                          //!<
+    std::map<size_t, core::parameter::ParameterSet> parameters;  //!< @brief
+    core::ReferenceManager* refmgr;                              //!< @brief
+    Importer* importer;                                          //!< @brief
+    bool referenceOnly;                                          //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param mgr
      * @param _importer
      * @param ref
@@ -44,20 +44,20 @@ class DataUnitFactory {
     explicit DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer, bool ref);
 
     /**
-     *
+     * @brief
      * @param id
      * @return
      */
     const core::parameter::ParameterSet& getParams(size_t id) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::map<size_t, core::parameter::ParameterSet>& getParams() const;
 
     /**
-     *
+     * @brief
      * @param bitReader
      * @return
      */

@@ -28,43 +28,43 @@ class PerfStats;
 namespace parameter {
 
 /**
- *
+ * @brief
  */
 class DataUnit {
  public:
     /**
-     *
+     * @brief
      */
     enum class DataUnitType : uint8_t { RAW_REFERENCE = 0, PARAMETER_SET = 1, ACCESS_UNIT = 2 };
 
     /**
-     *
+     * @brief
      */
     enum class DatasetType : uint8_t { NON_ALIGNED = 0, ALIGNED = 1, REFERENCE = 2 };
 
  private:
-    DataUnitType data_unit_type;  //!<
+    DataUnitType data_unit_type;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param t
      */
     explicit DataUnit(const DataUnitType &t);
 
     /**
-     *
+     * @brief
      */
     virtual ~DataUnit() = default;
 
     /**
-     *
+     * @brief
      * @param write
      */
     virtual void write(util::BitWriter &write) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     DataUnitType getDataUnitType() const;

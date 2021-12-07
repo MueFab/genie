@@ -22,7 +22,7 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  * @param temp_dir
  * @param cp
  * @param entropycoder

@@ -54,20 +54,20 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
  */
 class Decoder : public genie::core::ReadDecoder {
  private:
-    compression_params cp{};                   //!<
-    bool combine_pairs;                        //!<
-    util::OrderedLock lock;                    //!<
-    std::ofstream fout_unmatched1;             //!<
-    std::ofstream fout_unmatched2;             //!<
-    std::ofstream fout_unmatched_readnames_1;  //!<
-    std::ofstream fout_unmatched_readnames_2;  //!<
+    compression_params cp{};                   //!< @brief
+    bool combine_pairs;                        //!< @brief
+    util::OrderedLock lock;                    //!< @brief
+    std::ofstream fout_unmatched1;             //!< @brief
+    std::ofstream fout_unmatched2;             //!< @brief
+    std::ofstream fout_unmatched_readnames_1;  //!< @brief
+    std::ofstream fout_unmatched_readnames_2;  //!< @brief
 
-    std::string file_unmatched_fastq1;       //!<
-    std::string file_unmatched_fastq2;       //!<
-    std::string file_unmatched_readnames_1;  //!<
-    std::string file_unmatched_readnames_2;  //!<
-    uint32_t unmatched_record_index[2];      //!<
-    std::string basedir;                     //!<
+    std::string file_unmatched_fastq1;       //!< @brief
+    std::string file_unmatched_fastq2;       //!< @brief
+    std::string file_unmatched_readnames_1;  //!< @brief
+    std::string file_unmatched_readnames_2;  //!< @brief
+    uint32_t unmatched_record_index[2];      //!< @brief
+    std::string basedir;                     //!< @brief
 
  public:
     /**

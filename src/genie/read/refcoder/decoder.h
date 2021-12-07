@@ -18,17 +18,17 @@ namespace read {
 namespace refcoder {
 
 /**
- *
+ * @brief
  */
 class Decoder : public core::ReadDecoder {
  public:
     /**
-     *
+     * @brief
      */
     Decoder();
 
     /**
-     *
+     * @brief
      */
     void flowIn(core::AccessUnit&&, const util::Section&) override;
 };

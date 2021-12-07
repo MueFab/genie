@@ -21,7 +21,7 @@ namespace gabac {
 namespace contexttables {
 
 /**
- *
+ * @brief
  * @param numContexts
  * @return
  */

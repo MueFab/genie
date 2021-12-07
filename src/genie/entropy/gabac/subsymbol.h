@@ -20,14 +20,14 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 struct Subsymbol {
-    uint8_t subsymIdx = 0;           //!<
-    uint64_t subsymValue = 0;        //!<
-    uint64_t prvValues[2] = {0, 0};  //!<
-    uint64_t lutNumMaxElems = 0;     //!<
-    uint64_t lutEntryIdx = 0;        //!<
+    uint8_t subsymIdx = 0;           //!< @brief
+    uint64_t subsymValue = 0;        //!< @brief
+    uint64_t prvValues[2] = {0, 0};  //!< @brief
+    uint64_t lutNumMaxElems = 0;     //!< @brief
+    uint64_t lutEntryIdx = 0;        //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

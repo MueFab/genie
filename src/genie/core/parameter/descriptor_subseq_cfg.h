@@ -22,43 +22,43 @@ namespace core {
 namespace parameter {
 
 /**
- *
+ * @brief
  */
 class DescriptorSubseqCfg {
  public:
     /**
-     *
+     * @brief
      */
     DescriptorSubseqCfg();
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg);
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     DescriptorSubseqCfg(DescriptorSubseqCfg&& cfg) noexcept;
 
     /**
-     *
+     * @brief
      * @param cfg
      * @return
      */
     DescriptorSubseqCfg& operator=(const DescriptorSubseqCfg& cfg);
 
     /**
-     *
+     * @brief
      * @param cfg
      * @return
      */
     DescriptorSubseqCfg& operator=(DescriptorSubseqCfg&& cfg) noexcept;
 
     /**
-     *
+     * @brief
      * @param num_classes
      * @param desc
      * @param reader
@@ -66,56 +66,56 @@ class DescriptorSubseqCfg {
     DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~DescriptorSubseqCfg() = default;
 
     /**
-     *
+     * @brief
      * @param index
      * @param conf
      */
     void setClassSpecific(uint8_t index, std::unique_ptr<Descriptor> conf);
 
     /**
-     *
+     * @brief
      * @param conf
      */
     void set(std::unique_ptr<Descriptor> conf);
 
     /**
-     *
+     * @brief
      * @return
      */
     const Descriptor& get() const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     const Descriptor& getClassSpecific(uint8_t index) const;
 
     /**
-     *
+     * @brief
      * @param numClasses
      */
-    void enableClassSpecific(uint8_t numClasses);  //!< Unlocks class specific config
+    void enableClassSpecific(uint8_t numClasses);
 
     /**
-     *
+     * @brief
      * @return
      */
     bool isClassSpecific() const;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;
 
     /**
-     *
+     * @brief
      * @param cfg
      * @return
      */
@@ -123,14 +123,14 @@ class DescriptorSubseqCfg {
 
  private:
     /**
-     *
+     * @brief
      * @param cfg
      * @return
      */
     bool desc_comp(const DescriptorSubseqCfg& cfg) const;
 
-    bool class_specific_dec_cfg_flag;                                    //!<
-    std::vector<std::unique_ptr<Descriptor>> descriptor_configurations;  //!<
+    bool class_specific_dec_cfg_flag;                                    //!< @brief
+    std::vector<std::unique_ptr<Descriptor>> descriptor_configurations;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

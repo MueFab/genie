@@ -22,7 +22,7 @@ namespace genie {
 namespace module {
 
 /**
- *
+ * @brief
  * @param threads
  * @param working_dir
  * @param externalref
@@ -42,7 +42,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
                                                            size_t);
 
 /**
- *
+ * @brief
  * @param threads
  * @return
  */

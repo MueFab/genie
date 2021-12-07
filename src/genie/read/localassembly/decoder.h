@@ -19,13 +19,13 @@ namespace read {
 namespace localassembly {
 
 /**
- *
+ * @brief
  */
 class Decoder : public core::ReadDecoder {
  private:
  public:
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */

@@ -19,56 +19,56 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class BinaryArithmeticDecoder {
  public:
     /**
-     *
+     * @brief
      * @param bitInputStream
      */
     explicit BinaryArithmeticDecoder(const BitInputStream& bitInputStream);
 
     /**
-     *
+     * @brief
      * @param contextModel
      * @return
      */
     unsigned int decodeBin(ContextModel* contextModel);
 
     /**
-     *
+     * @brief
      * @param numBins
      * @return
      */
     unsigned int decodeBinsEP(unsigned int numBins);
 
     /**
-     *
+     * @brief
      */
     void decodeBinTrm();
 
     /**
-     *
+     * @brief
      */
     void reset();
 
     /**
-     *
+     * @brief
      */
     void start();
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t close();
 
  private:
-    BitInputStream m_bitInputStream;  //!<
-    int m_numBitsNeeded = 0;          //!<
-    unsigned int m_range = 0;         //!<
-    unsigned int m_value = 0;         //!<
+    BitInputStream m_bitInputStream;  //!< @brief
+    int m_numBitsNeeded = 0;          //!< @brief
+    unsigned int m_range = 0;         //!< @brief
+    unsigned int m_value = 0;         //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -34,29 +34,35 @@ Dataset::Dataset(const nlohmann::json& json)
     : version(json["version"]),
       DT_metadata_value(json["DT_metadata_value"]),
       DT_protection_value(json["DT_protection_value"]) {
+    // Optional: dataset group metadata
     if (json.contains("dataset_group")) {
         dataset_group = DatasetGroup(json["dataset_group"]);
     }
+    // Optional: reference metadata (aligned data only)
     if (json.contains("reference")) {
         reference = Reference(json["reference"]);
     }
+    // Optional: labels
     if (json.contains("label_list")) {
         for (const auto& l : json["label_list"]) {
             label_list.emplace_back(l);
         }
     }
+    // Presence of MIT and CC_mode flags signals blockheader_flag == true
     if (json.contains("MIT_flag") && json.contains("CC_mode_flag") && !json.contains("ordered_blocks_flag")) {
         headerCfg = genie::util::make_unique<blockheader::Enabled>(json);
     } else if (!json.contains("MIT_flag") && !json.contains("CC_mode_flag") && json.contains("ordered_blocks_flag")) {
-        headerCfg = genie::util::make_unique<blockheader::Enabled>(json);
+        headerCfg = genie::util::make_unique<blockheader::Disabled>(json);
     } else {
         UTILS_DIE("Could not infer block header mode.");
     }
+    // Optional: Access unit specific metadata
     if (json.contains("access_units")) {
         for (const auto& au : json["access_units"]) {
             access_units.emplace_back(au);
         }
     }
+    // Optional: descriptor stream metadata
     if (json.contains("descriptor_streams")) {
         for (const auto& ds : json["descriptor_streams"]) {
             descriptor_streams.emplace_back(ds);

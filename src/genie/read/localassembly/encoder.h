@@ -45,8 +45,8 @@ class Encoder : public core::ReadEncoder {
         bool pairedEnd;                     //!< @brief Current guess regarding pairing
         size_t readLength;                  //!< @brief Current guess regarding read length
         core::record::ClassType classType;  //!< @brief Current guess regarding class type
-        uint64_t minPos;                    //!<
-        uint64_t maxPos;                    //!<
+        uint64_t minPos;                    //!< @brief
+        uint64_t maxPos;                    //!< @brief
     };
 
     /**
@@ -109,14 +109,14 @@ class Encoder : public core::ReadEncoder {
     Encoder(uint32_t _cr_buf_max_size, bool _debug);
 
     /**
-     *
+     * @brief
      * @param cigar
      * @return
      */
     static uint64_t getLengthOfCigar(const std::string& cigar);
 
     /**
-     *
+     * @brief
      * @param position
      * @param cigar
      * @param state

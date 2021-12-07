@@ -19,30 +19,30 @@ namespace read {
 namespace lowlatency {
 
 /**
- *
+ * @brief
  */
 class Encoder : public core::ReadEncoder {
  private:
     /**
-     *
+     * @brief
      */
     struct LLState {
-        size_t readLength;         //!<
-        bool pairedEnd;            //!<
-        core::AccessUnit streams;  //!<
-        bool refOnly;              //!<
+        size_t readLength;         //!< @brief
+        bool pairedEnd;            //!< @brief
+        core::AccessUnit streams;  //!< @brief
+        bool refOnly;              //!< @brief
     };
 
  public:
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
-     *
+     * @brief
      * @param id
      * @param qv_depth
      * @param qvparam

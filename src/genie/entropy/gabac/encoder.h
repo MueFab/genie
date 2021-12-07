@@ -37,7 +37,7 @@ class Encoder : public core::EntropyEncoder {
                                                   core::AccessUnit::Subsequence&& in);
 
     /**
-     *
+     * @brief
      * @param conf0
      * @param in
      * @return
@@ -49,7 +49,7 @@ class Encoder : public core::EntropyEncoder {
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
 
     /**
-     *
+     * @brief
      * @param desc
      * @return
      */

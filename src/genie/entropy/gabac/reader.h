@@ -30,12 +30,12 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class Reader {
  public:
     /**
-     *
+     * @brief
      * @param bitstream
      * @param bypassFlag
      * @param numContexts
@@ -43,145 +43,145 @@ class Reader {
     explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
-     *
+     * @brief
      */
     ~Reader();
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsBIcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsTUbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsTUcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsEGbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsEGcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsSEGbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsTEGbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsSUTUbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsDTUbypass(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param binParams
      * @return
      */
     uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param codingSubsymSize
      * @return
      */
     uint64_t readLutSymbol(const uint8_t codingSubsymSize);
 
     /**
-     *
+     * @brief
      * @return
      */
     bool readSignFlag();
 
     /**
-     *
+     * @brief
      */
     void start();
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t close();
 
     /**
-     *
+     * @brief
      */
     void reset();
 
  private:
-    BitInputStream m_bitInputStream;        //!<
-    BinaryArithmeticDecoder m_decBinCabac;  //!<
+    BitInputStream m_bitInputStream;        //!< @brief
+    BinaryArithmeticDecoder m_decBinCabac;  //!< @brief
 
-    bool m_bypassFlag;       //!<
-    uint64_t m_numContexts;  //!<
+    bool m_bypassFlag;       //!< @brief
+    uint64_t m_numContexts;  //!< @brief
 
-    std::vector<ContextModel> m_contextModels;  //!<
+    std::vector<ContextModel> m_contextModels;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

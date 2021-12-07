@@ -22,12 +22,12 @@ namespace core {
 class GlobalCfg {
  private:
     /**
-     *
+     * @brief
      */
     GlobalCfg() = default;
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     GlobalCfg(GlobalCfg& cfg) = default;

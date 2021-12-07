@@ -19,22 +19,22 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- * ISO 23092-2 Section 8.3.2 table
+ * @brief
  */
 class SupportValues {
  public:
     /**
-     *
+     * @brief
      */
     enum class TransformIdSubsym : uint8_t { NO_TRANSFORM = 0, LUT_TRANSFORM = 1, DIFF_CODING = 2 };
 
     /**
-     *
+     * @brief
      */
     SupportValues();
 
     /**
-     *
+     * @brief
      * @param _output_symbol_size
      * @param _coding_subsym_size
      * @param _coding_order
@@ -45,54 +45,59 @@ class SupportValues {
                   bool _share_subsym_lut_flag = true, bool _share_subsym_prv_flag = true);
 
     /**
-     *
+     * @brief
      * @param transformIdSubsym
      * @param reader
      */
     SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~SupportValues() = default;
 
     /**
-     *
+     * @brief
      * @param transformIdSubsym
      * @param writer
      */
     virtual void write(TransformIdSubsym transformIdSubsym, util::BitWriter &writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getOutputSymbolSize() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getCodingSubsymSize() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getCodingOrder() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getShareSubsymLutFlag() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getShareSubsymPrvFlag() const;
 
+    /**
+     * @brief
+     * @param val
+     * @return
+     */
     bool operator==(const SupportValues &val) const {
         return output_symbol_size == val.output_symbol_size && coding_subsym_size == val.coding_subsym_size &&
                coding_order == val.coding_order && share_subsym_lut_flag == val.share_subsym_lut_flag &&
@@ -100,11 +105,11 @@ class SupportValues {
     }
 
  private:
-    uint8_t output_symbol_size;  //!<
-    uint8_t coding_subsym_size;  //!<
-    uint8_t coding_order;        //!<
-    bool share_subsym_lut_flag;  //!<
-    bool share_subsym_prv_flag;  //!<
+    uint8_t output_symbol_size;  //!< @brief
+    uint8_t coding_subsym_size;  //!< @brief
+    uint8_t coding_order;        //!< @brief
+    bool share_subsym_lut_flag;  //!< @brief
+    bool share_subsym_prv_flag;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

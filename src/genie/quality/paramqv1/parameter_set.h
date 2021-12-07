@@ -23,50 +23,50 @@ namespace quality {
 namespace paramqv1 {
 
 /**
- *
+ * @brief
  */
 class ParameterSet {
  private:
-    std::vector<Codebook> qv_codebooks;  //!<
+    std::vector<Codebook> qv_codebooks;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param ps
      * @return
      */
     bool operator==(const ParameterSet &ps) const;
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit ParameterSet(util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     ParameterSet() = default;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<Codebook> &getCodebooks() const;
 
     /**
-     *
+     * @brief
      */
     virtual ~ParameterSet() = default;
 
     /**
-     *
+     * @brief
      * @param book
      */
     void addCodeBook(Codebook &&book);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;

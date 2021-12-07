@@ -13,7 +13,7 @@ namespace genieapp {
 namespace transcode_sam {
 
 /**
- *
+ * @brief
  * @param argc
  * @param argv
  * @return

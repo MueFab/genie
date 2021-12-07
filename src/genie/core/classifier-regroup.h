@@ -22,35 +22,35 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class ClassifierRegroup : public Classifier {
  public:
     enum class RefMode { NONE = 0, RELEVANT = 1, FULL = 2 };
 
  private:
-    std::vector<record::Chunk> finishedChunks;  //!<
+    std::vector<record::Chunk> finishedChunks;  //!< @brief
 
-    using ClassBlock = std::vector<record::Chunk>;  //!<
-    using PairedBlock = std::vector<ClassBlock>;    //!<
+    using ClassBlock = std::vector<record::Chunk>;  //!< @brief
+    using PairedBlock = std::vector<ClassBlock>;    //!< @brief
     using RefNoRefBlock = std::vector<PairedBlock>;
-    RefNoRefBlock currentChunks;                                //!<
-    ReferenceManager* refMgr;                                   //!<
-    int16_t currentSeqID;                                       //!<
-    std::vector<std::pair<size_t, size_t>> currentSeqCoverage;  //!<
-    std::map<std::string, std::vector<uint8_t>> refState;       //!<
+    RefNoRefBlock currentChunks;                                //!< @brief
+    ReferenceManager* refMgr;                                   //!< @brief
+    int16_t currentSeqID;                                       //!< @brief
+    std::vector<std::pair<size_t, size_t>> currentSeqCoverage;  //!< @brief
+    std::map<std::string, std::vector<uint8_t>> refState;       //!< @brief
 
-    size_t auSize;                 //!<
-    core::stats::PerfStats stats;  //!<
-    RefMode refMode;               //!<
-    size_t refModeFullSeqID{0};    //!<
-    size_t refModeFullCovID{0};    //!<
-    size_t refModeFullChunkID{0};  //!<
+    size_t auSize;                 //!< @brief
+    core::stats::PerfStats stats;  //!< @brief
+    RefMode refMode;               //!< @brief
+    size_t refModeFullSeqID{0};    //!< @brief
+    size_t refModeFullCovID{0};    //!< @brief
+    size_t refModeFullChunkID{0};  //!< @brief
 
-    bool rawRefMode = true;  //!<
+    bool rawRefMode = true;  //!< @brief
 
     /**
-     *
+     * @brief
      * @param start
      * @param end
      * @return
@@ -58,30 +58,21 @@ class ClassifierRegroup : public Classifier {
     bool isCovered(size_t start, size_t end) const;
 
     /**
-     *
+     * @brief
      * @param r
      * @return
      */
     bool isCovered(const core::record::Record& r) const;
 
     /**
-     *
-     * @param refBased
-     * @param paired
-     * @param classtype
-     * @param r
-     */
-    void push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r);
-
-    /**
-     *
+     * @brief
      * @param data
      */
     void queueFinishedChunk(core::record::Chunk& data);
 
  public:
     /**
-     *
+     * @brief
      * @param ref
      * @param index
      * @return
@@ -89,26 +80,7 @@ class ClassifierRegroup : public Classifier {
     bool isWritten(const std::string& ref, size_t index);
 
     /**
-     *
-     * @param ref
-     * @param seq
-     * @param ecigar
-     * @return
-     */
-    record::ClassType fineClassifierECigar(const std::string& ref, const std::string& seq, const std::string& ecigar);
-
-    /**
-     *
-     * @param record_reference
-     * @param rec
-     * @param loadonly
-     * @return
-     */
-    record::ClassType fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
-                                           const core::record::Record& rec, bool loadonly);
-
-    /**
-     *
+     * @brief
      * @param _auSize
      * @param rfmgr
      * @param mode
@@ -117,42 +89,21 @@ class ClassifierRegroup : public Classifier {
     ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref);
 
     /**
-     *
+     * @brief
      * @return
      */
     record::Chunk getChunk() override;
 
     /**
-     *
+     * @brief
      * @param c
      */
     void add(record::Chunk&& c) override;
 
     /**
-     *
+     * @brief
      */
     void flush() override;
-
-    /**
-     *
-     * @param cigar
-     * @return
-     */
-    static record::ClassType classifyECigar(const std::string& cigar);
-
-    /**
-     *
-     * @param seq
-     * @return
-     */
-    static record::ClassType classifySeq(const std::string& seq);
-
-    /**
-     *
-     * @param r
-     * @return
-     */
-    static record::ClassType coarseClassify(const record::Record& r);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

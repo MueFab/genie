@@ -27,65 +27,65 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class BitInputStream {
  public:
     /**
-     *
+     * @brief
      * @param bitstream
      */
     explicit BitInputStream(util::DataBlock *bitstream);
 
     /**
-     *
+     * @brief
      */
     ~BitInputStream();
 
     /**
-     *
+     * @brief
      * @return
      */
     unsigned int getNumBitsUntilByteAligned() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t getNumBytesRead() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     unsigned char readByte();
 
     /**
-     *
+     * @brief
      * @param numBits
      * @return
      */
     unsigned int read(unsigned int numBits);
 
     /**
-     *
+     * @brief
      * @param numytes
      */
     void skipBytes(unsigned int numytes);
 
     /**
-     *
+     * @brief
      */
     void reset();
 
  private:
-    util::DataBlock *m_bitstream;  //!<
+    util::DataBlock *m_bitstream;  //!< @brief
 
-    util::BlockStepper m_reader;  //!<
+    util::BlockStepper m_reader;  //!< @brief
 
-    unsigned char m_heldBits;  //!<
+    unsigned char m_heldBits;  //!< @brief
 
-    unsigned int m_numHeldBits;  //!<
+    unsigned int m_numHeldBits;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

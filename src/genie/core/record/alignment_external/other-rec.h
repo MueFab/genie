@@ -23,51 +23,51 @@ namespace record {
 namespace alignment_external {
 
 /**
- *
+ * @brief
  */
 class OtherRec : public AlignmentExternal {
-    uint64_t next_pos;     //!<
-    uint16_t next_seq_ID;  //!<
+    uint64_t next_pos;     //!< @brief
+    uint16_t next_seq_ID;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _next_pos
      * @param _next_seq_ID
      */
     OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getNextPos() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getNextSeq() const;
 
     /**
-     *
+     * @brief
      */
     OtherRec();
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit OtherRec(util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<AlignmentExternal> clone() const override;

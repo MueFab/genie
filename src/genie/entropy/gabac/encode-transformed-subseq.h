@@ -30,7 +30,7 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  * @param trnsfSubseqConf
  * @param symbols
  * @param depSymbols

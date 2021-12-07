@@ -42,7 +42,7 @@ class ThreadManager {
     static thread_local size_t threadNum;  //!< @brief Each thread will see the number of threads here.
 
     /**
-     *
+     * @brief
      * @param thread_num
      * @param counter
      */

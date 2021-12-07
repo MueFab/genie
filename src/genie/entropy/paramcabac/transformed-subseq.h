@@ -23,17 +23,17 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- * ISO 23092-2 Section 8.3.1 table lines 9 to 11
+ * @brief
  */
 class TransformedSubSeq {
  public:
     /**
-     *
+     * @brief
      */
     TransformedSubSeq();
 
     /**
-     *
+     * @brief
      * @param _transform_ID_subsym
      * @param _support_values
      * @param _cabac_binarization
@@ -44,7 +44,7 @@ class TransformedSubSeq {
                       Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
-     *
+     * @brief
      * @param reader
      * @param _subsequence_ID
      * @param _alphabet_ID
@@ -53,64 +53,69 @@ class TransformedSubSeq {
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     /**
-     *
+     * @brief
      */
     virtual ~TransformedSubSeq() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     SupportValues::TransformIdSubsym getTransformIDSubsym() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const SupportValues& getSupportValues() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const Binarization& getBinarization() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const StateVars& getStateVars() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     StateVars& getStateVars();
 
     /**
-     *
+     * @brief
      * @param _subsequence_ID
      */
     void setSubsequenceID(const core::GenSubIndex _subsequence_ID);
 
     /**
-     *
+     * @brief
      * @return
      */
     core::AlphabetID getAlphabetID() const;
 
     /**
-     *
+     * @brief
      * @param _alphabet_ID
      */
     void setAlphabetID(core::AlphabetID _alphabet_ID);
 
+    /**
+     * @brief
+     * @param val
+     * @return
+     */
     bool operator==(const TransformedSubSeq& val) const {
         return transform_ID_subsym == val.transform_ID_subsym && support_values == val.support_values &&
                cabac_binarization == cabac_binarization && state_vars == val.state_vars &&
@@ -118,14 +123,14 @@ class TransformedSubSeq {
     }
 
  private:
-    SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
-    SupportValues support_values;                          //!< Line 10
-    Binarization cabac_binarization;                       //!< Line 11
-    StateVars state_vars;                                  //!<
+    SupportValues::TransformIdSubsym transform_ID_subsym;  //!< @brief
+    SupportValues support_values;                          //!< @brief
+    Binarization cabac_binarization;                       //!< @brief
+    StateVars state_vars;                                  //!< @brief
 
     // declaration with default value.
-    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST;  //!<
-    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;              //!<
+    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST;  //!< @brief
+    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;              //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

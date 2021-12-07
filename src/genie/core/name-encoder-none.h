@@ -19,12 +19,12 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class NameEncoderNone : public NameEncoder {
  public:
     /**
-     *
+     * @brief
      * @return
      */
     std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> process(const record::Chunk&) override;

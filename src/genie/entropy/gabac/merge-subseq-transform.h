@@ -21,7 +21,7 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  * @param subseqCfg
  * @param transformedSubseqs
  */
@@ -29,7 +29,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
                           std::vector<util::DataBlock>* const transformedSubseqs);
 
 /**
- *
+ * @brief
  * @param subseqCfg
  * @param transformedSubseqs
  */
