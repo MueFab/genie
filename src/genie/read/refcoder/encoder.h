@@ -37,8 +37,8 @@ class Encoder : public core::ReadEncoder {
         bool pairedEnd;                     //!< @brief Current guess regarding pairing
         size_t readLength;                  //!< @brief Current guess regarding read length
         core::record::ClassType classType;  //!< @brief Current guess regarding class type
-        uint64_t minPos;                    //!<
-        uint64_t maxPos;                    //!<
+        uint64_t minPos;                    //!< @brief
+        uint64_t maxPos;                    //!< @brief
     };
 
     /**

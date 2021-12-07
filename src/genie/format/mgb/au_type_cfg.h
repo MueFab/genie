@@ -22,20 +22,20 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class AuTypeCfg {
  private:
-    uint16_t sequence_ID;                     //!<
-    uint64_t AU_start_position;               //!<
-    uint64_t AU_end_position;                 //!<
-    boost::optional<ExtendedAu> extended_AU;  //!<
+    uint16_t sequence_ID;                     //!< @brief
+    uint64_t AU_start_position;               //!< @brief
+    uint64_t AU_end_position;                 //!< @brief
+    boost::optional<ExtendedAu> extended_AU;  //!< @brief
 
-    uint8_t posSize;  //!< internal
+    uint8_t posSize;  //!< @brief internal
 
  public:
     /**
-     *
+     * @brief
      * @param _sequence_ID
      * @param _AU_start_position
      * @param _AU_end_position
@@ -44,13 +44,13 @@ class AuTypeCfg {
     AuTypeCfg(uint16_t _sequence_ID, uint64_t _AU_start_position, uint64_t _AU_end_position, uint8_t posSize);
 
     /**
-     *
+     * @brief
      * @param posSize
      */
     explicit AuTypeCfg(uint8_t posSize);
 
     /**
-     *
+     * @brief
      * @param _posSize
      * @param multiple_alignments
      * @param reader
@@ -58,36 +58,36 @@ class AuTypeCfg {
     AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~AuTypeCfg() = default;
 
     /**
-     *
+     * @brief
      * @param _extended_AU
      */
     void setExtendedAu(ExtendedAu &&_extended_AU);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getRefID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getStartPos() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getEndPos() const;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;

@@ -31,7 +31,7 @@ class SubfileReader {
     std::ifstream reader;                              //!< @brief
     genie::util::BitReader bitreader;                  //!< @brief
     boost::optional<genie::core::record::Record> rec;  //!< @brief
-    std::string path;
+    std::string path;                                  //!< @brief
 
  public:
     /**
@@ -63,6 +63,10 @@ class SubfileReader {
      */
     bool good();
 
+    /**
+     * @brief
+     * @return
+     */
     std::string getPath() const { return path; }
 };
 

@@ -19,12 +19,12 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class CigarTokenizer {
  public:
     /**
-     *
+     * @brief
      * @tparam Lambda
      * @param cigar
      * @param format

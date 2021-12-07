@@ -19,79 +19,79 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class BinaryArithmeticEncoder {
  public:
     /**
-     *
+     * @brief
      * @param bitOutputStream
      */
     explicit BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream);
 
     /**
-     *
+     * @brief
      */
     ~BinaryArithmeticEncoder();
 
     /**
-     *
+     * @brief
      * @param bin
      * @param contextModel
      */
     void encodeBin(unsigned int bin, ContextModel* contextModel);
 
     /**
-     *
+     * @brief
      * @param bin
      */
     void encodeBinEP(unsigned int bin);
 
     /**
-     *
+     * @brief
      * @param bins
      * @param numBins
      */
     void encodeBinsEP(unsigned int bins, unsigned int numBins);
 
     /**
-     *
+     * @brief
      * @param bin
      */
     void encodeBinTrm(unsigned int bin);
 
     /**
-     *
+     * @brief
      */
     void start();
 
     /**
-     *
+     * @brief
      */
     void flush();
 
  private:
     /**
-     *
+     * @brief
      */
     void finish();
 
     /**
-     *
+     * @brief
      */
     void writeOut();
 
-    util::BitWriter m_bitOutputStream;  //!<
+    util::BitWriter m_bitOutputStream;  //!< @brief
 
-    unsigned char m_bufferedByte;  //!<
+    unsigned char m_bufferedByte;  //!< @brief
 
-    unsigned int m_low;  //!<
+    unsigned int m_low;  //!< @brief
 
-    unsigned int m_numBitsLeft;  //!<
+    unsigned int m_numBitsLeft;  //!< @brief
 
-    int m_numBufferedBytes;  //!<
+    int m_numBufferedBytes;  //!< @brief
 
-    unsigned int m_range;  //!<
+    unsigned int m_range;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

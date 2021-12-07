@@ -13,12 +13,12 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief
  */
 class GenericFactory {
  public:
     /**
-     *
+     * @brief
      */
     virtual ~GenericFactory() = default;
 };

@@ -20,42 +20,42 @@ namespace meta {
 namespace blockheader {
 
 /**
- * @brief
+ * @brief Represents block continuity with block headers
  */
 class Enabled : public BlockHeader {
  private:
-    bool MIT_flag;      //!< @brief
-    bool CC_mode_flag;  //!< @brief
+    bool MIT_flag;      //!< @brief If true, master index table is present
+    bool CC_mode_flag;  //!< @brief If true, access units are ordered by class instead mapping position
 
  public:
     /**
-     * @brief
-     * @param mit
-     * @param cc
+     * @brief Construct from raw values
+     * @param mit MIT_flag
+     * @param cc CC_mode_flag
      */
     Enabled(bool mit, bool cc);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json representation
      */
     explicit Enabled(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const override;
 
     /**
-     * @brief
-     * @return
+     * @brief Return MIT_flag
+     * @return MIT_flag
      */
     bool getMITFlag() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return CC_mode_flag
+     * @return CC_mode_flag
      */
     bool getCCFlag() const;
 };

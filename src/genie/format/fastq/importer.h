@@ -78,7 +78,7 @@ class Importer : public core::FormatImporter {
     Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2);
 
     /**
-     *
+     * @brief
      * @param _classifier
      * @return
      */

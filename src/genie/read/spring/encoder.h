@@ -21,15 +21,15 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  */
 class Encoder : public genie::core::ReadEncoder {
  private:
-    Preprocessor preprocessor;  //!<
+    Preprocessor preprocessor;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param working_dir
      * @param num_thr
      * @param paired_end
@@ -37,20 +37,20 @@ class Encoder : public genie::core::ReadEncoder {
     explicit Encoder(const std::string& working_dir, size_t num_thr, bool paired_end);
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void flowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
 
     /**
-     *
+     * @brief
      * @param pos
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section& id) override;

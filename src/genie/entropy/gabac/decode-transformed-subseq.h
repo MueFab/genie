@@ -31,7 +31,7 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
+ * @brief
  */
 typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
 

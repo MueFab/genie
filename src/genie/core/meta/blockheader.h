@@ -17,40 +17,40 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Block header presence interface
  */
 class BlockHeader {
  public:
     /**
-     * @brief
+     * @brief Block header modes
      */
     enum class HeaderType : uint8_t { DISABLED = 0, ENABLED = 1 };
 
  private:
-    HeaderType type;  //!< @brief
+    HeaderType type;  //!< @brief Active type
 
  protected:
     /**
-     * @brief
-     * @param _type
+     * @brief Construct from type
+     * @param _type Block header type
      */
     explicit BlockHeader(HeaderType _type);
 
  public:
     /**
-     * @brief
+     * @brief Virtual destructor for inheritance
      */
     virtual ~BlockHeader() = default;
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     virtual nlohmann::json toJson() const = 0;
 
     /**
-     * @brief
-     * @return
+     * @brief Return block header mode
+     * @return Block header mode
      */
     HeaderType getType() const;
 };

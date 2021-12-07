@@ -23,7 +23,7 @@ namespace util {
 class OrderedSection {
  private:
     OrderedLock* lock;  //!< @brief Underlying lock
-    size_t length;      //!<
+    size_t length;      //!< @brief
 
  public:
     /**

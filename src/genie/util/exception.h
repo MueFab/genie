@@ -39,11 +39,13 @@ class Exception : public std::exception {
     ~Exception() noexcept override = default;
 
     /**
+     * @brief
      * @return The internal message.
      */
     virtual std::string msg() const;
 
     /**
+     * @brief
      * @return The internal message as a c string.
      */
     const char* what() const noexcept override;

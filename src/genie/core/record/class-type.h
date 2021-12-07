@@ -18,7 +18,7 @@ namespace core {
 namespace record {
 
 /**
- *
+ * @brief
  */
 enum class ClassType : uint8_t {
     NONE = 0,

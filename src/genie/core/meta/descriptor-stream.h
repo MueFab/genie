@@ -18,42 +18,42 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Meta information for descriptor stream
  */
 class DescriptorStream {
  private:
-    size_t descriptor_ID;             //!< @brief
-    std::string DS_protection_value;  //!< @brief
+    size_t descriptor_ID;             //!< @brief ID of descriptor stream
+    std::string DS_protection_value;  //!< @brief Part 3 protection information
 
  public:
     /**
-     * @brief
-     * @param _descriptor_ID
-     * @param _ds_protection_value
+     * @brief Construct from raw values
+     * @param _descriptor_ID Descriptor ID
+     * @param _ds_protection_value Part 3 protection information
      */
     DescriptorStream(size_t _descriptor_ID, std::string _ds_protection_value);
 
     /**
-     * @brief
-     * @param obj
+     * @brief Construct from json
+     * @param obj Json representation
      */
     explicit DescriptorStream(const nlohmann::json& obj);
 
     /**
-     * @brief
-     * @return
+     * @brief Get descriptor ID
+     * @return Descriptor ID
      */
     size_t getID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return Part 3 protection information
+     * @return Part 3 protection information
      */
     const std::string& getProtection() const;
 };

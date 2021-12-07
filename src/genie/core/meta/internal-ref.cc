@@ -23,7 +23,7 @@ uint16_t InternalRef::getID() const { return internal_dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-InternalRef::InternalRef(nlohmann::json json)
+InternalRef::InternalRef(const nlohmann::json& json)
     : internal_dataset_group_id(json["internal_dataset_group_id"]), internal_dataset_ID(json["internal_dataset_ID"]) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

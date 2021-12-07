@@ -32,7 +32,7 @@ namespace core {
 namespace record {
 
 /**
- *
+ *  @brief
  */
 class Record {
  private:

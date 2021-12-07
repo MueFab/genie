@@ -24,96 +24,96 @@ namespace name {
 namespace tokenizer {
 
 /**
- *
+ * @brief
  */
 struct TokenState {
  private:
-    uint32_t token_pos;                      //!<
-    const std::vector<SingleToken>& oldRec;  //!<
-    std::vector<SingleToken> curRec;         //!<
+    uint32_t token_pos;                      //!< @brief
+    const std::vector<SingleToken>& oldRec;  //!< @brief
+    std::vector<SingleToken> curRec;         //!< @brief
 
-    std::string::const_iterator cur_it;  //!<
-    std::string::const_iterator end_it;  //!<
+    std::string::const_iterator cur_it;  //!< @brief
+    std::string::const_iterator end_it;  //!< @brief
 
  protected:
     /**
-     *
+     * @brief
      * @return
      */
     bool more() const;
 
     /**
-     *
+     * @brief
      */
     void step();
 
     /**
-     *
+     * @brief
      * @return
      */
     char get();
 
     /**
-     *
+     * @brief
      * @param t
      * @param param
      */
     void pushToken(Tokens t, uint32_t param = 0);
 
     /**
-     *
+     * @brief
      * @param t
      */
     void pushToken(const SingleToken& t);
 
     /**
-     *
+     * @brief
      * @param param
      */
     void pushTokenString(const std::string& param);
 
     /**
-     *
+     * @brief
      * @return
      */
     const SingleToken& getOldToken();
 
     /**
-     *
+     * @brief
      */
     void alphabetic();
 
     /**
-     *
+     * @brief
      */
     void zeros();
 
     /**
-     *
+     * @brief
      */
     void number();
 
     /**
-     *
+     * @brief
      */
     void character();
 
  public:
     /**
-     *
+     * @brief
      * @param old
      * @param input
      */
     TokenState(const std::vector<SingleToken>& old, const std::string& input);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<SingleToken>&& run();
 
     /**
-     *
+     * @brief
      * @param tokens
      * @param streams
      */

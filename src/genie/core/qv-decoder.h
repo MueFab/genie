@@ -24,7 +24,7 @@ namespace core {
 class QVDecoder {
  public:
     /**
-     *
+     * @brief
      * @param param
      * @param ecigar
      * @param desc

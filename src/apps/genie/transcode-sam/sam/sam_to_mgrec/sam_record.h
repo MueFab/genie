@@ -39,11 +39,15 @@ class SamRecord {
     std::string cigar;  //!< @brief CIGAR
     int32_t mate_rid;   //!< @brief Mate reference sequence ID
     uint32_t mate_pos;  //!< @brief Mate position
-                        //    int64_t tlen;       //!< @brief Observed template length
     std::string seq;    //!< @brief Read sequence
     std::string qual;   //!< @brief
 
  public:
+    /**
+     * @brief
+     * @param rec
+     * @return
+     */
     bool operator==(const SamRecord& rec) const {
         return qname == rec.qname && flag == rec.flag && rid == rec.rid && pos == rec.pos && mapq == rec.mapq &&
                cigar == rec.cigar && mate_rid == rec.mate_rid && mate_pos == rec.mate_pos && seq == rec.seq &&
@@ -288,7 +292,7 @@ class SamRecord {
     bool isRead2() const;
 
     /**
-     * SamRecord are correctly oriented with respect to one another,
+     * @brief SamRecord are correctly oriented with respect to one another,
      * i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
      * If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
      * This includes that the reads are mapped to the same chromosomes.

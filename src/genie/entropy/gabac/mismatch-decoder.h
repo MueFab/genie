@@ -58,14 +58,18 @@ class MismatchDecoder : public core::MismatchDecoder {
      * @return A copy of the full object state.
      */
     std::unique_ptr<core::MismatchDecoder> copy() const override;
+
+    /**
+     * @brief
+     */
     std::vector<util::DataBlock> trnsfSubseqData;
 
  private:
-    uint64_t numSubseqSymbolsTotal;
-    uint64_t numSubseqSymbolsDecoded;
+    uint64_t numSubseqSymbolsTotal;  //!< @brief
+    uint64_t numSubseqSymbolsDecoded; //!< @brief
 
-    std::vector<TransformedSymbolsDecoder> trnsfSymbolsDecoder;
-    size_t numTrnsfSubseqs;
+    std::vector<TransformedSymbolsDecoder> trnsfSymbolsDecoder; //!< @brief
+    size_t numTrnsfSubseqs; //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

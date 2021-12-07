@@ -30,52 +30,62 @@ class Date {
     uint8_t second;    //!< @brief Second.
 
     /**
+     * @brief
      * @return True if the date actually exists (e.g. 30th of february would return false).
      */
     bool checkValidity() const;
 
  public:
     /**
+     * @brief
      * @return A regex which can be used to check for valid ISO strings.
      */
     static std::string getRegex();
 
     /**
+     * @brief
      * @return Saved year.
      */
     uint16_t getYear() const;
 
     /**
+     * @brief
      * @return Saved month.
      */
     uint8_t getMonth() const;
 
     /**
+     * @brief
      * @return Saved day.
      */
     uint8_t getDay() const;
 
     /**
+     * @brief
      * @return True if the time variables are valid.
      */
     bool isTimePresent() const;
 
     /**
+     * @brief
      * @return Hour.
      */
     uint8_t getHour() const;
 
     /**
+     * @brief
      * @return Minute.
      */
     uint8_t getMinute() const;
 
     /**
+     * @brief
      * @return Second.
      */
     uint8_t getSecond() const;
 
     /**
+     * @brief
      * @return True if the year in this date is a leap year and february has 29 days instead of 28.
      */
     bool leapYear() const;
