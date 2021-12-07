@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/read-encoder.h>
+#include <genie/util/watch.h>
 #include <array>
 #include <memory>
 #include <string>
