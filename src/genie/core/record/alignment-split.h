@@ -21,34 +21,34 @@ namespace core {
 namespace record {
 
 /**
- *
+ * @brief
  */
 class AlignmentSplit {
  public:
     /**
-     *
+     * @brief
      */
     enum class Type : uint8_t { SAME_REC = 0, OTHER_REC = 1, UNPAIRED = 2 };
 
     /**
-     *
+     * @brief
      * @param _split_alignment
      */
     explicit AlignmentSplit(Type _split_alignment);
 
     /**
-     *
+     * @brief
      */
     virtual ~AlignmentSplit() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;
 
     /**
-     *
+     * @brief
      * @param as_depth
      * @param reader
      * @return
@@ -56,19 +56,19 @@ class AlignmentSplit {
     static std::unique_ptr<AlignmentSplit> factory(uint8_t as_depth, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @return
      */
     virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
 
     /**
-     *
+     * @brief
      * @return
      */
     Type getType() const;
 
  protected:
-    Type split_alignment;  //!<
+    Type split_alignment;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

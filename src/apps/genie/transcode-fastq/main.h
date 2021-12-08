@@ -13,7 +13,7 @@ namespace genieapp {
 namespace transcode_fastq {
 
 /**
- *
+ * @brief
  * @param argc
  * @param argv
  * @return

@@ -20,12 +20,12 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class NameDecoder {
  public:
     /**
-     *
+     * @brief
      * @param desc
      * @return
      */

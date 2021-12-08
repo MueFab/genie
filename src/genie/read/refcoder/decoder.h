@@ -9,7 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
+#include <string>
+#include <vector>
 #include "genie/core/read-decoder.h"
+#include "genie/read/basecoder/decoderstub.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,21 +22,39 @@ namespace read {
 namespace refcoder {
 
 /**
- *
+ * @brief
  */
-class Decoder : public core::ReadDecoder {
+class Decoder : public basecoder::DecoderStub {
+ private:
+    /**
+     * @brief
+     * @param t
+     * @return
+     */
+    std::unique_ptr<DecodingState> createDecodingState(core::AccessUnit& t) override;
+
+    /**
+     * @brief
+     * @param meta
+     * @param state
+     * @return
+     */
+    std::vector<std::string> getReferences(const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) override;
+
+    /**
+     * @brief
+     */
+    struct RefDecodingState : public DecodingState {
+        core::ReferenceManager::ReferenceExcerpt refExcerpt;
+        /**
+         * @brief
+         * @param t_data
+         */
+        explicit RefDecodingState(core::AccessUnit& t_data);
+    };
+
  public:
-    /**
-     *
-     */
-    Decoder();
-
-    /**
-     *
-     */
-    void flowIn(core::AccessUnit&&, const util::Section&) override;
 };
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace refcoder

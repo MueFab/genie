@@ -46,7 +46,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     app.add_option("-o,--output-file", outputFile, "Output file (mgrec or mgb)\n")->mandatory(true);
 
     inputRefFile = "";
-    app.add_option("--input-ref-file", inputRefFile,
+    app.add_option("-r,--input-ref-file", inputRefFile,
                    "Path to a reference fasta file. \n"
                    "Only relevant for aligned records. \nIf no path is provided, a \n"
                    "computed reference will be used instead.\n");
@@ -85,19 +85,21 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
         "Flag, if set no global reference will be \n"
         "calculated for unaligned records. \nThis will increase encoding speed, \nbut decrease compression rate.\n");
 
-    refMode = "relevant";
-    app.add_option("--embedded-ref", refMode,
-                   "How to encode the reference. Possible \n"
-                   "values are \"none\" (no encoding and reference must \nbe kept externally for decompression),\n"
-                   " \"relevant\" (only parts of the reference \nneeded for decoding are encoded)\n");
+    refMode = "none";
+    // Deactivated for now, as broken in connection with part 1
+    /*  app.add_option("--embedded-ref", refMode,
+                     "How to encode the reference. Possible \n"
+                     "values are \"none\" (no encoding and reference must \nbe kept externally for decompression),\n"
+                     " \"relevant\" (only parts of the reference \nneeded for decoding are encoded)\n");*/
 
     numberOfThreads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", numberOfThreads, "Number of threads to use.\n");
 
     rawReference = false;
-    app.add_flag("--raw-ref", rawReference,
-                 "Flag, if set references will be encoded raw \n"
-                 "instead of compressed. This will increase \nencoding speed, but decrease compression rate.\n");
+    // Deactivated for now, as broken in connection with part 1
+    /* app.add_flag("--raw-ref", rawReference,
+                  "Flag, if set references will be encoded raw \n"
+                  "instead of compressed. This will increase \nencoding speed, but decrease compression rate.\n");*/
 
     try {
         app.parse(argc, argv);

@@ -29,16 +29,19 @@ class BitReader {
 
  public:
     /**
+     * @brief
      * @return Total number of bits read since the BitReader has been created.
      */
     uint64_t getBitsRead() const;
 
     /**
+     * @brief
      * @return True if the position of the bitstream is aligned to a full byte.
      */
     bool isAligned() const;
 
     /**
+     * @brief
      * @return Returns the position in the input stream.
      */
     int64_t getPos() const;
@@ -106,6 +109,7 @@ class BitReader {
     void readBypass(std::string &str);
 
     /**
+     * @brief
      * @return True if there are no problems so far reading data.
      */
     bool isGood() const;

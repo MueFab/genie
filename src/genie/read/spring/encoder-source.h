@@ -25,24 +25,24 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  */
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
  private:
-    uint32_t num_AUs;                                    //!<
-    std::string read_desc_prefix;                        //!<
-    std::string id_desc_prefix;                          //!<
-    std::string quality_desc_prefix;                     //!<
-    std::vector<uint32_t> num_records_per_AU;            //!<
-    std::vector<uint32_t> num_reads_per_AU;              //!<
-    uint32_t auId;                                       //!<
-    std::vector<core::parameter::ParameterSet>& params;  //!<
+    uint32_t num_AUs;                                    //!< @brief
+    std::string read_desc_prefix;                        //!< @brief
+    std::string id_desc_prefix;                          //!< @brief
+    std::string quality_desc_prefix;                     //!< @brief
+    std::vector<uint32_t> num_records_per_AU;            //!< @brief
+    std::vector<uint32_t> num_reads_per_AU;              //!< @brief
+    uint32_t auId;                                       //!< @brief
+    std::vector<core::parameter::ParameterSet>& params;  //!< @brief
 
-    core::stats::PerfStats stats;  //!<
+    core::stats::PerfStats stats;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param temp_dir
      * @param cp
      * @param p
@@ -52,7 +52,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                  std::vector<core::parameter::ParameterSet>& p, core::stats::PerfStats s);
 
     /**
-     *
+     * @brief
      * @param id
      * @param lock
      * @return
@@ -60,7 +60,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
-     *
+     * @brief
      * @param pos
      */
     void flushIn(uint64_t& pos) override;

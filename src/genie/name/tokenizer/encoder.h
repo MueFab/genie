@@ -25,10 +25,16 @@ namespace genie {
 namespace name {
 namespace tokenizer {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ * @brief
+ */
 class Encoder : public core::NameEncoder {
  public:
+    /**
+     * @brief
+     * @param recs
+     * @return
+     */
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const core::record::Chunk& recs) override;
 };
 

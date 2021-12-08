@@ -18,7 +18,7 @@ namespace meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Label::Label(std::string id, Region&& firstRegion) : label_ID(std::move(id)), regions({std::move(firstRegion)}) {}
+Label::Label(std::string id) : label_ID(std::move(id)), regions() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,11 +42,11 @@ nlohmann::json Label::toJson() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Label::addRegion(const Region& r) { regions.push_back(r); }
+void Label::addRegion(Region r) { regions.emplace_back(std::move(r)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& Label::geID() const { return label_ID; }
+const std::string& Label::getID() const { return label_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

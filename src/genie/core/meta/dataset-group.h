@@ -18,58 +18,58 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Information about a dataset group
  */
 class DatasetGroup {
  private:
-    uint16_t dataset_group_ID;        //!< @brief
-    uint8_t version_number;           //!< @brief
-    std::string DG_metadata_value;    //!< @brief
-    std::string DG_protection_value;  //!< @brief
+    uint16_t dataset_group_ID;        //!< @brief ID of dataset group
+    uint8_t version_number;           //!< @brief Current iteration, counting up for every change
+    std::string DG_metadata_value;    //!< @brief MPEG-G part 3 meta information
+    std::string DG_protection_value;  //!< @brief MPEG-G part 3 protection information
 
  public:
     /**
-     * @brief
-     * @return
+     * @brief Return dataset group ID
+     * @return dataset group ID
      */
     uint16_t getID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return current iteration version
+     * @return Current version
      */
     uint8_t getVersion() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return MPEG-G part 3 meta information
+     * @return MPEG-G part 3 meta information
      */
     const std::string& getInformation() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return MPEG-G part 3 meta information
+     * @return MPEG-G part 3 protection information
      */
     const std::string& getProtection() const;
 
     /**
-     * @brief
-     * @param id
-     * @param version
-     * @param meta
-     * @param protection
+     * @brief Construct from raw values
+     * @param id ID of dataset group
+     * @param version Current version number
+     * @param meta MPEG-G part 3 meta information
+     * @param protection MPEG-G part 3 protection information
      */
     DatasetGroup(uint16_t id, uint8_t version, std::string meta, std::string protection);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json representation
      */
     explicit DatasetGroup(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const;
 };

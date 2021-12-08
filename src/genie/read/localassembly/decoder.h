@@ -9,7 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/read-decoder.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include "genie/read/basecoder/decoderstub.h"
 #include "genie/read/localassembly/local-reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,17 +22,45 @@ namespace read {
 namespace localassembly {
 
 /**
- *
+ * @brief
  */
-class Decoder : public core::ReadDecoder {
+class Decoder : public basecoder::DecoderStub {
  private:
- public:
     /**
-     *
+     * @brief
      * @param t
-     * @param id
+     * @return
      */
-    void flowIn(core::AccessUnit&& t, const util::Section& id) override;
+    std::unique_ptr<DecodingState> createDecodingState(core::AccessUnit& t) override;
+
+    /**
+     * @brief
+     * @param meta
+     * @param state
+     * @return
+     */
+    std::vector<std::string> getReferences(const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) override;
+
+    /**
+     * @brief
+     * @param state
+     * @param rec
+     */
+    void recordDecodedHook(basecoder::DecoderStub::DecodingState& state, const core::record::Record& rec) override;
+
+    /**
+     * @brief
+     */
+    struct LADecodingState : public DecodingState {
+        LocalReference refEncoder;  //!< @brief
+        /**
+         * @brief
+         * @param t_data
+         */
+        explicit LADecodingState(core::AccessUnit& t_data);
+    };
+
+ public:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ struct EncodingConfiguration;
 struct IOConfiguration;
 
 /**
- *
+ * @brief
  * @param ioConf
  * @param enConf
  * @return

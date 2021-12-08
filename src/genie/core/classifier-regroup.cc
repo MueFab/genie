@@ -223,6 +223,7 @@ record::Chunk ClassifierRegroup::getChunk() {
 
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
+    bool movedStats = false;
 
     // New reference
     if (chunk.getRefID() != static_cast<uint16_t>(currentSeqID)) {
@@ -278,6 +279,10 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef() = record_reference;
         } else {
             currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
+        }
+        if (!movedStats) {
+            currentChunks[refBased][paired][(uint8_t)classtype - 1].getStats().add(chunk.getStats());
+            movedStats = true;
         }
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
         if (currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().size() == auSize) {

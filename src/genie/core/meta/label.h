@@ -20,48 +20,47 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Label metadata
  */
 class Label {
  private:
-    std::string label_ID;         //!< @brief
-    std::vector<Region> regions;  //!< @brief
+    std::string label_ID;         //!< @brief Name of the label
+    std::vector<Region> regions;  //!< @brief Regions in the genome the label applies to
 
  public:
     /**
-     * @brief
-     * @param id
-     * @param firstRegion
+     * @brief Construct from raw values
+     * @param id Name of the label
      */
-    explicit Label(std::string id, Region&& firstRegion);
+    explicit Label(std::string id);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json representation
      */
     explicit Label(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const;
 
     /**
-     * @brief
-     * @param r
+     * @brief Apply label to a new region of the genome
+     * @param r New region
      */
-    void addRegion(const Region& r);
+    void addRegion(Region r);
 
     /**
-     * @brief
-     * @return
+     * @brief Return the name of the label
+     * @return label id
      */
-    const std::string& geID() const;
+    const std::string& getID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return the list of active region on the genome
+     * @return Active regions of this label
      */
     const std::vector<Region>& getRegions() const;
 };

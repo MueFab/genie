@@ -18,17 +18,17 @@ namespace format {
 namespace fasta {
 
 /**
- *
+ * @brief
  */
 class Exporter : public core::FormatExporter {
  private:
-    core::ReferenceManager* refMgr;  //!<
-    std::ostream* outfile;           //!<
-    size_t num_threads;              //!<
+    core::ReferenceManager* refMgr;  //!< @brief
+    std::ostream* outfile;           //!< @brief
+    size_t num_threads;              //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _refMgr
      * @param out
      * @param _num_threads
@@ -36,13 +36,13 @@ class Exporter : public core::FormatExporter {
     Exporter(core::ReferenceManager* _refMgr, std::ostream* out, size_t _num_threads);
 
     /**
-     *
+     * @brief
      * @param id
      */
     void flushIn(uint64_t& id) override;
 
     /**
-     *
+     * @brief
      * @param c
      * @param s
      */

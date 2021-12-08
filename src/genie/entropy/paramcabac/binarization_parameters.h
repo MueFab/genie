@@ -22,12 +22,12 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
+ * @brief
  */
 class BinarizationParameters {
  public:
     /**
-     *
+     * @brief
      */
     enum class BinarizationId : uint8_t {
         BI = 0,
@@ -43,19 +43,19 @@ class BinarizationParameters {
     };
 
     /**
-     *
+     * @brief
      */
     BinarizationParameters();
 
     /**
-     *
+     * @brief
      * @param binID
      * @param reader
      */
     BinarizationParameters(BinarizationId binID, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param _binarization_id
      * @param params
      */
@@ -67,38 +67,38 @@ class BinarizationParameters {
     virtual ~BinarizationParameters() = default;
 
     /**
-     *
+     * @brief
      * @param binID
      * @param writer
      */
     virtual void write(BinarizationId binID, util::BitWriter &writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getCMax() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getCMaxTeg() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getCMaxDtu() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getSplitUnitSize() const;
 
     /**
-     *
+     * @brief
      * @param binarzationId
      * @return
      */
@@ -110,12 +110,12 @@ class BinarizationParameters {
     }
 
  private:
-    uint8_t cmax;             //!<
-    uint8_t cmax_teg;         //!<
-    uint8_t cmax_dtu;         //!<
-    uint8_t split_unit_size;  //!<
+    uint8_t cmax;             //!< @brief
+    uint8_t cmax_teg;         //!< @brief
+    uint8_t cmax_dtu;         //!< @brief
+    uint8_t split_unit_size;  //!< @brief
 
-    static uint8_t numParams[unsigned(BinarizationId::SDTU) + 1u];  //!<
+    static uint8_t numParams[unsigned(BinarizationId::SDTU) + 1u];  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

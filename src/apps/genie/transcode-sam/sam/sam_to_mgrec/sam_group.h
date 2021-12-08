@@ -32,7 +32,6 @@ class SamRecordGroup {
     /**
      * @brief
      */
-
     enum class TemplateType : uint8_t {
         SINGLE = 0,
         PAIRED_1 = 1,
@@ -41,6 +40,9 @@ class SamRecordGroup {
         TOTAL_INDICES = 4,  // Not used
     };
 
+    /**
+     * @brief
+     */
     enum class MappingType : uint8_t {
         UNMAPPED = 0,
         PRIMARY = 1,

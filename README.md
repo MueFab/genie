@@ -111,9 +111,7 @@ Following CLI-Arguments are available:
 * --working-dir / -w: Path to a directory where temporary files can be stored. If no path is provided, the current working dir is used. Please make sure that enough space is available.
 * --qv: How to encode quality values. Possible values are "lossless" (default, keep all values) and "none" (discard all values).
 * --read-ids: How to encode read ids. Possible values are "lossless" (default, keep all values) and "none" (discard all values).
-* --embedded-ref: How to encode the reference. Possible values are "none" (no encoding and reference must be kept externally for decompression), "relevant" (only parts of the reference needed for decoding are encoded)
 * --low-latency: Flag, if set no global reference will be calculated for unaligned records. This will increase encoding speed, but decrease compression rate.
-* --raw-ref: Flag, if set references will be encoded raw instead of compressed. This will increase encoding speed, but decrease compression rate.
 * --combine-pairs: Flag, if provided to a decoding operation, unaligned reads will get matched to their mate again. Note: has no effect if encoded with --low-latency in case of aligned reads only. Does not work if encoded with --read-ids "none"
     
 ## Genie transcode-fastq

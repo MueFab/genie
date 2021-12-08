@@ -19,62 +19,62 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Information needed to use an external reference - interface
  */
 class ExternalRef : public RefBase {
  public:
     /**
-     * @brief
+     * @brief Checksum algorithm used for checksums
      */
     enum class ChecksumAlgorithm : uint8_t { MD5 = 0, SHA256 = 1 };
 
  private:
-    std::string ref_uri;             //!< @brief
-    ChecksumAlgorithm checksum_alg;  //!< @brief
-    ReferenceType reference_type;    //!< @brief
+    std::string ref_uri;             //!< @brief URI to reference location
+    ChecksumAlgorithm checksum_alg;  //!< @brief Checksum algorithm used
+    ReferenceType reference_type;    //!< @brief Type of external reference
 
  public:
     /**
-     * @brief
-     * @param _ref_uri
-     * @param check
-     * @param ref
+     * @brief Construct from raw values
+     * @param _ref_uri URI to reference location
+     * @param check Checksum algorithm used
+     * @param ref Type of external reference
      */
     ExternalRef(std::string _ref_uri, ChecksumAlgorithm check, ReferenceType ref);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json representation
      */
     explicit ExternalRef(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Return URI to external reference
+     * @return URI
      */
     const std::string& getURI() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return active checksum algorithm
+     * @return Checksum algorithm used
      */
     ChecksumAlgorithm getChecksumAlgo() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return reference type
+     * @return Reference type
      */
     ReferenceType getReferenceType() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Returns "external_ref"
+     * @return "external_ref"
      */
     const std::string& getKeyName() const override;
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const override;
 };

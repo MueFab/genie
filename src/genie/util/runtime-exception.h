@@ -34,7 +34,7 @@ namespace util {
 class RuntimeException : public Exception {
  public:
     /**
-     *
+     * @brief
      * @param file
      * @param function
      * @param line

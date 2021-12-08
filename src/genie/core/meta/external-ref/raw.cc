@@ -17,9 +17,8 @@ namespace external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Raw::Raw(std::string _ref_uri, ChecksumAlgorithm check, std::string firstChecksum)
-    : ExternalRef(std::move(_ref_uri), check, ReferenceType::RAW_REF),
-      ref_type_other_checksums({std::move(firstChecksum)}) {}
+Raw::Raw(std::string _ref_uri, ChecksumAlgorithm check)
+    : ExternalRef(std::move(_ref_uri), check, ReferenceType::RAW_REF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

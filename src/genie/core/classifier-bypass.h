@@ -18,27 +18,27 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class ClassifierBypass : public Classifier {
-    std::vector<record::Chunk> vec;  //!<
-    bool flushing = false;           //!<
+    std::vector<record::Chunk> vec;  //!< @brief
+    bool flushing = false;           //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @return
      */
     record::Chunk getChunk() override;
 
     /**
-     *
+     * @brief
      * @param c
      */
     void add(record::Chunk&& c) override;
 
     /**
-     *
+     * @brief
      */
     void flush() override;
 };

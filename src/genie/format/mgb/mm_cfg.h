@@ -20,7 +20,7 @@ namespace format {
 namespace mgb {
 
 /**
- * ISO 23092-2 Section 3.4.1.1 table 19 lines 7 to 10
+ * @brief ISO 23092-2 Section 3.4.1.1 table 19 lines 7 to 10
  */
 class MmCfg {
  private:
@@ -29,30 +29,30 @@ class MmCfg {
 
  public:
     /**
-     *
+     * @brief
      * @param _mm_threshold
      * @param _mm_count
      */
     MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
 
     /**
-     *
+     * @brief
      */
     MmCfg();
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit MmCfg(util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~MmCfg() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;

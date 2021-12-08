@@ -23,28 +23,28 @@ namespace format {
 namespace mgrec {
 
 /**
- *
+ * @brief
  */
 class Exporter : public core::FormatExporter {
-    util::BitWriter writer;  //!<
-    util::OrderedLock lock;  //!<
+    util::BitWriter writer;  //!< @brief
+    util::OrderedLock lock;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _file_1
      */
     explicit Exporter(std::ostream& _file_1);
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section& id) override;

@@ -19,7 +19,7 @@ namespace genie {
 namespace module {
 
 /**
- *
+ * @brief
  */
 void detect();
 

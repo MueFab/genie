@@ -17,7 +17,7 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief
  * @tparam T
  */
 template <class T>
@@ -26,7 +26,7 @@ struct Unique_if {
 };
 
 /**
- *
+ * @brief
  * @tparam T
  */
 template <class T>
@@ -35,7 +35,7 @@ struct Unique_if<T[]> {
 };
 
 /**
- *
+ * @brief
  * @tparam T
  * @tparam N
  */
@@ -45,7 +45,7 @@ struct Unique_if<T[N]> {
 };
 
 /**
- *
+ * @brief
  * @tparam T
  * @tparam Args
  * @param args
@@ -55,7 +55,7 @@ template <class T, class... Args>
 typename Unique_if<T>::Single_object make_unique(Args &&...args);
 
 /**
- *
+ * @brief
  * @tparam T
  * @param n
  * @return
@@ -64,7 +64,7 @@ template <class T>
 typename Unique_if<T>::Unknown_bound make_unique(size_t n);
 
 /**
- *
+ * @brief
  * @tparam T
  * @tparam Args
  * @return

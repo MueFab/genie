@@ -112,7 +112,7 @@ class DataBlock {
     uint64_t get(size_t index) const;
 
     /**
-     * Calculates the biggest possible word size for this block
+     * @brief Calculates the biggest possible word size for this block
      * @return Maximum
      */
     uint8_t getMaxWordSize() const;

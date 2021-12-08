@@ -31,7 +31,7 @@ class QVEncoder {
         std::tuple<std::unique_ptr<parameter::QualityValues>, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
 
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */
