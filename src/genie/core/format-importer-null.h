@@ -16,12 +16,12 @@
 namespace genie {
 namespace core {
 /**
- *
+ * @brief
  */
 class NullImporter : public FormatImporter {
  protected:
     /**
-     *
+     * @brief
      * @param _classifier
      * @return
      */

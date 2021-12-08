@@ -19,18 +19,18 @@ namespace parameter {
 namespace desc_pres {
 
 /**
- *
+ * @brief
  */
 class DecoderTokentype : public Decoder {
  public:
     /**
-     *
+     * @brief
      * @param _encoding_mode_id
      */
     explicit DecoderTokentype(uint8_t _encoding_mode_id);
 
     /**
-     *
+     * @brief
      */
     ~DecoderTokentype() override = default;
 };

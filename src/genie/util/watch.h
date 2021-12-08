@@ -37,6 +37,7 @@ class Watch {
     void reset();
 
     /**
+     * @brief
      * @return Elapsed time in all periods where the watch was active.
      */
     double check() const;

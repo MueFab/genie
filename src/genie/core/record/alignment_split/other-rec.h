@@ -23,52 +23,52 @@ namespace record {
 namespace alignment_split {
 
 /**
- *
+ * @brief
  */
 class OtherRec : public AlignmentSplit {
  private:
-    uint64_t split_pos;     //!<
-    uint16_t split_seq_ID;  //!<
+    uint64_t split_pos;     //!< @brief
+    uint16_t split_seq_ID;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _split_pos
      * @param _split_seq_ID
      */
     OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getNextPos() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getNextSeq() const;
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit OtherRec(util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     OtherRec();
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter& writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<AlignmentSplit> clone() const override;

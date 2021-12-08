@@ -22,42 +22,41 @@ namespace meta {
 namespace external_ref {
 
 /**
- * @brief
+ * @brief Represents external raw reference
  */
 class Raw : public ExternalRef {
  private:
-    std::vector<std::string> ref_type_other_checksums;  //!< @brief
+    std::vector<std::string> ref_type_other_checksums;  //!< @brief Checksums of sequences
 
  public:
     /**
-     * @brief
-     * @param _ref_uri
-     * @param check
-     * @param firstChecksum
+     * @brief Construct from raw data
+     * @param _ref_uri URI to reference file
+     * @param check Algorithm used to compute checksums
      */
-    Raw(std::string _ref_uri, ChecksumAlgorithm check, std::string firstChecksum);
+    Raw(std::string _ref_uri, ChecksumAlgorithm check);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json representation
      */
     explicit Raw(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Return sequence checksums
+     * @return Sequence checksums
      */
     const std::vector<std::string>& getChecksums() const;
 
     /**
-     * @brief
-     * @param checksum
+     * @brief Add new checksum
+     * @param checksum Checksum to add
      */
     void addChecksum(std::string checksum);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const override;
 };

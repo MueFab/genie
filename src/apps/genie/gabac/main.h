@@ -13,7 +13,7 @@ namespace genieapp {
 namespace gabac {
 
 /**
- *
+ * @brief
  * @param argc
  * @param argv
  * @return

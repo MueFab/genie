@@ -27,23 +27,23 @@ static const char chartorevchar[128] = {
     0, 0,   0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  //!<
 
 /**
- *
+ * @brief
  */
 struct compression_params {
-    bool paired_end;               //!<
-    bool preserve_quality;         //!<
-    bool preserve_id;              //!<
-    bool ureads_flag;              //!<
-    uint32_t num_reads;            //!<
-    uint32_t num_reads_clean[2];   //!<
-    uint32_t max_readlen;          //!<
-    uint32_t num_reads_per_block;  //!<
-    int num_thr;                   //!<
-    uint32_t num_blocks;           //!<
+    bool paired_end;               //!< @brief
+    bool preserve_quality;         //!< @brief
+    bool preserve_id;              //!< @brief
+    bool ureads_flag;              //!< @brief
+    uint32_t num_reads;            //!< @brief
+    uint32_t num_reads_clean[2];   //!< @brief
+    uint32_t max_readlen;          //!< @brief
+    uint32_t num_reads_per_block;  //!< @brief
+    int num_thr;                   //!< @brief
+    uint32_t num_blocks;           //!< @brief
 };
 
 /**
- *
+ * @brief
  * @param s
  * @param s1
  * @param readlen
@@ -51,7 +51,7 @@ struct compression_params {
 void reverse_complement(char *s, char *s1, const int readlen);
 
 /**
- *
+ * @brief
  * @param s
  * @param readlen
  * @return
@@ -59,14 +59,14 @@ void reverse_complement(char *s, char *s1, const int readlen);
 std::string reverse_complement(const std::string &s, const int readlen);
 
 /**
- *
+ * @brief
  * @param length
  * @return
  */
 std::string random_string(size_t length);
 
 /**
- *
+ * @brief
  * @param read
  * @param fout
  * @return
@@ -74,7 +74,7 @@ std::string random_string(size_t length);
 void write_dnaN_in_bits(const std::string &read, std::ofstream &fout);
 
 /**
- *
+ * @brief
  * @param read
  * @param fin
  * @return
@@ -82,7 +82,7 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout);
 void read_dnaN_from_bits(std::string &read, std::ifstream &fin);
 
 /**
- *
+ * @brief
  * @param read
  * @param fout
  * @return
@@ -90,7 +90,7 @@ void read_dnaN_from_bits(std::string &read, std::ifstream &fin);
 void write_dna_in_bits(const std::string &read, std::ofstream &fout);
 
 /**
- *
+ * @brief
  * @param read
  * @param fin
  * @return

@@ -24,12 +24,12 @@ namespace quality {
 namespace qvwriteout {
 
 /**
- *
+ * @brief
  */
 class Decoder : public core::QVDecoder {
  public:
     /**
-     *
+     * @brief
      * @param param
      * @param ecigar_vec
      * @param desc

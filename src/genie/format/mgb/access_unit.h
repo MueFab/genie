@@ -32,12 +32,17 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class AccessUnit : public core::parameter::DataUnit {
  public:
     /**
-     *
+     * @brief
+     */
+    void debugPrint(const core::parameter::ParameterSet &ps) const;
+
+    /**
+     * @brief
      * @param parameterSets
      * @param bitReader
      * @param lazyPayload
@@ -46,25 +51,25 @@ class AccessUnit : public core::parameter::DataUnit {
                         util::BitReader &bitReader, bool lazyPayload = false);
 
     /**
-     *
+     * @brief
      * @param bitReader
      */
     void loadPayload(util::BitReader &bitReader);
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t getPayloadSize() const;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;
 
     /**
-     *
+     * @brief
      * @param _access_unit_ID
      * @param _parameter_set_ID
      * @param _au_type
@@ -79,98 +84,98 @@ class AccessUnit : public core::parameter::DataUnit {
                uint32_t multiple_signature_base);
 
     /**
-     *
+     * @brief
      * @param block
      */
     void addBlock(Block block);
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     void setMmCfg(MmCfg &&cfg);
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     void setRefCfg(RefCfg &&cfg);
 
     /**
-     *
+     * @brief
      * @return
      */
     const RefCfg &getRefCfg();
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     void setAuTypeCfg(AuTypeCfg &&cfg);
 
     /**
-     *
+     * @brief
      * @param cfg
      */
     void setSignatureCfg(SignatureCfg &&cfg);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<Block> getBlocks() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getParameterID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const AuTypeCfg &getAlignmentInfo() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getReadCount() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     core::record::ClassType getClass() const;
 
  private:
     /**
-     *
+     * @brief
      * @param writer
      */
     void preWrite(util::BitWriter &writer) const;
 
-    uint32_t access_unit_ID;                         //!<
-    uint8_t num_blocks;                              //!<
-    uint8_t parameter_set_ID;                        //!<
-    core::record::ClassType au_type;                 //!<
-    uint32_t reads_count;                            //!<
-    boost::optional<MmCfg> mm_cfg;                   //!<
-    boost::optional<RefCfg> ref_cfg;                 //!<
-    boost::optional<AuTypeCfg> au_Type_U_Cfg;        //!<
-    boost::optional<SignatureCfg> signature_config;  //!<
+    uint32_t access_unit_ID;                         //!< @brief
+    uint8_t num_blocks;                              //!< @brief
+    uint8_t parameter_set_ID;                        //!< @brief
+    core::record::ClassType au_type;                 //!< @brief
+    uint32_t reads_count;                            //!< @brief
+    boost::optional<MmCfg> mm_cfg;                   //!< @brief
+    boost::optional<RefCfg> ref_cfg;                 //!< @brief
+    boost::optional<AuTypeCfg> au_Type_U_Cfg;        //!< @brief
+    boost::optional<SignatureCfg> signature_config;  //!< @brief
 
-    std::vector<Block> blocks;  //!<
+    std::vector<Block> blocks;  //!< @brief
 
-    size_t payloadbytes;  //!<
-    size_t qv_payloads;   //!<
+    size_t payloadbytes;  //!< @brief
+    size_t qv_payloads;   //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

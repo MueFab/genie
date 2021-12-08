@@ -20,37 +20,37 @@ namespace format {
 namespace mgb {
 
 /**
- * ISO 23092-2 Section 3.4.1.1 table 19 lines 11 to 15
+ * @brief
  */
 class RefCfg {
  private:
-    uint16_t ref_sequence_ID;     //!< Line 12
-    uint64_t ref_start_position;  //!< Line 13
-    uint64_t ref_end_position;    //!< Line 14
+    uint16_t ref_sequence_ID;     //!< @brief
+    uint64_t ref_start_position;  //!< @brief
+    uint64_t ref_end_position;    //!< @brief
 
-    uint8_t posSize;  //!< internal
+    uint8_t posSize;  //!< @brief internal
 
  public:
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getSeqID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getStart() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getEnd() const;
 
     /**
-     *
+     * @brief
      * @param _ref_sequence_ID
      * @param _ref_start_position
      * @param _ref_end_position
@@ -59,25 +59,25 @@ class RefCfg {
     RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
 
     /**
-     *
+     * @brief
      * @param _posSize
      */
     explicit RefCfg(uint8_t _posSize);
 
     /**
-     *
+     * @brief
      * @param _posSize
      * @param reader
      */
     RefCfg(uint8_t _posSize, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~RefCfg() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;

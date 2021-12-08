@@ -27,27 +27,27 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class ReferenceManager {
  private:
-    ReferenceCollection mgr;  //!<
+    ReferenceCollection mgr;  //!< @brief
 
     struct CacheLine {
-        std::shared_ptr<const std::string> chunk;  //!<
-        std::weak_ptr<const std::string> memory;   //!<
-        std::mutex loadMutex;                      //!<
+        std::shared_ptr<const std::string> chunk;  //!< @brief
+        std::weak_ptr<const std::string> memory;   //!< @brief
+        std::mutex loadMutex;                      //!< @brief
     };
 
-    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!<
+    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!< @brief
     std::map<size_t, std::string> indices;
-    std::deque<std::pair<std::string, size_t>> cacheInfo;  //!<
-    std::mutex cacheInfoLock;                              //!<
-    uint64_t cacheSize;                                    //!<
-    static const uint64_t CHUNK_SIZE;                      //!<
+    std::deque<std::pair<std::string, size_t>> cacheInfo;  //!< @brief
+    std::mutex cacheInfoLock;                              //!< @brief
+    uint64_t cacheSize;                                    //!< @brief
+    static const uint64_t CHUNK_SIZE;                      //!< @brief
 
     /**
-     *
+     * @brief
      * @param name
      * @param num
      */
@@ -55,95 +55,100 @@ class ReferenceManager {
 
  public:
     /**
-     *
+     * @brief
      * @param id
      */
     void validateRefID(size_t id);
 
     /**
-     *
+     * @brief
      * @param ref
      * @return
      */
     size_t ref2ID(const std::string& ref);
 
     /**
-     *
+     * @brief
      * @param id
      * @return
      */
     std::string ID2Ref(size_t id);
 
+    /**
+     * @brief
+     * @param id
+     * @return
+     */
     bool refKnown(size_t id);
 
     /**
-     *
+     * @brief
      * @return
      */
     static size_t getChunkSize();
 
     /**
-     *
+     * @brief
      */
     struct ReferenceExcerpt {
      private:
-        std::string ref_name;                                  //!<
-        size_t global_start;                                   //!<
-        size_t global_end;                                     //!<
-        std::vector<std::shared_ptr<const std::string>> data;  //!<
+        std::string ref_name;                                  //!< @brief
+        size_t global_start;                                   //!< @brief
+        size_t global_end;                                     //!< @brief
+        std::vector<std::shared_ptr<const std::string>> data;  //!< @brief
 
      public:
         /**
-         *
+         * @brief
          * @return
          */
         bool isEmpty() const;
 
         /**
-         *
+         * @brief
          * @param e
          */
         void merge(ReferenceExcerpt& e);
 
         /**
-         *
+         * @brief
          * @return
          */
         size_t getGlobalStart() const;
 
         /**
-         *
+         * @brief
          * @return
          */
         size_t getGlobalEnd() const;
 
         /**
-         *
+         * @brief
          * @return
          */
         const std::string& getRefName() const;
 
         /**
-         *
+         * @brief
          * @param pos
          * @return
          */
         std::shared_ptr<const std::string> getChunkAt(size_t pos) const;
 
         /**
-         *
+         * @brief
          * @param pos
          * @param dat
          */
         void mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat);
 
         /**
-         *
+         * @brief
          */
         ReferenceExcerpt();
 
         /**
-         *
+         * @brief
          * @param name
          * @param start
          * @param end
@@ -151,76 +156,76 @@ class ReferenceManager {
         ReferenceExcerpt(std::string name, size_t start, size_t end);
 
         /**
-         *
+         * @brief
          * @return
          */
         static const std::shared_ptr<const std::string>& undef_page();
 
         /**
-         *
+         * @brief
          * @param newEnd
          */
         void extend(size_t newEnd);
 
         /**
-         *
+         * @brief
          * @param page
          * @return
          */
         static bool isMapped(const std::shared_ptr<const std::string>& page);
 
         /**
-         *
+         * @brief
          * @param pos
          * @return
          */
         bool isMapped(size_t pos) const;
 
         /**
-         *
+         * @brief
          */
         struct Stepper {
          private:
-            std::vector<std::shared_ptr<const std::string>>::const_iterator startVecIt;  //!<
-            std::vector<std::shared_ptr<const std::string>>::const_iterator vecIt;       //!<
-            std::vector<std::shared_ptr<const std::string>>::const_iterator endVecIt;    //!<
-            size_t stringPos;                                                            //!<
-            const char* curString;                                                       //!<
+            std::vector<std::shared_ptr<const std::string>>::const_iterator startVecIt;  //!< @brief
+            std::vector<std::shared_ptr<const std::string>>::const_iterator vecIt;       //!< @brief
+            std::vector<std::shared_ptr<const std::string>>::const_iterator endVecIt;    //!< @brief
+            size_t stringPos;                                                            //!< @brief
+            const char* curString;                                                       //!< @brief
 
          public:
             /**
-             *
+             * @brief
              * @param e
              */
             explicit Stepper(const ReferenceExcerpt& e);
 
             /**
-             *
+             * @brief
              * @param off
              */
             void inc(size_t off = 1);
 
             /**
-             *
+             * @brief
              * @return
              */
             bool end() const;
 
             /**
-             *
+             * @brief
              * @return
              */
             char get() const;
         };
 
         /**
-         *
+         * @brief
          * @return
          */
         Stepper getStepper() const;
 
         /**
-         *
+         * @brief
          * @param start
          * @param end
          * @return
@@ -229,7 +234,7 @@ class ReferenceManager {
     };
 
     /**
-     *
+     * @brief
      * @param csize
      */
     explicit ReferenceManager(size_t csize);
@@ -242,7 +247,7 @@ class ReferenceManager {
     void addRef(size_t index, std::unique_ptr<Reference> ref);
 
     /**
-     *
+     * @brief
      * @param name
      * @param pos
      * @return
@@ -250,7 +255,7 @@ class ReferenceManager {
     std::shared_ptr<const std::string> loadAt(const std::string& name, size_t pos);
 
     /**
-     *
+     * @brief
      * @param name
      * @param start
      * @param end
@@ -259,20 +264,20 @@ class ReferenceManager {
     ReferenceExcerpt load(const std::string& name, size_t start, size_t end);
 
     /**
-     *
+     * @brief
      * @param name
      * @return
      */
     std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<std::string> getSequences() const;
 
     /**
-     *
+     * @brief
      * @param name
      * @return
      */

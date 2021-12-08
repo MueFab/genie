@@ -22,42 +22,41 @@ namespace meta {
 namespace external_ref {
 
 /**
- * @brief
+ * @brief Represents a reference in fasta format.
  */
 class Fasta : public ExternalRef {
  private:
-    std::vector<std::string> ref_type_other_checksums;  //!< @brief
+    std::vector<std::string> ref_type_other_checksums;  //!< @brief Sequence checksums
 
  public:
     /**
-     * @brief
-     * @param _ref_uri
-     * @param check
-     * @param firstChecksum
+     * @brief Construct form raw values
+     * @param _ref_uri URI to reference
+     * @param check Checksum algorithm used
      */
     Fasta(std::string _ref_uri, ChecksumAlgorithm check);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct from json
+     * @param json Json input
      */
     explicit Fasta(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Get Checksums of sequences
+     * @return Sequence checksums
      */
     const std::vector<std::string>& getChecksums() const;
 
     /**
-     * @brief
-     * @param checksum
+     * @brief Add new checksum to the end of the list
+     * @param checksum New checksum
      */
     void addChecksum(std::string checksum);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const override;
 };

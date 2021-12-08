@@ -19,17 +19,17 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class RefDecoder {
  public:
     /**
-     *
+     * @brief
      */
     virtual ~RefDecoder() = default;
 
     /**
-     *
+     * @brief
      * @param t
      * @return
      */

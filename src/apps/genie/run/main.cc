@@ -136,7 +136,7 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 256000;
+    constexpr size_t BLOCKSIZE = 64000;
     std::istream* in_ptr = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
         inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
@@ -156,7 +156,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 256000;
+    constexpr size_t BLOCKSIZE = 64000;
     genie::core::ClassifierRegroup::RefMode mode;
     if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
@@ -204,11 +204,11 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 256000;
+    constexpr size_t BLOCKSIZE = 64000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
 
-    std::string json_uri_path;
+    std::string json_uri_path = pOpts.inputRefFile;
     if (ghc::filesystem::exists(pOpts.inputFile + ".json")) {
         genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
         if (data.getReference()) {
@@ -223,7 +223,6 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                 json_uri_path = path;
             } else {
                 std::cerr << "Reference URI invalid. Falling back to CLI reference." << std::endl;
-                json_uri_path = pOpts.inputRefFile;
             }
         }
     }

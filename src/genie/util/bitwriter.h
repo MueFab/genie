@@ -78,6 +78,7 @@ class BitWriter {
     uint64_t getBitsWritten() const;
 
     /**
+     * @brief
      * @return True if the stream position is aligned to a full byte.
      */
     bool isAligned() const;

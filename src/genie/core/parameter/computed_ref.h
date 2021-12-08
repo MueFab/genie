@@ -22,12 +22,12 @@ namespace core {
 namespace parameter {
 
 /**
- *
+ * @brief
  */
 class ComputedRef {
  public:
     /**
-     *
+     * @brief
      */
     enum class Algorithm : uint8_t {
         RESERVED = 0,
@@ -38,54 +38,54 @@ class ComputedRef {
     };
 
  private:
-    Algorithm cr_alg_ID;                             //!<
-    boost::optional<ComputedRefExtended> extension;  //!<
+    Algorithm cr_alg_ID;                             //!< @brief
+    boost::optional<ComputedRefExtended> extension;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param cr
      * @return
      */
     bool operator==(const ComputedRef &cr) const;
 
     /**
-     *
+     * @brief
      * @param _cr_alg_ID
      */
     explicit ComputedRef(Algorithm _cr_alg_ID);
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit ComputedRef(util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~ComputedRef() = default;
 
     /**
-     *
+     * @brief
      * @param _crps_info
      */
     void setExtension(ComputedRefExtended &&_crps_info);
 
     /**
-     *
+     * @brief
      * @return
      */
     const ComputedRefExtended &getExtension() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     Algorithm getAlgorithm() const;
 
     /**
-     *
+     * @brief
      * @param bw
      */
     virtual void write(util::BitWriter &bw) const;

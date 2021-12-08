@@ -19,35 +19,35 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Base class for reference information (internal and external)
  */
 class RefBase {
  protected:
     /**
-     * @brief
+     * @brief Do not allow construction of interface
      */
     RefBase() = default;
 
  public:
     /**
-     * @brief
+     * @brief Reference types supported by the standard
      */
     enum class ReferenceType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
 
     /**
-     * @brief
+     * @brief Virtual destructor to allow inheritance
      */
     virtual ~RefBase() = default;
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     virtual nlohmann::json toJson() const = 0;
 
     /**
-     * @brief
-     * @return
+     * @brief Get Json Key of this base (internal vs external ref)
+     * @return Json key
      */
     virtual const std::string& getKeyName() const = 0;
 };

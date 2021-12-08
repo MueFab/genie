@@ -21,10 +21,10 @@ namespace tokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-constexpr uint8_t TYPE_SEQ = 0;  //!<
+constexpr uint8_t TYPE_SEQ = 0;  //!< @brief
 
 /**
- *
+ * @brief
  */
 enum class Tokens : uint8_t {
     DUP = 0,
@@ -42,23 +42,23 @@ enum class Tokens : uint8_t {
 };
 
 /**
- *
+ * @brief
  */
 struct TokenInfo {
-    std::string name;  //!<
-    int8_t paramSeq;   //!<
+    std::string name;  //!< @brief
+    int8_t paramSeq;   //!< @brief
 };
 
 /**
- *
+ * @brief
  */
 struct SingleToken {
-    Tokens token;             //!<
-    uint32_t param;           //!<
-    std::string paramString;  //!<
+    Tokens token;             //!< @brief
+    uint32_t param;           //!< @brief
+    std::string paramString;  //!< @brief
 
     /**
-     *
+     * @brief
      * @param t
      * @param p
      * @param ps
@@ -66,14 +66,14 @@ struct SingleToken {
     SingleToken(Tokens t, uint32_t p, std::string ps);
 
     /**
-     *
+     * @brief
      * @param t
      * @return
      */
     bool operator==(const SingleToken& t) const;
 
     /**
-     *
+     * @brief
      * @param t
      * @return
      */
@@ -81,14 +81,14 @@ struct SingleToken {
 };
 
 /**
- *
+ * @brief
  * @param t
  * @return
  */
 const TokenInfo& getTokenInfo(Tokens t);
 
 /**
- *
+ * @brief
  * @param oldString
  * @param newString
  * @return

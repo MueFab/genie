@@ -26,7 +26,7 @@ DescriptorStream::DescriptorStream(const nlohmann::json& obj)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t DescriptorStream::DescriptorStream::getID() const { return descriptor_ID; }
+size_t DescriptorStream::getID() const { return descriptor_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

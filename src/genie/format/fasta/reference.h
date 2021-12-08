@@ -22,15 +22,15 @@ namespace format {
 namespace fasta {
 
 /**
- *
+ * @brief
  */
 class Reference : public core::Reference {
  private:
-    Manager* mgr;  //!<
+    Manager* mgr;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param name
      * @param length
      * @param m
@@ -38,7 +38,7 @@ class Reference : public core::Reference {
     Reference(std::string name, size_t length, Manager* m);
 
     /**
-     *
+     * @brief
      * @param _start
      * @param _end
      * @return

@@ -23,26 +23,26 @@ namespace format {
 namespace fasta {
 
 /**
- *
+ * @brief
  */
 class FastaSource : public util::OriginalSource, public util::Source<std::string> {
  private:
-    std::ostream* outfile;                       //!<
-    util::OrderedLock outlock;                   //!<
-    core::ReferenceManager* refMgr;              //!<
-    std::map<std::string, size_t> accu_lengths;  //!<
-    size_t line_length;                          //!<
+    std::ostream* outfile;                       //!< @brief
+    util::OrderedLock outlock;                   //!< @brief
+    core::ReferenceManager* refMgr;              //!< @brief
+    std::map<std::string, size_t> accu_lengths;  //!< @brief
+    size_t line_length;                          //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _outfile
      * @param _refMgr
      */
     FastaSource(std::ostream* _outfile, core::ReferenceManager* _refMgr);
 
     /**
-     *
+     * @brief
      * @param id
      * @param lock
      * @return
@@ -50,7 +50,7 @@ class FastaSource : public util::OriginalSource, public util::Source<std::string
     bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
-     *
+     * @brief
      * @param id
      */
     void flushIn(uint64_t& id) override;

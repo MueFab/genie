@@ -20,58 +20,58 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Region on the genome, spanning many loci
  */
 class Region {
  private:
-    uint16_t seq_ID;                                      //!< @brief
-    std::vector<genie::core::record::ClassType> classes;  //!< @brief
-    uint64_t start_pos;                                   //!< @brief
-    uint64_t end_pos;                                     //!< @brief
+    uint16_t seq_ID;                                      //!< @brief Sequence ID name
+    std::vector<genie::core::record::ClassType> classes;  //!< @brief Record classes the region applies to
+    uint64_t start_pos;                                   //!< @brief Start position of region
+    uint64_t end_pos;                                     //!< @brief End position of region
 
  public:
     /**
-     * @brief
-     * @param seqid
-     * @param start
-     * @param end
-     * @param _classes
+     * @brief Construct from raw values
+     * @param seqid Reference sequence ID
+     * @param start Start locus
+     * @param end End locus
+     * @param _classes List of classes the region applies to
      */
     Region(uint16_t seqid, uint64_t start, uint64_t end, std::vector<genie::core::record::ClassType> _classes);
 
     /**
-     * @brief
-     * @param json
+     * @brief Construct form json
+     * @param json Json representation
      */
     explicit Region(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Get sequence ID
+     * @return Sequence ID
      */
     uint16_t getSeqID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Get List of active record classes
+     * @return List of record classes
      */
     const std::vector<genie::core::record::ClassType>& getClasses() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return start locus
+     * @return Start locus
      */
     uint64_t getStartPos() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Return end locus
+     * @return End locus
      */
     uint64_t getEndPos() const;
 };

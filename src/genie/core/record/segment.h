@@ -24,26 +24,26 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
+ * @brief
  */
 class Segment {
-    std::string sequence;                     //!<
-    std::vector<std::string> quality_values;  //!<
+    std::string sequence;                     //!< @brief
+    std::vector<std::string> quality_values;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      */
     Segment();
 
     /**
-     *
+     * @brief
      * @param _sequence
      */
     explicit Segment(std::string&& _sequence);
 
     /**
-     *
+     * @brief
      * @param length
      * @param qv_depth
      * @param reader
@@ -51,25 +51,25 @@ class Segment {
     Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::string& getSequence() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<std::string>& getQualities() const;
 
     /**
-     *
+     * @brief
      * @param qv
      */
     void addQualities(std::string&& qv);
 
     /**
-     *
+     * @brief
      * @param write
      */
     void write(util::BitWriter& write) const;

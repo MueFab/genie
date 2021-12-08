@@ -19,34 +19,34 @@ namespace meta {
 namespace blockheader {
 
 /**
- * @brief
+ * @brief Represents block continuity without block headers
  */
 class Disabled : public BlockHeader {
  private:
-    bool ordered_blocks_flag;  //!< @brief
+    bool ordered_blocks_flag;  //!< @brief True: Blocks are ordered by mapping position
 
  public:
     /**
-     * @brief
-     * @param ordered
+     * @brief Constructor from raw values
+     * @param ordered ordered_blocks_flag
      */
     explicit Disabled(bool ordered);
 
     /**
-     * @brief
-     * @param json
+     * @brief Constructor from json
+     * @param json Json input
      */
     explicit Disabled(const nlohmann::json& json);
 
     /**
-     * @brief
-     * @return
+     * @brief Return ordered_blocks_flag
+     * @return ordered_blocks_flag
      */
     bool getOrderedFlag() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const override;
 };

@@ -21,7 +21,7 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class ReferenceSource {
  protected:

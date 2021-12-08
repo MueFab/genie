@@ -48,10 +48,10 @@ class Config {
     std::string fasta_file_path;  //!< @brief
     std::string inputFile;        //!< @brief
     std::string outputFile;       //!< @brief
-    bool forceOverwrite;
-    bool help;
-    bool no_ref;
-    uint32_t num_threads;
+    bool forceOverwrite;          //!< @brief
+    bool help;                    //!< @brief
+    bool no_ref;                  //!< @brief
+    uint32_t num_threads;         //!< @brief
 
  private:
     /**

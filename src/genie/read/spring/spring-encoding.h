@@ -35,75 +35,78 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  */
 template <size_t bitset_size>
 struct encoder_global_b {
-    std::bitset<bitset_size> **basemask;  //!<
-    int max_readlen;                      //!<
+    std::bitset<bitset_size> **basemask;  //!< @brief
+    int max_readlen;                      //!< @brief
     // bitset for A,G,C,T,N at each position
     // used in stringtobitset, and bitsettostring
     std::bitset<bitset_size> mask63;  //!< bitset with 63 bits set to 1 (used in
     // bitsettostring for conversion to ullong)
 
     /**
-     *
+     * @brief
      * @param max_readlen_param
      */
     explicit encoder_global_b(int max_readlen_param);
 
     /**
-     *
+     * @brief
      */
     ~encoder_global_b();
 };
 
 /**
- *
+ * @brief
  */
 struct encoder_global {
-    uint32_t numreads{};               //!<
-    uint32_t numreads_s{};             //!<
-    uint32_t numreads_N{};             //!<
-    int numdict_s = NUM_DICT_ENCODER;  //!<
+    uint32_t numreads{};               //!< @brief
+    uint32_t numreads_s{};             //!< @brief
+    uint32_t numreads_N{};             //!< @brief
+    int numdict_s = NUM_DICT_ENCODER;  //!< @brief
 
-    int max_readlen{}, num_thr{};  //!<
+    int max_readlen{}, num_thr{};  //!< @brief
 
-    std::string basedir;            //!<
-    std::string infile;             //!<
-    std::string infile_flag;        //!<
-    std::string infile_pos;         //!<
-    std::string infile_seq;         //!<
-    std::string infile_RC;          //!<
-    std::string infile_readlength;  //!<
-    std::string infile_N;           //!<
-    std::string outfile_unaligned;  //!<
-    std::string outfile_seq;        //!<
-    std::string outfile_pos;        //!<
-    std::string outfile_noise;      //!<
-    std::string outfile_noisepos;   //!<
-    std::string infile_order;       //!<
-    std::string infile_order_N;     //!<
+    std::string basedir;            //!< @brief
+    std::string infile;             //!< @brief
+    std::string infile_flag;        //!< @brief
+    std::string infile_pos;         //!< @brief
+    std::string infile_seq;         //!< @brief
+    std::string infile_RC;          //!< @brief
+    std::string infile_readlength;  //!< @brief
+    std::string infile_N;           //!< @brief
+    std::string outfile_unaligned;  //!< @brief
+    std::string outfile_seq;        //!< @brief
+    std::string outfile_pos;        //!< @brief
+    std::string outfile_noise;      //!< @brief
+    std::string outfile_noisepos;   //!< @brief
+    std::string infile_order;       //!< @brief
+    std::string infile_order_N;     //!< @brief
 
-    char enc_noise[128][128]{};  //!<
+    char enc_noise[128][128]{};  //!< @brief
 
+    /**
+     * @brief
+     */
     encoder_global() = default;
 };
 
 /**
- *
+ * @brief
  */
 struct contig_reads {
-    std::string read;      //!<
-    int64_t pos;           //!<
-    char RC;               //!<
-    uint32_t order;        //!<
-    uint16_t read_length;  //!<
+    std::string read;      //!< @brief
+    int64_t pos;           //!< @brief
+    char RC;               //!< @brief
+    uint32_t order;        //!< @brief
+    uint16_t read_length;  //!< @brief
 };
 
 /**
- *
+ * @brief
  * @param current_contig
  * @param list_size
  * @return
@@ -111,7 +114,7 @@ struct contig_reads {
 std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t &list_size);
 
 /**
- *
+ * @brief
  * @param ref
  * @param current_contig
  * @param f_seq
@@ -128,21 +131,21 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
                  std::ofstream &f_RC, std::ofstream &f_readlength, uint64_t &abs_pos);
 
 /**
- *
+ * @brief
  * @param eg
  * @param cp
  */
 void getDataParams(encoder_global &eg, const compression_params &cp);
 
 /**
- *
+ * @brief
  * @param order_s
  * @param eg
  */
 void correct_order(uint32_t *order_s, const encoder_global &eg);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param b
  * @param readlen
@@ -154,7 +157,7 @@ std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
                            const encoder_global_b<bitset_size> &egb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param read
  * @param dict
@@ -168,7 +171,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             const encoder_global &eg, const encoder_global_b<bitset_size> &egb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param eg
  * @param egb
@@ -177,7 +180,7 @@ template <size_t bitset_size>
 void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param read
  * @param order_s
@@ -190,7 +193,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
                     const encoder_global &eg, const encoder_global_b<bitset_size> &egb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param temp_dir
  * @param cp

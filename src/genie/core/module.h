@@ -17,7 +17,7 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  * @tparam Tin
  * @tparam Tout
  */
@@ -25,18 +25,18 @@ template <typename Tin, typename Tout>
 class Module : public util::Source<Tout>, public util::Drain<Tin> {
  public:
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section& id) override;
 
     /**
-     *
+     * @brief
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      */
     ~Module() override = default;
 };

@@ -25,15 +25,15 @@ namespace core {
 class EntropyEncoder {
  public:
     using EntropyCoded =
-        std::tuple<parameter::DescriptorSubseqCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
+        std::tuple<parameter::DescriptorSubseqCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!< @brief
 
     /**
-     *
+     * @brief
      */
     virtual ~EntropyEncoder() = default;
 
     /**
-     *
+     * @brief
      * @param desc
      * @return
      */

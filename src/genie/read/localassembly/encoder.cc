@@ -22,18 +22,15 @@ namespace localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::LaeState::LaeState(size_t cr_buf_max_size, uint64_t startingPos)
-    : refCoder((uint32_t)cr_buf_max_size),
-      readCoder((int32_t)startingPos),
-      pairedEnd(false),
-      readLength(0),
-      classType(core::record::ClassType::NONE),
-      minPos(std::numeric_limits<uint64_t>::max()),
-      maxPos(std::numeric_limits<uint64_t>::min()) {}
+Encoder::LAEncodingState::LAEncodingState(const core::record::Chunk& data, uint32_t _cr_buf_max_size)
+    : EncoderStub::EncodingState(data), refCoder(_cr_buf_max_size) {
+    minPos = data.getData().front().getAlignments().front().getPosition();
+    maxPos = 0;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::printDebug(const Encoder::LaeState& state, const std::string& ref1, const std::string& ref2,
+void Encoder::printDebug(const LAEncodingState& state, const std::string& ref1, const std::string& ref2,
                          const core::record::Record& r) const {
     if (!debug) {
         return;
@@ -56,143 +53,53 @@ void Encoder::printDebug(const Encoder::LaeState& state, const std::string& ref1
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::updateAssembly(const core::record::Record& r, Encoder::LaeState& state) const {
-    std::string ref1 = state.refCoder.getReference((uint32_t)r.getAlignments().front().getPosition(),
-                                                   r.getAlignments().front().getAlignment().getECigar());
-    std::string ref2;
+core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+                               EncodingState& state) {
+    auto ret = basecoder::EncoderStub::pack(id, std::move(qv), std::move(rname), state);
 
-    updateAUBoundaries(r.getAlignments().front().getPosition(), r.getAlignments().front().getAlignment().getECigar(),
-                       state);
-    if (state.pairedEnd && r.getAlignments().front().getAlignmentSplits().front()->getType() ==
-                               core::record::AlignmentSplit::Type::SAME_REC) {
-        const auto& srec = getPairedAlignment(state, r);
-        ref2 = state.refCoder.getReference((uint32_t)(r.getAlignments().front().getPosition() + srec.getDelta()),
-                                           srec.getAlignment().getECigar());
-        updateAUBoundaries(r.getAlignments().front().getPosition() + srec.getDelta(), srec.getAlignment().getECigar(),
-                           state);
-    }
-
-    state.refCoder.addRead(r);
-    state.readCoder.add(r, ref1, ref2);
-
-    printDebug(state, ref1, ref2, r);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const core::record::alignment_split::SameRec& Encoder::getPairedAlignment(const Encoder::LaeState& state,
-                                                                          const core::record::Record& r) const {
-    UTILS_DIE_IF(!state.pairedEnd, "Record is single ended");
-    UTILS_DIE_IF(r.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                     core::record::AlignmentSplit::Type::SAME_REC,
-                 "Only same record split alignments supported");
-    return *reinterpret_cast<const core::record::alignment_split::SameRec*>(
-        r.getAlignments().front().getAlignmentSplits().front().get());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& state) const {
-    UTILS_DIE_IF((r.getNumberOfTemplateSegments() > 1) != state.pairedEnd, "Mix of paired / unpaired not supported");
-
-    state.classType = std::max(state.classType, r.getClassID());
-
-    if (r.getSegments()[0].getSequence().length() != state.readLength) {
-        state.readLength = 0;
-    }
-
-    if (r.getSegments().size() == 2) {
-        if (r.getSegments()[1].getSequence().length() != state.readLength) {
-            state.readLength = 0;
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                               std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
-                               Encoder::LaeState& state) const {
-    core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
-    core::parameter::ParameterSet ret((uint8_t)id, (uint8_t)id, dataType, core::AlphabetID::ACGTN,
-                                      (uint32_t)state.readLength, state.pairedEnd, false, qv_depth, 0, false, false);
-    ret.addClass(type, std::move(qvparam));
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
-    ret.setComputedRef(std::move(crps));
+    ret.getParameters().setComputedRef(std::move(crps));
 
-    auto rawAU = state.readCoder.moveStreams();
-
-    rawAU.setParameters(std::move(ret));
-    rawAU.setReference(ref);
-    rawAU.setMinPos(1);
-    rawAU.setMaxPos(state.maxPos - state.minPos + 1);
-    rawAU.setClassType(type);
-    return rawAU;
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
-    util::Watch watch;
-    core::record::Chunk data = std::move(t);
-    for (auto it = data.getData().begin(); it != data.getData().end();) {
-        if (it->getClassID() == core::record::ClassType::CLASS_HM) {
-            //    std::cerr << "Skipping record of class HM in local assembly..." << std::endl;
-            it = data.getData().erase(it);
-            continue;
-        } else {
-            ++it;
-        }
-    }
-    if (data.getData().empty()) {
-        skipOut(id);
-        return;
+std::pair<std::string, std::string> Encoder::getReferences(const core::record::Record& r, EncodingState& state) {
+    std::pair<std::string, std::string> ret;
+    {
+        auto begin = r.getAlignments().front().getPosition();
+        auto ecigar = r.getAlignments().front().getAlignment().getECigar();
+        ret.first = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
+
+        // Update AU end
+        auto end = begin + core::record::Record::getLengthOfCigar(ecigar);
+        state.maxPos = std::max(state.maxPos, end);
     }
 
-    LaeState state(cr_buf_max_size, data.getData().front().getAlignments().front().getPosition());
+    if (r.getSegments().size() > 1) {
+        const auto& srec = *reinterpret_cast<const core::record::alignment_split::SameRec*>(
+            r.getAlignments().front().getAlignmentSplits().front().get());
+        auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
+        auto ecigar = srec.getAlignment().getECigar();
+        ret.second = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
 
-    state.pairedEnd = data.getData().front().getNumberOfTemplateSegments() > 1;
-    state.readLength = data.getData().front().getSegments().front().getSequence().length();
-
-    auto ref = data.getData().front().getAlignmentSharedData().getSeqID();
-    uint64_t lastPos = 0;
-    data.getStats().addDouble("time-localassembly", watch.check());
-    watch.reset();
-    auto qv = qvcoder->process(data);
-    uint8_t qvdepth = std::get<1>(qv).isEmpty() ? 0 : 1;
-    data.getStats().addDouble("time-quality", watch.check());
-    watch.reset();
-    core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
-    rname = std::get<0>(namecoder->process(data));
-    data.getStats().addDouble("time-name", watch.check());
-    watch.reset();
-    size_t read_num = 0;
-    for (auto& r : data.getData()) {
-        read_num += r.getSegments().size();
-        uint64_t curPos = r.getAlignments().front().getPosition();
-        UTILS_DIE_IF(curPos < lastPos, "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
-
-        lastPos = r.getAlignments().front().getPosition();
-
-        updateGuesses(r, state);
-
-        UTILS_DIE_IF(r.getAlignmentSharedData().getSeqID() != ref,
-                     "Records belonging to different reference sequences in one access unit");
-
-        updateAssembly(r, state);
+        // Update AU end
+        auto end = begin + srec.getDelta() + core::record::Record::getLengthOfCigar(ecigar);
+        state.maxPos = std::max(state.maxPos, end);
     }
 
-    auto rawAU = pack(id.start, ref, qvdepth, std::move(std::get<0>(qv)), data.getData().front().getClassID(), state);
-    rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
-    rawAU.get(core::GenDesc::RNAME) = std::move(rname);
-    rawAU.get(core::GenDesc::FLAGS) = core::AccessUnit::Descriptor(core::GenDesc::FLAGS);
-    rawAU.setStats(std::move(data.getStats()));
-    data.getData().clear();
-    rawAU.getStats().addDouble("time-localassembly", watch.check());
-    rawAU = entropyCodeAU(std::move(rawAU));
-    rawAU.setNumReads(read_num);
-    flowOut(std::move(rawAU), id);
+    // Update computed reference
+    dynamic_cast<LAEncodingState&>(state).refCoder.addRead(r);
+    printDebug(dynamic_cast<LAEncodingState&>(state), ret.first, ret.second, r);
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record::Chunk& data) const {
+    return util::make_unique<LAEncodingState>(data, cr_buf_max_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -201,34 +108,23 @@ Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug) : debug(_debug), cr_buf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Encoder::getLengthOfCigar(const std::string& cigar) {
-    std::string digits;
-    size_t length = 0;
-    for (const auto& c : cigar) {
-        if (isdigit(c)) {
-            digits += c;
-            continue;
-        }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(c)) {
-            length++;
-            digits.clear();
-            continue;
-        }
-        if (c == '=' || c == '-' || c == '*' || c == '/' || c == '%') {
-            length += std::stoi(digits);
-            digits.clear();
-        } else {
-            digits.clear();
+void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
+    core::record::Chunk d = std::move(t);
+
+    // Class N is not supported in local assembly becuase of the follwing situation:
+    // AANAAAAAAAAA  <- Old reads
+    //  ANAAAAAAAAAAA
+    //
+    //   AAAAAAANAAAAA  <- New read
+    //   ^ Needs to patch N with A (not possible in class N), even though class of individual reads is correct
+    // Downgrade to class M!
+    for (auto& r : d.getData()) {
+        if (r.getClassID() == core::record::ClassType::CLASS_N) {
+            r.setClassType(core::record::ClassType::CLASS_M);
         }
     }
-    return length;
-}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Encoder::updateAUBoundaries(uint64_t position, const std::string& cigar, LaeState& state) const {
-    state.minPos = std::min(position, state.minPos);
-    state.maxPos = std::max(position + getLengthOfCigar(cigar), state.maxPos);
+    basecoder::EncoderStub::flowIn(std::move(d), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

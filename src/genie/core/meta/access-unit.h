@@ -19,50 +19,50 @@ namespace core {
 namespace meta {
 
 /**
- * @brief
+ * @brief Holds metadata associated with an access unit
  */
 class AccessUnit {
  private:
-    size_t access_unit_ID;             //!< @brief
-    std::string AU_information_value;  //!< @brief
-    std::string AU_protection_value;   //!< @brief
+    size_t access_unit_ID;             //!< @brief ID of associated access unit
+    std::string AU_information_value;  //!< @brief MPEG-G Part 3 metadata
+    std::string AU_protection_value;   //!< @brief MPEG-G Part 3 protection data
 
  public:
     /**
-     * @brief
-     * @param id
-     * @param information
-     * @param protection
+     * @brief Construct from raw data
+     * @param id ID of associated access unit
+     * @param information MPEG-G Part 3 metadata
+     * @param protection MPEG-G Part 3 protection data
      */
     AccessUnit(size_t id, std::string information, std::string protection);
 
     /**
-     * @brief
-     * @param obj
+     * @brief Construct form json
+     * @param obj Json representation
      */
     explicit AccessUnit(const nlohmann::json& obj);
 
     /**
-     * @brief
-     * @return
+     * @brief Convert to json
+     * @return Json representation
      */
     nlohmann::json toJson() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Get ID of associated access unit
+     * @return AU ID
      */
     size_t getID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Get MPEG-G Part 3 metadata
+     * @return MPEG-G Part 3 metadata
      */
     const std::string& getInformation() const;
 
     /**
-     * @brief
-     * @return
+     * @brief MPEG-G Part 3 protection data
+     * @return MPEG-G Part 3 protection data
      */
     const std::string& getProtection() const;
 };

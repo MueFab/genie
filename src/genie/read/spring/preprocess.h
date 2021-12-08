@@ -24,41 +24,41 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  */
 struct Preprocessor {
-    compression_params cp;  //!<
+    compression_params cp;  //!< @brief
 
-    std::string outfileclean[2];       //!<
-    std::string outfileN[2];           //!<
-    std::string outfileorderN[2];      //!<
-    std::string outfileid;             //!<
-    std::string outfilequality[2];     //!<
-    std::string outfilereadlength[2];  //!<
+    std::string outfileclean[2];       //!< @brief
+    std::string outfileN[2];           //!< @brief
+    std::string outfileorderN[2];      //!< @brief
+    std::string outfileid;             //!< @brief
+    std::string outfilequality[2];     //!< @brief
+    std::string outfilereadlength[2];  //!< @brief
 
-    std::ofstream fout_clean[2];    //!<
-    std::ofstream fout_N[2];        //!<
-    std::ofstream fout_order_N[2];  //!<
-    std::ofstream fout_id;          //!<
-    std::ofstream fout_quality[2];  //!<
+    std::ofstream fout_clean[2];    //!< @brief
+    std::ofstream fout_N[2];        //!< @brief
+    std::ofstream fout_order_N[2];  //!< @brief
+    std::ofstream fout_id;          //!< @brief
+    std::ofstream fout_quality[2];  //!< @brief
 
-    std::string temp_dir;     //!<
-    std::string working_dir;  //!<
+    std::string temp_dir;     //!< @brief
+    std::string working_dir;  //!< @brief
 
-    util::OrderedLock lock;  //!<
+    util::OrderedLock lock;  //!< @brief
 
-    core::stats::PerfStats stats;  //!<
+    core::stats::PerfStats stats;  //!< @brief
 
     /**
-     *
+     * @brief
      * @return
      */
     core::stats::PerfStats& getStats();
 
-    bool used = false;  //!<
+    bool used = false;  //!< @brief
 
     /**
-     *
+     * @brief
      * @param working_dir
      * @param num_thr
      * @param paired_end
@@ -66,25 +66,25 @@ struct Preprocessor {
     void setup(const std::string& working_dir, size_t num_thr, bool paired_end);
 
     /**
-     *
+     * @brief
      */
     ~Preprocessor();
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void preprocess(core::record::Chunk&& t, const util::Section& id);
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skip(const util::Section& id);
 
     /**
-     *
+     * @brief
      * @param pos
      */
     void finish(size_t pos);

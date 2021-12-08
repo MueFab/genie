@@ -32,14 +32,14 @@ class FileBuffer : public std::streambuf {
 
  protected:
     /**
-     *
+     * @brief
      * @param c
      * @return
      */
     int overflow(int c) override;
 
     /**
-     *
+     * @brief
      * @param s
      * @param n
      * @return
@@ -47,13 +47,13 @@ class FileBuffer : public std::streambuf {
     std::streamsize xsputn(const char *s, std::streamsize n) override;
 
     /**
-     *
+     * @brief
      * @return
      */
     int sync() override;
 
     /**
-     *
+     * @brief
      * @param s
      * @param n
      * @return
@@ -61,7 +61,7 @@ class FileBuffer : public std::streambuf {
     std::streamsize xsgetn(char *s, std::streamsize n) override;
 
     /**
-     *
+     * @brief
      * @return
      */
     int underflow() override;
@@ -83,21 +83,21 @@ class DataBlockBuffer : public std::streambuf {
     explicit DataBlockBuffer(util::DataBlock *d, size_t pos_i = 0);
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t size() const;
 
  protected:
     /**
-     *
+     * @brief
      * @param c
      * @return
      */
     int overflow(int c) override;
 
     /**
-     *
+     * @brief
      * @param s
      * @param n
      * @return
@@ -105,7 +105,7 @@ class DataBlockBuffer : public std::streambuf {
     std::streamsize xsputn(const char *s, std::streamsize n) override;
 
     /**
-     *
+     * @brief
      * @param s
      * @param n
      * @return
@@ -113,32 +113,32 @@ class DataBlockBuffer : public std::streambuf {
     std::streamsize xsgetn(char *s, std::streamsize n) override;
 
     /**
-     *
+     * @brief
      * @return
      */
     int underflow() override;
 
     /**
-     *
+     * @brief
      * @return
      */
     int uflow() override;
 
     /**
-     *
+     * @brief
      * @param blk
      */
     virtual void flush_block(util::DataBlock *blk);
 
     /**
-     *
+     * @brief
      * @param sp
      * @return
      */
     pos_type seekpos(pos_type sp, std::ios_base::openmode) override;
 
     /**
-     *
+     * @brief
      * @param off
      * @param dir
      * @param which
@@ -148,8 +148,8 @@ class DataBlockBuffer : public std::streambuf {
                      std::ios_base::openmode which = std::ios_base::in) override;
 
  private:
-    util::DataBlock block;  //!<
-    size_t pos;             //!<
+    util::DataBlock block;  //!< @brief
+    size_t pos;             //!< @brief
 };
 
 /**
@@ -190,7 +190,7 @@ class OBufferStream : public DataBlockBuffer, public std::ostream {
 class NullBuffer : public std::streambuf {
  protected:
     /**
-     *
+     * @brief
      * @param c
      * @return
      */
@@ -208,7 +208,7 @@ class NullStream : public std::ostream {
     NullStream();
 
  private:
-    NullBuffer m_sb;  //!<
+    NullBuffer m_sb;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

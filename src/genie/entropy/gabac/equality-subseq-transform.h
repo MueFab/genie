@@ -19,13 +19,13 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  * @param transformedSubseqs
  */
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs);
 
 /**
- *
+ * @brief
  * @param transformedSubseqs
  */
 void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs);
