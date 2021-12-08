@@ -26,12 +26,12 @@ namespace core {
  */
 class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk> {
  private:
-    Classifier* classifier;  //!<
-    bool flushing{false};    //!<
+    Classifier* classifier;  //!< @brief
+    bool flushing{false};    //!< @brief
 
  protected:
     /**
-     *
+     * @brief
      * @param _classifier
      * @return
      */
@@ -39,13 +39,13 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
 
  public:
     /**
-     *
+     * @brief
      * @param _classifier
      */
     void setClassifier(Classifier* _classifier);
 
     /**
-     *
+     * @brief
      * @param id
      * @param lock
      * @return
@@ -53,12 +53,12 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
     bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
-     *
+     * @brief
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      */
     ~FormatImporter() override = default;
 };

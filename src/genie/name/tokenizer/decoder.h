@@ -23,11 +23,11 @@ namespace name {
 namespace tokenizer {
 
 /**
- *
+ * @brief
  */
 class Decoder : public core::NameDecoder {
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */
@@ -35,7 +35,7 @@ class Decoder : public core::NameDecoder {
 
  public:
     /**
-     *
+     * @brief
      * @param desc
      * @return
      */

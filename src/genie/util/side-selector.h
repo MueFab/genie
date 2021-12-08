@@ -64,7 +64,7 @@ class SideSelector {
     void setSelection(std::function<size_t(Args...)> _select);
 
     /**
-     *
+     * @brief
      * @param param
      * @return
      */

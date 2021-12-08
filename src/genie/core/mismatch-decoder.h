@@ -18,30 +18,30 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class MismatchDecoder {
  public:
     /**
-     *
+     * @brief
      */
     virtual ~MismatchDecoder() = default;
 
     /**
-     *
+     * @brief
      * @param ref
      * @return
      */
     virtual uint64_t decodeMismatch(uint64_t ref) = 0;
 
     /**
-     *
+     * @brief
      * @return
      */
     virtual bool dataLeft() const = 0;
 
     /**
-     *
+     * @brief
      * @return
      */
     virtual std::unique_ptr<MismatchDecoder> copy() const = 0;

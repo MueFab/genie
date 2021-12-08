@@ -20,21 +20,21 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- * ISO 23092-2 Section 8.3.2 table
+ * @brief
  */
 class StateVars {
  private:
-    uint64_t numAlphaSubsym;           //!<
-    uint32_t numSubsyms;               //!<
-    uint32_t numCtxSubsym;             //!<
-    uint32_t cLengthBI;                //!<
-    uint64_t codingOrderCtxOffset[3];  //!<
-    uint64_t codingSizeCtxOffset;      //!<
-    uint32_t numCtxLuts;               //!<
-    uint64_t numCtxTotal;              //!<
+    uint64_t numAlphaSubsym;           //!< @brief
+    uint32_t numSubsyms;               //!< @brief
+    uint32_t numCtxSubsym;             //!< @brief
+    uint32_t cLengthBI;                //!< @brief
+    uint64_t codingOrderCtxOffset[3];  //!< @brief
+    uint64_t codingSizeCtxOffset;      //!< @brief
+    uint32_t numCtxLuts;               //!< @brief
+    uint64_t numCtxTotal;              //!< @brief
 
  public:
-    static const uint32_t MAX_LUT_SIZE = (1u << 8u);  //!<
+    static const uint32_t MAX_LUT_SIZE = (1u << 8u);  //!< @brief
 
     bool operator==(const StateVars& bin) const {
         return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
@@ -47,12 +47,12 @@ class StateVars {
     }
 
     /**
-     *
+     * @brief
      */
     StateVars();
 
     /**
-     *
+     * @brief
      * @param transform_ID_subsym
      * @param support_values
      * @param cabac_binarization
@@ -64,61 +64,61 @@ class StateVars {
                   const core::AlphabetID alphabet_ID);
 
     /**
-     *
+     * @brief
      */
     virtual ~StateVars() = default;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getNumSubsymbols() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getNumAlphaSubsymbol() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getNumCtxPerSubsymbol() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getCLengthBI() const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     uint64_t getCodingOrderCtxOffset(uint8_t index) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getCodingSizeCtxOffset() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getNumCtxLUTs() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getNumCtxTotal() const;
 
     /**
-     *
+     * @brief
      * @param codingOrder
      * @param shareSubsymLutFlag
      * @param trnsfSubsymID
@@ -128,7 +128,7 @@ class StateVars {
                        const SupportValues::TransformIdSubsym trnsfSubsymID) const;
 
     /**
-     *
+     * @brief
      * @param shareSubsymPrvFlag
      * @return
      */
@@ -139,7 +139,7 @@ class StateVars {
      */
 
     /**
-     *
+     * @brief
      * @param subsequence_ID
      * @param alphabet_ID
      * @return
@@ -147,21 +147,21 @@ class StateVars {
     static uint64_t getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID);
 
     /**
-     *
+     * @brief
      * @param sizeInBits
      * @return
      */
     static uint8_t getMinimalSizeInBytes(uint8_t sizeInBits);
 
     /**
-     *
+     * @brief
      * @param sizeInBits
      * @return
      */
     static uint8_t getLgWordSize(uint8_t sizeInBits);
 
     /**
-     *
+     * @brief
      * @param input
      * @param sizeInBytes
      * @return
@@ -169,7 +169,7 @@ class StateVars {
     static int64_t getSignedValue(uint64_t input, uint8_t sizeInBytes);
 
     /**
-     *
+     * @brief
      * @param N
      * @return
      */

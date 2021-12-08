@@ -33,6 +33,7 @@ struct BlockStepper {
     explicit BlockStepper(uint8_t *_cur = nullptr, uint8_t *_end = nullptr, uint8_t _wordSize = 1);
 
     /**
+     * @brief
      * @return True, if the current position is not yet the end position.
      */
     bool isValid() const;
@@ -43,6 +44,7 @@ struct BlockStepper {
     void inc();
 
     /**
+     * @brief
      * @return The current element.
      */
     uint64_t get() const;

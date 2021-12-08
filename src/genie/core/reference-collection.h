@@ -22,15 +22,15 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class ReferenceCollection {
  private:
-    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
+    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param name
      * @param _start
      * @param _end
@@ -39,26 +39,26 @@ class ReferenceCollection {
     std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
 
     /**
-     *
+     * @brief
      * @param name
      * @return
      */
     std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<std::string> getSequences() const;
 
     /**
-     *
+     * @brief
      * @param ref
      */
     void registerRef(std::unique_ptr<Reference> ref);
 
     /**
-     *
+     * @brief
      * @param ref
      */
     void registerRef(std::vector<std::unique_ptr<Reference>>&& ref);

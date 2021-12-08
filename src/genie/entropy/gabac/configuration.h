@@ -49,39 +49,39 @@ struct EncodingConfiguration {
     ~EncodingConfiguration();
 
     /**
-     * Compare
+     * @brief Compare
      * @param conf
      * @return
      */
     bool operator==(const EncodingConfiguration& conf) const;
 
     /**
-     * Compare
+     * @brief Compare
      * @param conf
      * @return
      */
     bool operator!=(const EncodingConfiguration& conf) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getSubseqWordSize() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const paramcabac::Subsequence& getSubseqConfig() const;
 
     /**
-     *
+     * @brief
      * @param _subseqCfg
      */
     void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg);
 
  private:
-    paramcabac::Subsequence subseqCfg;  //!<
+    paramcabac::Subsequence subseqCfg;  //!< @brief
 };
 
 /**

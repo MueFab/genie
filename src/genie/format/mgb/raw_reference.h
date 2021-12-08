@@ -22,63 +22,63 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class RawReference : public core::parameter::DataUnit {
  private:
-    std::vector<RawReferenceSequence> seqs;  //!<
+    std::vector<RawReferenceSequence> seqs;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      */
     RawReference();
 
     /**
-     *
+     * @brief
      * @param reader
      * @param headerOnly
      */
     explicit RawReference(util::BitReader& reader, bool headerOnly = false);
 
     /**
-     *
+     * @brief
      */
     ~RawReference() override = default;
 
     /**
-     *
+     * @brief
      * @param ref
      */
     void addSequence(RawReferenceSequence&& ref);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter& writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool isEmpty() const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     RawReferenceSequence& getSequence(size_t index);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<RawReferenceSequence>::iterator begin();
 
     /**
-     *
+     * @brief
      * @return
      */
     std::vector<RawReferenceSequence>::iterator end();

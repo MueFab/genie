@@ -19,14 +19,14 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  * @param temp_dir
  * @param cp
  */
 void call_reorder(const std::string &temp_dir, compression_params &cp);
 
 /**
- *
+ * @brief
  * @param temp_dir
  * @param cp
  */

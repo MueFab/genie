@@ -17,6 +17,12 @@ ReferenceSource::ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+genie::core::meta::Reference ReferenceSource::getMeta() const {
+    return {"", 0, 0, 0, util::make_unique<meta::InternalRef>(uint16_t(0), uint16_t(0)), "Placeholder"};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

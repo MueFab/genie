@@ -20,35 +20,35 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class Reference {
  private:
-    std::string name;  //!<
-    uint64_t start;    //!<
-    uint64_t end;      //!<
+    std::string name;  //!< @brief
+    uint64_t start;    //!< @brief
+    uint64_t end;      //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @return
      */
     const std::string& getName() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getStart() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getEnd() const;
 
     /**
-     *
+     * @brief
      * @param _start
      * @param _end
      * @return
@@ -56,12 +56,12 @@ class Reference {
     virtual std::string getSequence(uint64_t _start, uint64_t _end) = 0;
 
     /**
-     *
+     * @brief
      */
     virtual ~Reference() = default;
 
     /**
-     *
+     * @brief
      * @param _name
      * @param _start
      * @param _end

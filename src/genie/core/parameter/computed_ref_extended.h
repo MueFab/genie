@@ -19,41 +19,41 @@ namespace core {
 namespace parameter {
 
 /**
- *
+ * @brief
  */
 class ComputedRefExtended {
  private:
-    uint8_t cr_pad_size;       //!<
-    uint32_t cr_buf_max_size;  //!<
+    uint8_t cr_pad_size;       //!< @brief
+    uint32_t cr_buf_max_size;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param ext
      * @return
      */
     bool operator==(const ComputedRefExtended& ext) const;
 
     /**
-     *
+     * @brief
      * @param cr_pad_size
      * @param cr_buf_max_size
      */
     ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 
     /**
-     *
+     * @brief
      */
     virtual ~ComputedRefExtended() = default;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint32_t getBufMaxSize() const;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;

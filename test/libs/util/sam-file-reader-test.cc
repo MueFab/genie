@@ -317,6 +317,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
         EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
         EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
 
+        ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+                  genie::core::record::AlignmentSplit::Type::OTHER_REC);
         auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
             rec_alignment->getAlignmentSplits().front().get());
         EXPECT_EQ(rec_alignment_split->getNextPos(), 10541-1);
@@ -343,6 +345,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
         EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
         EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
 
+        ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+                  genie::core::record::AlignmentSplit::Type::OTHER_REC);
         auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
             rec_alignment->getAlignmentSplits().front().get());
         EXPECT_EQ(rec_alignment_split->getNextPos(), 181879-1);
@@ -370,6 +374,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
         EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
         EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
 
+        ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+                  genie::core::record::AlignmentSplit::Type::OTHER_REC);
         auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
             rec_alignment->getAlignmentSplits().front().get());
         EXPECT_EQ(rec_alignment_split->getNextPos(), 658-1);
@@ -391,6 +397,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
         EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
         EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
 
+        ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+                  genie::core::record::AlignmentSplit::Type::OTHER_REC);
         auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
             rec_alignment->getAlignmentSplits().front().get());
         EXPECT_EQ(rec_alignment_split->getNextPos(), 1491-1);
@@ -399,7 +407,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
 
 }
 
-# if true
+# if false
 TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 

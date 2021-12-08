@@ -22,23 +22,23 @@ namespace record {
 namespace alignment_external {
 
 /**
- *
+ * @brief
  */
 class None : public AlignmentExternal {
  public:
     /**
-     *
+     * @brief
      */
     None();
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<AlignmentExternal> clone() const override;

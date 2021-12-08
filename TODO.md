@@ -66,3 +66,67 @@
 - [ ] Resolve FIXMEs and TODOs
 - [ ] Update README.md
 - [ ] Check LICENSE (check that it is compatible to SPRING's license)
+
+# State of fastq transcoder
+- [X] Single end
+- [X] Paired end
+- [X] Read names
+- [X] Quality values
+- [ ] Missing pairs
+- [ ] Adapt interface to SRS
+
+CI tests are integrated into fastq tests due to relatively low complexity
+
+# State of sam -> mgrec transcoder
+- [X] Single end
+- [X] Paired end, same record
+- [X] Read names
+- [X] Quality values
+- [X] Flags
+- [ ] Handle case of forced split, if records too far apart (16 bit delta value limitation)
+- [X] Paired end, pair missing 
+- [X] Paired end, other record
+- [ ] Splices
+- [ ] Secondary alignments
+- [ ] Move classification between classes P, N, M, I from genie to transcoder
+- [ ] Adapt interface to SRS
+- [ ] Windows support
+- [X] CI tests including SAM comparison 
+
+The following characteristics of a sam file are lost during transcoding, as impossible to express in mpegg-records:
+- Sam Flag "Supplementary alignment" 
+- Distinction between CIGAR characters M, X and =
+- TLEN has no strict standard, so some TLEN fields can change during transcoding
+- Optional tags and the SAM file header
+- Unmapped records lose the "reverse complement" flag.
+- RNAME is replaced by a unique number instead of a string.
+
+The following characteristics of a sam file are lost during transcoding, but could be, in theory, supported:
+- If paired reads are mapped to different reference sequences, it is not checked if the paired record is actually present. The pointer to the paired read is just copied. Whereas if they are map to the same sequence, a missing mate will be marked as "unpaired".
+- If a pair is transcoded into two different records (either because the mates are mapped to two different sequences or because they are too far apart for a single record), the "SEQ of the next segment in the template being reverse complemented" SAM flag is lost
+- Splices / seondary alignments are discarded (but easy to add)
+- If flags are set only for one SAM record (e.g. optical duplicate), the state of the flags in the second SAM record are lost. The case that those flags differ between SAM records of the same pair is rare. Could be solved by splitting such pairs into two MPEG records.
+
+Windows support is currently deactivated for SAM transcoding, as it uses htslib, which has no microsoft visual studio / CMake support.
+
+# Local assembly
+- [ ] MMTYPE descriptor broken, not decodable in reference software
+- [X] Read names
+- [X] Quality values
+- [ ] QV depth > 1
+- [ ] Mapping score depth > 1
+- [ ] Splices
+- [ ] Secondary alignments
+- [X] Class P
+- [X] Class N
+- [X] Class M
+- [X] Class I
+- [ ] Class HM
+- [X] Softclips
+- [X] Hardclips
+- [X] Paired reads
+- [X] Unpaired reads
+- [X] CI Tests
+
+# Reference based compression
+- [ ] Not yet started

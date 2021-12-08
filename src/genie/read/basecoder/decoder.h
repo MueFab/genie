@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <array>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -24,21 +25,21 @@ namespace read {
 namespace basecoder {
 
 /**
- *
+ * @brief
  */
 class Decoder {
  private:
-    core::AccessUnit container;  //!<
-    uint64_t position;           //!<
-    uint64_t length;             //!<
+    core::AccessUnit container;  //!< @brief
+    uint64_t position;           //!< @brief
+    uint64_t length;             //!< @brief
 
-    uint64_t recordCounter;  //!<
+    uint64_t recordCounter;  //!< @brief
 
-    size_t number_template_segments;  //!<
+    size_t number_template_segments;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param au
      * @param segments
      * @param pos
@@ -46,29 +47,33 @@ class Decoder {
     Decoder(core::AccessUnit &&au, size_t segments, size_t pos = 0);
 
     /**
-     *
-     * @param ref
-     * @param vec
-     * @return
-     */
-    core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec);
-
-    /**
-     *
+     * @brief
      */
     struct SegmentMeta {
-        uint64_t position;  //!<
-        uint64_t length;    //!<
+        std::array<uint64_t, 2> position;  //!< @brief
+        std::array<uint64_t, 2> length;    //!< @brief
+        bool first1;                       //!< @brief
+        uint8_t decoding_case;             //!< @brief
+        uint8_t num_segments;              //!< @brief
     };
 
     /**
-     *
+     * @brief
+     * @param ref
+     * @param vec
+     * @param meta
      * @return
      */
-    std::vector<SegmentMeta> readSegmentMeta();
+    core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec, const SegmentMeta &meta);
 
     /**
-     *
+     * @brief
+     * @return
+     */
+    Decoder::SegmentMeta readSegmentMeta();
+
+    /**
+     * @brief
      * @param clip_offset
      * @param seq
      * @param cigar
@@ -78,39 +83,40 @@ class Decoder {
                                                                         std::string &&cigar);
 
     /**
-     *
+     * @brief
      * @param cigar_long
      * @return
      */
     static std::string contractECigar(const std::string &cigar_long);
 
     /**
-     *
+     * @brief
      * @param softclip_offset
      * @param seq
      * @param cigar
+     * @param delta_pos
      * @param state
      */
-    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
+    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar, uint16_t delta_pos,
                           std::tuple<core::record::AlignmentBox, core::record::Record> &state);
 
     /**
-     *
+     * @brief
      * @param number
      * @return
      */
     std::vector<int32_t> numberDeletions(size_t number);
 
     /**
-     *
+     * @brief
      * @param clip_offset
      * @param sequence
      * @param cigar_extended
      */
     void decodeMismatches(size_t clip_offset, std::string &sequence, std::string &cigar_extended);
 
-    /*+
-     *
+    /**
+     * @brief
      * @param sequences
      * @param cigar_extended
      * @return
@@ -119,7 +125,7 @@ class Decoder {
                                            std::vector<std::string> &cigar_extended);
 
     /**
-     *
+     * @brief
      */
     void clear();
 };

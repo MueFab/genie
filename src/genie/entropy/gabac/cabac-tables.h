@@ -19,7 +19,7 @@ namespace gabac {
 namespace cabactables {
 
 /**
- *
+ * @brief
  */
 const std::vector<std::vector<unsigned char>> lpsTable
 #ifndef _MSC_VER
@@ -40,13 +40,13 @@ const std::vector<std::vector<unsigned char>> lpsTable
        {6, 8, 9, 11},        {6, 7, 9, 10},        {6, 7, 8, 9},         {2, 2, 2, 2}};
 
 /**
- *
+ * @brief
  */
 const std::vector<unsigned char> renormTable = {6, 5, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2,
                                                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 /**
- *
+ * @brief
  */
 const std::vector<unsigned char> nextStateLps = {
     1,  0,  0,  1,  2,  3,  4,  5,  4,  5,  8,  9,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,  19, 18, 19,
@@ -56,7 +56,7 @@ const std::vector<unsigned char> nextStateLps = {
     70, 71, 70, 71, 70, 71, 72, 73, 72, 73, 72, 73, 74, 75, 74, 75, 74, 75, 76, 77, 76, 77, 126, 127};
 
 /**
- *
+ * @brief
  */
 const std::vector<unsigned char> nextStateMps = {
     2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,

@@ -21,9 +21,7 @@
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 
-
 #include "kwaymergesort/kwaymergesort.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -237,7 +235,7 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
         if (!ghc::filesystem::exists(basedir)) break;
     }
     UTILS_DIE_IF(!ghc::filesystem::create_directory(basedir), "Cannot create temporary directory.");
-    std::cout << "Temporary directory: " << basedir << "\n";
+    std::cerr << "Temporary directory: " << basedir << "\n";
     // Read compression params
     std::string compression_params_file = "cp.bin";
     std::string file_quality = "quality_1";
@@ -410,7 +408,7 @@ void Decoder::flushIn(uint64_t& pos) {
     // can lead to speed up due to fewer disk accesses.
 
     if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
-        std::cout << "Order unmatched decoded reads..." << std::endl;
+        std::cerr << "Order unmatched decoded reads..." << std::endl;
         fout_unmatched1.close();
         fout_unmatched2.close();
         fout_unmatched_readnames_1.close();
@@ -420,7 +418,7 @@ void Decoder::flushIn(uint64_t& pos) {
         if (unmatched_record_index[0] != unmatched_record_index[1])
             UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
         uint32_t size_unmatched = unmatched_record_index[0];
-        std::cout << "Pairs to match: " << size_unmatched << "\n";
+        std::cerr << "Pairs to match: " << size_unmatched << "\n";
 
         std::string file_unmatched_readnames_1_sorted = file_unmatched_readnames_1 + ".sorted";
         std::string file_unmatched_readnames_2_sorted = file_unmatched_readnames_2 + ".sorted";
@@ -445,7 +443,7 @@ void Decoder::flushIn(uint64_t& pos) {
             fout_unmatched_readnames_2_sorted.close();
             auto sort_readnames_end = std::chrono::steady_clock::now();
 
-            std::cout
+            std::cerr
                 << "Time for sorting read names: "
                 << std::chrono::duration_cast<std::chrono::seconds>(sort_readnames_end - sort_readnames_start).count()
                 << " s\n";
@@ -530,7 +528,7 @@ void Decoder::flushIn(uint64_t& pos) {
             ghc::filesystem::remove(file_unmatched_readnames_1_sorted);
             ghc::filesystem::remove(file_unmatched_readnames_2_sorted);
             auto reorder_unmatched_end = std::chrono::steady_clock::now();
-            std::cout << "Time for reordering unmatched reads: "
+            std::cerr << "Time for reordering unmatched reads: "
                       << std::chrono::duration_cast<std::chrono::seconds>(reorder_unmatched_end -
                                                                           reorder_unmatched_start)
                              .count()

@@ -22,17 +22,17 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- *
+ * @brief
  */
 class Context {
  public:
     /**
-     *
+     * @brief
      */
     Context();
 
     /**
-     *
+     * @brief
      * @param adaptive_mode_flag
      * @param output_symbol_size
      * @param coding_subsym_size
@@ -42,7 +42,7 @@ class Context {
             bool _share_subsym_ctx_flag);
 
     /**
-     *
+     * @brief
      * @param output_symbol_size
      * @param coding_subsym_size
      * @param reader
@@ -50,42 +50,42 @@ class Context {
     Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~Context() = default;
 
     /**
-     *
+     * @brief
      * @param _context_initialization_value
      */
     void addContextInitializationValue(uint8_t _context_initialization_value);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getAdaptiveModeFlag() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getNumContexts() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getShareSubsymCtxFlag() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<uint8_t>& getContextInitializationValue() const;
@@ -97,10 +97,10 @@ class Context {
     }
 
  private:
-    bool adaptive_mode_flag : true;                     //!<
-    uint16_t num_contexts : 16;                         //!<
-    std::vector<uint8_t> context_initialization_value;  //!<
-    boost::optional<bool> share_subsym_ctx_flag;        //!<
+    bool adaptive_mode_flag : true;                     //!< @brief
+    uint16_t num_contexts : 16;                         //!< @brief
+    std::vector<uint8_t> context_initialization_value;  //!< @brief
+    boost::optional<bool> share_subsym_ctx_flag;        //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

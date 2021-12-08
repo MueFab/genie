@@ -30,22 +30,22 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 struct LutEntry {
-    uint64_t value;  //!<
+    uint64_t value;  //!< @brief
     uint64_t freq;   //!< used only in encoder
 
     /**
-     *
+     * @brief
      * @param entry
      * @return
      */
-    bool operator>=(const LutEntry& entry) const;
+    bool operator>(const LutEntry& entry) const;
 };
 
 /**
- *
+ * @brief
  */
 struct LutRow {
     std::vector<LutEntry> entries;  //!< max size numAlphaSubsym
@@ -56,12 +56,12 @@ typedef std::vector<LutRow> LutOrder1;
 typedef std::vector<LutOrder1> LutOrder2;
 
 /**
- *
+ * @brief
  */
 class LUTsSubSymbolTransform {
  public:
     /**
-     *
+     * @brief
      * @param _supportVals
      * @param _stateVars
      * @param _numLuts
@@ -72,19 +72,19 @@ class LUTsSubSymbolTransform {
                            const uint8_t _numLuts, const uint8_t _numPrvs, const bool _modeFlag);
 
     /**
-     *
+     * @brief
      * @param src
      */
     LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src);
 
     /**
-     *
+     * @brief
      * @param reader
      */
     void decodeLUTs(Reader& reader);
 
     /**
-     *
+     * @brief
      * @param writer
      * @param symbols
      * @param depSymbols
@@ -92,7 +92,7 @@ class LUTsSubSymbolTransform {
     void encodeLUTs(Writer& writer, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param lutIdx
      * @param prvIdx
@@ -101,7 +101,7 @@ class LUTsSubSymbolTransform {
     uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param lutIdx
      * @param prvIdx
@@ -110,7 +110,7 @@ class LUTsSubSymbolTransform {
     uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param subsymIdx
      * @param lutIdx
@@ -120,7 +120,7 @@ class LUTsSubSymbolTransform {
                             const uint8_t prvIdx);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param subsymIdx
      * @param lutIdx
@@ -130,7 +130,7 @@ class LUTsSubSymbolTransform {
                             const uint8_t prvIdx);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param subsymIdx
      * @param lutIdx
@@ -140,7 +140,7 @@ class LUTsSubSymbolTransform {
                          const uint8_t prvIdx);
 
     /**
-     *
+     * @brief
      * @param subsymbols
      * @param subsymIdx
      * @param lutIdx
@@ -151,41 +151,41 @@ class LUTsSubSymbolTransform {
 
  private:
     /**
-     *
+     * @brief
      * @param numAlphaSubsym
      * @return
      */
     inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
 
     /**
-     *
+     * @brief
      * @param numSubsyms
      * @param numAlphaSubsym
      */
     void setupLutsOrder1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
 
     /**
-     *
+     * @brief
      * @param numSubsyms
      * @param numAlphaSubsym
      */
     void setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
 
     /**
-     *
+     * @brief
      * @param symbols
      * @param depSymbols
      */
     void buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     /**
-     *
+     * @brief
      * @param lutRow
      */
     void sortLutRow(LutRow& lutRow);
 
     /**
-     *
+     * @brief
      * @param reader
      * @param numAlphaSubsym
      * @param codingSubsymSize
@@ -194,7 +194,7 @@ class LUTsSubSymbolTransform {
     void decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     /**
-     *
+     * @brief
      * @param writer
      * @param numAlphaSubsym
      * @param codingSubsymSize
@@ -202,14 +202,14 @@ class LUTsSubSymbolTransform {
      */
     void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
-    const paramcabac::SupportValues supportVals;  //!<
-    const paramcabac::StateVars stateVars;        //!<
-    uint8_t numLuts;                              //!<
-    uint8_t numPrvs;                              //!<
-    bool encodingModeFlag;                        //!<
+    const paramcabac::SupportValues supportVals;  //!< @brief
+    const paramcabac::StateVars stateVars;        //!< @brief
+    uint8_t numLuts;                              //!< @brief
+    uint8_t numPrvs;                              //!< @brief
+    bool encodingModeFlag;                        //!< @brief
 
-    std::vector<LutOrder1> lutsO1;  //!< max size numSubsyms
-    std::vector<LutOrder2> lutsO2;  //!< max size numSubsyms
+    std::vector<LutOrder1> lutsO1;  //!< @brief max size numSubsyms
+    std::vector<LutOrder2> lutsO2;  //!< @brief max size numSubsyms
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -20,18 +20,18 @@ namespace format {
 namespace mgb {
 
 /**
- * ISO 23092-2 Section 3.4.1.1 table 19 lines 21 to 24
+ * @brief
  */
 class ExtendedAu {
  private:
-    uint64_t extended_AU_start_position;  //!< Line 22
-    uint64_t extended_AU_end_position;    //!< Line 23
+    uint64_t extended_AU_start_position;  //!< @brief
+    uint64_t extended_AU_end_position;    //!< @brief
 
-    uint8_t posSize;  //!< Internal
+    uint8_t posSize;  //!< @brief Internal
 
  public:
     /**
-     *
+     * @brief
      * @param _extended_AU_start_position
      * @param _extended_AU_end_position
      * @param _posSize
@@ -39,19 +39,19 @@ class ExtendedAu {
     ExtendedAu(uint64_t _extended_AU_start_position, uint64_t _extended_AU_end_position, uint8_t _posSize);
 
     /**
-     *
+     * @brief
      * @param _posSize
      * @param reader
      */
     ExtendedAu(uint8_t _posSize, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~ExtendedAu() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;

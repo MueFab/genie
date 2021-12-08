@@ -8,17 +8,20 @@
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"
+#include "genie/gabac/main.h"
 #include "genie/module/manager.h"
+#include "genie/transcode-fastq/main.h"
+#include "genie/transcode-sam/main.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 static void printCmdLine(int argc, char* argv[]) {
-    std::cout << "genie: command line: ";
+    std::cerr << "genie: command line: ";
     for (int i = 0; i < argc; i++) {
-        std::cout << argv[i] << " ";
+        std::cerr << argv[i] << " ";
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,10 +31,9 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 int help(int, char*[]) {
-    std::cout << "Usage: \ngenie run -i [input-file] -o [output-file]\nUse -f to overwrite existing output files.\nUse "
-                 "-t to specify the number of threads.\nIn case of paired fastq files, use --input-suppl-file or "
-                 "--output-suppl-file to specify the second file."
-              << std::endl;
+    std::cerr << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
+              << "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
+              << "To learn more about an operation, type \"genie <operation> --help\"." << std::endl;
     return 0;
 }
 
@@ -41,9 +43,9 @@ int main(int argc, char* argv[]) {
     printCmdLine(argc, argv);
 
 #ifdef GENIE_USE_OPENMP
-    std::cout << "genie: built with OpenMP\n\n" << std::endl;
+    std::cerr << "genie: built with OpenMP\n\n" << std::endl;
 #else
-    std::cout << "genie: *not* built with OpenMP\n\n" << std::endl;
+    std::cerr << "genie: *not* built with OpenMP\n\n" << std::endl;
 #endif
     genie::module::detect();
     constexpr int OPERATION_INDEX = 1;
@@ -56,10 +58,18 @@ int main(int argc, char* argv[]) {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
             stat(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+        } else if (operation == "transcode-fastq") {
+            genieapp::transcode_fastq::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+#ifdef GENIE_SAM_SUPPORT
+        } else if (operation == "transcode-sam") {
+            genieapp::transcode_sam::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+#endif
+        } else if (operation == "gabac") {
+            genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {
-            UTILS_DIE("Unknown operation " + operation);
+            UTILS_DIE("Unknown operation " + operation + "! Type \"genie help\" for a list of operations.");
         }
     } catch (const genie::util::Exception& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;

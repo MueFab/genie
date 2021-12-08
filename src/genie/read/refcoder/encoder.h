@@ -9,9 +9,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/watch.h>
 #include <memory>
+#include <string>
+#include <utility>
 #include "genie/core/read-encoder.h"
-#include "genie/read/basecoder/encoder.h"
+#include "genie/read/basecoder/encoderstub.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,36 +23,36 @@ namespace read {
 namespace refcoder {
 
 /**
- *
+ * @brief Module using a reference sequence to encode aligned reads
  */
-class Encoder : public core::ReadEncoder {
+class Encoder : public basecoder::EncoderStub {
  private:
-    struct State {
-        size_t readLength{};
-        bool pairedEnd{};
-        size_t minPos{};
-        size_t maxPos{};
-        basecoder::Encoder readCoder;
-        explicit State(size_t start) : readCoder((int32_t)start) {}
+    /**
+     * @brief Internal encoding state (not exposed publicly)
+     */
+    struct RefEncodingState : public EncoderStub::EncodingState {
+        /**
+         * @brief Construct from chunk of data
+         * @param data Chunk of data
+         */
+        explicit RefEncodingState(const core::record::Chunk& data);
+        core::ReferenceManager::ReferenceExcerpt excerpt;  //!< @brief Reference information of chunk
     };
 
-    void updateAssembly(const core::record::Record& r, State& state,
-                        const core::ReferenceManager::ReferenceExcerpt& excerpt) const;
-    static const core::record::alignment_split::SameRec& getPairedAlignment(const core::record::Record& r);
-    core::AccessUnit pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                          std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
-                          State& state) const;
-
- public:
     /**
-     *
+     * @brief Get references from existing reference sequence
+     * @param r Record to get references for
+     * @param state State to use for encoding
+     * @return Reference sequences
      */
-    Encoder();
+    std::pair<std::string, std::string> getReferences(const core::record::Record& r, EncodingState& state) override;
 
     /**
-     *
+     * @brief Construct the RefEncodingState
+     * @param data Chunk of data to construct form
+     * @return RefEncodingState
      */
-    void flowIn(core::record::Chunk&&, const util::Section&) override;
+    std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
