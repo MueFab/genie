@@ -39,7 +39,7 @@ core::record::Chunk DecoderStub::decodeSequences(DecodingState& state, core::Acc
 
         auto refs = getReferences(meta, state);
 
-        auto rec = decoder.pull(state.ref, std::move(refs), meta);
+        auto rec = decoder.pull(static_cast<uint16_t>(state.ref), std::move(refs), meta);
         addECigar(rec, state.ecigars);
         recordDecodedHook(state, rec);
 
