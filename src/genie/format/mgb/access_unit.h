@@ -38,6 +38,11 @@ class AccessUnit : public core::parameter::DataUnit {
  public:
     /**
      * @brief
+     */
+    void debugPrint(const core::parameter::ParameterSet &ps) const;
+
+    /**
+     * @brief
      * @param parameterSets
      * @param bitReader
      * @param lazyPayload

@@ -5,8 +5,10 @@
  */
 
 #include "genie/format/mgb/access_unit.h"
+#include <iostream>
 #include <map>
 #include <sstream>
+#include <string>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/util/bitwriter.h"
@@ -18,6 +20,43 @@
 namespace genie {
 namespace format {
 namespace mgb {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::debugPrint(const core::parameter::ParameterSet &ps) const {
+    std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
+    std::cerr << "AU " << getID() << ": class " << lut[static_cast<int>(getClass())];
+    if (getClass() != genie::core::record::ClassType::CLASS_U) {
+        std::cerr << ", Position [" << getAlignmentInfo().getRefID() << "-" << getAlignmentInfo().getStartPos() << ":"
+                  << getAlignmentInfo().getEndPos() << "]";
+    }
+    std::cerr << ", " << getReadCount() << " records";
+
+    if (getClass() == genie::core::record::ClassType::CLASS_U) {
+        if (!ps.isComputedReference()) {
+            std::cerr << " (Low Latency)";
+        } else {
+            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
+                std::cerr << " (Global Assembly)";
+            } else {
+                UTILS_DIE("Computed ref not supported: " +
+                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
+            }
+        }
+    } else {
+        if (!ps.isComputedReference()) {
+            std::cerr << " (Reference)";
+        } else {
+            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
+                std::cerr << " (Local Assembly)";
+            } else {
+                UTILS_DIE("Computed ref not supported: " +
+                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
+            }
+        }
+    }
+    std::cerr << "..." << std::endl;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

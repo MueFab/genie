@@ -71,7 +71,7 @@ std::pair<std::string, std::string> Encoder::getReferences(const core::record::R
     {
         auto begin = r.getAlignments().front().getPosition();
         auto ecigar = r.getAlignments().front().getAlignment().getECigar();
-        ret.first = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(begin, ecigar);
+        ret.first = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
 
         // Update AU end
         auto end = begin + core::record::Record::getLengthOfCigar(ecigar);
@@ -83,7 +83,7 @@ std::pair<std::string, std::string> Encoder::getReferences(const core::record::R
             r.getAlignments().front().getAlignmentSplits().front().get());
         auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
         auto ecigar = srec.getAlignment().getECigar();
-        ret.second = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(begin, ecigar);
+        ret.second = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
 
         // Update AU end
         auto end = begin + srec.getDelta() + core::record::Record::getLengthOfCigar(ecigar);

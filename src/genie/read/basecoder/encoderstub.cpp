@@ -52,7 +52,7 @@ void EncoderStub::encodeSeq(core::record::Chunk& data, EncodingState& state) {
         auto refs = getReferences(r, state);
         state.readCoder.add(r, refs.first, refs.second);
     }
-    data.getStats().addDouble("time-refbased", watch.check());
+    data.getStats().addDouble("time-basecoder", watch.check());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
