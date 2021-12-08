@@ -19,29 +19,29 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class Classifier {
  public:
     /**
-     *
+     * @brief
      * @return
      */
     virtual record::Chunk getChunk() = 0;
 
     /**
-     *
+     * @brief
      * @param c
      */
     virtual void add(record::Chunk&& c) = 0;
 
     /**
-     *
+     * @brief
      */
     virtual void flush() = 0;
 
     /**
-     *
+     * @brief
      */
     virtual ~Classifier() = default;
 };

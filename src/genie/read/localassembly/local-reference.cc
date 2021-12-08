@@ -103,7 +103,8 @@ void LocalReference::addSingleRead(const std::string &record, const std::string 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalReference::addRead(const core::record::Record &s) {
-    const auto &seq1 = s.getSegments().front().getSequence();
+    const auto &seq1 = !s.isRead1First() && s.getSegments().size() == 2 ? s.getSegments()[1].getSequence()
+                                                                        : s.getSegments()[0].getSequence();
     const auto &cigar1 = s.getAlignments().front().getAlignment().getECigar();
     const auto pos1 = s.getAlignments().front().getPosition();
     addSingleRead(seq1, cigar1, pos1);
@@ -119,7 +120,7 @@ void LocalReference::addRead(const core::record::Record &s) {
     const auto ptr = s.getAlignments().front().getAlignmentSplits().front().get();
     const auto &rec = dynamic_cast<const core::record::alignment_split::SameRec &>(*ptr);
 
-    const auto &seq2 = s.getSegments()[1].getSequence();
+    const auto &seq2 = s.isRead1First() ? s.getSegments()[1].getSequence() : s.getSegments()[0].getSequence();
     const auto &cigar2 = rec.getAlignment().getECigar();
     const auto pos2 = s.getAlignments().front().getPosition() + rec.getDelta();
     addSingleRead(seq2, cigar2, pos2);
@@ -225,9 +226,9 @@ void LocalReference::printWindow() const {
     for (size_t i = 0; i < sequences.size(); ++i) {
         uint64_t totalOffset = sequence_positions[i] - minPos;
         for (size_t s = 0; s < totalOffset; ++s) {
-            std::cout << ".";
+            std::cerr << ".";
         }
-        std::cout << sequences[i] << std::endl;
+        std::cerr << sequences[i] << std::endl;
     }
 }
 

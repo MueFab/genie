@@ -5,6 +5,7 @@
  */
 
 #include "genie/entropy/gabac/decoder.h"
+#include <algorithm>
 #include <iostream>
 #include <tuple>
 #include <utility>
@@ -46,8 +47,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     }
     int32_t typeNum = -1;
     for (size_t i = 0; i < num_tokentype_descriptors; ++i) {
-        UTILS_DIE_IF(offset >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
-        const size_t READAHEAD = 11;
+        const size_t READAHEAD = std::min<size_t>(11, remainingData.getRawSize() - offset - 1);
+        UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
         util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
                                               remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
@@ -97,7 +98,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
-    std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
+    std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cerr;
     const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream,
                                                    nullptr,
                                                    &outbuffer,

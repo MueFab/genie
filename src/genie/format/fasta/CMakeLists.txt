@@ -7,7 +7,7 @@ set(source_files
         manager.cc
         reader.cc
         reference.cc
-        )
+        sha256File.cc)
 
 add_library(genie-fasta ${source_files})
 

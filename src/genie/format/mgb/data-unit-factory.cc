@@ -6,6 +6,7 @@
 
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
+#include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
@@ -30,6 +31,7 @@ const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const
 
 boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
+    int i = 0;
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
@@ -43,10 +45,11 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 auto r = RawReference(bitReader, true);
                 for (auto& ref : r) {
                     pos += 12;
-                    std::cout << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
+                    std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++,
+                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
@@ -54,7 +57,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);
-                std::cout << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
+                std::cerr << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
                 parameters.insert(std::make_pair(p.getID(), std::move(p)));
                 break;
             }
@@ -63,15 +66,18 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 if (getParams(ret.getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
                     const auto& ref = ret.getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
-                    std::cout << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
+                    std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++,
+                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());
                 } else {
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
-                        std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
+                        UTILS_DIE_IF(ret.getClass() == genie::core::record::ClassType::CLASS_HM,
+                                     "Class HM not supported");
+                        ret.debugPrint(parameters.at(ret.getParameterID()));
                         return ret;
                     } else {
                         bitReader.skip(ret.getPayloadSize());

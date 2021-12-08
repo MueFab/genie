@@ -68,7 +68,7 @@ class GabacSeqConfSet {
     const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
 
     /**
-     *
+     * @brief
      * @param sub
      * @return
      */
@@ -93,7 +93,7 @@ class GabacSeqConfSet {
     void storeParameters(ParameterSet &parameterSet) const;
 
     /**
-     *
+     * @brief
      * @param desc
      * @param parameterSet
      */
@@ -106,7 +106,7 @@ class GabacSeqConfSet {
     void loadParameters(const ParameterSet &parameterSet);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param desc
      * @param decoder_config

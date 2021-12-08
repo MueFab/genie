@@ -32,24 +32,29 @@ namespace core {
 namespace record {
 
 /**
- *
+ *  @brief
  */
 class Record {
  private:
     uint8_t number_of_template_segments{};    //!< @brief
+    std::vector<Segment> reads;               //!< @brief
+    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
     ClassType class_ID{ClassType::NONE};      //!< @brief
+    std::string read_group;                   //!< @brief
     bool read_1_first{};                      //!< @brief
     AlignmentSharedData sharedAlignmentInfo;  //!< @brief
     uint8_t qv_depth{};                       //!< @brief
     std::string read_name;                    //!< @brief
-    std::string read_group;                   //!< @brief
-    std::vector<Segment> reads;               //!< @brief
-    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
     uint8_t flags{};                          //!< @brief
 
     std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief
 
  public:
+    /**
+     * @brief
+     */
+    void patchRefID(size_t refID);
+
     /**
      * @brief
      */
@@ -119,10 +124,14 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     std::vector<Segment>& getSegments();
+
+    /**
+     * @brief
+     */
+    void swapSegmentOrder();
 
     /**
      * @brief
@@ -138,7 +147,6 @@ class Record {
 
     /**
      * @brief
-     * @param index
      * @return
      */
     const std::vector<AlignmentBox>& getAlignments() const;
@@ -172,6 +180,18 @@ class Record {
      * @param _name
      */
     void setName(const std::string& _name);
+
+    /**
+     * @brief
+     * @param depth
+     */
+    void setQVDepth(uint8_t depth);
+
+    /**
+     * @brief
+     * @param val
+     */
+    void setRead1First(bool val);
 
     /**
      * @brief
@@ -217,6 +237,13 @@ class Record {
      * @return
      */
     size_t getMappedLength(size_t alignment, size_t split) const;
+
+    /**
+     * @brief
+     * @param id
+     * @param b
+     */
+    void setAlignment(size_t id, AlignmentBox&& b);
 
     /**
      * @brief

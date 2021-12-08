@@ -5,6 +5,8 @@
  */
 
 #include "genie/read/basecoder/decoder.h"
+#include <genie/core/record/alignment_split/other-rec.h>
+#include <genie/core/record/alignment_split/unpaired.h>
 #include <tuple>
 #include <utility>
 #include "genie/core/qv-decoder.h"
@@ -23,7 +25,7 @@ Decoder::Decoder(core::AccessUnit &&au, size_t segments, size_t pos)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec) {
+core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec, const SegmentMeta &meta) {
     std::vector<std::string> sequences = std::move(vec);
     std::vector<std::string> cigars;
     cigars.reserve(sequences.size());
@@ -31,28 +33,84 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec)
         cigars.emplace_back(sequence.size(), '=');
     }
     auto clip_offset = decodeClips(sequences, cigars);
+
     auto state = decode(std::get<0>(clip_offset), std::move(sequences.front()), std::move(cigars.front()));
+    switch (meta.decoding_case) {
+        case core::GenConst::PAIR_SAME_RECORD:
+            std::get<1>(state).setRead1First(meta.first1);
+            break;
+        case core::GenConst::PAIR_R1_SPLIT:
+            std::get<1>(state).setRead1First(false);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+                    container.pull(core::GenSub::PAIR_R1_SPLIT), ref));
+            break;
+        case core::GenConst::PAIR_R2_SPLIT:
+            std::get<1>(state).setRead1First(true);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+                    container.pull(core::GenSub::PAIR_R2_SPLIT), ref));
+            break;
+        case core::GenConst::PAIR_R1_DIFF_REF:
+            std::get<1>(state).setRead1First(false);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+                    container.pull(core::GenSub::PAIR_R1_DIFF_POS),
+                    (uint16_t)container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
+            break;
+        case core::GenConst::PAIR_R2_DIFF_REF:
+            std::get<1>(state).setRead1First(true);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+                    container.pull(core::GenSub::PAIR_R2_DIFF_POS),
+                    (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
+            break;
+        case core::GenConst::PAIR_R1_UNPAIRED:
+            std::get<1>(state).setRead1First(false);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
+            break;
+        case core::GenConst::PAIR_R2_UNPAIRED:
+            std::get<1>(state).setRead1First(true);
+            std::get<0>(state).addAlignmentSplit(
+                genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
+            break;
+    }
     for (size_t i = 1; i < sequences.size(); ++i) {
-        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]), state);
+        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]),
+                         uint16_t(meta.position[1] - meta.position[0]), state);
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
+    if (!std::get<1>(state).isRead1First()) {
+        std::get<1>(state).swapSegmentOrder();
+    }
     return std::get<1>(state);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Decoder::SegmentMeta> Decoder::readSegmentMeta() {
-    std::vector<SegmentMeta> metaData;
-    uint64_t offset = 0;
-    auto deletions = numberDeletions(number_template_segments);
-    for (size_t i = 0; i < number_template_segments; ++i) {
-        const auto LENGTH = (length ? length : container.pull(core::GenSub::RLEN) + 1) + deletions[i];
-        offset += container.get(core::GenSub::POS_MAPPING_FIRST).get(i);
-        const auto POSITION = position + offset;
-        metaData.emplace_back(SegmentMeta{POSITION, LENGTH});
+Decoder::SegmentMeta Decoder::readSegmentMeta() {
+    SegmentMeta meta{};
+    meta.position[0] = position + container.get(core::GenSub::POS_MAPPING_FIRST).get(0);
+
+    meta.num_segments = 1;
+    if (number_template_segments == 2) {
+        meta.decoding_case = uint8_t(container.pull(core::GenSub::PAIR_DECODING_CASE));
+        if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
+            meta.num_segments = 2;
+            const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
+            meta.first1 = SAME_REC_DATA & 1u;
+            const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
+            meta.position[1] = meta.position[0] + DELTA;
+        }
     }
-    return metaData;
+
+    auto deletions = numberDeletions(meta.num_segments);
+    for (size_t i = 0; i < meta.num_segments; ++i) {
+        meta.length[i] = (length ? length : container.pull(core::GenSub::RLEN) + 1) + deletions[i];
+    }
+    return meta;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -81,7 +139,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
 
     const auto MSCORE = (uint32_t)container.pull(core::GenSub::MSCORE);
 
-    const auto RGROUP = container.isEnd(core::GenSub::RGROUP) ? 0 : container.pull(core::GenSub::RGROUP);
+    // const auto RGROUP = container.isEnd(core::GenSub::RGROUP) ? 0 : container.pull(core::GenSub::RGROUP);
 
     position += container.pull(core::GenSub::POS_MAPPING_FIRST);
     const auto POSITION = position;
@@ -90,13 +148,13 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     decodeMismatches(clip_offset, sequence, ecigar);
 
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
-    alignment.addMappingScore(MSCORE);
+    alignment.addMappingScore((int32_t)MSCORE);
 
     std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
-    std::get<1>(ret) = core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "",
-                                            std::to_string(RGROUP), FLAGS);
+    std::get<1>(ret) =
+        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "Genie", FLAGS);
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(ret).addSegment(std::move(segment));
@@ -149,31 +207,22 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
+void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar, uint16_t delta_pos,
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
     const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
-
     const auto MSCORE = (int32_t)container.pull(core::GenSub::MSCORE);
 
     std::string ecigar = std::move(cigar);
     decodeMismatches(softclip_offset, sequence, ecigar);
 
-    const auto PAIRING_CASE = container.pull(core::GenSub::PAIR_DECODING_CASE);
-    UTILS_DIE_IF(PAIRING_CASE != core::GenConst::PAIR_SAME_RECORD, "Same-Record pair decoding supported only!");
-
-    const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
-    //        const bool FIRST1 = SAME_REC_DATA & 1u;
-    const uint32_t DELTA = SAME_REC_DATA >> 1u;
-
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
     alignment.addMappingScore(MSCORE);
-    auto srec = util::make_unique<core::record::alignment_split::SameRec>(DELTA, std::move(alignment));
+    std::get<0>(state).addAlignmentSplit(
+        genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
 
     core::record::Segment segment(std::move(sequence));
-
-    std::get<0>(state).addAlignmentSplit(std::move(srec));
     std::get<1>(state).addSegment(std::move(segment));
 }
 
@@ -181,7 +230,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
 
 std::vector<int32_t> Decoder::numberDeletions(size_t number) {
     std::vector<int32_t> counters(number, 0);
-    if (container.get(core::GenSub::MMPOS_TERMINATOR).isEmpty()) {
+    if (container.get(core::GenSub::MMPOS_TERMINATOR).isEmpty() || container.get(core::GenSub::MMTYPE_TYPE).isEmpty()) {
         return counters;
     }
     size_t lookahead = 0;
@@ -202,17 +251,21 @@ std::vector<int32_t> Decoder::numberDeletions(size_t number) {
 
 void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::string &cigar_extended) {
     uint64_t mismatchPosition = 0;
-    uint64_t cigarOffset = cigar_extended.find_first_not_of(']');
+    auto startPos = cigar_extended.find_first_not_of(']');
+    uint64_t cigarOffset = startPos == std::string::npos ? 0 : startPos;
     if (container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
         return;
     }
     while (!container.pull(core::GenSub::MMPOS_TERMINATOR)) {
         mismatchPosition += container.pull((core::GenSub::MMPOS_POSITION)) + 1;
         const auto POSITION = mismatchPosition - 1 + clip_offset;
-        const auto TYPE = container.pull((core::GenSub::MMTYPE_TYPE));
+        const auto TYPE = container.get(core::GenSub::MMTYPE_TYPE).isEmpty()
+                              ? core::GenConst::MMTYPE_SUBSTITUTION
+                              : container.pull((core::GenSub::MMTYPE_TYPE));
         if (TYPE == core::GenConst::MMTYPE_SUBSTITUTION) {
             const auto SUBSTITUTION =
-                container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
+                container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder() &&
+                        container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
                     ? container.get(core::GenSub::MMTYPE_SUBSTITUTION)
                           .getMismatchDecoder()
                           ->decodeMismatch(

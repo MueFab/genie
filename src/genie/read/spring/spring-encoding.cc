@@ -114,10 +114,10 @@ void getDataParams(encoder_global &eg, const compression_params &cp) {
     eg.numreads = numreads_clean - eg.numreads_s;
     eg.numreads_N = numreads_total - numreads_clean;
 
-    std::cout << "Maximum Read length: " << eg.max_readlen << std::endl;
-    std::cout << "Number of non-singleton reads: " << eg.numreads << std::endl;
-    std::cout << "Number of singleton reads: " << eg.numreads_s << std::endl;
-    std::cout << "Number of reads with N: " << eg.numreads_N << std::endl;
+    std::cerr << "Maximum Read length: " << eg.max_readlen << std::endl;
+    std::cerr << "Number of non-singleton reads: " << eg.numreads << std::endl;
+    std::cerr << "Number of singleton reads: " << eg.numreads_s << std::endl;
+    std::cerr << "Number of reads with N: " << eg.numreads_N << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

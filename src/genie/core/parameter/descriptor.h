@@ -21,30 +21,30 @@ namespace core {
 namespace parameter {
 
 /**
- *
+ * @brief
  */
 class Descriptor {
  public:
     /**
-     *
+     * @brief
      * @param _dec_cfg_preset
      */
     explicit Descriptor(uint8_t _dec_cfg_preset);
 
     /**
-     *
+     * @brief
      * @return
      */
     virtual std::unique_ptr<Descriptor> clone() const = 0;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;
 
     /**
-     *
+     * @brief
      * @param desc
      * @param reader
      * @return
@@ -52,25 +52,25 @@ class Descriptor {
     static std::unique_ptr<Descriptor> factory(GenDesc desc, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~Descriptor() = default;
 
     /**
-     *
+     * @brief
      * @param desc
      * @return
      */
     virtual bool equals(const Descriptor *desc) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getPreset() const;
 
  protected:
-    uint8_t dec_cfg_preset;  //!<
+    uint8_t dec_cfg_preset;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -23,13 +23,13 @@ namespace mgb {
 class Importer;
 
 /**
- *
+ * @brief
  */
 class Reference : public core::Reference {
  private:
-    Importer* mgr;  //!<
-    size_t f_pos;   //!<
-    bool raw;       //!<
+    Importer* mgr;  //!< @brief
+    size_t f_pos;   //!< @brief
+    bool raw;       //!< @brief
 
  public:
     /**
@@ -45,7 +45,7 @@ class Reference : public core::Reference {
         : core::Reference(_name, _start, _end), mgr(_mgr), f_pos(filepos), raw(_raw) {}
 
     /**
-     *
+     * @brief
      * @param _start
      * @param _end
      * @return

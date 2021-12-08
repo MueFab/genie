@@ -46,6 +46,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     if(${GENIE_WERROR})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
     endif()
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    endif()
     # Use -g with Release builds as well as Debug builds
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     #
@@ -75,6 +80,7 @@ option(BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)
 option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" ON)
+option(GENIE_SAM_SUPPORT "Use OpenMP parallelization in Genie" ON)
 option(GENIE_WERROR "Treat warnings during building as errors" OFF)
 
 message(STATUS "")
@@ -84,6 +90,7 @@ message(STATUS "  BUILD_DOCUMENTATION    : ${BUILD_DOCUMENTATION}")
 message(STATUS "  BUILD_TESTS            : ${BUILD_TESTS}")
 message(STATUS "  GABAC_BUILD_SHARED_LIB : ${GABAC_BUILD_SHARED_LIB}")
 message(STATUS "  GENIE_USE_OPENMP       : ${GENIE_USE_OPENMP}")
+message(STATUS "  GENIE_SAM_SUPPORT      : ${GENIE_SAM_SUPPORT}")
 message(STATUS "  GENIE_WERROR           : ${GENIE_WERROR}")
 message(STATUS "")
 
@@ -116,7 +123,6 @@ if(${GENIE_USE_OPENMP})
         message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
     endif()
 endif()
-
 
 #==============================================================================
 # Executable/library paths

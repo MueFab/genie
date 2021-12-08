@@ -48,15 +48,6 @@ AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const util::DataBlock *AccessUnit::Subsequence::getDependency() const {
-    if (id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
-        return &dependency;
-    else
-        return nullptr;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 util::DataBlock *AccessUnit::Subsequence::getDependency() {
     if (id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
         return &dependency;
@@ -133,16 +124,6 @@ AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) { return subd
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const { return subdesc[sub]; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const util::DataBlock *AccessUnit::Descriptor::getDependency(uint16_t sub) const {
-    return subdesc[sub].getDependency();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-util::DataBlock *AccessUnit::Descriptor::getDependency(uint16_t sub) { return subdesc[sub].getDependency(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

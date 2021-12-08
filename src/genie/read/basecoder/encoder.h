@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/read-encoder.h>
+#include <genie/util/watch.h>
 #include <array>
 #include <memory>
 #include <string>
@@ -25,37 +27,37 @@ namespace read {
 namespace basecoder {
 
 /**
- *
+ * @brief
  */
 class Encoder {
  private:
-    core::AccessUnit container;  //!<
-    int32_t pos;                 //!<
-    uint32_t readCounter;        //!<
+    core::AccessUnit container;  //!< @brief
+    int32_t pos;                 //!< @brief
+    uint32_t readCounter;        //!< @brief
 
     /**
-     *
+     * @brief
      * @param rec
      */
     void encodeFirstSegment(const core::record::Record &rec);
 
     /**
-     *
+     * @brief
      * @param length
      * @param srec
      */
-    void encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec);
+    void encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1);
 
     /**
-     *
+     * @brief
      */
     struct ClipInformation {
-        std::array<std::string, 2> softClips;        //!<
-        std::array<size_t, 2> hardClips = {{0, 0}};  //!<
+        std::array<std::string, 2> softClips;        //!< @brief
+        std::array<size_t, 2> hardClips = {{0, 0}};  //!< @brief
     };
 
     /**
-     *
+     * @brief
      * @param read
      * @param cigar
      * @param ref
@@ -66,7 +68,7 @@ class Encoder {
                                 core::record::ClassType type);
 
     /**
-     *
+     * @brief
      * @param inf
      * @param last
      * @return
@@ -74,78 +76,78 @@ class Encoder {
     bool encodeSingleClip(const ClipInformation &inf, bool last);
 
     /**
-     *
+     * @brief
      * @param clips
      */
     void encodeClips(const std::pair<ClipInformation, ClipInformation> &clips);
 
     /**
-     *
+     * @brief
      */
     struct CodingState {
         /**
-         *
+         * @brief
          * @param _read
          * @param _ref
          * @param _type
          */
         CodingState(const std::string &_read, const std::string &_ref, core::record::ClassType _type);
-        size_t count;         //!<
-        size_t read_pos;      //!<
-        size_t ref_offset;    //!<
-        size_t lastMisMatch;  //!<
-        bool isRightClip;     //!<
+        size_t count;         //!< @brief
+        size_t read_pos;      //!< @brief
+        size_t ref_offset;    //!< @brief
+        size_t lastMisMatch;  //!< @brief
+        bool isRightClip;     //!< @brief
 
-        const std::string &read;             //!<
-        const std::string &ref;              //!<
-        const core::record::ClassType type;  //!<
-        ClipInformation clips;               //!<
+        const std::string &read;             //!< @brief
+        const std::string &ref;              //!< @brief
+        const core::record::ClassType type;  //!< @brief
+        ClipInformation clips;               //!< @brief
     };
 
     /**
-     *
+     * @brief
      * @param state
      */
     void encodeInsertion(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     void encodeDeletion(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     static void encodeHardClip(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     static void encodeSoftClip(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     void encodeSubstitution(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     void encodeSplice(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param state
      */
     void encodeMatch(CodingState &state);
 
     /**
-     *
+     * @brief
      * @param cigar_char
      * @param state
      * @return
@@ -153,14 +155,14 @@ class Encoder {
     static bool updateCount(char cigar_char, CodingState &state);
 
     /**
-     *
+     * @brief
      * @param cigar_char
      * @param state
      */
     void encodeCigarToken(char cigar_char, CodingState &state);
 
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */
@@ -168,13 +170,13 @@ class Encoder {
 
  public:
     /**
-     *
+     * @brief
      * @param startingMappingPos
      */
     explicit Encoder(int32_t startingMappingPos);
 
     /**
-     *
+     * @brief
      * @param rec
      * @param ref1
      * @param ref2
@@ -182,7 +184,7 @@ class Encoder {
     void add(const core::record::Record &rec, const std::string &ref1, const std::string &ref2);
 
     /**
-     *
+     * @brief
      * @return
      */
     core::AccessUnit &&moveStreams();

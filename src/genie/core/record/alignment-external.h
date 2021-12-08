@@ -21,47 +21,47 @@ namespace core {
 namespace record {
 
 /**
- *
+ * @brief
  */
 class AlignmentExternal {
  public:
     /**
-     *
+     * @brief
      */
     enum class Type : uint8_t { NONE, OTHER_REC };
 
     /**
-     *
+     * @brief
      * @param _moreAlignmentInfoType
      */
     explicit AlignmentExternal(Type _moreAlignmentInfoType);
 
     /**
-     *
+     * @brief
      */
     virtual ~AlignmentExternal() = default;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter &writer) const;
 
     /**
-     *
+     * @brief
      * @param reader
      * @return
      */
     static std::unique_ptr<AlignmentExternal> factory(util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @return
      */
     virtual std::unique_ptr<AlignmentExternal> clone() const = 0;
 
  protected:
-    Type moreAlignmentInfoType;  //!<
+    Type moreAlignmentInfoType;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

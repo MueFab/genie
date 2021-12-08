@@ -18,37 +18,41 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class ContextModel {
  public:
     /**
-     *
+     * @brief
      * @param initState
      */
     explicit ContextModel(unsigned char initState = 64);
 
     /**
-     *
+     * @brief
      */
     ~ContextModel();
 
     /**
+     * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
     unsigned char getState() const;
 
     /**
+     * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
     unsigned char getMps() const;
 
     /**
+     * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
     void updateLps();
 
     /**
+     * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
     void updateMps();
@@ -58,24 +62,24 @@ class ContextModel {
 };
 
 /**
- *
+ * @brief
  * @return
  */
 inline unsigned char ContextModel::getState() const { return m_state >> 1u; }
 
 /**
- *
+ * @brief
  * @return
  */
 inline unsigned char ContextModel::getMps() const { return m_state & static_cast<unsigned char>(0x1u); }
 
 /**
- *
+ * @brief
  */
 inline void ContextModel::updateLps() { m_state = cabactables::nextStateLps[m_state]; }
 
 /**
- *
+ * @brief
  */
 inline void ContextModel::updateMps() { m_state = cabactables::nextStateMps[m_state]; }
 

@@ -27,12 +27,12 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class StreamHandler {
  public:
     /**
-     *
+     * @brief
      * @param input
      * @param retVal
      * @param numBytes
@@ -41,7 +41,7 @@ class StreamHandler {
     static size_t readUInt(std::istream& input, uint64_t& retVal, size_t numBytes);
 
     /**
-     *
+     * @brief
      * @param input
      * @param retVal
      * @return
@@ -49,7 +49,7 @@ class StreamHandler {
     static size_t readU7(std::istream& input, uint64_t& retVal);
 
     /**
-     *
+     * @brief
      * @param input
      * @param buffer
      * @param numSymbols
@@ -58,7 +58,7 @@ class StreamHandler {
     static size_t readStream(std::istream& input, util::DataBlock* buffer, uint64_t& numSymbols);
 
     /**
-     *
+     * @brief
      * @param input
      * @param bytes
      * @param buffer
@@ -67,7 +67,7 @@ class StreamHandler {
     static size_t readBytes(std::istream& input, size_t bytes, util::DataBlock* buffer);
 
     /**
-     *
+     * @brief
      * @param input
      * @param buffer
      * @return
@@ -75,7 +75,7 @@ class StreamHandler {
     static size_t readFull(std::istream& input, util::DataBlock* buffer);
 
     /**
-     *
+     * @brief
      * @param input
      * @param bytes
      * @param buffer
@@ -84,14 +84,14 @@ class StreamHandler {
     static size_t readBlock(std::istream& input, size_t bytes, util::DataBlock* buffer);
 
     /**
-     *
+     * @brief
      * @param input
      * @return
      */
     static size_t readStreamSize(std::istream& input);
 
     /**
-     *
+     * @brief
      * @param output
      * @param value
      * @param numBytes
@@ -100,7 +100,7 @@ class StreamHandler {
     static size_t writeUInt(std::ostream& output, uint64_t value, size_t numBytes);
 
     /**
-     *
+     * @brief
      * @param output
      * @param value
      * @return
@@ -108,7 +108,7 @@ class StreamHandler {
     static size_t writeU7(std::ostream& output, uint64_t value);
 
     /**
-     *
+     * @brief
      * @param output
      * @param buffer
      * @param numSymbols
@@ -117,7 +117,7 @@ class StreamHandler {
     static size_t writeStream(std::ostream& output, util::DataBlock* buffer, uint64_t numSymbols);
 
     /**
-     *
+     * @brief
      * @param output
      * @param buffer
      * @return

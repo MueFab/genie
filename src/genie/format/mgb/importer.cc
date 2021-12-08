@@ -88,6 +88,7 @@ core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
         set.setReference(unit.getAlignmentInfo().getRefID());
         set.setMinPos(unit.getAlignmentInfo().getStartPos());
         set.setMaxPos(unit.getAlignmentInfo().getEndPos());
+        ref_manager->validateRefID(set.getReference());
     } else {
         set.setReference(0);
         set.setMinPos(0);

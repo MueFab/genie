@@ -48,28 +48,28 @@ void Encoder::flushIn(uint64_t& pos) {
 #endif
 
     watch.reset();
-    std::cout << "Reordering ...\n";
+    std::cerr << "Reordering ...\n";
     call_reorder(preprocessor.temp_dir, loc_cp);
-    std::cout << "Reordering done!\n";
+    std::cerr << "Reordering done!\n";
     stats.addDouble("time-spring-reorder", watch.check());
 
     watch.reset();
-    std::cout << "Encoding ...\n";
+    std::cerr << "Encoding ...\n";
     call_encoder(preprocessor.temp_dir, loc_cp);
-    std::cout << "Encoding done!\n";
+    std::cerr << "Encoding done!\n";
     stats.addDouble("time-spring-encoding", watch.check());
 
     watch.reset();
-    std::cout << "Generating read streams ...\n";
+    std::cerr << "Generating read streams ...\n";
     generate_read_streams(preprocessor.temp_dir, loc_cp, entropycoder, params, stats);
-    std::cout << "Generating read streams done!\n";
+    std::cerr << "Generating read streams done!\n";
     stats.addDouble("time-spring-gen-reads", watch.check());
 
     if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
         watch.reset();
-        std::cout << "Reordering and compressing quality and/or ids ...\n";
+        std::cerr << "Reordering and compressing quality and/or ids ...\n";
         reorder_compress_quality_id(preprocessor.temp_dir, loc_cp, qvcoder, namecoder, entropycoder, params, stats);
-        std::cout << "Reordering and compressing quality and/or ids done!\n";
+        std::cerr << "Reordering and compressing quality and/or ids done!\n";
         stats.addDouble("time-spring-qual-name", watch.check());
     }
 
@@ -82,7 +82,7 @@ void Encoder::flushIn(uint64_t& pos) {
 
     ghc::filesystem::remove(preprocessor.temp_dir + "/blocks_id.bin");
     ghc::filesystem::remove(preprocessor.temp_dir + "/read_order.bin");
-    ghc::filesystem::remove(preprocessor.temp_dir);
+    ghc::filesystem::remove_all(preprocessor.temp_dir);
 
     preprocessor.setup(preprocessor.working_dir, preprocessor.cp.num_thr, preprocessor.cp.paired_end);
 

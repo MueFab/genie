@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgb/exporter.h"
+#include <iostream>
 #include <string>
 #include <utility>
 #include "genie/format/mgb/raw_reference.h"
@@ -39,6 +40,10 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         ref.addSequence(std::move(refseq));
     }
     if (!ref.isEmpty()) {
+        for (auto& r : ref) {
+            std::cerr << "Writing Ref " << r.getSeqID() << ":" << r.getStart() << "-" << r.getEnd() << "..."
+                      << std::endl;
+        }
         ref.write(writer);
         ref = mgb::RawReference();
     }
@@ -56,6 +61,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     }
 
     if (!found) {
+        std::cerr << "Writing PS " << uint32_t(data.getParameters().getID()) << "..." << std::endl;
         data.getParameters().write(writer);
         parameter_stash.push_back(data.getParameters());
     }
@@ -81,6 +87,9 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         }
         au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
     }
+
+    au.debugPrint(parameter_stash[au.getParameterID()]);
+
     au.write(writer);
     id_ctr++;
     getStats().addDouble("time-mgb-export", watch.check());

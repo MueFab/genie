@@ -21,18 +21,18 @@ namespace read {
 namespace localassembly {
 
 /**
- *
+ * @brief
  */
 class LocalReference {
  public:
-    uint32_t cr_buf_max_size;  //!<
+    uint32_t cr_buf_max_size;  //!< @brief
 
-    std::vector<std::string> sequences;        //!<
-    std::vector<uint64_t> sequence_positions;  //!<
-    uint32_t crBufSize;                        //!<
+    std::vector<std::string> sequences;        //!< @brief
+    std::vector<uint64_t> sequence_positions;  //!< @brief
+    uint32_t crBufSize;                        //!< @brief
 
     /**
-     *
+     * @brief
      * @param offset
      * @param len
      * @return
@@ -40,14 +40,14 @@ class LocalReference {
     std::string generateRef(uint32_t offset, uint32_t len);
 
     /**
-     *
+     * @brief
      * @param offset_to_first
      * @return
      */
     char majorityVote(uint32_t offset_to_first);
 
     /**
-     *
+     * @brief
      * @param read
      * @param cigar
      * @return
@@ -55,7 +55,7 @@ class LocalReference {
     static std::string preprocess(const std::string &read, const std::string &cigar);
 
     /**
-     *
+     * @brief
      * @param cigar
      * @return
      */
@@ -63,13 +63,13 @@ class LocalReference {
 
  public:
     /**
-     *
+     * @brief
      * @param _cr_buf_max_size
      */
     explicit LocalReference(uint32_t _cr_buf_max_size);
 
     /**
-     *
+     * @brief
      * @param record
      * @param ecigar
      * @param position
@@ -77,13 +77,13 @@ class LocalReference {
     void addSingleRead(const std::string &record, const std::string &ecigar, uint64_t position);
 
     /**
-     *
+     * @brief
      * @param s
      */
     void addRead(const core::record::Record &s);
 
     /**
-     *
+     * @brief
      * @param pos_offset
      * @param cigar
      * @return
@@ -91,7 +91,7 @@ class LocalReference {
     std::string getReference(uint32_t pos_offset, const std::string &cigar);
 
     /**
-     *
+     * @brief
      * @param pos_offset
      * @param len
      * @return
@@ -99,13 +99,13 @@ class LocalReference {
     std::string getReference(uint32_t pos_offset, uint32_t len);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getWindowBorder() const;
 
     /**
-     *
+     * @brief
      */
     void printWindow() const;
 };

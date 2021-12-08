@@ -46,7 +46,7 @@ class Exporter : public core::FormatExporter {
     Exporter(std::ostream &_file_1, std::ostream &_file_2);
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section &id) override;

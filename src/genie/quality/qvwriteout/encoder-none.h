@@ -18,12 +18,12 @@ namespace quality {
 namespace qvwriteout {
 
 /**
- *
+ * @brief
  */
 class NoneEncoder : public core::QVEncoder {
  public:
     /**
-     *
+     * @brief
      * @return
      */
     QVCoded process(const core::record::Chunk&) override;

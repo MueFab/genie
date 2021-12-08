@@ -18,32 +18,32 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class FormatExporterCompressed : public util::Drain<AccessUnit> {
  private:
-    stats::PerfStats stats;  //!<
+    stats::PerfStats stats;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @return
      */
     stats::PerfStats& getStats();
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section& id) override;
 
     /**
-     *
+     * @brief
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      */
     ~FormatExporterCompressed() override = default;
 };

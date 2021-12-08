@@ -22,12 +22,12 @@ namespace quality {
 namespace qvwriteout {
 
 /**
- *
+ * @brief
  */
 class Encoder : public core::QVEncoder {
  private:
     /**
-     *
+     * @brief
      * @param rec
      * @param param
      * @param desc
@@ -36,7 +36,7 @@ class Encoder : public core::QVEncoder {
                                 core::AccessUnit::Descriptor& desc);
 
     /**
-     *
+     * @brief
      * @param s
      * @param ecigar
      * @param desc
@@ -45,7 +45,7 @@ class Encoder : public core::QVEncoder {
                                      core::AccessUnit::Descriptor& desc);
 
     /**
-     *
+     * @brief
      * @param s
      * @param desc
      */
@@ -53,7 +53,7 @@ class Encoder : public core::QVEncoder {
 
  public:
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */

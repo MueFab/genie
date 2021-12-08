@@ -27,7 +27,7 @@ namespace core {
 class NameEncoder {
  public:
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */

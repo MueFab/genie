@@ -20,27 +20,27 @@ namespace read {
 namespace lowlatency {
 
 /**
- *
+ * @brief
  */
 class Decoder : public core::ReadDecoder, public core::RefDecoder {
  private:
  public:
     /**
-     *
+     * @brief
      * @param t
      * @return
      */
     std::string decode(core::AccessUnit&& t) override;
 
     /**
-     *
+     * @brief
      * @param t
      * @return
      */
     core::record::Chunk decode_common(core::AccessUnit&& t);
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */

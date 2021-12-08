@@ -21,23 +21,23 @@ namespace record {
 namespace alignment_split {
 
 /**
- *
+ * @brief
  */
 class Unpaired : public AlignmentSplit {
  public:
     /**
-     *
+     * @brief
      */
     Unpaired();
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<AlignmentSplit> clone() const override;

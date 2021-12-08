@@ -21,8 +21,6 @@
 #include "genie/format/mgb/importer.h"
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
-#include "genie/format/sam/exporter.h"
-#include "genie/format/sam/importer.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
@@ -49,7 +47,7 @@ std::string file_extension(const std::string& path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class OperationCase { UNKNOWN = 0, ENCODE = 1, DECODE = 2, CONVERT = 3, CAPSULATE = 4 };
+enum class OperationCase { UNKNOWN = 0, ENCODE = 1, DECODE = 2, CAPSULATE = 4 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileType getType(const std::string& ext) {
-    if (ext == "sam" || ext == "fastq" || ext == "mgrec" || ext == "fasta") {
+    if (ext == "mgrec" || ext == "fasta") {
         return FileType::THIRD_PARTY;
     } else if (ext == "mgb") {
         return FileType::MPEG;
@@ -74,8 +72,6 @@ OperationCase getOperation(FileType in, FileType out) {
         return OperationCase::ENCODE;
     } else if (in == FileType::MPEG && out == FileType::THIRD_PARTY) {
         return OperationCase::DECODE;
-    } else if (in == FileType::THIRD_PARTY && out == FileType::THIRD_PARTY) {
-        return OperationCase::CONVERT;
     } else if (in == FileType::MPEG && out == FileType::MPEG) {
         return OperationCase::CAPSULATE;
     } else {
@@ -93,23 +89,16 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 template <class T>
 void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
-    if (file_extension(pOpts.outputFile) == "sam") {
-        flow.addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
-            genie::format::sam::header::Header::createDefaultHeader(), *outputFiles.back()));
-    } else if (file_extension(pOpts.outputFile) == "fastq") {
-        if (file_extension(pOpts.outputSupFile) == "fastq") {
-            auto& file1 = *outputFiles.back();
-            outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputSupFile));
-            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(file1, *outputFiles.back()));
-        } else {
-            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(*outputFiles.back()));
-        }
-    } else if (file_extension(pOpts.outputFile) == "mgrec") {
-        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*outputFiles.back()));
+    std::ostream* out_ptr = &std::cout;
+    if (pOpts.outputFile.substr(0, 2) != "-.") {
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
+        out_ptr = outputFiles.back().get();
+    }
+    if (file_extension(pOpts.outputFile) == "mgrec") {
+        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*out_ptr));
     } else if (file_extension(pOpts.outputFile) == "fasta") {
-        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(
-            &flow.getRefMgr(), outputFiles.back().get(), pOpts.numberOfThreads));
+        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), out_ptr,
+                                                                                  pOpts.numberOfThreads));
     }
 }
 
@@ -117,43 +106,46 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 
 void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
               std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    std::string fai = fastaFile.substr(0, fastaFile.size() - 5) + "fai";
+    std::string fai = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "fai";
+    std::string sha = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "sha256";
     auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
     if (!ghc::filesystem::exists(fai)) {
-        std::cout << "Indexing " << fastaFile << " ..." << std::endl;
+        std::cerr << "Indexing " << fastaFile << " ..." << std::endl;
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
     }
+    if (!ghc::filesystem::exists(sha)) {
+        std::cerr << "Calculaing hashes " << fastaFile << " ..." << std::endl;
+        std::ofstream sha_file(sha);
+        std::ifstream fai_file(fai);
+        genie::format::fasta::FaiFile fai_reader(fai_file);
+        genie::format::fasta::FastaReader::hash(fai_reader, *fasta_file, sha_file);
+    }
     auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+    auto sha_file = genie::util::make_unique<std::ifstream>(sha);
     inputFiles.push_back(std::move(fasta_file));
     inputFiles.push_back(std::move(fai_file));
+    inputFiles.push_back(std::move(sha_file));
     flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-        **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
+        **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+        fastaFile));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <class T>
-void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
-    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
-    if (file_extension(pOpts.inputFile) == "sam") {
-        flow.addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, *inputFiles.back()));
-    } else if (file_extension(pOpts.inputFile) == "fastq") {
-        if (file_extension(pOpts.inputSupFile) == "fastq") {
-            if (pOpts.readNameMode == "none") {
-                std::cerr << "WARNING: paired fastq provided with read name mode set to none"
-                          << " - the pairing information of some reads will be lost when using SPRING encoding.\n";
-            }
-            auto& file1 = *inputFiles.back();
-            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));
-            flow.addImporter(
-                genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, file1, *inputFiles.back()));
-        } else {
-            flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *inputFiles.back()));
-        }
-    } else if (file_extension(pOpts.inputFile) == "mgrec") {
-        flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *inputFiles.back()));
+void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
+                    std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
+    constexpr size_t BLOCKSIZE = 64000;
+    std::istream* in_ptr = &std::cin;
+    if (pOpts.inputFile.substr(0, 2) != "-.") {
+        inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
+        in_ptr = inputFiles.back().get();
+    }
+    if (file_extension(pOpts.inputFile) == "mgrec") {
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
+        flow.addImporter(
+            genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
     } else if (file_extension(pOpts.inputFile) == "fasta") {
         flow.addImporter(genie::util::make_unique<genie::core::NullImporter>());
     }
@@ -164,7 +156,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 64000;
     genie::core::ClassifierRegroup::RefMode mode;
     if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
@@ -181,15 +173,19 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     if (file_extension(pOpts.inputFile) == "fasta") {
         addFasta(pOpts.inputFile, flow.get(), inputFiles);
     } else if (!pOpts.inputRefFile.empty()) {
-        if (file_extension(pOpts.inputRefFile) == "fasta") {
+        if (file_extension(pOpts.inputRefFile) == "fasta" || file_extension(pOpts.inputRefFile) == "fa") {
             addFasta(pOpts.inputRefFile, flow.get(), inputFiles);
         } else {
             UTILS_DIE("Unknown reference format");
         }
     }
-    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile, std::ios::binary));
-    flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(outputFiles.back().get()));
-    attachImporter(*flow, pOpts, inputFiles);
+    std::ostream* out_ptr = &std::cout;
+    if (pOpts.outputFile.substr(0, 2) != "-.") {
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile, std::ios::binary));
+        out_ptr = outputFiles.back().get();
+    }
+    flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(out_ptr));
+    attachImporter(*flow, pOpts, inputFiles, outputFiles);
     if (pOpts.qvMode == "none") {
         flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
     }
@@ -208,44 +204,67 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 64000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
-    if (!pOpts.inputRefFile.empty()) {
-        if (file_extension(pOpts.inputRefFile) == "fasta") {
-            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
-            auto fasta_file = genie::util::make_unique<std::ifstream>(pOpts.inputRefFile);
+
+    std::string json_uri_path = pOpts.inputRefFile;
+    if (ghc::filesystem::exists(pOpts.inputFile + ".json")) {
+        genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
+        if (data.getReference()) {
+            std::string uri =
+                dynamic_cast<const genie::core::meta::external_ref::Fasta&>(data.getReference()->getBase()).getURI();
+            std::string scheme = "file://";
+            UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme, "Unknown URI scheme: " + uri);
+            std::string path = uri.substr(scheme.length());
+            std::cerr << "Extracted reference URI: " << uri << std::endl;
+            if (ghc::filesystem::exists(path)) {
+                std::cerr << "Reference URI valid." << std::endl;
+                json_uri_path = path;
+            } else {
+                std::cerr << "Reference URI invalid. Falling back to CLI reference." << std::endl;
+            }
+        }
+    }
+    if (!json_uri_path.empty()) {
+        if (file_extension(json_uri_path) == "fasta" || file_extension(json_uri_path) == "fa") {
+            std::string fai = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "fai";
+            std::string sha = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "sha256";
+            auto fasta_file = genie::util::make_unique<std::ifstream>(json_uri_path);
             if (!ghc::filesystem::exists(fai)) {
-                std::cout << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
+                std::cerr << "Indexing " << json_uri_path << " ..." << std::endl;
                 std::ofstream fai_file(fai);
                 genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
             }
+            if (!ghc::filesystem::exists(sha)) {
+                std::cerr << "Calculating hashes " << json_uri_path << " ..." << std::endl;
+                std::ofstream sha_file(sha);
+                std::ifstream fai_file(fai);
+                genie::format::fasta::FaiFile fai_reader(fai_file);
+                genie::format::fasta::FastaReader::hash(fai_reader, *fasta_file, sha_file);
+            }
             auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+            auto sha_file = genie::util::make_unique<std::ifstream>(sha);
             inputFiles.push_back(std::move(fasta_file));
             inputFiles.push_back(std::move(fai_file));
+            inputFiles.push_back(std::move(sha_file));
             flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
-                **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
-        } else if (file_extension(pOpts.inputRefFile) == "mgb") {
-            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputRefFile));
+                **(inputFiles.rbegin() + 2), **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr(),
+                json_uri_path));
+        } else if (file_extension(json_uri_path) == "mgb") {
+            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(json_uri_path));
             flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
                 *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
         }
     }
-    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile, std::ios::binary));
+    std::istream* in_ptr = &std::cin;
+    if (pOpts.inputFile.substr(0, 2) != "-.") {
+        inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile, std::ios::binary));
+        in_ptr = inputFiles.back().get();
+    }
     flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
-        *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
+        *in_ptr, &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
     attachExporter(*flow, pOpts, outputFiles);
-    return flow;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOpts,
-                                                       std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
-                                                       std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    auto flow = genie::module::buildDefaultConverter(pOpts.numberOfThreads);
-    attachExporter(*flow, pOpts, outputFiles);
-    attachImporter(*flow, pOpts, inputFiles);
     return flow;
 }
 
@@ -270,10 +289,6 @@ int main(int argc, char* argv[]) {
         case OperationCase::DECODE:
             flowGraph = buildDecoder(pOpts, inputFiles, outputFiles);
             break;
-        case OperationCase::CONVERT: {
-            flowGraph = buildConverter(pOpts, inputFiles, outputFiles);
-            break;
-        }
         case OperationCase::CAPSULATE:
             UTILS_DIE("Encapsulation / Decapsulation not yet supported.");
             break;
@@ -281,9 +296,15 @@ int main(int argc, char* argv[]) {
 
     flowGraph->run();
 
+    if (getOperation(pOpts.inputFile, pOpts.outputFile) == OperationCase::ENCODE) {
+        std::ofstream jsonfile(pOpts.outputFile + ".json");
+        auto jsonstring = flowGraph->getMeta().toJson().dump(4);
+        jsonfile.write(jsonstring.data(), jsonstring.length());
+    }
+
     auto stats = flowGraph->getStats();
     stats.addDouble("time-total", watch.check());
-    std::cout << stats << std::endl;
+    std::cerr << stats << std::endl;
 
     return 0;
 }

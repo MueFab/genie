@@ -19,7 +19,7 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LutEntry::operator>=(const LutEntry& entry) const { return (freq >= entry.freq); }
+bool LutEntry::operator>(const LutEntry& entry) const { return (freq > entry.freq); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
 
 void LUTsSubSymbolTransform::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
-    sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater_equal<LutEntry>());
+    sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater<LutEntry>());
     lutRow.numMaxElems =
         std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e) { return e.freq != 0; });
     if (lutRow.numMaxElems > 0) lutRow.numMaxElems--;

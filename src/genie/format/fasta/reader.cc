@@ -7,8 +7,9 @@
 #include "genie/format/fasta/reader.h"
 #include <algorithm>
 #include <istream>
-#include <set>
 #include <string>
+#include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,11 +20,12 @@ namespace fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastaReader::FastaReader(std::istream& fastaFile, std::istream& faiFile) : fai(faiFile), fasta(&fastaFile) {}
+FastaReader::FastaReader(std::istream& fastaFile, std::istream& faiFile, std::istream& sha256File, std::string _path)
+    : hashFile(sha256File), fai(faiFile), fasta(&fastaFile), path(std::move(_path)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::set<std::string> FastaReader::getSequences() const { return fai.getSequences(); }
+std::map<size_t, std::string> FastaReader::getSequences() const { return fai.getSequences(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +61,9 @@ void FastaReader::index(std::istream& fasta, std::ostream& fai) {
     bool lastline = false;
     uint64_t nextoffset = 0;
     while (getline(fasta, buffer)) {
-        UTILS_DIE_IF(buffer.empty(), "Empty line in fasta");
+        if (buffer.empty()) {
+            continue;
+        }
         if (buffer.front() == '>') {
             lastline = false;
             if (seq.offset != 0) {
@@ -87,6 +91,36 @@ void FastaReader::index(std::istream& fasta, std::ostream& fai) {
     seq.offset = nextoffset;
     faiFile.addSequence(seq);
     fai << faiFile;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FastaReader::hash(const FaiFile& fai, std::istream& fasta, std::ostream& hash) {
+    std::vector<std::pair<std::string, std::string>> hashes;
+    for (const auto& s : fai.getSequences()) {
+        auto pos = fai.getFilePosition(s.second, 0);
+        auto length = fai.getLength(s.second);
+        auto sha_value = Sha256File::hash(fasta, pos, length);
+        hashes.emplace_back(s.second, sha_value);
+    }
+    Sha256File::write(hash, hashes);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::meta::Reference FastaReader::getMeta() const {
+    std::string basename = path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1);
+    auto f = genie::util::make_unique<core::meta::external_ref::Fasta>(
+        "file://" + path, core::meta::ExternalRef::ChecksumAlgorithm::SHA256);
+
+    size_t id = 0;
+    auto* f_ptr = f.get();
+    core::meta::Reference ret(basename, 0, 0, 0, std::move(f), "");
+    for (const auto& s : hashFile.getData()) {
+        ret.addSequence(genie::core::meta::Sequence(s.first, fai.getLength(s.first), static_cast<uint16_t>(id++)));
+        f_ptr->addChecksum(s.second);
+    }
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

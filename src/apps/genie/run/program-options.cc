@@ -42,43 +42,64 @@ std::string parent_dir(const std::string &path) {
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
-    app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (mgrec or mgb)\n")->mandatory(true);
 
-    inputSupFile = "";
-    app.add_option("--input-suppl-file", inputSupFile, "");
     inputRefFile = "";
-    app.add_option("--input-ref-file", inputRefFile, "");
-
-    outputSupFile = "";
-    app.add_option("--output-suppl-file", outputSupFile, "");
+    app.add_option("-r,--input-ref-file", inputRefFile,
+                   "Path to a reference fasta file. \n"
+                   "Only relevant for aligned records. \nIf no path is provided, a \n"
+                   "computed reference will be used instead.\n");
 
     workingDirectory = "";
-    app.add_option("-w,--working-dir", workingDirectory, "");
+    app.add_option("-w,--working-dir", workingDirectory,
+                   "Path to a directory where \n"
+                   "temporary files can be stored. \nIf no path is provided, \nthe current working dir is used. \n"
+                   "Please make sure that \nenough space is available.\n");
 
     qvMode = "lossless";
-    app.add_option("--qv", qvMode, "");
+    app.add_option("--qv", qvMode,
+                   "How to encode quality values. \nPossible values are \n"
+                   "\"lossless\" (default, keep all values) and \n\"none\" (discard all values).\n");
 
     readNameMode = "lossless";
-    app.add_option("--read-ids", readNameMode, "");
+    app.add_option("--read-ids", readNameMode,
+                   "How to encode read ids. Possible values \n"
+                   "are \"lossless\" (default, keep all values) and \n\"none\" (discard all values).\n");
 
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "");
+    app.add_flag("-f,--force", forceOverwrite,
+                 "Flag, if set already existing output \n"
+                 "files are overridden.\n");
 
     combinePairsFlag = false;
-    app.add_flag("--combine-pairs", combinePairsFlag, "");
+    app.add_flag(
+        "--combine-pairs", combinePairsFlag,
+        "Flag, if provided to a decoding \n"
+        "operation, unaligned reads will \nget matched to their mate again. \nNote: has no effect if encoded with \n"
+        "--low-latency in case of aligned reads only. \nDoes not work if encoded with --read-ids \"none\"\n");
 
     lowLatency = false;
-    app.add_flag("--low-latency", lowLatency, "");
+    app.add_flag(
+        "--low-latency", lowLatency,
+        "Flag, if set no global reference will be \n"
+        "calculated for unaligned records. \nThis will increase encoding speed, \nbut decrease compression rate.\n");
 
-    refMode = "relevant";
-    app.add_option("--embedded-ref", refMode, "");
+    refMode = "none";
+    // Deactivated for now, as broken in connection with part 1
+    /*  app.add_option("--embedded-ref", refMode,
+                     "How to encode the reference. Possible \n"
+                     "values are \"none\" (no encoding and reference must \nbe kept externally for decompression),\n"
+                     " \"relevant\" (only parts of the reference \nneeded for decoding are encoded)\n");*/
 
     numberOfThreads = std::thread::hardware_concurrency();
-    app.add_option("-t,--threads", numberOfThreads, "");
+    app.add_option("-t,--threads", numberOfThreads, "Number of threads to use.\n");
 
     rawReference = false;
-    app.add_flag("--raw-ref", rawReference, "");
+    // Deactivated for now, as broken in connection with part 1
+    /* app.add_flag("--raw-ref", rawReference,
+                  "Flag, if set references will be encoded raw \n"
+                  "instead of compressed. This will increase \nencoding speed, but decrease compression rate.\n");*/
 
     try {
         app.parse(argc, argv);
@@ -91,7 +112,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
             workingDirectory.pop_back();
         }
     } catch (const CLI::CallForHelp &) {
-        std::cout << app.help() << std::endl;
+        std::cerr << app.help() << std::endl;
         help = true;
         return;
     } catch (const CLI::ParseError &e) {
@@ -123,6 +144,9 @@ std::string size_string(std::uintmax_t f_size) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateInputFile(const std::string &file) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
@@ -169,6 +193,9 @@ void validateWorkingDir(const std::string &dir) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateOutputFile(const std::string &file, bool forced) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
@@ -188,44 +215,64 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
-              << std::endl;
+    if (inputFile.substr(0, 2) != "-.") {
+        inputFile = ghc::filesystem::canonical(inputFile).string();
+        std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
+        std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+                  << std::endl;
+    } else {
+        std::cerr << "Input file: stdin" << std::endl;
+    }
 
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
-        std::cout << "Input supplementary file: " << inputSupFile << " with size "
+        inputSupFile = ghc::filesystem::canonical(inputSupFile).string();
+        std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
+        std::cerr << "Input supplementary file: " << inputSupFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
     }
     if (!inputRefFile.empty()) {
         validateInputFile(inputRefFile);
-        std::cout << "Input reference file: " << inputRefFile << " with size "
+        inputRefFile = ghc::filesystem::canonical(inputRefFile).string();
+        std::replace(inputRefFile.begin(), inputRefFile.end(), '\\', '/');
+        std::cerr << "Input reference file: " << inputRefFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputRefFile)) << std::endl;
     }
 
     if (!paramsetPath.empty()) {
         validateInputFile(paramsetPath);
-        std::cout << "Parameter input file: " << paramsetPath << " with size "
+        std::cerr << "Parameter input file: " << paramsetPath << " with size "
                   << size_string(ghc::filesystem::file_size(paramsetPath)) << std::endl;
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     validateWorkingDir(workingDirectory);
-    std::cout << "Working directory: " << workingDirectory << " with "
+    workingDirectory = ghc::filesystem::canonical(workingDirectory).string();
+    std::replace(workingDirectory.begin(), workingDirectory.end(), '\\', '/');
+    std::cerr << "Working directory: " << workingDirectory << " with "
               << size_string(ghc::filesystem::space(workingDirectory).available) << " available" << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cout << "Output file: " << outputFile << " with "
-              << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    if (outputFile.substr(0, 2) != "-.") {
+        outputFile = ghc::filesystem::weakly_canonical(outputFile).string();
+        std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
+        std::cerr << "Output file: " << outputFile << " with "
+                  << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    } else {
+        std::cerr << "Output file: stdout" << std::endl;
+    }
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
-        std::cout << "Output supplementary file: " << outputSupFile << " with "
+        outputSupFile = ghc::filesystem::weakly_canonical(outputSupFile).string();
+        std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
+        std::cerr << "Output supplementary file: " << outputSupFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
                   << std::endl;
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless", "QVMode " + qvMode + " unknown");
     UTILS_DIE_IF(refMode != "none" && refMode != "relevant" && refMode != "full", "RefMode " + refMode + " unknown");
@@ -236,12 +283,12 @@ void ProgramOptions::validate() {
                      "Invalid number of threads: " + std::to_string(numberOfThreads) +
                          ". Your system supports between 1 and " + std::to_string(std::thread::hardware_concurrency()) +
                          " threads.");
-        std::cout << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
+        std::cerr << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
                   << std::endl;
     } else {
         UTILS_DIE_IF(!numberOfThreads,
                      "Could not detect hardware concurrency level. Please provide a number of threads manually.");
-        std::cout << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
+        std::cerr << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
                   << std::endl;
     }
 }

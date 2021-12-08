@@ -9,7 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/dataset.h"
 #include "genie/core/stats/perf-stats.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,28 +20,34 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class FlowGraph {
  public:
     /**
-     *
+     * @brief
      */
     virtual void run() = 0;
 
     /**
-     *
+     * @brief
      */
     virtual void stop(bool) {}
 
     /**
-     *
+     * @brief
+     * @return
+     */
+    virtual core::meta::Dataset getMeta() const;
+
+    /**
+     * @brief
      * @return
      */
     virtual core::stats::PerfStats getStats() = 0;
 
     /**
-     *
+     * @brief
      */
     virtual ~FlowGraph() = default;
 };

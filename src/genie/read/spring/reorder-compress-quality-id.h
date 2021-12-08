@@ -24,7 +24,7 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  * @param temp_dir
  * @param cp
  * @param qv_coder
@@ -40,7 +40,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
                                  std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
 
 /**
- *
+ * @brief
  * @param file_order
  * @param order_array
  * @param numreads
@@ -48,7 +48,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
 void generate_order(const std::string &file_order, uint32_t *order_array, const uint32_t &numreads);
 
 /**
- *
+ * @brief
  * @param file_blocks
  * @param block_start
  * @param block_end
@@ -57,7 +57,7 @@ void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> 
                           std::vector<uint32_t> &block_end);
 
 /**
- *
+ * @brief
  * @param id_array
  * @param temp_dir
  * @param file_order_id
@@ -78,7 +78,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
 
 /**
- *
+ * @brief
  * @param file_quality
  * @param outfile_quality
  * @param temp_dir
@@ -102,7 +102,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
 
 /**
- *
+ * @brief
  * @param file_name
  * @param temp_dir
  * @param num_reads_per_file

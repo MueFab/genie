@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
@@ -23,7 +24,7 @@ namespace format {
 namespace fasta {
 
 /**
- *
+ * @brief
  */
 class Manager : public core::ReferenceSource {
     FastaReader reader;
@@ -34,28 +35,36 @@ class Manager : public core::ReferenceSource {
 
  public:
     /**
-     *
+     * @brief
      * @param fasta
      * @param fai
+     * @param sha
      * @param mgr
+     * @param path
      */
-    Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr);
+    Manager(std::istream& fasta, std::istream& fai, std::istream& sha, core::ReferenceManager* mgr, std::string path);
 
     /**
-     *
+     * @brief
      * @return
      */
-    std::set<std::string> getSequences() const;
+    std::map<size_t, std::string> getSequences() const;
 
     /**
-     *
+     * @brief
      * @param seq
      * @return
      */
     uint64_t getLength(const std::string& seq) const;
 
     /**
-     *
+     * @brief
+     * @return
+     */
+    genie::core::meta::Reference getMeta() const override;
+
+    /**
+     * @brief
      * @param sequence
      * @param start
      * @param end

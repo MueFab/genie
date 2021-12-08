@@ -34,28 +34,28 @@ typedef boomphf::SingleHashFunctor<uint64_t> hasher_t;
 typedef boomphf::mphf<uint64_t, hasher_t> boophf_t;
 
 /**
- *
+ * @brief
  */
 class bbhashdict {
  public:
-    boophf_t *bphf;          //!<
-    int start;               //!<
-    int end;                 //!<
-    uint32_t numkeys;        //!<
+    boophf_t *bphf;          //!< @brief
+    int start;               //!< @brief
+    int end;                 //!< @brief
+    uint32_t numkeys;        //!< @brief
     uint32_t dict_numreads;  //!< number of reads in this dict (for variable length)
-    uint32_t *startpos;      //!<
-    uint32_t *read_id;       //!<
-    bool *empty_bin = NULL;  //!<
+    uint32_t *startpos;      //!< @brief
+    uint32_t *read_id;       //!< @brief
+    bool *empty_bin = NULL;  //!< @brief
 
     /**
-     *
+     * @brief
      * @param dictidx
      * @param startposidx
      */
     void findpos(int64_t *dictidx, const uint64_t &startposidx);
 
     /**
-     *
+     * @brief
      * @param dictidx
      * @param startposidx
      * @param current
@@ -63,7 +63,7 @@ class bbhashdict {
     void remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current);
 
     /**
-     *
+     * @brief
      */
     bbhashdict() {
         bphf = NULL;
@@ -72,7 +72,7 @@ class bbhashdict {
     }
 
     /**
-     *
+     * @brief
      */
     ~bbhashdict() {
         if (startpos != NULL) delete[] startpos;
@@ -83,7 +83,7 @@ class bbhashdict {
 };
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param s
  * @param readlen
@@ -95,7 +95,7 @@ void stringtobitset(const std::string &s, const uint16_t readlen, std::bitset<bi
                     std::bitset<bitset_size> **basemask);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param mask1
  * @param dict
@@ -106,7 +106,7 @@ template <size_t bitset_size>
 void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int numdict, int bpb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param read
  * @param dict
@@ -122,7 +122,7 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
                          const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param mask
  * @param max_readlen
@@ -132,7 +132,7 @@ template <size_t bitset_size>
 void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const int bpb);
 
 /**
- *
+ * @brief
  * @tparam bitset_size
  * @param s
  * @param readlen

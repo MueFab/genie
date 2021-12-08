@@ -19,17 +19,17 @@ namespace genie {
 namespace core {
 
 /**
- *
+ * @brief
  */
 class FormatImporterCompressed : public util::Source<AccessUnit>, public util::OriginalSource {
  public:
     /**
-     *
+     * @brief
      */
     ~FormatImporterCompressed() override = default;
 
     /**
-     *
+     * @brief
      */
     void flushIn(uint64_t& pos) override;
 };

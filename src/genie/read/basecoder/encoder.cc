@@ -5,6 +5,7 @@
  */
 
 #include "genie/read/basecoder/encoder.h"
+#include <genie/core/record/alignment_split/other-rec.h>
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -41,8 +42,9 @@ Encoder::Encoder(int32_t startingMappingPos)
 void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     // TODO(Fabian): Splices
     const auto &ALIGNMENT =
-        rec.getAlignments().front();                 // TODO(Fabian): Multiple alignments. Currently only 1 supported
-    const auto &RECORD = rec.getSegments().front();  // First segment
+        rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
+    const auto &RECORD = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1]
+                                                                              : rec.getSegments()[0];  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
@@ -90,7 +92,7 @@ const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec) {
+void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1) {
     const auto LENGTH = length - 1;
     container.push(core::GenSub::RLEN, LENGTH);
 
@@ -104,8 +106,7 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
-    const bool FIRST1 = srec.getDelta() >= 0;                     // Alignment 1 was the first if delta is positive
-    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(FIRST1);  // FIRST1 is encoded in least significant bit
+    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(first1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
 
@@ -116,20 +117,55 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 
     encodeFirstSegment(rec);
 
-    const auto &SEQUENCE = rec.getSegments().front().getSequence();
+    const auto &SEQUENCE = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1].getSequence()
+                                                                                : rec.getSegments()[0].getSequence();
     const auto &CIGAR = rec.getAlignments().front().getAlignment().getECigar();  // TODO(Fabian): Multi-alignments
     clips.first = encodeCigar(SEQUENCE, CIGAR, ref1, rec.getClassID());
 
     // Check if record is paired
     if (rec.getSegments().size() > 1) {
+        // Same record
         const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
-        const auto SECOND_RECORD_INDEX = 1;
-        const auto LENGTH2 = rec.getSegments()[SECOND_RECORD_INDEX].getSequence().length();
-        encodeAdditionalSegment(LENGTH2, srec);
+        const auto &SEQUENCE2 =
+            rec.isRead1First() ? rec.getSegments()[1].getSequence() : rec.getSegments()[0].getSequence();
+        const auto LENGTH2 = SEQUENCE2.length();
+        encodeAdditionalSegment(LENGTH2, srec, rec.isRead1First());
 
-        const auto &SEQUENCE2 = rec.getSegments()[SECOND_RECORD_INDEX].getSequence();
         const auto &CIGAR2 = srec.getAlignment().getECigar();
         clips.second = encodeCigar(SEQUENCE2, CIGAR2, ref2, rec.getClassID());
+    } else if (rec.getNumberOfTemplateSegments() > 1) {
+        // Unpaired
+        if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==
+            core::record::AlignmentSplit::Type::UNPAIRED) {
+            if (rec.isRead1First()) {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+            } else {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+            }
+            // Other record
+        } else {
+            const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
+            auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
+            if (rec.isRead1First()) {
+                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
+                    container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
+                    container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
+                } else {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_SPLIT);
+                    container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
+                }
+            } else {
+                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
+                    container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
+                    container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());
+                } else {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_SPLIT);
+                    container.push(core::GenSub::PAIR_R1_SPLIT, split.getNextPos());
+                }
+            }
+        }
     }
 
     encodeClips(clips);
@@ -315,9 +351,7 @@ bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
     for (const auto &soft : inf.softClips) {
         clips_present = clips_present || !soft.empty();
     }
-    if (clips_present) {
-        container.push(core::GenSub::CLIPS_RECORD_ID, readCounter);
-    } else {
+    if (!clips_present) {
         return clips_present;
     }
 
@@ -348,6 +382,7 @@ void Encoder::encodeClips(const std::pair<ClipInformation, ClipInformation> &cli
     present = encodeSingleClip(clips.second, true) || present;
 
     if (present) {
+        container.push(core::GenSub::CLIPS_RECORD_ID, readCounter);
         container.push(core::GenSub::CLIPS_TYPE, core::GenConst::CLIPS_RECORD_END);
     }
 

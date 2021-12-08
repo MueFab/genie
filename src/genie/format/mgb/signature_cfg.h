@@ -23,25 +23,25 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class SignatureCfg {
  private:
-    boost::optional<uint16_t> num_signatures;   //!<
-    std::vector<uint64_t> U_cluster_signature;  //!<
+    boost::optional<uint16_t> num_signatures;   //!< @brief
+    std::vector<uint64_t> U_cluster_signature;  //!< @brief
 
-    uint8_t U_signature_size;  //!<
+    uint8_t U_signature_size;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _U_cluster_signature_0
      * @param _U_signature_size
      */
     SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size);
 
     /**
-     *
+     * @brief
      * @param _U_signature_size
      * @param multiple_signature_base
      * @param reader
@@ -49,18 +49,18 @@ class SignatureCfg {
     SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~SignatureCfg() = default;
 
     /**
-     *
+     * @brief
      * @param _U_cluster_signature
      */
     void addSignature(uint64_t _U_cluster_signature);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;

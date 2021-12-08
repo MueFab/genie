@@ -30,38 +30,38 @@ namespace core {
  */
 class ReadEncoder : public Module<record::Chunk, AccessUnit> {
  public:
-    using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;  //!<
+    using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;  //!< @brief
     using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
-                                            const record::Chunk&>;  //!<
+                                            const record::Chunk&>;  //!< @brief
     using EntropySelector =
-        util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
+        util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!< @brief
 
  protected:
-    QvSelector* qvcoder{};            //!<
-    NameSelector* namecoder{};        //!<
-    EntropySelector* entropycoder{};  //!<
+    QvSelector* qvcoder{};            //!< @brief
+    NameSelector* namecoder{};        //!< @brief
+    EntropySelector* entropycoder{};  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setQVCoder(QvSelector* coder);
 
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setNameCoder(NameSelector* coder);
 
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setEntropyCoder(EntropySelector* coder);
 
     /**
-     *
+     * @brief
      * @param entropycoder
      * @param a
      * @return
@@ -69,7 +69,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
     static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a);
 
     /**
-     *
+     * @brief
      * @param a
      * @return
      */
