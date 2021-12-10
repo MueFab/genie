@@ -58,7 +58,8 @@ core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::Acc
     auto ret = basecoder::EncoderStub::pack(id, std::move(qv), std::move(rname), state);
 
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
-    crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
+    crps.setExtension(
+        core::parameter::ComputedRefExtended(0, dynamic_cast<LAEncodingState&>(state).refCoder.getMaxBufferSize()));
     ret.getParameters().setComputedRef(std::move(crps));
 
     return ret;
@@ -99,12 +100,19 @@ std::pair<std::string, std::string> Encoder::getReferences(const core::record::R
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record::Chunk& data) const {
-    return util::make_unique<LAEncodingState>(data, cr_buf_max_size);
+    const uint32_t READS_PER_ASSEMBLY = 10;
+    uint32_t max_read_size = 0;
+    for (const auto& r : data.getData()) {
+        for (const auto& s : r.getSegments()) {
+            max_read_size = std::max(max_read_size, static_cast<uint32_t>(s.getSequence().length()));
+        }
+    }
+    return util::make_unique<LAEncodingState>(data, max_read_size * READS_PER_ASSEMBLY);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug) : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+Encoder::Encoder(bool _debug) : debug(_debug) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
