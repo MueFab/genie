@@ -107,7 +107,11 @@ std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record:
             max_read_size = std::max(max_read_size, static_cast<uint32_t>(s.getSequence().length()));
         }
     }
-    return util::make_unique<LAEncodingState>(data, max_read_size * READS_PER_ASSEMBLY);
+    uint32_t buf_max_size = 1024;
+    while (buf_max_size < (max_read_size * READS_PER_ASSEMBLY)) {
+        buf_max_size *= 2;
+    }
+    return util::make_unique<LAEncodingState>(data, buf_max_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
