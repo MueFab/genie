@@ -244,6 +244,10 @@ uint64_t LocalReference::getWindowBorder() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint32_t LocalReference::getMaxBufferSize() const { return cr_buf_max_size; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace localassembly
 }  // namespace read
 }  // namespace genie
