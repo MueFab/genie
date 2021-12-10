@@ -108,6 +108,12 @@ class LocalReference {
      * @brief
      */
     void printWindow() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    uint32_t getMaxBufferSize() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
