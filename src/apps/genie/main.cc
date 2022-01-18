@@ -11,6 +11,7 @@
 #include "genie/gabac/main.h"
 #include "genie/module/manager.h"
 #include "genie/transcode-fastq/main.h"
+#include "genie/transcode-fasta/main.h"
 #include "genie/transcode-sam/main.h"
 #include "genie/util/runtime-exception.h"
 
@@ -58,6 +59,8 @@ int main(int argc, char* argv[]) {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
             stat(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+        } else if (operation == "transcode-fasta") {
+            genieapp::transcode_fasta::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "transcode-fastq") {
             genieapp::transcode_fastq::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
 #ifdef GENIE_SAM_SUPPORT
