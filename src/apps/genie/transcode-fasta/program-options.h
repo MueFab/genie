@@ -5,7 +5,7 @@
  */
 
 #ifndef SRC_APPS_GENIE_TRANSCODE_FASTA_PROGRAM_OPTIONS_H_
-#define SRC_APPS_GENIE_TRANSCODE_FASTQ_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_TRANSCODE_FASTA_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 

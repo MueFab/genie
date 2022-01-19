@@ -5,7 +5,7 @@
  */
 
 #ifndef SRC_APPS_GENIE_TRANSCODE_FASTA_MAIN_H_
-#define SRC_APPS_GENIE_TRANSCODE_FAST_MAIN_H_
+#define SRC_APPS_GENIE_TRANSCODE_FASTA_MAIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcode_fastq
+}  // namespace transcode_fasta
 }  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
