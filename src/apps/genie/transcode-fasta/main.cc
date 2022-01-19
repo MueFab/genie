@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     auto refMgr = genie::util::make_unique<genie::core::ReferenceManager>(4);
     auto fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
                                                                             refMgr.get(), pOpts.inputFile);
-    genie::format::mgb::RawReference raw_ref;
+    genie::format::mgb::RawReference raw_ref(true);
     for (size_t i = 0; i < refMgr->getSequences().size(); ++i) {
         auto name = refMgr->ID2Ref(i);
         auto length = refMgr->getLength(name);
