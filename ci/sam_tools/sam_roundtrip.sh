@@ -71,6 +71,9 @@ compress_roundtrip () {
     echo "-----------------Compressed:"
     ls -l $sam_file
     ls -l $working_dir/output.mgb
+    
+    rm $working_dir/output.mgb.json
+    rm $working_dir/output.mgb.unsupported.mgrec
 
  #   exit 0
 
