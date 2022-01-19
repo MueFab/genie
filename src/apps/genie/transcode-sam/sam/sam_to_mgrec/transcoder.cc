@@ -391,7 +391,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         auto rec = reader->moveRecord();
         rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
 
-        if(fix_ecigar(rec, refs, refinf)) {
+        if (fix_ecigar(rec, refs, refinf)) {
             rec.write(total_output_writer);
         } else {
             removed_unsupported_base++;

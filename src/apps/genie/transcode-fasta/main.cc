@@ -6,10 +6,10 @@
 
 #include "apps/genie/transcode-fasta/main.h"
 #include <string>
+#include <utility>
 #include "apps/genie/transcode-fasta/program-options.h"
 #include "genie/format/fasta/manager.h"
 #include "genie/format/mgb/raw_reference.h"
-
 
 // TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
 #include "filesystem/filesystem.hpp"
@@ -62,18 +62,17 @@ int main(int argc, char* argv[]) {
         genie::format::fasta::FastaReader::hash(faifile, fai_in, sha_out);
     }
 
-
     auto fastaFile = genie::util::make_unique<std::ifstream>(pOpts.inputFile);
     auto faiFile = genie::util::make_unique<std::ifstream>(fai_name);
     auto shaFile = genie::util::make_unique<std::ifstream>(sha_name);
     auto refMgr = genie::util::make_unique<genie::core::ReferenceManager>(4);
-    auto fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
-                                                                            pOpts.inputFile);
+    auto fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
+                                                                            refMgr.get(), pOpts.inputFile);
     genie::format::mgb::RawReference raw_ref;
     for (size_t i = 0; i < refMgr->getSequences().size(); ++i) {
         auto name = refMgr->ID2Ref(i);
         auto length = refMgr->getLength(name);
-        std::string seq_str = refMgr->load(name, 0,  length).getString(0, length);
+        std::string seq_str = refMgr->load(name, 0, length).getString(0, length);
         raw_ref.addSequence(genie::format::mgb::RawReferenceSequence(i, 0, std::move(seq_str)));
     }
 
