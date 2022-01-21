@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
     auto fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
                                                                             refMgr.get(), pOpts.inputFile);
     genie::format::mgb::RawReference raw_ref(true);
-    for (size_t i = 0; i < refMgr->getSequences().size(); ++i) {
+    for (uint16_t i = 0; i < static_cast<uint16_t>(refMgr->getSequences().size()); ++i) {
         auto name = refMgr->ID2Ref(i);
         auto length = refMgr->getLength(name);
         std::string seq_str = refMgr->load(name, 0, length).getString(0, length);
