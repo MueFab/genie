@@ -8,10 +8,11 @@
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"
+#include "genie/capsulator/main.h"
 #include "genie/gabac/main.h"
 #include "genie/module/manager.h"
-#include "genie/transcode-fastq/main.h"
 #include "genie/transcode-fasta/main.h"
+#include "genie/transcode-fastq/main.h"
 #include "genie/transcode-sam/main.h"
 #include "genie/util/runtime-exception.h"
 
@@ -69,6 +70,8 @@ int main(int argc, char* argv[]) {
 #endif
         } else if (operation == "gabac") {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+        } else if (operation == "capsulator") {
+            genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {
