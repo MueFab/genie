@@ -69,6 +69,11 @@ class ReferenceLocation {
      */
     virtual void write(genie::util::BitWriter& bitwriter) const;
 
+    /**
+     * @brief Virtual destructor
+     */
+    virtual ~ReferenceLocation() = default;
+
  private:
     Flag external_ref_flag;  //!< @brief
 };

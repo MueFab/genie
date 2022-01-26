@@ -30,7 +30,7 @@ RawReference::RawReference() : ExternalReference(ExternalReference::Type::RAW_RE
 RawReference::RawReference(const std::vector<std::unique_ptr<Checksum>> &_checksums) {
     auto checksum = _checksums.begin();
     while (checksum != _checksums.end()) {
-        checksums.emplace_back(std::move((*checksum)->clone()));
+        checksums.emplace_back((*checksum)->clone());
         checksum++;
     }
 }

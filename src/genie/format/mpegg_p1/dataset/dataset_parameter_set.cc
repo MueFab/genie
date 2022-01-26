@@ -40,8 +40,8 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, FileHeader& fh
     dataset_group_ID = reader.read<uint8_t>();
     dataset_ID = reader.read<uint16_t>();
 
-    auto _parameter_set_ID = reader.read<uint8_t>();
-    auto _parent_parameter_set_ID(reader.read<uint8_t>());
+    // auto _parameter_set_ID = reader.read<uint8_t>();
+    // auto _parent_parameter_set_ID(reader.read<uint8_t>());
 
     if (minor_version != "1900" && parameters_update_flag) {
         multiple_alignment_flag = reader.read<bool>(1);
@@ -61,7 +61,7 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, FileHeader& fh
         reader.flush();
     }
 
-    core::parameter::ParameterSet(_parameter_set_ID, _parent_parameter_set_ID, reader);
+    // core::parameter::ParameterSet(_parameter_set_ID, _parent_parameter_set_ID, reader);
 
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length, "Invalid dataset parameter set length!");
 }
@@ -99,7 +99,7 @@ uint64_t DatasetParameterSet::getLength() const {
     //    return len;
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    write(tmp_writer, true);
+    // write(tmp_writer);
     tmp_writer.flush();
     uint64_t len = tmp_writer.getBitsWritten() / 8;
 
@@ -108,16 +108,10 @@ uint64_t DatasetParameterSet::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::write(util::BitWriter& writer, bool empty_length) const {
+void DatasetParameterSet::write(util::BitWriter& writer) const {
     /// Key of KLV format
     writer.write("pars");
-
-    /// Length of KLV format
-    if (empty_length) {
-        writer.write(0, 64);
-    } else {
-        writer.write(getLength(), 64);
-    }
+    writer.write(getLength(), 64);
 
     writer.write(dataset_group_ID, 8);  /// group_ID u(8)
 

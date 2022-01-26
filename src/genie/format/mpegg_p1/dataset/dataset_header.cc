@@ -58,7 +58,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, si
             seq_IDs.push_back(reader.read<uint16_t>());
         }
         for (auto seq = 0; seq < seq_count; seq++) {
-            seq_blocks.push_back(reader.read<uint32_t>());
+            seq_blocks.push_back(static_cast<uint16_t>(reader.read<uint32_t>()));
         }
     }
 
@@ -113,7 +113,7 @@ uint8_t DatasetHeader::getGroupID() const { return group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::setGroupID(uint8_t) { group_ID = group_ID; }
+void DatasetHeader::setGroupID(uint8_t _group_ID) { group_ID = _group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

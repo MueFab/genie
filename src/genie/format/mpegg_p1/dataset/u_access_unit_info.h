@@ -34,7 +34,6 @@ namespace mpegg_p1 {
 class UAccessUnitInfo {
  private:
     uint32_t num_U_access_units;  //!< @brief
-    uint32_t num_U_clusters;      //!< @brief
     bool U_signature_flag;
     uint32_t multiple_signature_base;  //!< @brief
     uint8_t U_signature_size;          //!< @brief

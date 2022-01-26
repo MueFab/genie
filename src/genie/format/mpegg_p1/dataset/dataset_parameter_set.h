@@ -88,14 +88,14 @@ class DatasetParameterSet : public core::parameter::ParameterSet {
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    uint64_t getLength() const override;
 
     /**
      * @brief
      * @param writer
      * @param empty_length
      */
-    void write(genie::util::BitWriter& writer, bool empty_length = false) const;
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

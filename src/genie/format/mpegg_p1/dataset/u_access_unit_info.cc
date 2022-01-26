@@ -16,8 +16,7 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UAccessUnitInfo::UAccessUnitInfo()
-    : num_U_clusters(0),
-      multiple_signature_base(0),
+    : multiple_signature_base(0),
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0) {}
@@ -26,7 +25,6 @@ UAccessUnitInfo::UAccessUnitInfo()
 
 UAccessUnitInfo::UAccessUnitInfo(util::BitReader& reader, FileHeader&)
     : num_U_access_units(reader.read<uint32_t>()),
-      num_U_clusters(),
       U_signature_flag(false),
       multiple_signature_base(0),
       U_signature_size(0),
