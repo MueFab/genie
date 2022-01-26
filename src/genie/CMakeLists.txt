@@ -1,6 +1,7 @@
 add_subdirectory(core)
 add_subdirectory(format/fasta)
 add_subdirectory(format/fastq)
+add_subdirectory(format/mpegg_p1)
 add_subdirectory(entropy/gabac)
 add_subdirectory(entropy/paramcabac)
 add_subdirectory(quality/paramqv1)

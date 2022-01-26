@@ -66,8 +66,22 @@ class ParameterSet : public DataUnit {
 
     /**
      * @brief
+     * @param _parameter_set_ID
+     * @param _parent_parameter_set_ID
+     * @param bitReader
+     */
+    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, util::BitReader &bitReader);
+
+    /**
+     * @brief
      */
     ParameterSet();
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void writeEncodingParams(util::BitWriter &writer) const;
 
     /**
      * @brief
@@ -243,7 +257,7 @@ class ParameterSet : public DataUnit {
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    virtual uint64_t getLength() const;
 
     /**
      * @brief

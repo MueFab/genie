@@ -19,7 +19,7 @@ fi
 if ! command -v cppcheck &> /dev/null
 then
     echo "Cppcheck could not be found. Please install cppcheck (debian: sudo apt-get install cppcheck)."
-    exit 1
+#    exit 1
 fi
 
 ############ Run ###############

@@ -29,8 +29,8 @@ class ProgramOptions {
     ProgramOptions(int argc, char *argv[]);
 
  public:
-    std::string inputFile;     //!< @brief
-    std::string outputFile;     //!< @brief
+    std::string inputFile;   //!< @brief
+    std::string outputFile;  //!< @brief
 
     bool forceOverwrite;  //!< @brief
 
