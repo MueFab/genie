@@ -31,13 +31,6 @@ Checksum::Algo Checksum::getType() const { return checksum_alg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Checksum::getLength() const {
-    UTILS_DIE("This is the base class of Checksum");
-    return 0;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void Checksum::write(util::BitWriter&) const { UTILS_DIE("This is the base class of Checksum"); }
 
 // ---------------------------------------------------------------------------------------------------------------------
