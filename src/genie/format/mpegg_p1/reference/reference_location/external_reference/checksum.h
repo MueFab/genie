@@ -48,12 +48,6 @@ class Checksum {
 
     /**
      *
-     * @param _container
-     */
-    Checksum(const Checksum&& _container);
-
-    /**
-     *
      */
     virtual ~Checksum() = default;
 
@@ -73,7 +67,7 @@ class Checksum {
      * @brief
      * @return
      */
-    virtual uint64_t getLength() const;
+    virtual uint64_t getLength() const = 0;
 
     /**
      * @brief

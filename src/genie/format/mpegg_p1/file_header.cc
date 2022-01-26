@@ -30,8 +30,8 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader)
     std::string key = genie::format::mpegg_p1::readKey(bitreader);
     UTILS_DIE_IF(key != "flhd", "File header not found");
 
-    uint64_t length = bitreader.read<uint64_t>();
-    uint32_t num_compatible_brands = (length - 22) / 4;
+    auto length = bitreader.read<uint64_t>();
+    auto num_compatible_brands = static_cast<uint32_t>((length - 22) / 4);
 
     std::string f_major_brand(readFixedLengthChars(bitreader, 6));
     UTILS_DIE_IF(f_major_brand != major_brand, "Invalid major_brand in file header");

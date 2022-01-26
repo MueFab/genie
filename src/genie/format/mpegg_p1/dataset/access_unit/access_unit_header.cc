@@ -57,7 +57,7 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader&, size_t 
 
     /// dataset_type == 2
     if (dhd.getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        auto pos_size = (uint64_t)dhd.getPos40SizeFlag();
+        auto pos_size = (uint8_t)dhd.getPos40SizeFlag();
         ref_cfg = util::make_unique<format::mgb::RefCfg>(pos_size, reader);
     } else {
         ref_cfg = nullptr;
@@ -65,7 +65,7 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader&, size_t 
 
     if (!MIT_flag) {
         if (au_type != core::record::ClassType::CLASS_U) {
-            au_type_cfg = util::make_unique<format::mgb::AuTypeCfg>((uint64_t)dhd.getPos40SizeFlag(),
+            au_type_cfg = util::make_unique<format::mgb::AuTypeCfg>((uint8_t)dhd.getPos40SizeFlag(),
                                                                     dhd.getMultipleAlignmentFlag(), reader);
 
         } else {
