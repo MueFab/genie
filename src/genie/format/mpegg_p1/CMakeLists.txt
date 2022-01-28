@@ -13,7 +13,6 @@ set(source_files
         dataset/access_unit/access_unit_header.cc
         dataset/access_unit/signature_cfg.cc
         dataset/access_unit/block.cc
-        dataset/u_access_unit_info.cc
         #        dataset/master_index_table/access_unit_info/extended_au_info.cc
         #        dataset/master_index_table/access_unit_info/access_unit_info.cc
         #        dataset/master_index_table/u_access_unit_info/u_access_unit_info.cc
@@ -54,12 +53,12 @@ set(source_files
         reference/reference_location/external_reference/md5.cc
         reference/reference_location/external_reference/sha256.cc
 
-        label_list/label_list.cc
-        label_list/label/label.cc
-        label_list/label/dataset_info.cc
-        label_list/label/dataset_region.cc
+        label_list.cc
+        label.cc
+        label_dataset.cc
+        label_region.cc
         dataset/class_description.cc
-        )
+        gen_info.h reference_metadata.h dataset_group_metadata.h)
 
 add_library(genie-mpegg_p1 ${source_files})
 

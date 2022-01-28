@@ -24,6 +24,23 @@ namespace core {
  */
 enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1 };
 
+enum class MPEGMinorVersion : uint8_t { V1900 = 0, V2000 = 1, UNKNOWN = 2 };
+
+inline const std::string& getMPEGVersionString(MPEGMinorVersion v) {
+    static const std::string lut[] = {"1900", "2000"};
+    return lut[static_cast<uint8_t>(v)];
+}
+
+inline MPEGMinorVersion getMPEGVersion(const std::string& v) {
+    for (MPEGMinorVersion ret = MPEGMinorVersion::V1900; ret < MPEGMinorVersion::UNKNOWN;
+         ret = MPEGMinorVersion(static_cast<uint8_t>(ret) + 1)) {
+        if (getMPEGVersionString(ret) == v) {
+            return ret;
+        }
+    }
+    return  MPEGMinorVersion::UNKNOWN;
+}
+
 /**
  * @brief
  */

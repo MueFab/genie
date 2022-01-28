@@ -4,6 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#if 0
+
 #include "genie/format/mpegg_p1/dataset/dataset.h"
 #include <sstream>
 #include <utility>
@@ -298,3 +300,4 @@ void Dataset::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif

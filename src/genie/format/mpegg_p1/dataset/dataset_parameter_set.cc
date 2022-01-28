@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
+# if 0
 #include "genie/format/mpegg_p1/dataset/dataset_parameter_set.h"
 #include <sstream>
 
@@ -153,3 +153,4 @@ void DatasetParameterSet::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif

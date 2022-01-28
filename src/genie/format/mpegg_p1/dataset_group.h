@@ -23,7 +23,7 @@
 
 #include "dataset/dataset.h"
 #include "genie/format/mpegg_p1/dataset_group_header.h"
-#include "label_list/label_list.h"
+#include "label_list.h"
 #include "reference/reference.h"
 #include "reference_metadata/reference_metadata.h"
 

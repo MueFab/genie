@@ -4,20 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <array>
-#include <list>
-#include <memory>
+#include <cstdint>
 #include <vector>
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
+#include "label.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,39 +24,62 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class Md5 : public Checksum {
+class LabelList : public GenInfo {
  private:
-    std::list<uint64_t> data;  //!< @brief
+    /**
+     * ISO 23092-1 Section 6.5.1.5 table 14
+     **/
+    uint8_t dataset_group_ID;
+    std::vector<Label> labels;
 
  public:
-    /**
-     * @brief Default constructor
-     */
-    Md5();
+
+    const std::string& getKey() const override {
+        static const std::string key = "labl";
+        return key;
+    }
+
+    uint64_t getSize() const override {
+        uint64_t labelSize = 0;
+        for(const auto& l : labels) {
+            labelSize += l.getSize();
+        }
+        return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) + labelSize;
+    }
 
     /**
-     * @brief Read MD5 checksum from reader
-     * @param reader
+     *
+     * @param _ds_group_ID
      */
-    explicit Md5(util::BitReader& reader);
+    explicit LabelList(uint8_t _ds_group_ID);
+
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    explicit LabelList(util::BitReader& reader);
 
     /**
      *
      * @return
      */
-    std::unique_ptr<Checksum> clone() const override;
-
+    uint8_t getDatasetGroupID() const;
     /**
-     * @brief
+     *
      * @return
      */
-    uint64_t getLength() const override;
+    const std::vector<Label>& getLabels() const;
+
+    void addLabel(Label l) {
+        labels.emplace_back(std::move(l));
+    }
 
     /**
-     * @brief
-     * @param writer
+     *
+     * @param bit_writer
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void write(genie::util::BitWriter& bit_writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,7 +90,7 @@ class Md5 : public Checksum {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

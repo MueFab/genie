@@ -4,6 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#if 0
+
 #include "genie/format/mpegg_p1/dataset/dataset_header.h"
 #include <sstream>
 
@@ -289,3 +291,4 @@ void DatasetHeader::write(util::BitWriter& writer, bool zero_length) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif

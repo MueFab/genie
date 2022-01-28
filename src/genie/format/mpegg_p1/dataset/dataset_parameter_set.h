@@ -31,71 +31,146 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetParameterSet : public core::parameter::ParameterSet {
+class DatasetParameterSet : GenInfo {
+ public:
+    class USignature {
+     private:
+        boost::optional<uint8_t> u_signature_length;
+
+     public:
+        USignature() : u_signature_length(boost::none) {}
+
+        explicit USignature(genie::util::BitReader& reader) {
+            if (reader.read<bool>(1)) {
+                u_signature_length = reader.read<uint8_t>();
+            }
+        }
+
+        bool isConstantLength() const { return u_signature_length != boost::none; }
+
+        uint8_t getConstLength() const { return *u_signature_length; }
+
+        void setConstLength(uint8_t length) { u_signature_length = length; }
+
+        void write(genie::util::BitWriter& writer) const {
+            writer.write(u_signature_length != boost::none, 1);
+            if (u_signature_length != boost::none) {
+                writer.write(*u_signature_length, 8);
+            }
+        }
+    };
+
+    class ParameterUpdateInfo {
+     private:
+        bool multiple_alignment_flag;
+        bool pos_40_bits_flag;
+        core::AlphabetID alphabetId;
+        boost::optional<USignature> u_signature;
+
+     public:
+        ParameterUpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId)
+            : multiple_alignment_flag(_multiple_alignment_flag),
+              pos_40_bits_flag(_pos_40_bits_flag),
+              alphabetId(_alphabetId) {}
+
+        explicit ParameterUpdateInfo(genie::util::BitReader& reader) {
+            multiple_alignment_flag = reader.read<bool>(1);
+            pos_40_bits_flag = reader.read<bool>(1);
+            alphabetId = reader.read<core::AlphabetID>(8);
+            if (reader.read<bool>(1)) {
+                u_signature = USignature(reader);
+            }
+            reader.flush();
+        }
+
+        void write(genie::util::BitWriter& writer) const {
+            writer.write(multiple_alignment_flag, 1);
+            writer.write(pos_40_bits_flag, 1);
+            writer.write(static_cast<uint8_t>(alphabetId), 8);
+            writer.write(u_signature != boost::none, 1);
+            if (u_signature != boost::none) {
+                u_signature->write(writer);
+            }
+            writer.flush();
+        }
+
+        void addUSignature(USignature signature) { u_signature = signature; }
+
+        bool getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
+
+        bool getPos40BitsFlag() const { return pos_40_bits_flag; }
+
+        core::AlphabetID getAlphabetID() const { return alphabetId; }
+
+        bool hasUSignature() const { return u_signature != boost::none; }
+
+        const USignature& getUSignature() const { return *u_signature; }
+    };
+
  private:
-    /* ----- internal ----- */
-    std::string minor_version;
-
-    bool parameters_update_flag;
-    uint32_t num_U_access_units;
-
-    uint8_t dataset_group_ID;
-    uint16_t dataset_ID;
-
-    bool multiple_alignment_flag;
-    DatasetHeader::Pos40Size pos_40_bits_flag;
-    uint8_t alphabet_ID;
-    bool U_signature_flag;
-    bool U_signature_constant_length;
-    uint8_t U_signature_length;
+    uint8_t dataset_group_id;
+    uint16_t dataset_id;
+    uint8_t parameter_set_ID;
+    uint8_t parent_parameter_set_ID;
+    boost::optional<ParameterUpdateInfo> param_update;
+    genie::core::parameter::ParameterSet params;
+    core::MPEGMinorVersion version;
 
  public:
-    /**
-     * @brief
-     * @param reader
-     * @param fhd
-     * @param start_pos
-     * @param length
-     * @param dthd
-     */
-    DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length, DatasetHeader& dthd);
+    DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
+                        uint8_t _parent_parameter_set_ID, genie::core::parameter::ParameterSet ps,
+                        core::MPEGMinorVersion _version)
+        : dataset_group_id(_dataset_group_id),
+          dataset_id(_dataset_id),
+          parameter_set_ID(_parameter_set_ID),
+          parent_parameter_set_ID(_parent_parameter_set_ID),
+          params(std::move(ps)),
+          version(_version) {}
 
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getDatasetGroupID() const;
+    DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version, bool parameters_update_flag)
+        : version(_version) {
+        dataset_group_id = reader.readBypassBE<uint8_t>();
+        dataset_id = reader.readBypassBE<uint16_t>();
+        parameter_set_ID = reader.readBypassBE<uint8_t>();
+        parent_parameter_set_ID = reader.readBypassBE<uint8_t>();
+        if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
+            param_update = ParameterUpdateInfo(reader);
+        }
+        params = genie::core::parameter::ParameterSet(reader);
+    }
 
-    /**
-     * @brief
-     * @param _dataset_group_ID
-     */
-    void setDatasetGroupID(uint8_t _dataset_group_ID);
+    void write(genie::util::BitWriter& writer) const override {
+        writer.writeBypassBE(dataset_group_id);
+        writer.writeBypassBE(dataset_id);
+        writer.writeBypassBE(parameter_set_ID);
+        writer.writeBypassBE(parent_parameter_set_ID);
+        if (param_update != boost::none) {
+            param_update->write(writer);
+        }
+        params.write(writer);
+    }
 
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getDatasetID() const;
+    void addParameterUpdate(ParameterUpdateInfo update) {
+        if (version != core::MPEGMinorVersion::V1900) {
+            param_update = std::move(update);
+        }
+    }
 
-    /**
-     * @brief
-     * @param _dataset_ID
-     */
-    void setDatasetID(uint16_t _dataset_ID);
+    uint8_t getDatasetGroupID() const { return dataset_group_id; }
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getLength() const override;
+    uint16_t getDatasetID() const { return dataset_id; }
 
-    /**
-     * @brief
-     * @param writer
-     * @param empty_length
-     */
-    void write(genie::util::BitWriter& writer) const override;
+    uint8_t getParameterSetID() const { return parameter_set_ID; }
+
+    uint8_t getParentParameterSetID() const { return parent_parameter_set_ID; }
+
+    bool hasParameterUpdate() const { return param_update != boost::none; }
+
+    const ParameterUpdateInfo& getParameterUpdate() const { return *param_update; }
+
+    const genie::core::parameter::ParameterSet& getParameterSet() const { return params; }
+
+    genie::core::parameter::ParameterSet&& moveParameterSet() { return std::move(params); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

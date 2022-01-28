@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
+#if 0
 #include "genie/format/mpegg_p1/mpegg_file.h"
 #include <utility>
 
@@ -66,3 +66,4 @@ void MpeggFile::writeToFile(genie::util::BitWriter& bitWriter) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif

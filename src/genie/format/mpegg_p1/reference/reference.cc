@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#if 0
 #include "genie/format/mpegg_p1/reference/reference.h"
 #include <sstream>
 
@@ -243,3 +244,4 @@ void Reference::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif
