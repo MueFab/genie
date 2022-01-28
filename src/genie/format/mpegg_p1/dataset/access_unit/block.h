@@ -22,6 +22,7 @@
 #include "genie/util/exception.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +35,8 @@ namespace mpegg_p1 {
  */
 class Block {
  private:
-    BlockHeader header;                //!< @brief
-    std::list<uint8_t> block_payload;  //!< @brief block_payload_size (implicite), block_payload[]
+    BlockHeader header;                    //!< @brief
+    genie::util::DataBlock block_payload;  //!< @brief block_payload_size (implicite), block_payload[]
 
  public:
     /**
@@ -43,7 +44,10 @@ class Block {
      * @param reader
      * @param fhd
      */
-    explicit Block(util::BitReader& reader, FileHeader& fhd);
+    explicit Block(util::BitReader& reader);
+
+    Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload)
+        : header(false, _desc_id, 0, payload.getRawSize()), block_payload(std::move(payload)) {}
 
     /**
      * @brief
@@ -55,7 +59,13 @@ class Block {
      * @brief
      * @return
      */
-    const std::list<uint8_t>& getPayload() const;
+    const genie::util::DataBlock& getPayload() const {
+        return block_payload;
+    }
+
+    genie::util::DataBlock&& movePayload() {
+        return std::move(block_payload);
+    }
 
     /**
      * @brief
@@ -68,6 +78,10 @@ class Block {
      * @param writer
      */
     void write(genie::util::BitWriter& writer) const;
+
+    genie::core::GenDesc getDescID() const {
+        return header.getDescriptorID();
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

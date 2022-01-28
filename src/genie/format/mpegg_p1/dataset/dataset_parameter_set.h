@@ -129,6 +129,7 @@ class DatasetParameterSet : GenInfo {
 
     DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version, bool parameters_update_flag)
         : version(_version) {
+        reader.readBypassBE<uint64_t>();
         dataset_group_id = reader.readBypassBE<uint8_t>();
         dataset_id = reader.readBypassBE<uint16_t>();
         parameter_set_ID = reader.readBypassBE<uint8_t>();
@@ -136,10 +137,11 @@ class DatasetParameterSet : GenInfo {
         if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
             param_update = ParameterUpdateInfo(reader);
         }
-        params = genie::core::parameter::ParameterSet(reader);
+        params = genie::core::parameter::ParameterSet(reader, true);
     }
 
     void write(genie::util::BitWriter& writer) const override {
+        GenInfo::write(writer);
         writer.writeBypassBE(dataset_group_id);
         writer.writeBypassBE(dataset_id);
         writer.writeBypassBE(parameter_set_ID);
@@ -147,13 +149,25 @@ class DatasetParameterSet : GenInfo {
         if (param_update != boost::none) {
             param_update->write(writer);
         }
-        params.write(writer);
+        params.writeEncodingParams(writer);
     }
 
     void addParameterUpdate(ParameterUpdateInfo update) {
         if (version != core::MPEGMinorVersion::V1900) {
             param_update = std::move(update);
         }
+    }
+
+    uint64_t getSize() const override {
+        std::stringstream stream;
+        genie::util::BitWriter writer(&stream);
+        write(writer);
+        return stream.str().length();
+    }
+
+    const std::string& getKey() const override {
+        static const std::string key = "pars";
+        return key;
     }
 
     uint8_t getDatasetGroupID() const { return dataset_group_id; }
