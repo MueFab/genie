@@ -18,11 +18,16 @@ namespace parameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
-    bitReader.read<uint16_t>(10);  // ISO 23092-2 Section 3.1 table 3
-    bitReader.read<uint32_t>(22);
-    parameter_set_ID = bitReader.read<uint8_t>();
-    parent_parameter_set_ID = bitReader.read<uint8_t>();
+ParameterSet::ParameterSet(util::BitReader &bitReader, bool encoding_only) : DataUnit(DataUnitType::PARAMETER_SET) {
+    if (!encoding_only) {
+        bitReader.read<uint16_t>(10);  // ISO 23092-2 Section 3.1 table 3
+        bitReader.read<uint32_t>(22);
+        parameter_set_ID = bitReader.read<uint8_t>();
+        parent_parameter_set_ID = bitReader.read<uint8_t>();
+    } else {
+        parameter_set_ID = 0;
+        parent_parameter_set_ID = 0;
+    }
     dataset_type = bitReader.read<DatasetType>(4);
     alphabet_ID = bitReader.read<AlphabetID>();
     read_length = bitReader.read<uint32_t>(24);

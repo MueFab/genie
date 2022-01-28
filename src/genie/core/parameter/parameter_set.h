@@ -44,7 +44,7 @@ class ParameterSet : public DataUnit {
      * @brief Read parameter set from bitstream
      * @param bitReader Stream to read from
      */
-    explicit ParameterSet(util::BitReader &bitReader);
+    explicit ParameterSet(util::BitReader &bitReader, bool encoding_only = false);
 
     /**
      * @brief Construct from raw values

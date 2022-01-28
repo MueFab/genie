@@ -34,7 +34,9 @@ namespace mpegg_p1 {
  */
 class BlockHeader {
  private:
-    uint8_t descriptor_ID;  //!< @brief
+    bool reserved1;
+    genie::core::GenDesc descriptor_ID;  //!< @brief
+    uint8_t reserved2;
     uint32_t block_payload_size;  //!< @brief
 
  public:
@@ -43,13 +45,25 @@ class BlockHeader {
      * @param reader
      * @param fhd
      */
-    explicit BlockHeader(util::BitReader& reader, FileHeader& fhd);
+    explicit BlockHeader(util::BitReader& reader);
+
+    BlockHeader(bool _reserved1, genie::core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
+    : reserved1(_reserved1), descriptor_ID (_desc_id), reserved2(_reserved2), block_payload_size(payload_size) {
+    }
+
+    bool getReserved1() const {
+        return reserved1;
+    };
+
+    uint8_t getReserved2() const {
+        return reserved2;
+    }
 
     /**
      * @brief
      * @return
      */
-    uint8_t getDescriptorID() const;
+    genie::core::GenDesc getDescriptorID() const;
 
     /**
      * @brief
