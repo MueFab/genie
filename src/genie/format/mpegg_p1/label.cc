@@ -4,11 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/md5.h"
-#include "genie/util/exception.h"
+#include "label.h"
+#include <utility>
+#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
@@ -16,38 +15,51 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Md5::Md5() : Checksum(Checksum::Algo::MD5), data() {}
+Label::Label() : label_ID(), dataset_infos() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Md5::Md5(util::BitReader& reader) : Checksum(Checksum::Algo::MD5) {
-    /// MD5 u(128)
-    for (size_t i = 0; i < 2; i++) {
-        data.emplace_back(reader.read<uint64_t>());
+Label::Label(std::string _label_ID) : label_ID(std::move(_label_ID)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Label::Label(util::BitReader& reader) {
+    reader.readBypassBE<uint64_t>();
+    reader.readBypass_null_terminated(label_ID);
+    auto num_datasets = reader.read<uint16_t>();
+
+    for (size_t i = 0; i < num_datasets; ++i) {
+        dataset_infos.emplace_back(reader);
     }
+    reader.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Checksum> Md5::clone() const {
-    auto ret = util::make_unique<Md5>();
-    ret->data = this->data;
-    return ret;
-}
+void Label::addDataset(LabelDataset _ds_info) { dataset_infos.push_back(std::move(_ds_info)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Md5::getLength() const {
-    /// MD5 u(128)
-    return 128 / 8;
-}
+const std::string& Label::getLabelID() const { return label_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Md5::write(util::BitWriter& writer) const {
-    for (auto c : data) {
-        writer.write(c, 64);
+void Label::write(util::BitWriter& bit_writer) const {
+    GenInfo::write(bit_writer);
+
+    bit_writer.writeBypass(label_ID.data(), label_ID.length());
+    bit_writer.writeBypassBE('\0');
+
+    // num_datasets u(16)
+    bit_writer.writeBypassBE<uint16_t>(dataset_infos.size());
+
+    // data encapsulated in Class dataset_info
+    for (auto& ds_info : dataset_infos) {
+        ds_info.write(bit_writer);
     }
+
+    // aligned to byte
+    bit_writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

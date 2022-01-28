@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/label_list/label/dataset_region.h"
+#include "label_region.h"
 #include <utility>
 #include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/core/record/class-type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -15,18 +16,15 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetRegion::DatasetRegion() : seq_ID(0), class_IDs(), start_pos(0), end_pos(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-mpegg_p1::DatasetRegion::DatasetRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
+mpegg_p1::LabelRegion::LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
     : seq_ID((_seq_ID)), class_IDs(), start_pos(_start_pos), end_pos(_end_pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetRegion::ReadDatasetRegion(util::BitReader& reader) {
+LabelRegion::LabelRegion(util::BitReader& reader) {
     // seq_ID u(16)
     seq_ID = reader.read<uint16_t>();
 
@@ -35,7 +33,7 @@ void DatasetRegion::ReadDatasetRegion(util::BitReader& reader) {
 
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
-        class_ID = reader.read<uint8_t>(4);
+        class_ID = reader.read<genie::core::record::ClassType>(4);
     }
 
     // start_pos u(40)
@@ -47,71 +45,36 @@ void DatasetRegion::ReadDatasetRegion(util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetRegion::addClassID(uint8_t _class_ID) { class_IDs.push_back(_class_ID); }
+void LabelRegion::addClassID(genie::core::record::ClassType _class_ID) { class_IDs.push_back(_class_ID); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetRegion::addClassIDs(std::vector<uint8_t>& _class_IDs) {
-    std::move(_class_IDs.begin(), _class_IDs.end(), std::back_inserter(class_IDs));
-}
+uint16_t LabelRegion::getSeqID() const { return seq_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetRegion::setClassIDs(std::vector<uint8_t>&& _class_IDs) { class_IDs = _class_IDs; }
+const std::vector<genie::core::record::ClassType>& LabelRegion::getClassIDs() const { return class_IDs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t DatasetRegion::getSeqID() const { return seq_ID; }
+uint64_t LabelRegion::getStartPos() const { return start_pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetRegion::getNumClasses() const { return static_cast<uint8_t>(class_IDs.size()); }
+uint64_t LabelRegion::getEndPos() const { return end_pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t>& DatasetRegion::getClassIDs() const { return class_IDs; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetRegion::getStartPos() const { return start_pos; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetRegion::getEndPos() const { return end_pos; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetRegion::getBitLength() const {
-    // seq_ID u(16)
-    uint64_t bitlen = 16;
-
-    // num_classes u(8)
-    bitlen += 8;
-
-    // for class_IDs[] u(4)
-    bitlen += 4 * getNumClasses();
-
-    // start_pos u(40)
-    bitlen += 40;
-
-    // end_pos u(40)
-    bitlen += 40;
-
-    return bitlen;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetRegion::write(util::BitWriter& bit_writer) const {
+void LabelRegion::write(util::BitWriter& bit_writer) const {
     // seq_ID u(16)
     bit_writer.write(seq_ID, 16);
 
     // num_classes u(8)
-    bit_writer.write(getNumClasses(), 8);
+    bit_writer.write(class_IDs.size(), 4);
 
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
-        bit_writer.write(class_ID, 4);
+        bit_writer.write(static_cast<uint8_t>(class_ID), 4);
     }
 
     // start_pos u(40)

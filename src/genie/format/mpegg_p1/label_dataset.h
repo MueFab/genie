@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
-#include <memory>
+#include <vector>
+#include "label_region.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,56 +24,50 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class Checksum {
- public:
-    /**
-     * @brief
-     */
-    enum class Algo : uint8_t { MD5 = 0, SHA256 = 1, UNKNOWN = 2 };
-
+class LabelDataset {
  private:
-    Algo checksum_alg;  //!< @brief
+    /**
+     * ISO 23092-1 Section 6.5.1.5.4 table 15 (for num_dataset)
+     *
+     **/
+    uint16_t dataset_ID;
+
+    std::vector<LabelRegion> dataset_regions;
 
  public:
     /**
-     * @brief
+     *
+     * @param _ds_ID
      */
-    Checksum();
-
+    explicit LabelDataset(uint16_t _ds_ID);
     /**
-     * @brief
-     * @param _algo
+     *
+     * @param reader
      */
-    explicit Checksum(Algo _algo);
+    explicit LabelDataset(util::BitReader& reader);
 
     /**
      *
+     * @param _ds_region
      */
-    virtual ~Checksum() = default;
+    void addDatasetRegion(LabelRegion _ds_region);
 
     /**
      *
      * @return
      */
-    virtual std::unique_ptr<Checksum> clone() const = 0;
+    uint16_t getDatasetID() const;
 
     /**
-     * @brief
+     *
      * @return
      */
-    Algo getType() const;
-
+    uint64_t getBitLength() const;
     /**
-     * @brief
-     * @return
-     */
-    virtual uint64_t getLength() const = 0;
-
-    /**
-     * @brief
+     *
      * @param bit_writer
      */
-    virtual void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -84,7 +78,7 @@ class Checksum {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

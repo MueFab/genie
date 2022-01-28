@@ -4,7 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
+#include "label_list.h"
+#include <string>
+#include <utility>
+#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -15,23 +18,42 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Checksum::Checksum() : checksum_alg(Algo::UNKNOWN) {}
+LabelList::LabelList(uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Checksum::Checksum(Algo _algo) : checksum_alg(_algo) {}
+LabelList::LabelList(util::BitReader& reader) {
+    reader.readBypassBE<uint64_t>();
+    // ID u(8)
+    dataset_group_ID = reader.read<uint8_t>();
+    // num_labels u(16)
+    auto num_labels = reader.read<uint16_t>();
+
+    /// Data encapsulated in Class Label
+    for (size_t i = 0; i < num_labels; ++i) {
+        labels.emplace_back(reader);
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Checksum::Checksum(Checksum&& _container) noexcept { *this = _container; }
+uint8_t LabelList::getDatasetGroupID() const { return dataset_group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Checksum::Algo Checksum::getType() const { return checksum_alg; }
+const std::vector<Label>& LabelList::getLabels() const { return labels; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Checksum::write(util::BitWriter&) const { UTILS_DIE("This is the base class of Checksum"); }
+void LabelList::write(util::BitWriter& bit_writer) const {
+    GenInfo::write(bit_writer);
+    bit_writer.writeBypassBE<uint8_t>(dataset_group_ID);
+    bit_writer.writeBypassBE<uint16_t>(labels.size());
+    // data encapsulated in Class Label
+    for (auto& label : labels) {
+        label.write(bit_writer);
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

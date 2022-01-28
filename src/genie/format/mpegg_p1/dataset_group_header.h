@@ -30,7 +30,7 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetGroupHeader {
+class DatasetGroupHeader : public GenInfo {
  private:
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
@@ -43,16 +43,26 @@ class DatasetGroupHeader {
     /**
      * @brief
      */
-    DatasetGroupHeader();
+    DatasetGroupHeader(uint8_t _id, uint8_t _version) : ID(_id), version(_version) {
 
-    /**
-     * @brief
-     * @param reader
-     * @param fhd
-     * @param start_pos
-     * @param length
-     */
-    explicit DatasetGroupHeader(genie::util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
+    }
+
+    const std::string& getKey() const override {
+        static const std::string key = "dghd";
+        return key;
+    }
+
+
+    explicit DatasetGroupHeader(genie::util::BitReader& reader) {
+        auto length = reader.readBypassBE<uint64_t>();
+        auto num_datasets = (length - 14) / 2;
+        dataset_IDs.resize(num_datasets);
+        ID = reader.readBypassBE<uint8_t>();
+        version = reader.readBypassBE<uint8_t>();
+        for(auto& d : dataset_IDs) {
+            d = reader.readBypassBE<uint16_t>();
+        }
+    }
 
     /**
      * @brief
@@ -76,20 +86,35 @@ class DatasetGroupHeader {
      * @brief
      * @return
      */
-    std::vector<uint16_t>& getDatasetIDs();
+    const std::vector<uint16_t>& getDatasetIDs() const {
+        return dataset_IDs;
+    }
+
+    void addDatasetID(uint16_t _id) {
+        ID = _id;
+    }
 
     /**
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    uint64_t getSize() const override {
+        return GenInfo::getSize() + sizeof(uint8_t) * 2 + sizeof(uint16_t) * dataset_IDs.size();
+    }
 
     /**
      * @brief
      * @param writer
      * @param empty_length
      */
-    void write(genie::util::BitWriter& writer, bool empty_length = false) const;
+    void write(genie::util::BitWriter& writer) const override {
+        GenInfo::write(writer);
+        writer.writeBypassBE<uint8_t>(ID);
+        writer.writeBypassBE<uint8_t>(version);
+        for(auto& d : dataset_IDs) {
+            writer.writeBypassBE<uint16_t>(d);
+        }
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

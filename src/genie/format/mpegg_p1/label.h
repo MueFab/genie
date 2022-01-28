@@ -3,17 +3,17 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
+#include <string>
 #include <vector>
-#include "genie/format/mpegg_p1/label_list/label/dataset_region.h"
+#include "label_dataset.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/format/mpegg_p1/gen_info.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,68 +24,68 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetInfo {
+class Label : public GenInfo {
  private:
     /**
-     * ISO 23092-1 Section 6.5.1.5.4 table 15 (for num_dataset)
-     *
+     * ISO 23092-1 Section 6.5.1.5.4 table 15
      **/
-    uint16_t dataset_ID;
-
-    std::vector<DatasetRegion> dataset_regions;
+    std::string label_ID;
+    std::vector<LabelDataset> dataset_infos;
 
  public:
+
+    const std::string& getKey() const override {
+        static const std::string key = "lbll";
+        return key;
+    }
+
+    uint64_t getSize() const override {
+        auto bitSize = (label_ID.size() + 1 + sizeof(uint16_t)) * 8;
+        for (const auto& d : dataset_infos) {
+            bitSize += d.getBitLength();
+        }
+        return bitSize / 8 + (bitSize % 8 ? 1 : 0) + GenInfo::getSize();
+    }
+
     /**
      *
      */
-    DatasetInfo();
+    Label();
     /**
      *
-     * @param _ds_ID
+     * @param _label_ID
      */
-    explicit DatasetInfo(uint16_t _ds_ID);
+    explicit Label(std::string _label_ID);
+
     /**
      *
      * @param reader
      */
-    void ReadDatasetInfo(util::BitReader& reader);
+    explicit Label(util::BitReader& reader);
 
     /**
      *
-     * @param _ds_region
+     * @param _ds_info
      */
-    void addDatasetRegion(DatasetRegion&& _ds_region);
-    /**
-     *
-     * @param _ds_regions
-     */
-    void addDatasetRegions(std::vector<DatasetRegion>& _ds_regions);
-    /**
-     *
-     * @param _ds_regions
-     */
-    void setDatasetRegions(std::vector<DatasetRegion>&& _ds_regions);
-    /**
-     *
-     * @return
-     */
-    uint16_t getDatasetID() const;
-    /**
-     *
-     * @return
-     */
-    uint8_t getNumRegions() const;
+    void addDataset(LabelDataset _ds_info);
+
 
     /**
      *
      * @return
      */
-    uint64_t getBitLength() const;
+    const std::string& getLabelID() const;
+
+
+    const std::vector<LabelDataset>& getDatasets() const {
+        return dataset_infos;
+    }
+
     /**
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ class DatasetInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

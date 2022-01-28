@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
+#if 0
 #include "genie/format/mpegg_p1/dataset/access_unit/access_unit_header.h"
 #include <sstream>
 #include <utility>
@@ -174,3 +174,4 @@ void AccessUnitHeader::write(util::BitWriter& writer, bool zero_length) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+#endif
