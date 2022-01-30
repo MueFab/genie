@@ -7,7 +7,6 @@
 #include "label_list.h"
 #include <string>
 #include <utility>
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

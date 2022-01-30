@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/format/mpegg_p1/dataset/access_unit/block_header.h>
+#include "block_header.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

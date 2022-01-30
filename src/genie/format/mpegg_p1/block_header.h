@@ -3,21 +3,23 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_CLASS_DESCRIPTION_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_CLASS_DESCRIPTION_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_HEADER_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "dataset_header.h"
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
+#include "access_unit_header.h"
 #include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
 #include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,25 +30,50 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ClassDescription {
+class BlockHeader {
  private:
-    bool block_header_flag;               //!< @brief
-    uint8_t clid;                         //!< @brief
-    std::vector<uint8_t> descriptor_IDs;  //!< @brief
+    bool reserved1;
+    genie::core::GenDesc descriptor_ID;  //!< @brief
+    uint8_t reserved2;
+    uint32_t block_payload_size;  //!< @brief
 
  public:
     /**
-     * @brief
+     *
      * @param reader
-     * @param _block_header_flag
+     * @param fhd
      */
-    explicit ClassDescription(genie::util::BitReader& reader, bool _block_header_flag);
+    explicit BlockHeader(util::BitReader& reader);
+
+    BlockHeader(bool _reserved1, genie::core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
+    : reserved1(_reserved1), descriptor_ID (_desc_id), reserved2(_reserved2), block_payload_size(payload_size) {
+    }
+
+    bool getReserved1() const {
+        return reserved1;
+    };
+
+    uint8_t getReserved2() const {
+        return reserved2;
+    }
 
     /**
      * @brief
      * @return
      */
-    uint64_t getBitLength() const;
+    genie::core::GenDesc getDescriptorID() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    uint32_t getPayloadSize() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getLength() const;
 
     /**
      * @brief
@@ -63,7 +90,7 @@ class ClassDescription {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_CLASS_DESCRIPTION_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

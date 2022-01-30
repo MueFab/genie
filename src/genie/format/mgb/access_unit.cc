@@ -25,33 +25,33 @@ namespace mgb {
 
 void AccessUnit::debugPrint(const core::parameter::ParameterSet &ps) const {
     std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
-    std::cerr << "AU " << getID() << ": class " << lut[static_cast<int>(getClass())];
-    if (getClass() != genie::core::record::ClassType::CLASS_U) {
-        std::cerr << ", Position [" << getAlignmentInfo().getRefID() << "-" << getAlignmentInfo().getStartPos() << ":"
-                  << getAlignmentInfo().getEndPos() << "]";
+    std::cerr << "AU " << header.getID() << ": class " << lut[static_cast<int>(header.getClass())];
+    if (header.getClass() != genie::core::record::ClassType::CLASS_U) {
+        std::cerr << ", Position [" << header.getAlignmentInfo().getRefID() << "-"
+                  << header.getAlignmentInfo().getStartPos() << ":" << header.getAlignmentInfo().getEndPos() << "]";
     }
-    std::cerr << ", " << getReadCount() << " records";
+    std::cerr << ", " << header.getReadCount() << " records";
 
-    if (getClass() == genie::core::record::ClassType::CLASS_U) {
-        if (!ps.isComputedReference()) {
+    if (header.getClass() == genie::core::record::ClassType::CLASS_U) {
+        if (!ps.getEncodingSet().isComputedReference()) {
             std::cerr << " (Low Latency)";
         } else {
-            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
+            if (ps.getEncodingSet().getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
                 std::cerr << " (Global Assembly)";
             } else {
                 UTILS_DIE("Computed ref not supported: " +
-                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
+                          std::to_string(static_cast<int>(ps.getEncodingSet().getComputedRef().getAlgorithm())));
             }
         }
     } else {
-        if (!ps.isComputedReference()) {
+        if (!ps.getEncodingSet().isComputedReference()) {
             std::cerr << " (Reference)";
         } else {
-            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
+            if (ps.getEncodingSet().getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
                 std::cerr << " (Local Assembly)";
             } else {
                 UTILS_DIE("Computed ref not supported: " +
-                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
+                          std::to_string(static_cast<int>(ps.getEncodingSet().getComputedRef().getAlgorithm())));
             }
         }
     }
@@ -61,7 +61,7 @@ void AccessUnit::debugPrint(const core::parameter::ParameterSet &ps) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::loadPayload(util::BitReader &bitReader) {
-    for (size_t i = 0; i < num_blocks; ++i) {
+    for (size_t i = 0; i < header.getNumBlocks(); ++i) {
         blocks.emplace_back(qv_payloads, bitReader);
     }
 }
@@ -80,32 +80,11 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
     bitReader.read_b(3);
     uint32_t du_size = bitReader.read<uint32_t>(29);
 
-    access_unit_ID = bitReader.read<uint32_t>();
-    num_blocks = bitReader.read<uint8_t>();
-    parameter_set_ID = bitReader.read<uint8_t>();
-    au_type = bitReader.read<core::record::ClassType>(4);
-    reads_count = bitReader.read<uint32_t>();
-    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-        this->mm_cfg = MmCfg(bitReader);
-    }
-
-    if (parameterSets.at(parameter_set_ID).getDatasetType() == core::parameter::ParameterSet::DatasetType::REFERENCE) {
-        this->ref_cfg = RefCfg(parameterSets.at(parameter_set_ID).getPosSize(), bitReader);
-    }
-
-    if (au_type != core::record::ClassType::CLASS_U) {
-        this->au_Type_U_Cfg = AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
-                                        parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
-    } else {
-        this->signature_config = SignatureCfg(parameterSets.at(parameter_set_ID).getSignatureSize(),
-                                              parameterSets.at(parameter_set_ID).getMultipleSignatureBase(), bitReader);
-    }
-
-    bitReader.flush();
+    header = AUHeader(bitReader, parameterSets);
 
     uint64_t bytesRead = (bitReader.getBitsRead() / 8 - bitreader_pos);
     payloadbytes = du_size - bytesRead;
-    qv_payloads = parameterSets.at(parameter_set_ID).getQVConfig(au_type).getNumSubsequences();
+    qv_payloads = parameterSets.at(header.getParameterID()).getEncodingSet().getQVConfig(header.getClass()).getNumSubsequences();
 
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
 
@@ -117,37 +96,30 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                       uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
-                       uint32_t multiple_signature_base)
+                       uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag)
     : DataUnit(DataUnitType::ACCESS_UNIT),
-      access_unit_ID(_access_unit_ID),
-      num_blocks(0),
-      parameter_set_ID(_parameter_set_ID),
-      au_type(_au_type),
-      reads_count(_reads_count),
-      mm_cfg(),
-      ref_cfg(),
-      au_Type_U_Cfg(),
-      signature_config(),
-      blocks(0) {
-    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-        mm_cfg = MmCfg();
+      header(_access_unit_ID, _parameter_set_ID, _au_type, _reads_count, dataset_type, posSize, signatureFlag),
+      blocks(0),
+      payloadbytes(0),
+      qv_payloads(0) {
+    if (_au_type == core::record::ClassType::CLASS_N || _au_type == core::record::ClassType::CLASS_M) {
+        header.setMmCfg(MmCfg());
     }
     if (dataset_type == DatasetType::REFERENCE) {
-        ref_cfg = RefCfg(posSize);
+        header.setRefCfg(RefCfg(posSize));
     }
-    if (au_type != core::record::ClassType::CLASS_U) {
-        au_Type_U_Cfg = AuTypeCfg(posSize);
+    if (_au_type != core::record::ClassType::CLASS_U) {
+        header.setAuTypeCfg(AuTypeCfg(posSize));
     } else {
-        if (multiple_signature_base != 0) {
-            signature_config = SignatureCfg(0, signatureSize);
+        if (signatureFlag) {
+            header.setSignatureCfg(SignatureCfg());
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setMmCfg(MmCfg &&cfg) {
+void AUHeader::setMmCfg(MmCfg &&cfg) {
     if (!mm_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
     }
@@ -156,7 +128,7 @@ void AccessUnit::setMmCfg(MmCfg &&cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setRefCfg(RefCfg &&cfg) {
+void AUHeader::setRefCfg(RefCfg &&cfg) {
     if (!ref_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
     }
@@ -165,11 +137,11 @@ void AccessUnit::setRefCfg(RefCfg &&cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const RefCfg &AccessUnit::getRefCfg() { return ref_cfg.get(); }
+const RefCfg &AUHeader::getRefCfg() { return ref_cfg.get(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setAuTypeCfg(AuTypeCfg &&cfg) {
+void AUHeader::setAuTypeCfg(AuTypeCfg &&cfg) {
     if (!au_Type_U_Cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
     }
@@ -178,7 +150,7 @@ void AccessUnit::setAuTypeCfg(AuTypeCfg &&cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setSignatureCfg(SignatureCfg &&cfg) {
+void AUHeader::setSignatureCfg(SignatureCfg &&cfg) {
     if (!signature_config) {
         UTILS_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
     }
@@ -187,27 +159,27 @@ void AccessUnit::setSignatureCfg(SignatureCfg &&cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Block> AccessUnit::getBlocks() const { return blocks; }
+std::vector<Block> &AccessUnit::getBlocks() { return blocks; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t AccessUnit::getID() const { return access_unit_ID; }
+uint32_t AUHeader::getID() const { return access_unit_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t AccessUnit::getParameterID() const { return parameter_set_ID; }
+uint8_t AUHeader::getParameterID() const { return parameter_set_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const AuTypeCfg &AccessUnit::getAlignmentInfo() const { return *au_Type_U_Cfg; }
+const AuTypeCfg &AUHeader::getAlignmentInfo() const { return *au_Type_U_Cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t AccessUnit::getReadCount() const { return reads_count; }
+uint32_t AUHeader::getReadCount() const { return reads_count; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::ClassType AccessUnit::getClass() const { return au_type; }
+core::record::ClassType AUHeader::getClass() const { return au_type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -218,7 +190,7 @@ void AccessUnit::write(util::BitWriter &writer) const {
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    preWrite(tmp_writer);
+    header.write(tmp_writer, true);
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29;  // data_unit_type, reserved, data_unit_size
@@ -239,30 +211,8 @@ void AccessUnit::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::preWrite(util::BitWriter &writer) const {
-    writer.write(access_unit_ID, 32);
-    writer.write(num_blocks, 8);
-    writer.write(parameter_set_ID, 8);
-    writer.write(uint8_t(au_type), 4);
-    writer.write(reads_count, 32);
-    if (mm_cfg) {
-        mm_cfg->write(writer);
-    }
-    if (ref_cfg) {
-        ref_cfg->write(writer);
-    }
-    if (au_Type_U_Cfg) {
-        au_Type_U_Cfg->write(writer);
-    }
-    if (signature_config) {
-        signature_config->write(writer);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void AccessUnit::addBlock(Block block) {
-    ++num_blocks;
+    header.blockAdded();
     blocks.push_back(std::move(block));
 }
 

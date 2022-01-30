@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
+#include "genie/core/constants.h"
 #include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <iostream>
@@ -19,9 +19,7 @@
 #include <sstream>
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class-type.h"
-#include "genie/format/mpegg_p1/dataset/class_description.h"
 #include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"

@@ -12,9 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "genie/format/mpegg_p1/dataset/class_description.h"
 #include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"

@@ -97,10 +97,10 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
-        if (au.getParameters().isComputedReference()) {
-            switch (au.getParameters().getComputedRef().getAlgorithm()) {
+        if (au.getParameters().getEncodingSet().isComputedReference()) {
+            switch (au.getParameters().getEncodingSet().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                    if (au.getParameters().getNumberTemplateSegments() >= 2) {
+                    if (au.getParameters().getEncodingSet().getNumberTemplateSegments() >= 2) {
                         return 4;
                     } else {
                         return 3;

@@ -20,11 +20,11 @@ namespace basecoder {
 
 DecoderStub::DecodingState::DecodingState(core::AccessUnit& t_data) {
     numRecords = t_data.getNumReads();
-    numSegments = t_data.getParameters().getNumberTemplateSegments();
+    numSegments = t_data.getParameters().getEncodingSet().getNumberTemplateSegments();
     ref = t_data.getReference();
     qvStream = std::move(t_data.get(core::GenDesc::QV));
     nameStream = std::move(t_data.get(core::GenDesc::RNAME));
-    qvparam = t_data.getParameters().getQVConfig(t_data.getClassType()).clone();
+    qvparam = t_data.getParameters().getEncodingSet().getQVConfig(t_data.getClassType()).clone();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -6,7 +6,6 @@
 
 #include "label.h"
 #include <utility>
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
 
 namespace genie {
