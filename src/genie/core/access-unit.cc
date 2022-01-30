@@ -327,7 +327,7 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
+AccessUnit::AccessUnit(parameter::EncodingSet &&set, size_t _numRecords)
     : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
@@ -341,19 +341,19 @@ AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setParameters(parameter::ParameterSet &&_parameters) { parameters = std::move(_parameters); }
+void AccessUnit::setParameters(parameter::EncodingSet &&_parameters) { parameters = std::move(_parameters); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const parameter::ParameterSet &AccessUnit::getParameters() const { return parameters; }
+const parameter::EncodingSet &AccessUnit::getParameters() const { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-parameter::ParameterSet &AccessUnit::getParameters() { return parameters; }
+parameter::EncodingSet &AccessUnit::getParameters() { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-parameter::ParameterSet &&AccessUnit::moveParameters() { return std::move(parameters); }
+parameter::EncodingSet &&AccessUnit::moveParameters() { return std::move(parameters); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -361,7 +361,7 @@ size_t AccessUnit::getNumReads() const { return numReads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::clear() { *this = AccessUnit(parameter::ParameterSet(), 0); }
+void AccessUnit::clear() { *this = AccessUnit(parameter::EncodingSet(), 0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

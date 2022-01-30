@@ -37,7 +37,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::NameSelector *name_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
 
 /**
  * @brief
@@ -75,7 +75,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::string &file_name, const compression_params &cp,
                             genie::core::ReadEncoder::NameSelector *name_coder,
                             genie::core::ReadEncoder::EntropySelector *entropy,
-                            std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
+                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
 
 /**
  * @brief
@@ -99,7 +99,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
 
 /**
  * @brief
@@ -124,7 +124,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       genie::core::ReadEncoder::QvSelector *qv_coder,
                       genie::core::ReadEncoder::NameSelector *name_coder,
                       genie::core::ReadEncoder::EntropySelector *entropy,
-                      std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats);
+                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

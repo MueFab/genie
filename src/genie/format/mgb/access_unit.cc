@@ -23,7 +23,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::debugPrint(const core::parameter::ParameterSet &ps) const {
+void AccessUnit::debugPrint(const core::parameter::EncodingSet &ps) const {
     std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
     std::cerr << "AU " << header.getID() << ": class " << lut[static_cast<int>(header.getClass())];
     if (header.getClass() != genie::core::record::ClassType::CLASS_U) {
@@ -33,25 +33,25 @@ void AccessUnit::debugPrint(const core::parameter::ParameterSet &ps) const {
     std::cerr << ", " << header.getReadCount() << " records";
 
     if (header.getClass() == genie::core::record::ClassType::CLASS_U) {
-        if (!ps.getEncodingSet().isComputedReference()) {
+        if (!ps.isComputedReference()) {
             std::cerr << " (Low Latency)";
         } else {
-            if (ps.getEncodingSet().getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
+            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
                 std::cerr << " (Global Assembly)";
             } else {
                 UTILS_DIE("Computed ref not supported: " +
-                          std::to_string(static_cast<int>(ps.getEncodingSet().getComputedRef().getAlgorithm())));
+                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
             }
         }
     } else {
-        if (!ps.getEncodingSet().isComputedReference()) {
+        if (!ps.isComputedReference()) {
             std::cerr << " (Reference)";
         } else {
-            if (ps.getEncodingSet().getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
+            if (ps.getComputedRef().getAlgorithm() == core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
                 std::cerr << " (Local Assembly)";
             } else {
                 UTILS_DIE("Computed ref not supported: " +
-                          std::to_string(static_cast<int>(ps.getEncodingSet().getComputedRef().getAlgorithm())));
+                          std::to_string(static_cast<int>(ps.getComputedRef().getAlgorithm())));
             }
         }
     }
@@ -72,7 +72,7 @@ size_t AccessUnit::getPayloadSize() const { return payloadbytes; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader,
+AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets, util::BitReader &bitReader,
                        bool lazyPayload)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
@@ -84,7 +84,7 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
 
     uint64_t bytesRead = (bitReader.getBitsRead() / 8 - bitreader_pos);
     payloadbytes = du_size - bytesRead;
-    qv_payloads = parameterSets.at(header.getParameterID()).getEncodingSet().getQVConfig(header.getClass()).getNumSubsequences();
+    qv_payloads = parameterSets.at(header.getParameterID()).getQVConfig(header.getClass()).getNumSubsequences();
 
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
 

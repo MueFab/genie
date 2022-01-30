@@ -9,14 +9,15 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/constants.h"
 #include <boost/optional/optional.hpp>
 #include <cstdint>
+#include <limits>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
+#include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class-type.h"
 #include "genie/format/mpegg_p1/file_header.h"
@@ -281,7 +282,7 @@ class DatasetHeader : public GenInfo {
 
     bool getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
 
-    uint8_t getByteOffset() const { return byte_offset_size_flag ? 64 : 32; }
+    uint8_t getByteOffsetSize() const { return byte_offset_size_flag ? 64 : 32; }
 
     bool getNonOverlappingAURangeFlag() const { return non_overlapping_AU_range_flag; }
 
@@ -324,6 +325,10 @@ class DatasetHeader : public GenInfo {
         write(writer);
         return stream.str().length();
     }
+
+    DatasetHeader()
+        : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
+                        core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
 
     DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
                   bool _multiple_alignments_flags, bool _byte_offset_size_flags, bool _non_overlapping_AU_range_flag,
@@ -408,7 +413,7 @@ class DatasetHeader : public GenInfo {
         writer.write(static_cast<uint8_t>(dataset_type), 4);
         if ((block_header_on != boost::none && block_header_on->getMITFlag()) || block_header_on == boost::none) {
             writer.write(mit_configs.size(), 4);
-            for (const auto & c : mit_configs) {
+            for (const auto& c : mit_configs) {
                 c.write(writer);
             }
         }

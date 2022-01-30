@@ -71,7 +71,7 @@ class AUHeader {
 
     void blockAdded() { num_blocks++; }
 
-    AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::ParameterSet> &parameterSets, bool read_signatures = true) {
+    AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool read_signatures = true) {
         UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
         access_unit_ID = bitReader.read<uint32_t>();
         num_blocks = bitReader.read<uint8_t>();
@@ -82,20 +82,20 @@ class AUHeader {
             this->mm_cfg = MmCfg(bitReader);
         }
 
-        if (parameterSets.at(parameter_set_ID).getEncodingSet().getDatasetType() ==
+        if (parameterSets.at(parameter_set_ID).getDatasetType() ==
             core::parameter::ParameterSet::DatasetType::REFERENCE) {
-            this->ref_cfg = RefCfg(parameterSets.at(parameter_set_ID).getEncodingSet().getPosSize(), bitReader);
+            this->ref_cfg = RefCfg(parameterSets.at(parameter_set_ID).getPosSize(), bitReader);
         }
         if (read_signatures) {
             if (au_type != core::record::ClassType::CLASS_U) {
                 this->au_Type_U_Cfg =
-                    AuTypeCfg(parameterSets.at(parameter_set_ID).getEncodingSet().getPosSize(),
-                              parameterSets.at(parameter_set_ID).getEncodingSet().hasMultipleAlignments(), bitReader);
+                    AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
+                              parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
             } else {
-                if (parameterSets.at(parameter_set_ID).getEncodingSet().isSignatureActivated()) {
+                if (parameterSets.at(parameter_set_ID).isSignatureActivated()) {
                     uint8_t length = 0;
-                    if (parameterSets.at(parameter_set_ID).getEncodingSet().isSignatureConstLength()) {
-                        length = parameterSets.at(parameter_set_ID).getEncodingSet().getSignatureConstLength();
+                    if (parameterSets.at(parameter_set_ID).isSignatureConstLength()) {
+                        length = parameterSets.at(parameter_set_ID).getSignatureConstLength();
                     }
                     this->signature_config = SignatureCfg(bitReader, length);
                 }
@@ -205,7 +205,7 @@ class AccessUnit : public core::parameter::DataUnit {
     /**
      * @brief
      */
-    void debugPrint(const core::parameter::ParameterSet &ps) const;
+    void debugPrint(const core::parameter::EncodingSet &ps) const;
 
     /**
      * @brief
@@ -213,7 +213,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param bitReader
      * @param lazyPayload
      */
-    explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
+    explicit AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
                         util::BitReader &bitReader, bool lazyPayload = false);
 
     /**

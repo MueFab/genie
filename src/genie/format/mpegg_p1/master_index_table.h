@@ -101,6 +101,7 @@ class AlignedAUIndex {
         UTILS_DIE_IF(!block_byte_offset.empty() && block_byte_offset.back() > offset, "Blocks unordered");
         block_byte_offset.emplace_back(offset);
     }
+
 };
 
 class UnalignedAUIndex {
@@ -115,6 +116,11 @@ class UnalignedAUIndex {
     uint8_t signature_size;
 
  public:
+
+    const std::vector<uint64_t>& getBlockOffsets() const {
+        return block_byte_offset;
+    }
+
     explicit UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                               core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                               bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
@@ -150,8 +156,6 @@ class UnalignedAUIndex {
 
     uint64_t getAUOffset() const { return au_byte_offset; }
 
-    const std::vector<uint64_t>& getBlockOffsets() const { return block_byte_offset; }
-
     void addBlockOffset(uint64_t offset) {
         UTILS_DIE_IF(!block_byte_offset.empty() && block_byte_offset.back() > offset, "Blocks unordered");
         block_byte_offset.emplace_back(offset);
@@ -184,31 +188,44 @@ class MasterIndexTable : public GenInfo {
     std::vector<UnalignedAUIndex> unaligned_aus;
 
  public:
+
+    const std::vector<std::vector<std::vector<AlignedAUIndex>>>& getAlignedAUs() const {
+        return aligned_aus;
+    }
+
+    const std::vector<UnalignedAUIndex>& getUnalignedAUs() const {
+        return unaligned_aus;
+    }
+
     MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
         aligned_aus.resize(seq_count,
                            std::vector<std::vector<AlignedAUIndex>>(num_classes, std::vector<AlignedAUIndex>()));
     }
 
-    MasterIndexTable(util::BitReader& reader, uint8_t num_classes, uint8_t byte_offset_size, int8_t position_size,
-                     const ReferenceOptions& ref, core::parameter::DataUnit::DatasetType dataset_type,
-                     bool multiple_alignment, bool block_header_flag,
-                     const std::vector<genie::core::GenDesc>& descriptors, uint32_t num_u_aus, bool signature_flag,
-                     bool signature_const_flag, uint8_t _signature_size) {
+    MasterIndexTable(util::BitReader& reader, const DatasetHeader& hdr) {
         reader.read<uint64_t>();
-        for (size_t seq = 0; seq < ref.getSeqIDs().size(); ++seq) {
-            for (size_t ci = 0; ci < num_classes; ++ci) {
-                if (core::record::ClassType::CLASS_U == core::record::ClassType(ci)) {
+        for (size_t seq = 0; seq < hdr.getReferenceOptions().getSeqIDs().size(); ++seq) {
+            for (size_t ci = 0; ci < hdr.getMITConfigs().size(); ++ci) {
+                if (core::record::ClassType::CLASS_U == hdr.getMITConfigs()[ci].getClassID()) {
                     continue;
                 }
-                for (size_t au_id = 0; au_id < ref.getSeqBlocks()[seq]; ++au_id) {
-                    aligned_aus[seq][ci].emplace_back(reader, byte_offset_size, position_size, dataset_type,
-                                                      multiple_alignment, block_header_flag, descriptors);
+                for (size_t au_id = 0; au_id < hdr.getReferenceOptions().getSeqBlocks()[seq]; ++au_id) {
+                    aligned_aus[seq][ci].emplace_back(reader, hdr.getByteOffsetSize(), hdr.getPosBits(),
+                                                      hdr.getDatasetType(), hdr.getMultipleAlignmentFlag(),
+                                                      hdr.isBlockHeaderEnabled(),
+                                                      hdr.getMITConfigs()[ci].getDescriptorIDs());
                 }
             }
         }
-        for (size_t uau_id = 0; uau_id < num_u_aus; ++uau_id) {
-            unaligned_aus.emplace_back(reader, byte_offset_size, position_size, dataset_type, signature_flag,
-                                       signature_const_flag, _signature_size, block_header_flag, descriptors);
+        for (size_t uau_id = 0; uau_id < hdr.getNumUAccessUnits(); ++uau_id) {
+            unaligned_aus.emplace_back(
+                reader, hdr.getByteOffsetSize(), hdr.getPosBits(), hdr.getDatasetType(),
+                hdr.getUOptions().hasSignature(),
+                hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength(),
+                hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength()
+                    ? hdr.getUOptions().getSignature().getConstLength()
+                    : 0,
+                hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs());
         }
     }
 

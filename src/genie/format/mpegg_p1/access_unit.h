@@ -50,7 +50,7 @@ class AccessUnit : public GenInfo {
 
     }
 
-    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::ParameterSet> &parameterSets, bool mit) {
+    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool mit) {
         reader.readBypassBE<uint64_t>();
         header = AccessUnitHeader(reader, parameterSets, mit);
         do {

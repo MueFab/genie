@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
@@ -113,12 +112,12 @@ class DatasetParameterSet : GenInfo {
     uint8_t parameter_set_ID;
     uint8_t parent_parameter_set_ID;
     boost::optional<ParameterUpdateInfo> param_update;
-    genie::core::parameter::ParameterSet params;
+    genie::core::parameter::EncodingSet params;
     core::MPEGMinorVersion version;
 
  public:
     DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
-                        uint8_t _parent_parameter_set_ID, genie::core::parameter::ParameterSet ps,
+                        uint8_t _parent_parameter_set_ID, genie::core::parameter::EncodingSet ps,
                         core::MPEGMinorVersion _version)
         : dataset_group_id(_dataset_group_id),
           dataset_id(_dataset_id),
@@ -137,7 +136,7 @@ class DatasetParameterSet : GenInfo {
         if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
             param_update = ParameterUpdateInfo(reader);
         }
-        params = genie::core::parameter::ParameterSet(reader, true);
+        params = genie::core::parameter::EncodingSet(reader);
     }
 
     void write(genie::util::BitWriter& writer) const override {
@@ -149,7 +148,7 @@ class DatasetParameterSet : GenInfo {
         if (param_update != boost::none) {
             param_update->write(writer);
         }
-        params.writeEncodingParams(writer);
+        params.write(writer);
     }
 
     void addParameterUpdate(ParameterUpdateInfo update) {
@@ -182,9 +181,9 @@ class DatasetParameterSet : GenInfo {
 
     const ParameterUpdateInfo& getParameterUpdate() const { return *param_update; }
 
-    const genie::core::parameter::ParameterSet& getParameterSet() const { return params; }
+    const genie::core::parameter::EncodingSet& getEncodingSet() const { return params; }
 
-    genie::core::parameter::ParameterSet&& moveParameterSet() { return std::move(params); }
+    genie::core::parameter::EncodingSet&& moveParameterSet() { return std::move(params); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

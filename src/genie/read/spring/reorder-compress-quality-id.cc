@@ -36,7 +36,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::NameSelector *name_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     // Read some parameters
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -168,7 +168,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::string &file_name, const compression_params &cp,
                             genie::core::ReadEncoder::NameSelector *name_coder,
                             genie::core::ReadEncoder::EntropySelector *entropy,
-                            std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void)cp;
 
@@ -197,7 +197,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         auto encoded = entropy->process(std::get<0>(raw_desc));
         stat_vec[block_num].add(std::get<2>(encoded));
         std::string name = file_name + "." + std::to_string(block_num);
-        params[block_num].getEncodingSet().setDescriptor(core::GenDesc::RNAME, std::move(std::get<0>(encoded)));
+        params[block_num].setDescriptor(core::GenDesc::RNAME, std::move(std::get<0>(encoded)));
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
         std::ofstream outfile(file_to_save_streams, std::ios::binary);
         util::BitWriter bw(&outfile);
@@ -220,7 +220,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -261,13 +261,13 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
             std::string name = outfile_quality + "." + std::to_string(block_num);
             auto raw_desc = qv_coder->process(chunk);
-            params[block_num].getEncodingSet().setQVDepth(std::get<1>(raw_desc).isEmpty() ? 0 : 1);
+            params[block_num].setQVDepth(std::get<1>(raw_desc).isEmpty() ? 0 : 1);
             stat_vec[block_num - start_block_num].add(std::get<2>(raw_desc));
             chunk.getData().clear();
             auto encoded = entropy->process(std::get<1>(raw_desc));
             stat_vec[block_num - start_block_num].add(std::get<2>(encoded));
-            params[block_num].getEncodingSet().addClass(core::record::ClassType::CLASS_U, std::move(std::get<0>(raw_desc)));
-            params[block_num].getEncodingSet().setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
+            params[block_num].addClass(core::record::ClassType::CLASS_U, std::move(std::get<0>(raw_desc)));
+            params[block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
             std::ofstream out(file_to_save_streams, std::ios::binary);
             util::BitWriter bw(&out);
@@ -289,7 +289,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       genie::core::ReadEncoder::QvSelector *qv_coder,
                       genie::core::ReadEncoder::NameSelector *name_coder,
                       genie::core::ReadEncoder::EntropySelector *entropy,
-                      std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
@@ -356,7 +356,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 stat_vec[block_num].add(std::get<1>(name_raw));
                 auto encoded = entropy->process(std::get<0>(name_raw));
                 stat_vec[block_num].add(std::get<2>(encoded));
-                params[block_num_offset + block_num].getEncodingSet().setDescriptor(core::GenDesc::RNAME,
+                params[block_num_offset + block_num].setDescriptor(core::GenDesc::RNAME,
                                                                    std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
@@ -372,12 +372,12 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 }
                 auto qv_str = qv_coder->process(chunk);
                 stat_vec[block_num].add(std::get<2>(qv_str));
-                params[block_num_offset + block_num].getEncodingSet().setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
+                params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
                 auto encoded = entropy->process(std::get<1>(qv_str));
                 stat_vec[block_num].add(std::get<2>(encoded));
-                params[block_num_offset + block_num].getEncodingSet().addClass(core::record::ClassType::CLASS_U,
+                params[block_num_offset + block_num].addClass(core::record::ClassType::CLASS_U,
                                                               std::move(std::get<0>(qv_str)));
-                params[block_num_offset + block_num].getEncodingSet().setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
+                params[block_num_offset + block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
                 util::BitWriter bw(&out);
