@@ -28,7 +28,7 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetGroupProtection : public GenInfo {
+class DatasetProtection : public GenInfo {
  public:
     const std::string& getKey() const override {
         static const std::string key = "dtpr";
@@ -38,7 +38,7 @@ class DatasetGroupProtection : public GenInfo {
     /**
      * @brief
      */
-    explicit DatasetGroupProtection(genie::util::BitReader& bitreader,
+    explicit DatasetProtection(genie::util::BitReader& bitreader,
                                     genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
         : version(_version) {
         auto length = bitreader.readBypassBE<uint64_t>();
@@ -53,7 +53,7 @@ class DatasetGroupProtection : public GenInfo {
         bitreader.readBypass(dg_protection_value);
     }
 
-    DatasetGroupProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_protection_value,
+    DatasetProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_protection_value,
                            genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
         : version(_version),
           dataset_group_id(_dataset_group_id),

@@ -49,7 +49,7 @@ class AccessUnitHeader : public GenInfo {
 
     }
 
-    explicit AccessUnitHeader(util::BitReader& reader, const std::map<size_t, core::parameter::ParameterSet> &parameterSets, bool mit) : mit_flag(mit){
+    explicit AccessUnitHeader(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool mit) : mit_flag(mit){
         reader.readBypassBE<uint64_t>();
         header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
 

@@ -292,7 +292,7 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
         UTILS_DIE("combinePairsFlag cannot be set to true when read names are not present for all records.");
 
     au.getStats().add(std::get<1>(names));
-    auto qvs = qvcoder->process(au.getParameters().getEncodingSet().getQVConfig(core::record::ClassType::CLASS_U), ecigars,
+    auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars,
                                 au.get(core::GenDesc::QV));
     au.getStats().add(std::get<1>(qvs));
     watch.resume();

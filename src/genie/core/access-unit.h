@@ -415,31 +415,31 @@ class AccessUnit {
      * @param set
      * @param _numRecords
      */
-    AccessUnit(parameter::ParameterSet&& set, size_t _numRecords);
+    AccessUnit(parameter::EncodingSet&& set, size_t _numRecords);
 
     /**
      * @brief
      * @param _parameters
      */
-    void setParameters(parameter::ParameterSet&& _parameters);
+    void setParameters(parameter::EncodingSet&& _parameters);
 
     /**
      * @brief
      * @return
      */
-    const parameter::ParameterSet& getParameters() const;
+    const parameter::EncodingSet& getParameters() const;
 
     /**
      * @brief
      * @return
      */
-    parameter::ParameterSet& getParameters();
+    parameter::EncodingSet& getParameters();
 
     /**
      * @brief
      * @return
      */
-    parameter::ParameterSet&& moveParameters();
+    parameter::EncodingSet&& moveParameters();
 
     /**
      * @brief
@@ -581,7 +581,7 @@ class AccessUnit {
 
  private:
     std::vector<Descriptor> descriptors;                //!< @brief
-    parameter::ParameterSet parameters;                 //!< @brief
+    parameter::EncodingSet parameters;                 //!< @brief
     stats::PerfStats stats;                             //!< @brief
     ReferenceManager::ReferenceExcerpt reference;       //!< @brief
     std::vector<std::pair<size_t, size_t>> refToWrite;  //!< @brief

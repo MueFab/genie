@@ -36,7 +36,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     std::vector<uint32_t> num_records_per_AU;            //!< @brief
     std::vector<uint32_t> num_reads_per_AU;              //!< @brief
     uint32_t auId;                                       //!< @brief
-    std::vector<core::parameter::ParameterSet>& params;  //!< @brief
+    std::vector<core::parameter::EncodingSet>& params;  //!< @brief
 
     core::stats::PerfStats stats;  //!< @brief
 
@@ -49,7 +49,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
      * @param s
      */
     SpringSource(const std::string& temp_dir, const compression_params& cp,
-                 std::vector<core::parameter::ParameterSet>& p, core::stats::PerfStats s);
+                 std::vector<core::parameter::EncodingSet>& p, core::stats::PerfStats s);
 
     /**
      * @brief

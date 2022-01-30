@@ -38,6 +38,10 @@ class DatasetGroupHeader : public GenInfo {
     std::vector<uint16_t> dataset_IDs;  //!< @brief
 
  public:
+    DatasetGroupHeader() : DatasetGroupHeader(0,0){
+
+    }
+
     /**
      * @brief
      */

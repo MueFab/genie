@@ -29,7 +29,7 @@ void ReadDecoder::setEntropyCoder(EntropySelector* coder) { entropycoder = coder
 AccessUnit ReadDecoder::entropyCodeAU(EntropySelector* select, AccessUnit&& a, bool mmCoderEnabled) {
     AccessUnit au = std::move(a);
     for (auto& d : au) {
-        auto enc = select->process(au.getParameters().getEncodingSet().getDescriptor(d.getID()), d, mmCoderEnabled);
+        auto enc = select->process(au.getParameters().getDescriptor(d.getID()), d, mmCoderEnabled);
         au.set(d.getID(), std::move(std::get<0>(enc)));
         au.getStats().add(std::get<1>(enc));
     }

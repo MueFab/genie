@@ -271,6 +271,12 @@ class ParameterSet : public DataUnit {
      */
     ParameterSet() : DataUnit(DataUnitType::PARAMETER_SET), parameter_set_ID(0), parent_parameter_set_ID(0), set() {}
 
+    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, EncodingSet _set)
+        : DataUnit(DataUnitType::PARAMETER_SET),
+          parameter_set_ID(_parameter_set_ID),
+          parent_parameter_set_ID(_parent_parameter_set_ID),
+          set(std::move(_set)) {}
+
     bool operator==(const ParameterSet &pset) const {
         return parameter_set_ID == pset.parameter_set_ID && parent_parameter_set_ID == pset.parent_parameter_set_ID &&
                set == pset.set;

@@ -25,7 +25,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     if (data.getData().empty()) {
         core::parameter::ParameterSet set;
-        core::AccessUnit au(std::move(set), 0);
+        core::AccessUnit au(std::move(set.getEncodingSet()), 0);
         au.setReference(data.getRef(), data.getRefToWrite());
         au.setReference(uint16_t(data.getRefID()));
         flowOut(std::move(au), id);
@@ -36,7 +36,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
-                  core::AccessUnit(std::move(set), data.getData().size()), data.isReferenceOnly()};
+                  core::AccessUnit(std::move(set.getEncodingSet()), data.getData().size()), data.isReferenceOnly()};
     size_t num_reads = 0;
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
@@ -98,7 +98,7 @@ core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
 
     auto rawAU = std::move(state.streams);
 
-    rawAU.setParameters(std::move(ret));
+    rawAU.setParameters(std::move(ret.getEncodingSet()));
     rawAU.setReference(0);
     rawAU.setMinPos(0);
     rawAU.setMaxPos(0);

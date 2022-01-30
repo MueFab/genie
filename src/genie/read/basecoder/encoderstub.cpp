@@ -71,7 +71,7 @@ core::AccessUnit EncoderStub::pack(size_t id, core::QVEncoder::QVCoded qv, core:
     rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
 
-    rawAU.setParameters(std::move(ret));
+    rawAU.setParameters(std::move(ret.getEncodingSet()));
     rawAU.setReference(state.ref);
     rawAU.setMinPos(state.minPos);
     rawAU.setMaxPos(state.maxPos);

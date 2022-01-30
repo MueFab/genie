@@ -96,7 +96,7 @@ core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
     }
     set.setNumReads(unit.getHeader().getReadCount());
     set.setClassType(unit.getHeader().getClass());
-    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U && !set.getParameters().getEncodingSet().isComputedReference()) {
+    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U && !set.getParameters().isComputedReference()) {
         auto seqs = ref_manager->getSequences();
         auto cur_seq = ref_manager->ID2Ref(unit.getHeader().getAlignmentInfo().getRefID());
         if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
