@@ -162,7 +162,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks); block_num++) {
         params[block_num] = core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
                                                           core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
-        params[block_num].setComputedRef(
+        params[block_num].getEncodingSet().setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[block_num]), 0);
 
@@ -862,7 +862,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         params[cur_block_num] =
             core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
                                           core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
-        params[cur_block_num].setComputedRef(
+        params[cur_block_num].getEncodingSet().setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 

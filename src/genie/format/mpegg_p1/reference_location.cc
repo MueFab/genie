@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
+#include "reference_location.h"
 #include <memory>
 #include "genie/util/bitreader.h"
 #include "genie/util/make-unique.h"

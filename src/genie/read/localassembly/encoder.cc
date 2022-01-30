@@ -60,7 +60,7 @@ core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::Acc
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(
         core::parameter::ComputedRefExtended(0, dynamic_cast<LAEncodingState&>(state).refCoder.getMaxBufferSize()));
-    ret.getParameters().setComputedRef(std::move(crps));
+    ret.getParameters().getEncodingSet().setComputedRef(std::move(crps));
 
     return ret;
 }

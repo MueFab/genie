@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 #include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
+#include "reference_location.h"
 #include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"

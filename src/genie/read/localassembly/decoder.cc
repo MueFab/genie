@@ -49,7 +49,7 @@ void Decoder::recordDecodedHook(basecoder::DecoderStub::DecodingState& state, co
 // ---------------------------------------------------------------------------------------------------------------------
 
 Decoder::LADecodingState::LADecodingState(core::AccessUnit& t_data)
-    : DecodingState(t_data), refEncoder(t_data.getParameters().getComputedRef().getExtension().getBufMaxSize()) {}
+    : DecodingState(t_data), refEncoder(t_data.getParameters().getEncodingSet().getComputedRef().getExtension().getBufMaxSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -72,14 +72,14 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
     mgb::AccessUnit au((uint32_t)id_ctr, (uint8_t)parameter_id, data.getClassType(), (uint32_t)data.getNumReads(),
-                       datasetType, 32, 32, 0);
+                       datasetType, 32, false);
     if (data.isReferenceOnly()) {
-        au.setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
+        au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
                             data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
     }
-    if (au.getClass() != core::record::ClassType::CLASS_U) {
-        au.setAuTypeCfg(
-            AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
+    if (au.getHeader().getClass() != core::record::ClassType::CLASS_U) {
+        au.getHeader().setAuTypeCfg(
+            AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getEncodingSet().getPosSize()));
     }
     for (uint8_t descriptor = 0; descriptor < (uint8_t)core::getDescriptors().size(); ++descriptor) {
         if (data.get(core::GenDesc(descriptor)).isEmpty()) {
@@ -88,7 +88,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
     }
 
-    au.debugPrint(parameter_stash[au.getParameterID()]);
+    au.debugPrint(parameter_stash[au.getHeader().getParameterID()]);
 
     au.write(writer);
     id_ctr++;

@@ -63,7 +63,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
                 filename = id_desc_prefix + std::to_string(auId);
             } else if (d.getID() == core::GenDesc::QV) {
                 filename = quality_desc_prefix + std::to_string(auId);
-                count = au.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getNumSubsequences();
+                count = au.getParameters().getEncodingSet().getQVConfig(core::record::ClassType::CLASS_U).getNumSubsequences();
             } else {
                 filename = read_desc_prefix + std::to_string(auId) + "." + std::to_string(uint8_t(d.getID()));
             }

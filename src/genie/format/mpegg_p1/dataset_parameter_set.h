@@ -21,7 +21,7 @@
 #include "genie/util/runtime-exception.h"
 
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/format/mpegg_p1/dataset/dataset_header.h"
+#include "dataset_header.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

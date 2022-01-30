@@ -9,8 +9,6 @@
 #include <iostream>
 #include "apps/genie/capsulator/program-options.h"
 #include "genie/format/mgb/raw_reference.h"
-#include "genie/format/mpegg_p1/mpegg_file.h"
-#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,7 +31,7 @@ ErrorCode decapsulate(ProgramOptions& options) {
     std::ifstream reader(options.inputFile);
     genie::util::BitReader bitreader(reader);
 
-    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
+//    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
 
     return ErrorCode::success;
 }

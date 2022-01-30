@@ -4,17 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_SIGNATURE_CFG_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_SIGNATURE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "dataset_header.h"
+#include <memory>
 #include <string>
 #include <vector>
-#include "genie/format/mpegg_p1/dataset_group.h"
 #include "genie/format/mpegg_p1/file_header.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,42 +29,37 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class MpeggFile {
+class SignatureCfg {
  private:
-    FileHeader fileHeader;
-    std::vector<DatasetGroup> ds_groups;
+    std::vector<uint8_t> U_signature_length;    //!< @brief
+    std::vector<uint64_t> U_cluster_signature;  //!< @brief
+
+    uint8_t U_signature_size;  //!< @brief
 
  public:
     /**
      * @brief
+     * @param reader
+     * @param dhd
      */
-    explicit MpeggFile(std::vector<DatasetGroup>*);
+    explicit SignatureCfg(util::BitReader& reader, DatasetHeader& dhd);
 
     /**
      * @brief
      */
-    explicit MpeggFile(std::vector<DatasetGroup>*, std::vector<std::string>*);
+    virtual ~SignatureCfg() = default;
 
     /**
      * @brief
+     * @return
      */
-    explicit MpeggFile(genie::util::BitReader& reader);
+    bool getUSignatureConstantLength() const;
 
     /**
      * @brief
+     * @param writer
      */
-    const FileHeader& getFileHeader() const;
-
-    /**
-     * @brief
-     */
-    const std::vector<DatasetGroup>& getDatasetGroups() const;
-
-    /**
-     * @brief
-     * @param bitWriter
-     */
-    void writeToFile(genie::util::BitWriter& bitWriter) const;
+    virtual void write(util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,7 +70,7 @@ class MpeggFile {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_SIGNATURE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
