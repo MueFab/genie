@@ -28,6 +28,11 @@ class MmCfg {
     uint32_t mm_count;      //!< Line 9
 
  public:
+
+    bool operator==(const MmCfg& other) const {
+        return mm_threshold == other.mm_threshold && mm_count == other.mm_count;
+    }
+
     /**
      * @brief
      * @param _mm_threshold

@@ -68,7 +68,7 @@ set(source_files
         meta/external-ref/mpeg.cc
         meta/blockheader/enabled.cc
         meta/blockheader/disabled.cc
-        api.h c_api.h)
+        api.h c_api.h api.cc c_api.cc)
 
 add_library(genie-core ${source_files})
 

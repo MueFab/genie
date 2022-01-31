@@ -4,17 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "label_region.h"
-#include <utility>
-#include "genie/util/runtime-exception.h"
-#include "genie/core/record/class-type.h"
+#include "genie/format/mpegg_p1/label_region.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,6 +78,17 @@ void LabelRegion::write(util::BitWriter& bit_writer) const {
     // end_pos u(40)
     bit_writer.write(end_pos, 40);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool LabelRegion::operator==(const LabelRegion& other) const {
+    return seq_ID == other.seq_ID && class_IDs == other.class_IDs && start_pos == other.start_pos &&
+           end_pos == other.end_pos;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t LabelRegion::sizeInBits() const { return sizeof(uint16_t) * 8 + 4 + 4 * class_IDs.size() + 40 + 40; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

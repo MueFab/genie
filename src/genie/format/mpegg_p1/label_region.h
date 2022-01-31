@@ -9,11 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <vector>
+#include "genie/core/record/class-type.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/record/class-type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,47 +25,52 @@ namespace mpegg_p1 {
  */
 class LabelRegion {
  private:
-    uint16_t seq_ID;
-    std::vector<genie::core::record::ClassType> class_IDs;
-    uint64_t start_pos;
-    uint64_t end_pos;
+    uint16_t seq_ID;                                        //!< @brief
+    std::vector<genie::core::record::ClassType> class_IDs;  //!< @brief
+    uint64_t start_pos;                                     //!< @brief
+    uint64_t end_pos;                                       //!< @brief
 
  public:
+    bool operator==(const LabelRegion& other) const;
+
     /**
-     *
+     * @brief
      * @param _seq_ID
      * @param _start_pos
      * @param end_pos
      */
     LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t end_pos);
+
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit LabelRegion(util::BitReader& reader);
 
     /**
-     *
+     * @brief
      * @param _class_ID
      */
     void addClassID(genie::core::record::ClassType _class_ID);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getSeqID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<genie::core::record::ClassType>& getClassIDs() const;
+
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getStartPos() const;
+
     /**
      *
      * @return
@@ -79,11 +83,11 @@ class LabelRegion {
      */
     void write(genie::util::BitWriter& bit_writer) const;
 
-
-    uint64_t sizeInBits() const {
-        return sizeof(uint16_t) * 8  + 4 + 4 * class_IDs.size() + 40 + 40;
-    }
-
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t sizeInBits() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,44 +1,67 @@
-
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #ifndef GENIE_OFFSET_H
 #define GENIE_OFFSET_H
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+/**
+ * @brief
+ */
 class Offset {
  private:
-    std::string subkey;
-    uint64_t offset;
+    std::string subkey;  //!< @brief
+    uint64_t offset;     //!< @brief
+
  public:
-    explicit Offset(util::BitReader& bitReader) : subkey(4, '\0'){
-        bitReader.readBypass(subkey);
-        offset = bitReader.readBypassBE<uint64_t>();
-    }
+    /**
+     * @brief
+     * @param bitReader
+     */
+    explicit Offset(util::BitReader& bitReader);
 
-    void write(util::BitWriter& writer) const {
-        writer.writeBypass("offs", 4);
-        writer.writeBypass(subkey.data(), 4);
-        writer.writeBypassBE(offset);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter& writer) const;
 
-    const std::string& getSubkey() const {
-        return subkey;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getSubkey() const;
 
-    uint64_t getOffset() const {
-        return offset;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getOffset() const;
 };
 
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_OFFSET_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

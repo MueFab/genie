@@ -9,9 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <vector>
-#include "label_region.h"
+#include "genie/format/mpegg_p1/label_region.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -26,45 +25,49 @@ namespace mpegg_p1 {
  */
 class LabelDataset {
  private:
-    /**
-     * ISO 23092-1 Section 6.5.1.5.4 table 15 (for num_dataset)
-     *
-     **/
-    uint16_t dataset_ID;
+    uint16_t dataset_ID;  //!< @brief
 
-    std::vector<LabelRegion> dataset_regions;
+    std::vector<LabelRegion> dataset_regions;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const LabelDataset& other) const;
+
+    /**
+     * @brief
      * @param _ds_ID
      */
     explicit LabelDataset(uint16_t _ds_ID);
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit LabelDataset(util::BitReader& reader);
 
     /**
-     *
+     * @brief
      * @param _ds_region
      */
     void addDatasetRegion(LabelRegion _ds_region);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getDatasetID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint64_t getBitLength() const;
+
     /**
-     *
+     * @brief
      * @param bit_writer
      */
     void write(genie::util::BitWriter& bit_writer) const;

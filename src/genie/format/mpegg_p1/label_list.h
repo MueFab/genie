@@ -9,11 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <vector>
-#include "label.h"
+#include "genie/format/mpegg_p1/gen_info.h"
+#include "genie/format/mpegg_p1/label.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,57 +25,61 @@ namespace mpegg_p1 {
  */
 class LabelList : public GenInfo {
  private:
-    /**
-     * ISO 23092-1 Section 6.5.1.5 table 14
-     **/
-    uint8_t dataset_group_ID;
-    std::vector<Label> labels;
+    uint8_t dataset_group_ID;   //!< @brief
+    std::vector<Label> labels;  //!< @brief
 
  public:
-
-    const std::string& getKey() const override {
-        static const std::string key = "labl";
-        return key;
-    }
-
-    uint64_t getSize() const override {
-        uint64_t labelSize = 0;
-        for(const auto& l : labels) {
-            labelSize += l.getSize();
-        }
-        return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) + labelSize;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 
     /**
-     *
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
+
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
+
+    /**
+     * @brief
      * @param _ds_group_ID
      */
     explicit LabelList(uint8_t _ds_group_ID);
 
     /**
-     *
+     * @brief
      * @param reader
-     * @param length
      */
     explicit LabelList(util::BitReader& reader);
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getDatasetGroupID() const;
+
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<Label>& getLabels() const;
 
-    void addLabel(Label l) {
-        labels.emplace_back(std::move(l));
-    }
+    /**
+     * @brief
+     * @param l
+     */
+    void addLabel(Label l);
 
     /**
-     *
+     * @brief
      * @param bit_writer
      */
     void write(genie::util::BitWriter& bit_writer) const override;

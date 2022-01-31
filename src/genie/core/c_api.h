@@ -1,10 +1,23 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_C_API_H
 #define GENIE_C_API_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 extern "C" {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdint.h>
 
+/**
+ * @brief
+ */
 enum genie_ReturnCode : uint8_t {
     genie_ReturnCode_G_SUCCESS = 0,
     genie_ReturnCode_G_PARTIALLY_AUTHORIZED = 1,
@@ -24,8 +37,16 @@ enum genie_ReturnCode : uint8_t {
     genie_ReturnCode_G_UNLISTED_ERROR = 15
 };
 
+/**
+ * @brief
+ * @param rc
+ * @return
+ */
 const char* genie_strerror(genie_ReturnCode rc);
 
+/**
+ * @brief
+ */
 enum genie_SegmentType : uint8_t {
     genie_SegmentType_SINGLE = 0,
     genie_SegmentType_FIRST = 1,
@@ -33,6 +54,9 @@ enum genie_SegmentType : uint8_t {
     genie_SegmentType_COUNT = 3
 };
 
+/**
+ * @brief
+ */
 enum genie_StatisticsIndex : uint8_t {
     genie_StatisticsIndex_MINIMUM = 0,
     genie_StatisticsIndex_MAXIMUM = 1,
@@ -40,6 +64,9 @@ enum genie_StatisticsIndex : uint8_t {
     genie_StatisticsIndex_COUNT = 3
 };
 
+/**
+ * @brief
+ */
 enum genie_Strand : uint8_t {
     genie_Strand_UNMAPPED_UNKNOWN = 0,
     genie_Strand_FORWARD = 1,
@@ -47,12 +74,18 @@ enum genie_Strand : uint8_t {
     genie_Strand_COUNT = 3
 };
 
+/**
+ * @brief
+ */
 enum genie_StrandStrict : uint8_t {
     genie_StrandStrict_FORWARD = 0,
     genie_StrandStrict_REVERSE = 1,
     genie_StrandStrict_COUNT = 2
 };
 
+/**
+ * @brief
+ */
 enum genie_StrandPaired : uint8_t {
     genie_StrandPaired_UNMAPPED_UNMAPPED = 0,
     genie_StrandPaired_UNMAPPED_FORWARD = 1,
@@ -66,8 +99,14 @@ enum genie_StrandPaired : uint8_t {
     genie_StrandPaired_COUNT = 9
 };
 
+/**
+ * @brief
+ */
 enum genie_ClipType : uint8_t { genie_ClipType_SOFT = 0, genie_ClipType_HARD = 1, genie_ClipType_COUNT = 2 };
 
+/**
+ * @brief
+ */
 enum genie_ClipTypeCombination : uint8_t {
     genie_ClipTypeCombination_NONE = 0,
     genie_ClipTypeCombination_SOFT = 1,
@@ -75,6 +114,9 @@ enum genie_ClipTypeCombination : uint8_t {
     genie_ClipTypeCombination_COUNT = 3
 };
 
+/**
+ * @brief
+ */
 enum genie_PhredBins {
     genie_PhredBins_0_10 = 0,
     genie_PhredBins_10_25 = 1,
@@ -85,6 +127,9 @@ enum genie_PhredBins {
     genie_PhredBins_COUNT = 6
 };
 
+/**
+ * @brief
+ */
 enum genie_TagType : uint8_t {
     genie_TagType_INT32 = 0,
     genie_TagType_STRING = 1,
@@ -98,6 +143,9 @@ enum genie_TagType : uint8_t {
     genie_TagType_FLOAT64 = 9
 };
 
+/**
+ * @brief
+ */
 enum genie_RecordClass : uint8_t {
     genie_RecordClass_P = 0,
     genie_RecordClass_N = 1,
@@ -108,6 +156,9 @@ enum genie_RecordClass : uint8_t {
     genie_RecordClass_COUNT = 6,
 };
 
+/**
+ * @brief
+ */
 enum genie_AlphabetACGNT : uint8_t {
     genie_AlphabetACGNT_A = 0,
     genie_AlphabetACGNT_C = 1,
@@ -117,22 +168,31 @@ enum genie_AlphabetACGNT : uint8_t {
     genie_AlphabetACGNT_COUNT = 5,
 };
 
+/**
+ * @brief
+ */
 struct genie_Hierarchy {
-    uint64_t datasetGroupsCount;
-    uint64_t* datasetGroupID;  // [datasetGroupsCount]
-    uint64_t* datasetsCount;   // [datasetGroupsCount]
-    uint64_t** datasetID;      // [datasetGroupsCount][datasetsCount[i]]
+    uint64_t datasetGroupsCount;  //!< @brief
+    uint64_t* datasetGroupID;     //!< @brief [datasetGroupsCount]
+    uint64_t* datasetsCount;      //!< @brief [datasetGroupsCount]
+    uint64_t** datasetID;         //!< @brief [datasetGroupsCount][datasetsCount[i]]
 };
 
-// TODO implement
+/**
+ * @brief
+ */
 struct genie_mpeggRecord {
     void* tmp;
+    // TODO implement
 };
 
+/**
+ * @brief
+ */
 struct genie_GenTag {
-    char key[2];
-    genie_TagType type;
-    uint16_t length;
+    char key[2];         //!< @brief
+    genie_TagType type;  //!< @brief
+    uint16_t length;     //!< @brief
     union {
         int32_t i32;
         char* string;
@@ -144,203 +204,355 @@ struct genie_GenTag {
         uint8_t hex;
         float f32;
         double f64;
-    } value;
+    } value;  //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_GenAux {
-    uint8_t numberOfTags;
-    genie_GenTag* auxFields;  // [numberOfTags]
+    uint8_t numberOfTags;     //!< @brief
+    genie_GenTag* auxFields;  //!< @brief [numberOfTags]
 };
 
+/**
+ * @brief
+ */
 struct genie_genAuxRecord {
-    uint8_t numberOfGenAux;
-    genie_GenAux* auxSet;  // [numberOfGenAux]
+    uint8_t numberOfGenAux;  //!< @brief
+    genie_GenAux* auxSet;    //!< @brief [numberOfGenAux]
 };
 
+/**
+ * @brief
+ */
 struct genie_Records {
-    uint64_t datasetGroupID;
-    uint64_t datasetID;
-    uint64_t recordsCount;
-    genie_mpeggRecord* records;   // [recordsCount]
-    genie_genAuxRecord* auxInfo;  // [recordsCount]
+    uint64_t datasetGroupID;      //!< @brief
+    uint64_t datasetID;           //!< @brief
+    uint64_t recordsCount;        //!< @brief
+    genie_mpeggRecord* records;   //!< @brief [recordsCount]
+    genie_genAuxRecord* auxInfo;  //!< @brief [recordsCount]
 };
 
+/**
+ * @brief
+ */
 struct genie_Reference {
-    uint64_t seqCount;
-    char** seqName;      // [seqCount] \0
-    uint64_t* seqStart;  // [seqCount]
-    uint64_t* seqEnd;    // [seqCount]
-    char** refSequence;  // [seqCount] \0
+    uint64_t seqCount;   //!< @brief
+    char** seqName;      //!< @brief [seqCount] \0
+    uint64_t* seqStart;  //!< @brief [seqCount]
+    uint64_t* seqEnd;    //!< @brief [seqCount]
+    char** refSequence;  //!< @brief [seqCount] \0
 };
 
+/**
+ * @brief
+ */
 struct genie_RegionProtection {
-    char* sequenceName;  // \0
-    uint64_t startPos;
-    uint64_t endPos;
-    uint64_t classID;
-    uint64_t numKeys;
-    char** keyName;  // [numKeys] \0
+    char* sequenceName;  //!< @brief \0
+    uint64_t startPos;   //!< @brief
+    uint64_t endPos;     //!< @brief
+    uint64_t classID;    //!< @brief
+    uint64_t numKeys;    //!< @brief
+    char** keyName;      //!< @brief [numKeys] \0
 };
 
+/**
+ * @brief
+ */
 struct genie_SimpleSegmentStatistics {
-    uint64_t readsNumber;
-    uint64_t* segmentsNumberReadsDistribution;  // [max_segments]
-    uint64_t qualityCheckFailedReadsNumber;
-    uint64_t segmentLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t mappedStrandSegmentDistribution[genie_Strand::genie_Strand_COUNT];
-    uint64_t properlyPairedNumber;
-    uint64_t mappedStrandPairDistribution[genie_StrandPaired::genie_StrandPaired_COUNT];
-    uint64_t maxAlignments;
-    uint64_t* multipleAlignmentSegmentDistribution;  // [maxAlignments + 1]
-    uint64_t coverage[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t weightedCoverage[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t errorsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t substitutionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t insertionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t insertionsLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t deletionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t deletionsLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t splicesNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t splicesLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t alignmentScore[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];
-    uint64_t classSegmentDistribution[genie_RecordClass::genie_RecordClass_COUNT];
-    uint64_t clippedSegmentDistribution[genie_ClipTypeCombination::genie_ClipTypeCombination_COUNT];
-    uint64_t opticalDuplicatesNumber;
-    uint64_t chimerasNumber;
+    uint64_t readsNumber;                                                                 //!< @brief
+    uint64_t* segmentsNumberReadsDistribution;                                            //!< @brief [max_segments]
+    uint64_t qualityCheckFailedReadsNumber;                                               //!< @brief
+    uint64_t segmentLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];           //!< @brief
+    uint64_t mappedStrandSegmentDistribution[genie_Strand::genie_Strand_COUNT];           //!< @brief
+    uint64_t properlyPairedNumber;                                                        //!< @brief
+    uint64_t mappedStrandPairDistribution[genie_StrandPaired::genie_StrandPaired_COUNT];  //!< @brief
+    uint64_t maxAlignments;                                                               //!< @brief
+    uint64_t* multipleAlignmentSegmentDistribution;                                    //!< @brief [maxAlignments + 1]
+    uint64_t coverage[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];             //!< @brief
+    uint64_t weightedCoverage[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];     //!< @brief
+    uint64_t errorsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];         //!< @brief
+    uint64_t substitutionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];  //!< @brief
+    uint64_t insertionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];     //!< @brief
+    uint64_t insertionsLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];     //!< @brief
+    uint64_t deletionsNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];      //!< @brief
+    uint64_t deletionsLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];      //!< @brief
+    uint64_t splicesNumber[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];        //!< @brief
+    uint64_t splicesLength[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];        //!< @brief
+    uint64_t alignmentScore[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];       //!< @brief
+    uint64_t classSegmentDistribution[genie_RecordClass::genie_RecordClass_COUNT];     //!< @brief
+    uint64_t clippedSegmentDistribution[genie_ClipTypeCombination::genie_ClipTypeCombination_COUNT];  //!< @brief
+    uint64_t opticalDuplicatesNumber;                                                                 //!< @brief
+    uint64_t chimerasNumber;                                                                          //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_ExtendedSegmentStatistics {
-    uint64_t* mappedBasesNumberDistribution;    // [segmentLength[1] + 1]
-    uint64_t* coverage;                         // [endPos – startPos + 1]
-    uint64_t* weightedCoverage;                 // [endPos – startPos + 1]
-    uint64_t* errorsNumberDistribution;         // [errorsNumber[1] + 1]
-    uint64_t* errorsPositionDistribution;       // [segmentLength[1]]
-    uint64_t* substitutionsNumberDistribution;  // [substitutionsNumber[1] + 1]
+    uint64_t* mappedBasesNumberDistribution;    //!< @brief [segmentLength[1] + 1]
+    uint64_t* coverage;                         //!< @brief [endPos – startPos + 1]
+    uint64_t* weightedCoverage;                 //!< @brief [endPos – startPos + 1]
+    uint64_t* errorsNumberDistribution;         //!< @brief [errorsNumber[1] + 1]
+    uint64_t* errorsPositionDistribution;       //!< @brief [segmentLength[1]]
+    uint64_t* substitutionsNumberDistribution;  //!< @brief [substitutionsNumber[1] + 1]
     uint64_t*
         substitutionsTransitionDistribution[genie_AlphabetACGNT::genie_AlphabetACGNT_COUNT]
-                                           [genie_AlphabetACGNT::genie_AlphabetACGNT_COUNT];  // [segmentLength[1]]
-    uint64_t* substitutionsPositionDistribution;                                              // [segmentLength[1]]
-    uint64_t* insertionsNumberDistribution;                                   // [insertionsNumber[1] + 1]
-    uint64_t* insertionsLengthDistribution;                                   // [insertionsLength[1] + 1]
-    uint64_t* insertionsPositionDistribution;                                 // [segmentLength[1]]
-    uint64_t* deletionsNumberDistribution;                                    // [deletionsNumber[1] + 1]
-    uint64_t* deletionsLengthDistribution;                                    // [deletionsLength[1] + 1]
-    uint64_t* deletionsPositionDistribution;                                  // [segmentLength[1]]
-    uint64_t* splicesNumberDistribution[genie_Strand::genie_Strand_COUNT];    // [splicesNumber[1] + 1],
-    uint64_t* splicesLengthDistribution[genie_Strand::genie_Strand_COUNT];    // [splicesLength[1] + 1],
-    uint64_t* splicesPositionDistribution[genie_Strand::genie_Strand_COUNT];  // [segmentLength[1]],
-    uint64_t* alignmentScoreValueDistribution;                                // [alignmentScore[1] + 1]
+                                           [genie_AlphabetACGNT::genie_AlphabetACGNT_COUNT];  //!< @brief
+                                                                                              //!< [segmentLength[1]]
+    uint64_t* substitutionsPositionDistribution;                              //!< @brief [segmentLength[1]]
+    uint64_t* insertionsNumberDistribution;                                   //!< @brief [insertionsNumber[1] + 1]
+    uint64_t* insertionsLengthDistribution;                                   //!< @brief [insertionsLength[1] + 1]
+    uint64_t* insertionsPositionDistribution;                                 //!< @brief [segmentLength[1]]
+    uint64_t* deletionsNumberDistribution;                                    //!< @brief [deletionsNumber[1] + 1]
+    uint64_t* deletionsLengthDistribution;                                    //!< @brief [deletionsLength[1] + 1]
+    uint64_t* deletionsPositionDistribution;                                  //!< @brief [segmentLength[1]]
+    uint64_t* splicesNumberDistribution[genie_Strand::genie_Strand_COUNT];    //!< @brief [splicesNumber[1] + 1],
+    uint64_t* splicesLengthDistribution[genie_Strand::genie_Strand_COUNT];    //!< @brief [splicesLength[1] + 1],
+    uint64_t* splicesPositionDistribution[genie_Strand::genie_Strand_COUNT];  //!< @brief [segmentLength[1]],
+    uint64_t* alignmentScoreValueDistribution;                                //!< @brief [alignmentScore[1] + 1]
     uint64_t* alignmentScoreSegmentLengthDistribution
-        [genie_StatisticsIndex::genie_StatisticsIndex_COUNT];                             // [segmentLength[1]],
-    uint64_t* basesPositionDistribution[genie_AlphabetACGNT::genie_AlphabetACGNT_COUNT];  // [segmentLength[1]]
-    uint64_t gcContentValueDistribution[101];                                             // GC content in percent 0-100
-    uint64_t maxQualityScore;
-    uint64_t* qualityScoreDistribution;  // [maxQualityScore + 1]
+        [genie_StatisticsIndex::genie_StatisticsIndex_COUNT];  //!< @brief [segmentLength[1]],
+    uint64_t* basesPositionDistribution[genie_AlphabetACGNT::genie_AlphabetACGNT_COUNT];  //!< @brief [segmentLength[1]]
+    uint64_t gcContentValueDistribution[101];  //!< @brief GC content in percent 0-100
+    uint64_t maxQualityScore;                  //!< @brief
+    uint64_t* qualityScoreDistribution;        //!< @brief [maxQualityScore + 1]
     uint64_t*
-        qualityScorePositionDistribution[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];  // [segmentLength[1]]
+        qualityScorePositionDistribution[genie_StatisticsIndex::genie_StatisticsIndex_COUNT];  //!< @brief
+                                                                                               //!< [segmentLength[1]]
     uint64_t*
-        qualityScorePositionPercentilesDistribution[genie_PhredBins::genie_PhredBins_COUNT];  // [segmentLength[1]],
+        qualityScorePositionPercentilesDistribution[genie_PhredBins::genie_PhredBins_COUNT];  //!< @brief
+                                                                                              //!< [segmentLength[1]],
 };
 
+/**
+ * @brief
+ */
 struct genie_AdvancedSegmentStatistics {
-    genie_SimpleSegmentStatistics simpleStatistics[genie_StrandStrict::genie_StrandStrict_COUNT];
-    genie_ExtendedSegmentStatistics extendedStatistics[genie_StrandStrict::genie_StrandStrict_COUNT];
+    genie_SimpleSegmentStatistics simpleStatistics[genie_StrandStrict::genie_StrandStrict_COUNT];      //!< @brief
+    genie_ExtendedSegmentStatistics extendedStatistics[genie_StrandStrict::genie_StrandStrict_COUNT];  //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_SimpleFilter {
-    uint64_t numberOfGroups;
-    char** groupNames;  // [numberOfGroups] \0
-    bool classID[genie_RecordClass::genie_RecordClass_COUNT];
-    uint64_t sequenceID;
-    uint64_t startPos;
-    uint64_t endPos;
-    bool singleEndsStrand[genie_Strand::genie_Strand_COUNT];
-    bool pairedEndsStrand[genie_StrandPaired::genie_StrandPaired_COUNT];
-    bool includeClippedReads[genie_ClipType::genie_ClipType_COUNT];  // genie_clips
-    bool includeMultipleAlignments;
-    bool includeOpticalDuplicates;
-    bool includeQualityCheckFailed;
-    bool includeAuxRecords;
-    bool includeReadNames;
-    bool includeQualityValues;
-    bool mismatchesIncludeNs;
+    uint64_t numberOfGroups;                                              //!< @brief
+    char** groupNames;                                                    //!< @brief [numberOfGroups] \0
+    bool classID[genie_RecordClass::genie_RecordClass_COUNT];             //!< @brief
+    uint64_t sequenceID;                                                  //!< @brief
+    uint64_t startPos;                                                    //!< @brief
+    uint64_t endPos;                                                      //!< @brief
+    bool singleEndsStrand[genie_Strand::genie_Strand_COUNT];              //!< @brief
+    bool pairedEndsStrand[genie_StrandPaired::genie_StrandPaired_COUNT];  //!< @brief
+    bool includeClippedReads[genie_ClipType::genie_ClipType_COUNT];       //!< @brief genie_clips
+    bool includeMultipleAlignments;                                       //!< @brief
+    bool includeOpticalDuplicates;                                        //!< @brief
+    bool includeQualityCheckFailed;                                       //!< @brief
+    bool includeAuxRecords;                                               //!< @brief
+    bool includeReadNames;                                                //!< @brief
+    bool includeQualityValues;                                            //!< @brief
+    bool mismatchesIncludeNs;                                             //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_RangeFloat {
-    float min;
-    float max;
+    float min;  //!< @brief
+    float max;  //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_RangeInt {
-    uint64_t min;
-    uint64_t max;
+    uint64_t min;  //!< @brief
+    uint64_t max;  //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_SegmentFilter {
-    bool filterScope[genie_SegmentType::genie_SegmentType_COUNT];
-    genie_RangeInt mappedBasesRange;
-    genie_RangeFloat mappedFractionRange;
-    genie_RangeInt errorsRange;
-    genie_RangeFloat errorsFractionRange;
-    genie_RangeInt substitutionsRange;
-    genie_RangeFloat substitutionsFractionRange;
-    genie_RangeInt insertionsRange;
-    genie_RangeFloat insertionsFractionRange;
-    genie_RangeInt insertionsLengthRange;
-    genie_RangeFloat insertionsLengthFractionRange;
-    genie_RangeInt deletionsRange;
-    genie_RangeFloat deletionsFractionRange;
-    genie_RangeInt deletionsLengthRange;
-    genie_RangeFloat deletionsLengthFractionRange;
-    genie_RangeInt splicesRange;
-    genie_RangeFloat splicesFractionRange;
-    genie_RangeInt splicesLengthRange;
-    int splicesDirectionAsEnd;
-    genie_RangeFloat alignmentScoreRange;
-    genie_RangeInt qualityScoreRange;
+    bool filterScope[genie_SegmentType::genie_SegmentType_COUNT];  //!< @brief
+    genie_RangeInt mappedBasesRange;                               //!< @brief
+    genie_RangeFloat mappedFractionRange;                          //!< @brief
+    genie_RangeInt errorsRange;                                    //!< @brief
+    genie_RangeFloat errorsFractionRange;                          //!< @brief
+    genie_RangeInt substitutionsRange;                             //!< @brief
+    genie_RangeFloat substitutionsFractionRange;                   //!< @brief
+    genie_RangeInt insertionsRange;                                //!< @brief
+    genie_RangeFloat insertionsFractionRange;                      //!< @brief
+    genie_RangeInt insertionsLengthRange;                          //!< @brief
+    genie_RangeFloat insertionsLengthFractionRange;                //!< @brief
+    genie_RangeInt deletionsRange;                                 //!< @brief
+    genie_RangeFloat deletionsFractionRange;                       //!< @brief
+    genie_RangeInt deletionsLengthRange;                           //!< @brief
+    genie_RangeFloat deletionsLengthFractionRange;                 //!< @brief
+    genie_RangeInt splicesRange;                                   //!< @brief
+    genie_RangeFloat splicesFractionRange;                         //!< @brief
+    genie_RangeInt splicesLengthRange;                             //!< @brief
+    int splicesDirectionAsEnd;                                     //!< @brief
+    genie_RangeFloat alignmentScoreRange;                          //!< @brief
+    genie_RangeInt qualityScoreRange;                              //!< @brief
 };
 
+/**
+ * @brief
+ */
 struct genie_AdvancedFilter {
-    genie_SimpleFilter filter;
-    uint64_t segmentFiltersCount;
-    genie_SegmentFilter* segmentFilters;  // [segmentFiltersCount]
+    genie_SimpleFilter filter;            //!< @brief
+    uint64_t segmentFiltersCount;         //!< @brief
+    genie_SegmentFilter* segmentFilters;  //!< @brief [segmentFiltersCount]
 };
 
+/**
+ * @brief
+ * @param outputHierarchy
+ * @return
+ */
 genie_ReturnCode genie_getHierarchy(genie_Hierarchy** outputHierarchy);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param filter
+ * @param outputRecords
+ * @return
+ */
 genie_ReturnCode genie_getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
                                              const genie_SimpleFilter* filter, genie_Records** outputRecords);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param filter
+ * @param outputRecords
+ * @return
+ */
 genie_ReturnCode genie_getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
                                                const genie_AdvancedFilter* filter, genie_Records** outputRecords);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param signature
+ * @param outputRecords
+ * @return
+ */
 genie_ReturnCode genie_getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID, const char* signature,
                                           genie_Records** outputRecords);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param labelID
+ * @param outputRecords
+ * @return
+ */
 genie_ReturnCode genie_getDataByLabel(uint64_t datasetGroupID, const char* labelID, genie_Records** outputRecords);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param outputMetadata
+ * @return
+ */
 genie_ReturnCode genie_getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID, char*** outputMetadata);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param fieldName
+ * @param outputMetadata
+ * @return
+ */
 genie_ReturnCode genie_getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const char* fieldName,
                                           char** outputMetadata);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param outputProtection
+ * @return
+ */
 genie_ReturnCode genie_getDatasetGroupProtection(uint64_t datasetGroupID, char** outputProtection);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param outputProtection
+ * @return
+ */
 genie_ReturnCode genie_getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID, char** outputProtection);
 
+/**
+ * @brief
+ * @param datasetGroup_ID
+ * @param datasetID
+ * @param sequenceID
+ * @param startPos
+ * @param endPos
+ * @param outputProtection
+ * @return
+ */
 genie_ReturnCode genie_getDatasetRegionProtection(uint64_t datasetGroup_ID, uint64_t datasetID, uint64_t sequenceID,
                                                   uint64_t startPos, uint64_t endPos,
                                                   genie_RegionProtection** outputProtection);
-
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param includeSequences
+ * @param outputReference
+ * @return
+ */
 genie_ReturnCode genie_getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences,
                                            genie_Reference* outputReference);
-
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param sequenceID
+ * @param startPos
+ * @param endPos
+ * @param maxSegments
+ * @param outputStatistics
+ * @return
+ */
 genie_ReturnCode genie_getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
                                            uint64_t startPos, uint64_t endPos, uint64_t* maxSegments,
                                            genie_SimpleSegmentStatistics** outputStatistics);
 
+/**
+ * @brief
+ * @param datasetGroupID
+ * @param datasetID
+ * @param sequenceID
+ * @param startPos
+ * @param endPos
+ * @param maxSegments
+ * @param outputStatistics
+ * @return
+ */
 genie_ReturnCode genie_getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
                                              uint64_t startPos, uint64_t endPos, uint64_t* maxSegments,
                                              genie_AdvancedSegmentStatistics** outputStatistics);
+
+// ---------------------------------------------------------------------------------------------------------------------
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_C_API_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

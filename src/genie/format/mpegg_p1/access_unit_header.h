@@ -3,27 +3,17 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+
 #ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_ACCESS_UNIT_HEADER_H_
 #define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_ACCESS_UNIT_HEADER_H_
 
-#include <memory>
-#include <string>
-#include <vector>
-#include "dataset_header.h"
-#include "genie/core/constants.h"
-#include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/class-type.h"
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <map>
+#include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgb/access_unit.h"
-#include "genie/format/mgb/au_type_cfg.h"
-#include "genie/format/mgb/mm_cfg.h"
-#include "genie/format/mgb/ref_cfg.h"
-#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-#include "signature_cfg.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,44 +26,61 @@ namespace mpegg_p1 {
  */
 class AccessUnitHeader : public GenInfo {
  private:
-    genie::format::mgb::AUHeader header;
-    bool mit_flag;
+    genie::format::mgb::AUHeader header;  //!< @brief
+    bool mit_flag;                        //!< @brief
 
  public:
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
-    const genie::format::mgb::AUHeader& getHeader() const {
-        return header;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const genie::format::mgb::AUHeader& getHeader() const;
 
-    AccessUnitHeader () : AccessUnitHeader(genie::format::mgb::AUHeader(), false) {
+    /**
+     * @brief
+     */
+    AccessUnitHeader();
 
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param parameterSets
+     * @param mit
+     */
+    explicit AccessUnitHeader(util::BitReader& reader,
+                              const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit);
 
-    explicit AccessUnitHeader(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool mit) : mit_flag(mit){
-        reader.readBypassBE<uint64_t>();
-        header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
+    /**
+     * @brief
+     * @param _header
+     * @param _mit_flag
+     */
+    explicit AccessUnitHeader(genie::format::mgb::AUHeader _header, bool _mit_flag);
 
-    }
+    /**
+     * @brief
+     * @param bitWriter
+     */
+    void write(genie::util::BitWriter& bitWriter) const override;
 
-    explicit AccessUnitHeader(genie::format::mgb::AUHeader _header, bool _mit_flag)
-        : header(std::move(_header)), mit_flag(_mit_flag) {}
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 
-    void write(genie::util::BitWriter& bitWriter) const override {
-        GenInfo::write(bitWriter);
-        header.write(bitWriter, !mit_flag);
-    }
-
-    uint64_t getSize() const override {
-        std::stringstream stream;
-        genie::util::BitWriter writer(&stream);
-        write(writer);
-        return stream.str().length();
-    }
-
-    const std::string& getKey() const override {
-        static const std::string key = "auhd";
-        return key;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

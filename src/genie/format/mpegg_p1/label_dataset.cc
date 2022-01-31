@@ -4,15 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "label_dataset.h"
-#include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/label_dataset.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool LabelDataset::operator==(const LabelDataset& other) const {
+    return dataset_ID == other.dataset_ID && dataset_regions == other.dataset_regions;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

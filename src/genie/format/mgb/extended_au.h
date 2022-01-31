@@ -30,6 +30,11 @@ class ExtendedAu {
     uint8_t posSize;  //!< @brief Internal
 
  public:
+    bool operator==(const ExtendedAu& other) const {
+        return extended_AU_start_position == other.extended_AU_start_position &&
+               extended_AU_end_position == other.extended_AU_end_position && posSize == other.posSize;
+    }
+
     /**
      * @brief
      * @param _extended_AU_start_position

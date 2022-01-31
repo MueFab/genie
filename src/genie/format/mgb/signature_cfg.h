@@ -33,6 +33,12 @@ class SignatureCfg {
     boost::optional<uint8_t> U_signature_size;  //!< @brief
 
  public:
+    bool operator==(const SignatureCfg& other) const {
+        return U_cluster_signature == other.U_cluster_signature &&
+               U_cluster_signature_length == other.U_cluster_signature_length &&
+               U_signature_size == other.U_signature_size;
+    }
+
     /**
      * @brief
      * @param _U_cluster_signature_0

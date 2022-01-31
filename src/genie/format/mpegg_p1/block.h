@@ -9,17 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "block_header.h"
-#include <list>
-#include <memory>
-#include <string>
-#include <vector>
-#include "genie/format/mpegg_p1/file_header.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/block_header.h"
 #include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,13 +29,24 @@ class Block {
  public:
     /**
      * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const Block& other) const;
+
+    /**
+     * @brief
      * @param reader
      * @param fhd
      */
     explicit Block(util::BitReader& reader);
 
-    Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload)
-        : header(false, _desc_id, 0, payload.getRawSize()), block_payload(std::move(payload)) {}
+    /**
+     * @brief
+     * @param _desc_id
+     * @param payload
+     */
+    Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload);
 
     /**
      * @brief
@@ -57,13 +58,13 @@ class Block {
      * @brief
      * @return
      */
-    const genie::util::DataBlock& getPayload() const {
-        return block_payload;
-    }
+    const genie::util::DataBlock& getPayload() const;
 
-    genie::util::DataBlock&& movePayload() {
-        return std::move(block_payload);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    genie::util::DataBlock&& movePayload();
 
     /**
      * @brief
@@ -77,9 +78,11 @@ class Block {
      */
     void write(genie::util::BitWriter& writer) const;
 
-    genie::core::GenDesc getDescID() const {
-        return header.getDescriptorID();
-    }
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::GenDesc getDescID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

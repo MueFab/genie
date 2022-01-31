@@ -44,6 +44,13 @@ class AUHeader {
     boost::optional<SignatureCfg> signature_config;  //!< @brief
 
  public:
+    bool operator==(const AUHeader &other) const {
+        return access_unit_ID == other.access_unit_ID && num_blocks == other.num_blocks &&
+               parameter_set_ID == other.parameter_set_ID && au_type == other.au_type &&
+               reads_count == other.reads_count && mm_cfg == other.mm_cfg && ref_cfg == other.ref_cfg &&
+               au_Type_U_Cfg == other.au_Type_U_Cfg && signature_config == other.signature_config;
+    }
+
     void write(genie::util::BitWriter &writer, bool write_signatures) const {
         writer.write(access_unit_ID, 32);
         writer.write(num_blocks, 8);
@@ -71,7 +78,8 @@ class AUHeader {
 
     void blockAdded() { num_blocks++; }
 
-    AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool read_signatures = true) {
+    AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
+             bool read_signatures = true) {
         UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
         access_unit_ID = bitReader.read<uint32_t>();
         num_blocks = bitReader.read<uint8_t>();
@@ -88,9 +96,8 @@ class AUHeader {
         }
         if (read_signatures) {
             if (au_type != core::record::ClassType::CLASS_U) {
-                this->au_Type_U_Cfg =
-                    AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
-                              parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
+                this->au_Type_U_Cfg = AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
+                                                parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
             } else {
                 if (parameterSets.at(parameter_set_ID).isSignatureActivated()) {
                     uint8_t length = 0;
@@ -213,8 +220,8 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param bitReader
      * @param lazyPayload
      */
-    explicit AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
-                        util::BitReader &bitReader, bool lazyPayload = false);
+    explicit AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets, util::BitReader &bitReader,
+                        bool lazyPayload = false);
 
     /**
      * @brief
@@ -246,7 +253,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param multiple_signature_base
      */
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                           uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag);
+               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag);
 
     /**
      * @brief
@@ -260,12 +267,9 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     std::vector<Block> &getBlocks();
 
-    AUHeader& getHeader() {
-        return header;
-    }
+    AUHeader &getHeader() { return header; }
 
  private:
-
     AUHeader header;
 
     std::vector<Block> blocks;  //!< @brief
