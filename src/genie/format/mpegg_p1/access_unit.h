@@ -3,31 +3,22 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+
 #ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_ACCESS_UNIT_H_
 #define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_ACCESS_UNIT_H_
 
-#include <memory>
-#include <string>
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <boost/optional/optional.hpp>
+#include <map>
 #include <vector>
-#include "dataset_header.h"
-#include "genie/core/constants.h"
-#include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/class-type.h"
-#include "genie/format/mgb/access_unit.h"
-#include "genie/format/mgb/au_type_cfg.h"
-#include "genie/format/mgb/mm_cfg.h"
-#include "genie/format/mgb/ref_cfg.h"
-#include "genie/format/mpegg_p1/file_header.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-#include "signature_cfg.h"
+#include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mpegg_p1/access_unit_header.h"
 #include "genie/format/mpegg_p1/au_information.h"
 #include "genie/format/mpegg_p1/au_protection.h"
 #include "genie/format/mpegg_p1/block.h"
+#include "genie/format/mpegg_p1/gen_info.h"
+#include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,101 +31,104 @@ namespace mpegg_p1 {
  */
 class AccessUnit : public GenInfo {
  private:
-    AccessUnitHeader header;
-    boost::optional<AUInformation> au_information;
-    boost::optional<AUProtection> au_protection;
-    std::vector<Block> blocks;
+    AccessUnitHeader header;                        //!< @brief
+    boost::optional<AUInformation> au_information;  //!< @brief
+    boost::optional<AUProtection> au_protection;    //!< @brief
+    std::vector<Block> blocks;                      //!< @brief
+
  public:
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
-    AccessUnit(AccessUnitHeader h) : header(std::move(h)){
+    /**
+     * @brief
+     * @param h
+     */
+    explicit AccessUnit(AccessUnitHeader h);
 
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param parameterSets
+     * @param mit
+     */
+    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit);
 
-    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets, bool mit) {
-        reader.readBypassBE<uint64_t>();
-        header = AccessUnitHeader(reader, parameterSets, mit);
-        do {
-            auto tmp_pos = reader.getPos();
-            std::string tmp_str(4, '\0');
-            reader.readBypass(tmp_str);
-            if(tmp_str == "auin") {
-                UTILS_DIE_IF(au_information != boost::none, "AU-Inf already present");
-                UTILS_DIE_IF(au_protection != boost::none, "AU-Inf must be before AU-PR");
-                au_information = AUInformation(reader);
-            } else if (tmp_str == "aupr") {
-                UTILS_DIE_IF(au_protection != boost::none, "AU-Pr already present");
-                au_protection = AUProtection(reader);
-            } else {
-                reader.setPos(tmp_pos);
-                break;
-            }
-        } while(true);
-        for (size_t i = 0; i < header.getHeader().getNumBlocks(); ++i) {
-            blocks.emplace_back(reader);
-        }
-    }
+    /**
+     * @brief
+     * @param b
+     */
+    void addBlock(Block b);
 
-    void addBlock(Block b) {
-        blocks.emplace_back(std::move(b));
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<Block>& getBlocks() const;
 
-    const std::vector<Block>& getBlocks() const {
-        return blocks;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const AccessUnitHeader& getHeader() const;
 
-    const AccessUnitHeader& getHeader() const {
-        return header;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    bool hasInformation() const;
 
-    bool hasInformation() const {
-        return au_information != boost::none;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    bool hasProtection() const;
 
-    bool hasProtection() const {
-        return au_protection != boost::none;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const AUInformation& getInformation() const;
 
-    const AUInformation& getInformation() const {
-        return *au_information;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const AUProtection& getProtection() const;
 
-    const AUProtection& getProtection() const {
-        return *au_protection;
-    }
+    /**
+     * @brief
+     * @param au
+     */
+    void setInformation(AUInformation au);
 
-    void setInformation (AUInformation au) {
-        au_information = std::move(au);
-    }
+    /**
+     * @brief
+     * @param au
+     */
+    void setProtection(AUProtection au);
 
-    void setProtection (AUProtection au) {
-        au_protection = std::move(au);
-    }
+    /**
+     * @brief
+     * @param bitWriter
+     */
+    void write(genie::util::BitWriter& bitWriter) const override;
 
-    void write(genie::util::BitWriter& bitWriter) const override {
-        GenInfo::write(bitWriter);
-        header.write(bitWriter);
-        if(au_information != boost::none) {
-            au_information->write(bitWriter);
-        }
-        if(au_protection != boost::none) {
-            au_protection->write(bitWriter);
-        }
-        for(const auto& b : blocks) {
-            b.write(bitWriter);
-        }
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 
-    uint64_t getSize() const override {
-        std::stringstream stream;
-        genie::util::BitWriter writer(&stream);
-        write(writer);
-        return stream.str().length();
-    }
-
-    const std::string& getKey() const override {
-        static const std::string key = "aucn";
-        return key;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,15 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
-#include <vector>
-#include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,57 +23,70 @@ namespace mpegg_p1 {
  */
 class PacketHeader {
  private:
-    uint16_t sid;
-    uint8_t reserved;
-    bool marker_bit;
-    uint8_t sequence_number;
-    uint16_t packet_size;
+    uint16_t sid;             //!< @brief
+    uint8_t reserved;         //!< @brief
+    bool marker_bit;          //!< @brief
+    uint8_t sequence_number;  //!< @brief
+    uint16_t packet_size;     //!< @brief
 
  public:
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getSID() const;
 
-    uint16_t getSID() const {
-        return sid;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getReserved() const;
 
-    uint8_t getReserved() const {
-        return reserved;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    bool getMarkerBit() const;
 
-    bool getMarkerBit() const {
-        return marker_bit;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getSequenceNumber() const;
 
-    uint8_t getSequenceNumber() const {
-        return sequence_number;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getPacketSize() const;
 
-    uint16_t getPacketSize() const {
-        return packet_size;
-    }
+    /**
+     * @brief
+     * @param _sid
+     * @param _reserved
+     * @param _marker_bit
+     * @param _sequence_number
+     * @param _packet_size
+     */
+    PacketHeader(uint16_t _sid, uint8_t _reserved, bool _marker_bit, uint8_t _sequence_number, uint16_t _packet_size);
 
-    PacketHeader(uint16_t _sid, uint8_t _reserved, bool _marker_bit, uint8_t _sequence_number, uint16_t _packet_size) :
-     sid(_sid), reserved(_reserved), marker_bit(_marker_bit), sequence_number(_sequence_number), packet_size(_packet_size) {
-    }
-    explicit PacketHeader(util::BitReader& reader) {
-        sid = reader.read<uint16_t>(13);
-        reserved = reader.read<uint8_t>(3);
-        marker_bit = reader.read<bool>(1);
-        sequence_number = reader.read<uint8_t>(8);
-        packet_size = reader.read<uint16_t>(15);
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit PacketHeader(util::BitReader& reader);
 
-    void write(util::BitWriter& writer) const {
-        writer.write(sid, 13);
-        writer.write(reserved, 3);
-        writer.write(marker_bit, 1);
-        writer.write(sequence_number, 8);
-        writer.write(packet_size, 15);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter& writer) const;
 
-    uint64_t getLength() const {
-        return 5;
-    }
-
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getLength() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

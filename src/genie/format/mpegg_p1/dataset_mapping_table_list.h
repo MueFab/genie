@@ -9,15 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,53 +24,64 @@ namespace mpegg_p1 {
  */
 class DataSetMappingTableList : public GenInfo {
  private:
-    uint8_t dataset_group_ID;
-    std::vector<uint16_t> dataset_mapping_table_SID;
+    uint8_t dataset_group_ID;                         //!< @brief
+    std::vector<uint16_t> dataset_mapping_table_SID;  //!< @brief
+
  public:
-    const std::string& getKey() const override {
-        static const std::string key = "dmtl";
-        return key;
-    }
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
-    explicit DataSetMappingTableList(uint8_t _ds_group_id) : dataset_group_ID(_ds_group_id) {
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 
-    explicit DataSetMappingTableList(util::BitReader& reader) {
-        size_t length = reader.readBypassBE<uint64_t>();
-        dataset_group_ID = reader.readBypassBE<uint8_t>();
-        size_t num_SIDs = (length - 13) / 2;
-        for (size_t i = 0; i < num_SIDs; ++i) {
-            dataset_mapping_table_SID.emplace_back(reader.readBypassBE<uint16_t>());
-        }
-    }
+    /**
+     * @brief
+     * @param _ds_group_id
+     */
+    explicit DataSetMappingTableList(uint8_t _ds_group_id);
 
-    void addDatasetMappingTableSID(uint16_t sid) {
-        dataset_mapping_table_SID.emplace_back(sid);
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit DataSetMappingTableList(util::BitReader& reader);
+
+    /**
+     * @brief
+     * @param sid
+     */
+    void addDatasetMappingTableSID(uint16_t sid);
 
     /**
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override {
-        GenInfo::write(bitWriter);
-        bitWriter.writeBypassBE(dataset_group_ID);
-        for (const auto& s : dataset_mapping_table_SID) {
-            bitWriter.writeBypassBE(s);
-        }
-    }
+    void write(genie::util::BitWriter& bitWriter) const override;
 
-    uint8_t getDatasetGroupID() const {
-        return dataset_group_ID;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
 
-    const std::vector<uint16_t>& getDatasetMappingTableSIDs() const {
-        return dataset_mapping_table_SID;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<uint16_t>& getDatasetMappingTableSIDs() const;
 
-    uint64_t getSize() const override {
-        return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) * dataset_mapping_table_SID.size();
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

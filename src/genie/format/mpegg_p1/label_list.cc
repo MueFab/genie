@@ -4,10 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "label_list.h"
-#include <string>
-#include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/label_list.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,6 +50,37 @@ void LabelList::write(util::BitWriter& bit_writer) const {
         label.write(bit_writer);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string& LabelList::getKey() const {
+    static const std::string key = "labl";
+    return key;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t LabelList::getSize() const {
+    uint64_t labelSize = 0;
+    for (const auto& l : labels) {
+        labelSize += l.getSize();
+    }
+    return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) + labelSize;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool LabelList::operator==(const GenInfo& info) const {
+    if (!GenInfo::operator==(info)) {
+        return false;
+    }
+    const auto& other = dynamic_cast<const LabelList&>(info);
+    return dataset_group_ID == other.dataset_group_ID && labels == other.labels;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LabelList::addLabel(Label l) { labels.emplace_back(std::move(l)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

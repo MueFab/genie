@@ -8,18 +8,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "dataset_header.h"
-#include <list>
-#include <memory>
-#include <string>
-#include <vector>
-#include "access_unit_header.h"
-#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,30 +23,45 @@ namespace mpegg_p1 {
  */
 class BlockHeader {
  private:
-    bool reserved1;
+    bool reserved1;                      //!< @brief
     genie::core::GenDesc descriptor_ID;  //!< @brief
-    uint8_t reserved2;
-    uint32_t block_payload_size;  //!< @brief
+    uint8_t reserved2;                   //!< @brief
+    uint32_t block_payload_size;         //!< @brief
 
  public:
     /**
-     *
+     * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const BlockHeader& other) const;
+
+    /**
+     * @brief
      * @param reader
-     * @param fhd
      */
     explicit BlockHeader(util::BitReader& reader);
 
-    BlockHeader(bool _reserved1, genie::core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
-    : reserved1(_reserved1), descriptor_ID (_desc_id), reserved2(_reserved2), block_payload_size(payload_size) {
-    }
+    /**
+     * @brief
+     * @param _reserved1
+     * @param _desc_id
+     * @param _reserved2
+     * @param payload_size
+     */
+    BlockHeader(bool _reserved1, genie::core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size);
 
-    bool getReserved1() const {
-        return reserved1;
-    };
+    /**
+     * @brief
+     * @return
+     */
+    bool getReserved1() const;
 
-    uint8_t getReserved2() const {
-        return reserved2;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getReserved2() const;
 
     /**
      * @brief

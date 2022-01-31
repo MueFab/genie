@@ -9,15 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
-#include <vector>
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,65 +24,59 @@ namespace mpegg_p1 {
  */
 class AUInformation : public GenInfo {
  public:
-    const std::string& getKey() const override {
-        static const std::string key = "auin";
-        return key;
-    }
+    const std::string& getKey() const override;
 
     /**
      * @brief
      */
     explicit AUInformation(genie::util::BitReader& bitreader,
-                             genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
-        : version(_version) {
-        auto length = bitreader.readBypassBE<uint64_t>();
-        auto metadata_length = length - GenInfo::getSize();
-        if (version != genie::core::MPEGMinorVersion::V1900) {
-            dataset_group_id = bitreader.readBypassBE<uint8_t>();
-            dataset_id = bitreader.readBypassBE<uint16_t>();
-            metadata_length -= sizeof(uint8_t);
-            metadata_length -= sizeof(uint16_t);
-        }
-        au_information_value.resize(metadata_length);
-        bitreader.readBypass(au_information_value);
-    }
+                           genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
     AUInformation(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_information_value,
-                    genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
-        : version(_version),
-          dataset_group_id(_dataset_group_id),
-          dataset_id(_dataset_id),
-          au_information_value(std::move(_au_information_value)) {}
+                  genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
     /**
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override {
-        GenInfo::write(bitWriter);
-        if (version != genie::core::MPEGMinorVersion::V1900) {
-            bitWriter.writeBypassBE(dataset_group_id);
-            bitWriter.writeBypassBE(dataset_id);
-        }
-        bitWriter.writeBypass(au_information_value.data(), au_information_value.length());
-    }
+    void write(genie::util::BitWriter& bitWriter) const override;
 
-    uint64_t getSize() const override {
-        return GenInfo::getSize() + au_information_value.size() +
-               (version != genie::core::MPEGMinorVersion::V1900 ? sizeof(uint8_t) + sizeof(uint16_t) : 0);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 
-    uint8_t getDatasetGroupID() const { return dataset_group_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
 
-    uint16_t getDatasetID() const { return dataset_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getDatasetID() const;
 
-    const std::string& getInformation() const { return au_information_value; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getInformation() const;
+
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
  private:
-    genie::core::MPEGMinorVersion version;
-    uint8_t dataset_group_id;
-    uint16_t dataset_id;
-    std::string au_information_value;
+    genie::core::MPEGMinorVersion version;  //!< @brief
+    uint8_t dataset_group_id;               //!< @brief
+    uint16_t dataset_id;                    //!< @brief
+    std::string au_information_value;       //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

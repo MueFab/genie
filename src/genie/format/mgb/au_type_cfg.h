@@ -34,6 +34,11 @@ class AuTypeCfg {
     uint8_t posSize;  //!< @brief internal
 
  public:
+    bool operator==(const AuTypeCfg &other) const {
+        return sequence_ID == other.sequence_ID && AU_start_position == other.AU_start_position &&
+               AU_end_position == other.AU_end_position && extended_AU == other.extended_AU && posSize == other.posSize;
+    }
+
     /**
      * @brief
      * @param _sequence_ID

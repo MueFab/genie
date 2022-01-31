@@ -13,8 +13,6 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,301 +25,400 @@ namespace mpegg_p1 {
  */
 class ReferenceLocation {
  private:
-    uint8_t reserved;
-    bool external_ref_flag;
+    uint8_t reserved;        //!< @brief
+    bool external_ref_flag;  //!< @brief
 
  public:
+    /**
+     * @brief
+     */
     virtual ~ReferenceLocation() = default;
 
-    explicit ReferenceLocation(uint8_t _reserved, bool _external_ref_flag)
-        : reserved(_reserved), external_ref_flag(_external_ref_flag) {}
+    /**
+     * @brief
+     * @param _reserved
+     * @param _external_ref_flag
+     */
+    explicit ReferenceLocation(uint8_t _reserved, bool _external_ref_flag);
 
-    explicit ReferenceLocation(genie::util::BitReader& reader) {
-        reserved = reader.read<uint8_t>(7);
-        external_ref_flag = reader.read<bool>(1);
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit ReferenceLocation(genie::util::BitReader& reader);
 
-    bool isExternal() const { return external_ref_flag; }
+    /**
+     * @brief
+     * @return
+     */
+    bool isExternal() const;
 
+    /**
+     * @brief
+     * @param reader
+     * @param seq_count
+     * @param _version
+     * @return
+     */
     static std::unique_ptr<ReferenceLocation> referenceLocationFactory(
         genie::util::BitReader& reader, size_t seq_count,
         genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
-    virtual void write(genie::util::BitWriter& writer) {
-        writer.write(reserved, 7);
-        writer.write(external_ref_flag, 1);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    virtual void write(genie::util::BitWriter& writer);
 };
 
+/**
+ * @brief
+ */
 class ExternalReferenceLocation : public ReferenceLocation {
  public:
+    /**
+     * @brief
+     */
     enum class ChecksumAlgorithm : uint8_t { MD5 = 0, SHA256 = 1 };
 
+    /**
+     * @brief
+     */
     constexpr static const size_t checksum_sizes[] = {128 / 8, 256 / 8};
 
+    /**
+     * @brief
+     */
     enum class RefType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
 
  private:
-    std::string uri;
-    ChecksumAlgorithm checksum_algo;
-    RefType reference_type;
+    std::string uri;                  //!< @brief
+    ChecksumAlgorithm checksum_algo;  //!< @brief
+    RefType reference_type;           //!< @brief
 
  public:
-    ExternalReferenceLocation(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, RefType type)
-        : ReferenceLocation(_reserved, true), uri(std::move(_uri)), checksum_algo(algo), reference_type(type) {}
+    /**
+     * @brief
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     * @param type
+     */
+    ExternalReferenceLocation(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, RefType type);
 
-    explicit ExternalReferenceLocation(genie::util::BitReader& reader) : ReferenceLocation(reader) {
-        reader.readBypass_null_terminated(uri);
-        checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();
-        reference_type = reader.readBypassBE<RefType>();
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit ExternalReferenceLocation(genie::util::BitReader& reader);
 
-    ExternalReferenceLocation(genie::util::BitReader& reader, uint8_t _reserved) : ReferenceLocation(_reserved, true) {
-        reader.readBypass_null_terminated(uri);
-        checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();
-        reference_type = reader.readBypassBE<RefType>();
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     */
+    ExternalReferenceLocation(genie::util::BitReader& reader, uint8_t _reserved);
 
-    const std::string& getURI() const { return uri; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getURI() const;
 
-    ChecksumAlgorithm getChecksumAlgorithm() const { return checksum_algo; }
+    /**
+     * @brief
+     * @return
+     */
+    ChecksumAlgorithm getChecksumAlgorithm() const;
 
-    RefType getReferenceType() const { return reference_type; }
+    /**
+     * @brief
+     * @return
+     */
+    RefType getReferenceType() const;
 
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     * @param seq_count
+     * @param _version
+     * @return
+     */
     static std::unique_ptr<ExternalReferenceLocation> externalReferenceLocationFactory(
         genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
         genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
-    void write(genie::util::BitWriter& writer) override {
-        ReferenceLocation::write(writer);
-        writer.writeBypass(uri.data(), uri.length());
-        writer.writeBypassBE('\0');
-        writer.writeBypassBE(checksum_algo);
-        writer.writeBypassBE(reference_type);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 
+    /**
+     * @brief
+     * @param checksum
+     */
     virtual void addChecksum(std::string checksum) = 0;
 };
 
+/**
+ * @brief
+ */
 class ExternalReferenceLocationMPEGG : public ExternalReferenceLocation {
  private:
-    genie::core::MPEGMinorVersion version;
-    uint8_t external_dataset_group_id;
-    uint16_t external_dataset_id;
-    std::string ref_checksum;
-    std::vector<std::string> seq_checksums;
+    genie::core::MPEGMinorVersion version;   //!< @brief
+    uint8_t external_dataset_group_id;       //!< @brief
+    uint16_t external_dataset_id;            //!< @brief
+    std::string ref_checksum;                //!< @brief
+    std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
+    /**
+     * @brief
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     * @param _group_id
+     * @param _dataset_id
+     * @param _ref_checksum
+     * @param _version
+     */
     ExternalReferenceLocationMPEGG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t _group_id,
                                    uint16_t _dataset_id, std::string _ref_checksum = "",
-                                   genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
-          version(_version),
-          external_dataset_group_id(_group_id),
-          external_dataset_id(_dataset_id),
-          ref_checksum(std::move(_ref_checksum)) {
-        UTILS_DIE_IF(version == genie::core::MPEGMinorVersion::V1900 &&
-                         ref_checksum.size() != checksum_sizes[static_cast<uint8_t>(algo)],
-                     "Invalid reference checksum");
-    }
+                                   genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
+    /**
+     * @brief
+     * @param reader
+     * @param seq_count
+     * @param _version
+     */
     explicit ExternalReferenceLocationMPEGG(
         genie::util::BitReader& reader, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
-        : ExternalReferenceLocation(reader),
-          version(_version),
-          ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
-        external_dataset_group_id = reader.readBypassBE<uint8_t>();
-        external_dataset_id = reader.readBypassBE<uint16_t>();
-        if (version == core::MPEGMinorVersion::V1900) {
-            reader.readBypass(ref_checksum);
-        } else {
-            ref_checksum.clear();
-            for (size_t i = 0; i < seq_count; ++i) {
-                seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-                reader.readBypass(seq_checksums.back());
-            }
-        }
-    }
+        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     * @param seq_count
+     * @param _version
+     */
     explicit ExternalReferenceLocationMPEGG(
         genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
-          version(_version),
-          ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
-        external_dataset_group_id = reader.readBypassBE<uint8_t>();
-        external_dataset_id = reader.readBypassBE<uint16_t>();
-        if (version == core::MPEGMinorVersion::V1900) {
-            reader.readBypass(ref_checksum);
-        } else {
-            ref_checksum.clear();
-            for (size_t i = 0; i < seq_count; ++i) {
-                seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-                reader.readBypass(seq_checksums.back());
-            }
-        }
-    }
+        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
-    uint8_t getExternalDatasetGroupID() const { return external_dataset_group_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getExternalDatasetGroupID() const;
 
-    uint16_t getExternalDatasetID() const { return external_dataset_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getExternalDatasetID() const;
 
-    const std::string& getRefChecksum() const { return ref_checksum; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getRefChecksum() const;
 
-    const std::vector<std::string>& getSeqChecksums() const { return seq_checksums; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<std::string>& getSeqChecksums() const;
 
-    void addSeqChecksum(std::string checksum) {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        seq_checksums.emplace_back(std::move(checksum));
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addSeqChecksum(std::string checksum);
 
-    void write(genie::util::BitWriter& writer) override {
-        ExternalReferenceLocation::write(writer);
-        writer.writeBypassBE(external_dataset_group_id);
-        writer.writeBypassBE(external_dataset_id);
-        if (version == core::MPEGMinorVersion::V1900) {
-            writer.writeBypass(ref_checksum.data(), ref_checksum.length());
-        } else {
-            for (const auto& s : seq_checksums) {
-                writer.writeBypass(s.data(), s.length());
-            }
-        }
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 
-    void addChecksum(std::string checksum) override {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        if (version != core::MPEGMinorVersion::V1900) {
-            seq_checksums.emplace_back(std::move(checksum));
-        }
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addChecksum(std::string checksum) override;
 };
 
+/**
+ * @brief
+ */
 class ExternalReferenceLocationRaw : public ExternalReferenceLocation {
  private:
-    std::vector<std::string> seq_checksums;
+    std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
-    ExternalReferenceLocationRaw(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::RAW_REF) {}
+    /**
+     * @brief
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     */
+    ExternalReferenceLocationRaw(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo);
 
-    ExternalReferenceLocationRaw(genie::util::BitReader& reader, size_t seq_count) : ExternalReferenceLocation(reader) {
-        for (size_t i = 0; i < seq_count; ++i) {
-            seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
-        }
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param seq_count
+     */
+    ExternalReferenceLocationRaw(genie::util::BitReader& reader, size_t seq_count);
 
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     * @param seq_count
+     */
     ExternalReferenceLocationRaw(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri,
-                                 ChecksumAlgorithm algo, size_t seq_count)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::RAW_REF) {
-        for (size_t i = 0; i < seq_count; ++i) {
-            seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
-        }
-    }
+                                 ChecksumAlgorithm algo, size_t seq_count);
 
-    const std::vector<std::string>& getSeqChecksums() const { return seq_checksums; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<std::string>& getSeqChecksums() const;
 
-    void addSeqChecksum(std::string checksum) {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        seq_checksums.emplace_back(std::move(checksum));
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addSeqChecksum(std::string checksum);
 
-    void write(genie::util::BitWriter& writer) override {
-        ExternalReferenceLocation::write(writer);
-        for (const auto& s : seq_checksums) {
-            writer.writeBypass(s.data(), s.length());
-        }
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 
-    void addChecksum(std::string checksum) override {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        seq_checksums.emplace_back(std::move(checksum));
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addChecksum(std::string checksum) override;
 };
 
+/**
+ * @brief
+ */
 class ExternalReferenceLocationFasta : public ExternalReferenceLocation {
  private:
-    std::vector<std::string> seq_checksums;
+    std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
-    ExternalReferenceLocationFasta(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::RAW_REF) {}
+    /**
+     * @brief
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     */
+    ExternalReferenceLocationFasta(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo);
 
-    ExternalReferenceLocationFasta(genie::util::BitReader& reader, size_t seq_count)
-        : ExternalReferenceLocation(reader) {
-        for (size_t i = 0; i < seq_count; ++i) {
-            seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
-        }
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param seq_count
+     */
+    ExternalReferenceLocationFasta(genie::util::BitReader& reader, size_t seq_count);
 
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     * @param _uri
+     * @param algo
+     * @param seq_count
+     */
     ExternalReferenceLocationFasta(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri,
-                                   ChecksumAlgorithm algo, size_t seq_count)
-        : ExternalReferenceLocation(_reserved, std::move(_uri), algo, RefType::RAW_REF) {
-        for (size_t i = 0; i < seq_count; ++i) {
-            seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
-        }
-    }
+                                   ChecksumAlgorithm algo, size_t seq_count);
 
-    const std::vector<std::string>& getSeqChecksums() const { return seq_checksums; }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<std::string>& getSeqChecksums() const;
 
-    void addSeqChecksum(std::string checksum) {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        seq_checksums.emplace_back(std::move(checksum));
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addSeqChecksum(std::string checksum);
 
-    void write(genie::util::BitWriter& writer) override {
-        ExternalReferenceLocation::write(writer);
-        for (const auto& s : seq_checksums) {
-            writer.writeBypass(s.data(), s.length());
-        }
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 
-    void addChecksum(std::string checksum) override {
-        UTILS_DIE_IF(checksum.size() != checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())],
-                     "Invalid checksum length");
-        seq_checksums.emplace_back(std::move(checksum));
-    }
+    /**
+     * @brief
+     * @param checksum
+     */
+    void addChecksum(std::string checksum) override;
 };
 
+/**
+ * @brief
+ */
 class InternalReferenceLocation : public ReferenceLocation {
  private:
-    uint8_t internal_dataset_group_id;
-    uint16_t internal_dataset_id;
+    uint8_t internal_dataset_group_id;  //!< @brief
+    uint16_t internal_dataset_id;       //!< @brief
 
  public:
-    InternalReferenceLocation(uint8_t _reserved, uint8_t _internal_dataset_group_id, uint16_t _internal_dataset_id)
-        : ReferenceLocation(_reserved, false),
-          internal_dataset_group_id(_internal_dataset_group_id),
-          internal_dataset_id(_internal_dataset_id) {}
+    /**
+     * @brief
+     * @param _reserved
+     * @param _internal_dataset_group_id
+     * @param _internal_dataset_id
+     */
+    InternalReferenceLocation(uint8_t _reserved, uint8_t _internal_dataset_group_id, uint16_t _internal_dataset_id);
 
-    explicit InternalReferenceLocation(genie::util::BitReader& reader) : ReferenceLocation(reader) {
-        internal_dataset_group_id = reader.readBypassBE<uint8_t>();
-        internal_dataset_id = reader.readBypassBE<uint16_t>();
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit InternalReferenceLocation(genie::util::BitReader& reader);
 
-    InternalReferenceLocation(genie::util::BitReader& reader, uint8_t _reserved) : ReferenceLocation(_reserved, false) {
-        internal_dataset_group_id = reader.readBypassBE<uint8_t>();
-        internal_dataset_id = reader.readBypassBE<uint16_t>();
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param _reserved
+     */
+    InternalReferenceLocation(genie::util::BitReader& reader, uint8_t _reserved);
 
-    uint8_t getDatasetGroupID() const { return internal_dataset_group_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
 
-    uint16_t getDatasetID() const { return internal_dataset_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getDatasetID() const;
 
-    void write(genie::util::BitWriter& writer) override {
-        ReferenceLocation::write(writer);
-        writer.writeBypassBE(internal_dataset_group_id);
-        writer.writeBypassBE(internal_dataset_id);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,15 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
 #include <vector>
-#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,41 +24,39 @@ namespace mpegg_p1 {
  */
 class DatasetGroupHeader : public GenInfo {
  private:
-    /** ------------------------------------------------------------------------------------------------------------
-     * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
-     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t ID;                         //!< @brief
     uint8_t version;                    //!< @brief
     std::vector<uint16_t> dataset_IDs;  //!< @brief
 
  public:
-    DatasetGroupHeader() : DatasetGroupHeader(0,0){
-
-    }
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
     /**
      * @brief
      */
-    DatasetGroupHeader(uint8_t _id, uint8_t _version) : ID(_id), version(_version) {
+    DatasetGroupHeader();
 
-    }
+    /**
+     * @brief
+     */
+    DatasetGroupHeader(uint8_t _id, uint8_t _version);
 
-    const std::string& getKey() const override {
-        static const std::string key = "dghd";
-        return key;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 
-
-    explicit DatasetGroupHeader(genie::util::BitReader& reader) {
-        auto length = reader.readBypassBE<uint64_t>();
-        auto num_datasets = (length - 14) / 2;
-        dataset_IDs.resize(num_datasets);
-        ID = reader.readBypassBE<uint8_t>();
-        version = reader.readBypassBE<uint8_t>();
-        for(auto& d : dataset_IDs) {
-            d = reader.readBypassBE<uint16_t>();
-        }
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit DatasetGroupHeader(genie::util::BitReader& reader);
 
     /**
      * @brief
@@ -88,35 +80,26 @@ class DatasetGroupHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<uint16_t>& getDatasetIDs() const {
-        return dataset_IDs;
-    }
+    const std::vector<uint16_t>& getDatasetIDs() const;
 
-    void addDatasetID(uint16_t _id) {
-        ID = _id;
-    }
+    /**
+     * @brief
+     * @param _id
+     */
+    void addDatasetID(uint16_t _id);
 
     /**
      * @brief
      * @return
      */
-    uint64_t getSize() const override {
-        return GenInfo::getSize() + sizeof(uint8_t) * 2 + sizeof(uint16_t) * dataset_IDs.size();
-    }
+    uint64_t getSize() const override;
 
     /**
      * @brief
      * @param writer
      * @param empty_length
      */
-    void write(genie::util::BitWriter& writer) const override {
-        GenInfo::write(writer);
-        writer.writeBypassBE<uint8_t>(ID);
-        writer.writeBypassBE<uint8_t>(version);
-        for(auto& d : dataset_IDs) {
-            writer.writeBypassBE<uint16_t>(d);
-        }
-    }
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

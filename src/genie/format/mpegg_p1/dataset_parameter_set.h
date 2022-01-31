@@ -9,18 +9,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
-#include <vector>
-#include "genie/format/mpegg_p1/file_header.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-
+#include <boost/optional/optional.hpp>
+#include "genie/core/constants.h"
 #include "genie/core/parameter/parameter_set.h"
-#include "dataset_header.h"
+#include "genie/format/mpegg_p1/gen_info.h"
+#include "genie/util/bitreader.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -32,158 +26,241 @@ namespace mpegg_p1 {
  */
 class DatasetParameterSet : GenInfo {
  public:
+    /**
+     * @brief
+     */
     class USignature {
      private:
-        boost::optional<uint8_t> u_signature_length;
+        boost::optional<uint8_t> u_signature_length;  //!< @brief
 
      public:
-        USignature() : u_signature_length(boost::none) {}
+        /**
+         * @brief
+         * @param other
+         * @return
+         */
+        bool operator==(const USignature& other) const;
 
-        explicit USignature(genie::util::BitReader& reader) {
-            if (reader.read<bool>(1)) {
-                u_signature_length = reader.read<uint8_t>();
-            }
-        }
+        /**
+         * @brief
+         */
+        USignature();
 
-        bool isConstantLength() const { return u_signature_length != boost::none; }
+        /**
+         * @brief
+         * @param reader
+         */
+        explicit USignature(genie::util::BitReader& reader);
 
-        uint8_t getConstLength() const { return *u_signature_length; }
+        /**
+         * @brief
+         * @return
+         */
+        bool isConstantLength() const;
 
-        void setConstLength(uint8_t length) { u_signature_length = length; }
+        /**
+         * @brief
+         * @return
+         */
+        uint8_t getConstLength() const;
 
-        void write(genie::util::BitWriter& writer) const {
-            writer.write(u_signature_length != boost::none, 1);
-            if (u_signature_length != boost::none) {
-                writer.write(*u_signature_length, 8);
-            }
-        }
+        /**
+         * @brief
+         * @param length
+         */
+        void setConstLength(uint8_t length);
+
+        /**
+         * @brief
+         * @param writer
+         */
+        void write(genie::util::BitWriter& writer) const;
     };
 
+    /**
+     * @brief
+     */
     class ParameterUpdateInfo {
      private:
-        bool multiple_alignment_flag;
-        bool pos_40_bits_flag;
-        core::AlphabetID alphabetId;
-        boost::optional<USignature> u_signature;
+        bool multiple_alignment_flag;             //!< @brief
+        bool pos_40_bits_flag;                    //!< @brief
+        core::AlphabetID alphabetId;              //!< @brief
+        boost::optional<USignature> u_signature;  //!< @brief
 
      public:
-        ParameterUpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId)
-            : multiple_alignment_flag(_multiple_alignment_flag),
-              pos_40_bits_flag(_pos_40_bits_flag),
-              alphabetId(_alphabetId) {}
+        /**
+         * @brief
+         * @param other
+         * @return
+         */
+        bool operator==(const ParameterUpdateInfo& other) const;
 
-        explicit ParameterUpdateInfo(genie::util::BitReader& reader) {
-            multiple_alignment_flag = reader.read<bool>(1);
-            pos_40_bits_flag = reader.read<bool>(1);
-            alphabetId = reader.read<core::AlphabetID>(8);
-            if (reader.read<bool>(1)) {
-                u_signature = USignature(reader);
-            }
-            reader.flush();
-        }
+        /**
+         * @brief
+         * @param _multiple_alignment_flag
+         * @param _pos_40_bits_flag
+         * @param _alphabetId
+         */
+        ParameterUpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId);
 
-        void write(genie::util::BitWriter& writer) const {
-            writer.write(multiple_alignment_flag, 1);
-            writer.write(pos_40_bits_flag, 1);
-            writer.write(static_cast<uint8_t>(alphabetId), 8);
-            writer.write(u_signature != boost::none, 1);
-            if (u_signature != boost::none) {
-                u_signature->write(writer);
-            }
-            writer.flush();
-        }
+        /**
+         * @brief
+         * @param reader
+         */
+        explicit ParameterUpdateInfo(genie::util::BitReader& reader);
 
-        void addUSignature(USignature signature) { u_signature = signature; }
+        /**
+         * @brief
+         * @param writer
+         */
+        void write(genie::util::BitWriter& writer) const;
 
-        bool getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
+        /**
+         * @brief
+         * @param signature
+         */
+        void addUSignature(USignature signature);
 
-        bool getPos40BitsFlag() const { return pos_40_bits_flag; }
+        /**
+         * @brief
+         * @return
+         */
+        bool getMultipleAlignmentFlag() const;
 
-        core::AlphabetID getAlphabetID() const { return alphabetId; }
+        /**
+         * @brief
+         * @return
+         */
+        bool getPos40BitsFlag() const;
 
-        bool hasUSignature() const { return u_signature != boost::none; }
+        /**
+         * @brief
+         * @return
+         */
+        core::AlphabetID getAlphabetID() const;
 
-        const USignature& getUSignature() const { return *u_signature; }
+        /**
+         * @brief
+         * @return
+         */
+        bool hasUSignature() const;
+
+        /**
+         * @brief
+         * @return
+         */
+        const USignature& getUSignature() const;
     };
 
  private:
-    uint8_t dataset_group_id;
-    uint16_t dataset_id;
-    uint8_t parameter_set_ID;
-    uint8_t parent_parameter_set_ID;
-    boost::optional<ParameterUpdateInfo> param_update;
-    genie::core::parameter::EncodingSet params;
-    core::MPEGMinorVersion version;
+    uint8_t dataset_group_id;                           //!< @brief
+    uint16_t dataset_id;                                //!< @brief
+    uint8_t parameter_set_ID;                           //!< @brief
+    uint8_t parent_parameter_set_ID;                    //!< @brief
+    boost::optional<ParameterUpdateInfo> param_update;  //!< @brief
+    genie::core::parameter::EncodingSet params;         //!< @brief
+    core::MPEGMinorVersion version;                     //!< @brief
 
  public:
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
+
+    /**
+     * @brief
+     * @param _dataset_group_id
+     * @param _dataset_id
+     * @param _parameter_set_ID
+     * @param _parent_parameter_set_ID
+     * @param ps
+     * @param _version
+     */
     DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
                         uint8_t _parent_parameter_set_ID, genie::core::parameter::EncodingSet ps,
-                        core::MPEGMinorVersion _version)
-        : dataset_group_id(_dataset_group_id),
-          dataset_id(_dataset_id),
-          parameter_set_ID(_parameter_set_ID),
-          parent_parameter_set_ID(_parent_parameter_set_ID),
-          params(std::move(ps)),
-          version(_version) {}
+                        core::MPEGMinorVersion _version);
 
-    DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version, bool parameters_update_flag)
-        : version(_version) {
-        reader.readBypassBE<uint64_t>();
-        dataset_group_id = reader.readBypassBE<uint8_t>();
-        dataset_id = reader.readBypassBE<uint16_t>();
-        parameter_set_ID = reader.readBypassBE<uint8_t>();
-        parent_parameter_set_ID = reader.readBypassBE<uint8_t>();
-        if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
-            param_update = ParameterUpdateInfo(reader);
-        }
-        params = genie::core::parameter::EncodingSet(reader);
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param _version
+     * @param parameters_update_flag
+     */
+    DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version, bool parameters_update_flag);
 
-    void write(genie::util::BitWriter& writer) const override {
-        GenInfo::write(writer);
-        writer.writeBypassBE(dataset_group_id);
-        writer.writeBypassBE(dataset_id);
-        writer.writeBypassBE(parameter_set_ID);
-        writer.writeBypassBE(parent_parameter_set_ID);
-        if (param_update != boost::none) {
-            param_update->write(writer);
-        }
-        params.write(writer);
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) const override;
 
-    void addParameterUpdate(ParameterUpdateInfo update) {
-        if (version != core::MPEGMinorVersion::V1900) {
-            param_update = std::move(update);
-        }
-    }
+    /**
+     * @brief
+     * @param update
+     */
+    void addParameterUpdate(ParameterUpdateInfo update);
 
-    uint64_t getSize() const override {
-        std::stringstream stream;
-        genie::util::BitWriter writer(&stream);
-        write(writer);
-        return stream.str().length();
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 
-    const std::string& getKey() const override {
-        static const std::string key = "pars";
-        return key;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 
-    uint8_t getDatasetGroupID() const { return dataset_group_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
 
-    uint16_t getDatasetID() const { return dataset_id; }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getDatasetID() const;
 
-    uint8_t getParameterSetID() const { return parameter_set_ID; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getParameterSetID() const;
 
-    uint8_t getParentParameterSetID() const { return parent_parameter_set_ID; }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getParentParameterSetID() const;
 
-    bool hasParameterUpdate() const { return param_update != boost::none; }
+    /**
+     * @brief
+     * @return
+     */
+    bool hasParameterUpdate() const;
 
-    const ParameterUpdateInfo& getParameterUpdate() const { return *param_update; }
+    /**
+     * @brief
+     * @return
+     */
+    const ParameterUpdateInfo& getParameterUpdate() const;
 
-    const genie::core::parameter::EncodingSet& getEncodingSet() const { return params; }
+    /**
+     * @brief
+     * @return
+     */
+    const genie::core::parameter::EncodingSet& getEncodingSet() const;
 
-    genie::core::parameter::EncodingSet&& moveParameterSet() { return std::move(params); }
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::parameter::EncodingSet&& moveParameterSet();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

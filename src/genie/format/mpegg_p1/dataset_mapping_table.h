@@ -9,15 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,8 +24,14 @@ namespace mpegg_p1 {
  */
 class DataSetMappingTable : public GenInfo {
  public:
+    /**
+     * @brief
+     */
     class DataStream {
      public:
+        /**
+         * @brief
+         */
         enum class Type : uint8_t {
             DATASET_GROUP_HEADER = 0,
             REFERENCE = 1,
@@ -53,88 +53,115 @@ class DataSetMappingTable : public GenInfo {
         };
 
      private:
-        Type data_type;
-        uint8_t reserved;
-        uint16_t data_SID;
+        Type data_type;     //!< @brief
+        uint8_t reserved;   //!< @brief
+        uint16_t data_SID;  //!< @brief
 
      public:
-        DataStream(Type _data_type, uint8_t _reserved, uint16_t _data_SID)
-            : data_type(_data_type), reserved(_reserved), data_SID(_data_SID) {}
+        /**
+         * @brief
+         * @param other
+         * @return
+         */
+        bool operator==(const DataStream& other) const;
 
-        DataStream(util::BitReader& reader) {
-            data_type = reader.read<Type>(8);
-            reserved = reader.read<uint8_t>(3);
-            data_SID = reader.read<uint16_t>(13);
-        }
+        /**
+         * @brief
+         * @param _data_type
+         * @param _reserved
+         * @param _data_SID
+         */
+        DataStream(Type _data_type, uint8_t _reserved, uint16_t _data_SID);
 
-        void write(util::BitWriter& writer) const {
-            writer.write(static_cast<uint8_t>(data_type), 8);
-            writer.write(reserved, 3);
-            writer.write(data_SID, 13);
-        }
+        /**
+         * @brief
+         * @param reader
+         */
+        explicit DataStream(util::BitReader& reader);
 
-        Type getDataType() const {
-            return data_type;
-        }
+        /**
+         * @brief
+         * @param writer
+         */
+        void write(util::BitWriter& writer) const;
 
-        uint8_t getReserved() const {
-            return reserved;
-        }
+        /**
+         * @brief
+         * @return
+         */
+        Type getDataType() const;
 
-        uint16_t getDataSID() const {
-            return data_SID;
-        }
+        /**
+         * @brief
+         * @return
+         */
+        uint8_t getReserved() const;
+
+        /**
+         * @brief
+         * @return
+         */
+        uint16_t getDataSID() const;
     };
 
-    const std::string& getKey() const override {
-        static const std::string key = "dmtb";
-        return key;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getKey() const override;
 
     /**
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override {
-        GenInfo::write(bitWriter);
-        bitWriter.writeBypassBE(dataset_id);
-        for (const auto& s : streams) {
-            s.write(bitWriter);
-        }
-    }
+    void write(genie::util::BitWriter& bitWriter) const override;
 
-    uint64_t getSize() const override {
-        return GenInfo::getSize() + sizeof(uint16_t) + (sizeof(uint8_t) + sizeof(uint16_t)) * streams.size();
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getSize() const override;
 
-    uint16_t getDatasetID() const {
-        return dataset_id;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getDatasetID() const;
 
-    const std::vector<DataStream>& getDataStreams() const {
-        return streams;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<DataStream>& getDataStreams() const;
 
-    void addDataStream(DataStream d) {
-        streams.emplace_back(std::move(d));
-    }
+    /**
+     * @brief
+     * @param d
+     */
+    void addDataStream(DataStream d);
 
-    explicit DataSetMappingTable(uint16_t _dataset_id) : dataset_id(_dataset_id) {
+    /**
+     * @brief
+     * @param _dataset_id
+     */
+    explicit DataSetMappingTable(uint16_t _dataset_id);
 
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit DataSetMappingTable(util::BitReader& reader);
 
-    explicit DataSetMappingTable(util::BitReader& reader) {
-        uint64_t length = reader.readBypassBE<uint64_t>();
-        dataset_id = reader.readBypassBE<uint16_t>();
-        size_t num_data_streams = (length - 14) / 3;
-        for (size_t i = 0; i < num_data_streams; ++i) {
-            streams.emplace_back(reader);
-        }
-    }
+    /**
+     * @brief
+     * @param info
+     * @return
+     */
+    bool operator==(const GenInfo& info) const override;
 
  private:
-    uint16_t dataset_id;
-    std::vector<DataStream> streams;
+    uint16_t dataset_id;              //!< @brief
+    std::vector<DataStream> streams;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

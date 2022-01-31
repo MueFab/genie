@@ -9,15 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
 #include <string>
-#include <vector>
 #include "genie/format/mpegg_p1/packet_header.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,30 +25,40 @@ namespace mpegg_p1 {
  */
 class Packet {
  private:
-    PacketHeader header;
-    std::string data;
+    PacketHeader header;  //!< @brief
+    std::string data;     //!< @brief
+
  public:
-    Packet(PacketHeader _header, std::string _data) : header(_header), data(std::move(_data)) {
-    }
+    /**
+     * @brief
+     * @param _header
+     * @param _data
+     */
+    Packet(PacketHeader _header, std::string _data);
 
-    explicit Packet(util::BitReader& reader) : header(reader) {
-        data.resize(header.getPacketSize() - header.getLength());
-        reader.readBypass(data);
-    }
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit Packet(util::BitReader& reader);
 
-    void write(util::BitWriter& writer) {
-        header.write(writer);
-        writer.writeBypass(data.data(), data.size());
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter& writer);
 
-    const PacketHeader& getHeader() const {
-        return header;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    const PacketHeader& getHeader() const;
 
-    const std::string& getData() const {
-        return data;
-    }
-
+    /**
+     * @brief
+     * @return
+     */
+    const std::string& getData() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

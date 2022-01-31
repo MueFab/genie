@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "label.h"
-#include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/label.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
@@ -60,6 +60,37 @@ void Label::write(util::BitWriter& bit_writer) const {
     // aligned to byte
     bit_writer.flush();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string& Label::getKey() const {
+    static const std::string key = "lbll";
+    return key;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t Label::getSize() const {
+    auto bitSize = (label_ID.size() + 1 + sizeof(uint16_t)) * 8;
+    for (const auto& d : dataset_infos) {
+        bitSize += d.getBitLength();
+    }
+    return bitSize / 8 + (bitSize % 8 ? 1 : 0) + GenInfo::getSize();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Label::operator==(const GenInfo& info) const {
+    if (!GenInfo::operator==(info)) {
+        return false;
+    }
+    const auto& other = dynamic_cast<const Label&>(info);
+    return label_ID == other.label_ID && dataset_infos == other.dataset_infos;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<LabelDataset>& Label::getDatasets() const { return dataset_infos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
