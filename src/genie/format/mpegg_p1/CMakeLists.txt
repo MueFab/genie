@@ -22,7 +22,7 @@ set(source_files
         label.cc
         label_dataset.cc
         label_region.cc
-        gen_info.h reference_metadata.h dataset_group_metadata.h master_index_table.h offset.h access_unit.cc access_unit_header.cc au_information.cc au_protection.cc dataset.cc dataset_group_metadata.cc dataset_group_protection.cc dataset_header.cc dataset_mapping_table.cc dataset_mapping_table_list.cc dataset_metadata.cc dataset_parameter_set.cc dataset_protection.cc descriptor_stream.cc descriptor_stream_header.cc gen_info.cc master_index_table.cc offset.cc packet.cc packet_header.cc reference.cc reference_metadata.cc)
+        gen_info.h reference_metadata.h dataset_group_metadata.h master_index_table.h offset.h access_unit.cc access_unit_header.cc au_information.cc au_protection.cc dataset.cc dataset_group_metadata.cc dataset_group_protection.cc dataset_header.cc dataset_mapping_table.cc dataset_mapping_table_list.cc dataset_metadata.cc dataset_parameter_set.cc dataset_protection.cc descriptor_stream.cc descriptor_stream_header.cc gen_info.cc master_index_table.cc offset.cc packet.cc packet_header.cc reference.cc reference_metadata.cc box.h mgg_file.h)
 
 add_library(genie-mpegg_p1 ${source_files})
 

@@ -4,16 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_PACKET_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_PACKET_H_
+#ifndef GENIE_BOX_H
+#define GENIE_BOX_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
-#include "genie/format/mpegg_p1/packet_header.h"
-#include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/format/mpegg_p1/box.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,42 +20,39 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class Packet : public Box {
- private:
-    PacketHeader header;  //!< @brief
-    std::string data;     //!< @brief
-
+class Box {
+ protected:
+    virtual void print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, const std::string& msg) const {
+        if (depth > max_depth) {
+            return;
+        }
+        for(int i = 0; i < depth; ++i) {
+            output << "\t";
+        }
+        output << msg << std::endl;
+    }
  public:
     /**
      * @brief
-     * @param _header
-     * @param _data
      */
-    Packet(PacketHeader _header, std::string _data);
+    virtual ~Box() = default;
 
     /**
      * @brief
-     * @param reader
+     * @param bitWriter
      */
-    explicit Packet(util::BitReader& reader);
+    virtual void write(genie::util::BitWriter& bitWriter) const = 0;
 
     /**
      * @brief
-     * @param writer
+     * @param output
+     * @param depth
      */
-    void write(util::BitWriter& writer) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    const PacketHeader& getHeader() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getData() const;
+    virtual void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+        (void) output;
+        (void) depth;
+        (void) max_depth;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -70,7 +63,7 @@ class Packet : public Box {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_PACKET_H_
+#endif  // GENIE_BOX_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

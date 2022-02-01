@@ -20,7 +20,7 @@ const std::string& FileHeader::getMajorBrand() const { return major_brand; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& FileHeader::getMinorVersion() const { return minor_version; }
+core::MPEGMinorVersion FileHeader::getMinorVersion() const { return minor_version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,17 +39,18 @@ const std::string& FileHeader::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FileHeader::FileHeader(std::string _minor_version) : major_brand("MPEG-G"), minor_version(std::move(_minor_version)) {}
+FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPEG-G"), minor_version(_minor_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0'), minor_version(4, '\0') {
+FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0'), minor_version() {
     auto length = bitreader.readBypassBE<uint64_t>();
     auto num_compatible_brands = (length - 22) / 4;
     bitreader.readBypass(major_brand);
     UTILS_DIE_IF(major_brand != "MPEG-G", "Not an MPEG-G file");
-    bitreader.readBypass(minor_version);
-    UTILS_DIE_IF(minor_version != "2000", "Unsupported version of MPEG-G");
+    std::string tmp(4, '\0');
+    bitreader.readBypass(tmp);
+    minor_version = core::getMPEGVersion(tmp);
     compatible_brands.resize(num_compatible_brands, std::string(4, '\0'));
     for (auto& b : compatible_brands) {
         bitreader.readBypass(b);
@@ -58,19 +59,13 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0')
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FileHeader::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void FileHeader::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.writeBypass(major_brand.data(), major_brand.length());
-    bitWriter.writeBypass(minor_version.data(), minor_version.length());
+    auto tmp = core::getMPEGVersionString(minor_version);
+    bitWriter.writeBypass(tmp.data(), tmp.length());
     for (auto& b : compatible_brands) {
         bitWriter.writeBypass(b.data(), b.length());
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t FileHeader::getSize() const {
-    return GenInfo::getSize() + major_brand.length() + minor_version.length() + compatible_brands.size() * 4;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
 #include "apps/genie/capsulator/program-options.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/mgg_file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,9 +30,9 @@ ErrorCode encapsulate(ProgramOptions&) { return ErrorCode::success; }
 
 ErrorCode decapsulate(ProgramOptions& options) {
     std::ifstream reader(options.inputFile);
-    genie::util::BitReader bitreader(reader);
 
-    //    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
+    genie::format::mpegg_p1::MggFile mpegg_file(&reader);
+    mpegg_file.print_debug(std::cout, 10);
 
     return ErrorCode::success;
 }

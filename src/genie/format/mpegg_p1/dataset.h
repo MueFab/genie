@@ -61,19 +61,37 @@ class Dataset : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief
      * @return
      */
     const std::string& getKey() const override;
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Dataset");
+        header.print_debug(output, depth + 1, max_depth);
+        if (metadata) {
+            metadata->print_debug(output, depth + 1, max_depth);
+        }
+        if (protection) {
+            metadata->print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : parameterSets) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+        if(master_index_table) {
+            master_index_table->print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : access_units) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : descriptor_streams) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

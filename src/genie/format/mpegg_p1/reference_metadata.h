@@ -42,11 +42,6 @@ class ReferenceMetadata : public GenInfo {
      */
     const std::string& getKey() const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief
@@ -66,7 +61,7 @@ class ReferenceMetadata : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
      * @brief

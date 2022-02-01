@@ -15,6 +15,8 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+const size_t ExternalReferenceLocation::checksum_sizes[] = {128 / 8, 256 / 8};
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(genie::util::BitReader& reader,

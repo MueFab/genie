@@ -38,12 +38,6 @@ class LabelList : public GenInfo {
 
     /**
      * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
-
-    /**
-     * @brief
      * @param info
      * @return
      */
@@ -83,7 +77,7 @@ class LabelList : public GenInfo {
      * @brief
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const override;
+    void box_write(genie::util::BitWriter& bit_writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

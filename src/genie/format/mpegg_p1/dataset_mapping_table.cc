@@ -61,18 +61,11 @@ const std::string& DataSetMappingTable::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataSetMappingTable::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void DataSetMappingTable::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.writeBypassBE(dataset_id);
     for (const auto& s : streams) {
         s.write(bitWriter);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DataSetMappingTable::getSize() const {
-    return GenInfo::getSize() + sizeof(uint16_t) + (sizeof(uint8_t) + sizeof(uint16_t)) * streams.size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

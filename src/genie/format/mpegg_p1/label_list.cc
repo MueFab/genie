@@ -42,8 +42,7 @@ const std::vector<Label>& LabelList::getLabels() const { return labels; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelList::write(util::BitWriter& bit_writer) const {
-    GenInfo::write(bit_writer);
+void LabelList::box_write(util::BitWriter& bit_writer) const {
     bit_writer.writeBypassBE<uint8_t>(dataset_group_ID);
     bit_writer.writeBypassBE<uint16_t>(labels.size());
     // data encapsulated in Class Label
@@ -57,16 +56,6 @@ void LabelList::write(util::BitWriter& bit_writer) const {
 const std::string& LabelList::getKey() const {
     static const std::string key = "labl";
     return key;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t LabelList::getSize() const {
-    uint64_t labelSize = 0;
-    for (const auto& l : labels) {
-        labelSize += l.getSize();
-    }
-    return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) + labelSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

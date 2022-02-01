@@ -38,6 +38,21 @@ class AccessUnit : public GenInfo {
     std::vector<Block> blocks;                      //!< @brief
 
  public:
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Access Unit");
+        header.print_debug(output, depth + 1, max_depth);
+        if (au_information) {
+            au_information->print_debug(output, depth + 1, max_depth);
+        }
+        if (au_protection) {
+            au_protection->print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : blocks) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+    }
+
     /**
      * @brief
      * @param info
@@ -117,13 +132,7 @@ class AccessUnit : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
      * @brief

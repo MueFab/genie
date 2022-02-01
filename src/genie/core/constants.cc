@@ -83,14 +83,14 @@ const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, (uint16_t)0);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline const std::string &getMPEGVersionString(MPEGMinorVersion v) {
+const std::string &getMPEGVersionString(MPEGMinorVersion v) {
     static const std::string lut[] = {"1900", "2000"};
     return lut[static_cast<uint8_t>(v)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline MPEGMinorVersion getMPEGVersion(const std::string &v) {
+MPEGMinorVersion getMPEGVersion(const std::string &v) {
     for (MPEGMinorVersion ret = MPEGMinorVersion::V1900; ret < MPEGMinorVersion::UNKNOWN;
          ret = MPEGMinorVersion(static_cast<uint8_t>(ret) + 1)) {
         if (getMPEGVersionString(ret) == v) {

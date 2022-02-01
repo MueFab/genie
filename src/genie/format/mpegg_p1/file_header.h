@@ -13,6 +13,7 @@
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
+#include "genie/core/constants.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ class FileHeader : public GenInfo {
     /**
      * @brief
      */
-    explicit FileHeader(std::string _minor_version);
+    explicit FileHeader(core::MPEGMinorVersion _minor_version);
 
     /**
      * @brief
@@ -62,7 +63,7 @@ class FileHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getMinorVersion() const;
+    core::MPEGMinorVersion getMinorVersion() const;
 
     /**
      * @brief
@@ -74,13 +75,7 @@ class FileHeader : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
      * @brief
@@ -89,9 +84,18 @@ class FileHeader : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* File Header");
+        print_offset(output, depth + 1, max_depth, "Major brand: " + major_brand);
+        print_offset(output, depth + 1, max_depth, "Minor version: " + core::getMPEGVersionString(minor_version));
+        for (const auto& b : compatible_brands) {
+            print_offset(output, depth + 1, max_depth, "Compatible brand: " + b);
+        }
+    }
+
  private:
     std::string major_brand;                     //!< @brief
-    std::string minor_version;                   //!< @brief
+    core::MPEGMinorVersion minor_version;        //!< @brief
     std::vector<std::string> compatible_brands;  //!< @brief
 };
 

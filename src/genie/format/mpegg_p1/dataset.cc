@@ -7,6 +7,7 @@
 #include "genie/format/mpegg_p1/dataset.h"
 #include <sstream>
 #include <utility>
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,9 +21,11 @@ Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : ver
     auto start_pos = reader.getPos();
     auto length = reader.readBypassBE<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length) - 4;
+    std::string tmp(4, '\0');
+    reader.readBypass(tmp);
+    UTILS_DIE_IF(tmp != "dthd", "Dataset without header");
     header = DatasetHeader(reader);
     while (reader.getPos() < end_pos) {
-        reader.getPos();
         std::string tmp_str(4, '\0');
         reader.readBypass(tmp_str);
         if (tmp_str == "dtmd") {
@@ -72,15 +75,26 @@ const DatasetHeader& Dataset::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::write(genie::util::BitWriter& bitWriter) const { GenInfo::write(bitWriter); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Dataset::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
+void Dataset::box_write(genie::util::BitWriter& bitWriter) const {
+    header.write(bitWriter);
+    if(metadata) {
+        metadata->write(bitWriter);
+    }
+    if(protection) {
+        protection->write(bitWriter);
+    }
+    for(const auto& p : parameterSets) {
+        p.write(bitWriter);
+    }
+    if(master_index_table) {
+        master_index_table->write(bitWriter);
+    }
+    for(const auto& p : access_units) {
+        p.write(bitWriter);
+    }
+    for(const auto& p : descriptor_streams) {
+        p.write(bitWriter);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

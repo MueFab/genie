@@ -72,14 +72,7 @@ void DatasetGroupHeader::addDatasetID(uint16_t _id) { ID = _id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t DatasetGroupHeader::getSize() const {
-    return GenInfo::getSize() + sizeof(uint8_t) * 2 + sizeof(uint16_t) * dataset_IDs.size();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetGroupHeader::write(genie::util::BitWriter& writer) const {
-    GenInfo::write(writer);
+void DatasetGroupHeader::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE<uint8_t>(ID);
     writer.writeBypassBE<uint8_t>(version);
     for (auto& d : dataset_IDs) {

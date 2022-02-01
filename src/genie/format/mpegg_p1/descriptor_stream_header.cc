@@ -25,9 +25,6 @@ DSProtection::DSProtection(genie::util::BitReader& reader) {
     reader.readBypass(DSProtectionValue);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DSProtection::getSize() const { return GenInfo::getSize() + DSProtectionValue.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,8 +39,7 @@ const std::string& DSProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DSProtection::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void DSProtection::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.writeBypass(DSProtectionValue.data(), DSProtectionValue.size());
 }
 
@@ -90,8 +86,7 @@ DescriptorStreamHeader::DescriptorStreamHeader(bool _reserved, genie::core::GenD
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStreamHeader::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.write(reserved, 1);
     bitWriter.write(static_cast<uint8_t>(descriptor_id), 7);
     bitWriter.write(static_cast<uint8_t>(class_id), 4);
@@ -107,12 +102,6 @@ DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
     class_id = reader.read<core::record::ClassType>(4);
     num_blocks = reader.read<uint32_t>(32);
     reader.flush();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DescriptorStreamHeader::getSize() const {
-    return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint8_t);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

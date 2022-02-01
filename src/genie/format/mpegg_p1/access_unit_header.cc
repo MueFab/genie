@@ -48,18 +48,8 @@ AccessUnitHeader::AccessUnitHeader(genie::format::mgb::AUHeader _header, bool _m
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitHeader::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void AccessUnitHeader::box_write(genie::util::BitWriter& bitWriter) const {
     header.write(bitWriter, !mit_flag);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AccessUnitHeader::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

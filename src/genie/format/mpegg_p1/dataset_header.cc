@@ -401,15 +401,6 @@ const std::string& DatasetHeader::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t DatasetHeader::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 DatasetHeader::DatasetHeader()
     : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
                     core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
@@ -483,8 +474,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::write(genie::util::BitWriter& writer) const {
-    GenInfo::write(writer);
+void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE<uint8_t>(group_ID);
     writer.writeBypassBE<uint16_t>(ID);
     const auto& v_string = genie::core::getMPEGVersionString(version);

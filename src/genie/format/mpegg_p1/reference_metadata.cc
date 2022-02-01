@@ -33,12 +33,6 @@ const std::string& ReferenceMetadata::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t ReferenceMetadata::getSize() const {
-    return GenInfo::getSize() + sizeof(uint8_t) * 2 + reference_metadata_value.length();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _reference_id,
                                      std::string _reference_metadata_value)
     : dataset_group_id(_dataset_group_id),
@@ -58,8 +52,7 @@ ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceMetadata::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void ReferenceMetadata::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.writeBypassBE<uint8_t>(dataset_group_id);
     bitWriter.writeBypassBE<uint8_t>(reference_id);
     bitWriter.writeBypass(reference_metadata_value.data(), reference_metadata_value.length());

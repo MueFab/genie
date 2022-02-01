@@ -25,7 +25,7 @@ const std::string& DatasetMetadata::getKey() const {
 DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
     auto length = bitreader.readBypassBE<uint64_t>();
-    auto metadata_length = length - GenInfo::getSize();
+    auto metadata_length = length - GenInfo::getHeaderLength();
     if (version != genie::core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readBypassBE<uint8_t>();
         dataset_id = bitreader.readBypassBE<uint16_t>();
@@ -47,20 +47,12 @@ DatasetMetadata::DatasetMetadata(uint8_t _dataset_group_id, uint16_t _dataset_id
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetMetadata::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void DatasetMetadata::box_write(genie::util::BitWriter& bitWriter) const {
     if (version != genie::core::MPEGMinorVersion::V1900) {
         bitWriter.writeBypassBE(dataset_group_id);
         bitWriter.writeBypassBE(dataset_id);
     }
     bitWriter.writeBypass(dg_metatdata_value.data(), dg_metatdata_value.length());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetMetadata::getSize() const {
-    return GenInfo::getSize() + dg_metatdata_value.size() +
-           (version != genie::core::MPEGMinorVersion::V1900 ? sizeof(uint8_t) + sizeof(uint16_t) : 0);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

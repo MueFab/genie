@@ -34,6 +34,9 @@ AccessUnit::AccessUnit(AccessUnitHeader h) : header(std::move(h)) {}
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
                        bool mit) {
     reader.readBypassBE<uint64_t>();
+    std::string tmp(4, '\0');
+    reader.readBypass(tmp);
+    UTILS_DIE_IF(tmp != "auhd", "Access unit without header");
     header = AccessUnitHeader(reader, parameterSets, mit);
     do {
         auto tmp_pos = reader.getPos();
@@ -94,9 +97,7 @@ void AccessUnit::setProtection(AUProtection au) { au_protection = std::move(au);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
-    header.write(bitWriter);
+void AccessUnit::box_write(genie::util::BitWriter& bitWriter) const {
     if (au_information != boost::none) {
         au_information->write(bitWriter);
     }
@@ -106,15 +107,6 @@ void AccessUnit::write(genie::util::BitWriter& bitWriter) const {
     for (const auto& b : blocks) {
         b.write(bitWriter);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AccessUnit::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
