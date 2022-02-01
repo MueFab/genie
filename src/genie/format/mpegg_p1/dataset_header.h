@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_HEADER_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_HEADER_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_HEADER_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
+#include <string>
 #include <vector>
+#include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class-type.h"
@@ -143,7 +144,7 @@ class ReferenceOptions {
     /**
      * @brief
      */
-    explicit ReferenceOptions();
+    ReferenceOptions();
 
     /**
      * @brief
@@ -367,7 +368,6 @@ class UOptions {
  * @brief
  */
 class DatasetHeader : public GenInfo {
- public:
  private:
     uint8_t group_ID;                       //!< @brief
     uint16_t ID;                            //!< @brief
@@ -605,7 +605,7 @@ class DatasetHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_HEADER_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

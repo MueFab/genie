@@ -29,13 +29,13 @@ namespace spring {
  */
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
  private:
-    uint32_t num_AUs;                                    //!< @brief
-    std::string read_desc_prefix;                        //!< @brief
-    std::string id_desc_prefix;                          //!< @brief
-    std::string quality_desc_prefix;                     //!< @brief
-    std::vector<uint32_t> num_records_per_AU;            //!< @brief
-    std::vector<uint32_t> num_reads_per_AU;              //!< @brief
-    uint32_t auId;                                       //!< @brief
+    uint32_t num_AUs;                                   //!< @brief
+    std::string read_desc_prefix;                       //!< @brief
+    std::string id_desc_prefix;                         //!< @brief
+    std::string quality_desc_prefix;                    //!< @brief
+    std::vector<uint32_t> num_records_per_AU;           //!< @brief
+    std::vector<uint32_t> num_reads_per_AU;             //!< @brief
+    uint32_t auId;                                      //!< @brief
     std::vector<core::parameter::EncodingSet>& params;  //!< @brief
 
     core::stats::PerfStats stats;  //!< @brief

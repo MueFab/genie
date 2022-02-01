@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
+#include <string>
+#include <vector>
+#include "boost/optional/optional.hpp"
 #include "genie/format/mpegg_p1/descriptor_stream_header.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
@@ -114,7 +116,7 @@ class DescriptorStream : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

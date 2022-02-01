@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MASTER_INDEX_TABLE_H
-#define GENIE_MASTER_INDEX_TABLE_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_MASTER_INDEX_TABLE_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_MASTER_INDEX_TABLE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
@@ -325,7 +326,7 @@ class MasterIndexTable : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MASTER_INDEX_TABLE_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_MASTER_INDEX_TABLE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

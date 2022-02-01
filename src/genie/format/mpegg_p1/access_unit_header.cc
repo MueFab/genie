@@ -6,6 +6,7 @@
 
 #include "genie/format/mpegg_p1/access_unit_header.h"
 #include <sstream>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

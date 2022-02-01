@@ -15,6 +15,13 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool RefCfg::operator==(const RefCfg &other) const {
+    return ref_sequence_ID == other.ref_sequence_ID && ref_start_position == other.ref_start_position &&
+           ref_end_position == other.ref_end_position && posSize == other.posSize;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint16_t RefCfg::getSeqID() const { return ref_sequence_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------

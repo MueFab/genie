@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
@@ -97,7 +98,6 @@ class DatasetGroupHeader : public GenInfo {
     /**
      * @brief
      * @param writer
-     * @param empty_length
      */
     void write(genie::util::BitWriter& writer) const override;
 };

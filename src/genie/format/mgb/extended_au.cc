@@ -5,13 +5,19 @@
  */
 
 #include "genie/format/mgb/extended_au.h"
-#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mgb {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ExtendedAu::operator==(const ExtendedAu& other) const {
+    return extended_AU_start_position == other.extended_AU_start_position &&
+           extended_AU_end_position == other.extended_AU_end_position && posSize == other.posSize;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

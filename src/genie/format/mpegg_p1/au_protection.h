@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_AU_PROTECTION_H
-#define GENIE_AU_PROTECTION_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_AU_PROTECTION_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_AU_PROTECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
@@ -100,7 +101,7 @@ class AUProtection : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_AU_PROTECTION_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_AU_PROTECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATASET_GROUP_METADATA_H
-#define GENIE_DATASET_GROUP_METADATA_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_METADATA_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_METADATA_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
@@ -92,7 +93,7 @@ class DatasetGroupMetadata : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATASET_GROUP_METADATA_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_METADATA_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

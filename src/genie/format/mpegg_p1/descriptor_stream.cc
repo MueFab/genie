@@ -6,6 +6,7 @@
 
 #include "genie/format/mpegg_p1/descriptor_stream.h"
 #include <sstream>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

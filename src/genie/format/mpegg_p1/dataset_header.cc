@@ -7,6 +7,7 @@
 #include "genie/format/mpegg_p1/dataset_header.h"
 #include <limits>
 #include <sstream>
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 
 #include "genie/format/mpegg_p1/master_index_table.h"
 #include <sstream>
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

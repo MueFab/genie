@@ -581,7 +581,7 @@ class AccessUnit {
 
  private:
     std::vector<Descriptor> descriptors;                //!< @brief
-    parameter::EncodingSet parameters;                 //!< @brief
+    parameter::EncodingSet parameters;                  //!< @brief
     stats::PerfStats stats;                             //!< @brief
     ReferenceManager::ReferenceExcerpt reference;       //!< @brief
     std::vector<std::pair<size_t, size_t>> refToWrite;  //!< @brief

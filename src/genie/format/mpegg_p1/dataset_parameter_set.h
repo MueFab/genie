@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_PARAMETER_SET_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_PARAMETER_SET_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_PARAMETER_SET_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
+#include <string>
+#include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mpegg_p1/gen_info.h"
@@ -271,7 +272,7 @@ class DatasetParameterSet : GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DATASET_PARAMETER_SET_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

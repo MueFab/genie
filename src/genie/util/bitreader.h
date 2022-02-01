@@ -113,14 +113,7 @@ class BitReader {
      * @attention This bypasses the bit wise reading mechanism.
      * @param str The string to fill with data.
      */
-    void readBypass_null_terminated(std::string &str) {
-        str.clear();
-        auto c = readBypassBE<char>();
-        while(c != 0) {
-            str.push_back(c);
-            c = readBypassBE<char>();
-        }
-    }
+    void readBypass_null_terminated(std::string &str);
 
     /**
      * @brief

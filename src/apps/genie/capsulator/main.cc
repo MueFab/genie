@@ -31,7 +31,7 @@ ErrorCode decapsulate(ProgramOptions& options) {
     std::ifstream reader(options.inputFile);
     genie::util::BitReader bitreader(reader);
 
-//    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
+    //    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
 
     return ErrorCode::success;
 }

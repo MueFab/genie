@@ -4,11 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
+#include <string>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/reference_location.h"
@@ -91,6 +94,7 @@ class Reference : public GenInfo {
         uint16_t major;  //!< @brief
         uint16_t minor;  //!< @brief
         uint16_t patch;  //!< @brief
+
      public:
         /**
          * @brief
@@ -248,7 +252,7 @@ class Reference : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
