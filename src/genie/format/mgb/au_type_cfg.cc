@@ -16,6 +16,13 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool AuTypeCfg::operator==(const AuTypeCfg &other) const {
+    return sequence_ID == other.sequence_ID && AU_start_position == other.AU_start_position &&
+           AU_end_position == other.AU_end_position && extended_AU == other.extended_AU && posSize == other.posSize;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void AuTypeCfg::write(util::BitWriter &writer) const {
     writer.write(sequence_ID, 16);
     writer.write(AU_start_position, posSize);

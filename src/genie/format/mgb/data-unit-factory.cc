@@ -63,7 +63,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             }
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT: {
                 auto ret = AccessUnit(parameters, bitReader, true);
-                if (getParams(ret.getHeader().getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
+                if (getParams(ret.getHeader().getParameterID()).getDatasetType() ==
+                    mgb::AccessUnit::DatasetType::REFERENCE) {
                     const auto& ref = ret.getHeader().getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "

@@ -18,6 +18,12 @@ namespace parameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool EncodingSet::SignatureCfg::operator==(const SignatureCfg &cfg) const {
+    return signature_length == cfg.signature_length;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 EncodingSet::EncodingSet(util::BitReader &bitReader) {
     dataset_type = bitReader.read<DataUnit::DatasetType>(4);
     alphabet_ID = bitReader.read<AlphabetID>();
@@ -69,10 +75,9 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
 
 //------------------------------------------------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(DataUnit::DatasetType _dataset_type,
-                           AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
-                           uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
-                           bool _spliced_reads_flag)
+EncodingSet::EncodingSet(DataUnit::DatasetType _dataset_type, AlphabetID _alphabet_id, uint32_t _read_length,
+                         bool _paired_end, bool _pos_40_bits_flag, uint8_t _qv_depth, uint8_t _as_depth,
+                         bool _multiple_alignments_flag, bool _spliced_reads_flag)
     : dataset_type(_dataset_type),
       alphabet_ID(_alphabet_id),
       read_length(_read_length),
@@ -91,8 +96,8 @@ EncodingSet::EncodingSet(DataUnit::DatasetType _dataset_type,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncodingSet::EncodingSet() :
-      dataset_type(DataUnit::DatasetType::ALIGNED),
+EncodingSet::EncodingSet()
+    : dataset_type(DataUnit::DatasetType::ALIGNED),
       alphabet_ID(AlphabetID::ACGTN),
       read_length(0),
       number_of_template_segments_minus1(0),
@@ -117,6 +122,8 @@ void ParameterSet::write(util::BitWriter &writer) const {
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
+    tmp_writer.write(parameter_set_ID, 8);
+    tmp_writer.write(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
@@ -141,6 +148,31 @@ uint64_t ParameterSet::getLength() const {
     uint64_t len = tmp_writer.getBitsWritten() / 8;
 
     return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void EncodingSet::activateSignature() { signature_cfg = SignatureCfg(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool EncodingSet::isSignatureActivated() const { return signature_cfg != boost::none; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool EncodingSet::isSignatureConstLength() const {
+    return isSignatureActivated() && signature_cfg->signature_length != boost::none;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t EncodingSet::getSignatureConstLength() const { return *signature_cfg->signature_length; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void EncodingSet::setSignatureLength(uint8_t length) {
+    UTILS_DIE_IF(!isSignatureActivated(), "Signature not activated");
+    signature_cfg->signature_length = length;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -171,6 +203,8 @@ void EncodingSet::write(util::BitWriter &writer) const {
     }
     writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
     writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
+    writer.write(reserved, 30);
+    writer.write(signature_cfg != boost::none, 1);
     if (signature_cfg != boost::none) {
         writer.write(signature_cfg->signature_length != boost::none, 1);
         if (signature_cfg->signature_length != boost::none) {
@@ -384,8 +418,7 @@ bool EncodingSet::operator==(const EncodingSet &ps) const {
            qv_depth == ps.qv_depth && as_depth == ps.as_depth && class_IDs == ps.class_IDs &&
            descriptors == ps.descriptors && rgroup_IDs == ps.rgroup_IDs &&
            multiple_alignments_flag == ps.multiple_alignments_flag && spliced_reads_flag == ps.spliced_reads_flag &&
-           signature_cfg == ps.signature_cfg &&
-           qual_cmp(ps) && parameter_set_crps == ps.parameter_set_crps;
+           signature_cfg == ps.signature_cfg && qual_cmp(ps) && parameter_set_crps == ps.parameter_set_crps;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -400,6 +433,48 @@ bool EncodingSet::qual_cmp(const EncodingSet &ps) const {
         }
     }
     return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
+    bitReader.read<uint16_t>(10);
+    bitReader.read<uint32_t>(22);
+    parameter_set_ID = bitReader.read<uint8_t>(8);
+    parent_parameter_set_ID = bitReader.read<uint8_t>(8);
+    set = EncodingSet(bitReader);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
+                           AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
+                           uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
+                           bool _spliced_reads_flag)
+    : DataUnit(DataUnitType::PARAMETER_SET),
+      parameter_set_ID(_parameter_set_ID),
+      parent_parameter_set_ID(_parent_parameter_set_ID),
+      set(_dataset_type, _alphabet_id, _read_length, _paired_end, _pos_40_bits_flag, _qv_depth, _as_depth,
+          _multiple_alignments_flag, _spliced_reads_flag) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ParameterSet::ParameterSet()
+    : DataUnit(DataUnitType::PARAMETER_SET), parameter_set_ID(0), parent_parameter_set_ID(0), set() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, EncodingSet _set)
+    : DataUnit(DataUnitType::PARAMETER_SET),
+      parameter_set_ID(_parameter_set_ID),
+      parent_parameter_set_ID(_parent_parameter_set_ID),
+      set(std::move(_set)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ParameterSet::operator==(const ParameterSet &pset) const {
+    return parameter_set_ID == pset.parameter_set_ID && parent_parameter_set_ID == pset.parent_parameter_set_ID &&
+           set == pset.set;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"

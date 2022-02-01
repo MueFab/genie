@@ -153,6 +153,17 @@ bool BitReader::isGood() const { return static_cast<bool>(istream); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void BitReader::readBypass_null_terminated(std::string &str) {
+    str.clear();
+    auto c = readBypassBE<char>();
+    while (c != 0) {
+        str.push_back(c);
+        c = readBypassBE<char>();
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace util
 }  // namespace genie
 

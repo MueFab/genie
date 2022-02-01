@@ -30,9 +30,9 @@ class Importer;
 class DataUnitFactory {
  private:
     std::map<size_t, core::parameter::EncodingSet> parameters;  //!< @brief
-    core::ReferenceManager* refmgr;                              //!< @brief
-    Importer* importer;                                          //!< @brief
-    bool referenceOnly;                                          //!< @brief
+    core::ReferenceManager* refmgr;                             //!< @brief
+    Importer* importer;                                         //!< @brief
+    bool referenceOnly;                                         //!< @brief
 
  public:
     /**

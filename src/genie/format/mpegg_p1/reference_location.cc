@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/reference_location.h"
+#include <utility>
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 

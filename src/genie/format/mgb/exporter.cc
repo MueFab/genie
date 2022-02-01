@@ -74,7 +74,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                        datasetType, 32, false);
     if (data.isReferenceOnly()) {
         au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
-                            data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
+                                        data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
     }
     if (au.getHeader().getClass() != core::record::ClassType::CLASS_U) {
         au.getHeader().setAuTypeCfg(

@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_AU_INFORMATION_H
-#define GENIE_AU_INFORMATION_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
@@ -28,10 +29,19 @@ class AUInformation : public GenInfo {
 
     /**
      * @brief
+     * @param bitreader
+     * @param _version
      */
     explicit AUInformation(genie::util::BitReader& bitreader,
                            genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
+    /**
+     * @brief
+     * @param _dataset_group_id
+     * @param _dataset_id
+     * @param _au_information_value
+     * @param _version
+     */
     AUInformation(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_information_value,
                   genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
 
@@ -87,7 +97,7 @@ class AUInformation : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_AU_INFORMATION_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

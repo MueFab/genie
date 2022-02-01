@@ -3,11 +3,12 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_HEADER_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_HEADER_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/core/record/class-type.h"
 #include "genie/format/mpegg_p1/gen_info.h"
@@ -76,7 +77,7 @@ class DSProtection : public GenInfo {
  */
 class DescriptorStreamHeader : public GenInfo {
  private:
-    bool reserved;                       //!@brief
+    bool reserved;                       //!< @brief
     genie::core::GenDesc descriptor_id;  //!< @brief
     core::record::ClassType class_id;    //!< @brief
     uint32_t num_blocks;                 //!< @brief
@@ -166,7 +167,7 @@ class DescriptorStreamHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_DESCRIPTOR_STREAM_HEADER_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

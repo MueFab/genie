@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/label.h"
@@ -93,7 +94,7 @@ class LabelList : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

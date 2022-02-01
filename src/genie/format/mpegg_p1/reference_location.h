@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <string>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -429,7 +431,7 @@ class InternalReferenceLocation : public ReferenceLocation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

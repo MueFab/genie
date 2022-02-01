@@ -9,8 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <boost/optional/optional.hpp>
+#include <string>
 #include <vector>
+#include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/dataset.h"
 #include "genie/format/mpegg_p1/dataset_group_header.h"

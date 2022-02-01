@@ -160,8 +160,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
 #pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
     for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks); block_num++) {
-        params[block_num] = core::parameter::EncodingSet( core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
-                                                          core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
+        params[block_num] = core::parameter::EncodingSet(core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
+                                                         core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
         params[block_num].setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[block_num]), 0);
@@ -861,7 +861,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     for (int64_t cur_block_num = 0; cur_block_num < static_cast<int64_t>(bdata.block_start.size()); cur_block_num++) {
         params[cur_block_num] =
             core::parameter::EncodingSet(core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
-                                          core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
+                                         core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
         params[cur_block_num].setComputedRef(
             core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[cur_block_num]), 0);

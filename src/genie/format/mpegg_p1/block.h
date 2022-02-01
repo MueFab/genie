@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_BLOCK_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,6 @@ class Block {
     /**
      * @brief
      * @param reader
-     * @param fhd
      */
     explicit Block(util::BitReader& reader);
 
@@ -93,7 +92,7 @@ class Block {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/file_header.h"
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,6 +21,10 @@ const std::string& FileHeader::getMajorBrand() const { return major_brand; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& FileHeader::getMinorVersion() const { return minor_version; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FileHeader::addCompatibleBrand(std::string brand) { compatible_brands.emplace_back(std::move(brand)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

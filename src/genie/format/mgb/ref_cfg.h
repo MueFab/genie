@@ -31,10 +31,12 @@ class RefCfg {
     uint8_t posSize;  //!< @brief internal
 
  public:
-    bool operator==(const RefCfg &other) const {
-        return ref_sequence_ID == other.ref_sequence_ID && ref_start_position == other.ref_start_position &&
-               ref_end_position == other.ref_end_position && posSize == other.posSize;
-    }
+    /**
+     * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const RefCfg &other) const;
 
     /**
      * @brief

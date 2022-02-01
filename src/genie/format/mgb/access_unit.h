@@ -44,104 +44,58 @@ class AUHeader {
     boost::optional<SignatureCfg> signature_config;  //!< @brief
 
  public:
-    bool operator==(const AUHeader &other) const {
-        return access_unit_ID == other.access_unit_ID && num_blocks == other.num_blocks &&
-               parameter_set_ID == other.parameter_set_ID && au_type == other.au_type &&
-               reads_count == other.reads_count && mm_cfg == other.mm_cfg && ref_cfg == other.ref_cfg &&
-               au_Type_U_Cfg == other.au_Type_U_Cfg && signature_config == other.signature_config;
-    }
+    /**
+     * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const AUHeader &other) const;
 
-    void write(genie::util::BitWriter &writer, bool write_signatures) const {
-        writer.write(access_unit_ID, 32);
-        writer.write(num_blocks, 8);
-        writer.write(parameter_set_ID, 8);
-        writer.write(uint8_t(au_type), 4);
-        writer.write(reads_count, 32);
-        if (mm_cfg) {
-            mm_cfg->write(writer);
-        }
-        if (ref_cfg) {
-            ref_cfg->write(writer);
-        }
-        if (write_signatures) {
-            if (au_Type_U_Cfg) {
-                au_Type_U_Cfg->write(writer);
-            }
-            if (signature_config) {
-                signature_config->write(writer);
-            }
-        }
-        writer.flush();
-    }
+    /**
+     * @brief
+     * @param writer
+     * @param write_signatures
+     */
+    void write(genie::util::BitWriter &writer, bool write_signatures) const;
 
-    uint32_t getNumBlocks() const { return num_blocks; }
+    /**
+     * @brief
+     * @return
+     */
+    uint32_t getNumBlocks() const;
 
-    void blockAdded() { num_blocks++; }
+    /**
+     * @brief
+     */
+    void blockAdded();
 
+    /**
+     * @brief
+     * @param bitReader
+     * @param parameterSets
+     * @param read_signatures
+     */
     AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
-             bool read_signatures = true) {
-        UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
-        access_unit_ID = bitReader.read<uint32_t>();
-        num_blocks = bitReader.read<uint8_t>();
-        parameter_set_ID = bitReader.read<uint8_t>();
-        au_type = bitReader.read<core::record::ClassType>(4);
-        reads_count = bitReader.read<uint32_t>();
-        if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-            this->mm_cfg = MmCfg(bitReader);
-        }
+             bool read_signatures = true);
 
-        if (parameterSets.at(parameter_set_ID).getDatasetType() ==
-            core::parameter::ParameterSet::DatasetType::REFERENCE) {
-            this->ref_cfg = RefCfg(parameterSets.at(parameter_set_ID).getPosSize(), bitReader);
-        }
-        if (read_signatures) {
-            if (au_type != core::record::ClassType::CLASS_U) {
-                this->au_Type_U_Cfg = AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
-                                                parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
-            } else {
-                if (parameterSets.at(parameter_set_ID).isSignatureActivated()) {
-                    uint8_t length = 0;
-                    if (parameterSets.at(parameter_set_ID).isSignatureConstLength()) {
-                        length = parameterSets.at(parameter_set_ID).getSignatureConstLength();
-                    }
-                    this->signature_config = SignatureCfg(bitReader, length);
-                }
-            }
-        }
-        bitReader.flush();
-        UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
-    }
+    /**
+     * @brief
+     */
+    AUHeader();
 
-    AUHeader()
-        : AUHeader(0, 0, core::record::ClassType::NONE, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED, 0,
-                   false) {}
-
+    /**
+     * @brief
+     * @param _access_unit_ID
+     * @param _parameter_set_ID
+     * @param _au_type
+     * @param _reads_count
+     * @param dataset_type
+     * @param posSize
+     * @param signatureFlag
+     */
     AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
              uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type, uint8_t posSize,
-             bool signatureFlag)
-        : access_unit_ID(_access_unit_ID),
-          num_blocks(0),
-          parameter_set_ID(_parameter_set_ID),
-          au_type(_au_type),
-          reads_count(_reads_count),
-          mm_cfg(),
-          ref_cfg(),
-          au_Type_U_Cfg(),
-          signature_config() {
-        if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-            mm_cfg = MmCfg();
-        }
-        if (dataset_type == genie::core::parameter::ParameterSet::DatasetType::REFERENCE) {
-            ref_cfg = RefCfg(posSize);
-        }
-        if (au_type != core::record::ClassType::CLASS_U) {
-            au_Type_U_Cfg = AuTypeCfg(posSize);
-        } else {
-            if (signatureFlag) {
-                signature_config = SignatureCfg();
-            }
-        }
-    }
+             bool signatureFlag);
 
     /**
      * @brief
@@ -249,8 +203,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param _reads_count
      * @param dataset_type
      * @param posSize
-     * @param signatureSize
-     * @param multiple_signature_base
+     * @param signatureFlag
      */
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag);
@@ -267,10 +220,14 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     std::vector<Block> &getBlocks();
 
-    AUHeader &getHeader() { return header; }
+    /**
+     * @brief
+     * @return
+     */
+    AUHeader &getHeader();
 
  private:
-    AUHeader header;
+    AUHeader header;  //!< @brief
 
     std::vector<Block> blocks;  //!< @brief
 

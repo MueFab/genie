@@ -6,6 +6,7 @@
 
 #include "genie/format/mpegg_p1/dataset_group.h"
 #include <sstream>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

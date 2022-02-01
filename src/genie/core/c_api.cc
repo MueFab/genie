@@ -32,7 +32,7 @@ genie_ReturnCode genie_getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t d
                                              const genie_SimpleFilter* filter, genie_Records** outputRecords) {
     (void)datasetGroupID;
     (void)datasetID;
-    (void) filter;
+    (void)filter;
     (void)outputRecords;
     return genie_ReturnCode_G_UNLISTED_ERROR;
 }
