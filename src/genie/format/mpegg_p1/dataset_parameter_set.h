@@ -25,7 +25,7 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetParameterSet : GenInfo {
+class DatasetParameterSet : public GenInfo {
  public:
     /**
      * @brief
@@ -195,19 +195,13 @@ class DatasetParameterSet : GenInfo {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void box_write(genie::util::BitWriter& writer) const override;
 
     /**
      * @brief
      * @param update
      */
     void addParameterUpdate(ParameterUpdateInfo update);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief

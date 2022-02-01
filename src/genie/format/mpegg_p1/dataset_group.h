@@ -144,11 +144,6 @@ class DatasetGroup : public GenInfo {
      */
     const std::vector<Dataset>& getDatasets() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief
@@ -160,7 +155,30 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @param wr
      */
-    void write(util::BitWriter& wr) const override;
+    void box_write(util::BitWriter& wr) const override;
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Dataset Group");
+        header.print_debug(output, depth + 1, max_depth);
+        for(const auto& r : references) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : reference_metadatas) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+        if (labels) {
+            labels->print_debug(output, depth + 1, max_depth);
+        }
+        if (metadata) {
+            metadata->print_debug(output, depth + 1, max_depth);
+        }
+        if (protection) {
+            metadata->print_debug(output, depth + 1, max_depth);
+        }
+        for(const auto& r : dataset) {
+            r.print_debug(output, depth + 1, max_depth);
+        }
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

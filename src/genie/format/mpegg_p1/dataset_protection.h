@@ -53,13 +53,8 @@ class DatasetProtection : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
+    
 
     /**
      * @brief

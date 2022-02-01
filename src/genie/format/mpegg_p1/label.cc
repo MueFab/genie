@@ -44,9 +44,7 @@ const std::string& Label::getLabelID() const { return label_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Label::write(util::BitWriter& bit_writer) const {
-    GenInfo::write(bit_writer);
-
+void Label::box_write(util::BitWriter& bit_writer) const {
     bit_writer.writeBypass(label_ID.data(), label_ID.length());
     bit_writer.writeBypassBE('\0');
 
@@ -67,16 +65,6 @@ void Label::write(util::BitWriter& bit_writer) const {
 const std::string& Label::getKey() const {
     static const std::string key = "lbll";
     return key;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Label::getSize() const {
-    auto bitSize = (label_ID.size() + 1 + sizeof(uint16_t)) * 8;
-    for (const auto& d : dataset_infos) {
-        bitSize += d.getBitLength();
-    }
-    return bitSize / 8 + (bitSize % 8 ? 1 : 0) + GenInfo::getSize();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

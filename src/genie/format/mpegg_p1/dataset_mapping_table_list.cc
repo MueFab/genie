@@ -51,8 +51,7 @@ void DataSetMappingTableList::addDatasetMappingTableSID(uint16_t sid) { dataset_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataSetMappingTableList::write(genie::util::BitWriter& bitWriter) const {
-    GenInfo::write(bitWriter);
+void DataSetMappingTableList::box_write(genie::util::BitWriter& bitWriter) const {
     bitWriter.writeBypassBE(dataset_group_ID);
     for (const auto& s : dataset_mapping_table_SID) {
         bitWriter.writeBypassBE(s);
@@ -67,12 +66,6 @@ uint8_t DataSetMappingTableList::getDatasetGroupID() const { return dataset_grou
 
 const std::vector<uint16_t>& DataSetMappingTableList::getDatasetMappingTableSIDs() const {
     return dataset_mapping_table_SID;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DataSetMappingTableList::getSize() const {
-    return GenInfo::getSize() + sizeof(uint8_t) + sizeof(uint16_t) * dataset_mapping_table_SID.size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

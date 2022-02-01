@@ -43,6 +43,7 @@ uint16_t Reference::ReferenceSeq::getID() const { return sequence_id; }
 
 Reference::ReferenceSeq::ReferenceSeq(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
+
     reader.readBypass_null_terminated(name);
     if (version != genie::core::MPEGMinorVersion::V1900) {
         sequence_length = reader.readBypassBE<uint32_t>();
@@ -116,6 +117,7 @@ bool Reference::operator==(const GenInfo& info) const {
 
 Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
+    reader.readBypassBE<uint64_t>();
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     reference_ID = reader.readBypassBE<uint8_t>();
     reader.readBypass_null_terminated(reference_name);
@@ -181,17 +183,7 @@ const ReferenceLocation& Reference::getLocation() const { return *reference_loca
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Reference::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Reference::write(genie::util::BitWriter& writer) const {
-    GenInfo::write(writer);
+void Reference::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE(dataset_group_ID);
     writer.writeBypassBE(reference_ID);
     writer.writeBypass(reference_name.data(), reference_name.length());

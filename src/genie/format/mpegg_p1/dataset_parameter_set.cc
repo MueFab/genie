@@ -159,8 +159,7 @@ DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::M
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::write(genie::util::BitWriter& writer) const {
-    GenInfo::write(writer);
+void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE(dataset_group_id);
     writer.writeBypassBE(dataset_id);
     writer.writeBypassBE(parameter_set_ID);
@@ -177,15 +176,6 @@ void DatasetParameterSet::addParameterUpdate(ParameterUpdateInfo update) {
     if (version != core::MPEGMinorVersion::V1900) {
         param_update = std::move(update);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetParameterSet::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

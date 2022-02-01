@@ -5,6 +5,7 @@
  */
 #include "genie/entropy/paramcabac/state_vars.h"
 #include <cmath>
+#include <iostream>
 #include "genie/entropy/paramcabac/binarization_parameters.h"
 #include "genie/util/runtime-exception.h"
 
@@ -86,7 +87,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     if (codingSubsymSize > 0) {
         numSubsyms = outputSymbolSize / codingSubsymSize;
     } else {
-        UTILS_THROW_RUNTIME_EXCEPTION("coding_subsym_size = " + std::to_string(codingSubsymSize) + " not supported");
+        std::cerr << "coding_subsym_size = " + std::to_string(codingSubsymSize) + " not supported" << std::endl;
     }
 
     // numAlphaSubsym

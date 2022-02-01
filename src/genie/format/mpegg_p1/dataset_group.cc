@@ -32,6 +32,9 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
     auto start_pos = reader.getPos();
     auto length = reader.readBypassBE<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length) - 4;
+    std::string tmp(4, '\0');
+    reader.readBypass(tmp);
+    UTILS_DIE_IF(tmp != "dghd", "Datasetgroup without header");
     header = DatasetGroupHeader(reader);
     while (reader.getPos() < end_pos) {
         reader.getPos();
@@ -133,14 +136,6 @@ void DatasetGroup::addProtection(DatasetGroupProtection pr) { protection = std::
 
 const std::vector<Dataset>& DatasetGroup::getDatasets() const { return dataset; }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetGroup::getSize() const {
-    std::stringstream stream;
-    genie::util::BitWriter writer(&stream);
-    write(writer);
-    return stream.str().length();
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -151,8 +146,7 @@ const std::string& DatasetGroup::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::write(util::BitWriter& wr) const {
-    GenInfo::write(wr);
+void DatasetGroup::box_write(util::BitWriter& wr) const {
     header.write(wr);
     for (const auto& r : references) {
         r.write(wr);

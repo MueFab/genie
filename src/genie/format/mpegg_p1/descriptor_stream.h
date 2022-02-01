@@ -93,13 +93,8 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const override;
+    void box_write(util::BitWriter& writer) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief

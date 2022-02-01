@@ -394,6 +394,11 @@ class DatasetHeader : public GenInfo {
     std::vector<boost::optional<uint32_t>> thresholds;  //!< @brief
 
  public:
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Dataset Header");
+    }
+
     /**
      * @brief
      * @param info
@@ -523,12 +528,6 @@ class DatasetHeader : public GenInfo {
 
     /**
      * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
-
-    /**
-     * @brief
      */
     DatasetHeader();
 
@@ -560,7 +559,7 @@ class DatasetHeader : public GenInfo {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void box_write(genie::util::BitWriter& writer) const override;
 
     /**
      * @brief

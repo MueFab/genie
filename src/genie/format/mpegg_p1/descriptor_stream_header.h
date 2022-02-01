@@ -44,12 +44,6 @@ class DSProtection : public GenInfo {
      * @brief
      * @return
      */
-    uint64_t getSize() const override;
-
-    /**
-     * @brief
-     * @return
-     */
     const std::string& getProtectionValue() const;
 
     /**
@@ -62,7 +56,7 @@ class DSProtection : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
      * @brief
@@ -131,19 +125,13 @@ class DescriptorStreamHeader : public GenInfo {
      * @brief
      * @param bitWriter
      */
-    void write(genie::util::BitWriter& bitWriter) const override;
+    void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
      * @brief
      * @param reader
      */
     explicit DescriptorStreamHeader(genie::util::BitReader& reader);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
 
     /**
      * @brief

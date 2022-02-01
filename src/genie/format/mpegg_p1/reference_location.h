@@ -86,7 +86,7 @@ class ExternalReferenceLocation : public ReferenceLocation {
     /**
      * @brief
      */
-    constexpr static const size_t checksum_sizes[] = {128 / 8, 256 / 8};
+    const static size_t checksum_sizes[];
 
     /**
      * @brief

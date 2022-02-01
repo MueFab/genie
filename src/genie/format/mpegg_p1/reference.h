@@ -233,15 +233,38 @@ class Reference : public GenInfo {
 
     /**
      * @brief
-     * @return
-     */
-    uint64_t getSize() const override;
-
-    /**
-     * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void box_write(genie::util::BitWriter& writer) const override;
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Reference");
+        print_offset(output, depth + 1, max_depth, "Dataset group ID: " + std::to_string((int)(dataset_group_ID)));
+        print_offset(output, depth + 1, max_depth, "Reference ID: " + std::to_string((int)(reference_ID)));
+        print_offset(output, depth + 1, max_depth, "Reference name: " + reference_name);
+        print_offset(output, depth + 1, max_depth,
+                     "Reference major version: " + std::to_string(ref_version.getMajor()));
+        print_offset(output, depth + 1, max_depth,
+                     "Reference minor version: " + std::to_string(ref_version.getMinor()));
+        print_offset(output, depth + 1, max_depth,
+                     "Reference patch version: " + std::to_string(ref_version.getPatch()));
+        for (const auto& r : sequences) {
+            std::string s = "Reference sequence: " + r.getName();
+            if (version != core::MPEGMinorVersion::V1900) {
+                s += " (ID: " + std::to_string(r.getID()) + "; length: " + std::to_string(r.getLength()) + ")";
+            }
+            print_offset(output, depth + 1, max_depth, s);
+        }
+        std::string location;
+        if (reference_location->isExternal()) {
+            location = "External at " + dynamic_cast<const ExternalReferenceLocation&>(*reference_location).getURI();
+        } else {
+            const auto& i = dynamic_cast<const InternalReferenceLocation&>(*reference_location);
+            location = "Internal at (Dataset Group " + std::to_string(int(i.getDatasetGroupID())) + ", Dataset " +
+                       std::to_string(int(i.getDatasetID())) + ")";
+        }
+        print_offset(output, depth + 1, max_depth, "Reference location: " + location);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

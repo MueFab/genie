@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include "genie/format/mpegg_p1/box.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -21,8 +22,15 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class GenInfo {
+class GenInfo : public Box {
+ protected:
+    virtual void box_write(genie::util::BitWriter& bitWriter) const = 0;
  public:
+
+    static uint64_t getHeaderLength() {
+        return 8;
+    }
+
     /**
      * @brief
      * @return
@@ -31,20 +39,19 @@ class GenInfo {
 
     /**
      * @brief
-     * @return
-     */
-    virtual uint64_t getSize() const;
-
-    /**
-     * @brief
      * @param bitWriter
      */
-    virtual void write(genie::util::BitWriter& bitWriter) const;
-
-    /**
-     * @brief
-     */
-    virtual ~GenInfo() = default;
+    void write(genie::util::BitWriter& bitWriter) const final {
+        int64_t begin = bitWriter.getPosition();
+        bitWriter.writeBypass(getKey().data(), getKey().length());
+        int64_t size_pos = bitWriter.getPosition();
+        bitWriter.writeBypassBE<uint64_t>(0);
+        box_write(bitWriter);
+        int64_t end = bitWriter.getPosition();
+        bitWriter.setPosition(size_pos);
+        bitWriter.writeBypassBE<uint64_t>(end - begin);
+        bitWriter.setPosition(end);
+    }
 
     /**
      * @brief

@@ -15,9 +15,10 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(util::BitReader& reader) : header(reader), block_payload() {
-    block_payload.resize(header.getPayloadSize());
-    reader.readBypass(block_payload.getData(), header.getPayloadSize());
+Block::Block(util::BitReader& reader) : header(reader), block_payload(), internal_reader(&reader) {
+    payloadLoaded = false;
+    payloadPosition = reader.getPos();
+    reader.skip(header.getPayloadSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,7 +40,12 @@ uint64_t Block::getLength() const {
 
 void Block::write(genie::util::BitWriter& writer) const {
     header.write(writer);
-    writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
+    if (!isPayloadLoaded() && internal_reader) {
+        auto tmp = _internal_loadPayload(*internal_reader);
+        writer.writeBypass(tmp.getData(), tmp.getRawSize());
+    } else {
+        writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -51,7 +57,11 @@ bool Block::operator==(const Block& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload)
-    : header(false, _desc_id, 0, payload.getRawSize()), block_payload(std::move(payload)) {}
+    : header(false, _desc_id, 0, payload.getRawSize()),
+      block_payload(std::move(payload)),
+      payloadLoaded(true),
+      payloadPosition(-1),
+      internal_reader(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

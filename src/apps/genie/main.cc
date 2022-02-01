@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 #endif
         } else if (operation == "gabac") {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-        } else if (operation == "capsulator") {
+        } else if (operation == "capsulate") {
             genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);

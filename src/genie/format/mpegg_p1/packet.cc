@@ -26,7 +26,7 @@ Packet::Packet(util::BitReader& reader) : header(reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Packet::write(util::BitWriter& writer) {
+void Packet::write(util::BitWriter& writer) const {
     header.write(writer);
     writer.writeBypass(data.data(), data.size());
 }
