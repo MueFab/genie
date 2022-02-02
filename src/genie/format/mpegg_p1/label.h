@@ -82,6 +82,10 @@ class Label : public GenInfo {
      * @param bit_writer
      */
     void box_write(genie::util::BitWriter& bit_writer) const override;
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Label");
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

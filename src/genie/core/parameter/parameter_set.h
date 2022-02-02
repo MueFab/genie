@@ -79,6 +79,11 @@ class EncodingSet {
     bool qual_cmp(const EncodingSet &ps) const;
 
  public:
+
+    AlphabetID getAlphabetID() const {
+        return alphabet_ID;
+    }
+
     /**
      * @brief
      * @return

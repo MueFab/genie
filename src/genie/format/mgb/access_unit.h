@@ -95,7 +95,7 @@ class AUHeader {
      */
     AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
              uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type, uint8_t posSize,
-             bool signatureFlag);
+             bool signatureFlag, core::AlphabetID alphabet);
 
     /**
      * @brief
@@ -206,7 +206,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param signatureFlag
      */
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag);
+               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag, core::AlphabetID alphabet);
 
     /**
      * @brief

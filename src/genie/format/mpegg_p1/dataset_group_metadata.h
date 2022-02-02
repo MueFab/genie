@@ -44,7 +44,7 @@ class DatasetGroupMetadata : public GenInfo {
      * @param _version
      */
     explicit DatasetGroupMetadata(genie::util::BitReader& bitreader,
-                                  genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                                  genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -53,7 +53,7 @@ class DatasetGroupMetadata : public GenInfo {
      * @param _version
      */
     DatasetGroupMetadata(uint8_t _dataset_group_id, std::string _dg_metatdata_value,
-                         genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                         genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

@@ -64,7 +64,7 @@ class ReferenceLocation {
      */
     static std::unique_ptr<ReferenceLocation> referenceLocationFactory(
         genie::util::BitReader& reader, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+        genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -149,7 +149,7 @@ class ExternalReferenceLocation : public ReferenceLocation {
      */
     static std::unique_ptr<ExternalReferenceLocation> externalReferenceLocationFactory(
         genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+        genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -187,8 +187,8 @@ class ExternalReferenceLocationMPEGG : public ExternalReferenceLocation {
      * @param _version
      */
     ExternalReferenceLocationMPEGG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t _group_id,
-                                   uint16_t _dataset_id, std::string _ref_checksum = "",
-                                   genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                                   uint16_t _dataset_id, std::string _ref_checksum,
+                                   genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -198,7 +198,7 @@ class ExternalReferenceLocationMPEGG : public ExternalReferenceLocation {
      */
     explicit ExternalReferenceLocationMPEGG(
         genie::util::BitReader& reader, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+        genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -211,7 +211,7 @@ class ExternalReferenceLocationMPEGG : public ExternalReferenceLocation {
      */
     explicit ExternalReferenceLocationMPEGG(
         genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, size_t seq_count,
-        genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+        genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

@@ -32,65 +32,30 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
     auto start_pos = reader.getPos();
     auto length = reader.readBypassBE<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length) - 4;
-    std::string tmp(4, '\0');
-    reader.readBypass(tmp);
-    UTILS_DIE_IF(tmp != "dghd", "Datasetgroup without header");
-    header = DatasetGroupHeader(reader);
-    while (reader.getPos() < end_pos) {
-        reader.getPos();
-        std::string tmp_str(4, '\0');
-        reader.readBypass(tmp_str);
-        if (tmp_str == "rfgn") {
-            UTILS_DIE_IF(!reference_metadatas.empty(), "Reference must be before ref metadata");
-            UTILS_DIE_IF(labels != boost::none, "Reference must be before labels");
-            UTILS_DIE_IF(metadata != boost::none, "Reference must be before metadata");
-            UTILS_DIE_IF(protection != boost::none, "Reference must be before protection");
-            UTILS_DIE_IF(!dataset.empty(), "Reference must be before dataset");
-            references.emplace_back(reader);
-        } else if (tmp_str == "rfmd") {
-            UTILS_DIE_IF(labels != boost::none, "Ref metadata must be before labels");
-            UTILS_DIE_IF(metadata != boost::none, "Ref metadata must be before metadata");
-            UTILS_DIE_IF(protection != boost::none, "Ref metadata must be before protection");
-            UTILS_DIE_IF(!dataset.empty(), "Ref metadata must be before dataset");
-            reference_metadatas.emplace_back(reader);
-        } else if (tmp_str == "labl") {
-            UTILS_DIE_IF(labels != boost::none, "Labels already present");
-            UTILS_DIE_IF(metadata != boost::none, "Labels must be before metadata");
-            UTILS_DIE_IF(protection != boost::none, "Labels must be before protection");
-            UTILS_DIE_IF(!dataset.empty(), "Labels must be before dataset");
-            labels.emplace(reader);
-        } else if (tmp_str == "dgmd") {
-            UTILS_DIE_IF(metadata != boost::none, "Metadata already present");
-            UTILS_DIE_IF(protection != boost::none, "Metadata must be before protection");
-            UTILS_DIE_IF(!dataset.empty(), "Metadata must be before dataset");
-            metadata = DatasetGroupMetadata(reader);
-        } else if (tmp_str == "dtpr") {
-            UTILS_DIE_IF(protection != boost::none, "Protection already present");
-            UTILS_DIE_IF(!dataset.empty(), "Protection must be before dataset");
-            protection = DatasetGroupProtection(reader);
-        } else if (tmp_str == "dtcn") {
-            dataset.emplace_back(reader, version);
-        } else {
-            UTILS_DIE("Unknown box");
-        }
+    while (reader.getPos() != end_pos) {
+        UTILS_DIE_IF(reader.getPos() > end_pos, "Read too far");
+        read_box(reader, false);
     }
+
+    std::cout << reader.getPos() << " " << end_pos << std::endl;
+    UTILS_DIE_IF(header == boost::none, "Datasetgroup without header");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
-    : header(_ID, _version), version(_mpeg_version) {}
+    : header(DatasetGroupHeader(_ID, _version)), version(_mpeg_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::addDataset(Dataset ds) {
     dataset.emplace_back(std::move(ds));
-    header.addDatasetID(dataset.back().getHeader().getDatasetID());
+    header->addDatasetID(dataset.back().getHeader().getDatasetID());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DatasetGroupHeader& DatasetGroup::getHeader() const { return header; }
+const DatasetGroupHeader& DatasetGroup::getHeader() const { return *header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -147,7 +112,7 @@ const std::string& DatasetGroup::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::box_write(util::BitWriter& wr) const {
-    header.write(wr);
+    header->write(wr);
     for (const auto& r : references) {
         r.write(wr);
     }

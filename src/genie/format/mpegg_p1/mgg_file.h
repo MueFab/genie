@@ -53,6 +53,9 @@ class MggFile {
                 const auto& hdr = dynamic_cast<const genie::format::mpegg_p1::FileHeader&>(*boxes.front().second);
                 boxes.emplace_back(std::make_pair(
                     pos, genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(reader, hdr.getMinorVersion())));
+            } else {
+                std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
+                break;
             }
         }
 

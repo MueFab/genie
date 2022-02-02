@@ -27,12 +27,13 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(AccessUnitHeader h) : header(std::move(h)) {}
+AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
-                       bool mit) {
+                       bool mit, bool block_header, core::MPEGMinorVersion _version)
+    : version(_version) {
     reader.readBypassBE<uint64_t>();
     std::string tmp(4, '\0');
     reader.readBypass(tmp);
@@ -45,17 +46,19 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
         if (tmp_str == "auin") {
             UTILS_DIE_IF(au_information != boost::none, "AU-Inf already present");
             UTILS_DIE_IF(au_protection != boost::none, "AU-Inf must be before AU-PR");
-            au_information = AUInformation(reader);
+            au_information = AUInformation(reader, version);
         } else if (tmp_str == "aupr") {
             UTILS_DIE_IF(au_protection != boost::none, "AU-Pr already present");
-            au_protection = AUProtection(reader);
+            au_protection = AUProtection(reader, version);
         } else {
             reader.setPos(tmp_pos);
             break;
         }
     } while (true);
-    for (size_t i = 0; i < header.getHeader().getNumBlocks(); ++i) {
-        blocks.emplace_back(reader);
+    if (block_header) {
+        for (size_t i = 0; i < header.getHeader().getNumBlocks(); ++i) {
+            blocks.emplace_back(reader);
+        }
     }
 }
 

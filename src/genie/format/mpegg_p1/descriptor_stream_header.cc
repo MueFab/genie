@@ -97,6 +97,7 @@ void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
+    reader.readBypassBE<uint64_t>();
     reserved = reader.read<bool>(1);
     descriptor_id = reader.read<genie::core::GenDesc>(7);
     class_id = reader.read<core::record::ClassType>(4);

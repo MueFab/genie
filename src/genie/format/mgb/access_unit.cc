@@ -90,7 +90,9 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
                 if (parameterSets.at(parameter_set_ID).isSignatureConstLength()) {
                     length = parameterSets.at(parameter_set_ID).getSignatureConstLength();
                 }
-                this->signature_config = SignatureCfg(bitReader, length);
+                this->signature_config =
+                    SignatureCfg(bitReader, length,
+                                 genie::core::getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
             }
         }
     }
@@ -102,13 +104,13 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
 
 AUHeader::AUHeader()
     : AUHeader(0, 0, core::record::ClassType::NONE, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED, 0,
-               false) {}
+               false, core::AlphabetID::ACGTN) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AUHeader::AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                    uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type,
-                   uint8_t posSize, bool signatureFlag)
+                   uint8_t posSize, bool signatureFlag, core::AlphabetID alphabet)
     : access_unit_ID(_access_unit_ID),
       num_blocks(0),
       parameter_set_ID(_parameter_set_ID),
@@ -128,7 +130,7 @@ AUHeader::AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::re
         au_Type_U_Cfg = AuTypeCfg(posSize);
     } else {
         if (signatureFlag) {
-            signature_config = SignatureCfg();
+            signature_config = SignatureCfg(genie::core::getAlphabetProperties(alphabet).base_bits);
         }
     }
 }
@@ -208,9 +210,11 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &par
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                       uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag)
+                       uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
+                       core::AlphabetID alphabet)
     : DataUnit(DataUnitType::ACCESS_UNIT),
-      header(_access_unit_ID, _parameter_set_ID, _au_type, _reads_count, dataset_type, posSize, signatureFlag),
+      header(_access_unit_ID, _parameter_set_ID, _au_type, _reads_count, dataset_type, posSize, signatureFlag,
+             alphabet),
       blocks(0),
       payloadbytes(0),
       qv_payloads(0) {
@@ -224,7 +228,7 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
         header.setAuTypeCfg(AuTypeCfg(posSize));
     } else {
         if (signatureFlag) {
-            header.setSignatureCfg(SignatureCfg());
+            header.setSignatureCfg(SignatureCfg(core::getAlphabetProperties(alphabet).base_bits));
         }
     }
 }

@@ -63,8 +63,12 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     }
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.read<uint8_t>(4);
-        qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
-            mode, genie::core::GenDesc::QV, bitReader));
+        if (mode == 1) {
+            qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
+                mode, genie::core::GenDesc::QV, bitReader));
+        } else {
+            bitReader.read<uint8_t>(1);
+        }
     }
     auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {

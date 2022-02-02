@@ -9,11 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <list>
 #include <string>
 #include <vector>
 #include "boost/optional/optional.hpp"
+#include "genie/format/mpegg_p1/block.h"
 #include "genie/format/mpegg_p1/descriptor_stream_header.h"
 #include "genie/format/mpegg_p1/gen_info.h"
+#include "genie/format/mpegg_p1/master_index_table.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/data-block.h"
 
@@ -30,7 +33,7 @@ class DescriptorStream : public GenInfo {
  private:
     DescriptorStreamHeader header;                //!< @brief
     boost::optional<DSProtection> ds_protection;  //!< @brief
-    std::vector<util::DataBlock> payload;         //!< @brief
+    std::vector<Payload> payload;                 //!< @brief
 
  public:
     /**
@@ -51,7 +54,8 @@ class DescriptorStream : public GenInfo {
      * @param reader
      * @param payload_sizes
      */
-    explicit DescriptorStream(util::BitReader& reader, const std::vector<uint64_t>& payload_sizes);
+    explicit DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
+                              const std::vector<MITClassConfig>& configs);
 
     /**
      * @brief
@@ -63,13 +67,13 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @param block
      */
-    void addPayload(util::DataBlock block);
+    void addPayload(Payload p);
 
     /**
      * @brief
      * @return
      */
-    const std::vector<util::DataBlock>& getPayloads() const;
+    const std::vector<Payload>& getPayloads() const;
 
     /**
      * @brief
@@ -94,7 +98,6 @@ class DescriptorStream : public GenInfo {
      * @param writer
      */
     void box_write(util::BitWriter& writer) const override;
-
 
     /**
      * @brief
