@@ -25,7 +25,7 @@ const std::string& DatasetMetadata::getKey() const {
 DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
     auto length = bitreader.readBypassBE<uint64_t>();
-    auto metadata_length = length - GenInfo::getHeaderLength();
+    auto metadata_length = length - GenInfo::getHeaderLength() - 100;
     if (version != genie::core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readBypassBE<uint8_t>();
         dataset_id = bitreader.readBypassBE<uint16_t>();

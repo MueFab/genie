@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cmath>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -204,6 +205,7 @@ struct GenomicDescriptorProperties {
 struct Alphabet {
     std::vector<char> lut;         //!< @brief
     std::vector<char> inverseLut;  //!< @brief
+    uint8_t base_bits;
 
     /**
      * @brief

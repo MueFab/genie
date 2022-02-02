@@ -21,9 +21,9 @@ bool SignatureCfg::operator==(const SignatureCfg& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size)
+SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, uint8_t _base_bits)
     : U_signature_size(_U_signature_size ? boost::optional<uint8_t>(_U_signature_size)
-                                         : boost::optional<uint8_t>(boost::none)) {
+                                         : boost::optional<uint8_t>(boost::none)), base_bits(_base_bits) {
     auto num_signatures = reader.read<uint16_t>();
     for (uint16_t i = 0; i < num_signatures; ++i) {
         size_t len = 0;
@@ -33,8 +33,7 @@ SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size)
             len = reader.read<uint8_t>(8);
             U_cluster_signature_length.emplace_back(len);
         }
-        const size_t ACTGN_BITS = 3;
-        U_cluster_signature.emplace_back(reader.read<uint64_t>(ACTGN_BITS * len));
+        U_cluster_signature.emplace_back(reader.read<uint64_t>(base_bits * len));
     }
 }
 
@@ -55,13 +54,12 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature, uint8_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SignatureCfg::write(util::BitWriter& writer) const {
-    const size_t ACTGN_BITS = 3;
     writer.write(U_cluster_signature.size(), 16);
     for (size_t i = 0; i < U_cluster_signature.size(); ++i) {
         if (U_signature_size != boost::none) {
-            writer.write(U_cluster_signature[i], ACTGN_BITS * *U_signature_size);
+            writer.write(U_cluster_signature[i], base_bits * *U_signature_size);
         } else {
-            writer.write(U_cluster_signature[i], ACTGN_BITS * U_cluster_signature_length[i]);
+            writer.write(U_cluster_signature[i], base_bits * U_cluster_signature_length[i]);
         }
     }
 }

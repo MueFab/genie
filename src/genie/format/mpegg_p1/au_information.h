@@ -33,7 +33,7 @@ class AUInformation : public GenInfo {
      * @param _version
      */
     explicit AUInformation(genie::util::BitReader& bitreader,
-                           genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                           genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -43,7 +43,7 @@ class AUInformation : public GenInfo {
      * @param _version
      */
     AUInformation(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_information_value,
-                  genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                  genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

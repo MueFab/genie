@@ -24,8 +24,8 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
     seq_ID = reader.read<uint16_t>();
 
     // num_classes u(8)
-    reader.read<uint8_t>();
-
+    auto num_classes = reader.read<uint8_t>(4);
+    class_IDs.resize(num_classes);
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
         class_ID = reader.read<genie::core::record::ClassType>(4);

@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/extended_au.h"
@@ -190,7 +191,7 @@ class UnalignedAUIndex {
     explicit UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                               core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                               bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                              const std::vector<genie::core::GenDesc>& descriptors);
+                              const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet);
 
     /**
      * @brief
@@ -266,6 +267,32 @@ class MasterIndexTable : public GenInfo {
     std::vector<UnalignedAUIndex> unaligned_aus;                        //!< @brief
 
  public:
+
+    std::vector<uint64_t> getDescriptorStreamOffsets(uint8_t class_index, uint8_t desc_index, bool isUnaligned, uint64_t total_size) const {
+        std::vector<uint64_t> offsets;
+        if(isUnaligned) {
+            for (const auto & unaligned_au : unaligned_aus) {
+                offsets.emplace_back(unaligned_au.getBlockOffsets().at(desc_index));
+            }
+        } else {
+            for (const auto & seq : aligned_aus) {
+                for(const auto& aligned_au : seq.at(class_index)) {
+                    offsets.emplace_back(aligned_au.getBlockOffsets().at(desc_index));
+                }
+            }
+        }
+        std::sort(offsets.begin(), offsets.end());
+        uint64_t last = offsets.front();
+        offsets.erase(offsets.begin());
+        offsets.emplace_back(total_size + last);
+        for(uint64_t& offset : offsets) {
+            uint64_t tmp = offset;
+            offset = offset - last;
+            last = tmp;
+        }
+        return offsets;
+    }
+
     /**
      * @brief
      * @param info
@@ -310,6 +337,11 @@ class MasterIndexTable : public GenInfo {
      * @return
      */
     const std::string& getKey() const override;
+
+
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
+        print_offset(output, depth, max_depth, "* Master index table");
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

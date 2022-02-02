@@ -32,7 +32,7 @@ ErrorCode decapsulate(ProgramOptions& options) {
     std::ifstream reader(options.inputFile);
 
     genie::format::mpegg_p1::MggFile mpegg_file(&reader);
-    mpegg_file.print_debug(std::cout, 10);
+    mpegg_file.print_debug(std::cout, 2);
 
     return ErrorCode::success;
 }

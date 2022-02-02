@@ -5,9 +5,9 @@
  */
 
 #include "genie/format/mpegg_p1/dataset.h"
+#include <iostream>
 #include <sstream>
 #include <utility>
-#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,46 +26,8 @@ Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : ver
     UTILS_DIE_IF(tmp != "dthd", "Dataset without header");
     header = DatasetHeader(reader);
     while (reader.getPos() < end_pos) {
-        std::string tmp_str(4, '\0');
-        reader.readBypass(tmp_str);
-        if (tmp_str == "dtmd") {
-            UTILS_DIE_IF(metadata != boost::none, "Metadata already present");
-            UTILS_DIE_IF(protection != boost::none, "Metadata must be before protection");
-            UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-            UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
-            UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-            UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-            metadata = DatasetMetadata(reader);
-        } else if (tmp_str == "dtpr") {
-            UTILS_DIE_IF(protection != boost::none, "Protection already present");
-            UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-            UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
-            UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-            UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-            protection = DatasetProtection(reader);
-        } else if (tmp_str == "pars") {
-            UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
-            UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-            UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-            parameterSets.emplace_back(reader, version, header.getParameterUpdateFlag());
-            encoding_sets.emplace(std::make_pair(size_t(parameterSets.back().getParameterSetID()),
-                                                 parameterSets.back().getEncodingSet()));
-        } else if (tmp_str == "mitb") {
-            UTILS_DIE_IF(master_index_table != boost::none, "MIT already present");
-            UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-            UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-            master_index_table = MasterIndexTable(reader, header);
-        } else if (tmp_str == "aucn") {
-            UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-            access_units.emplace_back(reader, encoding_sets, header.isMITEnabled());
-        } else if (tmp_str == "dscn") {
-            UTILS_DIE_IF(master_index_table == boost::none, "descriptor streams without MIT not allowed");
-            UTILS_DIE_IF(header.isBlockHeaderEnabled(), "descriptor streams only allowed without block headers");
-            // TODO(muenteferi): How to calculate offsets
-            //     descriptor_streams.emplace_back(reader, master_index_table.get);
-        } else {
-            UTILS_DIE("Unknown box");
-        }
+        UTILS_DIE_IF(!reader.isGood(), "Reader died");
+        read_box(reader, false);
     }
 }
 
@@ -77,22 +39,22 @@ const DatasetHeader& Dataset::getHeader() const { return header; }
 
 void Dataset::box_write(genie::util::BitWriter& bitWriter) const {
     header.write(bitWriter);
-    if(metadata) {
+    if (metadata) {
         metadata->write(bitWriter);
     }
-    if(protection) {
+    if (protection) {
         protection->write(bitWriter);
     }
-    for(const auto& p : parameterSets) {
+    for (const auto& p : parameterSets) {
         p.write(bitWriter);
     }
-    if(master_index_table) {
+    if (master_index_table) {
         master_index_table->write(bitWriter);
     }
-    for(const auto& p : access_units) {
+    for (const auto& p : access_units) {
         p.write(bitWriter);
     }
-    for(const auto& p : descriptor_streams) {
+    for (const auto& p : descriptor_streams) {
         p.write(bitWriter);
     }
 }

@@ -168,7 +168,7 @@ class Reference : public GenInfo {
      * @param _version
      */
     explicit Reference(util::BitReader& reader,
-                       genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                       genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

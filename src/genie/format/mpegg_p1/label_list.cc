@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/label_list.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,13 +23,12 @@ LabelList::LabelList(uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
 LabelList::LabelList(util::BitReader& reader) {
     reader.readBypassBE<uint64_t>();
     // ID u(8)
-    dataset_group_ID = reader.read<uint8_t>();
+    dataset_group_ID = reader.readBypassBE<uint8_t>();
     // num_labels u(16)
-    auto num_labels = reader.read<uint16_t>();
+    auto num_labels = reader.readBypassBE<uint16_t>();
 
-    /// Data encapsulated in Class Label
     for (size_t i = 0; i < num_labels; ++i) {
-        labels.emplace_back(reader);
+        read_box(reader, false);
     }
 }
 

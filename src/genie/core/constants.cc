@@ -217,8 +217,10 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
         std::vector<Alphabet> loc;
         loc.emplace_back();
         loc.back().lut = {'A', 'C', 'G', 'T', 'N'};
+        loc.back().base_bits = 3;
         loc.emplace_back();
         loc.back().lut = {'A', 'C', 'G', 'T', 'R', 'Y', 'S', 'W', 'K', 'M', 'B', 'D', 'H', 'V', 'N', '-'};
+        loc.back().base_bits = 5;
         for (auto &l : loc) {
             l.inverseLut = std::vector<char>(*std::max_element(l.lut.begin(), l.lut.end()) + 1, 0);
             for (size_t i = 0; i < l.lut.size(); ++i) {

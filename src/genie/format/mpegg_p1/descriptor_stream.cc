@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/descriptor_stream.h"
+#include <iostream>
 #include <sstream>
 #include <utility>
 
@@ -30,21 +31,52 @@ DescriptorStream::DescriptorStream(DescriptorStreamHeader _header) : header(std:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream(util::BitReader& reader, const std::vector<uint64_t>& payload_sizes) {
-   // auto length = reader.read<uint64_t>();
+DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
+                                   const std::vector<MITClassConfig>& configs) {
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.read<uint64_t>();
+    std::string tmp(4, '\0');
+    reader.readBypass(tmp);
+    UTILS_DIE_IF(tmp != "dshd", "Descriptor stream without header");
     header = DescriptorStreamHeader(reader);
-    uint64_t total_payload_size = 0;
-    for (const auto& p : payload_sizes) {
-        total_payload_size += p;
-    }
-    //TODO
-  /*  if (length - header.getSize() - 4 < total_payload_size) {
+
+    reader.readBypass(tmp);
+    if (tmp == "dspr") {
         ds_protection = DSProtection(reader);
-    }*/
-    for (const auto& p : payload_sizes) {
-        payload.emplace_back(p, 1);
-        reader.readBypass(payload.back().getData(), payload.back().getRawSize());
+    } else {
+        reader.setPos(reader.getPos() - 4);
     }
+
+    uint8_t class_index = 0;
+    uint8_t descriptor_index = 0;
+    bool found = false;
+    for (size_t i = 0; i < configs.size(); ++i) {
+        if (configs[i].getClassID() == header.getClassType()) {
+            class_index = i;
+            found = true;
+            bool found2 = false;
+            for (size_t j = 0; j < configs[i].getDescriptorIDs().size(); ++j) {
+                if (configs[i].getDescriptorIDs()[j] == header.getDescriptorID()) {
+                    descriptor_index = j;
+                    found2 = true;
+                    break;
+                }
+            }
+            UTILS_DIE_IF(!found2, "Did not find descriptor config");
+            break;
+        }
+    }
+    UTILS_DIE_IF(!found, "Did not find class config");
+
+    auto payloadSizes = table.getDescriptorStreamOffsets(class_index, descriptor_index,
+                                                         header.getClassType() == core::record::ClassType::CLASS_U,
+                                                         length - (reader.getPos() - start_pos));
+    UTILS_DIE_IF(payloadSizes.size() < header.getNumBlocks(), "DS payload sizes not available");
+    for (size_t i = 0; i < header.getNumBlocks(); ++i) {
+        payload.emplace_back(reader, payloadSizes[i]);
+    }
+
+    std::cout << start_pos << " " << length << " "  << reader.getPos() << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -53,14 +85,14 @@ const DescriptorStreamHeader& DescriptorStream::getHeader() const { return heade
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStream::addPayload(util::DataBlock block) {
-    payload.emplace_back(std::move(block));
+void DescriptorStream::addPayload(Payload p) {
+    payload.emplace_back(std::move(p));
     header.addBlock();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<util::DataBlock>& DescriptorStream::getPayloads() const { return payload; }
+const std::vector<Payload>& DescriptorStream::getPayloads() const { return payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +114,7 @@ void DescriptorStream::box_write(util::BitWriter& writer) const {
         ds_protection->write(writer);
     }
     for (const auto& p : payload) {
-        writer.writeBypass(p.getData(), p.getRawSize());
+        p.write(writer);
     }
 }
 

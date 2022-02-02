@@ -37,8 +37,9 @@ class AccessUnit : public GenInfo {
     boost::optional<AUProtection> au_protection;    //!< @brief
     std::vector<Block> blocks;                      //!< @brief
 
- public:
+    core::MPEGMinorVersion version;
 
+ public:
     void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
         print_offset(output, depth, max_depth, "* Access Unit");
         header.print_debug(output, depth + 1, max_depth);
@@ -48,7 +49,7 @@ class AccessUnit : public GenInfo {
         if (au_protection) {
             au_protection->print_debug(output, depth + 1, max_depth);
         }
-        for(const auto& r : blocks) {
+        for (const auto& r : blocks) {
             r.print_debug(output, depth + 1, max_depth);
         }
     }
@@ -64,7 +65,7 @@ class AccessUnit : public GenInfo {
      * @brief
      * @param h
      */
-    explicit AccessUnit(AccessUnitHeader h);
+    explicit AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion);
 
     /**
      * @brief
@@ -72,7 +73,8 @@ class AccessUnit : public GenInfo {
      * @param parameterSets
      * @param mit
      */
-    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit);
+    AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit,
+               bool block_header, core::MPEGMinorVersion);
 
     /**
      * @brief

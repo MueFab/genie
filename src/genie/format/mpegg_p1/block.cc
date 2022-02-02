@@ -15,10 +15,7 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(util::BitReader& reader) : header(reader), block_payload(), internal_reader(&reader) {
-    payloadLoaded = false;
-    payloadPosition = reader.getPos();
-    reader.skip(header.getPayloadSize());
+Block::Block(util::BitReader& reader) : header(reader), payload(reader, header.getPayloadSize()) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -40,36 +37,28 @@ uint64_t Block::getLength() const {
 
 void Block::write(genie::util::BitWriter& writer) const {
     header.write(writer);
-    if (!isPayloadLoaded() && internal_reader) {
-        auto tmp = _internal_loadPayload(*internal_reader);
-        writer.writeBypass(tmp.getData(), tmp.getRawSize());
-    } else {
-        writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
-    }
+    payload.write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Block::operator==(const Block& other) const {
-    return header == other.header && block_payload == other.block_payload;
+    return header == other.header && payload.getPayload() == other.getPayload();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload)
-    : header(false, _desc_id, 0, payload.getRawSize()),
-      block_payload(std::move(payload)),
-      payloadLoaded(true),
-      payloadPosition(-1),
-      internal_reader(nullptr) {}
+Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock _payload)
+    : header(false, _desc_id, 0, _payload.getRawSize()),
+      payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::util::DataBlock& Block::getPayload() const { return block_payload; }
+const genie::util::DataBlock& Block::getPayload() const { return payload.getPayload(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::util::DataBlock&& Block::movePayload() { return std::move(block_payload); }
+genie::util::DataBlock&& Block::movePayload() { return payload.movePayload(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

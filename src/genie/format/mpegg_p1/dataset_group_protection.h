@@ -44,7 +44,7 @@ class DatasetGroupProtection : public GenInfo {
      * @param _version
      */
     explicit DatasetGroupProtection(genie::util::BitReader& bitreader,
-                                    genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                                    genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -53,7 +53,7 @@ class DatasetGroupProtection : public GenInfo {
      * @param _version
      */
     DatasetGroupProtection(uint8_t _dataset_group_id, std::string _dg_protection_value,
-                           genie::core::MPEGMinorVersion _version = genie::core::MPEGMinorVersion::V2000);
+                           genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

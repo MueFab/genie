@@ -245,7 +245,8 @@ UOptions::UOptions(genie::util::BitReader& reader) {
     if (reserved_flag) {
         reserved2 = reader.read<uint8_t>(8);
     }
-    reserved3 = reader.read<bool>(1);
+    //  reserved3 = reader.read<bool>(1); // TODO(muenteferi): Reference decoder and reference bitstreams contradict
+    //  document
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -463,6 +464,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     }
     for (size_t i = 0; i < referenceOptions.getSeqIDs().size(); ++i) {
         bool flag = reader.read<bool>(1);
+        UTILS_DIE_IF(flag == false && i == 0, "First ref must provide treshold");
         if (flag) {
             thresholds.emplace_back(reader.read<uint32_t>(31));
         } else {

@@ -138,13 +138,14 @@ const std::vector<uint64_t>& UnalignedAUIndex::getBlockOffsets() const { return 
 UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                                    core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                                    bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                                   const std::vector<genie::core::GenDesc>& descriptors)
+                                   const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet)
     : byte_offset_size(_byte_offset_size), position_size(_position_size), signature_size(_signature_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
         ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
     } else if (signature_flag) {
-        sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0);
+        sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
+                                                   core::getAlphabetProperties(alphabet).base_bits);
         reader.flush();
     }
     if (!block_header_flag) {
@@ -245,6 +246,9 @@ MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
 
 MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader& hdr) {
     reader.read<uint64_t>();
+    aligned_aus.resize(
+        hdr.getReferenceOptions().getSeqIDs().size(),
+        std::vector<std::vector<AlignedAUIndex>>(hdr.getMITConfigs().size(), std::vector<AlignedAUIndex>()));
     for (size_t seq = 0; seq < hdr.getReferenceOptions().getSeqIDs().size(); ++seq) {
         for (size_t ci = 0; ci < hdr.getMITConfigs().size(); ++ci) {
             if (core::record::ClassType::CLASS_U == hdr.getMITConfigs()[ci].getClassID()) {
@@ -259,13 +263,13 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader&
         }
     }
     for (size_t uau_id = 0; uau_id < hdr.getNumUAccessUnits(); ++uau_id) {
-        unaligned_aus.emplace_back(reader, hdr.getByteOffsetSize(), hdr.getPosBits(), hdr.getDatasetType(),
-                                   hdr.getUOptions().hasSignature(),
-                                   hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength(),
-                                   hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength()
-                                       ? hdr.getUOptions().getSignature().getConstLength()
-                                       : 0,
-                                   hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs());
+        unaligned_aus.emplace_back(
+            reader, hdr.getByteOffsetSize(), hdr.getPosBits(), hdr.getDatasetType(), hdr.getUOptions().hasSignature(),
+            hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength(),
+            hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength()
+                ? hdr.getUOptions().getSignature().getConstLength()
+                : 0,
+            hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs(), hdr.getAlphabetID());
     }
 }
 
