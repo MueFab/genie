@@ -245,7 +245,8 @@ MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader& hdr) {
-    reader.read<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.read<uint64_t>();
     aligned_aus.resize(
         hdr.getReferenceOptions().getSeqIDs().size(),
         std::vector<std::vector<AlignedAUIndex>>(hdr.getMITConfigs().size(), std::vector<AlignedAUIndex>()));
@@ -271,6 +272,7 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader&
                 : 0,
             hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs(), hdr.getAlphabetID());
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -29,15 +29,15 @@ bool DatasetGroup::operator==(const GenInfo& info) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getPos();
+    auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
-    auto end_pos = start_pos + static_cast<int64_t>(length) - 4;
+    auto end_pos = start_pos + static_cast<int64_t>(length);
     while (reader.getPos() != end_pos) {
-        UTILS_DIE_IF(reader.getPos() > end_pos, "Read too far");
+        UTILS_DIE_IF(reader.getPos() > end_pos, "Read " + std::to_string(reader.getPos() - end_pos) + " bytes too far");
         read_box(reader, false);
     }
 
-    std::cout << reader.getPos() << " " << end_pos << std::endl;
+    std::cout << std::to_string(end_pos - reader.getPos()) << std::endl;
     UTILS_DIE_IF(header == boost::none, "Datasetgroup without header");
 }
 
@@ -100,7 +100,6 @@ void DatasetGroup::addProtection(DatasetGroupProtection pr) { protection = std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<Dataset>& DatasetGroup::getDatasets() const { return dataset; }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

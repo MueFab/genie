@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_mapping_table_list.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,12 +38,14 @@ DataSetMappingTableList::DataSetMappingTableList(uint8_t _ds_group_id) : dataset
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
-    size_t length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     size_t num_SIDs = (length - 13) / 2;
     for (size_t i = 0; i < num_SIDs; ++i) {
         dataset_mapping_table_SID.emplace_back(reader.readBypassBE<uint16_t>());
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

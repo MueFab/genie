@@ -6,6 +6,7 @@
 
 #include "genie/format/mpegg_p1/label.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,8 @@ Label::Label(std::string _label_ID) : label_ID(std::move(_label_ID)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 Label::Label(util::BitReader& reader) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     reader.readBypass_null_terminated(label_ID);
     auto num_datasets = reader.read<uint16_t>();
 
@@ -32,6 +34,10 @@ Label::Label(util::BitReader& reader) {
         dataset_infos.emplace_back(reader);
     }
     reader.flush();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()),
+                 "Invalid length: start_pos " + std::to_string(start_pos) + "; length " + std::to_string(length) +
+                     "; position should be " + std::to_string(start_pos + length) + "; position is " +
+                     std::to_string(reader.getPos()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

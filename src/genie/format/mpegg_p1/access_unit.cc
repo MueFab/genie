@@ -34,7 +34,8 @@ AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : he
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
                        bool mit, bool block_header, core::MPEGMinorVersion _version)
     : version(_version) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     std::string tmp(4, '\0');
     reader.readBypass(tmp);
     UTILS_DIE_IF(tmp != "auhd", "Access unit without header");
@@ -60,6 +61,7 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
             blocks.emplace_back(reader);
         }
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t (reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

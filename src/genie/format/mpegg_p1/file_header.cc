@@ -44,6 +44,7 @@ FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPE
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0'), minor_version() {
+    auto start_pos = bitreader.getPos() - 4;
     auto length = bitreader.readBypassBE<uint64_t>();
     auto num_compatible_brands = (length - 22) / 4;
     bitreader.readBypass(major_brand);
@@ -55,6 +56,7 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0')
     for (auto& b : compatible_brands) {
         bitreader.readBypass(b);
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -146,7 +146,8 @@ DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _da
 DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version,
                                          bool parameters_update_flag)
     : version(_version) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     dataset_group_id = reader.readBypassBE<uint8_t>();
     dataset_id = reader.readBypassBE<uint16_t>();
     parameter_set_ID = reader.readBypassBE<uint8_t>();
@@ -155,6 +156,7 @@ DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::M
         param_update = ParameterUpdateInfo(reader);
     }
     params = genie::core::parameter::EncodingSet(reader);
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

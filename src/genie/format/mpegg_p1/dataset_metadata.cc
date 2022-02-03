@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_metadata.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,8 +25,9 @@ const std::string& DatasetMetadata::getKey() const {
 
 DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
+    auto start_pos = bitreader.getPos() - 4;
     auto length = bitreader.readBypassBE<uint64_t>();
-    auto metadata_length = length - GenInfo::getHeaderLength() - 100;
+    auto metadata_length = length - GenInfo::getHeaderLength();
     if (version != genie::core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readBypassBE<uint8_t>();
         dataset_id = bitreader.readBypassBE<uint16_t>();
@@ -34,6 +36,8 @@ DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core:
     }
     dg_metatdata_value.resize(metadata_length);
     bitreader.readBypass(dg_metatdata_value);
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
+    UTILS_DIE_IF(!bitreader.isGood(), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

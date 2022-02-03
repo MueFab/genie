@@ -170,6 +170,17 @@ class DatasetParameterSet : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+    DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::parameter::ParameterSet set,
+                        core::MPEGMinorVersion _version)
+        : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
+                              std::move(set.getEncodingSet()), _version) {}
+
+
+
+    genie::core::parameter::ParameterSet descapsulate() {
+        return {parameter_set_ID, parent_parameter_set_ID, std::move(params)};
+    }
+
     /**
      * @brief
      * @param _dataset_group_id

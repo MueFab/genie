@@ -11,6 +11,7 @@
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/format/mpegg_p1/mgg_file.h"
+#include "format/mgb/mgb_file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,20 @@ enum class DataUnitType : uint8_t { RAW_REF = 0, PAR_SET = 1, ACC_UNT = 2 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ErrorCode encapsulate(ProgramOptions&) { return ErrorCode::success; }
+ErrorCode encapsulate(ProgramOptions& options) {
+    std::ifstream reader(options.inputFile);
+
+    genie::format::mgb::MgbFile mgb_file(&reader);
+
+    mgb_file.remove_class(genie::core::record::ClassType::CLASS_N);
+    mgb_file.remove_class(genie::core::record::ClassType::CLASS_M);
+    mgb_file.select_mapping_range(0, 54111088, 101380838);
+    mgb_file.sort_by_class();
+
+    mgb_file.print_debug(std::cout, 100);
+
+    return ErrorCode::success;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

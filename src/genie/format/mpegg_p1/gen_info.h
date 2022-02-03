@@ -28,7 +28,7 @@ class GenInfo : public Box {
  public:
 
     static uint64_t getHeaderLength() {
-        return 8;
+        return sizeof(uint64_t) + sizeof(char) * 4;
     }
 
     /**

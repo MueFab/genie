@@ -18,7 +18,7 @@ set(source_files
         importer.cc
 
         reference.cc
-        )
+        mgb_file.h mgb_file.cc)
 
 add_library(genie-mgb ${source_files})
 

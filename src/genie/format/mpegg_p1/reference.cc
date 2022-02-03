@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/reference.h"
+#include "genie/util/runtime-exception.h"
 #include <sstream>
 #include <utility>
 
@@ -117,7 +118,8 @@ bool Reference::operator==(const GenInfo& info) const {
 
 Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     reference_ID = reader.readBypassBE<uint8_t>();
     reader.readBypass_null_terminated(reference_name);
@@ -128,6 +130,7 @@ Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _ver
     }
 
     reference_location = ReferenceLocation::referenceLocationFactory(reader, seq_count, _version);
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

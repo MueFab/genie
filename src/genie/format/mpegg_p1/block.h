@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "genie/core/payload.h"
 #include "genie/format/mpegg_p1/block_header.h"
 #include "genie/format/mpegg_p1/box.h"
 #include "genie/util/data-block.h"
@@ -19,84 +20,13 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class Payload {
- private:
-    genie::util::DataBlock block_payload;
-
-    bool payloadLoaded;
-    int64_t payloadPosition;
-    uint64_t payloadSize;
-
-    util::BitReader* internal_reader;
-
-    genie::util::DataBlock _internal_loadPayload(util::BitReader& reader) const {
-        auto pos = reader.getPos();
-        reader.setPos(payloadPosition);
-        genie::util::DataBlock tmp;
-        tmp.resize(payloadSize);
-        reader.readBypass(tmp.getData(), payloadSize);
-        reader.setPos(pos);
-        return tmp;
-    }
-
- public:
-    void loadPayload() {
-        block_payload = _internal_loadPayload(*internal_reader);
-        payloadLoaded = true;
-    }
-
-    void unloadPayload() {
-        payloadLoaded = false;
-        block_payload.clear();
-    }
-
-    bool isPayloadLoaded() const { return payloadLoaded; }
-
-    const genie::util::DataBlock& getPayload() const { return block_payload; }
-
-    genie::util::DataBlock&& movePayload() {
-        payloadLoaded = false;
-        return std::move(block_payload);
-    }
-
-    explicit Payload(genie::util::DataBlock payload)
-        : block_payload(std::move(payload)),
-          payloadLoaded(true),
-          payloadPosition(-1),
-          payloadSize(payload.getRawSize()),
-          internal_reader(nullptr) {}
-
-    explicit Payload(util::BitReader& reader, uint64_t size)
-        : block_payload(),
-          payloadLoaded(false),
-          payloadPosition(reader.getPos()),
-          payloadSize(size),
-          internal_reader(&reader) {
-        reader.skip(size);
-    }
-
-    void write(genie::util::BitWriter& writer) const {
-        if (!isPayloadLoaded() && internal_reader && false) {
-            auto tmp = _internal_loadPayload(*internal_reader);
-            writer.writeBypass(tmp.getData(), tmp.getRawSize());
-        } else {
-            writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
-        }
-    }
-
-    bool operator==(const Payload& other) const {
-        return payloadSize == other.payloadSize && payloadPosition == other.payloadPosition &&
-               payloadLoaded == other.payloadLoaded && block_payload == other.block_payload;
-    }
-};
-
 /**
  * @brief
  */
 class Block : public Box {
  private:
     BlockHeader header;  //!< @brief
-    Payload payload;
+    core::Payload payload;
 
  public:
     void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
@@ -126,6 +56,10 @@ class Block : public Box {
      */
     Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload);
 
+    explicit Block(format::mgb::Block b)
+        : header(false, core::GenDesc(b.getDescriptorID()), 0, b.getPayloadUnparsed().getPayloadSize()),
+          payload(std::move(b.getPayloadUnparsed())) {}
+
     /**
      * @brief
      * @return
@@ -142,7 +76,9 @@ class Block : public Box {
      * @brief
      * @return
      */
-    genie::util::DataBlock&& movePayload();
+    core::Payload movePayload() { return std::move(boost::get<core::Payload>(payload)); }
+
+    format::mgb::Block decapsulate() { return {header.getDescriptorID(), movePayload()}; }
 
     /**
      * @brief

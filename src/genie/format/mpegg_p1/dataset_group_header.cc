@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_group_header.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ const std::string& DatasetGroupHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
+    auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
     auto num_datasets = (length - 14) / 2;
     dataset_IDs.resize(num_datasets);
@@ -48,6 +50,8 @@ DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
     for (auto& d : dataset_IDs) {
         d = reader.readBypassBE<uint16_t>();
     }
+
+    UTILS_DIE_IF(start_pos + length != uint64_t (reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

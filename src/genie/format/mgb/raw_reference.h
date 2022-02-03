@@ -86,6 +86,23 @@ class RawReference : public core::parameter::DataUnit {
      */
     std::vector<RawReferenceSequence>::iterator end();
 
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<RawReferenceSequence>::const_iterator begin() const {
+        return seqs.begin();
+    }
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<RawReferenceSequence>::const_iterator end() const {
+        return seqs.end();
+    }
+
     /**
      * @brief
      * @param state

@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/au_information.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ const std::string& AUInformation::getKey() const {
 
 AUInformation::AUInformation(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
+    auto start_pos = bitreader.getPos() - 4;
     auto length = bitreader.readBypassBE<uint64_t>();
     auto metadata_length = length - GenInfo::getHeaderLength();
     if (version != genie::core::MPEGMinorVersion::V1900) {
@@ -34,6 +36,7 @@ AUInformation::AUInformation(genie::util::BitReader& bitreader, genie::core::MPE
     }
     au_information_value.resize(metadata_length);
     bitreader.readBypass(au_information_value);
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
