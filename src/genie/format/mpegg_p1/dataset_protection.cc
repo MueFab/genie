@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_protection.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ const std::string& DatasetProtection::getKey() const {
 
 DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
     : version(_version) {
+    auto start_pos = bitreader.getPos();
     auto length = bitreader.readBypassBE<uint64_t>();
     auto protection_length = length - GenInfo::getHeaderLength();
     if (version != genie::core::MPEGMinorVersion::V1900) {
@@ -34,6 +36,7 @@ DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::c
     }
     dg_protection_value.resize(protection_length);
     bitreader.readBypass(dg_protection_value);
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

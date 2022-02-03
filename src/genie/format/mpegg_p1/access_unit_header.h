@@ -66,6 +66,12 @@ class AccessUnitHeader : public GenInfo {
 
     /**
      * @brief
+     * @return
+     */
+    genie::format::mgb::AUHeader& getHeader();
+
+    /**
+     * @brief
      */
     AccessUnitHeader();
 

@@ -76,7 +76,7 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
         payload.emplace_back(reader, payloadSizes[i]);
     }
 
-    std::cout << start_pos << " " << length << " "  << reader.getPos() << std::endl;
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -85,14 +85,14 @@ const DescriptorStreamHeader& DescriptorStream::getHeader() const { return heade
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStream::addPayload(Payload p) {
+void DescriptorStream::addPayload(core::Payload p) {
     payload.emplace_back(std::move(p));
     header.addBlock();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<Payload>& DescriptorStream::getPayloads() const { return payload; }
+const std::vector<core::Payload>& DescriptorStream::getPayloads() const { return payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

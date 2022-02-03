@@ -28,6 +28,8 @@ bool AccessUnitHeader::operator==(const GenInfo& info) const {
 
 const genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() const { return header; }
 
+genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() { return header; }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(genie::format::mgb::AUHeader(), false) {}
@@ -37,8 +39,10 @@ AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(genie::format::mgb::AUHe
 AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
                                    const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit)
     : mit_flag(mit) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

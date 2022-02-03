@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/reference_metadata.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,12 +43,14 @@ ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _referen
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
+    auto start_pos = bitreader.getPos() - 4;
     auto length = bitreader.readBypassBE<uint64_t>();
     auto len_value = (length - sizeof(uint8_t) * 2);
     reference_metadata_value.resize(len_value);
     dataset_group_id = bitreader.readBypassBE<uint8_t>();
     reference_id = bitreader.readBypassBE<uint8_t>();
     bitreader.readBypass(reference_metadata_value);
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

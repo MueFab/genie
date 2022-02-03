@@ -183,7 +183,6 @@ class DatasetGroup : public GenInfo {
     void read_box(util::BitReader& reader, bool in_offset) {
         std::string tmp_str(4, '\0');
         reader.readBypass(tmp_str);
-        std::cout << tmp_str << std::endl;
         if (tmp_str == "dghd") {
             UTILS_DIE_IF(header != boost::none, "More than one header");
             UTILS_DIE_IF(!reference_metadatas.empty(), "Header must be before ref metadata");

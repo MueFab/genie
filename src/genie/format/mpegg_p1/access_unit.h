@@ -54,6 +54,20 @@ class AccessUnit : public GenInfo {
         }
     }
 
+    format::mgb::AccessUnit decapsulate() {
+        std::vector<format::mgb::Block> newBlocks;
+        for(auto& b : blocks) {
+            newBlocks.emplace_back(b.decapsulate());
+        }
+        return {std::move(header.getHeader()), std::move(newBlocks)};
+    }
+
+    AccessUnit(format::mgb::AccessUnit au,  bool mit, core::MPEGMinorVersion _version) : header(std::move(au.getHeader()), mit), version(_version){
+        for(auto& b: au.getBlocks()) {
+            blocks.emplace_back(std::move(b));
+        }
+    }
+
     /**
      * @brief
      * @param info

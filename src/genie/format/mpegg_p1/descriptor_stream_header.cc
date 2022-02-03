@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/descriptor_stream_header.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,9 +21,11 @@ DSProtection::DSProtection(std::string _DSProtectionValue) : DSProtectionValue(s
 // ---------------------------------------------------------------------------------------------------------------------
 
 DSProtection::DSProtection(genie::util::BitReader& reader) {
-    uint64_t length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     DSProtectionValue.resize(length);
     reader.readBypass(DSProtectionValue);
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 
@@ -97,12 +100,14 @@ void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     reserved = reader.read<bool>(1);
     descriptor_id = reader.read<genie::core::GenDesc>(7);
     class_id = reader.read<core::record::ClassType>(4);
     num_blocks = reader.read<uint32_t>(32);
     reader.flush();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -430,7 +430,8 @@ DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, ge
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     group_ID = reader.readBypassBE<uint8_t>();
     ID = reader.readBypassBE<uint16_t>();
     std::string versionString(4, '\0');
@@ -472,6 +473,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         }
     }
     reader.flush();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

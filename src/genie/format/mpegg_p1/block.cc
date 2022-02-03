@@ -58,10 +58,6 @@ const genie::util::DataBlock& Block::getPayload() const { return payload.getPayl
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::util::DataBlock&& Block::movePayload() { return payload.movePayload(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 genie::core::GenDesc Block::getDescID() const { return header.getDescriptorID(); }
 
 // ---------------------------------------------------------------------------------------------------------------------

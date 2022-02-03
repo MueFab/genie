@@ -21,7 +21,8 @@ LabelList::LabelList(uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 LabelList::LabelList(util::BitReader& reader) {
-    reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     // ID u(8)
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     // num_labels u(16)
@@ -30,6 +31,7 @@ LabelList::LabelList(util::BitReader& reader) {
     for (size_t i = 0; i < num_labels; ++i) {
         read_box(reader, false);
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_mapping_table.h"
+#include "genie/util/runtime-exception.h"
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -87,12 +88,14 @@ DataSetMappingTable::DataSetMappingTable(uint16_t _dataset_id) : dataset_id(_dat
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
-    uint64_t length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getPos() - 4;
+    auto length = reader.readBypassBE<uint64_t>();
     dataset_id = reader.readBypassBE<uint16_t>();
     size_t num_data_streams = (length - 14) / 3;
     for (size_t i = 0; i < num_data_streams; ++i) {
         streams.emplace_back(reader);
     }
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

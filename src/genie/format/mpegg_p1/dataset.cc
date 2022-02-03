@@ -18,17 +18,19 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getPos();
+    auto start_pos = reader.getPos() - 4;
     auto length = reader.readBypassBE<uint64_t>();
-    auto end_pos = start_pos + static_cast<int64_t>(length) - 4;
+    auto end_pos = start_pos + static_cast<int64_t>(length);
     std::string tmp(4, '\0');
     reader.readBypass(tmp);
     UTILS_DIE_IF(tmp != "dthd", "Dataset without header");
     header = DatasetHeader(reader);
-    while (reader.getPos() < end_pos) {
+    while (reader.getPos() != end_pos) {
+        UTILS_DIE_IF(reader.getPos() > end_pos, "Read too far");
         UTILS_DIE_IF(!reader.isGood(), "Reader died");
         read_box(reader, false);
     }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

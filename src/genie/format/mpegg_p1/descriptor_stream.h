@@ -33,7 +33,7 @@ class DescriptorStream : public GenInfo {
  private:
     DescriptorStreamHeader header;                //!< @brief
     boost::optional<DSProtection> ds_protection;  //!< @brief
-    std::vector<Payload> payload;                 //!< @brief
+    std::vector<core::Payload> payload;                 //!< @brief
 
  public:
     /**
@@ -67,13 +67,13 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @param block
      */
-    void addPayload(Payload p);
+    void addPayload(core::Payload p);
 
     /**
      * @brief
      * @return
      */
-    const std::vector<Payload>& getPayloads() const;
+    const std::vector<core::Payload>& getPayloads() const;
 
     /**
      * @brief
