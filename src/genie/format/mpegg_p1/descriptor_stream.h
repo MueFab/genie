@@ -49,6 +49,33 @@ class DescriptorStream : public GenInfo {
      */
     explicit DescriptorStream(DescriptorStreamHeader _header);
 
+    DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID, std::vector<format::mgb::Block> blocks) : header(false, descriptor, classID, blocks.size()){
+        for (auto& b : blocks) {
+            payload.emplace_back(b.movePayloadUnparsed());
+        }
+    }
+
+    std::vector<format::mgb::Block> decapsulate() {
+        std::vector<format::mgb::Block> ret;
+        for(auto& p : payload) {
+            ret.emplace_back(header.getDescriptorID(), std::move(p));
+        }
+        return ret;
+    }
+
+    bool isEmpty() const {
+        if(payload.empty()) {
+            return true;
+        }
+
+        for (const auto& p : payload) {
+            if(p.getPayloadSize()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * @brief
      * @param reader

@@ -97,14 +97,6 @@ class MgbFile {
                     UTILS_DIE("Unknown data unit");
             }
         }
-
-        std::stringstream ss;
-        util::BitWriter writer(&ss);
-        for (const auto& b : units) {
-            b.second->write(writer);
-        }
-
-        std::cout << ss.str().length() << std::endl;
     }
 
     void print_debug(std::ostream& output, uint8_t max_depth = 100) const {
@@ -236,12 +228,15 @@ class MgbFile {
             units.end());
     }
 
-
-    std::vector<Block> extractDescriptor(core::record::ClassType type, core::GenDesc descriptor) {
+    std::vector<Block> extractDescriptor(core::record::ClassType type, core::GenDesc descriptor, const std::vector<uint8_t>& param_sets) {
         std::vector<Block> ret;
         for (auto& u : units) {
             if (u.second->getDataUnitType() == genie::core::parameter::DataUnit::DataUnitType::ACCESS_UNIT) {
                 auto& au = dynamic_cast<genie::format::mgb::AccessUnit&>(*u.second);
+                if (std::find(param_sets.begin(), param_sets.end(), au.getHeader().getParameterID()) ==
+                    param_sets.end()) {
+                    continue;
+                }
                 if (au.getHeader().getClass() != type) {
                     continue;
                 }
@@ -261,12 +256,31 @@ class MgbFile {
         return ret;
     }
 
-    std::vector<std::unique_ptr<core::parameter::ParameterSet>> extractParameters() {
+    void clearAUBlocks(const std::vector<uint8_t>& param_sets) {
+        for (auto& u : units) {
+            if (u.second->getDataUnitType() == genie::core::parameter::DataUnit::DataUnitType::ACCESS_UNIT) {
+                auto& au = dynamic_cast<genie::format::mgb::AccessUnit&>(*u.second);
+                if (std::find(param_sets.begin(), param_sets.end(), au.getHeader().getParameterID()) !=
+                    param_sets.end()) {
+                    au.getBlocks().clear();
+                }
+            }
+        }
+    }
+
+    std::vector<std::unique_ptr<core::parameter::ParameterSet>> extractParameters(
+        const std::vector<uint8_t>& param_sets) {
         std::vector<std::unique_ptr<core::parameter::ParameterSet>> ret;
-        for(auto it = units.begin(); it != units.end();) {
-            if(it->second->getDataUnitType() == core::parameter::DataUnit::DataUnitType::PARAMETER_SET) {
-                ret.emplace_back(dynamic_cast<core::parameter::ParameterSet*>(it->second.release()));
-                it = units.erase(it);
+        for (auto it = units.begin(); it != units.end();) {
+            if (it->second->getDataUnitType() == core::parameter::DataUnit::DataUnitType::PARAMETER_SET) {
+                if (std::find(param_sets.begin(), param_sets.end(),
+                              dynamic_cast<core::parameter::ParameterSet*>(it->second.get())->getID()) !=
+                    param_sets.end()) {
+                    ret.emplace_back(dynamic_cast<core::parameter::ParameterSet*>(it->second.release()));
+                    it = units.erase(it);
+                } else {
+                    it++;
+                }
             } else {
                 it++;
             }
@@ -274,14 +288,34 @@ class MgbFile {
         return ret;
     }
 
-    std::vector<std::unique_ptr<format::mgb::AccessUnit>> extractAUs() {
+    std::vector<std::unique_ptr<format::mgb::AccessUnit>> extractAUs(const std::vector<uint8_t>& param_sets) {
         std::vector<std::unique_ptr<format::mgb::AccessUnit>> ret;
-        for(auto it = units.begin(); it != units.end();) {
-            if(it->second->getDataUnitType() == core::parameter::DataUnit::DataUnitType::ACCESS_UNIT) {
-                ret.emplace_back(dynamic_cast<format::mgb::AccessUnit*>(it->second.release()));
-                it = units.erase(it);
+        for (auto it = units.begin(); it != units.end();) {
+            if (it->second->getDataUnitType() == core::parameter::DataUnit::DataUnitType::ACCESS_UNIT) {
+                if (std::find(param_sets.begin(), param_sets.end(),
+                              dynamic_cast<format::mgb::AccessUnit*>(it->second.get())->getHeader().getParameterID()) !=
+                    param_sets.end()) {
+                    ret.emplace_back(dynamic_cast<format::mgb::AccessUnit*>(it->second.release()));
+                    it = units.erase(it);
+                } else {
+                    it++;
+                }
             } else {
                 it++;
+            }
+        }
+        return ret;
+    }
+
+    std::vector<uint8_t> collect_param_ids(bool multipleAlignments, bool pos40,
+                                           genie::core::parameter::DataUnit::DatasetType dataset_type,
+                                           genie::core::AlphabetID alphabet) {
+        std::vector<uint8_t> ret;
+        for (auto & parameterSet : parameterSets) {
+            if (parameterSet.second.hasMultipleAlignments() == multipleAlignments &&
+                (parameterSet.second.getPosSize() == 40) == pos40 && parameterSet.second.getDatasetType() == dataset_type &&
+                parameterSet.second.getAlphabetID() == alphabet) {
+                ret.emplace_back(parameterSet.first);
             }
         }
         return ret;

@@ -9,9 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+#include "genie/core/meta/blockheader/disabled.h"
+#include "genie/core/meta/blockheader/enabled.h"
+#include "genie/core/meta/dataset.h"
+#include "genie/format/mgb/mgb_file.h"
 #include "genie/format/mpegg_p1/access_unit.h"
 #include "genie/format/mpegg_p1/dataset_header.h"
 #include "genie/format/mpegg_p1/dataset_metadata.h"
@@ -20,7 +25,6 @@
 #include "genie/format/mpegg_p1/descriptor_stream.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/master_index_table.h"
-#include <iostream>
 
 #define GENIE_DEBUG_PRINT_NODETAIL
 
@@ -53,6 +57,61 @@ class Dataset : public GenInfo {
      * @param _version
      */
     Dataset(util::BitReader& reader, core::MPEGMinorVersion _version);
+
+    Dataset(format::mgb::MgbFile& file, const core::meta::Dataset& meta, core::MPEGMinorVersion _version, const std::vector<uint8_t>& param_ids)
+        : version(_version) {
+        bool mitFlag = false;
+        bool cc_mode = false;
+        bool ordered_blocks = false;
+        bool headerON = meta.getHeader().getType() == core::meta::BlockHeader::HeaderType::ENABLED;
+        if (headerON) {
+            cc_mode = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getCCFlag();
+            mitFlag = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getMITFlag();
+        } else {
+            ordered_blocks = dynamic_cast<const core::meta::blockheader::Disabled&>(meta.getHeader()).getOrderedFlag();
+        }
+
+        if (!headerON) {
+            if (ordered_blocks) {
+                file.sort_by_position();
+            }
+            for (size_t c = 0; c < size_t(core::record::ClassType::COUNT); ++c) {
+                for (size_t d = 0; d < size_t(core::GenDesc::COUNT); ++d) {
+                    auto blocks = file.extractDescriptor(core::record::ClassType(c), core::GenDesc(d), param_ids);
+                    auto desc = DescriptorStream(core::GenDesc(d), core::record::ClassType(c), blocks);
+                    if (!desc.isEmpty()) {
+                        descriptor_streams.emplace_back(std::move(desc));
+                    }
+                }
+            }
+            file.clearAUBlocks(param_ids);
+        } else {
+            if (cc_mode) {
+                file.sort_by_class();
+            } else {
+                file.sort_by_position();
+            }
+        }
+
+        auto params_p2 = file.extractParameters(param_ids);
+        for (auto& p : params_p2) {
+            parameterSets.emplace_back(0, 0, p->getID(), p->getParentID(), std::move(p->getEncodingSet()), version);
+        }
+
+
+
+        auto access_units_p2 = file.extractAUs(param_ids);
+
+        for (auto& a : access_units_p2) {
+            access_units.emplace_back(std::move(*a), mitFlag, version);
+        }
+
+        header = DatasetHeader(0, 0, version, parameterSets.front().getEncodingSet().hasMultipleAlignments(), true, false,
+                               parameterSets.front().getEncodingSet().getPosSize() == 40, parameterSets.front().getEncodingSet().getDatasetType(), false,
+                               parameterSets.front().getEncodingSet().getAlphabetID());
+
+
+    }
 
     /**
      * @brief

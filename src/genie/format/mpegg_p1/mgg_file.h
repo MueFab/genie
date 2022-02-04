@@ -30,47 +30,49 @@ namespace mpegg_p1 {
  */
 class MggFile {
  private:
-    std::vector<std::pair<int64_t, std::unique_ptr<Box>>> boxes;
+    std::vector<std::unique_ptr<Box>> boxes;
     std::istream* file;
-    util::BitReader reader;
+    boost::optional<util::BitReader> reader;
 
  public:
     explicit MggFile(std::istream* _file) : file(_file), reader(*file) {
         while (true) {
             std::string boxname(4, '\0');
-            reader.readBypass(boxname);
-            if(!reader.isGood()) {
+            reader->readBypass(boxname);
+            if(!reader->isGood()) {
                 break;
             }
             UTILS_DIE_IF(boxes.empty() && boxname != "flhd", "No file header found");
             UTILS_DIE_IF(!boxes.empty() && boxname == "flhd", "Multiple file headers found");
             if (boxname == "flhd") {
-                auto pos = reader.getPos();
-                boxes.emplace_back(std::make_pair(
-                    pos, genie::util::make_unique<genie::format::mpegg_p1::FileHeader>(reader)));
+                boxes.emplace_back(genie::util::make_unique<genie::format::mpegg_p1::FileHeader>(*reader));
             } else if (boxname == "dgcn"){
-                auto pos = reader.getPos();
-                const auto& hdr = dynamic_cast<const genie::format::mpegg_p1::FileHeader&>(*boxes.front().second);
-                boxes.emplace_back(std::make_pair(
-                    pos, genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(reader, hdr.getMinorVersion())));
+                const auto& hdr = dynamic_cast<const genie::format::mpegg_p1::FileHeader&>(*boxes.front());
+                boxes.emplace_back(genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(*reader, hdr.getMinorVersion()));
             } else {
                 std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
                 break;
             }
         }
+    }
 
-        std::stringstream ss;
-        util::BitWriter writer(&ss);
+    MggFile() : file(nullptr), reader(){
+
+    }
+
+    void addBox(std::unique_ptr<Box> box) {
+        boxes.emplace_back(std::move(box));
+    }
+
+    void write(util::BitWriter& writer) {
         for (const auto& b : boxes) {
-           b.second->write(writer);
+            b->write(writer);
         }
-
-        std::cout << ss.str().length() << std::endl;
     }
 
     void print_debug(std::ostream& output, uint8_t max_depth = 100) const {
         for (const auto& b : boxes) {
-            b.second->print_debug(output, 0, max_depth);
+            b->print_debug(output, 0, max_depth);
         }
     }
 };

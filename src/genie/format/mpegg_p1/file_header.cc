@@ -33,7 +33,7 @@ const std::vector<std::string>& FileHeader::getCompatibleBrands() const { return
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& FileHeader::getKey() const {
-    static const std::string key = "fldh";
+    static const std::string key = "flhd";
     return key;
 }
 

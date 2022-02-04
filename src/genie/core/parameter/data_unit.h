@@ -40,7 +40,7 @@ class DataUnit {
     /**
      * @brief
      */
-    enum class DatasetType : uint8_t { NON_ALIGNED = 0, ALIGNED = 1, REFERENCE = 2 };
+    enum class DatasetType : uint8_t { NON_ALIGNED = 0, ALIGNED = 1, REFERENCE = 2, COUNT = 3 };
 
  private:
     DataUnitType data_unit_type;  //!< @brief
