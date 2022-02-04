@@ -394,6 +394,9 @@ class ParameterSet : public DataUnit {
                 break;
             case core::AlphabetID::ACGTRYSWKMBDHVN_:
                 output << ", alphabet ACGTRYSWKMBDHVN_";
+                break;
+            default:
+                UTILS_DIE("Unknown alphabet ID");
         }
         output << ", " << getEncodingSet().getNumberTemplateSegments() << " segments" << std::endl;
     }

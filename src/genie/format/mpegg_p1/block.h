@@ -12,6 +12,7 @@
 #include "genie/core/payload.h"
 #include "genie/format/mpegg_p1/block_header.h"
 #include "genie/format/mpegg_p1/box.h"
+#include "genie/format/mgb/block.h"
 #include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

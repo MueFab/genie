@@ -27,7 +27,9 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {}
+AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -103,6 +105,7 @@ void AccessUnit::setProtection(AUProtection au) { au_protection = std::move(au);
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::box_write(genie::util::BitWriter& bitWriter) const {
+    header.write(bitWriter);
     if (au_information != boost::none) {
         au_information->write(bitWriter);
     }

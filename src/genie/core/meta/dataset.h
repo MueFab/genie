@@ -19,7 +19,9 @@
 #include "genie/core/meta/descriptor-stream.h"
 #include "genie/core/meta/label.h"
 #include "genie/core/meta/reference.h"
+#include "genie/util/make-unique.h"
 #include "nlohmann/json.hpp"
+#include "genie/core/meta/blockheader/enabled.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,6 +53,12 @@ class Dataset {
      * @param protection MPEG-G part 3 protection data
      */
     Dataset(uint32_t _version, std::unique_ptr<BlockHeader> _headerCfg, std::string meta, std::string protection);
+
+
+    Dataset() {
+        version = 0;
+        headerCfg = genie::util::make_unique<blockheader::Enabled>(false, false);
+    }
 
     /**
      * @brief Construct from json
