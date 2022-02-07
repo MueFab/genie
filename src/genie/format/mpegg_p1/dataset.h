@@ -51,6 +51,35 @@ class Dataset : public GenInfo {
     std::map<size_t, core::parameter::EncodingSet> encoding_sets;  //!< @brief
 
  public:
+
+    bool hasMetadata() const {
+        return metadata != boost::none;
+    }
+
+    bool hasProtection() const {
+        return metadata != boost::none;
+    }
+
+    DatasetMetadata& getMetadata() {
+        return *metadata;
+    }
+
+    DatasetProtection& getProtection() {
+        return *protection;
+    }
+
+    std::vector<AccessUnit>& getAccessUnits() {
+        return access_units;
+    }
+
+    std::vector<DescriptorStream>& getDescriptorStreams() {
+        return descriptor_streams;
+    }
+
+    std::vector<DatasetParameterSet>& getParameterSets() {
+        return parameterSets;
+    }
+
     /**
      * @brief
      * @param reader
@@ -58,7 +87,7 @@ class Dataset : public GenInfo {
      */
     Dataset(util::BitReader& reader, core::MPEGMinorVersion _version);
 
-    Dataset(format::mgb::MgbFile& file, const core::meta::Dataset& meta, core::MPEGMinorVersion _version, const std::vector<uint8_t>& param_ids)
+    Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version, const std::vector<uint8_t>& param_ids)
         : version(_version) {
         bool mitFlag = false;
         bool cc_mode = false;
@@ -81,6 +110,11 @@ class Dataset : public GenInfo {
                     auto desc = DescriptorStream(core::GenDesc(d), core::record::ClassType(c), blocks);
                     if (!desc.isEmpty()) {
                         descriptor_streams.emplace_back(std::move(desc));
+                        for(auto& b : meta.getDSs()) {
+                            if(core::GenDesc(b.getID()) == descriptor_streams.back().getHeader().getDescriptorID()) {
+                                descriptor_streams.back().setProtection(DSProtection(std::move(b.getProtection())));
+                            }
+                        }
                     }
                 }
             }
@@ -104,20 +138,56 @@ class Dataset : public GenInfo {
 
         for (auto& a : access_units_p2) {
             access_units.emplace_back(std::move(*a), mitFlag, version);
+            for(auto& b : meta.getAUs()) {
+                if(b.getID() == access_units.back().getHeader().getHeader().getID()) {
+                    access_units.back().setInformation(AUInformation(0, 0, std::move(b.getInformation()), _version));
+                    access_units.back().setProtection(AUProtection(0, 0, std::move(b.getProtection()), _version));
+                }
+            }
         }
 
         header = DatasetHeader(0, 0, version, parameterSets.front().getEncodingSet().hasMultipleAlignments(), true, false,
                                parameterSets.front().getEncodingSet().getPosSize() == 40, parameterSets.front().getEncodingSet().getDatasetType(), false,
                                parameterSets.front().getEncodingSet().getAlphabetID());
 
+        if (!meta.getInformation().empty()) {
+            metadata = DatasetMetadata(0, 0, std::move(meta.getInformation()), _version);
+        }
+
+        if (!meta.getProtection().empty()) {
+            protection = DatasetProtection(0, 0, std::move(meta.getProtection()), _version);
+        }
 
     }
+
+    void patchID(uint8_t groupID, uint16_t setID) {
+        header.patchID(groupID, setID);
+        if(metadata != boost::none) {
+            metadata->patchID(groupID, setID);
+        }
+        if(protection != boost::none) {
+            protection->patchID(groupID, setID);
+        }
+        for(auto& ps : parameterSets) {
+            ps.patchID(groupID, setID);
+        }
+    }
+
+    void patchRefID(uint8_t _old, uint8_t _new) {
+        header.patchRefID(_old, _new);
+    }
+
 
     /**
      * @brief
      * @return
      */
     const DatasetHeader& getHeader() const;
+
+
+    DatasetHeader& getHeader() {
+        return header;
+    }
 
     /**
      * @brief

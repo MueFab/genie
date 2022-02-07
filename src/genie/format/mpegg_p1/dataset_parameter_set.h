@@ -163,6 +163,12 @@ class DatasetParameterSet : public GenInfo {
     core::MPEGMinorVersion version;                     //!< @brief
 
  public:
+
+    void patchID(uint8_t _groupID, uint16_t _setID) {
+        dataset_group_id = _groupID;
+        dataset_id = _setID;
+    }
+
     /**
      * @brief
      * @param info

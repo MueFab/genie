@@ -56,6 +56,10 @@ class MggFile {
         }
     }
 
+    std::vector<std::unique_ptr<Box>>& getBoxes() {
+        return boxes;
+    }
+
     MggFile() : file(nullptr), reader(){
 
     }

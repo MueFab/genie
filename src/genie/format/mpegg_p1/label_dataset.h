@@ -30,6 +30,18 @@ class LabelDataset {
     std::vector<LabelRegion> dataset_regions;  //!< @brief
 
  public:
+
+    std::vector<genie::core::meta::Region> decapsulate(uint16_t dataset) {
+        std::vector<genie::core::meta::Region> ret;
+        if(dataset != dataset_ID) {
+            return ret;
+        }
+        for(auto& r : dataset_regions) {
+            ret.emplace_back(r.decapsulate());
+        }
+        return ret;
+    }
+
     /**
      * @brief
      * @param other

@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include "genie/core/constants.h"
+#include "genie/core/meta/reference.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/reference_location.h"
 #include "genie/util/bitreader.h"
@@ -53,6 +54,9 @@ class Reference : public GenInfo {
          * @param _version
          */
         ReferenceSeq(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version);
+
+        ReferenceSeq(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
+            : name(std::move(s.getName())), sequence_length(s.getLength()), sequence_id(s.getID()), version(_version) {}
 
         /**
          * @brief
@@ -155,6 +159,34 @@ class Reference : public GenInfo {
     genie::core::MPEGMinorVersion version;  //!< @brief
 
  public:
+    void patchID(uint8_t groupID) { dataset_group_ID = groupID; }
+
+    void patchRefID(uint8_t _old, uint8_t _new) {
+        if (reference_ID == _old) {
+            reference_ID = _new;
+        }
+    }
+
+    genie::core::meta::Reference decapsulate(std::string meta) {
+        std::unique_ptr<genie::core::meta::RefBase> location = reference_location->decapsulate();
+        genie::core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
+                                         ref_version.getPatch(), std::move(location), std::move(meta));
+        return ret;
+    }
+
+    Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
+              genie::core::MPEGMinorVersion _version)
+        : dataset_group_ID(_dataset_group_id),
+          reference_ID(_reference_ID),
+          reference_name(std::move(ref.getName())),
+          ref_version(ref.getMajorVersion(), ref.getMinorVersion(), ref.getPatchVersion()),
+          version(_version) {
+        for(auto& r : ref.getSequences()) {
+            sequences.emplace_back(std::move(r), version);
+        }
+
+    }
+
     /**
      * @brief
      * @param info
@@ -167,8 +199,7 @@ class Reference : public GenInfo {
      * @param reader
      * @param _version
      */
-    explicit Reference(util::BitReader& reader,
-                       genie::core::MPEGMinorVersion _version);
+    explicit Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief

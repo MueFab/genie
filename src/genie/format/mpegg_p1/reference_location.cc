@@ -31,6 +31,41 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(g
     }
 }
 
+std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
+    std::unique_ptr<genie::core::meta::RefBase> base, genie::core::MPEGMinorVersion _version) {
+    if (dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get()) != nullptr) {
+        auto ref = dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get());
+        auto ret = genie::util::make_unique<ExternalReferenceLocationMPEGG>(
+            0, std::move(ref->getURI()),
+            genie::format::mpegg_p1::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()),
+            ref->getGroupID(), ref->getID(), std::move(ref->getChecksum()), _version);
+        return ret;
+    } else if (dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get()) != nullptr) {
+        auto ref = dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get());
+        auto ret = genie::util::make_unique<ExternalReferenceLocationFasta>(
+            0, std::move(ref->getURI()),
+            genie::format::mpegg_p1::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
+        for (auto &s : ref->getChecksums()) {
+            ret->addChecksum(std::move(s));
+        }
+        return ret;
+    } else if (dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get()) != nullptr) {
+        auto ref = dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get());
+        auto ret = genie::util::make_unique<ExternalReferenceLocationRaw>(
+            0, std::move(ref->getURI()),
+            genie::format::mpegg_p1::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
+        for (auto &s : ref->getChecksums()) {
+            ret->addChecksum(std::move(s));
+        }
+        return ret;
+    } else if (dynamic_cast<genie::core::meta::InternalRef*>(base.get()) != nullptr) {
+        auto ref = dynamic_cast<genie::core::meta::InternalRef*>(base.get());
+        return genie::util::make_unique<InternalReferenceLocation>(0, ref->getGroupID(), ref->getID());
+    } else {
+        UTILS_DIE("Unknown reference location type");
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<ExternalReferenceLocation> ExternalReferenceLocation::externalReferenceLocationFactory(

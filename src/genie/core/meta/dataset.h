@@ -45,6 +45,15 @@ class Dataset {
     std::vector<DescriptorStream> descriptor_streams;  //!< @brief List DS meta information
 
  public:
+
+    void setMetadata(std::string meta) {
+        DT_metadata_value = std::move(meta);
+    }
+
+    void setProtection(std::string prot) {
+        DT_protection_value = std::move(prot);
+    }
+
     /**
      * @brief Construct from raw information
      * @param _version Current iteration
@@ -58,6 +67,10 @@ class Dataset {
     Dataset() {
         version = 0;
         headerCfg = genie::util::make_unique<blockheader::Enabled>(false, false);
+    }
+
+    void setHeader(std::unique_ptr<BlockHeader> _hdr) {
+        headerCfg = std::move(_hdr);
     }
 
     /**
@@ -78,11 +91,20 @@ class Dataset {
      */
     const boost::optional<DatasetGroup>& getDataGroup() const;
 
+    boost::optional<DatasetGroup>& getDataGroup() {
+        return dataset_group;
+    }
+
     /**
      * @brief Return reference information, if any
      * @return Reference information
      */
     const boost::optional<Reference>& getReference() const;
+
+
+    boost::optional<Reference>& getReference() {
+        return reference;
+    }
 
     /**
      * @brief Return list of labels
@@ -108,11 +130,20 @@ class Dataset {
      */
     const std::string& getInformation() const;
 
+    std::string& getInformation() {
+        return DT_metadata_value;
+    }
+
     /**
      * @brief Return MPEG-G Part 3 protection information
      * @return MPEG-G Part 3 protection information
      */
     const std::string& getProtection() const;
+
+
+    std::string& getProtection() {
+        return DT_protection_value;
+    }
 
     /**
      * @brief Return list of access unit meta information blocks
@@ -120,11 +151,20 @@ class Dataset {
      */
     const std::vector<AccessUnit>& getAUs() const;
 
+    std::vector<AccessUnit>& getAUs() {
+        return access_units;
+    }
+
     /**
      * @brief Return list of descriptor stream meta information blocks
      * @return Descriptor stream blocks
      */
     const std::vector<DescriptorStream>& getDSs() const;
+
+
+    std::vector<DescriptorStream>& getDSs() {
+        return descriptor_streams;
+    }
 
     /**
      * @brief Update dataset group information

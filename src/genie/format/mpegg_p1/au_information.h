@@ -76,6 +76,10 @@ class AUInformation : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+    std::string decapsulate() {
+        return std::move(au_information_value);
+    }
+
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief
     uint8_t dataset_group_id;               //!< @brief

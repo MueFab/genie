@@ -44,6 +44,43 @@ class DatasetGroup : public GenInfo {
     core::MPEGMinorVersion version;  //!< @brief
 
  public:
+
+    void patchID(uint8_t groupID) {
+        if(header != boost::none) {
+            header->patchID(groupID);
+        }
+        for(auto& r : references) {
+            r.patchID(groupID);
+        }
+        for(auto& r : reference_metadatas) {
+            r.patchID(groupID);
+        }
+        if(labels != boost::none) {
+            labels->patchID(groupID);
+        }
+        if(metadata != boost::none) {
+            metadata->patchID(groupID);
+        }
+        if(protection != boost::none) {
+            protection->patchID(groupID);
+        }
+        for(auto& d : dataset) {
+            d.patchID(groupID, d.getHeader().getDatasetID());
+        }
+    }
+
+    void patchRefID(uint8_t _old, uint8_t _new) {
+        for(auto& r : references) {
+            r.patchRefID(_old, _new);
+        }
+        for(auto& r : reference_metadatas) {
+            r.patchRefID(_old, _new);
+        }
+        for(auto& d : dataset) {
+            d.patchRefID(_old, _new);
+        }
+    }
+
     /**
      * @brief
      * @param info
@@ -84,11 +121,20 @@ class DatasetGroup : public GenInfo {
      */
     const std::vector<Reference>& getReferences() const;
 
+
+    std::vector<Reference>& getReferences() {
+        return references;
+    }
+
     /**
      * @brief
      * @return
      */
     const std::vector<ReferenceMetadata>& getReferenceMetadata() const;
+
+    std::vector<ReferenceMetadata>& getReferenceMetadata() {
+        return reference_metadatas;
+    }
 
     /**
      * @brief
@@ -102,6 +148,11 @@ class DatasetGroup : public GenInfo {
      */
     const LabelList& getLabelList() const;
 
+
+    LabelList& getLabelList() {
+        return *labels;
+    }
+
     /**
      * @brief
      * @return
@@ -114,6 +165,11 @@ class DatasetGroup : public GenInfo {
      */
     const DatasetGroupMetadata& getMetadata() const;
 
+
+    DatasetGroupMetadata& getMetadata() {
+        return *metadata;
+    }
+
     /**
      * @brief
      * @return
@@ -125,6 +181,10 @@ class DatasetGroup : public GenInfo {
      * @return
      */
     const DatasetGroupProtection& getProtection() const;
+
+    DatasetGroupProtection& getProtection() {
+        return *protection;
+    }
 
     /**
      * @brief
@@ -143,6 +203,14 @@ class DatasetGroup : public GenInfo {
      * @return
      */
     const std::vector<Dataset>& getDatasets() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<Dataset>& getDatasets() {
+        return dataset;
+    }
 
 
     /**

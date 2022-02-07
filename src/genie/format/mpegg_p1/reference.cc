@@ -109,7 +109,7 @@ bool Reference::operator==(const GenInfo& info) const {
         return false;
     }
     const auto& other = dynamic_cast<const Reference&>(info);
-    return dataset_group_ID == other.dataset_group_ID && reference_ID == other.reference_ID &&
+    return
            reference_name == other.reference_name && ref_version == other.ref_version && sequences == other.sequences &&
            reference_location == other.reference_location && version == other.version;
 }

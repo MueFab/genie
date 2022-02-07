@@ -54,6 +54,16 @@ class AccessUnit : public GenInfo {
         }
     }
 
+    AUInformation& getInformation() {
+        return *au_information;
+    }
+
+
+    AUProtection& getProtection() {
+        return *au_protection;
+    }
+
+
     format::mgb::AccessUnit decapsulate() {
         std::vector<format::mgb::Block> newBlocks;
         for(auto& b : blocks) {
