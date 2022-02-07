@@ -56,6 +56,11 @@ class DescriptorStream {
      * @return Part 3 protection information
      */
     const std::string& getProtection() const;
+
+
+    std::string& getProtection() {
+        return DS_protection_value;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

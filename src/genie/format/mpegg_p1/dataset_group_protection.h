@@ -74,6 +74,14 @@ class DatasetGroupProtection : public GenInfo {
      */
     const std::string& getProtection() const;
 
+    std::string decapsulate() {
+        return std::move(dg_protection_value);
+    }
+
+    void patchID(uint8_t groupID) {
+        dataset_group_id = groupID;
+    }
+
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief
     uint8_t dataset_group_id;               //!< @brief

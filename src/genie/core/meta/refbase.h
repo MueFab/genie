@@ -50,6 +50,8 @@ class RefBase {
      * @return Json key
      */
     virtual const std::string& getKeyName() const = 0;
+
+    virtual std::unique_ptr<RefBase> clone() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

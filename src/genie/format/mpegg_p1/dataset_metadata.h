@@ -80,6 +80,16 @@ class DatasetMetadata : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+
+    std::string decapsulate() {
+        return std::move(dg_metatdata_value);
+    }
+
+    void patchID(uint8_t _groupID, uint16_t _setID) {
+        dataset_group_id = _groupID;
+        dataset_id = _setID;
+    }
+
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief
     uint8_t dataset_group_id;               //!< @brief

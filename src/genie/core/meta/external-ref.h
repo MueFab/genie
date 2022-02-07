@@ -54,6 +54,11 @@ class ExternalRef : public RefBase {
      */
     const std::string& getURI() const;
 
+
+    std::string& getURI() {
+        return ref_uri;
+    }
+
     /**
      * @brief Return active checksum algorithm
      * @return Checksum algorithm used

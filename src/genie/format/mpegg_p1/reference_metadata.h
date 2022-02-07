@@ -29,6 +29,21 @@ class ReferenceMetadata : public GenInfo {
     std::string reference_metadata_value;  //!< @brief
 
  public:
+
+    void patchID(uint8_t groupID) {
+        dataset_group_id = groupID;
+    }
+
+    void patchRefID(uint8_t _old, uint8_t _new) {
+        if(reference_id == _old) {
+            reference_id = _new;
+        }
+    }
+
+    std::string decapsulate() {
+        return std::move(reference_metadata_value);
+    }
+
     /**
      * @brief
      * @param info

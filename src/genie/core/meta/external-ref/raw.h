@@ -13,6 +13,7 @@
 #include <vector>
 #include "genie/core/meta/external-ref.h"
 #include "nlohmann/json.hpp"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +49,11 @@ class Raw : public ExternalRef {
      */
     const std::vector<std::string>& getChecksums() const;
 
+
+    std::vector<std::string>& getChecksums() {
+        return ref_type_other_checksums;
+    }
+
     /**
      * @brief Add new checksum
      * @param checksum Checksum to add
@@ -59,6 +65,14 @@ class Raw : public ExternalRef {
      * @return Json representation
      */
     nlohmann::json toJson() const override;
+
+    std::unique_ptr<RefBase> clone() const override {
+        auto ret = genie::util::make_unique<Raw>(getURI(), getChecksumAlgo());
+        for(auto& c : ref_type_other_checksums) {
+            ret->addChecksum(c);
+        }
+        return ret;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -36,6 +36,46 @@ class Reference {
     std::string reference_metadata_value;  //!< @brief MPEG-G part 3 meta information
 
  public:
+    Reference(const Reference& _ref)
+        : reference_name(_ref.reference_name),
+          reference_major_version(_ref.reference_major_version),
+          reference_minor_version(_ref.reference_minor_version),
+          reference_patch_version(_ref.reference_patch_version),
+          seqs(_ref.seqs),
+          ref(_ref.ref->clone()),
+          reference_metadata_value(_ref.reference_metadata_value) {}
+
+    Reference(Reference&& _ref) noexcept
+        : reference_name(std::move(_ref.reference_name)),
+          reference_major_version(_ref.reference_major_version),
+          reference_minor_version(_ref.reference_minor_version),
+          reference_patch_version(_ref.reference_patch_version),
+          seqs(std::move(_ref.seqs)),
+          ref(std::move(_ref.ref)),
+          reference_metadata_value(std::move(_ref.reference_metadata_value)) {}
+
+    Reference& operator=(const Reference& _ref) {
+        reference_name = _ref.reference_name;
+        reference_major_version = _ref.reference_major_version;
+        reference_minor_version = _ref.reference_minor_version;
+        reference_patch_version = _ref.reference_patch_version;
+        seqs = _ref.seqs;
+        ref = _ref.ref->clone();
+        reference_metadata_value = _ref.reference_metadata_value;
+        return *this;
+    }
+
+    Reference& operator=(Reference&& _ref) noexcept {
+        reference_name = std::move(_ref.reference_name);
+        reference_major_version = _ref.reference_major_version;
+        reference_minor_version = _ref.reference_minor_version;
+        reference_patch_version = _ref.reference_patch_version;
+        seqs = std::move(_ref.seqs);
+        ref = std::move(_ref.ref);
+        reference_metadata_value = std::move(_ref.reference_metadata_value);
+        return *this;
+    }
+
     /**
      * @brief Construct from raw data
      * @param name Reference name
@@ -66,6 +106,11 @@ class Reference {
      */
     const std::string& getName() const;
 
+
+    std::string& getName() {
+        return reference_name;
+    }
+
     /**
      * @brief Return major version level
      * @return Major version
@@ -89,6 +134,10 @@ class Reference {
      * @return Information about all reference sequences
      */
     const std::vector<Sequence>& getSequences() const;
+
+    std::vector<Sequence>& getSequences() {
+        return seqs;
+    }
 
     /**
      * @brief Add a new reference sequence

@@ -28,6 +28,15 @@ class DatasetGroup {
     std::string DG_protection_value;  //!< @brief MPEG-G part 3 protection information
 
  public:
+
+    void setMetadata(std::string meta) {
+        DG_metadata_value = std::move(meta);
+    }
+
+    void setProtection(std::string prot) {
+        DG_metadata_value = std::move(prot);
+    }
+
     /**
      * @brief Return dataset group ID
      * @return dataset group ID
@@ -45,6 +54,15 @@ class DatasetGroup {
      * @return MPEG-G part 3 meta information
      */
     const std::string& getInformation() const;
+
+
+    std::string& getInformation() {
+        return DG_metadata_value;
+    }
+
+    std::string& getProtection() {
+        return DG_protection_value;
+    }
 
     /**
      * @brief Return MPEG-G part 3 meta information

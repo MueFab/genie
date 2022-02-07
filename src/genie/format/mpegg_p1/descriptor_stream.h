@@ -114,6 +114,15 @@ class DescriptorStream : public GenInfo {
      */
     const DSProtection& getProtection() const;
 
+
+    /**
+     * @brief
+     * @return
+     */
+    DSProtection& getProtection() {
+        return *ds_protection;
+    }
+
     /**
      * @brief
      * @return

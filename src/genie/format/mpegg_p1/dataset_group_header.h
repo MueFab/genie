@@ -30,6 +30,11 @@ class DatasetGroupHeader : public GenInfo {
     std::vector<uint16_t> dataset_IDs;  //!< @brief
 
  public:
+
+    void patchID(uint8_t groupID) {
+        ID = groupID;
+    }
+
     /**
      * @brief
      * @param info

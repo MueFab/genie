@@ -13,6 +13,7 @@
 #include <vector>
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/label_dataset.h"
+#include "genie/core/meta/label.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +30,18 @@ class Label : public GenInfo {
     std::vector<LabelDataset> dataset_infos;  //!< @brief
 
  public:
+
+    core::meta::Label decapsulate(uint16_t dataset) {
+        core::meta::Label ret(label_ID);
+        for(auto& d : dataset_infos) {
+            auto regions = d.decapsulate(dataset);
+            for (auto& r : regions) {
+                ret.addRegion(std::move(r));
+            }
+        }
+        return ret;
+    }
+
     /**
      * @brief
      * @return

@@ -31,11 +31,23 @@ class LabelList : public GenInfo {
     std::vector<Label> labels;  //!< @brief
 
  public:
+
+    void patchID(uint8_t groupID) {
+        dataset_group_ID = groupID;
+    }
     /**
      * @brief
      * @return
      */
     const std::string& getKey() const override;
+
+    std::vector<genie::core::meta::Label> decapsulate(uint16_t dataset) {
+        std::vector<genie::core::meta::Label> ret;
+        for(auto& l : labels) {
+            ret.emplace_back(l.decapsulate(dataset));
+        }
+        return ret;
+    }
 
     /**
      * @brief
