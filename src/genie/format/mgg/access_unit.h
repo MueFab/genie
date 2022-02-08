@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_ACCESS_UNIT_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_ACCESS_UNIT_H_
+#ifndef SRC_GENIE_FORMAT_MGG_ACCESS_UNIT_H_
+#define SRC_GENIE_FORMAT_MGG_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -174,7 +174,7 @@ class AccessUnit : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_ACCESS_UNIT_H_
+#endif  // SRC_GENIE_FORMAT_MGG_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_REGION_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_REGION_H_
+#ifndef SRC_GENIE_FORMAT_MGG_LABEL_REGION_H_
+#define SRC_GENIE_FORMAT_MGG_LABEL_REGION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ class LabelRegion {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_REGION_H_
+#endif  // SRC_GENIE_FORMAT_MGG_LABEL_REGION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

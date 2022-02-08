@@ -97,7 +97,7 @@ std::string ExceptionBitstreamInvalid::msg() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Hierarchy GenieState::getHierarchy() {
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return Hierarchy{};
 }
 
@@ -108,7 +108,7 @@ std::vector<Records> GenieState::getDataBySimpleFilter(uint64_t datasetGroupID, 
     (void)datasetGroupID;
     (void)datasetID;
     (void)filter;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<Records>();
 }
 
@@ -119,7 +119,7 @@ std::vector<Records> GenieState::getDataByAdvancedFilter(uint64_t datasetGroupID
     (void)datasetGroupID;
     (void)datasetID;
     (void)filter;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<Records>();
 }
 
@@ -130,7 +130,7 @@ std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uin
     (void)datasetGroupID;
     (void)datasetID;
     (void)signature;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<Records>();
 }
 
@@ -139,7 +139,7 @@ std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uin
 std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const std::string& labelID) {
     (void)datasetGroupID;
     (void)labelID;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<Records>();
 }
 
@@ -148,7 +148,7 @@ std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const s
 std::vector<std::string> GenieState::getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID) {
     (void)datasetGroupID;
     (void)datasetID;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<std::string>();
 }
 
@@ -158,7 +158,7 @@ std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t dat
     (void)datasetGroupID;
     (void)datasetID;
     (void)fieldName;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::string();
 }
 
@@ -166,7 +166,7 @@ std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t dat
 
 std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
     (void)datasetGroupID;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::string();
 }
 
@@ -175,7 +175,7 @@ std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
 std::string GenieState::getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID) {
     (void)datasetGroupID;
     (void)datasetID;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::string();
 }
 
@@ -189,7 +189,7 @@ std::vector<RegionProtection> GenieState::getDatasetRegionProtection(uint64_t da
     (void)sequenceID;
     (void)startPos;
     (void)endPos;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<RegionProtection>();
 }
 
@@ -199,7 +199,7 @@ OutReference GenieState::getDatasetReference(uint64_t datasetGroupID, uint64_t d
     (void)datasetGroupID;
     (void)datasetID;
     (void)includeSequences;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return OutReference();
 }
 
@@ -213,7 +213,7 @@ std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(uint64_t da
     (void)sequenceID;
     (void)startPos;
     (void)endPos;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<SimpleSegmentStatistics>();
 }
 
@@ -227,7 +227,7 @@ std::vector<AdvancedSegmentStatistics> GenieState::getAdvancedStatistics(uint64_
     (void)sequenceID;
     (void)startPos;
     (void)endPos;
-    UTILS_DIE("Not implemented");
+    // UTILS_DIE("Not implemented");
     return std::vector<AdvancedSegmentStatistics>();
 }
 

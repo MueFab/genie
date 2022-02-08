@@ -3,8 +3,8 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
+#ifndef SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_HEADER_H_
+#define SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ class DescriptorStreamHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_HEADER_H_
+#endif  // SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
