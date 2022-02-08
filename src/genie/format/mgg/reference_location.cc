@@ -60,8 +60,8 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
         return ret;
     } else if (dynamic_cast<genie::core::meta::InternalRef*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::InternalRef*>(base.get());
-        return genie::util::make_unique<InternalReferenceLocation>(static_cast<uint8_t>(0), ref->getGroupID(),
-                                                                   ref->getID());
+        return genie::util::make_unique<InternalReferenceLocation>(
+            static_cast<uint8_t>(0), static_cast<uint8_t>(ref->getGroupID()), ref->getID());
     } else {
         UTILS_DIE("Unknown reference location type");
     }
