@@ -72,7 +72,7 @@ const std::vector<uint16_t>& DatasetGroupHeader::getDatasetIDs() const { return 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupHeader::addDatasetID(uint16_t _id) { ID = _id; }
+void DatasetGroupHeader::addDatasetID(uint8_t _id) { ID = _id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

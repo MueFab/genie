@@ -269,7 +269,7 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader&
             hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength(),
             hdr.getUOptions().hasSignature() && hdr.getUOptions().getSignature().isConstLength()
                 ? hdr.getUOptions().getSignature().getConstLength()
-                : 0,
+                : static_cast<uint8_t>(0),
             hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs(), hdr.getAlphabetID());
     }
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");

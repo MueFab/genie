@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
-#include <string>
 #include "genie/format/mgg/mgg_file.h"
+#include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

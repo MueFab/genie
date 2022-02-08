@@ -164,7 +164,7 @@ class ReferenceOptions {
      * @param _seq_id
      * @param blocks
      */
-    void addSeq(uint8_t _reference_ID, uint8_t _seq_id, uint16_t blocks);
+    void addSeq(uint8_t _reference_ID, uint16_t _seq_id, uint32_t blocks);
 
     /**
      * @brief

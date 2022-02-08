@@ -118,7 +118,7 @@ ReferenceOptions::ReferenceOptions() : reference_ID(std::numeric_limits<uint8_t>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceOptions::addSeq(uint8_t _reference_ID, uint8_t _seq_id, uint16_t blocks) {
+void ReferenceOptions::addSeq(uint8_t _reference_ID, uint16_t _seq_id, uint32_t blocks) {
     UTILS_DIE_IF(_reference_ID != reference_ID && !seq_ID.empty(), "Unmatching ref id");
     reference_ID = _reference_ID;
     seq_ID.push_back(_seq_id);

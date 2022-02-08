@@ -46,7 +46,7 @@ const std::vector<Label>& LabelList::getLabels() const { return labels; }
 
 void LabelList::box_write(util::BitWriter& bit_writer) const {
     bit_writer.writeBypassBE<uint8_t>(dataset_group_ID);
-    bit_writer.writeBypassBE<uint16_t>(labels.size());
+    bit_writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(labels.size()));
     // data encapsulated in Class Label
     for (auto& label : labels) {
         label.write(bit_writer);
