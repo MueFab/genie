@@ -99,12 +99,12 @@ struct IOConfiguration {
      * @brief Logging level config
      */
     enum class LogLevel {
-        TRACE = 0,   /**< @brief Log every step in great detail */
-        DEBUG = 1,   /**< @brief Intermediate results */
-        INFO = 2,    /**< @brief Expected Results */
-        WARNING = 3, /**< @brief Suspicious events (may be an error) */
-        ERROR = 4,   /**< @brief Handled errors */
-        FATAL = 5    /**< @brief Error causing application to terminate */
+        LOG_TRACE = 0,   /**< @brief Log every step in great detail */
+        LOG_DEBUG = 1,   /**< @brief Intermediate results */
+        LOG_INFO = 2,    /**< @brief Expected Results */
+        LOG_WARNING = 3, /**< @brief Suspicious events (may be an error) */
+        LOG_ERROR = 4,   /**< @brief Handled errors */
+        LOG_FATAL = 5    /**< @brief Error causing application to terminate */
     };
     LogLevel level; /**< @brief Selected level */
 
@@ -114,7 +114,7 @@ struct IOConfiguration {
      * than the currently selected level and a null stream otherwise
      * @param l Logging level of the message you want to write.
      * @return The appropriate stream
-     * Usage: log(LogLevel::FATAL) << "N=NP" << std::endl;
+     * Usage: log(LogLevel::LOG_FATAL) << "N=NP" << std::endl;
      */
     std::ostream& log(const LogLevel& l) const;
 

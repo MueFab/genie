@@ -67,7 +67,7 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, s
     }
 
     genie::entropy::gabac::IOConfiguration ioconf = {
-        istream, dstream, ostream, blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
+        istream, dstream, ostream, blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::LOG_INFO};
 
     genie::core::GenSubIndex genieSubseqID =
         (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
