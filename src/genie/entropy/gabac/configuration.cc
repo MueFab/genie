@@ -92,7 +92,7 @@ void IOConfiguration::validate() const {
     if (!logStream) {
         UTILS_DIE("Invalid logging output stream");
     }
-    if (unsigned(this->level) > unsigned(IOConfiguration::LogLevel::FATAL)) {
+    if (unsigned(this->level) > unsigned(IOConfiguration::LogLevel::LOG_FATAL)) {
         UTILS_DIE("Invalid logging level");
     }
 }

@@ -79,7 +79,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cerr;
     const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream,      bufferDependencyStream,
                                                    &bufferOutputStream,     GABAC_BLOCK_SIZE,
-                                                   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
+                                                   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::LOG_TRACE};
     const bool GABAC_DECODING_MODE = false;
 
     // Run
