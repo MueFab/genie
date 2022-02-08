@@ -9,10 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
-
 #include "boost/variant/variant.hpp"
 #include "genie/core/constants.h"
 #include "genie/core/record/record.h"

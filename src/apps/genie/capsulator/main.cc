@@ -16,7 +16,7 @@
 #include "filesystem/filesystem.hpp"
 #include "format/mgb/mgb_file.h"
 #include "genie/format/mgb/raw_reference.h"
-#include "genie/format/mpegg_p1/mgg_file.h"
+#include "genie/format/mgg/mgg_file.h"
 #include "genie/util/runtime-exception.h"
 #include "util/string-helpers.h"
 
@@ -37,7 +37,7 @@ struct EncapsulatedDataset {
     genie::format::mgb::MgbFile mgb_file;
     genie::core::meta::Dataset meta;
 
-    std::vector<genie::format::mpegg_p1::Dataset> datasets;
+    std::vector<genie::format::mgg::Dataset> datasets;
 
     explicit EncapsulatedDataset(const std::string& input_file, genie::core::MPEGMinorVersion version)
         : reader(input_file), mgb_file(&reader) {
@@ -54,7 +54,7 @@ struct EncapsulatedDataset {
                         if (param_ids.empty()) {
                             continue;
                         }
-                        auto dataset = genie::format::mpegg_p1::Dataset(mgb_file, meta, version, param_ids);
+                        auto dataset = genie::format::mgg::Dataset(mgb_file, meta, version, param_ids);
                         datasets.emplace_back(std::move(dataset));
                     }
                 }
@@ -64,12 +64,12 @@ struct EncapsulatedDataset {
 };
 
 struct EncapsulatedDatasetGroup {
-    boost::optional<genie::format::mpegg_p1::DatasetGroupMetadata> group_meta;
-    boost::optional<genie::format::mpegg_p1::DatasetGroupProtection> group_protection;
-    std::vector<genie::format::mpegg_p1::Reference> references;
-    std::vector<genie::format::mpegg_p1::ReferenceMetadata> reference_meta;
+    boost::optional<genie::format::mgg::DatasetGroupMetadata> group_meta;
+    boost::optional<genie::format::mgg::DatasetGroupProtection> group_protection;
+    std::vector<genie::format::mgg::Reference> references;
+    std::vector<genie::format::mgg::ReferenceMetadata> reference_meta;
     std::vector<std::unique_ptr<EncapsulatedDataset>> datasets;
-    boost::optional<genie::format::mpegg_p1::LabelList> labelList;
+    boost::optional<genie::format::mgg::LabelList> labelList;
 
     void patchID(uint8_t id) {
         if (group_meta != boost::none) {
@@ -119,11 +119,11 @@ struct EncapsulatedDatasetGroup {
         }
 
         if (!meta.empty()) {
-            group_meta = genie::format::mpegg_p1::DatasetGroupMetadata(0, std::move(meta), version);
+            group_meta = genie::format::mgg::DatasetGroupMetadata(0, std::move(meta), version);
         }
 
         if (!protection.empty()) {
-            group_protection = genie::format::mpegg_p1::DatasetGroupProtection(0, std::move(protection), version);
+            group_protection = genie::format::mgg::DatasetGroupProtection(0, std::move(protection), version);
         }
     }
 
@@ -132,14 +132,13 @@ struct EncapsulatedDatasetGroup {
             if (d->meta.getReference() == boost::none) {
                 continue;
             }
-            genie::format::mpegg_p1::ReferenceMetadata ref_meta(0, 0,
-                                                                std::move(d->meta.getReference()->getInformation()));
-            genie::format::mpegg_p1::Reference ref(0, 0, std::move(*d->meta.getReference()), version);
+            genie::format::mgg::ReferenceMetadata ref_meta(0, 0, std::move(d->meta.getReference()->getInformation()));
+            genie::format::mgg::Reference ref(0, 0, std::move(*d->meta.getReference()), version);
             bool found = false;
             for (size_t i = 0; i < references.size(); ++i) {
                 if (references[i] == ref) {
                     if (reference_meta[i].getReferenceMetadataValue().empty()) {
-                        reference_meta[i] = genie::format::mpegg_p1::ReferenceMetadata(0, i, ref_meta.decapsulate());
+                        reference_meta[i] = genie::format::mgg::ReferenceMetadata(0, i, ref_meta.decapsulate());
                     } else {
                         UTILS_DIE_IF(
                             !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
@@ -174,23 +173,22 @@ struct EncapsulatedDatasetGroup {
     }
 
     void mergeLabels() {
-        std::map<std::string, std::vector<genie::format::mpegg_p1::LabelDataset>> labels;
+        std::map<std::string, std::vector<genie::format::mgg::LabelDataset>> labels;
         for (auto& d : datasets) {
             for (auto& l : d->meta.getLabels()) {
                 for (auto& s : d->datasets) {
-                    labels[l.getID()].emplace_back(
-                        genie::format::mpegg_p1::LabelDataset(s.getHeader().getDatasetID(), l));
+                    labels[l.getID()].emplace_back(genie::format::mgg::LabelDataset(s.getHeader().getDatasetID(), l));
                 }
             }
         }
 
         for (auto& s : labels) {
-            genie::format::mpegg_p1::Label label(s.first);
+            genie::format::mgg::Label label(s.first);
             for (auto& l : s.second) {
                 label.addDataset(std::move(l));
             }
             if (labelList == boost::none) {
-                labelList = genie::format::mpegg_p1::LabelList(0);
+                labelList = genie::format::mgg::LabelList(0);
             }
             labelList->addLabel(std::move(label));
         }
@@ -215,8 +213,8 @@ struct EncapsulatedDatasetGroup {
         mergeLabels();
     }
 
-    genie::format::mpegg_p1::DatasetGroup assemble(genie::core::MPEGMinorVersion version) {
-        genie::format::mpegg_p1::DatasetGroup ret(0, 0, version);
+    genie::format::mgg::DatasetGroup assemble(genie::core::MPEGMinorVersion version) {
+        genie::format::mgg::DatasetGroup ret(0, 0, version);
         for (auto& r : references) {
             ret.addReference(std::move(r));
         }
@@ -288,12 +286,12 @@ struct EncapsulatedFile {
         }
     }
 
-    genie::format::mpegg_p1::MggFile assemble(genie::core::MPEGMinorVersion version) {
-        genie::format::mpegg_p1::MggFile ret;
-        ret.addBox(genie::util::make_unique<genie::format::mpegg_p1::FileHeader>(version));
+    genie::format::mgg::MggFile assemble(genie::core::MPEGMinorVersion version) {
+        genie::format::mgg::MggFile ret;
+        ret.addBox(genie::util::make_unique<genie::format::mgg::FileHeader>(version));
 
         for (auto& g : groups) {
-            ret.addBox(genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(g.assemble(version)));
+            ret.addBox(genie::util::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
         }
         return ret;
     }
@@ -325,7 +323,7 @@ ErrorCode encapsulate(ProgramOptions& options) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-boost::optional<genie::core::meta::DatasetGroup> decapsulate_dataset_group(genie::format::mpegg_p1::DatasetGroup* grp) {
+boost::optional<genie::core::meta::DatasetGroup> decapsulate_dataset_group(genie::format::mgg::DatasetGroup* grp) {
     boost::optional<genie::core::meta::DatasetGroup> meta_group;
     if (grp->hasMetadata()) {
         if (meta_group == boost::none) {
@@ -345,7 +343,7 @@ boost::optional<genie::core::meta::DatasetGroup> decapsulate_dataset_group(genie
     return meta_group;
 }
 
-std::map<uint8_t, genie::core::meta::Reference> decapsulate_references(genie::format::mpegg_p1::DatasetGroup* grp) {
+std::map<uint8_t, genie::core::meta::Reference> decapsulate_references(genie::format::mgg::DatasetGroup* grp) {
     std::map<uint8_t, std::string> ref_metadata;
 
     for (auto& m : grp->getReferenceMetadata()) {
@@ -370,9 +368,9 @@ ErrorCode decapsulate(ProgramOptions& options) {
 
     std::string global_output_prefix = options.outputFile.substr(0, options.outputFile.find_last_of('.'));
 
-    genie::format::mpegg_p1::MggFile mpegg_file(&reader);
+    genie::format::mgg::MggFile mpegg_file(&reader);
     for (auto& box : mpegg_file.getBoxes()) {
-        auto* grp = dynamic_cast<genie::format::mpegg_p1::DatasetGroup*>(box.get());
+        auto* grp = dynamic_cast<genie::format::mgg::DatasetGroup*>(box.get());
         if (!grp) {
             continue;
         }
