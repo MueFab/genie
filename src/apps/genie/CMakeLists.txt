@@ -37,7 +37,7 @@ endif ()
 
 add_executable(genie ${source_files})
 
-target_link_libraries(genie PRIVATE genie-mpegg_p1)
+target_link_libraries(genie PRIVATE genie-mgg)
 target_link_libraries(genie PRIVATE genie-gabac)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-spring)
