@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
+#include "genie/core/meta/label.h"
 #include "genie/format/mpegg_p1/label_region.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -30,17 +31,12 @@ class LabelDataset {
     std::vector<LabelRegion> dataset_regions;  //!< @brief
 
  public:
-
-    std::vector<genie::core::meta::Region> decapsulate(uint16_t dataset) {
-        std::vector<genie::core::meta::Region> ret;
-        if(dataset != dataset_ID) {
-            return ret;
-        }
-        for(auto& r : dataset_regions) {
-            ret.emplace_back(r.decapsulate());
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @param dataset
+     * @return
+     */
+    std::vector<genie::core::meta::Region> decapsulate(uint16_t dataset);
 
     /**
      * @brief
@@ -59,6 +55,13 @@ class LabelDataset {
      * @param reader
      */
     explicit LabelDataset(util::BitReader& reader);
+
+    /**
+     * @brief
+     * @param _dataset_ID
+     * @param labels
+     */
+    LabelDataset(uint16_t _dataset_ID, genie::core::meta::Label& labels);
 
     /**
      * @brief

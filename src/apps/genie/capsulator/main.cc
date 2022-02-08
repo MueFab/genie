@@ -7,11 +7,18 @@
 #include "apps/genie/capsulator/main.h"
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "apps/genie/capsulator/program-options.h"
+#include "filesystem/filesystem.hpp"
 #include "format/mgb/mgb_file.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mpegg_p1/mgg_file.h"
 #include "genie/util/runtime-exception.h"
+#include "util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +48,7 @@ struct EncapsulatedDataset {
                     for (uint8_t alphabet_type = 0; alphabet_type < uint8_t(genie::core::AlphabetID::COUNT);
                          ++alphabet_type) {
                         auto param_ids =
-                            mgb_file.collect_param_ids(bool(multiple_alignment), bool(pos40),
+                            mgb_file.collect_param_ids(static_cast<bool>(multiple_alignment), static_cast<bool>(pos40),
                                                        genie::core::parameter::DataUnit::DatasetType(data_type),
                                                        genie::core::AlphabetID(alphabet_type));
                         if (param_ids.empty()) {
@@ -60,7 +67,32 @@ struct EncapsulatedDatasetGroup {
     boost::optional<genie::format::mpegg_p1::DatasetGroupMetadata> group_meta;
     boost::optional<genie::format::mpegg_p1::DatasetGroupProtection> group_protection;
     std::vector<genie::format::mpegg_p1::Reference> references;
+    std::vector<genie::format::mpegg_p1::ReferenceMetadata> reference_meta;
     std::vector<std::unique_ptr<EncapsulatedDataset>> datasets;
+    boost::optional<genie::format::mpegg_p1::LabelList> labelList;
+
+    void patchID(uint8_t id) {
+        if (group_meta != boost::none) {
+            group_meta->patchID(id);
+        }
+        if (group_protection != boost::none) {
+            group_protection->patchID(id);
+        }
+        for (auto& r : references) {
+            r.patchID(id);
+        }
+        for (auto& r : reference_meta) {
+            r.patchID(id);
+        }
+        for (auto& r : datasets) {
+            for (auto& d : r->datasets) {
+                d.patchID(id, d.getHeader().getDatasetID());
+            }
+        }
+        if (labelList != boost::none) {
+            labelList->patchID(id);
+        }
+    }
 
     void mergeMetadata(genie::core::MPEGMinorVersion version) {
         std::string meta;
@@ -97,14 +129,24 @@ struct EncapsulatedDatasetGroup {
 
     void mergeReferences(genie::core::MPEGMinorVersion version) {
         for (auto& d : datasets) {
-            if(d->meta.getReference() == boost::none) {
+            if (d->meta.getReference() == boost::none) {
                 continue;
             }
+            genie::format::mpegg_p1::ReferenceMetadata ref_meta(0, 0,
+                                                                std::move(d->meta.getReference()->getInformation()));
             genie::format::mpegg_p1::Reference ref(0, 0, std::move(*d->meta.getReference()), version);
             bool found = false;
-            for(size_t i = 0; i < references.size(); ++i) {
+            for (size_t i = 0; i < references.size(); ++i) {
                 if (references[i] == ref) {
-                    for(auto& d2 : d->datasets) {
+                    if (reference_meta[i].getReferenceMetadataValue().empty()) {
+                        reference_meta[i] = genie::format::mpegg_p1::ReferenceMetadata(0, i, ref_meta.decapsulate());
+                    } else {
+                        UTILS_DIE_IF(
+                            !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
+                            "Reference Meta mismatch");
+                    }
+
+                    for (auto& d2 : d->datasets) {
                         d2.patchRefID(ref.getReferenceID(), i);
                     }
                     found = true;
@@ -112,12 +154,45 @@ struct EncapsulatedDatasetGroup {
                 }
             }
             if (!found) {
-                for(auto& d2 : d->datasets) {
+                for (auto& d2 : d->datasets) {
                     d2.patchRefID(ref.getReferenceID(), references.size());
                 }
                 ref.patchRefID(ref.getReferenceID(), references.size());
+                ref_meta.patchRefID(ref_meta.getReferenceID(), references.size());
                 references.emplace_back(std::move(ref));
+                reference_meta.emplace_back(std::move(ref_meta));
             }
+        }
+
+        for (auto it = reference_meta.begin(); it != reference_meta.end(); ++it) {
+            if (it->getReferenceMetadataValue().empty()) {
+                it = reference_meta.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    void mergeLabels() {
+        std::map<std::string, std::vector<genie::format::mpegg_p1::LabelDataset>> labels;
+        for (auto& d : datasets) {
+            for (auto& l : d->meta.getLabels()) {
+                for (auto& s : d->datasets) {
+                    labels[l.getID()].emplace_back(
+                        genie::format::mpegg_p1::LabelDataset(s.getHeader().getDatasetID(), l));
+                }
+            }
+        }
+
+        for (auto& s : labels) {
+            genie::format::mpegg_p1::Label label(s.first);
+            for (auto& l : s.second) {
+                label.addDataset(std::move(l));
+            }
+            if (labelList == boost::none) {
+                labelList = genie::format::mpegg_p1::LabelList(0);
+            }
+            labelList->addLabel(std::move(label));
         }
     }
 
@@ -136,9 +211,93 @@ struct EncapsulatedDatasetGroup {
         mergeMetadata(version);
 
         mergeReferences(version);
+
+        mergeLabels();
+    }
+
+    genie::format::mpegg_p1::DatasetGroup assemble(genie::core::MPEGMinorVersion version) {
+        genie::format::mpegg_p1::DatasetGroup ret(0, 0, version);
+        for (auto& r : references) {
+            ret.addReference(std::move(r));
+        }
+        for (auto& r : reference_meta) {
+            ret.addReferenceMeta(std::move(r));
+        }
+        if (labelList != boost::none) {
+            ret.setLabels(std::move(*labelList));
+        }
+        if (group_meta != boost::none) {
+            ret.setMetadata(std::move(*group_meta));
+        }
+        if (group_protection != boost::none) {
+            ret.setProtection(std::move(*group_protection));
+        }
+
+        for (auto& d : datasets) {
+            for (auto& d2 : d->datasets) {
+                ret.addDataset(std::move(d2));
+            }
+        }
+
+        return ret;
     }
 };
 
+struct EncapsulatedFile {
+    std::vector<EncapsulatedDatasetGroup> groups;
+
+    std::map<uint8_t, std::vector<std::string>> groupInputFiles(const std::vector<std::string>& input_files) const {
+        std::vector<std::string> unknown_id;
+        std::map<uint8_t, std::vector<std::string>> ret;
+        for (auto& i : input_files) {
+            if (!ghc::filesystem::exists(i + ".json")) {
+                unknown_id.emplace_back(i);
+                continue;
+            }
+
+            std::ifstream in_file(i + ".json");
+            nlohmann::json my_json;
+            in_file >> my_json;
+            genie::core::meta::Dataset dataset(my_json);
+            if (dataset.getDataGroup() == boost::none) {
+                unknown_id.emplace_back(i);
+                continue;
+            }
+            ret[dataset.getDataGroup()->getID()].emplace_back(i);
+        }
+
+        if (!unknown_id.empty()) {
+            for (size_t i = 0; i < input_files.size(); ++i) {
+                if (ret.find(i) == ret.end()) {
+                    ret[i] = std::move(unknown_id);
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version) {
+        std::map<uint8_t, std::vector<std::string>> file_groups = groupInputFiles(input_files);
+
+        for (auto& g : file_groups) {
+            auto group = EncapsulatedDatasetGroup(g.second, version);
+            group.patchID(g.first);
+            groups.emplace_back(std::move(group));
+        }
+    }
+
+    genie::format::mpegg_p1::MggFile assemble(genie::core::MPEGMinorVersion version) {
+        genie::format::mpegg_p1::MggFile ret;
+        ret.addBox(genie::util::make_unique<genie::format::mpegg_p1::FileHeader>(version));
+
+        for (auto& g : groups) {
+            ret.addBox(genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(g.assemble(version)));
+        }
+        return ret;
+    }
+};
 
 ErrorCode encapsulate(ProgramOptions& options) {
     auto version = genie::core::MPEGMinorVersion::V2000;
@@ -150,18 +309,16 @@ ErrorCode encapsulate(ProgramOptions& options) {
 
     // mgb_file.print_debug(std::cout, 100);
 
-    genie::format::mpegg_p1::MggFile mpegg_file;
-    mpegg_file.addBox(genie::util::make_unique<genie::format::mpegg_p1::FileHeader>(version));
-    auto group = genie::util::make_unique<genie::format::mpegg_p1::DatasetGroup>(0, 0, version);
-
-    mpegg_file.addBox(std::move(group));
+    auto inputs = genie::util::tokenize(options.inputFile, ';');
+    auto input_file = EncapsulatedFile(inputs, version);
+    auto mgg_file = input_file.assemble(version);
 
     std::ofstream outstream(options.outputFile);
     genie::util::BitWriter writer(&outstream);
 
-    mpegg_file.print_debug(std::cout, 100);
+    mgg_file.print_debug(std::cout, 100);
 
-    mpegg_file.write(writer);
+    mgg_file.write(writer);
 
     return ErrorCode::success;
 }

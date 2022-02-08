@@ -36,8 +36,7 @@ class DatasetProtection : public GenInfo {
      * @param bitreader
      * @param _version
      */
-    explicit DatasetProtection(genie::util::BitReader& bitreader,
-                               genie::core::MPEGMinorVersion _version);
+    explicit DatasetProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -54,7 +53,6 @@ class DatasetProtection : public GenInfo {
      * @param bitWriter
      */
     void box_write(genie::util::BitWriter& bitWriter) const override;
-
 
     /**
      * @brief
@@ -81,14 +79,18 @@ class DatasetProtection : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
-    std::string decapsulate() {
-        return std::move(dg_protection_value);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string decapsulate();
 
-    void patchID(uint8_t _groupID, uint16_t _setID) {
-        dataset_group_id = _groupID;
-        dataset_id = _setID;
-    }
+    /**
+     * @brief
+     * @param _groupID
+     * @param _setID
+     */
+    void patchID(uint8_t _groupID, uint16_t _setID);
 
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief

@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/au_protection.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +81,10 @@ bool AUProtection::operator==(const GenInfo& info) const {
            dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
            au_protection_value == other.au_protection_value;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string AUProtection::decapsulate() { return std::move(au_protection_value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

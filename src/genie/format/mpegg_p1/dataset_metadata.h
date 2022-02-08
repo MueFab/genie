@@ -36,8 +36,7 @@ class DatasetMetadata : public GenInfo {
      * @param bitreader
      * @param _version
      */
-    explicit DatasetMetadata(genie::util::BitReader& bitreader,
-                             genie::core::MPEGMinorVersion _version);
+    explicit DatasetMetadata(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -80,15 +79,18 @@ class DatasetMetadata : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+    /**
+     * @brief
+     * @return
+     */
+    std::string decapsulate();
 
-    std::string decapsulate() {
-        return std::move(dg_metatdata_value);
-    }
-
-    void patchID(uint8_t _groupID, uint16_t _setID) {
-        dataset_group_id = _groupID;
-        dataset_id = _setID;
-    }
+    /**
+     * @brief
+     * @param _groupID
+     * @param _setID
+     */
+    void patchID(uint8_t _groupID, uint16_t _setID);
 
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief

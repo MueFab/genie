@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_group_protection.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -71,6 +71,14 @@ uint8_t DatasetGroupProtection::getDatasetGroupID() const { return dataset_group
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& DatasetGroupProtection::getProtection() const { return dg_protection_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string DatasetGroupProtection::decapsulate() { return std::move(dg_protection_value); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupProtection::patchID(uint8_t groupID) { dataset_group_id = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

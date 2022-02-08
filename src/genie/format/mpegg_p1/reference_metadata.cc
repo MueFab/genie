@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/reference_metadata.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,6 +72,22 @@ uint8_t ReferenceMetadata::getReferenceID() const { return reference_id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& ReferenceMetadata::getReferenceMetadataValue() const { return reference_metadata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReferenceMetadata::patchID(uint8_t groupID) { dataset_group_id = groupID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReferenceMetadata::patchRefID(uint8_t _old, uint8_t _new) {
+    if (reference_id == _old) {
+        reference_id = _new;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string ReferenceMetadata::decapsulate() { return std::move(reference_metadata_value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

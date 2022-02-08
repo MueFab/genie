@@ -483,6 +483,44 @@ bool ParameterSet::operator==(const ParameterSet &pset) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
+    output << "* Parameter set " << uint32_t(getID());
+    if (getEncodingSet().isComputedReference()) {
+        switch (getEncodingSet().getComputedRef().getAlgorithm()) {
+            case core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY:
+                output << ", local assembly";
+                break;
+            case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
+                output << ", global assembly";
+                break;
+            case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
+                output << ", ref transform";
+                break;
+            case core::parameter::ComputedRef::Algorithm::PUSH_IN:
+                output << ", push in";
+                break;
+            case core::parameter::ComputedRef::Algorithm::RESERVED:
+                output << ", reserved";
+                break;
+        }
+    } else {
+        output << ", reference based";
+    }
+    switch (getEncodingSet().getAlphabetID()) {
+        case core::AlphabetID::ACGTN:
+            output << ", alphabet ACTGN";
+            break;
+        case core::AlphabetID::ACGTRYSWKMBDHVN_:
+            output << ", alphabet ACGTRYSWKMBDHVN_";
+            break;
+        default:
+            UTILS_DIE("Unknown alphabet ID");
+    }
+    output << ", " << getEncodingSet().getNumberTemplateSegments() << " segments" << std::endl;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace parameter
 }  // namespace core
 }  // namespace genie

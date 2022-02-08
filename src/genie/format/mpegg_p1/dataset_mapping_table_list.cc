@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_mapping_table_list.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -127,6 +127,45 @@ const std::string& DescriptorStream::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID,
+                                   std::vector<format::mgb::Block> blocks)
+    : header(false, descriptor, classID, blocks.size()) {
+    for (auto& b : blocks) {
+        payload.emplace_back(b.movePayloadUnparsed());
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<format::mgb::Block> DescriptorStream::decapsulate() {
+    std::vector<format::mgb::Block> ret;
+    for (auto& p : payload) {
+        ret.emplace_back(header.getDescriptorID(), std::move(p));
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DescriptorStream::isEmpty() const {
+    if (payload.empty()) {
+        return true;
+    }
+
+    for (const auto& p : payload) {
+        if (p.getPayloadSize()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DSProtection& DescriptorStream::getProtection() { return *ds_protection; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

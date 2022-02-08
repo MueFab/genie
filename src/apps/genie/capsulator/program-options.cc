@@ -13,6 +13,7 @@
 #include "cli11/CLI11.hpp"
 #include "filesystem/filesystem.hpp"
 #include "genie/util/runtime-exception.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -109,9 +110,12 @@ void validateOutputFile(const std::string &file, bool forced) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ProgramOptions::validate() const {
-    validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
-              << std::endl;
+    auto files = genie::util::tokenize(inputFile, ';');
+
+    for (const auto &f : files) {
+        validateInputFile(f);
+        std::cout << "Input file: " << f << " with size " << size_string(ghc::filesystem::file_size(f)) << std::endl;
+    }
 
     //    validateOutputFile(outputFile, forceOverwrite);
     std::cout << "Output file: " << outputFile << " with "

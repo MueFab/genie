@@ -4,13 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_BOX_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_BOX_H_
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
-#include "genie/util/bitwriter.h"
+#include "genie/format/mpegg_p1/box.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,50 +14,31 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-/**
- * @brief
- */
-class Box {
- protected:
-    /**
-     * @brief
-     * @param output
-     * @param depth
-     * @param max_depth
-     * @param msg
-     */
-    virtual void print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, const std::string& msg) const;
+// ---------------------------------------------------------------------------------------------------------------------
 
- public:
-    /**
-     * @brief
-     */
-    virtual ~Box() = default;
+void Box::print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, const std::string& msg) const {
+    if (depth > max_depth) {
+        return;
+    }
+    for (int i = 0; i < depth; ++i) {
+        output << "\t";
+    }
+    output << msg << std::endl;
+}
 
-    /**
-     * @brief
-     * @param bitWriter
-     */
-    virtual void write(genie::util::BitWriter& bitWriter) const = 0;
+// ---------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * @brief
-     * @param output
-     * @param depth
-     * @param max_depth
-     */
-    virtual void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const;
-};
+void Box::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    (void)output;
+    (void)depth;
+    (void)max_depth;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_BOX_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

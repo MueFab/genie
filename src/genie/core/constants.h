@@ -9,11 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cmath>
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
-#include <cmath>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace core {
 /**
  * @brief
  */
-enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1, COUNT = 2};
+enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1, COUNT = 2 };
 
 enum class MPEGMinorVersion : uint8_t { V1900 = 0, V2000 = 1, UNKNOWN = 2 };
 

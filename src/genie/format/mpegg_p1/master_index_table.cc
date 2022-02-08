@@ -299,6 +299,40 @@ const std::string& MasterIndexTable::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<uint64_t> MasterIndexTable::getDescriptorStreamOffsets(uint8_t class_index, uint8_t desc_index,
+                                                                   bool isUnaligned, uint64_t total_size) const {
+    std::vector<uint64_t> offsets;
+    if (isUnaligned) {
+        for (const auto& unaligned_au : unaligned_aus) {
+            offsets.emplace_back(unaligned_au.getBlockOffsets().at(desc_index));
+        }
+    } else {
+        for (const auto& seq : aligned_aus) {
+            for (const auto& aligned_au : seq.at(class_index)) {
+                offsets.emplace_back(aligned_au.getBlockOffsets().at(desc_index));
+            }
+        }
+    }
+    std::sort(offsets.begin(), offsets.end());
+    uint64_t last = offsets.front();
+    offsets.erase(offsets.begin());
+    offsets.emplace_back(total_size + last);
+    for (uint64_t& offset : offsets) {
+        uint64_t tmp = offset;
+        offset = offset - last;
+        last = tmp;
+    }
+    return offsets;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void MasterIndexTable::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Master index table");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

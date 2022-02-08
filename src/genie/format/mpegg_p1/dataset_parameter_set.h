@@ -163,11 +163,12 @@ class DatasetParameterSet : public GenInfo {
     core::MPEGMinorVersion version;                     //!< @brief
 
  public:
-
-    void patchID(uint8_t _groupID, uint16_t _setID) {
-        dataset_group_id = _groupID;
-        dataset_id = _setID;
-    }
+    /**
+     * @brief
+     * @param _groupID
+     * @param _setID
+     */
+    void patchID(uint8_t _groupID, uint16_t _setID);
 
     /**
      * @brief
@@ -176,16 +177,21 @@ class DatasetParameterSet : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
+    /**
+     * @brief
+     * @param _dataset_group_id
+     * @param _dataset_id
+     * @param set
+     * @param _version
+     */
     DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::parameter::ParameterSet set,
-                        core::MPEGMinorVersion _version)
-        : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
-                              std::move(set.getEncodingSet()), _version) {}
+                        core::MPEGMinorVersion _version);
 
-
-
-    genie::core::parameter::ParameterSet descapsulate() {
-        return {parameter_set_ID, parent_parameter_set_ID, std::move(params)};
-    }
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::parameter::ParameterSet descapsulate();
 
     /**
      * @brief

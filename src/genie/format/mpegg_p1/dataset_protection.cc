@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_protection.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +79,17 @@ bool DatasetProtection::operator==(const GenInfo& info) const {
     const auto& other = dynamic_cast<const DatasetProtection&>(info);
     return version == other.version && dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
            dg_protection_value == other.dg_protection_value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string DatasetProtection::decapsulate() { return std::move(dg_protection_value); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetProtection::patchID(uint8_t _groupID, uint16_t _setID) {
+    dataset_group_id = _groupID;
+    dataset_id = _setID;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

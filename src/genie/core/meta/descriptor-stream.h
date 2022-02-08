@@ -57,10 +57,11 @@ class DescriptorStream {
      */
     const std::string& getProtection() const;
 
-
-    std::string& getProtection() {
-        return DS_protection_value;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getProtection();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

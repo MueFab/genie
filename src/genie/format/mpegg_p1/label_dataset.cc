@@ -79,6 +79,30 @@ void LabelDataset::write(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<genie::core::meta::Region> LabelDataset::decapsulate(uint16_t dataset) {
+    std::vector<genie::core::meta::Region> ret;
+    if (dataset != dataset_ID) {
+        return ret;
+    }
+    for (auto& r : dataset_regions) {
+        ret.emplace_back(r.decapsulate());
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+LabelDataset::LabelDataset(uint16_t _dataset_ID, genie::core::meta::Label& labels) : dataset_ID(_dataset_ID) {
+    for (auto& l : labels.getRegions()) {
+        dataset_regions.emplace_back(l.getSeqID(), l.getStartPos(), l.getEndPos());
+        for (auto& c : l.getClasses()) {
+            dataset_regions.back().addClassID(c);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

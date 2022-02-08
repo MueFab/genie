@@ -88,7 +88,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
         numSubsyms = outputSymbolSize / codingSubsymSize;
     } else {
         static bool print = false;
-        if(!print) {
+        if (!print) {
             std::cerr << "coding_subsym_size = " + std::to_string(codingSubsymSize) + " not supported" << std::endl;
             print = true;
         }

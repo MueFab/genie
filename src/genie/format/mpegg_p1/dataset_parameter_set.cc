@@ -223,6 +223,26 @@ genie::core::parameter::EncodingSet&& DatasetParameterSet::moveParameterSet() { 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetParameterSet::patchID(uint8_t _groupID, uint16_t _setID) {
+    dataset_group_id = _groupID;
+    dataset_id = _setID;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id,
+                                         genie::core::parameter::ParameterSet set, core::MPEGMinorVersion _version)
+    : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
+                          std::move(set.getEncodingSet()), _version) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::parameter::ParameterSet DatasetParameterSet::descapsulate() {
+    return {parameter_set_ID, parent_parameter_set_ID, std::move(params)};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

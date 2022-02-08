@@ -30,10 +30,11 @@ class DatasetGroupHeader : public GenInfo {
     std::vector<uint16_t> dataset_IDs;  //!< @brief
 
  public:
-
-    void patchID(uint8_t groupID) {
-        ID = groupID;
-    }
+    /**
+     * @brief
+     * @param groupID
+     */
+    void patchID(uint8_t groupID);
 
     /**
      * @brief
@@ -100,14 +101,13 @@ class DatasetGroupHeader : public GenInfo {
      */
     void box_write(genie::util::BitWriter& writer) const override;
 
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* Dataset Group Header");
-        print_offset(output, depth + 1, max_depth, "ID: " + std::to_string(int(ID)));
-        print_offset(output, depth + 1, max_depth, "Version: " + std::to_string(int(version)));
-        for (const auto &id : dataset_IDs) {
-            print_offset(output, depth + 1, max_depth, "Dataset ID: " + std::to_string(int(id)));
-        }
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_metadata.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -80,6 +80,17 @@ bool DatasetMetadata::operator==(const GenInfo& info) const {
     const auto& other = dynamic_cast<const DatasetMetadata&>(info);
     return version == other.version && dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
            dg_metatdata_value == other.dg_metatdata_value;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string DatasetMetadata::decapsulate() { return std::move(dg_metatdata_value); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetMetadata::patchID(uint8_t _groupID, uint16_t _setID) {
+    dataset_group_id = _groupID;
+    dataset_id = _setID;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -15,13 +15,13 @@
 #include "boost/optional/optional.hpp"
 #include "genie/core/meta/access-unit.h"
 #include "genie/core/meta/blockheader.h"
+#include "genie/core/meta/blockheader/enabled.h"
 #include "genie/core/meta/dataset-group.h"
 #include "genie/core/meta/descriptor-stream.h"
 #include "genie/core/meta/label.h"
 #include "genie/core/meta/reference.h"
 #include "genie/util/make-unique.h"
 #include "nlohmann/json.hpp"
-#include "genie/core/meta/blockheader/enabled.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,14 +45,17 @@ class Dataset {
     std::vector<DescriptorStream> descriptor_streams;  //!< @brief List DS meta information
 
  public:
+    /**
+     * @brief
+     * @param meta
+     */
+    void setMetadata(std::string meta);
 
-    void setMetadata(std::string meta) {
-        DT_metadata_value = std::move(meta);
-    }
-
-    void setProtection(std::string prot) {
-        DT_protection_value = std::move(prot);
-    }
+    /**
+     * @brief
+     * @param prot
+     */
+    void setProtection(std::string prot);
 
     /**
      * @brief Construct from raw information
@@ -63,15 +66,16 @@ class Dataset {
      */
     Dataset(uint32_t _version, std::unique_ptr<BlockHeader> _headerCfg, std::string meta, std::string protection);
 
+    /**
+     * @brief
+     */
+    Dataset();
 
-    Dataset() {
-        version = 0;
-        headerCfg = genie::util::make_unique<blockheader::Enabled>(false, false);
-    }
-
-    void setHeader(std::unique_ptr<BlockHeader> _hdr) {
-        headerCfg = std::move(_hdr);
-    }
+    /**
+     * @brief
+     * @param _hdr
+     */
+    void setHeader(std::unique_ptr<BlockHeader> _hdr);
 
     /**
      * @brief Construct from json
@@ -91,9 +95,11 @@ class Dataset {
      */
     const boost::optional<DatasetGroup>& getDataGroup() const;
 
-    boost::optional<DatasetGroup>& getDataGroup() {
-        return dataset_group;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    boost::optional<DatasetGroup>& getDataGroup();
 
     /**
      * @brief Return reference information, if any
@@ -101,16 +107,23 @@ class Dataset {
      */
     const boost::optional<Reference>& getReference() const;
 
-
-    boost::optional<Reference>& getReference() {
-        return reference;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    boost::optional<Reference>& getReference();
 
     /**
      * @brief Return list of labels
      * @return List of labels
      */
     const std::vector<Label>& getLabels() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<Label>& getLabels();
 
     /**
      * @brief Return current version iteration
@@ -130,9 +143,11 @@ class Dataset {
      */
     const std::string& getInformation() const;
 
-    std::string& getInformation() {
-        return DT_metadata_value;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
 
     /**
      * @brief Return MPEG-G Part 3 protection information
@@ -140,10 +155,11 @@ class Dataset {
      */
     const std::string& getProtection() const;
 
-
-    std::string& getProtection() {
-        return DT_protection_value;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getProtection();
 
     /**
      * @brief Return list of access unit meta information blocks
@@ -151,9 +167,11 @@ class Dataset {
      */
     const std::vector<AccessUnit>& getAUs() const;
 
-    std::vector<AccessUnit>& getAUs() {
-        return access_units;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<AccessUnit>& getAUs();
 
     /**
      * @brief Return list of descriptor stream meta information blocks
@@ -161,10 +179,11 @@ class Dataset {
      */
     const std::vector<DescriptorStream>& getDSs() const;
 
-
-    std::vector<DescriptorStream>& getDSs() {
-        return descriptor_streams;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<DescriptorStream>& getDSs();
 
     /**
      * @brief Update dataset group information

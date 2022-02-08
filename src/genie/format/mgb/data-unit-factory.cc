@@ -76,6 +76,10 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 } else {
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
+                        for (auto& b : ret.getBlocks()) {
+                            b.load();
+                            b.parse();
+                        }
                         UTILS_DIE_IF(ret.getHeader().getClass() == genie::core::record::ClassType::CLASS_HM,
                                      "Class HM not supported");
                         ret.debugPrint(parameters.at(ret.getHeader().getParameterID()));

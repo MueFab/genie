@@ -25,6 +25,10 @@ namespace mpegg_p1 {
  */
 class AUInformation : public GenInfo {
  public:
+    /**
+     * @brief
+     * @return
+     */
     const std::string& getKey() const override;
 
     /**
@@ -32,8 +36,7 @@ class AUInformation : public GenInfo {
      * @param bitreader
      * @param _version
      */
-    explicit AUInformation(genie::util::BitReader& bitreader,
-                           genie::core::MPEGMinorVersion _version);
+    explicit AUInformation(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -76,9 +79,11 @@ class AUInformation : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
-    std::string decapsulate() {
-        return std::move(au_information_value);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string decapsulate();
 
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief

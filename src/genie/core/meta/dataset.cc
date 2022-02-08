@@ -157,6 +157,53 @@ void Dataset::addDescriptorStream(DescriptorStream ds) { descriptor_streams.empl
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Dataset::setMetadata(std::string meta) { DT_metadata_value = std::move(meta); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setProtection(std::string prot) { DT_protection_value = std::move(prot); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Dataset::Dataset() {
+    version = 0;
+    headerCfg = genie::util::make_unique<blockheader::Enabled>(false, false);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setHeader(std::unique_ptr<BlockHeader> _hdr) { headerCfg = std::move(_hdr); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+boost::optional<DatasetGroup>& Dataset::getDataGroup() { return dataset_group; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+boost::optional<Reference>& Dataset::getReference() { return reference; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<Label>& Dataset::getLabels() { return label_list; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& Dataset::getInformation() { return DT_metadata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& Dataset::getProtection() { return DT_protection_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<AccessUnit>& Dataset::getAUs() { return access_units; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<DescriptorStream>& Dataset::getDSs() { return descriptor_streams; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace meta
 }  // namespace core
 }  // namespace genie

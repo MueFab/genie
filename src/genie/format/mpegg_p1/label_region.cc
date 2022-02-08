@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <utility>
 #include "genie/format/mpegg_p1/label_region.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -89,6 +90,13 @@ bool LabelRegion::operator==(const LabelRegion& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t LabelRegion::sizeInBits() const { return sizeof(uint16_t) * 8 + 4 + 4 * class_IDs.size() + 40 + 40; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::meta::Region LabelRegion::decapsulate() {
+    genie::core::meta::Region ret(seq_ID, start_pos, end_pos, std::move(class_IDs));
+    return ret;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

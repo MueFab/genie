@@ -51,7 +51,7 @@ DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
         d = reader.readBypassBE<uint16_t>();
     }
 
-    UTILS_DIE_IF(start_pos + length != uint64_t (reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -81,6 +81,21 @@ void DatasetGroupHeader::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE<uint8_t>(version);
     for (auto& d : dataset_IDs) {
         writer.writeBypassBE<uint16_t>(d);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupHeader::patchID(uint8_t groupID) { ID = groupID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Dataset Group Header");
+    print_offset(output, depth + 1, max_depth, "ID: " + std::to_string(static_cast<int>(ID)));
+    print_offset(output, depth + 1, max_depth, "Version: " + std::to_string(static_cast<int>(version)));
+    for (const auto& id : dataset_IDs) {
+        print_offset(output, depth + 1, max_depth, "Dataset ID: " + std::to_string(static_cast<int>(id)));
     }
 }
 

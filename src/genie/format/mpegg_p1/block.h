@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include "genie/core/payload.h"
+#include "genie/format/mgb/block.h"
 #include "genie/format/mpegg_p1/block_header.h"
 #include "genie/format/mpegg_p1/box.h"
-#include "genie/format/mgb/block.h"
 #include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -26,16 +26,17 @@ namespace mpegg_p1 {
  */
 class Block : public Box {
  private:
-    BlockHeader header;  //!< @brief
-    core::Payload payload;
+    BlockHeader header;     //!< @brief
+    core::Payload payload;  //!< @brief
 
  public:
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* Block");
-        print_offset(output, depth + 1, max_depth,
-                     "Block descriptor ID: " + genie::core::getDescriptor(header.getDescriptorID()).name);
-        print_offset(output, depth + 1, max_depth, "Block payload size: " + std::to_string(header.getPayloadSize()));
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 
     /**
      * @brief
@@ -57,9 +58,11 @@ class Block : public Box {
      */
     Block(genie::core::GenDesc _desc_id, genie::util::DataBlock payload);
 
-    explicit Block(format::mgb::Block b)
-        : header(false, core::GenDesc(b.getDescriptorID()), 0, b.getPayloadUnparsed().getPayloadSize()),
-          payload(std::move(b.getPayloadUnparsed())) {}
+    /**
+     * @brief
+     * @param b
+     */
+    explicit Block(format::mgb::Block b);
 
     /**
      * @brief
@@ -77,9 +80,13 @@ class Block : public Box {
      * @brief
      * @return
      */
-    core::Payload movePayload() { return std::move(boost::get<core::Payload>(payload)); }
+    core::Payload movePayload();
 
-    format::mgb::Block decapsulate() { return {header.getDescriptorID(), movePayload()}; }
+    /**
+     * @brief
+     * @return
+     */
+    format::mgb::Block decapsulate();
 
     /**
      * @brief

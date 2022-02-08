@@ -89,6 +89,25 @@ const std::vector<LabelDataset>& Label::getDatasets() const { return dataset_inf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+core::meta::Label Label::decapsulate(uint16_t dataset) {
+    core::meta::Label ret(label_ID);
+    for (auto& d : dataset_infos) {
+        auto regions = d.decapsulate(dataset);
+        for (auto& r : regions) {
+            ret.addRegion(std::move(r));
+        }
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Label::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Label");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

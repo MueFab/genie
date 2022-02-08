@@ -90,9 +90,9 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
                 if (parameterSets.at(parameter_set_ID).isSignatureConstLength()) {
                     length = parameterSets.at(parameter_set_ID).getSignatureConstLength();
                 }
-                this->signature_config =
-                    SignatureCfg(bitReader, length,
-                                 genie::core::getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
+                this->signature_config = SignatureCfg(
+                    bitReader, length,
+                    genie::core::getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
             }
         }
     }
@@ -335,6 +335,56 @@ void AccessUnit::addBlock(Block block) {
     header.blockAdded();
     blocks.push_back(std::move(block));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AUHeader &AccessUnit::getHeader() const { return header; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::print_debug(std::ostream &output, uint8_t, uint8_t) const {
+    output << "* Access Unit " << header.getID() << " ";
+    switch (header.getClass()) {
+        case core::record::ClassType::NONE:
+            output << "INVALID";
+            break;
+        case core::record::ClassType::CLASS_U:
+            output << "U";
+            break;
+        case core::record::ClassType::CLASS_P:
+            output << "P";
+            break;
+        case core::record::ClassType::CLASS_N:
+            output << "N";
+            break;
+        case core::record::ClassType::CLASS_M:
+            output << "M";
+            break;
+        case core::record::ClassType::CLASS_I:
+            output << "I";
+            break;
+        case core::record::ClassType::CLASS_HM:
+            output << "HM";
+            break;
+    }
+    if (header.getClass() != core::record::ClassType::CLASS_U) {
+        output << ", [" << header.getAlignmentInfo().getRefID() << "-" << header.getAlignmentInfo().getStartPos() << ":"
+               << header.getAlignmentInfo().getEndPos() << "]";
+    }
+
+    output << ", " << header.getReadCount() << " records";
+    output << ", " << header.getNumBlocks() << " blocks";
+    output << ", parameter set " << uint32_t(header.getParameterID()) << std::endl;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::AccessUnit(AUHeader h, std::vector<Block> b)
+    : DataUnit(DataUnitType::ACCESS_UNIT),
+      header(std::move(h)),
+      blocks(std::move(b)),
+      payloadbytes(0),
+      qv_payloads(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -77,7 +77,6 @@ class DataSetMappingTableList : public GenInfo {
      * @return
      */
     const std::vector<uint16_t>& getDatasetMappingTableSIDs() const;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

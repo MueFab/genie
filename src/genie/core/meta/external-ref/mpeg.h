@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include <memory>
 #include "genie/core/meta/external-ref.h"
 #include "genie/util/make-unique.h"
 
@@ -70,16 +71,17 @@ class MPEG : public ExternalRef {
      */
     const std::string& getChecksum() const;
 
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getChecksum();
 
-    std::string& getChecksum()  {
-        return ref_checksum;
-    }
-
-    std::unique_ptr<RefBase> clone() const override {
-        auto ret = genie::util::make_unique<MPEG>(getURI(), getChecksumAlgo(), external_dataset_group_id,
-                                                  external_dataset_id, ref_checksum);
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

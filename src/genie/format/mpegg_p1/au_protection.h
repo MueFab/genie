@@ -36,8 +36,7 @@ class AUProtection : public GenInfo {
      * @param bitreader
      * @param _version
      */
-    explicit AUProtection(genie::util::BitReader& bitreader,
-                          genie::core::MPEGMinorVersion _version);
+    explicit AUProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -54,7 +53,6 @@ class AUProtection : public GenInfo {
      * @param bitWriter
      */
     void box_write(genie::util::BitWriter& bitWriter) const override;
-
 
     /**
      * @brief
@@ -81,9 +79,11 @@ class AUProtection : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
-    std::string decapsulate() {
-        return std::move(au_protection_value);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string decapsulate();
 
  private:
     genie::core::MPEGMinorVersion version;  //!< @brief

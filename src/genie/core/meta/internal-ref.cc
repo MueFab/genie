@@ -49,6 +49,13 @@ const std::string& InternalRef::getKeyName() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::unique_ptr<RefBase> InternalRef::clone() const {
+    auto ret = genie::util::make_unique<InternalRef>(internal_dataset_group_id, internal_dataset_ID);
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace meta
 }  // namespace core
 }  // namespace genie
