@@ -50,12 +50,12 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
     uint8_t class_index = 0;
     uint8_t descriptor_index = 0;
     bool found = false;
-    for (size_t i = 0; i < configs.size(); ++i) {
+    for (uint8_t i = 0; i < static_cast<uint8_t>(configs.size()); ++i) {
         if (configs[i].getClassID() == header.getClassType()) {
             class_index = i;
             found = true;
             bool found2 = false;
-            for (size_t j = 0; j < configs[i].getDescriptorIDs().size(); ++j) {
+            for (uint8_t j = 0; j < static_cast<uint8_t>(configs[i].getDescriptorIDs().size()); ++j) {
                 if (configs[i].getDescriptorIDs()[j] == header.getDescriptorID()) {
                     descriptor_index = j;
                     found2 = true;
@@ -129,7 +129,7 @@ const std::string& DescriptorStream::getKey() const {
 
 DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID,
                                    std::vector<format::mgb::Block> blocks)
-    : header(false, descriptor, classID, blocks.size()) {
+    : header(false, descriptor, classID, static_cast<uint32_t>(blocks.size())) {
     for (auto& b : blocks) {
         payload.emplace_back(b.movePayloadUnparsed());
     }

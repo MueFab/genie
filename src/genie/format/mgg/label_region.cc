@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/label_region.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

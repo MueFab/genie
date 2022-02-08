@@ -93,7 +93,7 @@ class DatasetGroupHeader : public GenInfo {
      * @brief
      * @param _id
      */
-    void addDatasetID(uint16_t _id);
+    void addDatasetID(uint8_t _id);
 
     /**
      * @brief

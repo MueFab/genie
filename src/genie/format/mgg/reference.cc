@@ -189,7 +189,7 @@ void Reference::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE(reference_ID);
     writer.writeBypass(reference_name.data(), reference_name.length());
     ref_version.write(writer);
-    writer.writeBypassBE<uint16_t>(sequences.size());
+    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(sequences.size()));
     for (const auto& s : sequences) {
         s.write(writer);
     }
@@ -198,7 +198,10 @@ void Reference::box_write(genie::util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::ReferenceSeq::ReferenceSeq(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
-    : name(std::move(s.getName())), sequence_length(s.getLength()), sequence_id(s.getID()), version(_version) {}
+    : name(std::move(s.getName())),
+      sequence_length(static_cast<uint32_t>(s.getLength())),
+      sequence_id(s.getID()),
+      version(_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -228,7 +231,8 @@ Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::co
     : dataset_group_ID(_dataset_group_id),
       reference_ID(_reference_ID),
       reference_name(std::move(ref.getName())),
-      ref_version(ref.getMajorVersion(), ref.getMinorVersion(), ref.getPatchVersion()),
+      ref_version(static_cast<uint16_t>(ref.getMajorVersion()), static_cast<uint16_t>(ref.getMinorVersion()),
+                  static_cast<uint16_t>(ref.getPatchVersion())),
       version(_version) {
     for (auto& r : ref.getSequences()) {
         sequences.emplace_back(std::move(r), version);

@@ -48,7 +48,7 @@ bool Block::operator==(const Block& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock _payload)
-    : header(false, _desc_id, 0, _payload.getRawSize()), payload(std::move(_payload)) {}
+    : header(false, _desc_id, 0, static_cast<uint32_t>(_payload.getRawSize())), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,8 @@ void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(format::mgb::Block b)
-    : header(false, core::GenDesc(b.getDescriptorID()), 0, b.getPayloadUnparsed().getPayloadSize()),
+    : header(false, core::GenDesc(b.getDescriptorID()), 0,
+             static_cast<uint32_t>(b.getPayloadUnparsed().getPayloadSize())),
       payload(std::move(b.getPayloadUnparsed())) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

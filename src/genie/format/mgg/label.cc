@@ -55,7 +55,7 @@ void Label::box_write(util::BitWriter& bit_writer) const {
     bit_writer.writeBypassBE('\0');
 
     // num_datasets u(16)
-    bit_writer.writeBypassBE<uint16_t>(dataset_infos.size());
+    bit_writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(dataset_infos.size()));
 
     // data encapsulated in Class dataset_info
     for (auto& ds_info : dataset_infos) {

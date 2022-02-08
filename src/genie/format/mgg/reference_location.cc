@@ -38,7 +38,7 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
         auto ret = genie::util::make_unique<ExternalReferenceLocationMPEGG>(
             0, std::move(ref->getURI()),
             genie::format::mgg::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()),
-            ref->getGroupID(), ref->getID(), std::move(ref->getChecksum()), _version);
+            static_cast<uint8_t>(ref->getGroupID()), ref->getID(), std::move(ref->getChecksum()), _version);
         return ret;
     } else if (dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get());
