@@ -36,14 +36,14 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
     if (dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get());
         auto ret = genie::util::make_unique<ExternalReferenceLocationMPEGG>(
-            static_cast<uint16_t>(0), std::move(ref->getURI()),
+            static_cast<uint8_t>(0), std::move(ref->getURI()),
             genie::format::mgg::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()),
             static_cast<uint8_t>(ref->getGroupID()), ref->getID(), std::move(ref->getChecksum()), _version);
         return ret;
     } else if (dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get());
         auto ret = genie::util::make_unique<ExternalReferenceLocationFasta>(
-            static_cast<uint16_t>(0), std::move(ref->getURI()),
+            static_cast<uint8_t>(0), std::move(ref->getURI()),
             genie::format::mgg::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
             ret->addChecksum(std::move(s));
@@ -52,7 +52,7 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
     } else if (dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get());
         auto ret = genie::util::make_unique<ExternalReferenceLocationRaw>(
-            static_cast<uint16_t>(0), std::move(ref->getURI()),
+            static_cast<uint8_t>(0), std::move(ref->getURI()),
             genie::format::mgg::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
             ret->addChecksum(std::move(s));
@@ -60,7 +60,7 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
         return ret;
     } else if (dynamic_cast<genie::core::meta::InternalRef*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::InternalRef*>(base.get());
-        return genie::util::make_unique<InternalReferenceLocation>(static_cast<uint16_t>(0), ref->getGroupID(),
+        return genie::util::make_unique<InternalReferenceLocation>(static_cast<uint8_t>(0), ref->getGroupID(),
                                                                    ref->getID());
     } else {
         UTILS_DIE("Unknown reference location type");
