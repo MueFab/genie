@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
+#ifndef SRC_GENIE_FORMAT_MGG_AU_INFORMATION_H_
+#define SRC_GENIE_FORMAT_MGG_AU_INFORMATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ class AUInformation : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_AU_INFORMATION_H_
+#endif  // SRC_GENIE_FORMAT_MGG_AU_INFORMATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

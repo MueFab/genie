@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
+#ifndef SRC_GENIE_FORMAT_MGG_REFERENCE_LOCATION_H_
+#define SRC_GENIE_FORMAT_MGG_REFERENCE_LOCATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -478,7 +478,7 @@ class InternalReferenceLocation : public ReferenceLocation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_LOCATION_H_
+#endif  // SRC_GENIE_FORMAT_MGG_REFERENCE_LOCATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

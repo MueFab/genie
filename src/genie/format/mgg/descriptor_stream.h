@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
+#ifndef SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_H_
+#define SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -142,7 +142,7 @@ class DescriptorStream : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DESCRIPTOR_STREAM_H_
+#endif  // SRC_GENIE_FORMAT_MGG_DESCRIPTOR_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
