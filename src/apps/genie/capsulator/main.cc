@@ -138,7 +138,8 @@ struct EncapsulatedDatasetGroup {
             for (size_t i = 0; i < references.size(); ++i) {
                 if (references[i] == ref) {
                     if (reference_meta[i].getReferenceMetadataValue().empty()) {
-                        reference_meta[i] = genie::format::mgg::ReferenceMetadata(0, i, ref_meta.decapsulate());
+                        reference_meta[i] = genie::format::mgg::ReferenceMetadata(
+                            static_cast<uint8_t>(0), static_cast<uint8_t>(i), ref_meta.decapsulate());
                     } else {
                         UTILS_DIE_IF(
                             !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
@@ -146,7 +147,7 @@ struct EncapsulatedDatasetGroup {
                     }
 
                     for (auto& d2 : d->datasets) {
-                        d2.patchRefID(ref.getReferenceID(), i);
+                        d2.patchRefID(ref.getReferenceID(), static_cast<uint8_t>(i));
                     }
                     found = true;
                     break;
@@ -154,10 +155,10 @@ struct EncapsulatedDatasetGroup {
             }
             if (!found) {
                 for (auto& d2 : d->datasets) {
-                    d2.patchRefID(ref.getReferenceID(), references.size());
+                    d2.patchRefID(ref.getReferenceID(), static_cast<uint8_t>(references.size()));
                 }
-                ref.patchRefID(ref.getReferenceID(), references.size());
-                ref_meta.patchRefID(ref_meta.getReferenceID(), references.size());
+                ref.patchRefID(ref.getReferenceID(), static_cast<uint8_t>(references.size()));
+                ref_meta.patchRefID(ref_meta.getReferenceID(), static_cast<uint8_t>(references.size()));
                 references.emplace_back(std::move(ref));
                 reference_meta.emplace_back(std::move(ref_meta));
             }
@@ -202,7 +203,7 @@ struct EncapsulatedDatasetGroup {
         size_t index = 0;
         for (auto& d : datasets) {
             for (auto& d2 : d->datasets) {
-                d2.patchID(0, index++);
+                d2.patchID(static_cast<uint8_t>(0), static_cast<uint16_t>(index++));
             }
         }
 
@@ -261,13 +262,13 @@ struct EncapsulatedFile {
                 unknown_id.emplace_back(i);
                 continue;
             }
-            ret[dataset.getDataGroup()->getID()].emplace_back(i);
+            ret[static_cast<uint8_t>(dataset.getDataGroup()->getID())].emplace_back(i);
         }
 
         if (!unknown_id.empty()) {
             for (size_t i = 0; i < input_files.size(); ++i) {
-                if (ret.find(i) == ret.end()) {
-                    ret[i] = std::move(unknown_id);
+                if (ret.find(static_cast<uint8_t>(i)) == ret.end()) {
+                    ret[static_cast<uint8_t>(i)] = std::move(unknown_id);
                     break;
                 }
             }
