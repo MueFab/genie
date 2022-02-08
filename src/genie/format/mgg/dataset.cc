@@ -140,7 +140,7 @@ Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MP
 
     auto params_p2 = file.extractParameters(param_ids);
     for (auto& p : params_p2) {
-        parameterSets.emplace_back(static_cast<uint16_t>(0), static_cast<uint16_t>(0), p->getID(), p->getParentID(),
+        parameterSets.emplace_back(static_cast<uint8_t>(0), static_cast<uint16_t>(0), p->getID(), p->getParentID(),
                                    std::move(p->getEncodingSet()), version);
     }
 

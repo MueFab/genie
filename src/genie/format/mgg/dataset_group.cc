@@ -50,7 +50,7 @@ DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion
 
 void DatasetGroup::addDataset(Dataset ds) {
     dataset.emplace_back(std::move(ds));
-    header->addDatasetID(dataset.back().getHeader().getDatasetID());
+    header->addDatasetID(static_cast<uint8_t>(dataset.back().getHeader().getDatasetID()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
