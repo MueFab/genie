@@ -32,9 +32,9 @@ SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, u
             len = *U_signature_size;
         } else {
             len = reader.read<uint8_t>(8);
-            U_cluster_signature_length.emplace_back(len);
+            U_cluster_signature_length.emplace_back(static_cast<uint8_t>(len));
         }
-        U_cluster_signature.emplace_back(reader.read<uint64_t>(base_bits * len));
+        U_cluster_signature.emplace_back(reader.read<uint64_t>(static_cast<uint8_t>(base_bits * len)));
     }
 }
 
