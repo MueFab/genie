@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/descriptor_stream_header.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,6 @@ DSProtection::DSProtection(genie::util::BitReader& reader) {
     reader.readBypass(DSProtectionValue);
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -127,6 +126,10 @@ bool DescriptorStreamHeader::operator==(const GenInfo& info) const {
     return reserved == other.reserved && descriptor_id == other.descriptor_id && class_id == other.class_id &&
            num_blocks == other.num_blocks;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string DSProtection::decapsulate() { return std::move(DSProtectionValue); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

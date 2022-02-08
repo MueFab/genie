@@ -40,13 +40,27 @@ void Raw::addChecksum(std::string checksum) { ref_type_other_checksums.emplace_b
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<std::string>& Raw::getChecksums() { return ref_type_other_checksums; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 nlohmann::json Raw::toJson() const {
     auto ret = ExternalRef::toJson();
     std::vector<std::string> hexed = ref_type_other_checksums;
-    for(auto& s : hexed) {
+    for (auto& s : hexed) {
         s = util::toHex(s);
     }
     ret["ref_type_other_checksums"] = hexed;
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<RefBase> Raw::clone() const {
+    auto ret = genie::util::make_unique<Raw>(getURI(), getChecksumAlgo());
+    for (auto& c : ref_type_other_checksums) {
+        ret->addChecksum(c);
+    }
     return ret;
 }
 

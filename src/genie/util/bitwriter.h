@@ -97,13 +97,17 @@ class BitWriter {
      */
     void writeBypass(const void *in, size_t size);
 
-    int64_t getPosition() const {
-        return stream->tellp();
-    }
+    /**
+     * @brief
+     * @return
+     */
+    int64_t getPosition() const;
 
-    void setPosition(int64_t pos) {
-        stream->seekp(pos, std::ios::beg);
-    }
+    /**
+     * @brief
+     * @param pos
+     */
+    void setPosition(int64_t pos);
 
     /**
      * @brief Write a single value as big endian

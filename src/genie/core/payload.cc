@@ -4,87 +4,106 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/block.h"
 #include <utility>
+#include "genie/core/payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace mpegg_p1 {
+namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(util::BitReader& reader) : header(reader), payload(reader, header.getPayloadSize()) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t Block::getPayloadSize() const { return header.getPayloadSize(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Block::getLength() const {
-    uint64_t len = header.getLength() + header.getPayloadSize();
-
-    /// block_payload[] u(8)
-    //    len += block_payload.size() * sizeof(uint8_t);
-
-    return len;
+genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
+    auto pos = reader.getPos();
+    reader.setPos(payloadPosition);
+    genie::util::DataBlock tmp;
+    tmp.resize(payloadSize);
+    reader.readBypass(tmp.getData(), payloadSize);
+    reader.setPos(pos);
+    return tmp;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Block::write(genie::util::BitWriter& writer) const {
-    header.write(writer);
-    payload.write(writer);
+uint64_t Payload::getPayloadSize() const {
+    if (isPayloadLoaded()) {
+        return block_payload.getRawSize();
+    } else {
+        return payloadSize;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Block::operator==(const Block& other) const {
-    return header == other.header && payload.getPayload() == other.getPayload();
+void Payload::loadPayload() {
+    block_payload = _internal_loadPayload(*internal_reader);
+    payloadLoaded = true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock _payload)
-    : header(false, _desc_id, 0, _payload.getRawSize()), payload(std::move(_payload)) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::util::DataBlock& Block::getPayload() const { return payload.getPayload(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-genie::core::GenDesc Block::getDescID() const { return header.getDescriptorID(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
-    print_offset(output, depth, max_depth, "* Block");
-    print_offset(output, depth + 1, max_depth,
-                 "Block descriptor ID: " + genie::core::getDescriptor(header.getDescriptorID()).name);
-    print_offset(output, depth + 1, max_depth, "Block payload size: " + std::to_string(header.getPayloadSize()));
+void Payload::unloadPayload() {
+    payloadLoaded = false;
+    block_payload.clear();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(format::mgb::Block b)
-    : header(false, core::GenDesc(b.getDescriptorID()), 0, b.getPayloadUnparsed().getPayloadSize()),
-      payload(std::move(b.getPayloadUnparsed())) {}
+bool Payload::isPayloadLoaded() const { return payloadLoaded; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::Payload Block::movePayload() { return std::move(boost::get<core::Payload>(payload)); }
+const genie::util::DataBlock& Payload::getPayload() const { return block_payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-format::mgb::Block Block::decapsulate() { return {header.getDescriptorID(), movePayload()}; }
+genie::util::DataBlock&& Payload::movePayload() {
+    payloadLoaded = false;
+    return std::move(block_payload);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mpegg_p1
-}  // namespace format
+Payload::Payload(genie::util::DataBlock payload)
+    : block_payload(std::move(payload)),
+      payloadLoaded(true),
+      payloadPosition(-1),
+      payloadSize(payload.getRawSize()),
+      internal_reader(nullptr) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Payload::Payload(util::BitReader& reader, uint64_t size)
+    : block_payload(),
+      payloadLoaded(false),
+      payloadPosition(reader.getPos()),
+      payloadSize(size),
+      internal_reader(&reader) {
+    reader.skip(size);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Payload::write(genie::util::BitWriter& writer) const {
+    if (!isPayloadLoaded() && internal_reader) {
+        auto tmp = _internal_loadPayload(*internal_reader);
+        writer.writeBypass(tmp.getData(), tmp.getRawSize());
+    } else {
+        writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Payload::operator==(const Payload& other) const {
+    return payloadSize == other.payloadSize && payloadPosition == other.payloadPosition &&
+           payloadLoaded == other.payloadLoaded && block_payload == other.block_payload;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------

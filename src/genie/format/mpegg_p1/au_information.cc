@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/au_information.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +81,10 @@ bool AUInformation::operator==(const GenInfo& info) const {
            dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
            au_information_value == other.au_information_value;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string AUInformation::decapsulate() { return std::move(au_information_value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

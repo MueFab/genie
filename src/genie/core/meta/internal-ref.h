@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include <string>
 #include "genie/core/meta/refbase.h"
 #include "genie/util/make-unique.h"
@@ -65,10 +66,11 @@ class InternalRef : public RefBase {
      */
     const std::string& getKeyName() const override;
 
-    std::unique_ptr<RefBase> clone() const override {
-        auto ret = genie::util::make_unique<InternalRef>(internal_dataset_group_id, internal_dataset_ID);
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

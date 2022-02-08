@@ -11,9 +11,9 @@
 
 #include <string>
 #include <vector>
+#include "genie/core/constants.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
-#include "genie/core/constants.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -84,14 +84,13 @@ class FileHeader : public GenInfo {
      */
     bool operator==(const GenInfo& info) const override;
 
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* File Header");
-        print_offset(output, depth + 1, max_depth, "Major brand: " + major_brand);
-        print_offset(output, depth + 1, max_depth, "Minor version: " + core::getMPEGVersionString(minor_version));
-        for (const auto& b : compatible_brands) {
-            print_offset(output, depth + 1, max_depth, "Compatible brand: " + b);
-        }
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 
  private:
     std::string major_brand;                     //!< @brief

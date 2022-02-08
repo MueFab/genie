@@ -32,6 +32,7 @@ class SignatureCfg {
 
     boost::optional<uint8_t> U_signature_size;  //!< @brief
     uint8_t base_bits;
+
  public:
     /**
      * @brief
@@ -43,13 +44,13 @@ class SignatureCfg {
     /**
      * @brief
      */
-    explicit SignatureCfg(uint8_t _base_bit) : base_bits(_base_bit){
-    }
+    explicit SignatureCfg(uint8_t _base_bit) : base_bits(_base_bit) {}
 
     /**
      * @brief
      * @param reader
      * @param _U_signature_size
+     * @param _base_bits
      */
     SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, uint8_t _base_bits);
 

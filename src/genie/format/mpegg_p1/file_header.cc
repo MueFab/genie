@@ -83,6 +83,17 @@ bool FileHeader::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void FileHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* File Header");
+    print_offset(output, depth + 1, max_depth, "Major brand: " + major_brand);
+    print_offset(output, depth + 1, max_depth, "Minor version: " + core::getMPEGVersionString(minor_version));
+    for (const auto& b : compatible_brands) {
+        print_offset(output, depth + 1, max_depth, "Compatible brand: " + b);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

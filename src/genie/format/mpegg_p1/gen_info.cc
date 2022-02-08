@@ -18,6 +18,24 @@ bool GenInfo::operator==(const GenInfo& info) const { return getKey() == info.ge
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t GenInfo::getHeaderLength() { return sizeof(uint64_t) + sizeof(char) * 4; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GenInfo::write(genie::util::BitWriter& bitWriter) const {
+    int64_t begin = bitWriter.getPosition();
+    bitWriter.writeBypass(getKey().data(), getKey().length());
+    int64_t size_pos = bitWriter.getPosition();
+    bitWriter.writeBypassBE<uint64_t>(0);
+    box_write(bitWriter);
+    int64_t end = bitWriter.getPosition();
+    bitWriter.setPosition(size_pos);
+    bitWriter.writeBypassBE<uint64_t>(end - begin);
+    bitWriter.setPosition(end);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

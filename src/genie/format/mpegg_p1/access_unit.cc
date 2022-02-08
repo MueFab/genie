@@ -27,9 +27,7 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {
-
-}
+AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +61,7 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
             blocks.emplace_back(reader);
         }
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t (reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -122,6 +120,49 @@ void AccessUnit::box_write(genie::util::BitWriter& bitWriter) const {
 const std::string& AccessUnit::getKey() const {
     static const std::string key = "aucn";
     return key;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Access Unit");
+    header.print_debug(output, depth + 1, max_depth);
+    if (au_information) {
+        au_information->print_debug(output, depth + 1, max_depth);
+    }
+    if (au_protection) {
+        au_protection->print_debug(output, depth + 1, max_depth);
+    }
+    for (const auto& r : blocks) {
+        r.print_debug(output, depth + 1, max_depth);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AUInformation& AccessUnit::getInformation() { return *au_information; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AUProtection& AccessUnit::getProtection() { return *au_protection; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+format::mgb::AccessUnit AccessUnit::decapsulate() {
+    std::vector<format::mgb::Block> newBlocks;
+    for (auto& b : blocks) {
+        newBlocks.emplace_back(b.decapsulate());
+    }
+    return {std::move(header.getHeader()), std::move(newBlocks)};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version)
+    : header(std::move(au.getHeader()), mit), version(_version) {
+    for (auto& b : au.getBlocks()) {
+        blocks.emplace_back(std::move(b));
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

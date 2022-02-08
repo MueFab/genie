@@ -117,7 +117,6 @@ class DataSetMappingTable : public GenInfo {
      */
     void box_write(genie::util::BitWriter& bitWriter) const override;
 
-
     /**
      * @brief
      * @return

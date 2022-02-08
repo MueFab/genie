@@ -11,9 +11,9 @@
 
 #include <string>
 #include <vector>
+#include "genie/core/meta/label.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/format/mpegg_p1/label_dataset.h"
-#include "genie/core/meta/label.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,17 +30,12 @@ class Label : public GenInfo {
     std::vector<LabelDataset> dataset_infos;  //!< @brief
 
  public:
-
-    core::meta::Label decapsulate(uint16_t dataset) {
-        core::meta::Label ret(label_ID);
-        for(auto& d : dataset_infos) {
-            auto regions = d.decapsulate(dataset);
-            for (auto& r : regions) {
-                ret.addRegion(std::move(r));
-            }
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @param dataset
+     * @return
+     */
+    core::meta::Label decapsulate(uint16_t dataset);
 
     /**
      * @brief
@@ -96,9 +91,13 @@ class Label : public GenInfo {
      */
     void box_write(genie::util::BitWriter& bit_writer) const override;
 
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* Label");
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

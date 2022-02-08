@@ -134,6 +134,174 @@ void DatasetGroup::box_write(util::BitWriter& wr) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetGroup::setMetadata(DatasetGroupMetadata meta) { metadata = std::move(meta); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::setProtection(DatasetGroupProtection prot) { protection = std::move(prot); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addReference(Reference r) { references.emplace_back(std::move(r)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addReferenceMeta(ReferenceMetadata r) { reference_metadatas.emplace_back(std::move(r)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::setLabels(LabelList l) { labels = std::move(l); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::patchID(uint8_t groupID) {
+    if (header != boost::none) {
+        header->patchID(groupID);
+    }
+    for (auto& r : references) {
+        r.patchID(groupID);
+    }
+    for (auto& r : reference_metadatas) {
+        r.patchID(groupID);
+    }
+    if (labels != boost::none) {
+        labels->patchID(groupID);
+    }
+    if (metadata != boost::none) {
+        metadata->patchID(groupID);
+    }
+    if (protection != boost::none) {
+        protection->patchID(groupID);
+    }
+    for (auto& d : dataset) {
+        d.patchID(groupID, d.getHeader().getDatasetID());
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::patchRefID(uint8_t _old, uint8_t _new) {
+    for (auto& r : references) {
+        r.patchRefID(_old, _new);
+    }
+    for (auto& r : reference_metadatas) {
+        r.patchRefID(_old, _new);
+    }
+    for (auto& d : dataset) {
+        d.patchRefID(_old, _new);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<Reference>& DatasetGroup::getReferences() { return references; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<ReferenceMetadata>& DatasetGroup::getReferenceMetadata() { return reference_metadatas; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+LabelList& DatasetGroup::getLabelList() { return *labels; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetGroupMetadata& DatasetGroup::getMetadata() { return *metadata; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetGroupProtection& DatasetGroup::getProtection() { return *protection; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<Dataset>& DatasetGroup::getDatasets() { return dataset; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Dataset Group");
+    header->print_debug(output, depth + 1, max_depth);
+    for (const auto& r : references) {
+        r.print_debug(output, depth + 1, max_depth);
+    }
+    for (const auto& r : reference_metadatas) {
+        r.print_debug(output, depth + 1, max_depth);
+    }
+    if (labels) {
+        labels->print_debug(output, depth + 1, max_depth);
+    }
+    if (metadata) {
+        metadata->print_debug(output, depth + 1, max_depth);
+    }
+    if (protection) {
+        metadata->print_debug(output, depth + 1, max_depth);
+    }
+    for (const auto& r : dataset) {
+        r.print_debug(output, depth + 1, max_depth);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
+    std::string tmp_str(4, '\0');
+    reader.readBypass(tmp_str);
+    if (tmp_str == "dghd") {
+        UTILS_DIE_IF(header != boost::none, "More than one header");
+        UTILS_DIE_IF(!reference_metadatas.empty(), "Header must be before ref metadata");
+        UTILS_DIE_IF(labels != boost::none, "Header must be before labels");
+        UTILS_DIE_IF(metadata != boost::none, "Header must be before metadata");
+        UTILS_DIE_IF(protection != boost::none, "Header must be before protection");
+        UTILS_DIE_IF(!dataset.empty(), "Header must be before dataset");
+        header = DatasetGroupHeader(reader);
+    } else if (tmp_str == "rfgn") {
+        UTILS_DIE_IF(!reference_metadatas.empty(), "Reference must be before ref metadata");
+        UTILS_DIE_IF(labels != boost::none, "Reference must be before labels");
+        UTILS_DIE_IF(metadata != boost::none, "Reference must be before metadata");
+        UTILS_DIE_IF(protection != boost::none, "Reference must be before protection");
+        UTILS_DIE_IF(!dataset.empty(), "Reference must be before dataset");
+        references.emplace_back(reader, version);
+    } else if (tmp_str == "rfmd") {
+        UTILS_DIE_IF(labels != boost::none, "Ref metadata must be before labels");
+        UTILS_DIE_IF(metadata != boost::none, "Ref metadata must be before metadata");
+        UTILS_DIE_IF(protection != boost::none, "Ref metadata must be before protection");
+        UTILS_DIE_IF(!dataset.empty(), "Ref metadata must be before dataset");
+        reference_metadatas.emplace_back(reader);
+    } else if (tmp_str == "labl") {
+        UTILS_DIE_IF(labels != boost::none, "Labels already present");
+        UTILS_DIE_IF(metadata != boost::none, "Labels must be before metadata");
+        UTILS_DIE_IF(protection != boost::none, "Labels must be before protection");
+        UTILS_DIE_IF(!dataset.empty(), "Labels must be before dataset");
+        labels.emplace(reader);
+    } else if (tmp_str == "dgmd") {
+        UTILS_DIE_IF(metadata != boost::none, "Metadata already present");
+        UTILS_DIE_IF(protection != boost::none, "Metadata must be before protection");
+        UTILS_DIE_IF(!dataset.empty(), "Metadata must be before dataset");
+        metadata = DatasetGroupMetadata(reader, version);
+    } else if (tmp_str == "dgpr") {
+        UTILS_DIE_IF(protection != boost::none, "Protection already present");
+        UTILS_DIE_IF(!dataset.empty(), "Protection must be before dataset");
+        protection = DatasetGroupProtection(reader, version);
+    } else if (tmp_str == "dtcn") {
+        dataset.emplace_back(reader, version);
+    } else if (tmp_str == "offs") {
+        UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
+        reader.readBypass(tmp_str);
+        uint64_t offset = reader.readBypassBE<uint64_t>();
+        if (offset == ~static_cast<uint64_t>(0)) {
+            return;
+        }
+        auto pos_save = reader.getPos();
+        reader.setPos(offset);
+        read_box(reader, true);
+        reader.setPos(pos_save);
+    } else {
+        UTILS_DIE("Unknown box");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

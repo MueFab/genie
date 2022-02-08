@@ -43,6 +43,10 @@ const std::string& DescriptorStream::getProtection() const { return DS_protectio
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string& DescriptorStream::getProtection() { return DS_protection_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace meta
 }  // namespace core
 }  // namespace genie

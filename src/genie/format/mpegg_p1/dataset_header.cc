@@ -567,6 +567,43 @@ void DatasetHeader::disableMIT() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetHeader::patchRefID(uint8_t _old, uint8_t _new) { referenceOptions.patchRefID(_old, _new); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
+    group_ID = _groupID;
+    ID = _setID;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
+    if (block_header_on != boost::none) {
+        return genie::util::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
+                                                                                 block_header_on->getCCFlag());
+    } else {
+        return genie::util::make_unique<genie::core::meta::blockheader::Disabled>(
+            block_header_off->getOrderedBlocksFlag());
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Dataset Header");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReferenceOptions::patchRefID(uint8_t _old, uint8_t _new) {
+    if (reference_ID == _old) {
+        reference_ID = _new;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

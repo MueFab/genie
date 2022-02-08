@@ -10,10 +10,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include "genie/format/mpegg_p1/box.h"
 #include "genie/format/mpegg_p1/packet_header.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/format/mpegg_p1/box.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

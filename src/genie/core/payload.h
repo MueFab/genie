@@ -1,97 +1,113 @@
-//
-// Created by muenteferi on 03.02.22.
-//
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#ifndef GENIE_PAYLOAD_H
-#define GENIE_PAYLOAD_H
+#ifndef SRC_GENIE_CORE_PAYLOAD_H_
+#define SRC_GENIE_CORE_PAYLOAD_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/data-block.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace core {
 
+/**
+ * @brief
+ */
 class Payload {
  private:
-    genie::util::DataBlock block_payload;
+    genie::util::DataBlock block_payload;  //!< @brief
 
-    bool payloadLoaded;
-    int64_t payloadPosition;
-    uint64_t payloadSize;
+    bool payloadLoaded;       //!< @brief
+    int64_t payloadPosition;  //!< @brief
+    uint64_t payloadSize;     //!< @brief
 
-    util::BitReader* internal_reader;
+    util::BitReader* internal_reader;  //!< @brief
 
-    genie::util::DataBlock _internal_loadPayload(util::BitReader& reader) const {
-        auto pos = reader.getPos();
-        reader.setPos(payloadPosition);
-        genie::util::DataBlock tmp;
-        tmp.resize(payloadSize);
-        reader.readBypass(tmp.getData(), payloadSize);
-        reader.setPos(pos);
-        return tmp;
-    }
+    /**
+     * @brief
+     * @param reader
+     * @return
+     */
+    genie::util::DataBlock _internal_loadPayload(util::BitReader& reader) const;
 
  public:
-    uint64_t getPayloadSize() const {
-        if (isPayloadLoaded()) {
-            return block_payload.getRawSize();
-        } else {
-            return payloadSize;
-        }
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getPayloadSize() const;
 
-    void loadPayload() {
-        block_payload = _internal_loadPayload(*internal_reader);
-        payloadLoaded = true;
-    }
+    /**
+     * @brief
+     */
+    void loadPayload();
 
-    void unloadPayload() {
-        payloadLoaded = false;
-        block_payload.clear();
-    }
+    /**
+     * @brief
+     */
+    void unloadPayload();
 
-    bool isPayloadLoaded() const { return payloadLoaded; }
+    /**
+     * @brief
+     * @return
+     */
+    bool isPayloadLoaded() const;
 
-    const genie::util::DataBlock& getPayload() const { return block_payload; }
+    /**
+     * @brief
+     * @return
+     */
+    const genie::util::DataBlock& getPayload() const;
 
-    genie::util::DataBlock&& movePayload() {
-        payloadLoaded = false;
-        return std::move(block_payload);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    genie::util::DataBlock&& movePayload();
 
-    explicit Payload(genie::util::DataBlock payload)
-        : block_payload(std::move(payload)),
-          payloadLoaded(true),
-          payloadPosition(-1),
-          payloadSize(payload.getRawSize()),
-          internal_reader(nullptr) {}
+    /**
+     * @brief
+     * @param payload
+     */
+    explicit Payload(genie::util::DataBlock payload);
 
-    explicit Payload(util::BitReader& reader, uint64_t size)
-        : block_payload(),
-          payloadLoaded(false),
-          payloadPosition(reader.getPos()),
-          payloadSize(size),
-          internal_reader(&reader) {
-        reader.skip(size);
-    }
+    /**
+     * @brief
+     * @param reader
+     * @param size
+     */
+    explicit Payload(util::BitReader& reader, uint64_t size);
 
-    void write(genie::util::BitWriter& writer) const {
-        if (!isPayloadLoaded() && internal_reader) {
-            auto tmp = _internal_loadPayload(*internal_reader);
-            writer.writeBypass(tmp.getData(), tmp.getRawSize());
-        } else {
-            writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
-        }
-    }
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) const;
 
-    bool operator==(const Payload& other) const {
-        return payloadSize == other.payloadSize && payloadPosition == other.payloadPosition &&
-               payloadLoaded == other.payloadLoaded && block_payload == other.block_payload;
-    }
+    /**
+     * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const Payload& other) const;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core
 }  // namespace genie
 
-#endif  // GENIE_PAYLOAD_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_CORE_PAYLOAD_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

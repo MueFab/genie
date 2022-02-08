@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_group_metadata.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,6 +70,14 @@ uint8_t DatasetGroupMetadata::getDatasetGroupID() const { return dataset_group_i
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& DatasetGroupMetadata::getMetadata() const { return dg_metatdata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string DatasetGroupMetadata::decapsulate() { return std::move(dg_metatdata_value); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupMetadata::patchID(uint8_t groupID) { dataset_group_id = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

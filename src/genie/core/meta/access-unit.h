@@ -36,17 +36,23 @@ class AccessUnit {
      */
     AccessUnit(size_t id, std::string information, std::string protection);
 
-    explicit AccessUnit(size_t id) : access_unit_ID(id) {
+    /**
+     * @brief
+     * @param id
+     */
+    explicit AccessUnit(size_t id);
 
-    }
+    /**
+     * @brief
+     * @param information
+     */
+    void setInformation(std::string information);
 
-    void setInformation(std::string information) {
-        AU_information_value = std::move(information);
-    }
-
-    void setProtection(std::string protection) {
-        AU_protection_value = std::move(protection);
-    }
+    /**
+     * @brief
+     * @param protection
+     */
+    void setProtection(std::string protection);
 
     /**
      * @brief Construct form json
@@ -72,10 +78,11 @@ class AccessUnit {
      */
     const std::string& getInformation() const;
 
-
-    std::string& getInformation() {
-        return AU_information_value;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
 
     /**
      * @brief MPEG-G Part 3 protection data
@@ -83,9 +90,11 @@ class AccessUnit {
      */
     const std::string& getProtection() const;
 
-    std::string& getProtection() {
-        return AU_protection_value;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getProtection();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

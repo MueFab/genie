@@ -43,10 +43,24 @@ void Fasta::addChecksum(std::string checksum) { ref_type_other_checksums.emplace
 nlohmann::json Fasta::toJson() const {
     auto ret = ExternalRef::toJson();
     std::vector<std::string> hexed = ref_type_other_checksums;
-    for(auto& s : hexed) {
+    for (auto& s : hexed) {
         s = util::toHex(s);
     }
     ret["ref_type_other_checksums"] = hexed;
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::string>& Fasta::getChecksums() { return ref_type_other_checksums; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<RefBase> Fasta::clone() const {
+    auto ret = genie::util::make_unique<Fasta>(getURI(), getChecksumAlgo());
+    for (auto& c : ref_type_other_checksums) {
+        ret->addChecksum(c);
+    }
     return ret;
 }
 

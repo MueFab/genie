@@ -28,10 +28,11 @@ class Sequence {
     uint16_t id;       //!< @brief Sequence ID
 
  public:
-
-    std::string& getName() {
-        return name;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getName();
 
     /**
      * @brief Construct from raw values

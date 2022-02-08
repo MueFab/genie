@@ -12,14 +12,14 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "genie/core/constants.h"
 #include "genie/core/meta/external-ref/fasta.h"
 #include "genie/core/meta/external-ref/mpeg.h"
 #include "genie/core/meta/external-ref/raw.h"
 #include "genie/core/meta/internal-ref.h"
-#include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/make-unique.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,6 +70,12 @@ class ReferenceLocation {
     static std::unique_ptr<ReferenceLocation> referenceLocationFactory(genie::util::BitReader& reader, size_t seq_count,
                                                                        genie::core::MPEGMinorVersion _version);
 
+    /**
+     * @brief
+     * @param base
+     * @param _version
+     * @return
+     */
     static std::unique_ptr<ReferenceLocation> referenceLocationFactory(std::unique_ptr<genie::core::meta::RefBase> base,
                                                                        genie::core::MPEGMinorVersion _version);
 
@@ -79,6 +85,10 @@ class ReferenceLocation {
      */
     virtual void write(genie::util::BitWriter& writer);
 
+    /**
+     * @brief
+     * @return
+     */
     virtual std::unique_ptr<genie::core::meta::RefBase> decapsulate() = 0;
 };
 
@@ -95,7 +105,7 @@ class ExternalReferenceLocation : public ReferenceLocation {
     /**
      * @brief
      */
-    const static size_t checksum_sizes[];
+    static const size_t checksum_sizes[];
 
     /**
      * @brief
@@ -136,7 +146,11 @@ class ExternalReferenceLocation : public ReferenceLocation {
      */
     const std::string& getURI() const;
 
-    std::string& getURI() { return uri; }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getURI();
 
     /**
      * @brief
@@ -186,12 +200,11 @@ class ExternalReferenceLocationMPEGG : public ExternalReferenceLocation {
     std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
-    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override {
-        auto ret = genie::util::make_unique<genie::core::meta::external_ref::MPEG>(
-            std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()),
-            external_dataset_group_id, external_dataset_id, std::move(ref_checksum));
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override;
 
     /**
      * @brief
@@ -280,15 +293,11 @@ class ExternalReferenceLocationRaw : public ExternalReferenceLocation {
     std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
-    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override {
-        auto ret = genie::util::make_unique<genie::core::meta::external_ref::Raw>(
-            std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
-
-        for (auto& s : seq_checksums) {
-            ret->addChecksum(std::move(s));
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override;
 
     /**
      * @brief
@@ -349,15 +358,11 @@ class ExternalReferenceLocationFasta : public ExternalReferenceLocation {
     std::vector<std::string> seq_checksums;  //!< @brief
 
  public:
-    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override {
-        auto ret = genie::util::make_unique<genie::core::meta::external_ref::Fasta>(
-            std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
-
-        for (auto& s : seq_checksums) {
-            ret->addChecksum(std::move(s));
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override;
 
     /**
      * @brief
@@ -458,11 +463,11 @@ class InternalReferenceLocation : public ReferenceLocation {
      */
     void write(genie::util::BitWriter& writer) override;
 
-    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override {
-        auto ret =
-            genie::util::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<genie::core::meta::RefBase> decapsulate() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

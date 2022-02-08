@@ -36,45 +36,31 @@ class Reference {
     std::string reference_metadata_value;  //!< @brief MPEG-G part 3 meta information
 
  public:
-    Reference(const Reference& _ref)
-        : reference_name(_ref.reference_name),
-          reference_major_version(_ref.reference_major_version),
-          reference_minor_version(_ref.reference_minor_version),
-          reference_patch_version(_ref.reference_patch_version),
-          seqs(_ref.seqs),
-          ref(_ref.ref->clone()),
-          reference_metadata_value(_ref.reference_metadata_value) {}
+    /**
+     * @brief
+     * @param _ref
+     */
+    Reference(const Reference& _ref);
 
-    Reference(Reference&& _ref) noexcept
-        : reference_name(std::move(_ref.reference_name)),
-          reference_major_version(_ref.reference_major_version),
-          reference_minor_version(_ref.reference_minor_version),
-          reference_patch_version(_ref.reference_patch_version),
-          seqs(std::move(_ref.seqs)),
-          ref(std::move(_ref.ref)),
-          reference_metadata_value(std::move(_ref.reference_metadata_value)) {}
+    /**
+     * @brief
+     * @param _ref
+     */
+    Reference(Reference&& _ref) noexcept;
 
-    Reference& operator=(const Reference& _ref) {
-        reference_name = _ref.reference_name;
-        reference_major_version = _ref.reference_major_version;
-        reference_minor_version = _ref.reference_minor_version;
-        reference_patch_version = _ref.reference_patch_version;
-        seqs = _ref.seqs;
-        ref = _ref.ref->clone();
-        reference_metadata_value = _ref.reference_metadata_value;
-        return *this;
-    }
+    /**
+     * @brief
+     * @param _ref
+     * @return
+     */
+    Reference& operator=(const Reference& _ref);
 
-    Reference& operator=(Reference&& _ref) noexcept {
-        reference_name = std::move(_ref.reference_name);
-        reference_major_version = _ref.reference_major_version;
-        reference_minor_version = _ref.reference_minor_version;
-        reference_patch_version = _ref.reference_patch_version;
-        seqs = std::move(_ref.seqs);
-        ref = std::move(_ref.ref);
-        reference_metadata_value = std::move(_ref.reference_metadata_value);
-        return *this;
-    }
+    /**
+     * @brief
+     * @param _ref
+     * @return
+     */
+    Reference& operator=(Reference&& _ref) noexcept;
 
     /**
      * @brief Construct from raw data
@@ -106,10 +92,11 @@ class Reference {
      */
     const std::string& getName() const;
 
-
-    std::string& getName() {
-        return reference_name;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getName();
 
     /**
      * @brief Return major version level
@@ -135,9 +122,11 @@ class Reference {
      */
     const std::vector<Sequence>& getSequences() const;
 
-    std::vector<Sequence>& getSequences() {
-        return seqs;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<Sequence>& getSequences();
 
     /**
      * @brief Add a new reference sequence
@@ -156,6 +145,12 @@ class Reference {
      * @return MPEG-G part 3 meta information
      */
     const std::string& getInformation() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

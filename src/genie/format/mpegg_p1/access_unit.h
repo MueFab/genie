@@ -37,46 +37,42 @@ class AccessUnit : public GenInfo {
     boost::optional<AUProtection> au_protection;    //!< @brief
     std::vector<Block> blocks;                      //!< @brief
 
-    core::MPEGMinorVersion version;
+    core::MPEGMinorVersion version;  //!< @brief
 
  public:
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* Access Unit");
-        header.print_debug(output, depth + 1, max_depth);
-        if (au_information) {
-            au_information->print_debug(output, depth + 1, max_depth);
-        }
-        if (au_protection) {
-            au_protection->print_debug(output, depth + 1, max_depth);
-        }
-        for (const auto& r : blocks) {
-            r.print_debug(output, depth + 1, max_depth);
-        }
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 
-    AUInformation& getInformation() {
-        return *au_information;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    AUInformation& getInformation();
 
+    /**
+     * @brief
+     * @return
+     */
+    AUProtection& getProtection();
 
-    AUProtection& getProtection() {
-        return *au_protection;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    format::mgb::AccessUnit decapsulate();
 
-
-    format::mgb::AccessUnit decapsulate() {
-        std::vector<format::mgb::Block> newBlocks;
-        for(auto& b : blocks) {
-            newBlocks.emplace_back(b.decapsulate());
-        }
-        return {std::move(header.getHeader()), std::move(newBlocks)};
-    }
-
-    AccessUnit(format::mgb::AccessUnit au,  bool mit, core::MPEGMinorVersion _version) : header(std::move(au.getHeader()), mit), version(_version){
-        for(auto& b: au.getBlocks()) {
-            blocks.emplace_back(std::move(b));
-        }
-    }
+    /**
+     * @brief
+     * @param au
+     * @param mit
+     * @param _version
+     */
+    AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -88,17 +84,20 @@ class AccessUnit : public GenInfo {
     /**
      * @brief
      * @param h
+     * @param version
      */
-    explicit AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion);
+    explicit AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion version);
 
     /**
      * @brief
      * @param reader
      * @param parameterSets
      * @param mit
+     * @param block_header
+     * @param version
      */
     AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit,
-               bool block_header, core::MPEGMinorVersion);
+               bool block_header, core::MPEGMinorVersion version);
 
     /**
      * @brief

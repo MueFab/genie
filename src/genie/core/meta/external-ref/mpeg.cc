@@ -55,6 +55,18 @@ const std::string& MPEG::getChecksum() const { return ref_checksum; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string& MPEG::getChecksum() { return ref_checksum; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<RefBase> MPEG::clone() const {
+    auto ret = genie::util::make_unique<MPEG>(getURI(), getChecksumAlgo(), external_dataset_group_id,
+                                              external_dataset_id, ref_checksum);
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace external_ref
 }  // namespace meta
 }  // namespace core

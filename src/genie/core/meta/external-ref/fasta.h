@@ -11,9 +11,10 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "genie/core/meta/external-ref.h"
-#include "nlohmann/json.hpp"
 #include "genie/util/make-unique.h"
+#include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,9 +50,11 @@ class Fasta : public ExternalRef {
      */
     const std::vector<std::string>& getChecksums() const;
 
-    std::vector<std::string>& getChecksums() {
-        return ref_type_other_checksums;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<std::string>& getChecksums();
 
     /**
      * @brief Add new checksum to the end of the list
@@ -65,13 +68,11 @@ class Fasta : public ExternalRef {
      */
     nlohmann::json toJson() const override;
 
-    std::unique_ptr<RefBase> clone() const override {
-        auto ret = genie::util::make_unique<Fasta>(getURI(), getChecksumAlgo());
-        for(auto& c : ref_type_other_checksums) {
-            ret->addChecksum(c);
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

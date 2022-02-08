@@ -5,8 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/label_list.h"
-#include "genie/util/runtime-exception.h"
 #include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -73,6 +73,53 @@ bool LabelList::operator==(const GenInfo& info) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LabelList::addLabel(Label l) { labels.emplace_back(std::move(l)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LabelList::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<genie::core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
+    std::vector<genie::core::meta::Label> ret;
+    for (auto& l : labels) {
+        ret.emplace_back(l.decapsulate(dataset));
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LabelList::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+    print_offset(output, depth, max_depth, "* Label list");
+    for (const auto& l : labels) {
+        l.print_debug(output, depth + 1, max_depth);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LabelList::read_box(util::BitReader& reader, bool in_offset) {
+    std::string tmp_str(4, '\0');
+    reader.readBypass(tmp_str);
+    if (tmp_str == "lbll") {
+        labels.emplace_back(reader);
+    } else if (tmp_str == "offs") {
+        UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
+        reader.readBypass(tmp_str);
+        uint64_t offset = reader.readBypassBE<uint64_t>();
+        if (offset == ~static_cast<uint64_t>(0)) {
+            read_box(reader, in_offset);
+            return;
+        }
+        auto pos_save = reader.getPos();
+        reader.setPos(offset);
+        read_box(reader, true);
+        reader.setPos(pos_save);
+    } else {
+        UTILS_DIE("Unknown box");
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

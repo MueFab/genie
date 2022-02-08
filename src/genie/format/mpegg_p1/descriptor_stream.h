@@ -33,7 +33,7 @@ class DescriptorStream : public GenInfo {
  private:
     DescriptorStreamHeader header;                //!< @brief
     boost::optional<DSProtection> ds_protection;  //!< @brief
-    std::vector<core::Payload> payload;                 //!< @brief
+    std::vector<core::Payload> payload;           //!< @brief
 
  public:
     /**
@@ -49,37 +49,32 @@ class DescriptorStream : public GenInfo {
      */
     explicit DescriptorStream(DescriptorStreamHeader _header);
 
-    DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID, std::vector<format::mgb::Block> blocks) : header(false, descriptor, classID, blocks.size()){
-        for (auto& b : blocks) {
-            payload.emplace_back(b.movePayloadUnparsed());
-        }
-    }
+    /**
+     * @brief
+     * @param descriptor
+     * @param classID
+     * @param blocks
+     */
+    DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID,
+                     std::vector<format::mgb::Block> blocks);
 
-    std::vector<format::mgb::Block> decapsulate() {
-        std::vector<format::mgb::Block> ret;
-        for(auto& p : payload) {
-            ret.emplace_back(header.getDescriptorID(), std::move(p));
-        }
-        return ret;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<format::mgb::Block> decapsulate();
 
-    bool isEmpty() const {
-        if(payload.empty()) {
-            return true;
-        }
-
-        for (const auto& p : payload) {
-            if(p.getPayloadSize()) {
-                return false;
-            }
-        }
-        return true;
-    }
+    /**
+     * @brief
+     * @return
+     */
+    bool isEmpty() const;
 
     /**
      * @brief
      * @param reader
-     * @param payload_sizes
+     * @param table
+     * @param configs
      */
     explicit DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
                               const std::vector<MITClassConfig>& configs);
@@ -92,7 +87,7 @@ class DescriptorStream : public GenInfo {
 
     /**
      * @brief
-     * @param block
+     * @param p
      */
     void addPayload(core::Payload p);
 
@@ -114,14 +109,11 @@ class DescriptorStream : public GenInfo {
      */
     const DSProtection& getProtection() const;
 
-
     /**
      * @brief
      * @return
      */
-    DSProtection& getProtection() {
-        return *ds_protection;
-    }
+    DSProtection& getProtection();
 
     /**
      * @brief

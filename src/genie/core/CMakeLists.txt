@@ -69,7 +69,8 @@ set(source_files
         meta/blockheader/enabled.cc
         meta/blockheader/disabled.cc
         api.cc
-        c_api.cc payload.h)
+        c_api.cc
+        payload.cc)
 
 add_library(genie-core ${source_files})
 

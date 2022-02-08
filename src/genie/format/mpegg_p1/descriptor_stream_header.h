@@ -28,10 +28,11 @@ class DSProtection : public GenInfo {
     std::string DSProtectionValue;  //!< @brief
 
  public:
-
-    std::string decapsulate() {
-        return std::move(DSProtectionValue);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::string decapsulate();
 
     /**
      * @brief

@@ -92,6 +92,7 @@ class AUHeader {
      * @param dataset_type
      * @param posSize
      * @param signatureFlag
+     * @param alphabet
      */
     AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
              uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type, uint8_t posSize,
@@ -204,6 +205,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @param dataset_type
      * @param posSize
      * @param signatureFlag
+     * @param alphabet
      */
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
@@ -227,49 +229,24 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     AUHeader &getHeader();
 
-    const AUHeader &getHeader() const { return header; }
+    /**
+     * @brief
+     * @return
+     */
+    const AUHeader &getHeader() const;
 
-    void print_debug(std::ostream &output, uint8_t, uint8_t) const override {
-        output << "* Access Unit " << header.getID() << " ";
-        switch (header.getClass()) {
-            case core::record::ClassType::NONE:
-                output << "INVALID";
-                break;
-            case core::record::ClassType::CLASS_U:
-                output << "U";
-                break;
-            case core::record::ClassType::CLASS_P:
-                output << "P";
-                break;
-            case core::record::ClassType::CLASS_N:
-                output << "N";
-                break;
-            case core::record::ClassType::CLASS_M:
-                output << "M";
-                break;
-            case core::record::ClassType::CLASS_I:
-                output << "I";
-                break;
-            case core::record::ClassType::CLASS_HM:
-                output << "HM";
-                break;
-        }
-        if (header.getClass() != core::record::ClassType::CLASS_U) {
-            output << ", [" << header.getAlignmentInfo().getRefID() << "-" << header.getAlignmentInfo().getStartPos()
-                   << ":" << header.getAlignmentInfo().getEndPos() << "]";
-        }
+    /**
+     * @brief
+     * @param output
+     */
+    void print_debug(std::ostream &output, uint8_t, uint8_t) const override;
 
-        output << ", " << header.getReadCount() << " records";
-        output << ", " << header.getNumBlocks() << " blocks";
-        output << ", parameter set " << uint32_t(header.getParameterID()) << std::endl;
-    }
-
-    AccessUnit(AUHeader h, std::vector<Block> b)
-        : DataUnit(DataUnitType::ACCESS_UNIT),
-          header(std::move(h)),
-          blocks(std::move(b)),
-          payloadbytes(0),
-          qv_payloads(0) {}
+    /**
+     * @brief
+     * @param h
+     * @param b
+     */
+    AccessUnit(AUHeader h, std::vector<Block> b);
 
  private:
     AUHeader header;  //!< @brief

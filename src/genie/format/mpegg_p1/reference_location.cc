@@ -45,7 +45,7 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
         auto ret = genie::util::make_unique<ExternalReferenceLocationFasta>(
             0, std::move(ref->getURI()),
             genie::format::mpegg_p1::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
-        for (auto &s : ref->getChecksums()) {
+        for (auto& s : ref->getChecksums()) {
             ret->addChecksum(std::move(s));
         }
         return ret;
@@ -54,7 +54,7 @@ std::unique_ptr<ReferenceLocation> ReferenceLocation::referenceLocationFactory(
         auto ret = genie::util::make_unique<ExternalReferenceLocationRaw>(
             0, std::move(ref->getURI()),
             genie::format::mpegg_p1::ExternalReferenceLocation::ChecksumAlgorithm(ref->getChecksumAlgo()));
-        for (auto &s : ref->getChecksums()) {
+        for (auto& s : ref->getChecksums()) {
             ret->addChecksum(std::move(s));
         }
         return ret;
@@ -414,6 +414,50 @@ void InternalReferenceLocation::write(genie::util::BitWriter& writer) {
     ReferenceLocation::write(writer);
     writer.writeBypassBE(internal_dataset_group_id);
     writer.writeBypassBE(internal_dataset_id);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& ExternalReferenceLocation::getURI() { return uri; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<genie::core::meta::RefBase> ExternalReferenceLocationMPEGG::decapsulate() {
+    auto ret = genie::util::make_unique<genie::core::meta::external_ref::MPEG>(
+        std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()),
+        external_dataset_group_id, external_dataset_id, std::move(ref_checksum));
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<genie::core::meta::RefBase> ExternalReferenceLocationRaw::decapsulate() {
+    auto ret = genie::util::make_unique<genie::core::meta::external_ref::Raw>(
+        std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
+
+    for (auto& s : seq_checksums) {
+        ret->addChecksum(std::move(s));
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<genie::core::meta::RefBase> ExternalReferenceLocationFasta::decapsulate() {
+    auto ret = genie::util::make_unique<genie::core::meta::external_ref::Fasta>(
+        std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
+
+    for (auto& s : seq_checksums) {
+        ret->addChecksum(std::move(s));
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<genie::core::meta::RefBase> InternalReferenceLocation::decapsulate() {
+    auto ret = genie::util::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -31,25 +31,13 @@ class AccessUnitHeader : public GenInfo {
     bool mit_flag;                        //!< @brief
 
  public:
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        static const std::string class_lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
-        print_offset(output, depth, max_depth, "* Access Unit Header");
-        print_offset(output, depth + 1, max_depth, "Access unit ID: " + std::to_string(int(header.getID())));
-        print_offset(output, depth + 1, max_depth, "Access unit class: " + class_lut[(int)header.getClass()]);
-        print_offset(output, depth + 1, max_depth, "Access unit blocks: " + std::to_string((int)header.getNumBlocks()));
-        print_offset(output, depth + 1, max_depth,
-                     "Access unit records: " + std::to_string((int)header.getReadCount()));
-        print_offset(output, depth + 1, max_depth,
-                     "Access unit parameter set ID: " + std::to_string((int)header.getParameterID()));
-        if (header.getClass() != core::record::ClassType::CLASS_U) {
-            print_offset(output, depth + 1, max_depth,
-                         "Access unit reference ID: " + std::to_string((int)header.getAlignmentInfo().getRefID()));
-            print_offset(output, depth + 1, max_depth,
-                         "Access unit start pos:  " + std::to_string((int)header.getAlignmentInfo().getStartPos()));
-            print_offset(output, depth + 1, max_depth,
-                         "Access unit end pos:  " + std::to_string((int)header.getAlignmentInfo().getEndPos()));
-        }
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 
     /**
      * @brief

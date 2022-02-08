@@ -9,19 +9,19 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 #include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
+#include "genie/core/meta/blockheader.h"
+#include "genie/core/meta/blockheader/disabled.h"
+#include "genie/core/meta/blockheader/enabled.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class-type.h"
 #include "genie/format/mpegg_p1/gen_info.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/make-unique.h"
-#include "genie/core/meta/blockheader.h"
-#include "genie/core/meta/blockheader/enabled.h"
-#include "genie/core/meta/blockheader/disabled.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -127,12 +127,12 @@ class ReferenceOptions {
     std::vector<uint32_t> seq_blocks;  //!< @brief
 
  public:
-
-    void patchRefID(uint8_t _old, uint8_t _new) {
-        if(reference_ID == _old) {
-            reference_ID = _new;
-        }
-    }
+    /**
+     * @brief
+     * @param _old
+     * @param _new
+     */
+    void patchRefID(uint8_t _old, uint8_t _new);
 
     /**
      * @brief
@@ -406,28 +406,33 @@ class DatasetHeader : public GenInfo {
     std::vector<boost::optional<uint32_t>> thresholds;  //!< @brief
 
  public:
-    void patchRefID(uint8_t _old, uint8_t _new) {
-        referenceOptions.patchRefID(_old, _new);
-    }
+    /**
+     * @brief
+     * @param _old
+     * @param _new
+     */
+    void patchRefID(uint8_t _old, uint8_t _new);
 
-    void patchID(uint8_t _groupID, uint16_t _setID) {
-        group_ID = _groupID;
-        ID = _setID;
-    }
+    /**
+     * @brief
+     * @param _groupID
+     * @param _setID
+     */
+    void patchID(uint8_t _groupID, uint16_t _setID);
 
-    std::unique_ptr<core::meta::BlockHeader> decapsulate() {
-        if (block_header_on != boost::none) {
-            return genie::util::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
-                                                                                     block_header_on->getCCFlag());
-        } else {
-            return genie::util::make_unique<genie::core::meta::blockheader::Disabled>(
-                block_header_off->getOrderedBlocksFlag());
-        }
-    }
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<core::meta::BlockHeader> decapsulate();
 
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override {
-        print_offset(output, depth, max_depth, "* Dataset Header");
-    }
+    /**
+     * @brief
+     * @param output
+     * @param depth
+     * @param max_depth
+     */
+    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 
     /**
      * @brief

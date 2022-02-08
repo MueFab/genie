@@ -10,10 +10,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
+#include "genie/core/meta/region.h"
 #include "genie/core/record/class-type.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/meta/region.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,12 +32,17 @@ class LabelRegion {
     uint64_t end_pos;                                       //!< @brief
 
  public:
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::meta::Region decapsulate();
 
-    genie::core::meta::Region decapsulate() {
-        genie::core::meta::Region ret(seq_ID, start_pos, end_pos, std::move(class_IDs));
-        return ret;
-    }
-
+    /**
+     * @brief
+     * @param other
+     * @return
+     */
     bool operator==(const LabelRegion& other) const;
 
     /**
