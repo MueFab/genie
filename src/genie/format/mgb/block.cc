@@ -20,7 +20,7 @@ namespace mgb {
 
 Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
     : descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {
-    count = boost::get<core::AccessUnit::Descriptor>(payload).getSize();
+    count = static_cast<uint8_t>(boost::get<core::AccessUnit::Descriptor>(payload).getSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,9 +39,9 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
            reader.read(8);
        } */
 
-    count = core::GenDesc(descriptor_ID) == core::GenDesc::QV
-                ? qv_count
-                : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size();
+    count = static_cast<uint8_t>(core::GenDesc(descriptor_ID) == core::GenDesc::QV
+                                     ? qv_count
+                                     : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size());
     // payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
     payload = core::Payload(reader, block_payload_size);
 
@@ -153,7 +153,7 @@ void Block::pack() {
 
 Block::Block(genie::core::GenDesc _descriptor_ID, core::Payload _payload)
     : descriptor_ID(uint8_t(_descriptor_ID)),
-      block_payload_size(_payload.getPayloadSize()),
+      block_payload_size(static_cast<uint32_t>(_payload.getPayloadSize())),
       count(0),
       payload(std::move(_payload)) {}
 
