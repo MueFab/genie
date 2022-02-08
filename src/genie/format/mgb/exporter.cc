@@ -28,7 +28,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     core::AccessUnit data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
-    uint8_t parameter_id = parameter_stash.size();
+    auto parameter_id = static_cast<uint8_t>(parameter_stash.size());
     core::parameter::ParameterSet out_set(parameter_id, parameter_id, std::move(data.getParameters()));
     mgb::RawReference ref;
     for (const auto& p : data.getRefToWrite()) {
