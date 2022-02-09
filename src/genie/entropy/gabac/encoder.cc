@@ -77,9 +77,9 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cerr;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream,      bufferDependencyStream,
-                                                   &bufferOutputStream,     GABAC_BLOCK_SIZE,
-                                                   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
+    const gabac::IOConfiguration GABAC_IO_SETUP = {
+        &bufferInputStream, bufferDependencyStream,  &bufferOutputStream,
+        GABAC_BLOCK_SIZE,   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::LOG_TRACE};
     const bool GABAC_DECODING_MODE = false;
 
     // Run

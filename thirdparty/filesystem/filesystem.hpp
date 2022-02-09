@@ -2188,8 +2188,8 @@ GHC_INLINE void timeToFILETIME(time_t t, FILETIME& ft)
     ft.dwHighDateTime = static_cast<DWORD>(ll >> 32);
 }
 
-template <typename INFO>
-GHC_INLINE uintmax_t hard_links_from_INFO(const INFO* info)
+template <typename LOG_INFO>
+GHC_INLINE uintmax_t hard_links_from_INFO(const LOG_INFO* info)
 {
     return static_cast<uintmax_t>(-1);
 }
@@ -2200,8 +2200,8 @@ GHC_INLINE uintmax_t hard_links_from_INFO<BY_HANDLE_FILE_INFORMATION>(const BY_H
     return info->nNumberOfLinks;
 }
 
-template <typename INFO>
-GHC_INLINE DWORD reparse_tag_from_INFO(const INFO*)
+template <typename LOG_INFO>
+GHC_INLINE DWORD reparse_tag_from_INFO(const LOG_INFO*)
 {
     return 0;
 }
@@ -2212,11 +2212,11 @@ GHC_INLINE DWORD reparse_tag_from_INFO(const WIN32_FIND_DATAW* info)
     return info->dwReserved0;
 }
 
-template <typename INFO>
-GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr)
+template <typename LOG_INFO>
+GHC_INLINE file_status status_from_INFO(const path& p, const LOG_INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr)
 {
     file_type ft = file_type::unknown;
-    if (sizeof(INFO) == sizeof(WIN32_FIND_DATAW)) {
+    if (sizeof(LOG_INFO) == sizeof(WIN32_FIND_DATAW)) {
         if (detail::reparse_tag_from_INFO(info) == IO_REPARSE_TAG_SYMLINK) {
             ft = file_type::symlink;
         }

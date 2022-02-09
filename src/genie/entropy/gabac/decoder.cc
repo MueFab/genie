@@ -104,7 +104,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
                                                    &outbuffer,
                                                    GABAC_BLOCK_SIZE,
                                                    GABC_LOG_OUTPUT_STREAM,
-                                                   gabac::IOConfiguration::LogLevel::TRACE};
+                                                   gabac::IOConfiguration::LogLevel::LOG_TRACE};
     const bool GABAC_DECODING_MODE = true;
 
     // Run
