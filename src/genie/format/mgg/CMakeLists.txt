@@ -14,8 +14,8 @@ set(source_files
         #        dataset/master_index_table/master_index_table.cc
         #        dataset/master_index_table/ref_seq_info.cpp
         block_header.cc
-        reference_location.cc
-        reference_location.cc
+        reference/location.cc
+        reference/location.cc
         label_list.cc
         label.cc
         label_dataset.cc
@@ -43,7 +43,13 @@ set(source_files
         reference.cc
         reference_metadata.cc
         box.cc
-        mgg_file.cc)
+        mgg_file.cc
+        dataset_header/block_header_off_options.cc
+        dataset_header/block_header_on_options.cc
+        dataset_header/mit_class_config.cc
+        dataset_header/reference_options.cc
+        dataset_header/u_options.cc
+        dataset_header/u_signature.cc data_stream.h data_stream.cc dataset_parameterset/u_signature.h dataset_parameterset/u_signature.cc dataset_parameterset/update_info.h dataset_parameterset/update_info.cc descriptor_stream_protection.h descriptor_stream_protection.cc master_index_table/aligned_au_index.h master_index_table/unaligned_au_index.h master_index_table/aligned_au_index.cc master_index_table/unaligned_au_index.cc reference/version.h reference/sequence.h reference/sequence.cc reference/version.cc reference/location/external.h reference/location/internal.h reference/location/external/mpeg.h reference/location/external/raw.h reference/location/external/fasta.h reference/location/external.cc reference/location/internal.cc reference/location/external/mpeg.cc reference/location/external/fasta.cc reference/location/external/raw.cc)
 
 add_library(genie-mgg ${source_files})
 

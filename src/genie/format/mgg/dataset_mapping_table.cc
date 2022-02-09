@@ -16,45 +16,6 @@ namespace mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DataSetMappingTable::DataStream::operator==(const DataStream& other) const {
-    return data_type == other.data_type && reserved == other.reserved && data_SID == other.data_SID;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DataSetMappingTable::DataStream::DataStream(Type _data_type, uint8_t _reserved, uint16_t _data_SID)
-    : data_type(_data_type), reserved(_reserved), data_SID(_data_SID) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DataSetMappingTable::DataStream::DataStream(util::BitReader& reader) {
-    data_type = reader.read<Type>(8);
-    reserved = reader.read<uint8_t>(3);
-    data_SID = reader.read<uint16_t>(13);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DataSetMappingTable::DataStream::write(util::BitWriter& writer) const {
-    writer.write(static_cast<uint8_t>(data_type), 8);
-    writer.write(reserved, 3);
-    writer.write(data_SID, 13);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DataSetMappingTable::DataStream::Type DataSetMappingTable::DataStream::getDataType() const { return data_type; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DataSetMappingTable::DataStream::getReserved() const { return reserved; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t DataSetMappingTable::DataStream::getDataSID() const { return data_SID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 const std::string& DataSetMappingTable::getKey() const {
     static const std::string key = "dmtb";
     return key;
@@ -75,7 +36,7 @@ uint16_t DataSetMappingTable::getDatasetID() const { return dataset_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<DataSetMappingTable::DataStream>& DataSetMappingTable::getDataStreams() const { return streams; }
+const std::vector<DataStream>& DataSetMappingTable::getDataStreams() const { return streams; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

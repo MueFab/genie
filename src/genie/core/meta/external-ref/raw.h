@@ -9,9 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 #include "genie/core/meta/external-ref.h"
 #include "genie/util/make-unique.h"
 #include "nlohmann/json.hpp"

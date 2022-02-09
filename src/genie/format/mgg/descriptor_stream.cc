@@ -32,7 +32,7 @@ DescriptorStream::DescriptorStream(DescriptorStreamHeader _header) : header(std:
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
-                                   const std::vector<MITClassConfig>& configs) {
+                                   const std::vector<dataset_header::MITClassConfig>& configs) {
     auto start_pos = reader.getPos() - 4;
     auto length = reader.read<uint64_t>();
     std::string tmp(4, '\0');
@@ -42,7 +42,7 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
 
     reader.readBypass(tmp);
     if (tmp == "dspr") {
-        ds_protection = DSProtection(reader);
+        ds_protection = DescriptorStreamProtection(reader);
     } else {
         reader.setPos(reader.getPos() - 4);
     }
@@ -96,11 +96,11 @@ const std::vector<core::Payload>& DescriptorStream::getPayloads() const { return
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStream::setProtection(DSProtection prot) { ds_protection = std::move(prot); }
+void DescriptorStream::setProtection(DescriptorStreamProtection prot) { ds_protection = std::move(prot); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DSProtection& DescriptorStream::getProtection() const { return *ds_protection; }
+const DescriptorStreamProtection& DescriptorStream::getProtection() const { return *ds_protection; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -162,7 +162,7 @@ bool DescriptorStream::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DSProtection& DescriptorStream::getProtection() { return *ds_protection; }
+DescriptorStreamProtection& DescriptorStream::getProtection() { return *ds_protection; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

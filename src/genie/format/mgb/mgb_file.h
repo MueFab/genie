@@ -10,11 +10,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
 #include <sstream>
 #include <utility>
-#include <map>
 #include <vector>
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/data-unit-factory.h"

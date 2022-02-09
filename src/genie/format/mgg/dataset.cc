@@ -123,7 +123,8 @@ Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MP
                     descriptor_streams.emplace_back(std::move(desc));
                     for (auto& b : meta.getDSs()) {
                         if (core::GenDesc(b.getID()) == descriptor_streams.back().getHeader().getDescriptorID()) {
-                            descriptor_streams.back().setProtection(DSProtection(std::move(b.getProtection())));
+                            descriptor_streams.back().setProtection(
+                                DescriptorStreamProtection(std::move(b.getProtection())));
                         }
                     }
                 }

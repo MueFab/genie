@@ -16,47 +16,6 @@ namespace mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DSProtection::DSProtection(std::string _DSProtectionValue) : DSProtectionValue(std::move(_DSProtectionValue)) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DSProtection::DSProtection(genie::util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    DSProtectionValue.resize(length);
-    reader.readBypass(DSProtectionValue);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& DSProtection::getProtectionValue() const { return DSProtectionValue; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& DSProtection::getKey() const {
-    static const std::string key = "dspr";
-    return key;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DSProtection::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeBypass(DSProtectionValue.data(), DSProtectionValue.size());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DSProtection::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const DSProtection&>(info);
-    return DSProtectionValue == other.DSProtectionValue;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 bool DescriptorStreamHeader::getReserved() const { return reserved; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -126,10 +85,6 @@ bool DescriptorStreamHeader::operator==(const GenInfo& info) const {
     return reserved == other.reserved && descriptor_id == other.descriptor_id && class_id == other.class_id &&
            num_blocks == other.num_blocks;
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::string DSProtection::decapsulate() { return std::move(DSProtectionValue); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

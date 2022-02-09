@@ -13,6 +13,7 @@
 #include "boost/optional/optional.hpp"
 #include "genie/core/constants.h"
 #include "genie/core/parameter/parameter_set.h"
+#include "genie/format/mgg/dataset_parameterset/update_info.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/util/bitreader.h"
 
@@ -26,141 +27,14 @@ namespace mgg {
  * @brief
  */
 class DatasetParameterSet : public GenInfo {
- public:
-    /**
-     * @brief
-     */
-    class USignature {
-     private:
-        boost::optional<uint8_t> u_signature_length;  //!< @brief
-
-     public:
-        /**
-         * @brief
-         * @param other
-         * @return
-         */
-        bool operator==(const USignature& other) const;
-
-        /**
-         * @brief
-         */
-        USignature();
-
-        /**
-         * @brief
-         * @param reader
-         */
-        explicit USignature(genie::util::BitReader& reader);
-
-        /**
-         * @brief
-         * @return
-         */
-        bool isConstantLength() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint8_t getConstLength() const;
-
-        /**
-         * @brief
-         * @param length
-         */
-        void setConstLength(uint8_t length);
-
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(genie::util::BitWriter& writer) const;
-    };
-
-    /**
-     * @brief
-     */
-    class ParameterUpdateInfo {
-     private:
-        bool multiple_alignment_flag;             //!< @brief
-        bool pos_40_bits_flag;                    //!< @brief
-        core::AlphabetID alphabetId;              //!< @brief
-        boost::optional<USignature> u_signature;  //!< @brief
-
-     public:
-        /**
-         * @brief
-         * @param other
-         * @return
-         */
-        bool operator==(const ParameterUpdateInfo& other) const;
-
-        /**
-         * @brief
-         * @param _multiple_alignment_flag
-         * @param _pos_40_bits_flag
-         * @param _alphabetId
-         */
-        ParameterUpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId);
-
-        /**
-         * @brief
-         * @param reader
-         */
-        explicit ParameterUpdateInfo(genie::util::BitReader& reader);
-
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(genie::util::BitWriter& writer) const;
-
-        /**
-         * @brief
-         * @param signature
-         */
-        void addUSignature(USignature signature);
-
-        /**
-         * @brief
-         * @return
-         */
-        bool getMultipleAlignmentFlag() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        bool getPos40BitsFlag() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        core::AlphabetID getAlphabetID() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        bool hasUSignature() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        const USignature& getUSignature() const;
-    };
-
  private:
-    uint8_t dataset_group_id;                           //!< @brief
-    uint16_t dataset_id;                                //!< @brief
-    uint8_t parameter_set_ID;                           //!< @brief
-    uint8_t parent_parameter_set_ID;                    //!< @brief
-    boost::optional<ParameterUpdateInfo> param_update;  //!< @brief
-    genie::core::parameter::EncodingSet params;         //!< @brief
-    core::MPEGMinorVersion version;                     //!< @brief
+    uint8_t dataset_group_id;                                        //!< @brief
+    uint16_t dataset_id;                                             //!< @brief
+    uint8_t parameter_set_ID;                                        //!< @brief
+    uint8_t parent_parameter_set_ID;                                 //!< @brief
+    boost::optional<dataset_parameterset::UpdateInfo> param_update;  //!< @brief
+    genie::core::parameter::EncodingSet params;                      //!< @brief
+    core::MPEGMinorVersion version;                                  //!< @brief
 
  public:
     /**
@@ -224,7 +98,7 @@ class DatasetParameterSet : public GenInfo {
      * @brief
      * @param update
      */
-    void addParameterUpdate(ParameterUpdateInfo update);
+    void addParameterUpdate(dataset_parameterset::UpdateInfo update);
 
     /**
      * @brief
@@ -266,7 +140,7 @@ class DatasetParameterSet : public GenInfo {
      * @brief
      * @return
      */
-    const ParameterUpdateInfo& getParameterUpdate() const;
+    const dataset_parameterset::UpdateInfo& getParameterUpdate() const;
 
     /**
      * @brief

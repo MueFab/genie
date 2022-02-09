@@ -13,110 +13,6 @@
 namespace genie {
 namespace format {
 namespace mgg {
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::USignature::operator==(const USignature& other) const {
-    return u_signature_length == other.u_signature_length;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::USignature::USignature() : u_signature_length(boost::none) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::USignature::USignature(genie::util::BitReader& reader) {
-    if (reader.read<bool>(1)) {
-        u_signature_length = reader.read<uint8_t>();
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::USignature::isConstantLength() const { return u_signature_length != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetParameterSet::USignature::getConstLength() const { return *u_signature_length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::USignature::setConstLength(uint8_t length) { u_signature_length = length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::USignature::write(genie::util::BitWriter& writer) const {
-    writer.write(u_signature_length != boost::none, 1);
-    if (u_signature_length != boost::none) {
-        writer.write(*u_signature_length, 8);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::ParameterUpdateInfo::operator==(const ParameterUpdateInfo& other) const {
-    return multiple_alignment_flag == other.multiple_alignment_flag && pos_40_bits_flag == other.pos_40_bits_flag &&
-           alphabetId == other.alphabetId && u_signature == other.u_signature;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::ParameterUpdateInfo::ParameterUpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag,
-                                                              core::AlphabetID _alphabetId)
-    : multiple_alignment_flag(_multiple_alignment_flag), pos_40_bits_flag(_pos_40_bits_flag), alphabetId(_alphabetId) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::ParameterUpdateInfo::ParameterUpdateInfo(genie::util::BitReader& reader) {
-    multiple_alignment_flag = reader.read<bool>(1);
-    pos_40_bits_flag = reader.read<bool>(1);
-    alphabetId = reader.read<core::AlphabetID>(8);
-    if (reader.read<bool>(1)) {
-        u_signature = USignature(reader);
-    }
-    reader.flush();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::ParameterUpdateInfo::write(genie::util::BitWriter& writer) const {
-    writer.write(multiple_alignment_flag, 1);
-    writer.write(pos_40_bits_flag, 1);
-    writer.write(static_cast<uint8_t>(alphabetId), 8);
-    writer.write(u_signature != boost::none, 1);
-    if (u_signature != boost::none) {
-        u_signature->write(writer);
-    }
-    writer.flush();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::ParameterUpdateInfo::addUSignature(USignature signature) { u_signature = signature; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::ParameterUpdateInfo::getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::ParameterUpdateInfo::getPos40BitsFlag() const { return pos_40_bits_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-core::AlphabetID DatasetParameterSet::ParameterUpdateInfo::getAlphabetID() const { return alphabetId; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::ParameterUpdateInfo::hasUSignature() const { return u_signature != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const DatasetParameterSet::USignature& DatasetParameterSet::ParameterUpdateInfo::getUSignature() const {
-    return *u_signature;
-}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DatasetParameterSet::operator==(const GenInfo& info) const {
@@ -153,7 +49,7 @@ DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::M
     parameter_set_ID = reader.readBypassBE<uint8_t>();
     parent_parameter_set_ID = reader.readBypassBE<uint8_t>();
     if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
-        param_update = ParameterUpdateInfo(reader);
+        param_update = dataset_parameterset::UpdateInfo(reader);
     }
     params = genie::core::parameter::EncodingSet(reader);
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
@@ -174,7 +70,7 @@ void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::addParameterUpdate(ParameterUpdateInfo update) {
+void DatasetParameterSet::addParameterUpdate(dataset_parameterset::UpdateInfo update) {
     if (version != core::MPEGMinorVersion::V1900) {
         param_update = std::move(update);
     }
@@ -209,9 +105,7 @@ bool DatasetParameterSet::hasParameterUpdate() const { return param_update != bo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DatasetParameterSet::ParameterUpdateInfo& DatasetParameterSet::getParameterUpdate() const {
-    return *param_update;
-}
+const dataset_parameterset::UpdateInfo& DatasetParameterSet::getParameterUpdate() const { return *param_update; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
