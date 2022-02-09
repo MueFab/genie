@@ -35,7 +35,7 @@ class FileHeader : public GenInfo {
     /**
      * @brief
      */
-    FileHeader() = default;
+    FileHeader();
 
     /**
      * @brief

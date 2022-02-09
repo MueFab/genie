@@ -39,6 +39,10 @@ const std::string& FileHeader::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+FileHeader::FileHeader() : major_brand("MPEG-G"), minor_version(core::MPEGMinorVersion::V2000) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPEG-G"), minor_version(_minor_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

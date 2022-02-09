@@ -23,58 +23,6 @@ namespace mgg {
 /**
  * @brief
  */
-class DSProtection : public GenInfo {
- private:
-    std::string DSProtectionValue;  //!< @brief
-
- public:
-    /**
-     * @brief
-     * @return
-     */
-    std::string decapsulate();
-
-    /**
-     * @brief
-     * @param _DSProtectionValue
-     */
-    explicit DSProtection(std::string _DSProtectionValue);
-
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit DSProtection(genie::util::BitReader& reader);
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getProtectionValue() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getKey() const override;
-
-    /**
-     * @brief
-     * @param bitWriter
-     */
-    void box_write(genie::util::BitWriter& bitWriter) const override;
-
-    /**
-     * @brief
-     * @param info
-     * @return
-     */
-    bool operator==(const GenInfo& info) const override;
-};
-
-/**
- * @brief
- */
 class DescriptorStreamHeader : public GenInfo {
  private:
     bool reserved;                       //!< @brief

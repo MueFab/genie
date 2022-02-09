@@ -17,207 +17,6 @@ namespace mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AlignedAUIndex::operator==(const AlignedAUIndex& other) const {
-    return au_byte_offset == other.au_byte_offset && au_start_position == other.au_start_position &&
-           au_end_position == other.au_end_position && ref_cfg == other.ref_cfg && extended_cfg == other.extended_cfg &&
-           block_byte_offset == other.block_byte_offset && byte_offset_size == other.byte_offset_size &&
-           position_size == other.position_size;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AlignedAUIndex::AlignedAUIndex(uint64_t _au_byte_offset, uint64_t _au_start_position, uint64_t _au_end_position,
-                               uint8_t _byte_offset_size, uint8_t _position_size)
-    : au_byte_offset(_au_byte_offset),
-      au_start_position(_au_start_position),
-      au_end_position(_au_end_position),
-      byte_offset_size(_byte_offset_size),
-      position_size(_position_size) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AlignedAUIndex::AlignedAUIndex(genie::util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
-                               core::parameter::DataUnit::DatasetType dataset_type, bool multiple_alignment,
-                               bool block_header_flag, const std::vector<genie::core::GenDesc>& descriptors)
-    : byte_offset_size(_byte_offset_size), position_size(_position_size) {
-    au_byte_offset = reader.read<uint64_t>(byte_offset_size);
-    au_start_position = reader.read<uint64_t>(position_size);
-    au_end_position = reader.read<uint64_t>(position_size);
-    if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
-    }
-    if (multiple_alignment) {
-        extended_cfg = genie::format::mgb::ExtendedAu(position_size, reader);
-    }
-    if (!block_header_flag) {
-        for (const auto& d : descriptors) {
-            (void)d;
-            block_byte_offset.emplace_back(reader.read<uint64_t>(byte_offset_size));
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AlignedAUIndex::write(genie::util::BitWriter& writer) const {
-    writer.write(au_byte_offset, byte_offset_size);
-    writer.write(au_start_position, position_size);
-    writer.write(au_end_position, position_size);
-    if (ref_cfg != boost::none) {
-        ref_cfg->write(writer);
-    }
-    if (extended_cfg != boost::none) {
-        extended_cfg->write(writer);
-    }
-    for (const auto& b : block_byte_offset) {
-        writer.write(b, byte_offset_size);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AlignedAUIndex::getByteOffset() const { return au_byte_offset; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AlignedAUIndex::getAUStartPos() const { return au_start_position; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AlignedAUIndex::getAUEndPos() const { return au_end_position; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool AlignedAUIndex::isReference() const { return ref_cfg != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::format::mgb::RefCfg& AlignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AlignedAUIndex::setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AlignedAUIndex::setExtended(genie::format::mgb::ExtendedAu _ext_au) { extended_cfg = std::move(_ext_au); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::format::mgb::ExtendedAu& AlignedAUIndex::getExtension() const { return *extended_cfg; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool AlignedAUIndex::isExtended() const { return extended_cfg != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<uint64_t>& AlignedAUIndex::getBlockOffsets() const { return block_byte_offset; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AlignedAUIndex::addBlockOffset(uint64_t offset) {
-    UTILS_DIE_IF(!block_byte_offset.empty() && block_byte_offset.back() > offset, "Blocks unordered");
-    block_byte_offset.emplace_back(offset);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool UnalignedAUIndex::operator==(const UnalignedAUIndex& other) const {
-    return au_byte_offset == other.au_byte_offset && ref_cfg == other.ref_cfg && sig_cfg == other.sig_cfg &&
-           block_byte_offset == other.block_byte_offset && byte_offset_size == other.byte_offset_size &&
-           position_size == other.position_size && signature_size == other.signature_size;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<uint64_t>& UnalignedAUIndex::getBlockOffsets() const { return block_byte_offset; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
-                                   core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
-                                   bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                                   const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet)
-    : byte_offset_size(_byte_offset_size), position_size(_position_size), signature_size(_signature_size) {
-    au_byte_offset = reader.read<uint64_t>(byte_offset_size);
-    if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
-    } else if (signature_flag) {
-        sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
-                                                   core::getAlphabetProperties(alphabet).base_bits);
-        reader.flush();
-    }
-    if (!block_header_flag) {
-        for (const auto& d : descriptors) {
-            (void)d;
-            block_byte_offset.emplace_back(reader.read<uint64_t>(byte_offset_size));
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UnalignedAUIndex::write(genie::util::BitWriter& writer) const {
-    writer.write(au_byte_offset, byte_offset_size);
-    if (ref_cfg != boost::none) {
-        ref_cfg->write(writer);
-    }
-    if (sig_cfg != boost::none) {
-        sig_cfg->write(writer);
-        writer.flush();
-    }
-    for (const auto& b : block_byte_offset) {
-        writer.write(b, byte_offset_size);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t UnalignedAUIndex::getAUOffset() const { return au_byte_offset; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UnalignedAUIndex::addBlockOffset(uint64_t offset) {
-    UTILS_DIE_IF(!block_byte_offset.empty() && block_byte_offset.back() > offset, "Blocks unordered");
-    block_byte_offset.emplace_back(offset);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-UnalignedAUIndex::UnalignedAUIndex(uint64_t _au_byte_offset, uint8_t _byte_offset_size, int8_t _position_size,
-                                   int8_t _signature_size)
-    : au_byte_offset(_au_byte_offset),
-      byte_offset_size(_byte_offset_size),
-      position_size(_position_size),
-      signature_size(_signature_size) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool UnalignedAUIndex::isReference() const { return ref_cfg != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::format::mgb::RefCfg& UnalignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UnalignedAUIndex::setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool UnalignedAUIndex::hasSignature() const { return sig_cfg != boost::none; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::format::mgb::SignatureCfg& UnalignedAUIndex::getSignatureInfo() const { return *sig_cfg; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UnalignedAUIndex::setSignatureInfo(genie::format::mgb::SignatureCfg sigcfg) { sig_cfg = std::move(sigcfg); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 bool MasterIndexTable::operator==(const GenInfo& info) const {
     if (!GenInfo::operator==(info)) {
         return false;
@@ -228,18 +27,22 @@ bool MasterIndexTable::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<std::vector<AlignedAUIndex>>>& MasterIndexTable::getAlignedAUs() const {
+const std::vector<std::vector<std::vector<master_index_table::AlignedAUIndex>>>& MasterIndexTable::getAlignedAUs()
+    const {
     return aligned_aus;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<UnalignedAUIndex>& MasterIndexTable::getUnalignedAUs() const { return unaligned_aus; }
+const std::vector<master_index_table::UnalignedAUIndex>& MasterIndexTable::getUnalignedAUs() const {
+    return unaligned_aus;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
-    aligned_aus.resize(seq_count, std::vector<std::vector<AlignedAUIndex>>(num_classes, std::vector<AlignedAUIndex>()));
+    aligned_aus.resize(seq_count, std::vector<std::vector<master_index_table::AlignedAUIndex>>(
+                                      num_classes, std::vector<master_index_table::AlignedAUIndex>()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -247,9 +50,9 @@ MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
 MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader& hdr) {
     auto start_pos = reader.getPos() - 4;
     auto length = reader.read<uint64_t>();
-    aligned_aus.resize(
-        hdr.getReferenceOptions().getSeqIDs().size(),
-        std::vector<std::vector<AlignedAUIndex>>(hdr.getMITConfigs().size(), std::vector<AlignedAUIndex>()));
+    aligned_aus.resize(hdr.getReferenceOptions().getSeqIDs().size(),
+                       std::vector<std::vector<master_index_table::AlignedAUIndex>>(
+                           hdr.getMITConfigs().size(), std::vector<master_index_table::AlignedAUIndex>()));
     for (size_t seq = 0; seq < hdr.getReferenceOptions().getSeqIDs().size(); ++seq) {
         for (size_t ci = 0; ci < hdr.getMITConfigs().size(); ++ci) {
             if (core::record::ClassType::CLASS_U == hdr.getMITConfigs()[ci].getClassID()) {

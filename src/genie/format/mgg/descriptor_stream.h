@@ -15,6 +15,7 @@
 #include "boost/optional/optional.hpp"
 #include "genie/format/mgg/block.h"
 #include "genie/format/mgg/descriptor_stream_header.h"
+#include "genie/format/mgg/descriptor_stream_protection.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/format/mgg/master_index_table.h"
 #include "genie/util/bitreader.h"
@@ -31,9 +32,9 @@ namespace mgg {
  */
 class DescriptorStream : public GenInfo {
  private:
-    DescriptorStreamHeader header;                //!< @brief
-    boost::optional<DSProtection> ds_protection;  //!< @brief
-    std::vector<core::Payload> payload;           //!< @brief
+    DescriptorStreamHeader header;                              //!< @brief
+    boost::optional<DescriptorStreamProtection> ds_protection;  //!< @brief
+    std::vector<core::Payload> payload;                         //!< @brief
 
  public:
     /**
@@ -77,7 +78,7 @@ class DescriptorStream : public GenInfo {
      * @param configs
      */
     explicit DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
-                              const std::vector<MITClassConfig>& configs);
+                              const std::vector<dataset_header::MITClassConfig>& configs);
 
     /**
      * @brief
@@ -101,19 +102,19 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @param prot
      */
-    void setProtection(DSProtection prot);
+    void setProtection(DescriptorStreamProtection prot);
 
     /**
      * @brief
      * @return
      */
-    const DSProtection& getProtection() const;
+    const DescriptorStreamProtection& getProtection() const;
 
     /**
      * @brief
      * @return
      */
-    DSProtection& getProtection();
+    DescriptorStreamProtection& getProtection();
 
     /**
      * @brief

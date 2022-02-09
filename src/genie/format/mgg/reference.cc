@@ -7,6 +7,8 @@
 #include "genie/format/mgg/reference.h"
 #include <sstream>
 #include <utility>
+#include "genie/format/mgg/reference/location/external.h"
+#include "genie/format/mgg/reference/location/internal.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -14,92 +16,6 @@
 namespace genie {
 namespace format {
 namespace mgg {
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Reference::ReferenceSeq::operator==(const ReferenceSeq& other) const {
-    return name == other.name && sequence_length == other.sequence_length && sequence_id == other.sequence_id &&
-           version == other.version;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Reference::ReferenceSeq::ReferenceSeq(std::string _name, uint32_t length, uint16_t id,
-                                      genie::core::MPEGMinorVersion _version)
-    : name(std::move(_name)), sequence_length(length), sequence_id(id), version(_version) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& Reference::ReferenceSeq::getName() const { return name; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t Reference::ReferenceSeq::getLength() const { return sequence_length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t Reference::ReferenceSeq::getID() const { return sequence_id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Reference::ReferenceSeq::ReferenceSeq(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version)
-    : version(_version) {
-    reader.readBypass_null_terminated(name);
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        sequence_length = reader.readBypassBE<uint32_t>();
-        sequence_id = reader.readBypassBE<uint16_t>();
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Reference::ReferenceSeq::write(genie::util::BitWriter& writer) const {
-    writer.writeBypass(name.data(), name.length());
-    writer.writeBypassBE<uint8_t>('\0');
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        writer.writeBypassBE(sequence_length);
-        writer.writeBypassBE(sequence_id);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Reference::ReferenceVersion::operator==(const ReferenceVersion& other) const {
-    return v_major == other.v_major && v_minor == other.v_minor && v_patch == other.v_patch;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Reference::ReferenceVersion::ReferenceVersion(uint16_t _v_major, uint16_t _v_minor, uint16_t _v_patch)
-    : v_major(_v_major), v_minor(_v_minor), v_patch(_v_patch) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Reference::ReferenceVersion::ReferenceVersion(genie::util::BitReader& reader) {
-    v_major = reader.readBypassBE<uint16_t>();
-    v_minor = reader.readBypassBE<uint16_t>();
-    v_patch = reader.readBypassBE<uint16_t>();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Reference::ReferenceVersion::write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE(v_major);
-    writer.writeBypassBE(v_minor);
-    writer.writeBypassBE(v_patch);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t Reference::ReferenceVersion::getMajor() const { return v_major; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t Reference::ReferenceVersion::getMinor() const { return v_minor; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t Reference::ReferenceVersion::getPatch() const { return v_patch; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,20 +37,20 @@ Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _ver
     dataset_group_ID = reader.readBypassBE<uint8_t>();
     reference_ID = reader.readBypassBE<uint8_t>();
     reader.readBypass_null_terminated(reference_name);
-    ref_version = ReferenceVersion(reader);
+    ref_version = reference::Version(reader);
     auto seq_count = reader.readBypassBE<uint16_t>();
     for (size_t i = 0; i < seq_count; ++i) {
         sequences.emplace_back(reader, version);
     }
 
-    reference_location = ReferenceLocation::referenceLocationFactory(reader, seq_count, _version);
+    reference_location = reference::Location::factory(reader, seq_count, _version);
     UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, ReferenceVersion _ref_version,
-                     std::unique_ptr<ReferenceLocation> location, genie::core::MPEGMinorVersion _version)
+Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
+                     std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version)
     : dataset_group_ID(group_id),
       reference_ID(ref_id),
       reference_name(std::move(ref_name)),
@@ -156,11 +72,11 @@ const std::string& Reference::getReferenceName() const { return reference_name; 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Reference::ReferenceVersion& Reference::getRefVersion() const { return ref_version; }
+const reference::Version& Reference::getRefVersion() const { return ref_version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<Reference::ReferenceSeq>& Reference::getSequences() const { return sequences; }
+const std::vector<reference::Sequence>& Reference::getSequences() const { return sequences; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -171,16 +87,16 @@ const std::string& Reference::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::addSequence(ReferenceSeq seq, std::string checksum) {
+void Reference::addSequence(reference::Sequence seq, std::string checksum) {
     sequences.emplace_back(std::move(seq));
     if (reference_location->isExternal()) {
-        dynamic_cast<ExternalReferenceLocation&>(*reference_location).addChecksum(std::move(checksum));
+        dynamic_cast<reference::location::External&>(*reference_location).addChecksum(std::move(checksum));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ReferenceLocation& Reference::getLocation() const { return *reference_location; }
+const reference::Location& Reference::getLocation() const { return *reference_location; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -194,14 +110,6 @@ void Reference::box_write(genie::util::BitWriter& writer) const {
         s.write(writer);
     }
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Reference::ReferenceSeq::ReferenceSeq(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
-    : name(std::move(s.getName())),
-      sequence_length(static_cast<uint32_t>(s.getLength())),
-      sequence_id(s.getID()),
-      version(_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -259,9 +167,9 @@ void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
     }
     std::string location;
     if (reference_location->isExternal()) {
-        location = "External at " + dynamic_cast<const ExternalReferenceLocation&>(*reference_location).getURI();
+        location = "External at " + dynamic_cast<const reference::location::External&>(*reference_location).getURI();
     } else {
-        const auto& i = dynamic_cast<const InternalReferenceLocation&>(*reference_location);
+        const auto& i = dynamic_cast<const reference::location::Internal&>(*reference_location);
         location = "Internal at (Dataset Group " + std::to_string(static_cast<int>(i.getDatasetGroupID())) +
                    ", Dataset " + std::to_string(static_cast<int>(i.getDatasetID())) + ")";
     }

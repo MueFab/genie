@@ -15,7 +15,9 @@
 #include "genie/core/constants.h"
 #include "genie/core/meta/reference.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/format/mgg/reference_location.h"
+#include "genie/format/mgg/reference/location.h"
+#include "genie/format/mgg/reference/sequence.h"
+#include "genie/format/mgg/reference/version.h"
 #include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,134 +33,15 @@ class Reference : public GenInfo {
  public:
     enum class ReferenceType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };  //!< @brief
 
-    class ReferenceSeq {
-     private:
-        std::string name;                       //!< @brief
-        uint32_t sequence_length;               //!< @brief
-        uint16_t sequence_id;                   //!< @brief
-        genie::core::MPEGMinorVersion version;  //!< @brief
-
-     public:
-        /**
-         * @brief
-         * @param other
-         * @return
-         */
-        bool operator==(const ReferenceSeq& other) const;
-
-        /**
-         * @brief
-         * @param _name
-         * @param length
-         * @param id
-         * @param _version
-         */
-        ReferenceSeq(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version);
-
-        /**
-         * @brief
-         * @param s
-         * @param _version
-         */
-        ReferenceSeq(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version);
-
-        /**
-         * @brief
-         * @return
-         */
-        const std::string& getName() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint32_t getLength() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint16_t getID() const;
-
-        /**
-         * @brief
-         * @param reader
-         * @param _version
-         */
-        ReferenceSeq(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version);
-
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(genie::util::BitWriter& writer) const;
-    };
-
-    /**
-     * @brief
-     */
-    class ReferenceVersion {
-     private:
-        uint16_t v_major;  //!< @brief
-        uint16_t v_minor;  //!< @brief
-        uint16_t v_patch;  //!< @brief
-
-     public:
-        /**
-         * @brief
-         * @param other
-         * @return
-         */
-        bool operator==(const ReferenceVersion& other) const;
-
-        /**
-         * @brief
-         * @param _v_major
-         * @param _v_minor
-         * @param _v_patch
-         */
-        ReferenceVersion(uint16_t _v_major, uint16_t _v_minor, uint16_t _v_patch);
-
-        /**
-         * @brief
-         * @param reader
-         */
-        explicit ReferenceVersion(genie::util::BitReader& reader);
-
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(genie::util::BitWriter& writer) const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint16_t getMajor() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint16_t getMinor() const;
-
-        /**
-         * @brief
-         * @return
-         */
-        uint16_t getPatch() const;
-    };
-
  private:
-    uint8_t dataset_group_ID;      //!< @brief
-    uint8_t reference_ID;          //!< @brief
-    std::string reference_name;    //!< @brief
-    ReferenceVersion ref_version;  //!< @brief
+    uint8_t dataset_group_ID;        //!< @brief
+    uint8_t reference_ID;            //!< @brief
+    std::string reference_name;      //!< @brief
+    reference::Version ref_version;  //!< @brief
 
-    std::vector<ReferenceSeq> sequences;  //!< @brief seq_count is length of vector
+    std::vector<reference::Sequence> sequences;  //!< @brief seq_count is length of vector
 
-    std::unique_ptr<ReferenceLocation> reference_location;  //!< @brief
+    std::unique_ptr<reference::Location> reference_location;  //!< @brief
 
     genie::core::MPEGMinorVersion version;  //!< @brief
 
@@ -214,8 +97,8 @@ class Reference : public GenInfo {
      * @param location
      * @param _version
      */
-    Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, ReferenceVersion _ref_version,
-              std::unique_ptr<ReferenceLocation> location, genie::core::MPEGMinorVersion _version);
+    Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
+              std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version);
 
     /**
      * @brief
@@ -239,13 +122,13 @@ class Reference : public GenInfo {
      * @brief
      * @return
      */
-    const ReferenceVersion& getRefVersion() const;
+    const reference::Version& getRefVersion() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<ReferenceSeq>& getSequences() const;
+    const std::vector<reference::Sequence>& getSequences() const;
 
     /**
      * @brief
@@ -258,13 +141,13 @@ class Reference : public GenInfo {
      * @param seq
      * @param checksum
      */
-    void addSequence(ReferenceSeq seq, std::string checksum);
+    void addSequence(reference::Sequence seq, std::string checksum);
 
     /**
      * @brief
      * @return
      */
-    const ReferenceLocation& getLocation() const;
+    const reference::Location& getLocation() const;
 
     /**
      * @brief
