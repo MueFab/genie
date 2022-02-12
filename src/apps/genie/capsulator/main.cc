@@ -41,6 +41,12 @@ struct EncapsulatedDataset {
 
     explicit EncapsulatedDataset(const std::string& input_file, genie::core::MPEGMinorVersion version)
         : reader(input_file), mgb_file(&reader) {
+        if ((ghc::filesystem::exists(input_file + ".json") && ghc::filesystem::file_size(input_file + ".json"))) {
+            std::ifstream in_file(input_file + ".json");
+            nlohmann::json my_json;
+            in_file >> my_json;
+            meta = genie::core::meta::Dataset(my_json);
+        }
         for (uint8_t multiple_alignment = 0; multiple_alignment < 2; ++multiple_alignment) {
             for (uint8_t pos40 = 0; pos40 < 2; ++pos40) {
                 for (uint8_t data_type = 0; data_type < uint8_t(genie::core::parameter::DataUnit::DatasetType::COUNT);
@@ -164,7 +170,7 @@ struct EncapsulatedDatasetGroup {
             }
         }
 
-        for (auto it = reference_meta.begin(); it != reference_meta.end(); ++it) {
+        for (auto it = reference_meta.begin(); it != reference_meta.end();) {
             if (it->getReferenceMetadataValue().empty()) {
                 it = reference_meta.erase(it);
             } else {
@@ -254,15 +260,19 @@ struct EncapsulatedFile {
                 continue;
             }
 
-            std::ifstream in_file(i + ".json");
-            nlohmann::json my_json;
-            in_file >> my_json;
-            genie::core::meta::Dataset dataset(my_json);
-            if (dataset.getDataGroup() == boost::none) {
+            if ((ghc::filesystem::exists(i + ".json") && ghc::filesystem::file_size(i + ".json"))) {
+                std::ifstream in_file(i + ".json");
+                nlohmann::json my_json;
+                in_file >> my_json;
+                genie::core::meta::Dataset dataset(my_json);
+                if (dataset.getDataGroup() == boost::none) {
+                    unknown_id.emplace_back(i);
+                    continue;
+                }
+                ret[static_cast<uint8_t>(dataset.getDataGroup()->getID())].emplace_back(i);
+            } else {
                 unknown_id.emplace_back(i);
-                continue;
             }
-            ret[static_cast<uint8_t>(dataset.getDataGroup()->getID())].emplace_back(i);
         }
 
         if (!unknown_id.empty()) {

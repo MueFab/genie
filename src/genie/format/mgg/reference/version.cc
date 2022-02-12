@@ -22,7 +22,9 @@ bool Version::operator==(const Version& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Version::Version(uint16_t _v_major, uint16_t _v_minor, uint16_t _v_patch)
-    : v_major(_v_major), v_minor(_v_minor), v_patch(_v_patch) {}
+    : v_major(_v_major), v_minor(20), v_patch(_v_patch) {
+    (void)_v_minor;  // Ref software requires 20?
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
