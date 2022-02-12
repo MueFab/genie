@@ -84,6 +84,9 @@ compress_roundtrip () {
         ls -l $paired_fastq_file
     fi
     ls -l $working_dir/output.mgb
+    
+    rm $working_dir/output.mgb.json
+    rm $working_dir/output.mgb.unsupported.mgrec
 
     echo "-----------------Genie decompress"
     eval $timing_command \

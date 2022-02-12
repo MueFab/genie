@@ -17,7 +17,7 @@ namespace basecoder {
 // ---------------------------------------------------------------------------------------------------------------------
 
 EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
-    : readCoder((int32_t)data.getRef().getGlobalStart()),
+    : readCoder(data.getData().front().getAlignments().front().getPosition()),
       pairedEnd(data.getData().front().getNumberOfTemplateSegments() > 1),
       readLength(data.getData().front().getSegments().front().getSequence().length()),
       classType(data.getData().front().getClassID()),

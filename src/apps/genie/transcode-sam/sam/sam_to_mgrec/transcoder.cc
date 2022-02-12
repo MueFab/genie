@@ -238,13 +238,24 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>&, RefInfo& ref) {
+bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
+    for (const auto& c : seq) {
+        if (!alphabet.isIncluded(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>&, RefInfo& ref) {
     if (r.getClassID() == genie::core::record::ClassType::CLASS_U) {
-        return;
+        return true;
     }
 
     if (!ref.isValid()) {
-        return;
+        return true;
     }
 
     size_t alignment_ctr = 0;
@@ -256,6 +267,14 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                           .getString(pos, pos + r.getMappedLength(alignment_ctr, 0));
         auto cigar = a.getAlignment().getECigar();
         auto seq = r.getSegments()[r.getSegments().size() == 2 ? !r.isRead1First() : 0].getSequence();
+
+        if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+            return false;
+        }
+
+        if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+            return false;
+        }
 
         cigar = patch_ecigar(refSeq, seq, cigar);
 
@@ -282,6 +301,14 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                 cigar = split.getAlignment().getECigar();
                 seq = r.getSegments()[r.isRead1First()].getSequence();
 
+                if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                    return false;
+                }
+
+                if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                    return false;
+                }
+
                 cigar = patch_ecigar(refSeq, seq, cigar);
 
                 if (r.getClassID() != genie::core::record::ClassType::CLASS_HM) {
@@ -302,6 +329,7 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
         r.setAlignment(alignment_ctr, std::move(newBox));
         alignment_ctr++;
     }
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -309,6 +337,7 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
 void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std::pair<std::string, size_t>>& refs) {
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
     RefInfo refinf(options.fasta_file_path);
+    size_t removed_unsupported_base = 0;
 
     std::vector<size_t> sam_hdr_to_fasta_lut;
     if (!options.no_ref) {
@@ -362,9 +391,11 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         auto rec = reader->moveRecord();
         rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
 
-        fix_ecigar(rec, refs, refinf);
-
-        rec.write(total_output_writer);
+        if (fix_ecigar(rec, refs, refinf)) {
+            rec.write(total_output_writer);
+        } else {
+            removed_unsupported_base++;
+        }
 
         if (reader->getRecord()) {
             heap.push(reader);
@@ -389,6 +420,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     out_stream->flush();
 
     std::cerr << "Finished merging!" << std::endl;
+    std::cerr << removed_unsupported_base << " records removed because of unsupported bases." << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

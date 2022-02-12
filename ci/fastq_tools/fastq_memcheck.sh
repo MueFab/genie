@@ -65,6 +65,8 @@ compress_roundtrip () {
         || { echo "Genie compress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     rm /tmp/transcoded.mgrec
+    rm /tmp/output.mgb.json
+    rm /tmp/output.mgb.unsupported.mgrec
 
     echo "Genie decompress"
     valgrind --suppressions=$git_root_dir/ci/omp.supp \

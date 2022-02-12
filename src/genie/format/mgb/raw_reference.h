@@ -28,18 +28,21 @@ class RawReference : public core::parameter::DataUnit {
  private:
     std::vector<RawReferenceSequence> seqs;  //!< @brief
 
+    bool headerless;
+
  public:
     /**
      * @brief
      */
-    RawReference();
+    explicit RawReference(bool headerLess = false);
 
     /**
      * @brief
      * @param reader
      * @param headerOnly
+     * @param headerLess
      */
-    explicit RawReference(util::BitReader& reader, bool headerOnly = false);
+    explicit RawReference(util::BitReader& reader, bool headerOnly = false, bool headerLess = false);
 
     /**
      * @brief
@@ -82,6 +85,12 @@ class RawReference : public core::parameter::DataUnit {
      * @return
      */
     std::vector<RawReferenceSequence>::iterator end();
+
+    /**
+     * @brief
+     * @param state
+     */
+    void setHeaderLess(bool state);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
