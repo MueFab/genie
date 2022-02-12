@@ -43,7 +43,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
         genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
+    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false));
     ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));

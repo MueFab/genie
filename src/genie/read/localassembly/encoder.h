@@ -29,8 +29,7 @@ namespace localassembly {
  */
 class Encoder : public basecoder::EncoderStub {
  private:
-    bool debug;                //!< @brief print debug output
-    uint32_t cr_buf_max_size;  //!< @brief maximum amount of bases in the local assembly
+    bool debug;  //!< @brief print debug output
 
     /**
      * @brief Internal encoding state (not exposed publicly)
@@ -83,10 +82,9 @@ class Encoder : public basecoder::EncoderStub {
  public:
     /**
      * @brief Create encoder with specified parameters
-     * @param _cr_buf_max_size Maximum assembly buffer size
      * @param _debug If true, debug information is printed
      */
-    Encoder(uint32_t _cr_buf_max_size, bool _debug);
+    explicit Encoder(bool _debug);
 
     /**
      * @brief Downgrade class N to class M and then proceed with encoding
