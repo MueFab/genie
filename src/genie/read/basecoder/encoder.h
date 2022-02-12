@@ -32,7 +32,7 @@ namespace basecoder {
 class Encoder {
  private:
     core::AccessUnit container;  //!< @brief
-    int32_t pos;                 //!< @brief
+    uint64_t pos;                //!< @brief
     uint32_t readCounter;        //!< @brief
 
     /**
@@ -173,7 +173,7 @@ class Encoder {
      * @brief
      * @param startingMappingPos
      */
-    explicit Encoder(int32_t startingMappingPos);
+    explicit Encoder(uint64_t startingMappingPos);
 
     /**
      * @brief

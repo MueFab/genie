@@ -19,12 +19,15 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReference::RawReference() : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {}
+RawReference::RawReference(bool headerLess) : DataUnit(DataUnitType::RAW_REFERENCE), seqs(), headerless(headerLess) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReference::RawReference(util::BitReader &reader, bool headerOnly) : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {
-    reader.read<uint64_t>();
+RawReference::RawReference(util::BitReader &reader, bool headerOnly, bool headerLess)
+    : DataUnit(DataUnitType::RAW_REFERENCE), seqs(), headerless(headerLess) {
+    if (!headerLess) {
+        reader.read<uint64_t>();
+    }
     auto count = reader.read<uint16_t>();
     for (size_t i = 0; i < count; ++i) {
         seqs.emplace_back(reader, headerOnly);
@@ -45,14 +48,15 @@ void RawReference::addSequence(RawReferenceSequence &&ref) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void RawReference::write(util::BitWriter &writer) const {
-    DataUnit::write(writer);
-
-    uint64_t size = 0;
-    for (auto &i : seqs) {
-        size += i.getTotalSize();
+    if (!headerless) {
+        DataUnit::write(writer);
+        uint64_t size = 0;
+        for (auto &i : seqs) {
+            size += i.getTotalSize();
+        }
+        size += (8 + 64 + 16) / 8;  // data_unit_type, data_unit_size, seq_count
+        writer.write(size, 64);
     }
-    size += (8 + 64 + 16) / 8;  // data_unit_type, data_unit_size, seq_count
-    writer.write(size, 64);
     writer.write(seqs.size(), 16);
 
     for (auto &i : seqs) {
@@ -75,6 +79,10 @@ std::vector<RawReferenceSequence>::iterator RawReference::begin() { return seqs.
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::vector<RawReferenceSequence>::iterator RawReference::end() { return seqs.end(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void RawReference::setHeaderLess(bool state) { headerless = state; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

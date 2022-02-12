@@ -60,9 +60,8 @@ RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_
 void RawReferenceSequence::write(util::BitWriter& writer) const {
     writer.write(sequence_ID, 16);
     writer.write(seq_start, 40);
-    writer.write(seq_start + ref_sequence.length(), 40);
+    writer.write(seq_start + ref_sequence.length() - 1, 40);
     writer.writeBypass(ref_sequence.data(), ref_sequence.length());
-    writer.write('\0', 8);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -72,8 +71,8 @@ bool RawReferenceSequence::isIdUnique(const RawReferenceSequence& s) const { ret
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t RawReferenceSequence::getTotalSize() const {
-    uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;         // sequence_ID, seq_start, seq_end
-    return (ref_sequence.length() + 1) + HEADER_SIZE;  // Including \0
+    uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;     // sequence_ID, seq_start, seq_end
+    return (ref_sequence.length()) + HEADER_SIZE;  // Including \0
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

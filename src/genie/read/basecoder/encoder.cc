@@ -34,7 +34,7 @@ Encoder::CodingState::CodingState(const std::string &_read, const std::string &_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(int32_t startingMappingPos)
+Encoder::Encoder(uint64_t startingMappingPos)
     : container(core::parameter::ParameterSet(), 0), pos(startingMappingPos), readCounter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
     const auto POSITION = ALIGNMENT.getPosition() - pos;
-    pos = (int32_t)ALIGNMENT.getPosition();
+    pos = ALIGNMENT.getPosition();
     container.push(core::GenSub::POS_MAPPING_FIRST, POSITION);
 
     const auto LENGTH = RECORD.getSequence().length() - 1;
