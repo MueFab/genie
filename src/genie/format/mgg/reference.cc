@@ -104,11 +104,13 @@ void Reference::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE(dataset_group_ID);
     writer.writeBypassBE(reference_ID);
     writer.writeBypass(reference_name.data(), reference_name.length());
+    writer.writeBypassBE<uint8_t>(0);
     ref_version.write(writer);
     writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(sequences.size()));
     for (const auto& s : sequences) {
         s.write(writer);
     }
+    reference_location->write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,6 +147,7 @@ Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::co
     for (auto& r : ref.getSequences()) {
         sequences.emplace_back(std::move(r), version);
     }
+    reference_location = reference::Location::referenceLocationFactory(ref.moveBase(), _version);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -477,8 +477,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ParameterSet::operator==(const ParameterSet &pset) const {
-    return parameter_set_ID == pset.parameter_set_ID && parent_parameter_set_ID == pset.parent_parameter_set_ID &&
-           set == pset.set;
+    return set == pset.set;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

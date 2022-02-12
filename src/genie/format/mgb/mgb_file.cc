@@ -72,6 +72,8 @@ MgbFile::MgbFile(std::istream* _file) : file(_file), reader(*file) {
                 UTILS_DIE("Unknown data unit");
         }
     }
+    file->clear();
+    file->seekg(0, std::ios::beg);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -91,6 +93,10 @@ void MgbFile::sort_by_class() {
             u1, u2, [](const genie::format::mgb::AccessUnit& a1, const genie::format::mgb::AccessUnit& a2) -> bool {
                 if (a1.getHeader().getClass() != a2.getHeader().getClass()) {
                     return uint8_t(a1.getHeader().getClass()) < uint8_t(a2.getHeader().getClass());
+                }
+                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
+                    a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                    return a1.getHeader().getID() < a2.getHeader().getID();
                 }
                 if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
                     return false;
@@ -116,6 +122,10 @@ void MgbFile::sort_by_position() {
                      const std::pair<uint64_t, std::unique_ptr<genie::core::parameter::DataUnit>>& u2) -> bool {
         return base_sorter(
             u1, u2, [](const genie::format::mgb::AccessUnit& a1, const genie::format::mgb::AccessUnit& a2) -> bool {
+                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
+                    a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                    return a1.getHeader().getID() < a2.getHeader().getID();
+                }
                 if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
                     return false;
                 }

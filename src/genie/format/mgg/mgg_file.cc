@@ -36,6 +36,8 @@ MggFile::MggFile(std::istream* _file) : file(_file), reader(*file) {
             break;
         }
     }
+    file->clear();
+    file->seekg(0, std::ios::beg);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

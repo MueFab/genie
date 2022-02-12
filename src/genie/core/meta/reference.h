@@ -141,6 +141,12 @@ class Reference {
     const RefBase& getBase() const;
 
     /**
+     * @brief Get reference type specific information
+     * @return Reference type specific information
+     */
+    std::unique_ptr<RefBase> moveBase();
+
+    /**
      * @brief Return MPEG-G part 3 meta information
      * @return MPEG-G part 3 meta information
      */
