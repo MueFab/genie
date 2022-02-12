@@ -132,9 +132,11 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
             flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1));
         }
     } else if (file_extension(pOpts.inputFile) == "mgrec") {
-        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
+        auto tmpFile = pOpts.outputFile + ".unsupported.mgrec";
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(tmpFile));
         flow.addImporter(
             genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1, *outputFiles.back(), false));
+        std::remove(tmpFile.c_str());
     }
 }
 

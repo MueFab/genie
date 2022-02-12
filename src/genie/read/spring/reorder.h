@@ -127,8 +127,6 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
  * @tparam bitset_size
  * @param ref
  * @param mask1
- * @param dict_lock
- * @param read_lock
  * @param mask
  * @param read_lengths
  * @param remainingreads

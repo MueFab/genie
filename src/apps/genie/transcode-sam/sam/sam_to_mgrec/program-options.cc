@@ -155,6 +155,44 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string random_string(size_t length) {
+    auto randchar = []() -> char {
+        const char charset[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[rand() % max_index];
+    };
+    std::string str(length, 0);
+    std::generate_n(str.begin(), length, randchar);
+    return str;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void validateWorkingDir(const std::string &dir) {
+    UTILS_DIE_IF(!ghc::filesystem::exists(dir), "Directory does not exist: " + dir);
+    UTILS_DIE_IF(!ghc::filesystem::is_directory(dir), "Is a file and not a directory: " + dir);
+
+    std::string test_name;
+    do {
+        const size_t NAME_LENGTH = 16;
+        test_name = dir + "/" + random_string(NAME_LENGTH) + ".test";
+    } while (ghc::filesystem::exists(test_name));
+
+    {
+        const std::string TEST_STRING = "test";
+        std::ofstream test_file(test_name);
+        test_file << TEST_STRING << std::endl;
+        UTILS_DIE_IF(!test_file, "Can't write to working directory. Insufficient permissions? " + dir);
+    }
+
+    ghc::filesystem::remove(test_name);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Config::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
@@ -177,6 +215,12 @@ void Config::validate() {
     } else {
         std::cerr << "Output file: stdout" << std::endl;
     }
+
+    validateWorkingDir(tmp_dir_path);
+    tmp_dir_path = ghc::filesystem::canonical(tmp_dir_path).string();
+    std::replace(tmp_dir_path.begin(), tmp_dir_path.end(), '\\', '/');
+    std::cerr << "Working directory: " << tmp_dir_path << " with "
+              << size_string(ghc::filesystem::space(tmp_dir_path).available) << " available" << std::endl;
 
     if (std::thread::hardware_concurrency()) {
         UTILS_DIE_IF(num_threads < 1 || num_threads > std::thread::hardware_concurrency(),
