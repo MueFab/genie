@@ -2,7 +2,7 @@
 
 Open Source MPEG-G Codec
 
-[![Build Status](https://dev.azure.com/janvoges/genie/_apis/build/status/mitogen.genie?branchName=main)](https://dev.azure.com/janvoges/genie/_build/latest?definitionId=1&branchName=main)
+[![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/mitogen.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build/latest?definitionId=1&branchName=develop)
 
 ---
 
