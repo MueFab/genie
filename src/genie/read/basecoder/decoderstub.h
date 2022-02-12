@@ -97,8 +97,6 @@ class DecoderStub : public core::ReadDecoder {
 
     /**
      * @brief
-     * @param state
-     * @param rec
      */
     virtual void recordDecodedHook(DecodingState&, const core::record::Record&) {}
 

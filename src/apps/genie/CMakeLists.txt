@@ -4,6 +4,8 @@ set(source_files
         main.cc
         run/main.cc
         run/program-options.cc
+        transcode-fasta/main.cc
+        transcode-fasta/program-options.cc
         transcode-fastq/main.cc
         transcode-fastq/program-options.cc
         gabac/code.cc
