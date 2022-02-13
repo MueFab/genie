@@ -6,6 +6,8 @@
 
 #include "genie/format/mgg/dataset_parameterset/u_signature.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mgg {
