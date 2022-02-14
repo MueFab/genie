@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include "genie/format/mgg/encapsulator/decapsulated_dataset_group.h"
+#include "genie/format/mgg/mgg_file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ namespace encapsulator {
 class DecapsulatedFile {
     std::vector<DecapsulatedDatasetGroup> groups;  //!< @brief
     std::ifstream reader;                          //!< @brief
+    genie::format::mgg::MggFile mpegg_file;        //!< @brief
  public:
     /**
      * @brief

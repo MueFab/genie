@@ -120,6 +120,23 @@ void EncapsulatedDatasetGroup::mergeReferences(genie::core::MPEGMinorVersion ver
             ++it;
         }
     }
+
+    for (auto& d : datasets) {
+        for (auto& d2 : d->datasets) {
+            if (d2.getHeader().getDatasetType() != core::parameter::DataUnit::DatasetType::ALIGNED) {
+                continue;
+            }
+
+            auto ref_id = d2.getHeader().getReferenceOptions().getReferenceID();
+            for (auto& reference : references) {
+                if (ref_id == reference.getReferenceID()) {
+                    for (auto& s : reference.getSequences()) {
+                        d2.getHeader().addRefSequence(ref_id, s.getID(), 0, 0);
+                    }
+                }
+            }
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

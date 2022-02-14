@@ -84,7 +84,7 @@ uint8_t ReferenceOptions::getReferenceID() const { return reference_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceOptions::patchRefID(uint8_t _old, uint8_t _new) {
-    if (reference_ID == _old) {
+    if (reference_ID == _old || reference_ID == 255) {
         reference_ID = _new;
     }
 }

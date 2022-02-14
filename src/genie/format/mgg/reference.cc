@@ -131,6 +131,9 @@ genie::core::meta::Reference Reference::decapsulate(std::string meta) {
     std::unique_ptr<genie::core::meta::RefBase> location = reference_location->decapsulate();
     genie::core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
                                      ref_version.getPatch(), std::move(location), std::move(meta));
+    for (auto& s : sequences) {
+        ret.addSequence(genie::core::meta::Sequence(s.getName(), s.getLength(), s.getID()));
+    }
     return ret;
 }
 

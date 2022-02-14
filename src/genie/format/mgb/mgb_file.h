@@ -34,7 +34,7 @@ class MgbFile {
  private:
     std::vector<std::pair<uint64_t, std::unique_ptr<genie::core::parameter::DataUnit>>> units;  //!< @brief
     std::istream* file;                                                                         //!< @brief
-    boost::optional<util::BitReader> reader;                                                    //!< @brief
+    std::unique_ptr<util::BitReader> reader;                                                    //!< @brief
 
     std::map<size_t, core::parameter::EncodingSet> parameterSets;  //!< @brief
 
