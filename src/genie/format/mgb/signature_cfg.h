@@ -27,26 +27,32 @@ namespace mgb {
  */
 class SignatureCfg {
  private:
-    boost::optional<uint16_t> num_signatures;   //!< @brief
-    std::vector<uint64_t> U_cluster_signature;  //!< @brief
+    std::vector<uint64_t> U_cluster_signature;        //!< @brief
+    std::vector<uint8_t> U_cluster_signature_length;  //!< @brief
 
-    uint8_t U_signature_size;  //!< @brief
+    boost::optional<uint8_t> U_signature_size;  //!< @brief
+    uint8_t base_bits;
 
  public:
     /**
      * @brief
-     * @param _U_cluster_signature_0
-     * @param _U_signature_size
+     * @param other
+     * @return
      */
-    SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size);
+    bool operator==(const SignatureCfg& other) const;
 
     /**
      * @brief
-     * @param _U_signature_size
-     * @param multiple_signature_base
-     * @param reader
      */
-    SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader);
+    explicit SignatureCfg(uint8_t _base_bit) : base_bits(_base_bit) {}
+
+    /**
+     * @brief
+     * @param reader
+     * @param _U_signature_size
+     * @param _base_bits
+     */
+    SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, uint8_t _base_bits);
 
     /**
      * @brief
@@ -56,8 +62,9 @@ class SignatureCfg {
     /**
      * @brief
      * @param _U_cluster_signature
+     * @param length
      */
-    void addSignature(uint64_t _U_cluster_signature);
+    void addSignature(uint64_t _U_cluster_signature, uint8_t length);
 
     /**
      * @brief

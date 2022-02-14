@@ -433,6 +433,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     found = false;
             }
             break;
+        default:
+            UTILS_DIE("Invalid genomic descriptor");
     }
 
     if (!found) {

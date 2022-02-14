@@ -83,6 +83,25 @@ const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, (uint16_t)0);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const std::string &getMPEGVersionString(MPEGMinorVersion v) {
+    static const std::string lut[] = {"1900", "2000"};
+    return lut[static_cast<uint8_t>(v)];
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+MPEGMinorVersion getMPEGVersion(const std::string &v) {
+    for (MPEGMinorVersion ret = MPEGMinorVersion::V1900; ret < MPEGMinorVersion::UNKNOWN;
+         ret = MPEGMinorVersion(static_cast<uint8_t>(ret) + 1)) {
+        if (getMPEGVersionString(ret) == v) {
+            return ret;
+        }
+    }
+    return MPEGMinorVersion::UNKNOWN;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::vector<GenomicDescriptorProperties> &getDescriptors() {
     static const std::vector<GenomicDescriptorProperties> prop = {
         {GenDesc::POS,
@@ -198,8 +217,10 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
         std::vector<Alphabet> loc;
         loc.emplace_back();
         loc.back().lut = {'A', 'C', 'G', 'T', 'N'};
+        loc.back().base_bits = 3;
         loc.emplace_back();
         loc.back().lut = {'A', 'C', 'G', 'T', 'R', 'Y', 'S', 'W', 'K', 'M', 'B', 'D', 'H', 'V', 'N', '-'};
+        loc.back().base_bits = 5;
         for (auto &l : loc) {
             l.inverseLut = std::vector<char>(*std::max_element(l.lut.begin(), l.lut.end()) + 1, 0);
             for (size_t i = 0; i < l.lut.size(); ++i) {

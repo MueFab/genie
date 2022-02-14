@@ -39,7 +39,7 @@ void Encoder::flushIn(uint64_t& pos) {
     }
     preprocessor.finish(pos);
 
-    std::vector<core::parameter::ParameterSet> params;
+    std::vector<core::parameter::EncodingSet> params;
     auto loc_cp = preprocessor.cp;
     util::Watch watch;
     core::stats::PerfStats stats = preprocessor.getStats();

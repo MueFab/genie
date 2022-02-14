@@ -32,6 +32,13 @@ class ExtendedAu {
  public:
     /**
      * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const ExtendedAu& other) const;
+
+    /**
+     * @brief
      * @param _extended_AU_start_position
      * @param _extended_AU_end_position
      * @param _posSize

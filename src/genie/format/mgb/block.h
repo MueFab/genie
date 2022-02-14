@@ -10,8 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <sstream>
 #include <vector>
+#include "boost/variant/get.hpp"
+#include "boost/variant/variant.hpp"
 #include "genie/core/access-unit.h"
+#include "genie/core/payload.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,9 +32,43 @@ class Block {
     uint8_t descriptor_ID;        //!< @brief
     uint32_t block_payload_size;  //!< @brief
 
-    core::AccessUnit::Descriptor payload;  //!< @brief
+    uint8_t count;  //!< @brief
+
+    boost::variant<genie::core::Payload, core::AccessUnit::Descriptor> payload;  //!< @brief
 
  public:
+    /**
+     * @brief
+     * @return
+     */
+    bool isLoaded() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    bool isParsed() const;
+
+    /**
+     * @brief
+     */
+    void load();
+
+    /**
+     * @brief
+     */
+    void unload();
+
+    /**
+     * @brief
+     */
+    void parse();
+
+    /**
+     * @brief
+     */
+    void pack();
+
     /**
      * @brief
      */
@@ -42,6 +80,13 @@ class Block {
      * @param _payload
      */
     Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload);
+
+    /**
+     * @brief
+     * @param _descriptor_ID
+     * @param _payload
+     */
+    Block(genie::core::GenDesc _descriptor_ID, core::Payload _payload);
 
     /**
      * @brief
@@ -66,6 +111,18 @@ class Block {
      * @return
      */
     core::AccessUnit::Descriptor &&movePayload();
+
+    /**
+     * @brief
+     * @return
+     */
+    core::Payload movePayloadUnparsed();
+
+    /**
+     * @brief
+     * @return
+     */
+    core::Payload &getPayloadUnparsed();
 
     /**
      * @brief

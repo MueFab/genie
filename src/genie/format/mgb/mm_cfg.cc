@@ -15,6 +15,12 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool MmCfg::operator==(const MmCfg &other) const {
+    return mm_threshold == other.mm_threshold && mm_count == other.mm_count;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void MmCfg::write(util::BitWriter &writer) const {
     writer.write(mm_threshold, 16);
     writer.write(mm_count, 32);

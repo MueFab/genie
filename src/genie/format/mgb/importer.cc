@@ -38,8 +38,8 @@ bool Importer::pump(uint64_t& id, std::mutex&) {
             return false;
         }
         sec.start = id;
-        sec.length = unit->getReadCount();
-        id += unit->getReadCount();
+        sec.length = unit->getHeader().getReadCount();
+        id += unit->getHeader().getReadCount();
     }
 
     flowOut(convertAU(std::move(unit.get())), sec);
@@ -49,7 +49,8 @@ bool Importer::pump(uint64_t& id, std::mutex&) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
-    AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, 0, 0);
+    AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, false,
+                  core::AlphabetID::ACGTN);
     std::string ret;
     {
         std::lock_guard<std::mutex> f_lock(this->lock);
@@ -78,30 +79,30 @@ std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
 
 core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
     auto unit = std::move(au);
-    auto paramset = factory.getParams(unit.getParameterID());
-    core::AccessUnit set(std::move(paramset), unit.getReadCount());
+    auto paramset = factory.getParams(unit.getHeader().getParameterID());
+    core::AccessUnit set(std::move(paramset), unit.getHeader().getReadCount());
 
     for (auto& b : unit.getBlocks()) {
         set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());
     }
-    if (unit.getClass() != core::record::ClassType::CLASS_U) {
-        set.setReference(unit.getAlignmentInfo().getRefID());
-        set.setMinPos(unit.getAlignmentInfo().getStartPos());
-        set.setMaxPos(unit.getAlignmentInfo().getEndPos());
+    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U) {
+        set.setReference(unit.getHeader().getAlignmentInfo().getRefID());
+        set.setMinPos(unit.getHeader().getAlignmentInfo().getStartPos());
+        set.setMaxPos(unit.getHeader().getAlignmentInfo().getEndPos());
         ref_manager->validateRefID(set.getReference());
     } else {
         set.setReference(0);
         set.setMinPos(0);
         set.setMaxPos(0);
     }
-    set.setNumReads(unit.getReadCount());
-    set.setClassType(unit.getClass());
-    if (unit.getClass() != core::record::ClassType::CLASS_U && !set.getParameters().isComputedReference()) {
+    set.setNumReads(unit.getHeader().getReadCount());
+    set.setClassType(unit.getHeader().getClass());
+    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U && !set.getParameters().isComputedReference()) {
         auto seqs = ref_manager->getSequences();
-        auto cur_seq = ref_manager->ID2Ref(unit.getAlignmentInfo().getRefID());
+        auto cur_seq = ref_manager->ID2Ref(unit.getHeader().getAlignmentInfo().getRefID());
         if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
-            set.setReference(ref_manager->load(cur_seq, unit.getAlignmentInfo().getStartPos(),
-                                               unit.getAlignmentInfo().getEndPos() + 1),
+            set.setReference(ref_manager->load(cur_seq, unit.getHeader().getAlignmentInfo().getStartPos(),
+                                               unit.getHeader().getAlignmentInfo().getEndPos() + 1),
                              {});
         }
     }

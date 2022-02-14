@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cmath>
 #include <cstdint>
 #include <string>
 #include <utility>
@@ -22,7 +23,23 @@ namespace core {
 /**
  * @brief
  */
-enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1 };
+enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1, COUNT = 2 };
+
+enum class MPEGMinorVersion : uint8_t { V1900 = 0, V2000 = 1, UNKNOWN = 2 };
+
+/**
+ * @brief
+ * @param v
+ * @return
+ */
+const std::string& getMPEGVersionString(MPEGMinorVersion v);
+
+/**
+ * @brief
+ * @param v
+ * @return
+ */
+MPEGMinorVersion getMPEGVersion(const std::string& v);
 
 /**
  * @brief
@@ -45,7 +62,8 @@ enum class GenDesc : uint8_t {
     QV = 14,
     RNAME = 15,
     RFTP = 16,
-    RFTT = 17
+    RFTT = 17,
+    COUNT = 18
 };
 
 /**
@@ -188,6 +206,7 @@ struct GenomicDescriptorProperties {
 struct Alphabet {
     std::vector<char> lut;         //!< @brief
     std::vector<char> inverseLut;  //!< @brief
+    uint8_t base_bits;
 
     /**
      * @brief

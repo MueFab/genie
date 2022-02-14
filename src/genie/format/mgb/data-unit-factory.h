@@ -29,10 +29,10 @@ class Importer;
  */
 class DataUnitFactory {
  private:
-    std::map<size_t, core::parameter::ParameterSet> parameters;  //!< @brief
-    core::ReferenceManager* refmgr;                              //!< @brief
-    Importer* importer;                                          //!< @brief
-    bool referenceOnly;                                          //!< @brief
+    std::map<size_t, core::parameter::EncodingSet> parameters;  //!< @brief
+    core::ReferenceManager* refmgr;                             //!< @brief
+    Importer* importer;                                         //!< @brief
+    bool referenceOnly;                                         //!< @brief
 
  public:
     /**
@@ -48,13 +48,13 @@ class DataUnitFactory {
      * @param id
      * @return
      */
-    const core::parameter::ParameterSet& getParams(size_t id) const;
+    const core::parameter::EncodingSet& getParams(size_t id) const;
 
     /**
      * @brief
      * @return
      */
-    const std::map<size_t, core::parameter::ParameterSet>& getParams() const;
+    const std::map<size_t, core::parameter::EncodingSet>& getParams() const;
 
     /**
      * @brief

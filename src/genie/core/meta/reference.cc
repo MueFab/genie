@@ -41,8 +41,10 @@ Reference::Reference(const nlohmann::json& json)
       reference_minor_version(json["reference_minor_version"]),
       reference_patch_version(json["reference_patch_version"]),
       reference_metadata_value(json["reference_metadata_value"]) {
-    for (const auto& s : json["seqs"]) {
-        seqs.emplace_back(s);
+    if (json.contains("seqs")) {
+        for (const auto& s : json["seqs"]) {
+            seqs.emplace_back(s);
+        }
     }
     if (json.contains("external_ref")) {
         auto type = static_cast<ExternalRef::ReferenceType>(json["external_ref"]["reference_type"]);
@@ -107,11 +109,75 @@ void Reference::addSequence(Sequence s) { seqs.emplace_back(std::move(s)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::unique_ptr<RefBase> Reference::moveBase() { return std::move(ref); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const RefBase& Reference::getBase() const { return *ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& Reference::getInformation() const { return reference_metadata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& Reference::getInformation() { return reference_metadata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<Sequence>& Reference::getSequences() { return seqs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& Reference::getName() { return reference_name; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Reference::Reference(const Reference& _ref)
+    : reference_name(_ref.reference_name),
+      reference_major_version(_ref.reference_major_version),
+      reference_minor_version(_ref.reference_minor_version),
+      reference_patch_version(_ref.reference_patch_version),
+      seqs(_ref.seqs),
+      ref(_ref.ref->clone()),
+      reference_metadata_value(_ref.reference_metadata_value) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Reference::Reference(Reference&& _ref) noexcept
+    : reference_name(std::move(_ref.reference_name)),
+      reference_major_version(_ref.reference_major_version),
+      reference_minor_version(_ref.reference_minor_version),
+      reference_patch_version(_ref.reference_patch_version),
+      seqs(std::move(_ref.seqs)),
+      ref(std::move(_ref.ref)),
+      reference_metadata_value(std::move(_ref.reference_metadata_value)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Reference& Reference::operator=(const Reference& _ref) {
+    reference_name = _ref.reference_name;
+    reference_major_version = _ref.reference_major_version;
+    reference_minor_version = _ref.reference_minor_version;
+    reference_patch_version = _ref.reference_patch_version;
+    seqs = _ref.seqs;
+    ref = _ref.ref->clone();
+    reference_metadata_value = _ref.reference_metadata_value;
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Reference& Reference::operator=(Reference&& _ref) noexcept {
+    reference_name = std::move(_ref.reference_name);
+    reference_major_version = _ref.reference_major_version;
+    reference_minor_version = _ref.reference_minor_version;
+    reference_patch_version = _ref.reference_patch_version;
+    seqs = std::move(_ref.seqs);
+    ref = std::move(_ref.ref);
+    reference_metadata_value = std::move(_ref.reference_metadata_value);
+    return *this;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -59,6 +59,22 @@ nlohmann::json DatasetGroup::toJson() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetGroup::setMetadata(std::string meta) { DG_metadata_value = std::move(meta); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::setProtection(std::string prot) { DG_metadata_value = std::move(prot); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& DatasetGroup::getInformation() { return DG_metadata_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& DatasetGroup::getProtection() { return DG_protection_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace meta
 }  // namespace core
 }  // namespace genie

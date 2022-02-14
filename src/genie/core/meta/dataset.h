@@ -15,10 +15,12 @@
 #include "boost/optional/optional.hpp"
 #include "genie/core/meta/access-unit.h"
 #include "genie/core/meta/blockheader.h"
+#include "genie/core/meta/blockheader/enabled.h"
 #include "genie/core/meta/dataset-group.h"
 #include "genie/core/meta/descriptor-stream.h"
 #include "genie/core/meta/label.h"
 #include "genie/core/meta/reference.h"
+#include "genie/util/make-unique.h"
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,6 +46,18 @@ class Dataset {
 
  public:
     /**
+     * @brief
+     * @param meta
+     */
+    void setMetadata(std::string meta);
+
+    /**
+     * @brief
+     * @param prot
+     */
+    void setProtection(std::string prot);
+
+    /**
      * @brief Construct from raw information
      * @param _version Current iteration
      * @param _headerCfg Block header mode
@@ -51,6 +65,17 @@ class Dataset {
      * @param protection MPEG-G part 3 protection data
      */
     Dataset(uint32_t _version, std::unique_ptr<BlockHeader> _headerCfg, std::string meta, std::string protection);
+
+    /**
+     * @brief
+     */
+    Dataset();
+
+    /**
+     * @brief
+     * @param _hdr
+     */
+    void setHeader(std::unique_ptr<BlockHeader> _hdr);
 
     /**
      * @brief Construct from json
@@ -71,16 +96,34 @@ class Dataset {
     const boost::optional<DatasetGroup>& getDataGroup() const;
 
     /**
+     * @brief
+     * @return
+     */
+    boost::optional<DatasetGroup>& getDataGroup();
+
+    /**
      * @brief Return reference information, if any
      * @return Reference information
      */
     const boost::optional<Reference>& getReference() const;
 
     /**
+     * @brief
+     * @return
+     */
+    boost::optional<Reference>& getReference();
+
+    /**
      * @brief Return list of labels
      * @return List of labels
      */
     const std::vector<Label>& getLabels() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<Label>& getLabels();
 
     /**
      * @brief Return current version iteration
@@ -101,10 +144,22 @@ class Dataset {
     const std::string& getInformation() const;
 
     /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
+
+    /**
      * @brief Return MPEG-G Part 3 protection information
      * @return MPEG-G Part 3 protection information
      */
     const std::string& getProtection() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getProtection();
 
     /**
      * @brief Return list of access unit meta information blocks
@@ -113,10 +168,22 @@ class Dataset {
     const std::vector<AccessUnit>& getAUs() const;
 
     /**
+     * @brief
+     * @return
+     */
+    std::vector<AccessUnit>& getAUs();
+
+    /**
      * @brief Return list of descriptor stream meta information blocks
      * @return Descriptor stream blocks
      */
     const std::vector<DescriptorStream>& getDSs() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::vector<DescriptorStream>& getDSs();
 
     /**
      * @brief Update dataset group information

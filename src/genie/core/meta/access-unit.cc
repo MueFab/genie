@@ -54,6 +54,26 @@ const std::string& AccessUnit::getProtection() const { return AU_protection_valu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+AccessUnit::AccessUnit(size_t id) : access_unit_ID(id) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::setInformation(std::string information) { AU_information_value = std::move(information); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::setProtection(std::string protection) { AU_protection_value = std::move(protection); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& AccessUnit::getInformation() { return AU_information_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string& AccessUnit::getProtection() { return AU_protection_value; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace meta
 }  // namespace core
 }  // namespace genie

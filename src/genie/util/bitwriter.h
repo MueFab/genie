@@ -98,6 +98,18 @@ class BitWriter {
     void writeBypass(const void *in, size_t size);
 
     /**
+     * @brief
+     * @return
+     */
+    int64_t getPosition() const;
+
+    /**
+     * @brief
+     * @param pos
+     */
+    void setPosition(int64_t pos);
+
+    /**
      * @brief Write a single value as big endian
      * @tparam T Type name
      * @tparam SIZE Size of value

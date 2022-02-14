@@ -36,6 +36,13 @@ class AuTypeCfg {
  public:
     /**
      * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const AuTypeCfg &other) const;
+
+    /**
+     * @brief
      * @param _sequence_ID
      * @param _AU_start_position
      * @param _AU_end_position

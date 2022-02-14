@@ -163,7 +163,6 @@ void ProgramOptions::validate() {
         std::cerr << "Input file: stdin" << std::endl;
     }
 
-
     std::cerr << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);

@@ -30,6 +30,13 @@ class MmCfg {
  public:
     /**
      * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const MmCfg &other) const;
+
+    /**
+     * @brief
      * @param _mm_threshold
      * @param _mm_count
      */

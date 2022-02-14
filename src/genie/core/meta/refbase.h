@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include <string>
 #include "nlohmann/json.hpp"
 
@@ -50,6 +51,12 @@ class RefBase {
      * @return Json key
      */
     virtual const std::string& getKeyName() const = 0;
+
+    /**
+     * @brief
+     * @return
+     */
+    virtual std::unique_ptr<RefBase> clone() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
