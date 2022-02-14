@@ -70,6 +70,12 @@ class DecapsulatedDatasetGroup {
  public:
     /**
      * @brief
+     * @param other
+     */
+    DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other)  noexcept;
+
+    /**
+     * @brief
      * @param grp
      */
     explicit DecapsulatedDatasetGroup(genie::format::mgg::DatasetGroup* grp);
