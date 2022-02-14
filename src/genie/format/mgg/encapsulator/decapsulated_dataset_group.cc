@@ -16,6 +16,15 @@ namespace encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other)  noexcept {
+    id = other.id;
+    meta_group = std::move(other.meta_group);
+    meta_references = std::move(other.meta_references);
+    data = std::move(other.data);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(genie::format::mgg::DatasetGroup* grp) {
     id = grp->getHeader().getID();
     meta_group = decapsulate_dataset_group(grp);
