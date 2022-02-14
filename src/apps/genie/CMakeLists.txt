@@ -11,6 +11,8 @@ set(source_files
         gabac/code.cc
         gabac/main.cc
         gabac/program-options.cc
+        capsulator/program-options.cc
+        capsulator/main.cc
         )
 
 if (${GENIE_SAM_SUPPORT})
@@ -35,6 +37,7 @@ endif ()
 
 add_executable(genie ${source_files})
 
+target_link_libraries(genie PRIVATE genie-mgg)
 target_link_libraries(genie PRIVATE genie-gabac)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-spring)

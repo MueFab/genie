@@ -28,9 +28,8 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     core::AccessUnit data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
-    size_t parameter_id = parameter_stash.size();
-    data.getParameters().setID((uint8_t)parameter_id);
-    data.getParameters().setParentID((uint8_t)parameter_id);
+    auto parameter_id = static_cast<uint8_t>(parameter_stash.size());
+    core::parameter::ParameterSet out_set(parameter_id, parameter_id, std::move(data.getParameters()));
     mgb::RawReference ref;
     for (const auto& p : data.getRefToWrite()) {
         auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
@@ -54,16 +53,16 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
 
     bool found = false;
     for (const auto& p : parameter_stash) {
-        if (data.getParameters() == p) {
+        if (out_set == p) {
             found = true;
             parameter_id = p.getID();
         }
     }
 
     if (!found) {
-        std::cerr << "Writing PS " << uint32_t(data.getParameters().getID()) << "..." << std::endl;
-        data.getParameters().write(writer);
-        parameter_stash.push_back(data.getParameters());
+        std::cerr << "Writing PS " << uint32_t(out_set.getID()) << "..." << std::endl;
+        out_set.write(writer);
+        parameter_stash.push_back(out_set);
     }
 
     auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
@@ -71,14 +70,14 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                            : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
-    mgb::AccessUnit au((uint32_t)id_ctr, (uint8_t)parameter_id, data.getClassType(), (uint32_t)data.getNumReads(),
-                       datasetType, 32, 32, 0);
+    mgb::AccessUnit au((uint32_t)id_ctr, parameter_id, data.getClassType(), (uint32_t)data.getNumReads(), datasetType,
+                       32, false, core::AlphabetID::ACGTN);
     if (data.isReferenceOnly()) {
-        au.setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
-                            data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
+        au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
+                                        data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
     }
-    if (au.getClass() != core::record::ClassType::CLASS_U) {
-        au.setAuTypeCfg(
+    if (au.getHeader().getClass() != core::record::ClassType::CLASS_U) {
+        au.getHeader().setAuTypeCfg(
             AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
     for (uint8_t descriptor = 0; descriptor < (uint8_t)core::getDescriptors().size(); ++descriptor) {
@@ -88,7 +87,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
     }
 
-    au.debugPrint(parameter_stash[au.getParameterID()]);
+    au.debugPrint(parameter_stash[au.getHeader().getParameterID()].getEncodingSet());
 
     au.write(writer);
     id_ctr++;

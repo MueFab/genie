@@ -209,7 +209,7 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
 
     std::string json_uri_path = pOpts.inputRefFile;
-    if (ghc::filesystem::exists(pOpts.inputFile + ".json")) {
+    if (ghc::filesystem::exists(pOpts.inputFile + ".json") && ghc::filesystem::file_size(pOpts.inputFile + ".json")) {
         genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
         if (data.getReference()) {
             std::string uri =

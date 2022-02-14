@@ -18,7 +18,7 @@ namespace spring {
 // ---------------------------------------------------------------------------------------------------------------------
 
 SpringSource::SpringSource(const std::string& temp_dir, const compression_params& cp,
-                           std::vector<core::parameter::ParameterSet>& p, core::stats::PerfStats s)
+                           std::vector<core::parameter::EncodingSet>& p, core::stats::PerfStats s)
     : params(p), stats(std::move(s)) {
     auId = 0;
     // read info about number of blocks (AUs) and the number of reads and records in those
@@ -45,7 +45,7 @@ SpringSource::SpringSource(const std::string& temp_dir, const compression_params
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
-    core::AccessUnit au(core::parameter::ParameterSet(), 0);
+    core::AccessUnit au(core::parameter::EncodingSet(), 0);
     util::Section sec{};
     {
         std::unique_lock<std::mutex> guard(lock);

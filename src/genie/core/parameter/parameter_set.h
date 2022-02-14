@@ -19,6 +19,7 @@
 #include "genie/core/parameter/quality-values.h"
 #include "genie/core/record/class-type.h"
 #include "genie/util/bitreader.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,39 +36,50 @@ class PerfStats;
 
 namespace parameter {
 
-/**
- * @brief MPEG-G Part 2 parameter set
- */
-class ParameterSet : public DataUnit {
+class EncodingSet {
  public:
-    /**
-     * @brief Read parameter set from bitstream
-     * @param bitReader Stream to read from
-     */
-    explicit ParameterSet(util::BitReader &bitReader);
-
-    /**
-     * @brief Construct from raw values
-     * @param _parameter_set_ID ID for this parameter set
-     * @param _parent_parameter_set_ID ID of parent parameter set (set equal to _parameter_set_ID for no parent)
-     * @param _dataset_type
-     * @param _alphabet_id
-     * @param _read_length
-     * @param _paired_end
-     * @param _pos_40_bits_flag
-     * @param _qv_depth
-     * @param _as_depth
-     * @param _multiple_alignments_flag
-     * @param _spliced_reads_flag
-     */
-    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
-                 AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
-                 uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag, bool _spliced_reads_flag);
-
     /**
      * @brief
      */
-    ParameterSet();
+    struct SignatureCfg {
+        boost::optional<uint8_t> signature_length;  //!< @brief
+
+        /**
+         * @brief
+         * @param cfg
+         * @return
+         */
+        bool operator==(const SignatureCfg &cfg) const;
+    };
+
+ private:
+    DataUnit::DatasetType dataset_type;                             //!< @brief
+    AlphabetID alphabet_ID;                                         //!< @brief
+    uint32_t read_length;                                           //!< @brief
+    uint8_t number_of_template_segments_minus1;                     //!< @brief
+    uint32_t max_au_data_unit_size;                                 //!< @brief
+    bool pos_40_bits_flag;                                          //!< @brief
+    uint8_t qv_depth;                                               //!< @brief
+    uint8_t as_depth;                                               //!< @brief
+    std::vector<record::ClassType> class_IDs;                       //!< @brief
+    std::vector<DescriptorSubseqCfg> descriptors;                   //!< @brief
+    std::vector<std::string> rgroup_IDs;                            //!< @brief
+    bool multiple_alignments_flag;                                  //!< @brief
+    bool spliced_reads_flag;                                        //!< @brief
+    uint32_t reserved{};                                            //!< @brief
+    boost::optional<SignatureCfg> signature_cfg;                    //!< @brief
+    std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;  //!< @brief
+    boost::optional<ComputedRef> parameter_set_crps;                //!< @brief
+
+    /**
+     * @brief
+     * @param ps
+     * @return
+     */
+    bool qual_cmp(const EncodingSet &ps) const;
+
+ public:
+    AlphabetID getAlphabetID() const { return alphabet_ID; }
 
     /**
      * @brief
@@ -122,22 +134,9 @@ class ParameterSet : public DataUnit {
 
     /**
      * @brief
-     * @param _multiple_signature_base
-     * @param _U_signature_size
-     */
-    void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
-
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter &writer) const override;
-
-    /**
-     * @brief
      * @return
      */
-    DatasetType getDatasetType() const;
+    DataUnit::DatasetType getDatasetType() const;
 
     /**
      * @brief
@@ -155,24 +154,6 @@ class ParameterSet : public DataUnit {
      * @brief
      * @return
      */
-    uint32_t getMultipleSignatureBase() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getSignatureSize() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getID() const;
-
-    /**
-     * @brief
-     * @return
-     */
     uint32_t getReadLength() const;
 
     /**
@@ -180,26 +161,26 @@ class ParameterSet : public DataUnit {
      * @param other
      * @return
      */
-    ParameterSet &operator=(const ParameterSet &other);
+    EncodingSet &operator=(const EncodingSet &other);
 
     /**
      * @brief
      * @param other
      * @return
      */
-    ParameterSet &operator=(ParameterSet &&other) noexcept;
+    EncodingSet &operator=(EncodingSet &&other) noexcept;
 
     /**
      * @brief
      * @param other
      */
-    ParameterSet(const ParameterSet &other);
+    EncodingSet(const EncodingSet &other);
 
     /**
      * @brief
      * @param other
      */
-    ParameterSet(ParameterSet &&other) noexcept;
+    EncodingSet(EncodingSet &&other) noexcept;
 
     /**
      * @brief
@@ -207,6 +188,137 @@ class ParameterSet : public DataUnit {
      * @return
      */
     const QualityValues &getQVConfig(record::ClassType type) const;
+
+    /**
+     * @brief
+     * @param qv
+     */
+    void setQVDepth(uint8_t qv);
+
+    /**
+     * @brief
+     * @param ps
+     * @return
+     */
+    bool operator==(const EncodingSet &ps) const;
+
+    /**
+     * @brief
+     */
+    void activateSignature();
+
+    /**
+     * @brief
+     * @return
+     */
+    bool isSignatureActivated() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    bool isSignatureConstLength() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getSignatureConstLength() const;
+
+    /**
+     * @brief
+     * @param length
+     */
+    void setSignatureLength(uint8_t length);
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter &writer) const;
+
+    /**
+     * @brief
+     * @param _dataset_type
+     * @param _alphabet_id
+     * @param _read_length
+     * @param _paired_end
+     * @param _pos_40_bits_flag
+     * @param _qv_depth
+     * @param _as_depth
+     * @param _multiple_alignments_flag
+     * @param _spliced_reads_flag
+     */
+    EncodingSet(DataUnit::DatasetType _dataset_type, AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end,
+                bool _pos_40_bits_flag, uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
+                bool _spliced_reads_flag);
+
+    /**
+     * @brief
+     */
+    EncodingSet();
+
+    /**
+     * @brief
+     * @param bitReader
+     */
+    explicit EncodingSet(util::BitReader &bitReader);
+};
+
+/**
+ * @brief MPEG-G Part 2 parameter set
+ */
+class ParameterSet : public DataUnit {
+ public:
+    /**
+     * @brief Read parameter set from bitstream
+     * @param bitReader Stream to read from
+     */
+    explicit ParameterSet(util::BitReader &bitReader);
+
+    /**
+     * @brief Construct from raw values
+     * @param _parameter_set_ID ID for this parameter set
+     * @param _parent_parameter_set_ID ID of parent parameter set (set equal to _parameter_set_ID for no parent)
+     * @param _dataset_type
+     * @param _alphabet_id
+     * @param _read_length
+     * @param _paired_end
+     * @param _pos_40_bits_flag
+     * @param _qv_depth
+     * @param _as_depth
+     * @param _multiple_alignments_flag
+     * @param _spliced_reads_flag
+     */
+    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
+                 AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
+                 uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag, bool _spliced_reads_flag);
+
+    /**
+     * @brief
+     */
+    ParameterSet();
+
+    /**
+     * @brief
+     * @param _parameter_set_ID
+     * @param _parent_parameter_set_ID
+     * @param _set
+     */
+    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, EncodingSet _set);
+
+    /**
+     * @brief
+     * @param pset
+     * @return
+     */
+    bool operator==(const ParameterSet &pset) const;
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter &writer) const override;
 
     /**
      * @brief
@@ -228,57 +340,39 @@ class ParameterSet : public DataUnit {
 
     /**
      * @brief
-     * @param qv
-     */
-    void setQVDepth(uint8_t qv);
-
-    /**
-     * @brief
-     * @param ps
      * @return
      */
-    bool operator==(const ParameterSet &ps) const;
+    uint8_t getID() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    EncodingSet &getEncodingSet() { return set; }
 
     /**
      * @brief
-     * @param writer
+     * @return
      */
-    void preWrite(util::BitWriter &writer) const;
+    const EncodingSet &getEncodingSet() const { return set; }
+
+    /**
+     * @brief
+     * @return
+     */
+    virtual uint64_t getLength() const;
+
+    /**
+     * @brief
+     * @param output
+     */
+    void print_debug(std::ostream &output, uint8_t, uint8_t) const override;
 
  private:
-    /**
-     * @brief
-     * @param ps
-     * @return
-     */
-    bool qual_cmp(const ParameterSet &ps) const;
-
     uint8_t parameter_set_ID;         //!< @brief
     uint8_t parent_parameter_set_ID;  //!< @brief
 
-    DatasetType dataset_type;                                       //!< @brief
-    AlphabetID alphabet_ID;                                         //!< @brief
-    uint32_t read_length;                                           //!< @brief
-    uint8_t number_of_template_segments_minus1;                     //!< @brief
-    uint32_t max_au_data_unit_size;                                 //!< @brief
-    bool pos_40_bits_flag;                                          //!< @brief
-    uint8_t qv_depth;                                               //!< @brief
-    uint8_t as_depth;                                               //!< @brief
-    std::vector<record::ClassType> class_IDs;                       //!< @brief
-    std::vector<DescriptorSubseqCfg> descriptors;                   //!< @brief
-    std::vector<std::string> rgroup_IDs;                            //!< @brief
-    bool multiple_alignments_flag;                                  //!< @brief
-    bool spliced_reads_flag;                                        //!< @brief
-    uint32_t multiple_signature_base;                               //!< @brief
-    boost::optional<uint8_t> u_signature_size;                      //!< @brief
-    std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;  //!< @brief
-    boost::optional<ComputedRef> parameter_set_crps;                //!< @brief
+    EncodingSet set;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

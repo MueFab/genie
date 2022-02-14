@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include <string>
 #include "genie/core/meta/refbase.h"
 
@@ -53,6 +54,12 @@ class ExternalRef : public RefBase {
      * @return URI
      */
     const std::string& getURI() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getURI();
 
     /**
      * @brief Return active checksum algorithm

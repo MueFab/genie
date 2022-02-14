@@ -37,6 +37,32 @@ class Reference {
 
  public:
     /**
+     * @brief
+     * @param _ref
+     */
+    Reference(const Reference& _ref);
+
+    /**
+     * @brief
+     * @param _ref
+     */
+    Reference(Reference&& _ref) noexcept;
+
+    /**
+     * @brief
+     * @param _ref
+     * @return
+     */
+    Reference& operator=(const Reference& _ref);
+
+    /**
+     * @brief
+     * @param _ref
+     * @return
+     */
+    Reference& operator=(Reference&& _ref) noexcept;
+
+    /**
      * @brief Construct from raw data
      * @param name Reference name
      * @param major Major version level
@@ -67,6 +93,12 @@ class Reference {
     const std::string& getName() const;
 
     /**
+     * @brief
+     * @return
+     */
+    std::string& getName();
+
+    /**
      * @brief Return major version level
      * @return Major version
      */
@@ -91,6 +123,12 @@ class Reference {
     const std::vector<Sequence>& getSequences() const;
 
     /**
+     * @brief
+     * @return
+     */
+    std::vector<Sequence>& getSequences();
+
+    /**
      * @brief Add a new reference sequence
      * @param s Sequence to add
      */
@@ -103,10 +141,22 @@ class Reference {
     const RefBase& getBase() const;
 
     /**
+     * @brief Get reference type specific information
+     * @return Reference type specific information
+     */
+    std::unique_ptr<RefBase> moveBase();
+
+    /**
      * @brief Return MPEG-G part 3 meta information
      * @return MPEG-G part 3 meta information
      */
     const std::string& getInformation() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

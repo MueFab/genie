@@ -36,7 +36,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::NameSelector *name_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     // Read some parameters
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -168,7 +168,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::string &file_name, const compression_params &cp,
                             genie::core::ReadEncoder::NameSelector *name_coder,
                             genie::core::ReadEncoder::EntropySelector *entropy,
-                            std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void)cp;
 
@@ -220,7 +220,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -289,7 +289,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       genie::core::ReadEncoder::QvSelector *qv_coder,
                       genie::core::ReadEncoder::NameSelector *name_coder,
                       genie::core::ReadEncoder::EntropySelector *entropy,
-                      std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {

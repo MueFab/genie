@@ -109,6 +109,13 @@ class BitReader {
     void readBypass(std::string &str);
 
     /**
+     * @brief Read a string from the input.
+     * @attention This bypasses the bit wise reading mechanism.
+     * @param str The string to fill with data.
+     */
+    void readBypass_null_terminated(std::string &str);
+
+    /**
      * @brief
      * @return True if there are no problems so far reading data.
      */

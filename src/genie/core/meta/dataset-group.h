@@ -29,6 +29,18 @@ class DatasetGroup {
 
  public:
     /**
+     * @brief
+     * @param meta
+     */
+    void setMetadata(std::string meta);
+
+    /**
+     * @brief
+     * @param prot
+     */
+    void setProtection(std::string prot);
+
+    /**
      * @brief Return dataset group ID
      * @return dataset group ID
      */
@@ -45,6 +57,18 @@ class DatasetGroup {
      * @return MPEG-G part 3 meta information
      */
     const std::string& getInformation() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getInformation();
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getProtection();
 
     /**
      * @brief Return MPEG-G part 3 meta information

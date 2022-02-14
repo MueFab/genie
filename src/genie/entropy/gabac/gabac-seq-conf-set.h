@@ -47,7 +47,7 @@ class GabacSeqConfSet {
     template <typename T>
     static const T &loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet &parameterSet,
                                              core::GenDesc descriptor_id) {
-        auto &curDesc = parameterSet.getDescriptor(descriptor_id);
+        auto &curDesc = parameterSet.getEncodingSet().getDescriptor(descriptor_id);
         UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
         auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
         auto &base_conf = curDesc.get();

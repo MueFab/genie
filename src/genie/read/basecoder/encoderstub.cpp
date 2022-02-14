@@ -64,14 +64,14 @@ core::AccessUnit EncoderStub::pack(size_t id, core::QVEncoder::QVCoded qv, core:
     core::parameter::ParameterSet ret((uint8_t)id, (uint8_t)id, dataType, core::AlphabetID::ACGTN,
                                       (uint32_t)state.readLength, state.pairedEnd, false, qv_depth, uint8_t(0), false,
                                       false);
-    ret.addClass(state.classType, std::move(std::get<0>(qv)));
+    ret.getEncodingSet().addClass(state.classType, std::move(std::get<0>(qv)));
 
     auto rawAU = state.readCoder.moveStreams();
 
     rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
 
-    rawAU.setParameters(std::move(ret));
+    rawAU.setParameters(std::move(ret.getEncodingSet()));
     rawAU.setReference(state.ref);
     rawAU.setMinPos(state.minPos);
     rawAU.setMaxPos(state.maxPos);

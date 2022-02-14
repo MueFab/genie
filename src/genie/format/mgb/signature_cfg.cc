@@ -5,7 +5,6 @@
  */
 
 #include "genie/format/mgb/signature_cfg.h"
-#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -15,53 +14,54 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SignatureCfg::SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size)
-    : num_signatures(), U_cluster_signature(1, _U_cluster_signature_0), U_signature_size(_U_signature_size) {
-    if (U_cluster_signature[0] == (1u << U_signature_size) - 1) {
-        num_signatures = 1;
+bool SignatureCfg::operator==(const SignatureCfg& other) const {
+    return U_cluster_signature == other.U_cluster_signature &&
+           U_cluster_signature_length == other.U_cluster_signature_length && U_signature_size == other.U_signature_size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, uint8_t _base_bits)
+    : U_signature_size(_U_signature_size ? boost::optional<uint8_t>(_U_signature_size)
+                                         : boost::optional<uint8_t>(boost::none)),
+      base_bits(_base_bits) {
+    auto num_signatures = reader.read<uint16_t>();
+    for (uint16_t i = 0; i < num_signatures; ++i) {
+        size_t len = 0;
+        if (U_signature_size != boost::none) {
+            len = *U_signature_size;
+        } else {
+            len = reader.read<uint8_t>(8);
+            U_cluster_signature_length.emplace_back(static_cast<uint8_t>(len));
+        }
+        U_cluster_signature.emplace_back(reader.read<uint64_t>(static_cast<uint8_t>(base_bits * len)));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SignatureCfg::SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader)
-    : U_signature_size(_U_signature_size) {
-    if (multiple_signature_base != 0) {
-        U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
-        if (U_cluster_signature[0] != (1u << U_signature_size) - 1u) {
-            for (size_t i = 1; i < multiple_signature_base; ++i) {
-                U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
-            }
-        } else {
-            num_signatures = reader.read<uint16_t>();
-            for (size_t i = 0; i < *num_signatures; ++i) {
-                U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
-            }
+void SignatureCfg::addSignature(uint64_t _U_cluster_signature, uint8_t length) {
+    if (U_cluster_signature.empty()) {
+        U_signature_size = length;
+    } else {
+        if (length != U_signature_size) {
+            U_signature_size = boost::none;
         }
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SignatureCfg::addSignature(uint64_t _U_cluster_signature) {
-    U_cluster_signature.push_back(_U_cluster_signature);
-    if (num_signatures) {
-        ++*num_signatures;
-    }
+    U_cluster_signature_length.emplace_back(length);
+    U_cluster_signature.emplace_back(_U_cluster_signature);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SignatureCfg::write(util::BitWriter& writer) const {
-    size_t i = 0;
-
-    writer.write(U_cluster_signature[0], U_signature_size);  // todo: size;
-    if (num_signatures) {
-        writer.write(*num_signatures, 16);
-        i = 1;
-    }
-    for (; i < U_cluster_signature.size(); ++i) {
-        writer.write(U_cluster_signature[i], U_signature_size);  // todo: size;
+    writer.write(U_cluster_signature.size(), 16);
+    for (size_t i = 0; i < U_cluster_signature.size(); ++i) {
+        if (U_signature_size != boost::none) {
+            writer.write(U_cluster_signature[i], base_bits * *U_signature_size);
+        } else {
+            writer.write(U_cluster_signature[i], base_bits * U_cluster_signature_length[i]);
+        }
     }
 }
 

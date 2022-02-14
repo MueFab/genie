@@ -33,6 +33,13 @@ class RefCfg {
  public:
     /**
      * @brief
+     * @param other
+     * @return
+     */
+    bool operator==(const RefCfg &other) const;
+
+    /**
+     * @brief
      * @return
      */
     uint16_t getSeqID() const;

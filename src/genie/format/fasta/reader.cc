@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 #include "genie/util/runtime-exception.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -118,7 +119,7 @@ core::meta::Reference FastaReader::getMeta() const {
     core::meta::Reference ret(basename, 0, 0, 0, std::move(f), "");
     for (const auto& s : hashFile.getData()) {
         ret.addSequence(genie::core::meta::Sequence(s.first, fai.getLength(s.first), static_cast<uint16_t>(id++)));
-        f_ptr->addChecksum(s.second);
+        f_ptr->addChecksum(genie::util::fromHex(s.second));
     }
     return ret;
 }

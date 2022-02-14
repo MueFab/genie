@@ -9,8 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include <string>
 #include "genie/core/meta/external-ref.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,6 +70,18 @@ class MPEG : public ExternalRef {
      * @return Checksum of full reference
      */
     const std::string& getChecksum() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string& getChecksum();
+
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -25,7 +25,7 @@ DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _im
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const { return parameters.at(id); }
+const core::parameter::EncodingSet& DataUnitFactory::getParams(size_t id) const { return parameters.at(id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,13 +58,14 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);
                 std::cerr << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
-                parameters.insert(std::make_pair(p.getID(), std::move(p)));
+                parameters.insert(std::make_pair(p.getID(), std::move(p.getEncodingSet())));
                 break;
             }
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT: {
                 auto ret = AccessUnit(parameters, bitReader, true);
-                if (getParams(ret.getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
-                    const auto& ref = ret.getRefCfg();
+                if (getParams(ret.getHeader().getParameterID()).getDatasetType() ==
+                    mgb::AccessUnit::DatasetType::REFERENCE) {
+                    const auto& ref = ret.getHeader().getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
@@ -75,9 +76,13 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 } else {
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
-                        UTILS_DIE_IF(ret.getClass() == genie::core::record::ClassType::CLASS_HM,
+                        for (auto& b : ret.getBlocks()) {
+                            b.load();
+                            b.parse();
+                        }
+                        UTILS_DIE_IF(ret.getHeader().getClass() == genie::core::record::ClassType::CLASS_HM,
                                      "Class HM not supported");
-                        ret.debugPrint(parameters.at(ret.getParameterID()));
+                        ret.debugPrint(parameters.at(ret.getHeader().getParameterID()));
                         return ret;
                     } else {
                         bitReader.skip(ret.getPayloadSize());
@@ -94,7 +99,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::map<size_t, core::parameter::ParameterSet>& DataUnitFactory::getParams() const { return parameters; }
+const std::map<size_t, core::parameter::EncodingSet>& DataUnitFactory::getParams() const { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

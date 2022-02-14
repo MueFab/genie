@@ -29,6 +29,12 @@ class Sequence {
 
  public:
     /**
+     * @brief
+     * @return
+     */
+    std::string& getName();
+
+    /**
      * @brief Construct from raw values
      * @param _name Sequence name
      * @param _length  Sequence length

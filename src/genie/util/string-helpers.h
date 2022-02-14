@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -52,6 +53,20 @@ std::string &trim(std::string &s, const char *t = ws);
  * @return Vector of tokens. The delimiting character will not be included.
  */
 std::vector<std::string> tokenize(const std::string &str, char delim);
+
+/**
+ * @brief
+ * @param bin
+ * @return
+ */
+std::string toHex(const std::string &bin);
+
+/**
+ * @brief
+ * @param hex
+ * @return
+ */
+std::string fromHex(const std::string &hex);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
