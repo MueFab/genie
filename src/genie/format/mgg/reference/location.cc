@@ -52,7 +52,7 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<gen
             static_cast<uint8_t>(0), std::move(ref->getURI()),
             genie::format::mgg::reference::location::External::ChecksumAlgorithm(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
-            ret->addChecksum(util::fromHex(s));
+            ret->addChecksum(s);
         }
         return ret;
     } else if (dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get()) != nullptr) {
@@ -61,7 +61,7 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<gen
             static_cast<uint8_t>(0), std::move(ref->getURI()),
             genie::format::mgg::reference::location::External::ChecksumAlgorithm(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
-            ret->addChecksum(util::fromHex(s));
+            ret->addChecksum(s);
         }
         return ret;
     } else if (dynamic_cast<genie::core::meta::InternalRef*>(base.get()) != nullptr) {
