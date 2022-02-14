@@ -46,7 +46,7 @@ void encapsulate(ProgramOptions& options) {
     std::ofstream outstream(options.outputFile);
     genie::util::BitWriter writer(&outstream);
 
-    mgg_file.print_debug(std::cout, 100);
+    mgg_file.print_debug(std::cerr, 100);
 
     mgg_file.write(writer);
 }
@@ -62,7 +62,6 @@ void decapsulate(ProgramOptions& options) {
             std::string local_output_prefix =
                 global_output_prefix + "." + std::to_string(grp.getID()) + "." + std::to_string(dt.first);
             auto meta_json = dt.second.second.toJson().dump(4);
-            std::cout << meta_json.size() << std::endl;
             std::ofstream json_file(local_output_prefix + ".mgb.json");
             json_file.write(meta_json.data(), meta_json.length());
 

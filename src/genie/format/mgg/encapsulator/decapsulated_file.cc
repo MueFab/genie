@@ -16,9 +16,7 @@ namespace encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecapsulatedFile::DecapsulatedFile(const std::string& input_file) : reader(input_file) {
-    genie::format::mgg::MggFile mpegg_file(&reader);
-
+DecapsulatedFile::DecapsulatedFile(const std::string& input_file) : reader(input_file), mpegg_file(&reader) {
     mpegg_file.print_debug(std::cout, 2);
 
     for (auto& box : mpegg_file.getBoxes()) {

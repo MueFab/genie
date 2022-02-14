@@ -47,7 +47,7 @@ MgbFile::MgbFile() : file(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgbFile::MgbFile(std::istream* _file) : file(_file), reader(*file) {
+MgbFile::MgbFile(std::istream* _file) : file(_file), reader(genie::util::make_unique<genie::util::BitReader>(*file)) {
     while (true) {
         uint64_t pos = reader->getPos();
         auto unit_type = reader->readBypassBE<core::parameter::DataUnit::DataUnitType>();
