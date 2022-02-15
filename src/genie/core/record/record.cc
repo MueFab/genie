@@ -37,6 +37,7 @@ Record::Record()
       alignmentInfo(0),
       class_ID(ClassType::NONE),
       read_group(),
+      extended_alignment_info(false),
       read_1_first(false),
       sharedAlignmentInfo(),
       qv_depth(0),
@@ -47,12 +48,13 @@ Record::Record()
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
-               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first)
+               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first, bool _extended_alignment_info)
     : number_of_template_segments(_number_of_template_segments),
       reads(),
       alignmentInfo(0),
       class_ID(_auTypeCfg),
       read_group(std::move(_read_group)),
+      extended_alignment_info(_extended_alignment_info),
       read_1_first(_is_read_1_first),
       sharedAlignmentInfo(),
       qv_depth(0),
@@ -68,7 +70,8 @@ Record::Record(util::BitReader &reader)
       alignmentInfo(reader.readBypassBE<uint16_t>()),
       class_ID(reader.readBypassBE<ClassType>()),
       read_group(reader.readBypassBE<uint8_t>(), 0),
-      read_1_first(reader.readBypassBE<uint8_t>()),
+      extended_alignment_info(reader.read<uint8_t>(7)),
+      read_1_first(reader.read<bool>()),
       sharedAlignmentInfo(!alignmentInfo.empty() ? AlignmentSharedData(reader) : AlignmentSharedData()) {
     std::vector<uint32_t> readSizes(reads.size());
     for (auto &s : readSizes) {
@@ -85,9 +88,13 @@ Record::Record(util::BitReader &reader)
         ++index;
     }
     for (auto &a : alignmentInfo) {
-        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
+        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), extended_alignment_info, reader);
     }
-    flags = reader.readBypassBE<uint8_t>();
+
+    flags = reader.readBypassBE<uint8_t>(); // flags[0][0]
+//    if (!extended_alignment_info || class_ID == ClassType::CLASS_U){
+//        flags = reader.readBypassBE<uint8_t>(); // flags[0][0]
+//    }
     moreAlignmentInfo = AlignmentExternal::factory(reader);
 }
 

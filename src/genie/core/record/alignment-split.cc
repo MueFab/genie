@@ -29,13 +29,13 @@ void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeBypassBE
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
+std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, bool extended_alignment_info, util::BitReader &reader) {
     Type type = reader.readBypassBE<Type>();
     switch (type) {
         case Type::SAME_REC:
-            return util::make_unique<alignment_split::SameRec>(as_depth, reader);
+            return util::make_unique<alignment_split::SameRec>(as_depth, extended_alignment_info, reader);
         case Type::OTHER_REC:
-            return util::make_unique<alignment_split::OtherRec>(reader);
+            return util::make_unique<alignment_split::OtherRec>(extended_alignment_info, reader);
         case Type::UNPAIRED:
             return util::make_unique<alignment_split::Unpaired>();
         default:

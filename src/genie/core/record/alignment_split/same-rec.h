@@ -49,7 +49,7 @@ class SameRec : public AlignmentSplit {
      * @param as_depth
      * @param reader
      */
-    explicit SameRec(uint8_t as_depth, util::BitReader& reader);
+    explicit SameRec(uint8_t as_depth, bool extended_alignment_info, util::BitReader& reader);
 
     /**
      * @brief

@@ -19,19 +19,32 @@ namespace alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
-    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID) {}
+OtherRec::OtherRec() : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(0), split_seq_ID(0),
+                       reverse_comp(0), ecigar_string(){}
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO: initialization of ecigar_string and its default value
+OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID, uint8_t _reverse_comp, std::string &&_ecigar_string)
+    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID),
+      reverse_comp(_reverse_comp), ecigar_string(std::move(_ecigar_string)){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(util::BitReader &reader)
+OtherRec::OtherRec(bool extended_alignment_info, util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
       split_pos(reader.readBypassBE<uint64_t, 5>()),
-      split_seq_ID(reader.readBypassBE<uint16_t>()) {}
+      split_seq_ID(reader.readBypassBE<uint16_t>()),
+      reverse_comp(0),
+      ecigar_string(){
 
-// ---------------------------------------------------------------------------------------------------------------------
+    if (extended_alignment_info){
+        reverse_comp = reader.readBypassBE<uint8_t>();
 
-OtherRec::OtherRec() : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(0), split_seq_ID(0) {}
+        ecigar_string.resize(reader.readBypassBE<uint32_t, 3>());
+        reader.readBypass(&ecigar_string[0], ecigar_string.size());
+    }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +53,14 @@ uint64_t OtherRec::getNextPos() const { return split_pos; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint16_t OtherRec::getNextSeq() const { return split_seq_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Alignment::getRComp() const { return this->reverse_comp; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string &Alignment::getECigar() const { return ecigar_string; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

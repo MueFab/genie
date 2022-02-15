@@ -29,14 +29,27 @@ class OtherRec : public AlignmentSplit {
  private:
     uint64_t split_pos;     //!< @brief
     uint16_t split_seq_ID;  //!< @brief
+    uint8_t reverse_comp;                //!< @brief
+    std::string ecigar_string;           //!< @brief
 
  public:
+    /**
+     * @brief
+     */
+    OtherRec();
+
     /**
      * @brief
      * @param _split_pos
      * @param _split_seq_ID
      */
-    OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID);
+    OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID, uint8_t _reverse_comp = 0, std::string &&_ecigar_string = "");
+
+    /**
+     * @brief
+     * @param reader
+     */
+    explicit OtherRec(bool extended_alignment_info, util::BitReader& reader);
 
     /**
      * @brief
@@ -52,14 +65,15 @@ class OtherRec : public AlignmentSplit {
 
     /**
      * @brief
-     * @param reader
+     * @return
      */
-    explicit OtherRec(util::BitReader& reader);
+    uint8_t getRComp() const;
 
     /**
      * @brief
+     * @return
      */
-    OtherRec();
+    const std::string& getECigar() const;
 
     /**
      * @brief

@@ -27,6 +27,7 @@ namespace record {
  */
 class Alignment {
     std::string ecigar_string;           //!< @brief
+    uint8_t flags;                       //!< @brief
     uint8_t reverse_comp;                //!< @brief
     std::vector<int32_t> mapping_score;  //!< @brief
 
@@ -41,9 +42,10 @@ class Alignment {
     /**
      * @brief
      * @param as_depth
+     * @param extended_alignment_info
      * @param reader
      */
-    Alignment(uint8_t as_depth, util::BitReader& reader);
+    Alignment(uint8_t as_depth, bool extended_alignment_info, util::BitReader& reader);
 
     /**
      * @brief

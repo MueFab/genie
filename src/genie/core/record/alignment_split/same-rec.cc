@@ -28,10 +28,10 @@ SameRec::SameRec(int64_t _delta, Alignment _alignment)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
+SameRec::SameRec(uint8_t as_depth, bool extended_alignment_info, util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
       delta(reader.readBypassBE<int64_t, 6>()),
-      alignment(as_depth, reader) {}
+      alignment(as_depth, extended_alignment_info, reader) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

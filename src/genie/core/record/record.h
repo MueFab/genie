@@ -41,11 +41,12 @@ class Record {
     std::vector<AlignmentBox> alignmentInfo;  //!< @brief
     ClassType class_ID{ClassType::NONE};      //!< @brief
     std::string read_group;                   //!< @brief
+    bool extended_alignment_info{};           //!< @brief
     bool read_1_first{};                      //!< @brief
     AlignmentSharedData sharedAlignmentInfo;  //!< @brief
     uint8_t qv_depth{};                       //!< @brief
     std::string read_name;                    //!< @brief
-    uint8_t flags{};                          //!< @brief
+    std::vector<uint8_t> flags;               //!< @brief
 
     std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief
 
@@ -70,7 +71,7 @@ class Record {
      * @param _is_read_1_first
      */
     Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
+           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true, bool _extended_alignment_info = false);
 
     /**
      * @brief

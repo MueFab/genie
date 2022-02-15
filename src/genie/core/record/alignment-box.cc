@@ -29,17 +29,17 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
+AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments, bool extended_alignment_info,
                            util::BitReader& reader)
     : splitAlignmentInfo(type == ClassType::CLASS_HM ? 0 : number_of_template_segments - 1) {
     mapping_pos = reader.readBypassBE<uint64_t, 5>();
-    alignment = Alignment(as_depth, reader);
+    alignment = Alignment(as_depth, extended_alignment_info, reader);
 
     if (type == ClassType::CLASS_HM) {
         return;
     }
     for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
-        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::factory(as_depth, reader);
+        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::factory(as_depth, extended_alignment_info, reader);
     }
 }
 

@@ -53,7 +53,7 @@ class AlignmentSplit {
      * @param reader
      * @return
      */
-    static std::unique_ptr<AlignmentSplit> factory(uint8_t as_depth, util::BitReader &reader);
+    static std::unique_ptr<AlignmentSplit> factory(uint8_t as_depth, bool extended_alignment_info, util::BitReader &reader);
 
     /**
      * @brief

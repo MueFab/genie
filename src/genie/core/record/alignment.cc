@@ -18,15 +18,20 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
-    : ecigar_string(std::move(_ecigar_string)), reverse_comp(_reverse_comp), mapping_score() {}
+    : ecigar_string(std::move(_ecigar_string)), flags(0), reverse_comp(_reverse_comp), mapping_score() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
+Alignment::Alignment(uint8_t as_depth, bool extended_alignment_info, util::BitReader &reader) {
     ecigar_string.resize(reader.readBypassBE<uint32_t, 3>());
     reader.readBypass(&ecigar_string[0], ecigar_string.size());
 
     reverse_comp = reader.readBypassBE<uint8_t>();
+
+    if (extended_alignment_info){
+        flags = reader.readBypassBE<uint8_t>();
+    }
+
     mapping_score.resize(as_depth);
     reader.readBypass(&mapping_score[0], as_depth * sizeof(int32_t));
     for (auto &s : mapping_score) {
@@ -36,7 +41,7 @@ Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Alignment::Alignment() : ecigar_string(), reverse_comp(0), mapping_score(0) {}
+Alignment::Alignment() : ecigar_string(), flags(0), reverse_comp(0), mapping_score(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

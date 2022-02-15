@@ -46,9 +46,10 @@ class AlignmentBox {
      * @param type
      * @param as_depth
      * @param number_of_template_segments
+     * @param extended_alignment_info
      * @param reader
      */
-    explicit AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
+    explicit AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments, bool extended_alignment_info,
                           util::BitReader& reader);
 
     /**
