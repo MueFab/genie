@@ -31,10 +31,8 @@ Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFla
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
                          bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
-    : descriptor_subsequence_ID(),
-      tokentypeFlag(_tokentypeFlag),
-      transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
-    if (!tokentypeFlag) {
+    : descriptor_subsequence_ID(), transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
+    if (!_tokentypeFlag) {
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
     }
 
@@ -46,9 +44,8 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, u
 // ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader) {
-    tokentypeFlag = tokentype;
     core::GenSubIndex subSeq;
-    if (!tokentypeFlag) {
+    if (!tokentype) {
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
         subSeq = std::pair<core::GenDesc, uint16_t>(desc, *descriptor_subsequence_ID);
     } else {
@@ -122,7 +119,43 @@ const std::vector<TransformedSubSeq>& Subsequence::getTransformSubseqCfgs() cons
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Subsequence::getTokentypeFlag() const { return tokentypeFlag; }
+bool Subsequence::getTokentypeFlag() const { return descriptor_subsequence_ID == boost::none; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Subsequence::operator==(const Subsequence& seq) const {
+    return descriptor_subsequence_ID == seq.descriptor_subsequence_ID &&
+           transform_subseq_parameters == seq.transform_subseq_parameters &&
+           transformSubseq_cfgs == seq.transformSubseq_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Subsequence::Subsequence(nlohmann::json j) {
+    if (j.contains("descriptor_subsequence_ID")) {
+        descriptor_subsequence_ID = j["descriptor_subsequence_ID"];
+    }
+    transform_subseq_parameters = TransformedParameters(j["transform_subseq_parameters"]);
+    for (const auto& it : j["transform_subseq_cfgs"]) {
+        transformSubseq_cfgs.emplace_back(it);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json Subsequence::toJoson() const {
+    nlohmann::json ret;
+    if (descriptor_subsequence_ID != boost::none) {
+        ret["descriptor_subsequence_ID"] = *descriptor_subsequence_ID;
+    }
+    ret["transform_subseq_parameters"] = transform_subseq_parameters.toJson();
+    std::vector<nlohmann::json> tmp;
+    for (const auto& a : transformSubseq_cfgs) {
+        tmp.emplace_back(a.toJson());
+    }
+    ret["transform_subseq_cfgs"] = tmp;
+    return ret;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

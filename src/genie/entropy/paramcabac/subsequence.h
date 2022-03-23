@@ -116,15 +116,22 @@ class Subsequence {
      * @param seq
      * @return
      */
-    bool operator==(const Subsequence& seq) const {
-        return descriptor_subsequence_ID == seq.descriptor_subsequence_ID && tokentypeFlag == seq.tokentypeFlag &&
-               transform_subseq_parameters == seq.transform_subseq_parameters &&
-               transformSubseq_cfgs == seq.transformSubseq_cfgs;
-    }
+    bool operator==(const Subsequence& seq) const;
+
+    /**
+     * @brief
+     * @param j
+     */
+    explicit Subsequence(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJoson() const;
 
  private:
     boost::optional<uint16_t> descriptor_subsequence_ID;  //!< @brief
-    bool tokentypeFlag;                                   //!< @brief helper field - not written to bitstream
     TransformedParameters transform_subseq_parameters;    //!< @brief
     std::vector<TransformedSubSeq> transformSubseq_cfgs;  //!< @brief
 };

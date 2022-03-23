@@ -112,8 +112,69 @@ uint8_t BinarizationParameters::getSplitUnitSize() const { return split_unit_siz
 
 uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SDTU) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
     return BinarizationParameters::numParams[uint8_t(binarzationId)];
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool BinarizationParameters::operator==(const BinarizationParameters &bin) const {
+    return cmax == bin.cmax && cmax_teg == bin.cmax_teg && cmax_dtu == bin.cmax_dtu &&
+           split_unit_size == bin.split_unit_size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+BinarizationParameters::BinarizationParameters(nlohmann::json j, BinarizationId binID) {
+    cmax = 0;
+    cmax_teg = 0;
+    cmax_dtu = 0;
+    split_unit_size = 0;
+    switch (binID) {
+        case BinarizationId::TU:
+            cmax = j["cmax"];
+            break;
+        case BinarizationId::TEG:
+        case BinarizationId::STEG:
+            cmax = j["cmax_teg"];
+            break;
+        case BinarizationId::DTU:
+        case BinarizationId::SDTU:
+            cmax_dtu = j["cmax_dtu"];  // Fall-through
+        case BinarizationId::SUTU:
+        case BinarizationId::SSUTU:
+            cmax_dtu = j["split_unit_size"];
+            break;
+        default:
+            break;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json BinarizationParameters::toJson(BinarizationId binID) const {
+    nlohmann::json ret;
+    switch (binID) {
+        case BinarizationId::TU:
+            ret["cmax"] = cmax;
+            break;
+        case BinarizationId::TEG:
+        case BinarizationId::STEG:
+            ret["cmax_teg"] = cmax_teg;
+            break;
+        case BinarizationId::DTU:
+        case BinarizationId::SDTU:
+            ret["cmax_dtu"] = cmax_dtu;  // Fall-through
+        case BinarizationId::SUTU:
+        case BinarizationId::SSUTU:
+            ret["split_unit_size"] = cmax_dtu;
+            break;
+        default:
+            break;
+    }
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

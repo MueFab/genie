@@ -33,12 +33,13 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
                    "'error', or 'fatal'");
 
     app.add_option("-i,--input_file", this->inputFilePath, "Input file");
+    app.add_option("-c,--config_file", this->paramFilePath, "Task ('encode' or 'decode')");
     app.add_option("-r,--dependency_file", this->dependencyFilePath, "Reference/Dependency file");
     app.add_option("-o,--output_file", this->outputFilePath, "Output file");
-    app.add_option("-t,--task", this->task, "Task ('encode' or 'decode')")->required(true);
+    app.add_option("-t,--task", this->task, "Task ('encode' or 'decode')");
 
     this->blocksize = 0;
-    app.add_option("-b,--block_size", this->blocksize, "Block size - 0 means infinite");
+    // app.add_option("-b,--block_size", this->blocksize, "Block size - 0 means infinite");
 
     this->descID = 0;
     app.add_option("-d,--desc_id", this->descID, "Descriptor ID (default 0)");
@@ -65,6 +66,7 @@ void ProgramOptions::validate() const {
         UTILS_DIE_IF(this->inputFilePath.empty(), "Input file path both not provided!");
 
         UTILS_DIE_IF(this->outputFilePath.empty(), "Output file path both not provided!");
+    } else if (this->task == "writeconfigs") {
     } else {
         UTILS_DIE("Task '" + this->task + "' is invalid");
     }

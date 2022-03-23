@@ -25,8 +25,8 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void code(const std::string &inputFilePath, const std::string &outputFilePath, size_t blocksize, uint8_t descID,
-          uint8_t subseqID, bool decode, const std::string &dependencyFilePath) {
+void code(const std::string &inputFilePath, const std::string &outputFilePath, const std::string &config_path,
+          size_t blocksize, uint8_t descID, uint8_t subseqID, bool decode, const std::string &dependencyFilePath) {
     std::ifstream inputFile;
     std::ifstream dependencyFile;
     std::ofstream outputFile;
@@ -72,10 +72,17 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, s
     genie::core::GenSubIndex genieSubseqID =
         (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
 
-    genie::entropy::gabac::run(
-        ioconf,
-        genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::getEncoderConfigManual(genieSubseqID)),
-        decode);
+    genie::entropy::gabac::EncodingConfiguration config;
+
+    if (config_path.empty()) {
+        config =
+            genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::getEncoderConfigManual(genieSubseqID));
+    } else {
+        std::ifstream t(config_path);
+        std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+        config = genie::entropy::gabac::EncodingConfiguration(nlohmann::json::parse(str));
+    }
+    genie::entropy::gabac::run(ioconf, config, decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
