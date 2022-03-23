@@ -116,7 +116,7 @@ std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(bool _debug) : debug(_debug) {}
+Encoder::Encoder(bool _debug, bool _write_raw) : EncoderStub(_write_raw), debug(_debug) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

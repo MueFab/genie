@@ -265,6 +265,10 @@ void AccessUnit::Subsequence::setPosition(size_t pos) { position = pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+util::DataBlock &AccessUnit::Subsequence::getData() { return data; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t AccessUnit::Descriptor::getWrittenSize() const {
     size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
     return std::accumulate(subdesc.begin(), subdesc.end(), overhead, [](size_t sum, const Subsequence &payload) {

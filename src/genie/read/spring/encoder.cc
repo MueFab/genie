@@ -61,14 +61,15 @@ void Encoder::flushIn(uint64_t& pos) {
 
     watch.reset();
     std::cerr << "Generating read streams ...\n";
-    generate_read_streams(preprocessor.temp_dir, loc_cp, entropycoder, params, stats);
+    generate_read_streams(preprocessor.temp_dir, loc_cp, entropycoder, params, stats, writeOutStreams);
     std::cerr << "Generating read streams done!\n";
     stats.addDouble("time-spring-gen-reads", watch.check());
 
     if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
         watch.reset();
         std::cerr << "Reordering and compressing quality and/or ids ...\n";
-        reorder_compress_quality_id(preprocessor.temp_dir, loc_cp, qvcoder, namecoder, entropycoder, params, stats);
+        reorder_compress_quality_id(preprocessor.temp_dir, loc_cp, qvcoder, namecoder, entropycoder, params, stats,
+                                    writeOutStreams);
         std::cerr << "Reordering and compressing quality and/or ids done!\n";
         stats.addDouble("time-spring-qual-name", watch.check());
     }
@@ -91,7 +92,8 @@ void Encoder::flushIn(uint64_t& pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(const std::string& working_dir, size_t num_thr, bool paired_end) {
+Encoder::Encoder(const std::string& working_dir, size_t num_thr, bool paired_end, bool _write_raw)
+    : ReadEncoder(_write_raw) {
     preprocessor.setup(working_dir, num_thr, paired_end);
 }
 
