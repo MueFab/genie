@@ -87,6 +87,42 @@ const std::vector<uint8_t>& Context::getContextInitializationValue() const { ret
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Context::operator==(const Context& ctx) const {
+    return adaptive_mode_flag == ctx.adaptive_mode_flag && num_contexts == ctx.num_contexts &&
+           context_initialization_value == ctx.context_initialization_value &&
+           share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Context::Context(nlohmann::json j) {
+    adaptive_mode_flag = j["adaptive_mode_flag"];
+    if (j.contains("context_initialization_value")) {
+        for (const auto& i : j["context_initialization_value"]) {
+            context_initialization_value.emplace_back(i);
+        }
+    }
+    if (j.contains("share_subsym_ctx_flag")) {
+        share_subsym_ctx_flag = j["share_subsym_ctx_flag"];
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json Context::toJson() const {
+    nlohmann::json ret;
+    ret["adaptive_mode_flag"] = adaptive_mode_flag;
+    if (!context_initialization_value.empty()) {
+        ret["context_initialization_value"] = context_initialization_value;
+    }
+    if (share_subsym_ctx_flag != boost::none) {
+        ret["share_subsym_ctx_flag"] = *share_subsym_ctx_flag;
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie
