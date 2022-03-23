@@ -211,6 +211,12 @@ class AccessUnit {
          * @param pos
          */
         void setPosition(size_t pos);
+
+        /**
+         * @brief
+         * @return
+         */
+        util::DataBlock& getData();
     };
 
     /**
