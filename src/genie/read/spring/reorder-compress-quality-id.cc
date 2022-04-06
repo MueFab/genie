@@ -201,7 +201,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         chunk.getData().clear();
 
         if (write_raw) {
-            for (size_t i = 0; i < std::get<0>(raw_desc).getSize(); ++i) {
+            for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(raw_desc).getSize()); ++i) {
                 if (std::get<0>(raw_desc).get(i).isEmpty()) {
                     continue;
                 }
@@ -285,7 +285,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             chunk.getData().clear();
 
             if (write_raw) {
-                for (size_t i = 0; i < std::get<1>(raw_desc).getSize(); ++i) {
+                for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(raw_desc).getSize()); ++i) {
                     if (std::get<1>(raw_desc).get(i).isEmpty()) {
                         continue;
                     }
@@ -390,7 +390,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 stat_vec[block_num].add(std::get<1>(name_raw));
 
                 if (write_raw) {
-                    for (size_t i = 0; i < std::get<0>(name_raw).getSize(); ++i) {
+                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(name_raw).getSize()); ++i) {
                         if (std::get<0>(name_raw).get(i).isEmpty()) {
                             continue;
                         }
@@ -424,7 +424,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
 
                 if (write_raw) {
-                    for (size_t i = 0; i < std::get<1>(qv_str).getSize(); ++i) {
+                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(qv_str).getSize()); ++i) {
                         if (std::get<1>(qv_str).get(i).isEmpty()) {
                             continue;
                         }

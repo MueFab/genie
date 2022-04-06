@@ -95,8 +95,8 @@ bool Context::operator==(const Context& ctx) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Context::Context(nlohmann::json j) {
-    adaptive_mode_flag = j["adaptive_mode_flag"];
+Context::Context(nlohmann::json j) : num_contexts(0) {
+    adaptive_mode_flag = static_cast<bool>(j["adaptive_mode_flag"]);
     if (j.contains("context_initialization_value")) {
         for (const auto& i : j["context_initialization_value"]) {
             context_initialization_value.emplace_back(i);
