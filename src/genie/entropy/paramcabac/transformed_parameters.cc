@@ -138,6 +138,56 @@ void TransformedParameters::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool TransformedParameters::operator==(const TransformedParameters &val) const {
+    return transform_ID_subseq == val.transform_ID_subseq && match_coding_buffer_size == val.match_coding_buffer_size &&
+           rle_coding_guard == val.rle_coding_guard && merge_coding_subseq_count == val.merge_coding_subseq_count &&
+           merge_coding_shift_size == val.merge_coding_shift_size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json TransformedParameters::toJson() const {
+    nlohmann::json ret;
+    ret["transform_ID_subseq"] = static_cast<uint8_t>(transform_ID_subseq);
+    switch (transform_ID_subseq) {
+        case TransformIdSubseq::NO_TRANSFORM:
+        case TransformIdSubseq::EQUALITY_CODING:
+            break;
+        case TransformIdSubseq::MATCH_CODING:
+            ret["match_coding_buffer_size"] = *match_coding_buffer_size;
+            break;
+        case TransformIdSubseq::RLE_CODING:
+            ret["rle_coding_guard"] = *rle_coding_guard;
+            break;
+        case TransformIdSubseq::MERGE_CODING:
+            ret["merge_coding_shift_size"] = merge_coding_shift_size;
+            break;
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TransformedParameters::TransformedParameters(const nlohmann::json &_json) {
+    transform_ID_subseq = _json["transform_ID_subseq"];
+    switch (transform_ID_subseq) {
+        case TransformIdSubseq::NO_TRANSFORM:
+        case TransformIdSubseq::EQUALITY_CODING:
+            break;
+        case TransformIdSubseq::MATCH_CODING:
+            match_coding_buffer_size = _json["match_coding_buffer_size"];
+            break;
+        case TransformIdSubseq::RLE_CODING:
+            rle_coding_guard = _json["rle_coding_guard"];
+            break;
+        case TransformIdSubseq::MERGE_CODING:
+            for (auto &elem : _json["merge_coding_shift_size"]) merge_coding_shift_size.push_back(elem);
+            break;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie

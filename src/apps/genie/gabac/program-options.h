@@ -38,6 +38,7 @@ class ProgramOptions {
     std::string inputFilePath;       //!< @brief
     std::string dependencyFilePath;  //!< @brief
     std::string outputFilePath;      //!< @brief
+    std::string paramFilePath;       //!< @brief
     std::string task;                //!< @brief
     size_t blocksize;                //!< @brief
 

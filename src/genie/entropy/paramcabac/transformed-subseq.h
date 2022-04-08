@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <nlohmann/json.hpp>
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/state_vars.h"
 #include "genie/entropy/paramcabac/support_values.h"
@@ -116,11 +117,19 @@ class TransformedSubSeq {
      * @param val
      * @return
      */
-    bool operator==(const TransformedSubSeq& val) const {
-        return transform_ID_subsym == val.transform_ID_subsym && support_values == val.support_values &&
-               cabac_binarization == cabac_binarization && state_vars == val.state_vars &&
-               subsequence_ID == val.subsequence_ID && alphabet_ID == val.alphabet_ID;
-    }
+    bool operator==(const TransformedSubSeq& val) const;
+
+    /**
+     * @brief
+     * @param j
+     */
+    explicit TransformedSubSeq(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJson() const;
 
  private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< @brief

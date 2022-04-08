@@ -109,6 +109,17 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(j) {
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json EncodingConfiguration::toJson() const {
+    return subseqCfg.toJoson();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie

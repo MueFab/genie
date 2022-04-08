@@ -7,6 +7,7 @@
 #include "apps/genie/gabac/main.h"
 #include <cassert>
 #include <csignal>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -27,11 +28,25 @@ int main(int argc, char* argv[]) {
         ProgramOptions programOptions(argc, argv);
 
         if (programOptions.task == "encode") {
-            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
-                 programOptions.descID, programOptions.subseqID, false, programOptions.dependencyFilePath);
+            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.paramFilePath,
+                 programOptions.blocksize, programOptions.descID, programOptions.subseqID, false,
+                 programOptions.dependencyFilePath);
         } else if (programOptions.task == "decode") {
-            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
-                 programOptions.descID, programOptions.subseqID, true, programOptions.dependencyFilePath);
+            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.paramFilePath,
+                 programOptions.blocksize, programOptions.descID, programOptions.subseqID, true,
+                 programOptions.dependencyFilePath);
+        } else if (programOptions.task == "writeconfigs") {
+            for (const auto& d : genie::core::getDescriptors()) {
+                for (const auto& s : d.subseqs) {
+                    auto conf = genie::entropy::gabac::EncodingConfiguration(
+                                    genie::entropy::gabac::getEncoderConfigManual(s.id))
+                                    .toJson()
+                                    .dump(4);
+                    std::ofstream outstream("gabacconf_" + std::to_string(static_cast<uint8_t>(s.id.first)) + "_" +
+                                            std::to_string(s.id.second) + ".json");
+                    outstream << conf;
+                }
+            }
         } else {
             UTILS_DIE("Invalid task: " + std::string(programOptions.task));
         }

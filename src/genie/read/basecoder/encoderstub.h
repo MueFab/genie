@@ -105,6 +105,12 @@ class EncoderStub : public core::ReadEncoder {
     static core::AccessUnit::Descriptor encodeNames(NameSelector* namecoder, core::record::Chunk& data);
 
  public:
+    /**
+     * @brief
+     * @param _write_raw
+     */
+    explicit EncoderStub(bool _write_raw) : core::ReadEncoder(_write_raw) {}
+
     ~EncoderStub() override = default;
 
     /**

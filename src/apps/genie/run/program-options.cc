@@ -85,6 +85,11 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
         "Flag, if set no global reference will be \n"
         "calculated for unaligned records. \nThis will increase encoding speed, \nbut decrease compression rate.\n");
 
+    rawStreams = false;
+    app.add_flag(
+        "--write-raw-streams", rawStreams,
+        "Flag, if set raw uncompressed descriptors will be written out\n");
+
     refMode = "none";
     // Deactivated for now, as broken in connection with part 1
     /*  app.add_option("--embedded-ref", refMode,

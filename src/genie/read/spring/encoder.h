@@ -33,8 +33,9 @@ class Encoder : public genie::core::ReadEncoder {
      * @param working_dir
      * @param num_thr
      * @param paired_end
+     * @param write_raw
      */
-    explicit Encoder(const std::string& working_dir, size_t num_thr, bool paired_end);
+    explicit Encoder(const std::string& working_dir, size_t num_thr, bool paired_end, bool write_raw);
 
     /**
      * @brief

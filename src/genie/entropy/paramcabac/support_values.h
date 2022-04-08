@@ -12,6 +12,8 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
+#include "nlohmann/json.hpp"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -98,11 +100,21 @@ class SupportValues {
      * @param val
      * @return
      */
-    bool operator==(const SupportValues &val) const {
-        return output_symbol_size == val.output_symbol_size && coding_subsym_size == val.coding_subsym_size &&
-               coding_order == val.coding_order && share_subsym_lut_flag == val.share_subsym_lut_flag &&
-               share_subsym_prv_flag == val.share_subsym_prv_flag;
-    }
+    bool operator==(const SupportValues &val) const;
+
+    /**
+     * @brief
+     * @param j
+     * @param transformIdSubsym
+     */
+    explicit SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubsym);
+
+    /**
+     * @brief
+     * @param transformIdSubsym
+     * @return
+     */
+    nlohmann::json toJson(TransformIdSubsym transformIdSubsym) const;
 
  private:
     uint8_t output_symbol_size;  //!< @brief
