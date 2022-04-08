@@ -5,6 +5,8 @@
  */
 
 #include "genie/entropy/gabac/encoder.h"
+#include <atomic>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -154,6 +156,10 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
     std::get<2>(ret).addDouble("time-gabac", watch.check());
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -21,14 +21,15 @@ namespace gabac {
  * @brief
  * @param inputFilePath
  * @param outputFilePath
+ * @param config_path
  * @param blocksize
  * @param descID
  * @param subseqID
  * @param decode
  * @param dependencyFilePath
  */
-void code(const std::string& inputFilePath, const std::string& outputFilePath, size_t blocksize, uint8_t descID,
-          uint8_t subseqID, bool decode, const std::string& dependencyFilePath = "");
+void code(const std::string& inputFilePath, const std::string& outputFilePath, const std::string& config_path,
+          size_t blocksize, uint8_t descID, uint8_t subseqID, bool decode, const std::string& dependencyFilePath = "");
 
 // ---------------------------------------------------------------------------------------------------------------------
 

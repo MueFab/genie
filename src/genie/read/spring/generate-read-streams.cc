@@ -147,7 +147,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
 
 void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                              bool write_raw) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
@@ -169,7 +170,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         generate_subseqs(data, block_num, au);
         num_reads_per_block[block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
 
-        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
+        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);
         stat_vec[block_num].add(au.getStats());
 
         params[block_num] = std::move(au.moveParameters());
@@ -319,11 +320,12 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
 void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                              bool write_raw) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    generate_and_compress_se(temp_dir, data, entropycoder, params, stats);
+    generate_and_compress_se(temp_dir, data, entropycoder, params, stats, write_raw);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -821,7 +823,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 
 void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                              std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                              bool write_raw) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -870,7 +873,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
         num_records_per_block[cur_block_num] =
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
-        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
+        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);
 
         stat_vec[cur_block_num].add(au.getStats());
 
@@ -911,11 +914,12 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                            core::ReadEncoder::EntropySelector *entropycoder,
-                           std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                           std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                           bool write_raw) {
     if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, entropycoder, params, stats);
+        generate_read_streams_se(temp_dir, cp, entropycoder, params, stats, write_raw);
     else
-        generate_read_streams_pe(temp_dir, cp, entropycoder, params, stats);
+        generate_read_streams_pe(temp_dir, cp, entropycoder, params, stats, write_raw);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

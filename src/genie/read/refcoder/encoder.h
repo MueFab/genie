@@ -53,6 +53,13 @@ class Encoder : public basecoder::EncoderStub {
      * @return RefEncodingState
      */
     std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
+
+ public:
+    /**
+     * @brief
+     * @param raw_write
+     */
+    explicit Encoder(bool raw_write) : basecoder::EncoderStub(raw_write) {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ namespace util {
 template <typename TYPE>
 class Source {
  protected:
-    Drain<TYPE>* drain;  //!< @brief Where to propagate output to.
+    Drain<TYPE>* drain{nullptr};  //!< @brief Where to propagate output to.
 
  protected:
     /**

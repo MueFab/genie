@@ -36,7 +36,8 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::NameSelector *name_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                                 bool write_raw) {
     // Read some parameters
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -72,14 +73,16 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::cerr << "Compressing qualities\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_quality[0], temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "quality", qv_coder, name_coder, entropy, params, stats);
+                             str_array_size, order_array, "quality", qv_coder, name_coder, entropy, params, stats,
+                             write_raw);
             remove(file_quality[0].c_str());
         }
         if (preserve_id) {
             std::cerr << "Compressing ids\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_id, temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "id", qv_coder, name_coder, entropy, params, stats);
+                             str_array_size, order_array, "id", qv_coder, name_coder, entropy, params, stats,
+                             write_raw);
             remove(file_id.c_str());
         }
 
@@ -106,7 +109,8 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             // (needed because block sizes are not exactly equal to
             // num_reads_per_block
             reorder_compress_quality_pe(file_quality, outfile_quality, temp_dir, quality_array, quality_array_size,
-                                        order_array, block_start, block_end, cp, qv_coder, entropy, params, stats);
+                                        order_array, block_start, block_end, cp, qv_coder, entropy, params, stats,
+                                        write_raw);
             delete[] quality_array;
             delete[] order_array;
             remove(file_quality[0].c_str());
@@ -120,7 +124,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::ifstream f_id(file_id);
             for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
             reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, file_id, cp, name_coder,
-                                   entropy, params, stats);
+                                   entropy, params, stats, write_raw);
             delete[] id_array;
             for (uint32_t i = 0; i < block_start.size(); i++) remove((file_order_id + "." + std::to_string(i)).c_str());
             remove(file_id.c_str());
@@ -168,7 +172,8 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::string &file_name, const compression_params &cp,
                             genie::core::ReadEncoder::NameSelector *name_coder,
                             genie::core::ReadEncoder::EntropySelector *entropy,
-                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                            bool write_raw) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void)cp;
 
@@ -194,6 +199,19 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         auto raw_desc = name_coder->process(chunk);
         stat_vec[block_num].add(std::get<1>(raw_desc));
         chunk.getData().clear();
+
+        if (write_raw) {
+            for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(raw_desc).getSize()); ++i) {
+                if (std::get<0>(raw_desc).get(i).isEmpty()) {
+                    continue;
+                }
+                std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
+                                              std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                                              std::to_string(static_cast<uint8_t>(i)));
+                out_file_stream.write(static_cast<char *>(std::get<0>(raw_desc).get(i).getData().getData()),
+                                      std::get<0>(raw_desc).get(i).getData().getRawSize());
+            }
+        }
         auto encoded = entropy->process(std::get<0>(raw_desc));
         stat_vec[block_num].add(std::get<2>(encoded));
         std::string name = file_name + "." + std::to_string(block_num);
@@ -220,7 +238,8 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                                 bool write_raw) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -264,6 +283,20 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             params[block_num].setQVDepth(std::get<1>(raw_desc).isEmpty() ? 0 : 1);
             stat_vec[block_num - start_block_num].add(std::get<2>(raw_desc));
             chunk.getData().clear();
+
+            if (write_raw) {
+                for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(raw_desc).getSize()); ++i) {
+                    if (std::get<1>(raw_desc).get(i).isEmpty()) {
+                        continue;
+                    }
+                    std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
+                                                  std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) + "_" +
+                                                  std::to_string(static_cast<uint8_t>(i)));
+                    out_file_stream.write(static_cast<char *>(std::get<1>(raw_desc).get(i).getData().getData()),
+                                          std::get<1>(raw_desc).get(i).getData().getRawSize());
+                }
+            }
+
             auto encoded = entropy->process(std::get<1>(raw_desc));
             stat_vec[block_num - start_block_num].add(std::get<2>(encoded));
             params[block_num].addClass(core::record::ClassType::CLASS_U, std::move(std::get<0>(raw_desc)));
@@ -289,7 +322,8 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       genie::core::ReadEncoder::QvSelector *qv_coder,
                       genie::core::ReadEncoder::NameSelector *name_coder,
                       genie::core::ReadEncoder::EntropySelector *entropy,
-                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats) {
+                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                      bool write_raw) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
@@ -354,6 +388,21 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 
                 auto name_raw = name_coder->process(chunk);
                 stat_vec[block_num].add(std::get<1>(name_raw));
+
+                if (write_raw) {
+                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(name_raw).getSize()); ++i) {
+                        if (std::get<0>(name_raw).get(i).isEmpty()) {
+                            continue;
+                        }
+                        std::ofstream out_file_stream(
+                            "rawstream_" + std::to_string(block_num_offset + block_num) + "_" +
+                            std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                            std::to_string(static_cast<uint8_t>(i)));
+                        out_file_stream.write(static_cast<char *>(std::get<0>(name_raw).get(i).getData().getData()),
+                                              std::get<0>(name_raw).get(i).getData().getRawSize());
+                    }
+                }
+
                 auto encoded = entropy->process(std::get<0>(name_raw));
                 stat_vec[block_num].add(std::get<2>(encoded));
                 params[block_num_offset + block_num].setDescriptor(core::GenDesc::RNAME,
@@ -373,6 +422,21 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 auto qv_str = qv_coder->process(chunk);
                 stat_vec[block_num].add(std::get<2>(qv_str));
                 params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
+
+                if (write_raw) {
+                    for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(qv_str).getSize()); ++i) {
+                        if (std::get<1>(qv_str).get(i).isEmpty()) {
+                            continue;
+                        }
+                        std::ofstream out_file_stream("rawstream_" + std::to_string(block_num_offset + block_num) +
+                                                      "_" +
+                                                      std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) +
+                                                      "_" + std::to_string(static_cast<uint8_t>(i)));
+                        out_file_stream.write(static_cast<char *>(std::get<1>(qv_str).get(i).getData().getData()),
+                                              std::get<1>(qv_str).get(i).getData().getRawSize());
+                    }
+                }
+
                 auto encoded = entropy->process(std::get<1>(qv_str));
                 stat_vec[block_num].add(std::get<2>(encoded));
                 params[block_num_offset + block_num].addClass(core::record::ClassType::CLASS_U,

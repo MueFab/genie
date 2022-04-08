@@ -80,6 +80,18 @@ struct EncodingConfiguration {
      */
     void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg);
 
+    /**
+     * @brief
+     * @param j
+     */
+    explicit EncodingConfiguration(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJson() const;
+
  private:
     paramcabac::Subsequence subseqCfg;  //!< @brief
 };
