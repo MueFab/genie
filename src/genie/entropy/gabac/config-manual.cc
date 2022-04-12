@@ -400,7 +400,14 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
                 default:  // subSequenceID >= 2
-                    // TODO(Jan)
+                    outputSymbolSize[0] = 7;
+                    codingSubSymSize[0] = 7;
+                    codingOrder[0] = 2;
+
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
+                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+
+                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     found = false;
             }
             break;
