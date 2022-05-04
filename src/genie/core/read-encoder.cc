@@ -37,6 +37,9 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
         auto this_id = id++;
         for (const auto& d : genie::core::getDescriptors()) {
             for (const auto& s : d.subseqs) {
+                if(au.get(d.id).getSize() <= s.id.second) {
+                    continue;
+                }
                 if (au.get(s.id).isEmpty()) {
                     continue;
                 }

@@ -6,6 +6,7 @@
 
 #include "genie/entropy/gabac/configuration.h"
 #include <utility>
+#include "encode-desc-subseq.h"
 #include "genie/entropy/gabac/config-manual.h"
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/gabac/streams.h"
@@ -109,14 +110,11 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(j) {
-}
+EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(j) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-nlohmann::json EncodingConfiguration::toJson() const {
-    return subseqCfg.toJoson();
-}
+nlohmann::json EncodingConfiguration::toJson() const { return subseqCfg.toJoson(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

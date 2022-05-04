@@ -55,7 +55,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while ((offset < symbolsSize) && (symbols.get(offset) == (symbols.get(w + offset - i)))) {
+            while ((offset < symbolsSize) && (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i ) < matchBufferSize)) {
                 offset++;
             }
             offset -= i;
@@ -69,6 +69,9 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
             rawValues->push_back(symbols.get(i));
         } else {
             pointers->push_back(i - pointer);
+            if (length > 64) {
+                std::cout << "dadümm" << std::endl;
+            }
             lengths->push_back(length);
             i += (length - 1);
         }
