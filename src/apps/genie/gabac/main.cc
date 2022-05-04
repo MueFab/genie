@@ -14,6 +14,7 @@
 #include <vector>
 #include "apps/genie/gabac/code.h"
 #include "apps/genie/gabac/program-options.h"
+#include "benchmark.h"
 #include "genie/entropy/gabac/gabac.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -47,6 +48,20 @@ int main(int argc, char* argv[]) {
                     outstream << conf;
                 }
             }
+        } else if (programOptions.task == "benchmark") {
+            float timeweight = 0.0f;
+            if (programOptions.fastBenchmark) {
+                timeweight = 1.0f;
+            }
+            auto result = genie::entropy::gabac::benchmark_full(
+                programOptions.inputFilePath,
+                genie::core::GenSubIndex(
+                    std::make_pair(genie::core::GenDesc(programOptions.descID), programOptions.subseqID)),
+                timeweight);
+            auto json = result.config.toJoson().dump(4);
+            std::ofstream output_stream(programOptions.outputFilePath);
+            output_stream.write(json.c_str(), json.length());
+
         } else {
             UTILS_DIE("Invalid task: " + std::string(programOptions.task));
         }

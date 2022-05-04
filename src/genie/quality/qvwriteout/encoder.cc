@@ -25,12 +25,12 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
     auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
     set.addCodeBook(std::move(codebook));
 
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_PRESENT));
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_CODEBOOK));
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_STEPS_0));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
     if (rec.getData().front().getClassID() == core::record::ClassType::CLASS_I ||
         rec.getData().front().getClassID() == core::record::ClassType::CLASS_HM) {
-        desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_STEPS_1));
+        desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_1));
 
         codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
         set.addCodeBook(std::move(codebook));

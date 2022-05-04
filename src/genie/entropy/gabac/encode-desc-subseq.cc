@@ -28,7 +28,7 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
                                           std::vector<util::DataBlock> *const transformedSubseqs) {
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:

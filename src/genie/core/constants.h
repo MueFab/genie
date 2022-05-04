@@ -178,9 +178,10 @@ struct GenConst {
  * @brief
  */
 struct GenomicSubDescriptorProperties {
-    GenSubIndex id;         //!< @brief
-    std::string name;       //!< @brief
-    bool mismatchDecoding;  //!< @brief
+    GenSubIndex id;                     //!< @brief
+    std::string name;                   //!< @brief
+    bool mismatchDecoding;              //!< @brief
+    std::pair<int64_t, int64_t> range;  //!< @brief
 };
 
 /**
