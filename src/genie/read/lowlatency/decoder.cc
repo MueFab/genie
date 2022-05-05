@@ -41,7 +41,6 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
         if (data.getParameters().getNumberTemplateSegments() > 1) {
             UTILS_DIE_IF(data.pull(core::GenSub::PAIR_DECODING_CASE) != core::GenConst::PAIR_SAME_RECORD,
                          "Only same record pairs supported");
-            data.pull(core::GenSub::PAIR_SAME_REC);
         }
 
         for (size_t j = 0; j < data.getParameters().getNumberTemplateSegments(); ++j) {

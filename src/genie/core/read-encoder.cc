@@ -36,18 +36,14 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
         static std::atomic<uint64_t> id(0);
         auto this_id = id++;
         for (const auto& d : genie::core::getDescriptors()) {
-            for (const auto& s : d.subseqs) {
-                if (au.get(d.id).getSize() <= s.id.second) {
-                    continue;
-                }
-                if (au.get(s.id).isEmpty()) {
+            for (auto& s : au.get(d.id)) {
+                if (s.isEmpty()) {
                     continue;
                 }
                 std::ofstream out_file_stream("rawstream_" + std::to_string(this_id) + "_" +
                                               std::to_string(static_cast<uint8_t>(d.id)) + "_" +
-                                              std::to_string(static_cast<uint8_t>(s.id.second)));
-                out_file_stream.write(static_cast<char*>(au.get(s.id).getData().getData()),
-                                      au.get(s.id).getData().getRawSize());
+                                              std::to_string(static_cast<uint8_t>(s.getID().second)));
+                out_file_stream.write(static_cast<char*>(s.getData().getData()), s.getData().getRawSize());
             }
         }
     }
