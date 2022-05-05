@@ -70,9 +70,6 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
             rawValues->push_back(symbols.get(i));
         } else {
             pointers->push_back(i - pointer);
-            if (length > 64) {
-                std::cout << "dadümm" << std::endl;
-            }
             lengths->push_back(length);
             i += (length - 1);
         }

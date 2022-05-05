@@ -151,6 +151,13 @@ bool ConfigSearchTranformedSeq::increment() {
         return false;
     }
 
+    while ((coding_order.getIndex(coding_order_search_idx) == 2 && output_bits > 8) ||
+        (coding_order.getIndex(coding_order_search_idx) == 1 && output_bits > 16)) {
+        if (!increment()) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -229,10 +236,6 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         std::vector<ResultTransformed> trans_results;
 
         for (size_t i = 0; i < transformedSubseqs.size(); ++i) {
-            uint64_t max = 0;
-            for (size_t j = 0; j < transformedSubseqs[i].size(); ++j) {
-                max = std::max(max, transformedSubseqs[i].get(j));
-            }
             trans_results.emplace_back(
                 optimizeTransformedSequence(config.getTransformedSeqs()[i], desc, transformedSubseqs[i], timeweight));
             auto tmp = trans_results.back().config;

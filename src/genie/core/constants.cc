@@ -204,7 +204,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::PAIR_SAME_REC,
            "same_rec",
            false,
-           {std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()}},
+           {std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()}},
           {GenSub::PAIR_R1_SPLIT,
            "r1_split",
            false,
@@ -360,6 +360,9 @@ const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescr
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &getSubsequence(GenSubIndex idx) {
+    if(getDescriptors()[uint8_t(idx.first)].tokentype) {
+        return getDescriptors()[uint8_t(idx.first)].subseqs[0];
+    }
     return getDescriptors()[uint8_t(idx.first)].subseqs[uint8_t(idx.second)];
 }
 
