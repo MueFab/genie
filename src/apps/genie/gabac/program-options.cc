@@ -18,7 +18,14 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : fastBenchmark(false), logLevel(), inputFilePath(), outputFilePath(), task(), blocksize(0), descID(0), subseqID(0) {
+    : fastBenchmark(false),
+      logLevel(),
+      inputFilePath(),
+      outputFilePath(),
+      task(),
+      blocksize(0),
+      descID(0),
+      subseqID(0) {
     processCommandLine(argc, argv);
 }
 

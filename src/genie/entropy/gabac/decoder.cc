@@ -68,7 +68,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset,
                               remainingData.getRawSize() - offset, remainingData.getWordSize());
         offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0),
-                                               (unsigned int)numSymbols, &tmp);
+                                               (unsigned int)numSymbols, &tmp, 4);
         while (ret.getSize() < mappedTypeId) {
             ret.add(core::AccessUnit::Subsequence(1, core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)ret.getSize()}));
         }

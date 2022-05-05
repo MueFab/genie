@@ -5,8 +5,10 @@
  */
 
 #include "genie/entropy/gabac/benchmark.h"
+#include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
@@ -198,7 +200,7 @@ std::string ResultFull::toCSV() {
                std::to_string(size_t(cfg.getTransformIDSubsym())) + ";" +
                std::to_string(size_t(cfg.getBinarization().getBinarizationID())) + ";";
     }
-    for (int i = 0; i < (3 - int(config.getTransformSubseqCfgs().size())); ++i) {
+    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
         ret += ";;;;";
     }
     return ret;
@@ -251,7 +253,6 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
             best_result.config = cfg;
             //   std::cout << "New best! Size: " << total_size << ", time: " << total_time << std::endl;
         }
-
     } while (config.increment());
 
     std::cout << input_file << ";" << best_result.toCSV() << std::endl;
