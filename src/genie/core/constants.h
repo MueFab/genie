@@ -262,6 +262,23 @@ const CigarFormatInfo& getECigarInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+inline uint8_t bits2bytes(uint8_t bits) {
+    auto bytes = int(std::ceil(bits / 8.0f));
+    bytes = int(std::pow(2, std::ceil(log2(bytes))));
+    return bytes;
+}
+
+inline uint8_t range2bytes(std::pair<int64_t, int64_t> range) {
+    int bits = std::ceil(std::log2(std::abs(range.first) + 1));
+    bits = std::max(bits, int(std::ceil(std::log2(std::abs(range.second) + 1))));
+    if (range.first < 0) {
+        bits++;
+    }
+
+    return bits2bytes(bits);
+}
+
+
 }  // namespace core
 }  // namespace genie
 

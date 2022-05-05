@@ -108,10 +108,12 @@ struct EncodingConfiguration {
  * @brief Specifies where to read and write.
  */
 struct IOConfiguration {
-    std::istream* inputStream;      /**< @brief Where to read from */
+    std::istream* inputStream; /**< @brief Where to read from */
+    uint8_t inputWordsize;
     std::istream* dependencyStream; /**< @brief Where to read from */
     std::ostream* outputStream;     /**< @brief Where to write to */
-    size_t blocksize;               /**< @brief How many bytes to read at once. Put 0 to read all in one go */
+    uint8_t outputWordsize;
+    size_t blocksize; /**< @brief How many bytes to read at once. Put 0 to read all in one go */
 
     std::ostream* logStream; /**< @brief Where to write logging information*/
 
