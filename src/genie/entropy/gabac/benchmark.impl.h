@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H
-#define SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
+#define SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cmath>
 #include "genie/util/runtime-exception.h"
 
@@ -154,7 +155,7 @@ TYPE SearchSpace<TYPE>::mutate(size_t index, float random) {
     while (value > max) {
         value = min + (value - max);
     }
-    return TYPE(std::round((value - min) / float(stride)));
+    return TYPE(std::round((value - min) / static_cast<float>(stride)));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -165,7 +166,7 @@ TYPE SearchSpace<TYPE>::mutate(size_t index, float random) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

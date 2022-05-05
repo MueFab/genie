@@ -16,13 +16,13 @@
 #include <random>
 #include <string>
 #include <vector>
-#include "encode-transformed-subseq.h"
 #include "genie/entropy/gabac/config-manual.h"
+#include "genie/entropy/gabac/encode-transformed-subseq.h"
+#include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/util/data-block.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/watch.h"
-#include "stream-handler.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,14 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H
-#define SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H_
+#define SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
 #include <cstdint>
 #include <random>
+#include <string>
+#include <vector>
+#include <utility>
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/entropy/paramcabac/transformed-subseq.h"
@@ -412,7 +415,7 @@ class ConfigSearch {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_BENCHMARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

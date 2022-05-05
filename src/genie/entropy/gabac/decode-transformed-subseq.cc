@@ -123,7 +123,7 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream, uint8_t wordsize) {
     if (bitstream == nullptr) {
         UTILS_DIE("Bitstream is null");
     }
@@ -147,7 +147,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
+    util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -192,7 +192,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
 size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                    const unsigned int numEncodedSymbols, util::DataBlock *bitstream,
-                                   util::DataBlock *const depSymbols) {
+                                   util::DataBlock *const depSymbols, uint8_t wordsize) {
     if (bitstream == nullptr) {
         UTILS_DIE("Bitstream is null");
     }
@@ -223,7 +223,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
+    util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -301,7 +301,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream, uint8_t wordsize) {
     if (bitstream == nullptr) {
         UTILS_DIE("Bitstream is null");
     }
@@ -331,7 +331,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
+    util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -393,16 +393,16 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock *bitstream, util::DataBlock *const depSymbols) {
+                             util::DataBlock *bitstream, uint8_t wordsize, util::DataBlock *const depSymbols) {
     switch (trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            return decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            return decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream, wordsize);
             break;
         case 1:
-            return decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
+            return decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols, wordsize);
             break;
         case 2:
-            return decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            return decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream, wordsize);
             break;
         default:
             UTILS_DIE("Unknown coding order");

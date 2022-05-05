@@ -11,10 +11,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 #include "apps/genie/gabac/code.h"
 #include "apps/genie/gabac/program-options.h"
-#include "benchmark.h"
+#include "genie/entropy/gabac/benchmark.h"
 #include "genie/entropy/gabac/gabac.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

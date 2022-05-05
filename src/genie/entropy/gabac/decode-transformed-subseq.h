@@ -74,7 +74,7 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
  * @return
  */
 size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock *bitstream, util::DataBlock *const depSymbols = nullptr);
+                             util::DataBlock *bitstream, uint8_t wordsize, util::DataBlock *const depSymbols = nullptr);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

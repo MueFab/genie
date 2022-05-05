@@ -6,6 +6,7 @@
 
 #include "genie/core/constants.h"
 #include <algorithm>
+#include <limits>
 #include <utility>
 #include "genie/core/record/class-type.h"
 
@@ -293,10 +294,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
          "qv",
          false,
          {{GenSub::QV_PRESENT, "present", false, {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
-          {GenSub::QV_CODEBOOK,
-           "codebook",
-           false,
-           {std::numeric_limits<uint8_t>::min(), 4}},
+          {GenSub::QV_CODEBOOK, "codebook", false, {std::numeric_limits<uint8_t>::min(), 4}},
           {GenSub::QV_STEPS_0,
            "steps_0",
            false,
