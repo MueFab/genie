@@ -61,7 +61,7 @@ class StateVars {
      */
     void populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
                   const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                  const core::AlphabetID alphabet_ID);
+                  const core::AlphabetID alphabet_ID, bool original = true);
 
     /**
      * @brief

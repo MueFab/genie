@@ -42,7 +42,7 @@ class TransformedSubSeq {
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID,
+                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID, bool original = true,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      * @brief
