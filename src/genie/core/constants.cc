@@ -298,7 +298,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::QV_STEPS_0,
            "steps_0",
            false,
-           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<int8_t>::max()}},
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
           {GenSub::QV_STEPS_1,
            "steps_1",
            false,

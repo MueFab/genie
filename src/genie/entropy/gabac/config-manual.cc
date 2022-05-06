@@ -452,7 +452,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     std::vector<paramcabac::TransformedSubSeq> trnsfSubseqCfgs;
 
     for (size_t t = 0; t < numTrnsfSubseqs; t++) {
-        trnsfSubseqCfgs.push_back(paramcabac::TransformedSubSeq(
+        trnsfSubseqCfgs.emplace_back(
             trnsfSubsymID[t],
             paramcabac::SupportValues(outputSymbolSize[t], codingSubSymSize[t], codingOrder[t], shareSubsymLutFlag[t],
                                       shareSubsymPrvFlag[t]),
@@ -460,7 +460,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                                      paramcabac::BinarizationParameters(binID[t], binParams[t]),
                                      paramcabac::Context(adaptiveModeFlag[t], outputSymbolSize[t], codingSubSymSize[t],
                                                          shareSubsymCtxFlag[t])),
-            genieSubseqID, alphaID));
+            genieSubseqID,  t == numTrnsfSubseqs - 1, alphaID);
     }
 
     paramcabac::Subsequence subseqCfg(std::move(trnsfSubseqParams), subseqID, tokenTypeFlag,

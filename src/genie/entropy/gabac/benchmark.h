@@ -191,13 +191,13 @@ class ConfigSearchBinarization {
      * @param outputbits
      * @return
      */
-    paramcabac::Binarization getBinarization(bool bypass, uint8_t outputbits) const;
+    paramcabac::Binarization getBinarization(bool bypass, uint8_t outputbits, uint8_t subsymsize) const;
 
     /**
      * @brief
      * @param range
      */
-    explicit ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range);
+    explicit ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range, uint8_t splitsize);
 
     /**
      * @brief
@@ -220,6 +220,12 @@ class ConfigSearchTranformedSeq {
  private:
     uint8_t output_bits;  //!< @brief
 
+    SearchSpace<int8_t> split_size;  //!< @brief
+    size_t split_size_idx;    //!< @brief
+
+    SearchSpace<int8_t> split_in_binarization;  //!< @brief
+    size_t split_in_binarization_idx;    //!< @brief
+
     SearchSpace<int8_t> coding_order;  //!< @brief
     size_t coding_order_search_idx;    //!< @brief
 
@@ -229,13 +235,13 @@ class ConfigSearchTranformedSeq {
     bool LUTValid;                                        //!< @brief
     SearchSpace<int8_t> subsymbol_transform_enabled;      //!< @brief
     size_t subsymbol_transform_search_idx;                //!< @brief
-    std::vector<ConfigSearchBinarization> binarizations;  //!< @brief
+    std::vector<std::vector<std::vector<ConfigSearchBinarization>>> binarizations;  //!< @brief
 
     /**
      * @brief
      * @return
      */
-    int8_t getBinID();
+    int8_t getSubsymbolTransID();
 
     /**
      * @brief
@@ -243,13 +249,17 @@ class ConfigSearchTranformedSeq {
      */
     bool incrementTransform();
 
+    uint8_t getSplitRatio() {
+        return 1 << split_size.getIndex(split_size_idx);
+    }
+
  public:
     /**
      * @brief
      * @param descriptor_subsequence
      * @return
      */
-    paramcabac::TransformedSubSeq createConfig(const genie::core::GenSubIndex& descriptor_subsequence);
+    paramcabac::TransformedSubSeq createConfig(const genie::core::GenSubIndex& descriptor_subsequence, bool original);
 
     /**
      * @brief
@@ -292,7 +302,7 @@ struct ResultFull {
      * @brief
      * @return
      */
-    std::string toCSV();
+    std::string toCSV(const std::string& filename);
 };
 
 /**
@@ -304,7 +314,7 @@ struct ResultFull {
  * @return
  */
 ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const genie::core::GenSubIndex& gensub,
-                                              util::DataBlock& data, float timeweight);
+                                              util::DataBlock& data, float timeweight, bool original);
 
 /**
  * @brief
@@ -370,6 +380,11 @@ class ConfigSearch {
     std::vector<ConfigSearchTransformation> params;  //!< @brief
 
  public:
+
+    uint8_t getTransform()const {
+        return transformation.getIndex(transformation_search_idx);
+    }
+
     /**
      * @brief
      * @return
