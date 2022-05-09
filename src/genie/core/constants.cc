@@ -83,6 +83,33 @@ const GenSubIndex GenSub::RFTP = std::make_pair(GenDesc::RFTP, (uint16_t)0);
 
 const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, (uint16_t)0);
 
+constexpr uint8_t GenConst::MMPOS_PERSIST;
+constexpr uint8_t GenConst::MMPOS_TERMINATE;
+constexpr uint8_t GenConst::FLAGS_PCR_DUPLICATE_POS;
+constexpr uint8_t GenConst::FLAGS_PCR_DUPLICATE_MASK;
+constexpr uint8_t GenConst::FLAGS_QUALITY_FAIL_POS;
+constexpr uint8_t GenConst::FLAGS_QUALITY_FAIL_MASK;
+constexpr uint8_t GenConst::FLAGS_PROPER_PAIR_POS;
+constexpr uint8_t GenConst::FLAGS_PROPER_PAIR_MASK;
+constexpr uint8_t GenConst::MMTYPE_SUBSTITUTION;
+constexpr uint8_t GenConst::MMTYPE_INSERTION;
+constexpr uint8_t GenConst::MMTYPE_DELETION;
+constexpr uint8_t GenConst::CLIPS_RECORD_END;
+constexpr uint8_t GenConst::PAIR_SAME_RECORD;
+constexpr uint8_t GenConst::PAIR_R1_SPLIT;
+constexpr uint8_t GenConst::PAIR_R2_SPLIT;
+constexpr uint8_t GenConst::PAIR_R1_DIFF_REF;
+constexpr uint8_t GenConst::PAIR_R2_DIFF_REF;
+constexpr uint8_t GenConst::PAIR_R1_UNPAIRED;
+constexpr uint8_t GenConst::PAIR_R2_UNPAIRED;
+constexpr uint8_t GenConst::RTYPE_REFERENCE;
+constexpr uint8_t GenConst::RTYPE_CLASS_P;
+constexpr uint8_t GenConst::RTYPE_CLASS_N;
+constexpr uint8_t GenConst::RTYPE_CLASS_M;
+constexpr uint8_t GenConst::RTYPE_CLASS_I;
+constexpr uint8_t GenConst::RTYPE_CLASS_U;
+constexpr uint8_t GenConst::RTYPE_CLASS_HM;
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string &getMPEGVersionString(MPEGMinorVersion v) {
@@ -442,6 +469,25 @@ const CigarFormatInfo &getECigarInfo() {
         return {ref_step2, seq_step2, ignore2, true};
     }();
     return formatInfo;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t bits2bytes(uint8_t bits) {
+    auto bytes = static_cast<uint8_t>(std::ceil(bits / 8.0f));
+    bytes = static_cast<uint8_t>(std::pow(2, std::ceil(log2(bytes))));
+    return bytes;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t range2bytes(std::pair<int64_t, int64_t> range) {
+    auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));
+    bits = std::max(bits, static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.second) + 1))));
+    if (range.first < 0) {
+        bits++;
+    }
+    return bits2bytes(bits);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
