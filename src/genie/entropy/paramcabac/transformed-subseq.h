@@ -39,6 +39,7 @@ class TransformedSubSeq {
      * @param _support_values
      * @param _cabac_binarization
      * @param _subsequence_ID
+     * @param original
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,

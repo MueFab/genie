@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include "filesystem/filesystem.hpp"
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
@@ -36,20 +37,18 @@ paramcabac::Binarization ConfigSearchBinarization::getBinarization(bool bypass, 
 
 ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range, uint8_t split_size)
     : binarization_search_idx(0), binarization_parameter_search_idx(0) {
+    auto bits = std::ceil(std::log2(std::max(std::abs(range.first), std::abs(range.second))));
+    if (range.first < 0) {
+        bits++;
+    }
     {
         if (split_size == 0) {
-            auto bits = std::ceil(std::log2(std::max(std::abs(range.first), std::abs(range.second))));
-            if (range.first < 0) {
-                bits++;
-            }
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::BI);
             binarizationParameters.emplace_back(bits, bits, 1);
         }
     }
     if (range.first >= 0) {
-
-
-        if (split_size != 0) {
+        if (split_size != 0 && split_size != bits) {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SUTU);
             binarizationParameters.emplace_back(split_size, split_size, 1);
         } else {
@@ -66,7 +65,7 @@ ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int6
 
         //      binarizationParameters.emplace_back(1, max_param, std::max(int64_t(1), (max_param - 1) / 4));
     } else {
-        if (split_size != 0) {
+        if (split_size != 0 && split_size != bits) {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SSUTU);
             binarizationParameters.emplace_back(split_size, split_size, 1);
         } else {
@@ -108,6 +107,12 @@ void ConfigSearchBinarization::mutate(std::mt19937& rd, std::normal_distribution
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool ConfigSearchTranformedSeq::lutValid() const {
+    return (output_bits / getSplitRatio()) <= 8 && coding_order.getIndex(coding_order_search_idx) > 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 int8_t ConfigSearchTranformedSeq::getSubsymbolTransID() {
     if (subsymbol_transform_enabled.getIndex(subsymbol_transform_search_idx) == 0) {
         return 0;
@@ -123,12 +128,16 @@ int8_t ConfigSearchTranformedSeq::getSubsymbolTransID() {
 bool ConfigSearchTranformedSeq::incrementTransform() {
     subsymbol_transform_search_idx++;
     if (subsymbol_transform_search_idx == subsymbol_transform_enabled.size() ||
-        (getSubsymbolTransID() == 2 && !LUTValid)) {
+        (getSubsymbolTransID() == 2 && !lutValid())) {
         subsymbol_transform_search_idx = 0;
         return false;
     }
     return true;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t ConfigSearchTranformedSeq::getSplitRatio() const { return 1 << split_size.getIndex(split_size_idx); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -145,8 +154,9 @@ paramcabac::TransformedSubSeq ConfigSearchTranformedSeq::createConfig(
     paramcabac::TransformedSubSeq ret(
         subsymbol_trans,
         paramcabac::SupportValues(output_bits, symbol_size, coding_order.getIndex(coding_order_search_idx)),
-        binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)][getSubsymbolTransID()].getBinarization(
-            bypass.getIndex(bypass_search_idx), output_bits, symbol_size),
+        binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
+                     [getSubsymbolTransID()]
+                         .getBinarization(bypass.getIndex(bypass_search_idx), output_bits, symbol_size),
         descriptor_subsequence, original);
     return ret;
 }
@@ -155,7 +165,9 @@ paramcabac::TransformedSubSeq ConfigSearchTranformedSeq::createConfig(
 
 bool ConfigSearchTranformedSeq::increment() {
     // Increment binarization for current split and transformation
-    if (binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)][getSubsymbolTransID()].increment()) {
+    if (binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
+                     [getSubsymbolTransID()]
+                         .increment()) {
         return true;
     }
 
@@ -206,7 +218,7 @@ bool ConfigSearchTranformedSeq::increment() {
 ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, int64_t>& range)
     : split_size(0, 3, 1),
       split_size_idx(0),
-      split_in_binarization(0, 1, 1),
+      split_in_binarization(0, 0, 1),
       split_in_binarization_idx(0),
       coding_order(0, 2, 1),
       coding_order_search_idx(0),
@@ -214,11 +226,6 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
       bypass_search_idx(0),
       subsymbol_transform_enabled(0, 1, 1),
       subsymbol_transform_search_idx(0) {
-    // LUT only allowed for value range < 8 bit
-    LUTValid =
-        (range.first >= std::numeric_limits<uint8_t>::min() && range.second <= std::numeric_limits<uint8_t>::max()) ||
-        (range.first >= std::numeric_limits<int8_t>::min() && range.second <= std::numeric_limits<int8_t>::max());
-
     // Necessary bits
     output_bits = std::ceil(log2(std::max(std::abs(range.first) + 1, std::abs(range.second) + 1)));
     if (range.first < 0) {
@@ -254,23 +261,59 @@ void ConfigSearchTranformedSeq::mutate(std::mt19937& rd, std::normal_distributio
     split_size_idx = split_size.mutate(split_size_idx, d(rd));
     subsymbol_transform_search_idx = subsymbol_transform_enabled.mutate(subsymbol_transform_search_idx, d(rd));
     bypass_search_idx = bypass.mutate(bypass_search_idx, d(rd));
-    if (getSubsymbolTransID() == 2 && !LUTValid) {
+    if (getSubsymbolTransID() == 2 && !lutValid()) {
         subsymbol_transform_search_idx = 0;
     }
-    binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)][getSubsymbolTransID()].mutate(rd, d);
+    binarizations[split_size.getIndex(split_size_idx)][split_in_binarization.getIndex(split_in_binarization_idx)]
+                 [getSubsymbolTransID()]
+                     .mutate(rd, d);
+}
+
+/**
+ * @brief
+ * @return
+ */
+std::string ResultTransformed::toCSV(const std::string& filename, size_t transform, size_t parameter,
+                                     size_t seq_id) const {
+    std::string ret;
+    ret += filename + ";" + std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
+           std::to_string(transform) + ";" + std::to_string(parameter) + ";" + std::to_string(seq_id) + ";";
+    ret += std::to_string(config.getSupportValues().getCodingOrder()) + ";" +
+           std::to_string(config.getSupportValues().getOutputSymbolSize()) + ";" +
+           std::to_string(config.getSupportValues().getCodingSubsymSize()) + ";" +
+           std::to_string(size_t(config.getTransformIDSubsym())) + ";" +
+           std::to_string(size_t(config.getBinarization().getBinarizationID())) + ";";
+    if (config.getBinarization().getBinarizationID() == paramcabac::BinarizationParameters::BinarizationId::TU) {
+        ret += std::to_string(size_t(config.getBinarization().getCabacBinarizationParameters().getCMax())) + ";";
+    } else if (config.getBinarization().getBinarizationID() ==
+               paramcabac::BinarizationParameters::BinarizationId::SUTU) {
+        ret +=
+            std::to_string(size_t(config.getBinarization().getCabacBinarizationParameters().getSplitUnitSize())) + ";";
+    } else {
+        ret += ";";
+    }
+    return ret;
+}
+
+/**
+ * @brief
+ * @return
+ */
+std::string ResultTransformed::getCSVHeader() {
+    std::string desc;
+    desc += "File;Compressed size;Compression time;Transformation;TransformationParam;seqID;";
+    desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
+    return desc;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ResultFull::toCSV(const std::string& filename) {
+std::string ResultFull::toCSV(const std::string& filename) const {
     std::string ret;
-    std::string desc;
-    desc += "File;Compressed size;Compression time;Transformation;TransformationParam;";
     ret += std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
            std::to_string(size_t(config.getTransformParameters().getTransformIdSubseq())) + ";" +
            std::to_string(size_t(config.getTransformParameters().getParam())) + ";";
     for (auto& cfg : config.getTransformSubseqCfgs()) {
-        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
         ret += std::to_string(cfg.getSupportValues().getCodingOrder()) + ";" +
                std::to_string(cfg.getSupportValues().getOutputSymbolSize()) + ";" +
                std::to_string(cfg.getSupportValues().getCodingSubsymSize()) + ";" +
@@ -287,10 +330,23 @@ std::string ResultFull::toCSV(const std::string& filename) {
         }
     }
     for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
-        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
         ret += ";;;;;;";
     }
-    return desc + "\n" + filename + ";" + ret;
+    return filename + ";" + ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string ResultFull::getCSVHeader() {
+    std::string desc;
+    desc += "File;Compressed size;Compression time;Transformation;TransformationParam;";
+    for (size_t i = 0; i < config.getTransformSubseqCfgs().size(); ++i) {
+        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
+    }
+    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
+        desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
+    }
+    return desc;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -303,8 +359,10 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
     ResultFull best_result;
     float best_score = INFINITY;
     ConfigSearch config(genie::core::getSubsequence(desc).range);
+    bool new_file = !ghc::filesystem::exists("benchmark_total.csv");
+    std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
     do {
-        std::cerr << "Optimizing transformation " << (int)config.getTransform() << "..." << std::endl;
+        std::cerr << "Optimizing transformation " << static_cast<int>(config.getTransform()) << "..." << std::endl;
         // Execute transformation
         std::vector<util::DataBlock> transformedSubseqs;
         transformedSubseqs.resize(1);
@@ -320,9 +378,9 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         // Optimze transformed sequences independently
         for (size_t i = 0; i < transformedSubseqs.size(); ++i) {
             std::cerr << "Optimizing subsequence " << i << "..." << std::endl;
-            trans_results.emplace_back(optimizeTransformedSequence(config.getTransformedSeqs()[i], desc,
-                                                                   transformedSubseqs[i], timeweight,
-                                                                   i == transformedSubseqs.size() - 1));
+            trans_results.emplace_back(optimizeTransformedSequence(
+                config.getTransformedSeqs()[i], desc, transformedSubseqs[i], timeweight,
+                i == transformedSubseqs.size() - 1, config.getTransform(), config.getTransformParam(), i, input_file));
             auto tmp = trans_results.back().config;
             cfg.setTransformSubseqCfg(i, std::move(tmp));
         }
@@ -344,6 +402,17 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
             best_result.size = total_size;
             best_result.config = cfg;
         }
+
+        ResultFull result_current;
+        result_current.milliseconds = total_time;
+        result_current.size = total_size;
+        result_current.config = cfg;
+
+        if (new_file) {
+            results_file << result_current.getCSVHeader() << std::endl;
+            new_file = false;
+        }
+        results_file << result_current.toCSV(input_file) << std::endl;
     } while (config.increment());
 
     std::cout << best_result.toCSV(input_file) << std::endl;
@@ -417,6 +486,16 @@ void ConfigSearchTransformation::mutate(std::mt19937& rd, std::normal_distributi
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t ConfigSearch::getTransform() const { return transformation.getIndex(transformation_search_idx); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ConfigSearch::getTransformParam() const {
+    return params[transformation.getIndex(transformation_search_idx)].getParameter();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::vector<ConfigSearchTranformedSeq>& ConfigSearch::getTransformedSeqs() {
     return params[transformation.getIndex(transformation_search_idx)].getTransformedSeqs();
 }
@@ -484,9 +563,13 @@ paramcabac::Subsequence ConfigSearch::createConfig(genie::core::GenSubIndex desc
 // ---------------------------------------------------------------------------------------------------------------------
 
 ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const genie::core::GenSubIndex& gensub,
-                                              util::DataBlock& data, float timeweight, bool original) {
+                                              util::DataBlock& data, float timeweight, bool original,
+                                              size_t transformation, size_t transformation_param, size_t sequence_id,
+                                              const std::string& filename) {
     ResultTransformed ret;
     float score = INFINITY;
+    bool new_file = !ghc::filesystem::exists("benchmark_trans_" + std::to_string(transformation) + ".csv");
+    std::ofstream results_file("benchmark_trans_" + std::to_string(transformation) + ".csv", std::ios_base::app);
     do {
         auto cfg = seq.createConfig(gensub, original);
         auto input = data;
@@ -505,6 +588,16 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
             ret.size = size;
             ret.config = cfg;
         }
+        ResultTransformed result_current;
+        result_current.milliseconds = time;
+        result_current.size = size;
+        result_current.config = cfg;
+
+        if (new_file) {
+            results_file << result_current.getCSVHeader() << std::endl;
+            new_file = false;
+        }
+        results_file << result_current.toCSV(filename, transformation, transformation_param, sequence_id) << std::endl;
     } while (seq.increment());
     return ret;
 }

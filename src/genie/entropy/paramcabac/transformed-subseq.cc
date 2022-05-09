@@ -25,7 +25,8 @@ TransformedSubSeq::TransformedSubSeq()
 
 TransformedSubSeq::TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
                                      SupportValues&& _support_values, Binarization&& _cabac_binarization,
-                                     const core::GenSubIndex _subsequence_ID, bool original, const core::AlphabetID _alphabet_ID)
+                                     const core::GenSubIndex _subsequence_ID, bool original,
+                                     const core::AlphabetID _alphabet_ID)
     : transform_ID_subsym(_transform_ID_subsym),
       support_values(std::move(_support_values)),
       cabac_binarization(std::move(_cabac_binarization)),
