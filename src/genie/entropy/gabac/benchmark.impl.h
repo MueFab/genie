@@ -139,7 +139,7 @@ size_t SearchSpace<TYPE>::size() const {
 
 template <typename TYPE>
 TYPE SearchSpace<TYPE>::getIndex(size_t idx) const {
-    return min + stride * idx;
+    return static_cast<TYPE>(min + stride * idx);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
