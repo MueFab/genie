@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "genie/entropy/gabac/benchmark.h"
 #include <algorithm>
 #include <fstream>
@@ -37,27 +38,28 @@ paramcabac::Binarization ConfigSearchBinarization::getBinarization(bool bypass, 
 
 ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range, uint8_t split_size)
     : binarization_search_idx(0), binarization_parameter_search_idx(0) {
-    auto bits = std::ceil(std::log2(std::max(std::abs(range.first), std::abs(range.second))));
+    auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::max(std::abs(range.first), std::abs(range.second)))));
     if (range.first < 0) {
         bits++;
     }
     {
         if (split_size == 0) {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::BI);
-            binarizationParameters.emplace_back(bits, bits, 1);
+            binarizationParameters.emplace_back(bits, bits, uint8_t(1));
         }
     }
     if (range.first >= 0) {
         if (split_size != 0 && split_size != bits) {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SUTU);
-            binarizationParameters.emplace_back(split_size, split_size, 1);
+            binarizationParameters.emplace_back(split_size, split_size, uint8_t(1));
         } else {
             if (range.second < 256) {
                 lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::TU);
-                binarizationParameters.emplace_back(range.second, range.second, 1);
+                binarizationParameters.emplace_back(static_cast<uint8_t>(range.second),
+                                                    static_cast<uint8_t>(range.second), uint8_t(1));
             }
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::EG);
-            binarizationParameters.emplace_back(0, 0, 1);
+            binarizationParameters.emplace_back(uint8_t(0), uint8_t(0), uint8_t(1));
         }
 
         //      lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::TEG);
@@ -67,10 +69,10 @@ ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int6
     } else {
         if (split_size != 0 && split_size != bits) {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SSUTU);
-            binarizationParameters.emplace_back(split_size, split_size, 1);
+            binarizationParameters.emplace_back(split_size, split_size, uint8_t(1));
         } else {
             lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::SEG);
-            binarizationParameters.emplace_back(0, 0, 1);
+            binarizationParameters.emplace_back(uint8_t(0), uint8_t(0), uint8_t(1));
         }
 
         //    lut.emplace_back(genie::entropy::paramcabac::BinarizationParameters::BinarizationId::STEG);
@@ -79,7 +81,7 @@ ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int6
 
         //     binarizationParameters.emplace_back(0, max_param, std::max(int64_t(1), max_param / 4));
     }
-    binarization = SearchSpace<uint8_t>(0, lut.size() - 1, 1);
+    binarization = SearchSpace<uint8_t>(uint8_t(0), static_cast<uint8_t>(lut.size()) - 1, uint8_t(1));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -100,9 +102,9 @@ bool ConfigSearchBinarization::increment() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ConfigSearchBinarization::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    binarization_search_idx = binarization.mutate(binarization_search_idx, d(rd));
-    binarization_parameter_search_idx =
-        binarizationParameters[binarization_search_idx].mutate(binarization_parameter_search_idx, d(rd));
+    binarization_search_idx = binarization.mutate(binarization_search_idx, static_cast<float>(d(rd)));
+    binarization_parameter_search_idx = binarizationParameters[binarization_search_idx].mutate(
+        binarization_parameter_search_idx, static_cast<float>(d(rd)));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -227,7 +229,8 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
       subsymbol_transform_enabled(0, 1, 1),
       subsymbol_transform_search_idx(0) {
     // Necessary bits
-    output_bits = std::ceil(log2(std::max(std::abs(range.first) + 1, std::abs(range.second) + 1)));
+    output_bits =
+        static_cast<uint8_t>(std::ceil(log2(std::max(std::abs(range.first) + 1, std::abs(range.second) + 1))));
     if (range.first < 0) {
         output_bits++;
     }
@@ -238,8 +241,8 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
         for (int j = 0; j < 2; ++j) {
             binarizations.back().emplace_back();
 
-            uint64_t splitsize = 1 << i;
-            uint64_t codingsize = output_bits / splitsize;
+            uint8_t splitsize = uint8_t(1) << i;
+            uint8_t codingsize = output_bits / splitsize;
 
             if (j == 0) {
                 codingsize = 0;
@@ -257,10 +260,11 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ConfigSearchTranformedSeq::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    coding_order_search_idx = coding_order.mutate(coding_order_search_idx, d(rd));
-    split_size_idx = split_size.mutate(split_size_idx, d(rd));
-    subsymbol_transform_search_idx = subsymbol_transform_enabled.mutate(subsymbol_transform_search_idx, d(rd));
-    bypass_search_idx = bypass.mutate(bypass_search_idx, d(rd));
+    coding_order_search_idx = coding_order.mutate(coding_order_search_idx, static_cast<float>(d(rd)));
+    split_size_idx = split_size.mutate(split_size_idx, static_cast<float>(d(rd)));
+    subsymbol_transform_search_idx =
+        subsymbol_transform_enabled.mutate(subsymbol_transform_search_idx, static_cast<float>(d(rd)));
+    bypass_search_idx = bypass.mutate(bypass_search_idx, static_cast<float>(d(rd)));
     if (getSubsymbolTransID() == 2 && !lutValid()) {
         subsymbol_transform_search_idx = 0;
     }
@@ -372,7 +376,7 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         timer.reset();
         auto cfg = config.createConfig(desc, core::getDescriptor(desc.first).tokentype);
         gabac::doSubsequenceTransform(cfg, &transformedSubseqs);
-        size_t total_time = timer.check() * 1000;
+        size_t total_time = static_cast<size_t>(timer.check() * 1000);
         std::vector<ResultTransformed> trans_results;
 
         // Optimze transformed sequences independently
@@ -477,7 +481,7 @@ bool ConfigSearchTransformation::increment() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ConfigSearchTransformation::mutate(std::mt19937& rd, std::normal_distribution<>& d) {
-    parameter_search_idx = parameter.mutate(parameter_search_idx, d(rd));
+    parameter_search_idx = parameter.mutate(parameter_search_idx, static_cast<float>(d(rd)));
 
     for (auto& ts : transformedSeqs) {
         ts.mutate(rd, d);
@@ -536,7 +540,7 @@ void ConfigSearch::mutate(float rate) {
     std::mt19937 gen{rd()};
     std::normal_distribution<> d{0, rate};
 
-    transformation_search_idx = transformation.mutate(transformation_search_idx, d(gen));
+    transformation_search_idx = transformation.mutate(transformation_search_idx, static_cast<float>(d(gen)));
     params[transformation.getIndex(transformation_search_idx)].mutate(gen, d);
 }
 
@@ -580,7 +584,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
         auto time = size_t(watch.check() * 1000);  // Milliseconds
         auto size = input.getRawSize();
 
-        float newscore = timeweight * time + (1.0 - timeweight) * size;
+        float newscore = static_cast<float>(timeweight * time + (1.0 - timeweight) * size);
         if (newscore < score) {
             // Found new bets score
             score = newscore;

@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "apps/genie/gabac/main.h"
 #include <cassert>
 #include <csignal>

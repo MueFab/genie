@@ -210,7 +210,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
             }
             uint32_t context_size = numCtxSubsym;
             if (codingOrder > 0) {
-                context_size = codingOrderCtxOffset[codingOrder] * numAlphaSubsym;
+                context_size = static_cast<uint32_t>(codingOrderCtxOffset[codingOrder] * numAlphaSubsym);
             }
             numCtxTotal += context_count * context_size;
         }

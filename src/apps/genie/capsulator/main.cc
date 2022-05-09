@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "apps/genie/capsulator/main.h"
 #include <fstream>
 #include <iostream>
