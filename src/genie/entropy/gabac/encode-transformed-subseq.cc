@@ -25,7 +25,7 @@ typedef void (Writer::*binFunc)(uint64_t, const std::vector<unsigned int>);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void encodeSignflag(Writer &writer, const paramcabac::BinarizationParameters::BinarizationId binID,
+/* static inline void encodeSignflag(Writer &writer, const paramcabac::BinarizationParameters::BinarizationId binID,
                                   const int64_t signedSymbolValue) {
     if (signedSymbolValue != 0) {
         switch (binID) {
@@ -39,7 +39,7 @@ static inline void encodeSignflag(Writer &writer, const paramcabac::Binarization
                 break;
         }
     }
-}
+} */
 
 // ---------------------------------------------------------------------------------------------------------------------
 
