@@ -333,11 +333,11 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 
 AccessUnit::AccessUnit(parameter::EncodingSet &&set, size_t _numRecords)
     : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
-    const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
         for (const auto &subdesc : desc.subseqs) {
-            desc_data.add(Subsequence(WORDSIZE, subdesc.id));
+            auto bytes = range2bytes(core::getSubsequence(subdesc.id).range);
+            desc_data.add(Subsequence(bytes, subdesc.id));
         }
         descriptors.push_back(std::move(desc_data));
     }

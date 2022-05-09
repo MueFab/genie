@@ -8,10 +8,6 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           binDir: 'bin'
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          binDir: 'bin'
         macos1015:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
@@ -92,11 +88,6 @@ stages:
           artifactName: 'ubuntu2004'
           architecture: ''
           binDir: 'bin'
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          architecture: ''
-          binDir: 'bin'
         macos1015:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
@@ -158,10 +149,6 @@ stages:
         ubuntu2004:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
-          fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
           fileExt: ''
         macos1015:
           imageName: 'macos-10.15'
@@ -237,10 +224,6 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
@@ -281,10 +264,6 @@ stages:
         ubuntu2004:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
-          fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
           fileExt: ''
         macos1015:
           imageName: 'macos-10.15'
@@ -367,10 +346,6 @@ stages:
         ubuntu2004:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
-          fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
           fileExt: ''
     pool:
       vmImage: $(imageName)

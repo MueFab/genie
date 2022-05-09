@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "apps/genie/transcode-fastq/main.h"
 #include <iostream>
 #include <memory>
