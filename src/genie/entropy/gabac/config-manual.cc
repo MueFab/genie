@@ -285,7 +285,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SSUTU;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
                     binParams[0][0] = 4;  // splitUnitSize;
                     break;
                 default:

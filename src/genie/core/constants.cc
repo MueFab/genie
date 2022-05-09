@@ -360,7 +360,7 @@ const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescr
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &getSubsequence(GenSubIndex idx) {
-    if(getDescriptors()[uint8_t(idx.first)].tokentype) {
+    if (getDescriptors()[uint8_t(idx.first)].tokentype) {
         return getDescriptors()[uint8_t(idx.first)].subseqs[0];
     }
     return getDescriptors()[uint8_t(idx.first)].subseqs[uint8_t(idx.second)];

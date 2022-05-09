@@ -17,6 +17,18 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool StateVars::operator==(const StateVars& bin) const {
+    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
+           numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
+           codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
+           codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
+           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
+           codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
+           numCtxTotal == bin.numCtxTotal;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 StateVars::StateVars()
     : numAlphaSubsym(0),
       numSubsyms(0),

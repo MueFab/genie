@@ -70,6 +70,7 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
  * @param trnsfSubseqConf
  * @param numEncodedSymbols
  * @param bitstream
+ * @param wordsize
  * @param depSymbols
  * @return
  */

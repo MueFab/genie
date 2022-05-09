@@ -36,15 +36,12 @@ class StateVars {
  public:
     static const uint32_t MAX_LUT_SIZE = (1u << 8u);  //!< @brief
 
-    bool operator==(const StateVars& bin) const {
-        return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
-               numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
-               codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
-               codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
-               codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
-               codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
-               numCtxTotal == bin.numCtxTotal;
-    }
+    /**
+     * @brief
+     * @param bin
+     * @return
+     */
+    bool operator==(const StateVars& bin) const;
 
     /**
      * @brief
@@ -58,6 +55,7 @@ class StateVars {
      * @param cabac_binarization
      * @param subsequence_ID
      * @param alphabet_ID
+     * @param original
      */
     void populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
                   const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,

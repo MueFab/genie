@@ -13,8 +13,8 @@
 #include <cstdint>
 #include <random>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/entropy/paramcabac/transformed-subseq.h"
@@ -189,6 +189,7 @@ class ConfigSearchBinarization {
      * @brief
      * @param bypass
      * @param outputbits
+     * @param subsymsize
      * @return
      */
     paramcabac::Binarization getBinarization(bool bypass, uint8_t outputbits, uint8_t subsymsize) const;
@@ -196,6 +197,7 @@ class ConfigSearchBinarization {
     /**
      * @brief
      * @param range
+     * @param splitsize
      */
     explicit ConfigSearchBinarization(const std::pair<int64_t, int64_t>& range, uint8_t splitsize);
 
@@ -221,10 +223,10 @@ class ConfigSearchTranformedSeq {
     uint8_t output_bits;  //!< @brief
 
     SearchSpace<int8_t> split_size;  //!< @brief
-    size_t split_size_idx;    //!< @brief
+    size_t split_size_idx;           //!< @brief
 
     SearchSpace<int8_t> split_in_binarization;  //!< @brief
-    size_t split_in_binarization_idx;    //!< @brief
+    size_t split_in_binarization_idx;           //!< @brief
 
     SearchSpace<int8_t> coding_order;  //!< @brief
     size_t coding_order_search_idx;    //!< @brief
@@ -232,10 +234,15 @@ class ConfigSearchTranformedSeq {
     SearchSpace<int8_t> bypass;  //!< @brief
     size_t bypass_search_idx;    //!< @brief
 
-    bool LUTValid;                                        //!< @brief
-    SearchSpace<int8_t> subsymbol_transform_enabled;      //!< @brief
-    size_t subsymbol_transform_search_idx;                //!< @brief
+    SearchSpace<int8_t> subsymbol_transform_enabled;                                //!< @brief
+    size_t subsymbol_transform_search_idx;                                          //!< @brief
     std::vector<std::vector<std::vector<ConfigSearchBinarization>>> binarizations;  //!< @brief
+
+    /**
+     * @brief
+     * @return
+     */
+    bool lutValid() const;
 
     /**
      * @brief
@@ -249,14 +256,17 @@ class ConfigSearchTranformedSeq {
      */
     bool incrementTransform();
 
-    uint8_t getSplitRatio() {
-        return 1 << split_size.getIndex(split_size_idx);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getSplitRatio() const;
 
  public:
     /**
      * @brief
      * @param descriptor_subsequence
+     * @param original
      * @return
      */
     paramcabac::TransformedSubSeq createConfig(const genie::core::GenSubIndex& descriptor_subsequence, bool original);
@@ -288,6 +298,22 @@ struct ResultTransformed {
     size_t milliseconds{};                 //!< @brief
     size_t size{};                         //!< @brief
     paramcabac::TransformedSubSeq config;  //!< @brief
+
+    /**
+     * @brief
+     * @param filename
+     * @param transform
+     * @param parameter
+     * @param seq_id
+     * @return
+     */
+    std::string toCSV(const std::string& filename, size_t transform, size_t parameter, size_t seq_id) const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string getCSVHeader();
 };
 
 /**
@@ -302,7 +328,13 @@ struct ResultFull {
      * @brief
      * @return
      */
-    std::string toCSV(const std::string& filename);
+    std::string toCSV(const std::string& filename) const;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::string getCSVHeader();
 };
 
 /**
@@ -311,10 +343,17 @@ struct ResultFull {
  * @param gensub
  * @param data
  * @param timeweight
+ * @param original
+ * @param transformation
+ * @param transformation_param
+ * @param sequence_id
+ * @param filename
  * @return
  */
 ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const genie::core::GenSubIndex& gensub,
-                                              util::DataBlock& data, float timeweight, bool original);
+                                              util::DataBlock& data, float timeweight, bool original,
+                                              size_t transformation, size_t transformation_param, size_t sequence_id,
+                                              const std::string& filename);
 
 /**
  * @brief
@@ -380,10 +419,17 @@ class ConfigSearch {
     std::vector<ConfigSearchTransformation> params;  //!< @brief
 
  public:
+    /**
+     * @brief
+     * @return
+     */
+    uint8_t getTransform() const;
 
-    uint8_t getTransform()const {
-        return transformation.getIndex(transformation_search_idx);
-    }
+    /**
+     * @brief
+     * @return
+     */
+    uint32_t getTransformParam() const;
 
     /**
      * @brief

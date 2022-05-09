@@ -167,8 +167,8 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
-        const uint64_t symbolValue = abs(signedSymbolValue);
+        // const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
+        const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
         uint64_t subsymValToCode = 0;
 
         uint32_t oss = outputSymbolSize;
@@ -187,7 +187,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
             (writer.*func)(subsymValToCode, binParams);
         }
 
-        encodeSignflag(writer, binID, signedSymbolValue);
+        // encodeSignflag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
@@ -257,8 +257,11 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
-        const uint64_t symbolValue = abs(signedSymbolValue);
+        //    const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol,
+        //    symbols->getWordSize());
+        const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
+        UTILS_DIE_IF(origSymbol != symbolValue, "Loss of information");
+
         uint64_t subsymValToCode = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
@@ -297,7 +300,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
         }
 
-        encodeSignflag(writer, binID, signedSymbolValue);
+        // encodeSignflag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
@@ -362,8 +365,9 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
-        const uint64_t symbolValue = abs(signedSymbolValue);
+        // const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
+        const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
+        UTILS_DIE_IF(origSymbol != symbolValue, "Loss of information");
         uint64_t subsymValToCode = 0;
 
         uint32_t oss = outputSymbolSize;
@@ -392,7 +396,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
         }
 
-        encodeSignflag(writer, binID, signedSymbolValue);
+        // encodeSignflag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
