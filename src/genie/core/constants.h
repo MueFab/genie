@@ -262,23 +262,21 @@ struct CigarFormatInfo {
  */
 const CigarFormatInfo& getECigarInfo();
 
+/**
+ * @brief
+ * @param bits
+ * @return
+ */
+uint8_t bits2bytes(uint8_t bits);
+
+/**
+ * @brief
+ * @param range
+ * @return
+ */
+uint8_t range2bytes(std::pair<int64_t, int64_t> range);
+
 // ---------------------------------------------------------------------------------------------------------------------
-
-inline uint8_t bits2bytes(uint8_t bits) {
-    auto bytes = static_cast<uint8_t>(std::ceil(bits / 8.0f));
-    bytes = static_cast<uint8_t>(std::pow(2, std::ceil(log2(bytes))));
-    return bytes;
-}
-
-inline uint8_t range2bytes(std::pair<int64_t, int64_t> range) {
-    auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));
-    bits = std::max(bits, static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.second) + 1))));
-    if (range.first < 0) {
-        bits++;
-    }
-
-    return bits2bytes(bits);
-}
 
 }  // namespace core
 }  // namespace genie
