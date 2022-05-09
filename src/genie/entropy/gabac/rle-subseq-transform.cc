@@ -22,6 +22,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(transformedSubseqs != nullptr);
     const auto guard = (uint8_t)subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
+    auto wordsize = transformedSubseqs->front().getWordSize();
 
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
@@ -31,8 +32,8 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
 
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    lengths->setWordSize(4);
-    rawValues->setWordSize(4);
+    lengths->setWordSize(1);
+    rawValues->setWordSize(wordsize);
 
     util::BlockStepper r = symbols.getReader();
     uint64_t lastSym = 0;

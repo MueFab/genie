@@ -9,12 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <fstream>
+#include <iostream>
 #include <istream>
 #include <ostream>
+#include <random>
 #include <string>
 #include <vector>
 #include "genie/entropy/gabac/config-manual.h"
+#include "genie/entropy/gabac/encode-transformed-subseq.h"
+#include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data-block.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,10 +108,12 @@ struct EncodingConfiguration {
  * @brief Specifies where to read and write.
  */
 struct IOConfiguration {
-    std::istream* inputStream;      /**< @brief Where to read from */
+    std::istream* inputStream; /**< @brief Where to read from */
+    uint8_t inputWordsize;
     std::istream* dependencyStream; /**< @brief Where to read from */
     std::ostream* outputStream;     /**< @brief Where to write to */
-    size_t blocksize;               /**< @brief How many bytes to read at once. Put 0 to read all in one go */
+    uint8_t outputWordsize;
+    size_t blocksize; /**< @brief How many bytes to read at once. Put 0 to read all in one go */
 
     std::ostream* logStream; /**< @brief Where to write logging information*/
 

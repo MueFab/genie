@@ -68,7 +68,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset,
                               remainingData.getRawSize() - offset, remainingData.getWordSize());
         offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0),
-                                               (unsigned int)numSymbols, &tmp);
+                                               (unsigned int)numSymbols, &tmp, 4);
         while (ret.getSize() < mappedTypeId) {
             ret.add(core::AccessUnit::Subsequence(1, core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)ret.getSize()}));
         }
@@ -83,6 +83,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
                                                   core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
+    auto id = in.getID();
 
     if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
         in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
@@ -93,15 +94,18 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     util::DataBlock buffer = in.move();
     gabac::IBufferStream in_stream(&buffer, 0);
 
-    util::DataBlock tmp(0, 4);
+    uint8_t bytes = genie::core::range2bytes(core::getSubsequence(id).range);
+    util::DataBlock tmp(0, bytes);
     gabac::OBufferStream outbuffer(&tmp);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cerr;
     const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream,
+                                                   1,
                                                    nullptr,
                                                    &outbuffer,
+                                                   bytes,
                                                    GABAC_BLOCK_SIZE,
                                                    GABC_LOG_OUTPUT_STREAM,
                                                    gabac::IOConfiguration::LogLevel::LOG_TRACE};

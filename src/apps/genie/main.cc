@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "genie/run/main.h"
 #include <iostream>
 #include <string>
