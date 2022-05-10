@@ -5,6 +5,8 @@
  */
 
 #include "genie/core/read-encoder.h"
+#include <atomic>
+#include <fstream>
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,10 +30,25 @@ void ReadEncoder::setEntropyCoder(EntropySelector* coder) { entropycoder = coder
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a) {
+AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit&& a, bool write_raw) {
     AccessUnit au = std::move(a);
+    if (write_raw) {
+        static std::atomic<uint64_t> id(0);
+        auto this_id = id++;
+        for (const auto& d : genie::core::getDescriptors()) {
+            for (auto& s : au.get(d.id)) {
+                if (s.isEmpty()) {
+                    continue;
+                }
+                std::ofstream out_file_stream("rawstream_" + std::to_string(this_id) + "_" +
+                                              std::to_string(static_cast<uint8_t>(d.id)) + "_" +
+                                              std::to_string(static_cast<uint8_t>(s.getID().second)));
+                out_file_stream.write(static_cast<char*>(s.getData().getData()), s.getData().getRawSize());
+            }
+        }
+    }
     for (auto& d : au) {
-        auto encoded = entropycoder->process(d);
+        auto encoded = _entropycoder->process(d);
         au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
         au.set(d.getID(), std::move(std::get<1>(encoded)));
         au.getStats().add(std::get<2>(encoded));
@@ -41,7 +58,9 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* entropycoder, AccessUnit&
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit ReadEncoder::entropyCodeAU(AccessUnit&& a) { return entropyCodeAU(entropycoder, std::move(a)); }
+AccessUnit ReadEncoder::entropyCodeAU(AccessUnit&& a) {
+    return entropyCodeAU(entropycoder, std::move(a), writeOutStreams);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

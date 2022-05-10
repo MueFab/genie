@@ -40,6 +40,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
     QvSelector* qvcoder{};            //!< @brief
     NameSelector* namecoder{};        //!< @brief
     EntropySelector* entropycoder{};  //!< @brief
+    bool writeOutStreams;
 
  public:
     /**
@@ -62,11 +63,12 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
 
     /**
      * @brief
-     * @param entropycoder
+     * @param _entropycoder
      * @param a
+     * @param write_raw
      * @return
      */
-    static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a);
+    static AccessUnit entropyCodeAU(EntropySelector* _entropycoder, AccessUnit&& a, bool write_raw);
 
     /**
      * @brief
@@ -79,6 +81,12 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
      * @brief For polymorphic destruction
      */
     ~ReadEncoder() override = default;
+
+    /**
+     * @brief
+     * @param _writeOutStreams
+     */
+    explicit ReadEncoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -12,6 +12,7 @@
 #include <vector>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,10 +105,26 @@ class BinarizationParameters {
      */
     static uint8_t getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId);
 
-    bool operator==(const BinarizationParameters &bin) const {
-        return cmax == bin.cmax && cmax_teg == bin.cmax_teg && cmax_dtu == bin.cmax_dtu &&
-               split_unit_size == bin.split_unit_size;
-    }
+    /**
+     * @brief
+     * @param bin
+     * @return
+     */
+    bool operator==(const BinarizationParameters &bin) const;
+
+    /**
+     * @brief
+     * @param j
+     * @param binID
+     */
+    BinarizationParameters(nlohmann::json j, BinarizationId binID);
+
+    /**
+     * @brief
+     * @param binID
+     * @return
+     */
+    nlohmann::json toJson(BinarizationId binID) const;
 
  private:
     uint8_t cmax;             //!< @brief

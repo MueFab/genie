@@ -79,6 +79,46 @@ bool SupportValues::getShareSubsymPrvFlag() const { return share_subsym_prv_flag
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool SupportValues::operator==(const SupportValues &val) const {
+    return output_symbol_size == val.output_symbol_size && coding_subsym_size == val.coding_subsym_size &&
+           coding_order == val.coding_order && share_subsym_lut_flag == val.share_subsym_lut_flag &&
+           share_subsym_prv_flag == val.share_subsym_prv_flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SupportValues::SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubsym) {
+    share_subsym_lut_flag = false;
+    share_subsym_prv_flag = false;
+    output_symbol_size = j["output_symbol_size"];
+    coding_subsym_size = j["coding_subsym_size"];
+    coding_order = j["coding_order"];
+    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
+        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
+            share_subsym_lut_flag = j["share_subsym_lut_flag"];
+        }
+        share_subsym_prv_flag = j["share_subsym_prv_flag"];
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json SupportValues::toJson(TransformIdSubsym transformIdSubsym) const {
+    nlohmann::json ret;
+    ret["output_symbol_size"] = output_symbol_size;
+    ret["coding_subsym_size"] = coding_subsym_size;
+    ret["coding_order"] = coding_order;
+    if (coding_subsym_size < output_symbol_size && coding_order > 0) {
+        if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
+            ret["share_subsym_lut_flag"] = share_subsym_lut_flag;
+        }
+        ret["share_subsym_prv_flag"] = share_subsym_prv_flag;
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie

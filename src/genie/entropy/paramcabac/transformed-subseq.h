@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <nlohmann/json.hpp>
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/state_vars.h"
 #include "genie/entropy/paramcabac/support_values.h"
@@ -38,10 +39,11 @@ class TransformedSubSeq {
      * @param _support_values
      * @param _cabac_binarization
      * @param _subsequence_ID
+     * @param original
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID,
+                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID, bool original = true,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      * @brief
@@ -116,11 +118,19 @@ class TransformedSubSeq {
      * @param val
      * @return
      */
-    bool operator==(const TransformedSubSeq& val) const {
-        return transform_ID_subsym == val.transform_ID_subsym && support_values == val.support_values &&
-               cabac_binarization == cabac_binarization && state_vars == val.state_vars &&
-               subsequence_ID == val.subsequence_ID && alphabet_ID == val.alphabet_ID;
-    }
+    bool operator==(const TransformedSubSeq& val) const;
+
+    /**
+     * @brief
+     * @param j
+     */
+    explicit TransformedSubSeq(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJson() const;
 
  private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< @brief

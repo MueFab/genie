@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define NOMINMAX
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <string>
@@ -178,9 +180,10 @@ struct GenConst {
  * @brief
  */
 struct GenomicSubDescriptorProperties {
-    GenSubIndex id;         //!< @brief
-    std::string name;       //!< @brief
-    bool mismatchDecoding;  //!< @brief
+    GenSubIndex id;                     //!< @brief
+    std::string name;                   //!< @brief
+    bool mismatchDecoding;              //!< @brief
+    std::pair<int64_t, int64_t> range;  //!< @brief
 };
 
 /**
@@ -258,6 +261,20 @@ struct CigarFormatInfo {
  * @return
  */
 const CigarFormatInfo& getECigarInfo();
+
+/**
+ * @brief
+ * @param bits
+ * @return
+ */
+uint8_t bits2bytes(uint8_t bits);
+
+/**
+ * @brief
+ * @param range
+ * @return
+ */
+uint8_t range2bytes(std::pair<int64_t, int64_t> range);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
