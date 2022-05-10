@@ -5,6 +5,8 @@
  */
 
 #include "genie/entropy/gabac/encoder.h"
+#include <atomic>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -64,6 +66,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     core::AccessUnit::Subsequence data = std::move(in);
     size_t num_symbols = data.getNumSymbols();
     util::DataBlock buffer = data.move();
+    uint8_t inputwordsize = buffer.getWordSize();
     gabac::IBufferStream bufferInputStream(&buffer);
 
     gabac::IBufferStream *bufferDependencyStream = nullptr;
@@ -77,9 +80,14 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cerr;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {
-        &bufferInputStream, bufferDependencyStream,  &bufferOutputStream,
-        GABAC_BLOCK_SIZE,   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::LOG_TRACE};
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream,
+                                                   inputwordsize,
+                                                   bufferDependencyStream,
+                                                   &bufferOutputStream,
+                                                   1,
+                                                   GABAC_BLOCK_SIZE,
+                                                   GABAC_LOG_OUTPUT_STREAM,
+                                                   gabac::IOConfiguration::LogLevel::LOG_TRACE};
     const bool GABAC_DECODING_MODE = false;
 
     // Run
@@ -154,6 +162,10 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
     std::get<2>(ret).addDouble("time-gabac", watch.check());
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

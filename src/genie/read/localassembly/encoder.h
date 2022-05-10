@@ -83,8 +83,9 @@ class Encoder : public basecoder::EncoderStub {
     /**
      * @brief Create encoder with specified parameters
      * @param _debug If true, debug information is printed
+     * @param _write_raw
      */
-    explicit Encoder(bool _debug);
+    Encoder(bool _debug, bool _write_raw);
 
     /**
      * @brief Downgrade class N to class M and then proceed with encoding

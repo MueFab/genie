@@ -36,17 +36,20 @@ namespace module {
 
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
                                                            size_t blocksize,
-                                                           core::ClassifierRegroup::RefMode externalref, bool rawref) {
+                                                           core::ClassifierRegroup::RefMode externalref, bool rawref,
+                                                           bool writeRawStreams) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
     ret->setClassifier(
         genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
-    ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
+    ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>(writeRawStreams));
+    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false, writeRawStreams));
+    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(writeRawStreams));
+    ret->addReadCoder(
+        genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false, writeRawStreams));
+    ret->addReadCoder(
+        genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().empty()) {
             return 2;
@@ -75,7 +78,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Encoder>());
     ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
-    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Encoder>());
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Encoder>(writeRawStreams));
     ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });

@@ -24,7 +24,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
                           std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
-
+    uint8_t wordsize = transformedSubseqs->front().getWordSize();
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
     symbols.swap(&(*transformedSubseqs)[0]);
@@ -34,9 +34,9 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
     util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
-    pointers->setWordSize(4);
-    lengths->setWordSize(4);
-    rawValues->setWordSize(4);
+    pointers->setWordSize(core::range2bytes({0, matchBufferSize}));
+    lengths->setWordSize(core::range2bytes({0, matchBufferSize}));
+    rawValues->setWordSize(wordsize);
 
     const uint64_t symbolsSize = symbols.size();
 
@@ -55,7 +55,8 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while ((offset < symbolsSize) && (symbols.get(offset) == (symbols.get(w + offset - i)))) {
+            while ((offset < symbolsSize) &&
+                   (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i) < matchBufferSize)) {
                 offset++;
             }
             offset -= i;

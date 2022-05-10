@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "apps/genie/run/main.h"
 #include <iostream>
 #include <memory>
@@ -169,7 +170,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         mode = genie::core::ClassifierRegroup::RefMode::FULL;
     }
     auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
-                                                   pOpts.rawReference);
+                                                   pOpts.rawReference, pOpts.rawStreams);
     if (file_extension(pOpts.inputFile) == "fasta") {
         addFasta(pOpts.inputFile, flow.get(), inputFiles);
     } else if (!pOpts.inputRefFile.empty()) {
@@ -193,8 +194,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
     }
     if (pOpts.lowLatency) {
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 3);
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 4);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 3);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 4);
     }
     return flow;
 }

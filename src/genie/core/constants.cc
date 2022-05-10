@@ -6,7 +6,9 @@
 
 #include "genie/core/constants.h"
 #include <algorithm>
+#include <limits>
 #include <utility>
+#include "genie/core/record/class-type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +83,33 @@ const GenSubIndex GenSub::RFTP = std::make_pair(GenDesc::RFTP, (uint16_t)0);
 
 const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, (uint16_t)0);
 
+constexpr uint8_t GenConst::MMPOS_PERSIST;
+constexpr uint8_t GenConst::MMPOS_TERMINATE;
+constexpr uint8_t GenConst::FLAGS_PCR_DUPLICATE_POS;
+constexpr uint8_t GenConst::FLAGS_PCR_DUPLICATE_MASK;
+constexpr uint8_t GenConst::FLAGS_QUALITY_FAIL_POS;
+constexpr uint8_t GenConst::FLAGS_QUALITY_FAIL_MASK;
+constexpr uint8_t GenConst::FLAGS_PROPER_PAIR_POS;
+constexpr uint8_t GenConst::FLAGS_PROPER_PAIR_MASK;
+constexpr uint8_t GenConst::MMTYPE_SUBSTITUTION;
+constexpr uint8_t GenConst::MMTYPE_INSERTION;
+constexpr uint8_t GenConst::MMTYPE_DELETION;
+constexpr uint8_t GenConst::CLIPS_RECORD_END;
+constexpr uint8_t GenConst::PAIR_SAME_RECORD;
+constexpr uint8_t GenConst::PAIR_R1_SPLIT;
+constexpr uint8_t GenConst::PAIR_R2_SPLIT;
+constexpr uint8_t GenConst::PAIR_R1_DIFF_REF;
+constexpr uint8_t GenConst::PAIR_R2_DIFF_REF;
+constexpr uint8_t GenConst::PAIR_R1_UNPAIRED;
+constexpr uint8_t GenConst::PAIR_R2_UNPAIRED;
+constexpr uint8_t GenConst::RTYPE_REFERENCE;
+constexpr uint8_t GenConst::RTYPE_CLASS_P;
+constexpr uint8_t GenConst::RTYPE_CLASS_N;
+constexpr uint8_t GenConst::RTYPE_CLASS_M;
+constexpr uint8_t GenConst::RTYPE_CLASS_I;
+constexpr uint8_t GenConst::RTYPE_CLASS_U;
+constexpr uint8_t GenConst::RTYPE_CLASS_HM;
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string &getMPEGVersionString(MPEGMinorVersion v) {
@@ -107,94 +136,245 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
         {GenDesc::POS,
          "pos",
          false,
-         {{GenSub::POS_MAPPING_FIRST, "first", false}, {GenSub::POS_MAPPING_ADDITIONAL, "additional", false}}},
+         {{GenSub::POS_MAPPING_FIRST,
+           "first",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::POS_MAPPING_ADDITIONAL,
+           "additional",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::RCOMP, "rcomp", false, {{GenSub::RCOMP, "rcomp", false}}},
+        {GenDesc::RCOMP,
+         "rcomp",
+         false,
+         {{GenSub::RCOMP, "rcomp", false, {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}}}},
 
         {GenDesc::FLAGS,
          "flags",
          false,
-         {{GenSub::FLAGS_PCR_DUPLICATE, "pcr_duplicate", false},
-          {GenSub::FLAGS_QUALITY_FAIL, "quality_flag", false},
-          {GenSub::FLAGS_PROPER_PAIR, "proper_pair", false}}},
+         {{GenSub::FLAGS_PCR_DUPLICATE,
+           "pcr_duplicate",
+           false,
+           {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
+          {GenSub::FLAGS_QUALITY_FAIL,
+           "quality_flag",
+           false,
+           {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
+          {GenSub::FLAGS_PROPER_PAIR,
+           "proper_pair",
+           false,
+           {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}}}},
 
         {GenDesc::MMPOS,
          "mmpos",
          false,
-         {{GenSub::MMPOS_TERMINATOR, "terminator", false}, {GenSub::MMPOS_POSITION, "position", false}}},
+         {{GenSub::MMPOS_TERMINATOR,
+           "terminator",
+           false,
+           {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
+          {GenSub::MMPOS_POSITION,
+           "position",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
         {GenDesc::MMTYPE,
          "mmtype",
          false,
-         {{GenSub::MMTYPE_TYPE, "type", false},
-          {GenSub::MMTYPE_SUBSTITUTION, "substitution", true},
-          {GenSub::MMTYPE_INSERTION, "insertion", false}}},
+         {{GenSub::MMTYPE_TYPE, "type", false, {std::numeric_limits<uint8_t>::min(), GenConst::MMTYPE_DELETION}},
+          {GenSub::MMTYPE_SUBSTITUTION,
+           "substitution",
+           true,
+           {0, getAlphabetProperties(AlphabetID::ACGTN).lut.size() - 1}},
+          {GenSub::MMTYPE_INSERTION,
+           "insertion",
+           false,
+           {0, getAlphabetProperties(AlphabetID::ACGTN).lut.size() - 1}}}},
 
         {GenDesc::CLIPS,
          "clips",
          false,
-         {{GenSub::CLIPS_RECORD_ID, "record_id", false},
-          {GenSub::CLIPS_TYPE, "type", false},
-          {GenSub::CLIPS_SOFT_STRING, "soft_string", false},
-          {GenSub::CLIPS_HARD_LENGTH, "hard_length", false}}},
+         {{GenSub::CLIPS_RECORD_ID,
+           "record_id",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::CLIPS_TYPE, "type", false, {std::numeric_limits<uint8_t>::min(), GenConst::CLIPS_RECORD_END}},
+          {GenSub::CLIPS_SOFT_STRING,
+           "soft_string",
+           false,
+           {std::numeric_limits<uint8_t>::min(), getAlphabetProperties(AlphabetID::ACGTN).lut.size()}},
+          {GenSub::CLIPS_HARD_LENGTH,
+           "hard_length",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::UREADS, "ureads", false, {{GenSub::UREADS, "ureads", false}}},
+        {GenDesc::UREADS,
+         "ureads",
+         false,
+         {{GenSub::UREADS,
+           "ureads",
+           false,
+           {std::numeric_limits<uint8_t>::min(), getAlphabetProperties(AlphabetID::ACGTN).lut.size() - 1}}}},
 
-        {GenDesc::RLEN, "rlen", false, {{GenSub::RLEN, "rlen", false}}},
+        {GenDesc::RLEN,
+         "rlen",
+         false,
+         {{GenSub::RLEN, "rlen", false, {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
         {GenDesc::PAIR,
          "pair",
          false,
-         {{GenSub::PAIR_DECODING_CASE, "decoding_case", false},
-          {GenSub::PAIR_SAME_REC, "same_rec", false},
-          {GenSub::PAIR_R1_SPLIT, "r1_split", false},
-          {GenSub::PAIR_R2_SPLIT, "r2_split", false},
-          {GenSub::PAIR_R1_DIFF_SEQ, "r1_diff_seq", false},
-          {GenSub::PAIR_R2_DIFF_SEQ, "r2_diff_seq", false},
-          {GenSub::PAIR_R1_DIFF_POS, "r1_diff_pos", false},
-          {GenSub::PAIR_R2_DIFF_POS, "r2_diff_pos", false}}},
+         {{GenSub::PAIR_DECODING_CASE,
+           "decoding_case",
+           false,
+           {std::numeric_limits<uint8_t>::min(), GenConst::PAIR_R2_UNPAIRED}},
+          {GenSub::PAIR_SAME_REC,
+           "same_rec",
+           false,
+           {std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()}},
+          {GenSub::PAIR_R1_SPLIT,
+           "r1_split",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::PAIR_R2_SPLIT,
+           "r2_split",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::PAIR_R1_DIFF_SEQ,
+           "r1_diff_seq",
+           false,
+           {std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()}},
+          {GenSub::PAIR_R2_DIFF_SEQ,
+           "r2_diff_seq",
+           false,
+           {std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()}},
+          {GenSub::PAIR_R1_DIFF_POS,
+           "r1_diff_pos",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::PAIR_R2_DIFF_POS,
+           "r2_diff_pos",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::MSCORE, "mscore", false, {{GenSub::MSCORE, "mscore", false}}},
+        {GenDesc::MSCORE,
+         "mscore",
+         false,
+         {{GenSub::MSCORE,
+           "mscore",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}}}},
 
         {GenDesc::MMAP,
          "mmap",
          false,
-         {{GenSub::MMAP_NUMBER_ALIGN, "number_alignments", false},
-          {GenSub::MMAP_RIGHT_ALIGN_ID, "right_alignment_id", false},
-          {GenSub::MMAP_OTHER_REC_FLAG, "other_rec_flag", false},
-          {GenSub::MMAP_REF_SEQ, "reference_seq", false},
-          {GenSub::MMAP_REF_POS, "reference_pos", false}}},
+         {{GenSub::MMAP_NUMBER_ALIGN,
+           "number_alignments",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::MMAP_RIGHT_ALIGN_ID,
+           "right_alignment_id",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::MMAP_OTHER_REC_FLAG,
+           "other_rec_flag",
+           false,
+           {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
+          {GenSub::MMAP_REF_SEQ,
+           "reference_seq",
+           false,
+           {std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max()}},
+          {GenSub::MMAP_REF_POS,
+           "reference_pos",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
         {GenDesc::MSAR,
          "msar",
          true,
-         {{GenSub::MSAR_CABAC_0, "cabac_0", false}, {GenSub::MSAR_CABAC_1, "cabac_1", false}}},
+         {{GenSub::MSAR_CABAC_0,
+           "cabac_0",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::MSAR_CABAC_1,
+           "cabac_1",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::RTYPE, "rtype", false, {{GenSub::RTYPE, "rtype", false}}},
+        {GenDesc::RTYPE,
+         "rtype",
+         false,
+         {{GenSub::RTYPE,
+           "rtype",
+           false,
+           {std::numeric_limits<uint8_t>::min(), static_cast<uint8_t>(genie::core::record::ClassType::COUNT)}}}},
 
-        {GenDesc::RGROUP, "rgroup", false, {{GenSub::RGROUP, "rgroup", false}}},
+        {GenDesc::RGROUP,
+         "rgroup",
+         false,
+         {{GenSub::RGROUP,
+           "rgroup",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}}}},
 
         {GenDesc::QV,
          "qv",
          false,
-         {{GenSub::QV_PRESENT, "present", false},
-          {GenSub::QV_CODEBOOK, "codebook", false},
-          {GenSub::QV_STEPS_0, "steps_0", false},
-          {GenSub::QV_STEPS_1, "steps_1", false},
-          {GenSub::QV_STEPS_2, "steps_2", false},
-          {GenSub::QV_STEPS_3, "steps_3", false},
-          {GenSub::QV_STEPS_4, "steps_4", false},
-          {GenSub::QV_STEPS_5, "steps_5", false},
-          {GenSub::QV_STEPS_6, "steps_6", false}}},
+         {{GenSub::QV_PRESENT, "present", false, {std::numeric_limits<bool>::min(), std::numeric_limits<bool>::max()}},
+          {GenSub::QV_CODEBOOK, "codebook", false, {std::numeric_limits<uint8_t>::min(), 4}},
+          {GenSub::QV_STEPS_0,
+           "steps_0",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_1,
+           "steps_1",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_2,
+           "steps_2",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_3,
+           "steps_3",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_4,
+           "steps_4",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_5,
+           "steps_5",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}},
+          {GenSub::QV_STEPS_6,
+           "steps_6",
+           false,
+           {std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}}}},
 
         {GenDesc::RNAME,
          "rname",
          true,
-         {{GenSub::RNAME_CABAC_0, "cabac0", false}, {GenSub::RNAME_CABAC_1, "cabac1", false}}},
+         {{GenSub::RNAME_CABAC_0,
+           "cabac0",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}},
+          {GenSub::RNAME_CABAC_1,
+           "cabac1",
+           false,
+           {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp", false}}},
+        {GenDesc::RFTP,
+         "rftp",
+         false,
+         {{GenSub::RFTP, "rftp", false, {std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()}}}},
 
-        {GenDesc::RFTT, "rftt", false, {{GenSub::RFTP, "rftt", true}}},
+        {GenDesc::RFTT,
+         "rftt",
+         false,
+         {{GenSub::RFTP,
+           "rftt",
+           true,
+           {std::numeric_limits<uint8_t>::min(), getAlphabetProperties(AlphabetID::ACGTN).lut.size() - 1}}}},
     };
 
     return prop;
@@ -207,6 +387,9 @@ const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescr
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &getSubsequence(GenSubIndex idx) {
+    if (getDescriptors()[uint8_t(idx.first)].tokentype) {
+        return getDescriptors()[uint8_t(idx.first)].subseqs[0];
+    }
     return getDescriptors()[uint8_t(idx.first)].subseqs[uint8_t(idx.second)];
 }
 
@@ -286,6 +469,25 @@ const CigarFormatInfo &getECigarInfo() {
         return {ref_step2, seq_step2, ignore2, true};
     }();
     return formatInfo;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t bits2bytes(uint8_t bits) {
+    auto bytes = static_cast<uint8_t>(std::ceil(bits / 8.0f));
+    bytes = static_cast<uint8_t>(std::pow(2, std::ceil(log2(bytes))));
+    return bytes;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t range2bytes(std::pair<int64_t, int64_t> range) {
+    auto bits = static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));
+    bits = std::max(bits, static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.second) + 1))));
+    if (range.first < 0) {
+        bits++;
+    }
+    return bits2bytes(bits);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
