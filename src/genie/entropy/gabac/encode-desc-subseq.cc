@@ -28,8 +28,8 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
-                                          std::vector<util::DataBlock> *const transformedSubseqs) {
+void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+                            std::vector<util::DataBlock> *const transformedSubseqs) {
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
@@ -57,8 +57,8 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
 uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
-    util::DataBlock subsequence(0, 4);
-    util::DataBlock dependency(0, 4);
+    util::DataBlock subsequence(0, conf.inputWordsize);
+    util::DataBlock dependency(0, conf.inputWordsize);
 
     size_t numDescSubseqSymbols = 0;
     size_t subseqPayloadSize = 0;

@@ -17,6 +17,18 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool StateVars::operator==(const StateVars& bin) const {
+    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
+           numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
+           codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
+           codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
+           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
+           codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
+           numCtxTotal == bin.numCtxTotal;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 StateVars::StateVars()
     : numAlphaSubsym(0),
       numSubsyms(0),
@@ -72,7 +84,7 @@ uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
 
 void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
                          const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                         const core::AlphabetID alphabet_ID) {
+                         const core::AlphabetID alphabet_ID, bool original) {
     const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
     const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
     const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();
@@ -82,6 +94,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     const uint8_t codingOrder = support_values.getCodingOrder();
     const bool shareSubSymCtxFlag = cabacContextParams.getShareSubsymCtxFlag();
     const uint16_t numContexts = cabacContextParams.getNumContexts();
+    numAlphaSubsym = 0;
 
     // numSubsyms
     if (codingSubsymSize > 0) {
@@ -96,7 +109,9 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
 
     // numAlphaSubsym
     // Check for special cases for numAlphaSubsym
-    numAlphaSubsym = StateVars::getNumAlphaSpecial(subsequence_ID, alphabet_ID);
+    if (original) {
+        numAlphaSubsym = StateVars::getNumAlphaSpecial(subsequence_ID, alphabet_ID);
+    }
 
     if (numAlphaSubsym == 0) {  // 0 == not special
         numAlphaSubsym = StateVars::get2PowN(codingSubsymSize);
@@ -189,10 +204,15 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
             numCtxTotal = numContexts;
         } else {
             numCtxTotal = numCtxLuts;
-            numCtxTotal += (shareSubSymCtxFlag)
-                               ? 1
-                               : numSubsyms * ((codingOrder == 0) ? numCtxSubsym
-                                                                  : codingOrderCtxOffset[codingOrder] * numAlphaSubsym);
+            uint32_t context_count = 1;
+            if (!shareSubSymCtxFlag) {
+                context_count = numSubsyms;
+            }
+            uint32_t context_size = numCtxSubsym;
+            if (codingOrder > 0) {
+                context_size = static_cast<uint32_t>(codingOrderCtxOffset[codingOrder] * numAlphaSubsym);
+            }
+            numCtxTotal += context_count * context_size;
         }
     }  // if (!cabac_binarization.getBypassFlag())
 }

@@ -34,6 +34,7 @@ class ProgramOptions {
     ~ProgramOptions() = default;
 
  public:
+    bool fastBenchmark;              //!< @brief
     std::string logLevel;            //!< @brief
     std::string inputFilePath;       //!< @brief
     std::string dependencyFilePath;  //!< @brief
