@@ -83,7 +83,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             } else {
                 payload_size = remainingData.getRawSize() - offset;
             }
-            uint32_t numTransformedSymbols = numSymbols;
+            auto numTransformedSymbols = static_cast<uint32_t>(numSymbols);
             if (payload_size > 0) {
                 if (conf0.getSubseqConfig().getNumTransformSubseqCfgs() > 1) {
                     util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
@@ -98,7 +98,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
                                        remainingData.getWordSize());
             offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(j),
-                                                   (unsigned int)numTransformedSymbols, &tmp, 4);
+                                                   static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
 
             transformedSeqs.emplace_back(std::move(tmp));
         }
