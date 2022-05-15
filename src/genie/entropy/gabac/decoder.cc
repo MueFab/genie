@@ -97,8 +97,9 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             }
             auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
                                        remainingData.getWordSize());
-            offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(j),
-                                                   static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
+            offset +=
+                gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
+                                             static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
 
             transformedSeqs.emplace_back(std::move(tmp));
         }
