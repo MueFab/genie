@@ -49,7 +49,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
 
     paramcabac::TransformedParameters::TransformIdSubseq trnsfSubseqID =
         paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
-    uint16_t trnsfSubseqParam = 0;
+    uint16_t trnsfSubseqParam = 255;
     std::vector<uint8_t> mergeCodingShiftSizes(MAX_NUM_TRANSPORT_SEQS, 0);
     bool tokenTypeFlag = false;
 
@@ -74,11 +74,17 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::POS:
             switch (subseqID) {
                 case 0:  // POS for first alignment
-                    outputSymbolSize[0] = 32;
-                    codingSubSymSize[0] = 32;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING;
+                    codingOrder[0] = 2;
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
-                    binParams[0][0] = 4;  // splitUnitSize;
+                    codingOrder[1] = 0;
+                    outputSymbolSize[1] = 32;
+                    codingSubSymSize[1] = 32;
+                    binID[1] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
+                    binParams[1][0] = 4;
                     break;
                 case 1:  // POS for other alignments
                     outputSymbolSize[0] = 32;
@@ -94,14 +100,12 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::RCOMP:
             switch (subseqID) {
                 case 0:
-                    outputSymbolSize[0] = 2;
-                    codingSubSymSize[0] = 2;
-                    codingOrder[0] = 1;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
+                    codingOrder[0] = 2;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
-
-                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
                     break;
                 default:
                     found = false;
@@ -125,6 +129,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::MMPOS:
             switch (subseqID) {
                 case 0:  // mmposFlag
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 1;
                     codingSubSymSize[0] = 1;
                     codingOrder[0] = 2;
@@ -132,14 +137,23 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
                     break;
                 case 1:  // mmposPos
-                    outputSymbolSize[0] = 16;
-                    codingSubSymSize[0] = 4;
-                    codingOrder[0] = 1;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING;
+                    outputSymbolSize[0] = 8;
+                    codingSubSymSize[0] = 8;
+                    codingOrder[0] = 0;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::EG;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    outputSymbolSize[1] = 8;
+                    codingSubSymSize[1] = 8;
+                    codingOrder[1] = 1;
+                    binID[1] = paramcabac::BinarizationParameters::BinarizationId::TU;
+                    binParams[1][0] = 255;  // cmax;
+                    trnsfSubsymID[1] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
 
-                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+                    outputSymbolSize[2] = 16;
+                    codingSubSymSize[2] = 16;
+                    codingOrder[2] = 0;
+                    binID[2] = paramcabac::BinarizationParameters::BinarizationId::EG;
                     break;
                 default:
                     found = false;
@@ -148,23 +162,25 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::MMTYPE:
             switch (subseqID) {
                 case 0:  // mmtype
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 2;
                     codingSubSymSize[0] = 2;
                     codingOrder[0] = 1;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 2;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
                 case 1:  // mmtypeSbs
                 case 2:  // mmtypeIndels
-                    outputSymbolSize[0] = symSize;
-                    codingSubSymSize[0] = symSize;
-                    codingOrder[0] = subseqID;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
+                    outputSymbolSize[0] = 3;
+                    codingSubSymSize[0] = 3;
+                    codingOrder[0] = 1;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 4;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
@@ -209,12 +225,13 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::UREADS:
             switch (subseqID) {
                 case 0:
-                    outputSymbolSize[0] = symSize;
-                    codingSubSymSize[0] = symSize;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
+                    outputSymbolSize[0] = 3;
+                    codingSubSymSize[0] = 3;
                     codingOrder[0] = 2;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 4;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
@@ -225,11 +242,19 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::RLEN:
             switch (subseqID) {
                 case 0:
-                    outputSymbolSize[0] = 32;
-                    codingSubSymSize[0] = 32;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING;
+                    codingOrder[0] = 1;
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
+                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
+                    binParams[0][0] = 1;  // splitUnitSize;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
-                    binParams[0][0] = 4;  // splitUnitSize;
+                    codingOrder[1] = 0;
+                    outputSymbolSize[1] = 32;
+                    codingSubSymSize[1] = 32;
+                    binID[1] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
+                    binParams[1][0] = 4;  // splitUnitSize;
                     break;
                 default:
                     found = false;
@@ -238,29 +263,44 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::PAIR:
             switch (subseqID) {
                 case 0:  // pairType
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 3;
                     codingSubSymSize[0] = 3;
-                    codingOrder[0] = 1;
+                    codingOrder[0] = 2;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 6;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
                 case 1:  // pairReadDistance
-                    outputSymbolSize[0] = 16;
-                    codingSubSymSize[0] = 4;
-                    codingOrder[0] = 1;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING;
+                    outputSymbolSize[0] = 8;
+                    codingSubSymSize[0] = 8;
+                    codingOrder[0] = 0;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 255;  // cmax;
 
-                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+                    outputSymbolSize[1] = 16;
+                    codingSubSymSize[1] = 16;
+                    codingOrder[1] = 0;
+
+                    binID[1] = paramcabac::BinarizationParameters::BinarizationId::BI;
+
                     break;
                 case 2:
                 case 3:
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
+
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
+                    binParams[0][0] = 4;  // splitUnitSize;
+                    break;
                 case 6:
                 case 7:  // pairAbsPos
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
 
@@ -269,11 +309,19 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     break;
                 case 4:
                 case 5:  // pairSeqID
-                    outputSymbolSize[0] = 16;
-                    codingSubSymSize[0] = 16;
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING;
+                    outputSymbolSize[0] = 8;
+                    codingSubSymSize[0] = 8;
+                    codingOrder[0] = 1;
+                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
+                    binParams[0][0] = 255;  // splitUnitSize;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
-                    binParams[0][0] = 4;  // splitUnitSize;
+                    outputSymbolSize[1] = 16;
+                    codingSubSymSize[1] = 16;
+                    codingOrder[1] = 0;
+                  //  trnsfSubsymID[1] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+                    binID[1] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
+                    binParams[1][0] = 4;  // splitUnitSize;
                     break;
                 default:
                     found = false;
@@ -335,38 +383,39 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case core::GenDesc::MSAR:
         case core::GenDesc::RNAME:
             tokenTypeFlag = true;
-            switch (subseqID) {
-                case 0:  // CABAC_METHOD_0
-                    outputSymbolSize[0] = 8;
-                    codingSubSymSize[0] = 8;
+            trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING;
+            outputSymbolSize[0] = 8;
+            codingSubSymSize[0] = 8;
+            codingOrder[0] = 0;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::SUTU;
-                    binParams[0][0] = 4;  // splitUnitSize;
-                    break;
-                case 1:  // CABAC_METHOD_1
-                    outputSymbolSize[0] = 8;
-                    codingSubSymSize[0] = 4;
-                    codingOrder[0] = 1;
-                    shareSubsymLutFlag[0] = false;
+            binID[0] = paramcabac::BinarizationParameters::BinarizationId::BI;
 
-                    binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
 
-                    trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
-                    break;
-                default:
-                    found = false;
-            }
+            outputSymbolSize[1] = 8;
+            codingSubSymSize[1] = 8;
+            codingOrder[1] = 0;
+
+            binID[1] = paramcabac::BinarizationParameters::BinarizationId::TU;
+            binParams[1][0] = 255;  // splitUnitSize;
+
+
+            outputSymbolSize[2] = 32;
+            codingSubSymSize[2] = 32;
+            codingOrder[2] = 0;
+
+            binID[2] = paramcabac::BinarizationParameters::BinarizationId::EG;
+
             break;
         case core::GenDesc::RTYPE:
             switch (subseqID) {
                 case 0:
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 3;
                     codingSubSymSize[0] = 3;
                     codingOrder[0] = 2;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 6;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
@@ -400,12 +449,13 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
                 default:  // subSequenceID >= 2
+                    trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 7;
                     codingSubSymSize[0] = 7;
-                    codingOrder[0] = 2;
+                    codingOrder[0] = 1;
 
                     binID[0] = paramcabac::BinarizationParameters::BinarizationId::TU;
-                    binParams[0][0] = getCmaxTU(numAlphaSpecial, codingSubSymSize[0]);  // cmax;
+                    binParams[0][0] = 127;  // cmax;
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     found = false;
