@@ -54,6 +54,8 @@ void Config::processCommandLine(int argc, char *argv[]) {
     app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
     no_ref = false;
     app.add_flag("--no_ref", no_ref, "Don't use a reference.\n");
+    clean = false;
+    app.add_flag("-c,--clean_records", clean, "Remove unsupported reads.\n");
     num_threads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", num_threads, "Number of threads to use.\n");
     fasta_file_path = "";
@@ -240,7 +242,7 @@ void Config::validate() {
                  "You did not pass a reference file. "
                  "Reference based compression might not work and record classes N and P can't be detected. "
                  "Are you sure? If yes, pass '--no_ref'.");
-    if (no_ref || outputFile.substr(outputFile.size() - 4) == ".sam") {
+    if (no_ref) {
         fasta_file_path = "";
     } else {
         validateReference(fasta_file_path);

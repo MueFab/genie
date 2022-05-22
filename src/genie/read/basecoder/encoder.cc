@@ -8,6 +8,7 @@
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/record/alignment-box.h"
@@ -106,7 +107,7 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
-    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(first1);  // FIRST1 is encoded in least significant bit
+    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(!first1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
 
@@ -147,7 +148,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
             const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
             auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
             if (rec.isRead1First()) {
-                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
                     container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
@@ -156,7 +157,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
                     container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
                 }
             } else {
-                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
                     container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());

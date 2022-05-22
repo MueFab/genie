@@ -100,7 +100,7 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
         if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
             meta.num_segments = 2;
             const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
-            meta.first1 = SAME_REC_DATA & 1u;
+            meta.first1 = !(SAME_REC_DATA & 1u);
             const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
             meta.position[1] = meta.position[0] + DELTA;
         }
