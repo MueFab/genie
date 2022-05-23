@@ -9,7 +9,7 @@
 class MatchCodingTest : public ::testing::Test {
  protected:
     const unsigned int largeTestSize = 1 * 10 * 1024;
-    std::vector<int> windowSizes = {1024};  // minimum value: 0,
+    std::vector<uint16_t> windowSizes = {1024};  // minimum value: 0,
     // which should not perform a search, maximum reasonable value: 32768
 
     genie::util::DataBlock symbols;
@@ -44,7 +44,7 @@ class MatchCodingTest : public ::testing::Test {
 };
 
 TEST_F(MatchCodingTest, voidInput) {
-    for (const int& windowSizeIt : windowSizes) {
+    for (auto& windowSizeIt : windowSizes) {
         auto cfg = createConfig(windowSizeIt);
         transformSubset = {rawValues};
 
