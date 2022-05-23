@@ -71,7 +71,7 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     lengths = {};
     expectedRawValues = {uint64_t(-1), 2, uint64_t(-3), 4, 4, uint64_t(-3), 2, uint64_t(-1)};
 
-    auto cfg = createConfig(1);  // TODO: ask about 0
+    auto cfg = createConfig(0);  // TODO: ask about 0
     transformSubset = {rawValues};
 
     EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(cfg, &transformSubset));
@@ -87,7 +87,6 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     // reset
     SetUp();
     // windowSize == 4
-    int windowSize = 4;
     rawValues = {uint64_t(-1), 2, uint64_t(-3), 4, 2, uint64_t(-3), 4, uint64_t(-1)};
     pointers = {};
     lengths = {};
@@ -99,7 +98,7 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     expectedLengths = {0, 0, 0, 0, 3, 0};
     expectedRawValues = {uint64_t(-1), 2, uint64_t(-3), 4, uint64_t(-1)};
 
-    cfg = createConfig(windowSize);
+    cfg = createConfig(4);
     transformSubset = {rawValues};
 
     EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(cfg, &transformSubset));
