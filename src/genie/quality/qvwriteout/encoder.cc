@@ -82,7 +82,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     setUpParameters(rec, *param, desc);
 
     for (const auto& r : rec.getData()) {
-        auto& s_first = !r.isRead1First() && r.getSegments().size() == 2 ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_first = r.getSegments()[0];
 
         if (r.getAlignments().empty()) {
             encodeUnalignedSegment(s_first, desc);
@@ -94,7 +94,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
             continue;
         }
 
-        auto& s_second = r.isRead1First() ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_second = r.getSegments()[1];
 
         if (r.getClassID() == core::record::ClassType::CLASS_HM || r.getClassID() == core::record::ClassType::CLASS_U) {
             encodeUnalignedSegment(s_second, desc);
