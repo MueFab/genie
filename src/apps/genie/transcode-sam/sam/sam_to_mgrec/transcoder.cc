@@ -86,13 +86,13 @@ std::vector<genie::core::record::Record> splitRecord(genie::core::record::Record
                              std::string(input.getName()), std::string(input.getGroup()), input.getFlags(),
                              input.isRead1First());
             ret.back().setQVDepth(1);
-            ret.back().getSegments().emplace_back(input.getSegments()[input.isRead1First() ? 0 : 1]);
+            ret.back().getSegments().emplace_back(input.getSegments()[0]);
 
             ret.emplace_back(input.getNumberOfTemplateSegments(), genie::core::record::ClassType::CLASS_U,
                              std::string(input.getName()), std::string(input.getGroup()), input.getFlags(),
                              !input.isRead1First());
             ret.back().setQVDepth(1);
-            ret.back().getSegments().emplace_back(input.getSegments()[input.isRead1First() ? 1 : 0]);
+            ret.back().getSegments().emplace_back(input.getSegments()[1]);
         } break;
         case genie::core::record::ClassType::CLASS_U:
             ret.emplace_back(input.getNumberOfTemplateSegments(), genie::core::record::ClassType::CLASS_U,
@@ -128,14 +128,14 @@ std::vector<genie::core::record::Record> splitRecord(genie::core::record::Record
                 box.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
             ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(),
-                                    genie::core::record::AlignmentBox(input.isRead1First() ? box : box2));
+                                    genie::core::record::AlignmentBox(box));
 
             ret.emplace_back(input.getNumberOfTemplateSegments(), input.getClassID(), std::string(input.getName()),
                              std::string(input.getGroup()), input.getFlags(), !input.isRead1First());
             ret.back().setQVDepth(1);
             ret.back().getSegments().emplace_back(input.getSegments()[1]);
             ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(),
-                                    genie::core::record::AlignmentBox(input.isRead1First() ? box2 : box));
+                                    genie::core::record::AlignmentBox(box2));
     }
     return ret;
 }
@@ -477,7 +477,7 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                                  pos + r.getMappedLength(alignment_ctr, 0))
                           .getString(pos, pos + r.getMappedLength(alignment_ctr, 0));
         auto cigar = a.getAlignment().getECigar();
-        auto seq = r.getSegments()[r.getSegments().size() == 2 ? !r.isRead1First() : 0].getSequence();
+        auto seq = r.getSegments()[0].getSequence();
 
         if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
             return false;
@@ -510,7 +510,7 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                                              pos + r.getMappedLength(alignment_ctr, 1));
                 refSeq = ex.getString(pos, pos + r.getMappedLength(alignment_ctr, 1));
                 cigar = split.getAlignment().getECigar();
-                seq = r.getSegments()[r.isRead1First()].getSequence();
+                seq = r.getSegments()[1].getSequence();
 
                 if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
                     return false;
@@ -754,17 +754,17 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
     // This read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
         ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-         ((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())))) {
+         (s == 1))) {
         flags |= 0x4;
     }
     // Paired read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
         ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-         ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First())))) {
+         (s == 0))) {
         flags |= 0x8;
     }
     // First or second read?
-    if ((s == 0 && record.getSegments().size() == 2) || (record.getSegments().size() == 1 && record.isRead1First())) {
+    if ((record.isRead1First() && s == 0) || (!record.isRead1First() && s == 1)) {
         flags |= 0x40;
     } else {
         flags |= 0x80;
@@ -790,7 +790,7 @@ void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Re
     // This read is mapped, process mapping
     rname = refinfo.isValid() ? refinfo.getMgr()->ID2Ref(record.getAlignmentSharedData().getSeqID())
                               : std::to_string(record.getAlignmentSharedData().getSeqID());
-    if ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First()) || record.getSegments().size() == 1) {
+    if (s == 0) {
         // First segment is in primary alignment
         pos = std::to_string(record.getAlignments()[a].getPosition() + 1);
         tlen -= record.getAlignments()[a].getPosition() + 1;
@@ -825,7 +825,7 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
     auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
                           ? genie::core::record::AlignmentSplit::Type::UNPAIRED
                           : record.getAlignments()[0].getAlignmentSplits().front()->getType();
-    if ((((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())) &&
+    if ((s == 1 &&
          split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
         (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
         // Paired read is first read
@@ -896,6 +896,7 @@ void transcode_mpg2sam(Config& options) {
         for (size_t s = 0; s < record.getSegments().size(); ++s) {
             for (size_t a = 0; a < std::max(record.getAlignments().size(), size_t(1)); ++a) {
                 std::string sam_record = record.getName() + "\t";
+
                 uint16_t flags = computeSAMFlags(s, a, record);
                 bool mapped = !(flags & 0x4);
                 bool other_mapped = !(flags & 0x8);

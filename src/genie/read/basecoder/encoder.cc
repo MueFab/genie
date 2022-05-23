@@ -44,8 +44,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     // TODO(Fabian): Splices
     const auto &ALIGNMENT =
         rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
-    const auto &RECORD = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1]
-                                                                              : rec.getSegments()[0];  // First segment
+    const auto &RECORD = rec.getSegments()[0];  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
@@ -118,8 +117,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 
     encodeFirstSegment(rec);
 
-    const auto &SEQUENCE = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1].getSequence()
-                                                                                : rec.getSegments()[0].getSequence();
+    const auto &SEQUENCE = rec.getSegments()[0].getSequence();
     const auto &CIGAR = rec.getAlignments().front().getAlignment().getECigar();  // TODO(Fabian): Multi-alignments
     clips.first = encodeCigar(SEQUENCE, CIGAR, ref1, rec.getClassID());
 
@@ -127,8 +125,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
     if (rec.getSegments().size() > 1) {
         // Same record
         const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
-        const auto &SEQUENCE2 =
-            rec.isRead1First() ? rec.getSegments()[1].getSequence() : rec.getSegments()[0].getSequence();
+        const auto &SEQUENCE2 = rec.getSegments()[1].getSequence();
         const auto LENGTH2 = SEQUENCE2.length();
         encodeAdditionalSegment(LENGTH2, srec, rec.isRead1First());
 
@@ -139,9 +136,9 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==
             core::record::AlignmentSplit::Type::UNPAIRED) {
             if (rec.isRead1First()) {
-                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
-            } else {
                 container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+            } else {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
             }
             // Other record
         } else {

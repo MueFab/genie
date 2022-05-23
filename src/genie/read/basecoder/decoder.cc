@@ -66,12 +66,12 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
                     (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
-            std::get<1>(state).setRead1First(false);
+            std::get<1>(state).setRead1First(true);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
         case core::GenConst::PAIR_R2_UNPAIRED:
-            std::get<1>(state).setRead1First(true);
+            std::get<1>(state).setRead1First(false);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
@@ -82,9 +82,6 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
-    if (!std::get<1>(state).isRead1First()) {
-        std::get<1>(state).swapSegmentOrder();
-    }
     return std::get<1>(state);
 }
 
