@@ -61,7 +61,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
     if (r1 == nullptr || r2 == nullptr) {
         // Only one SAM record is unavailable
         auto r_avail = r1 ? r1 : r2;  // The available SAM record
-        if (r_avail->mate_rid == r_avail->getRID()) {
+        if (r_avail->mate_rid == r_avail->getRID() && r_avail->mate_pos == r_avail->getPos()) {
             // Case 1: Paired SAM record is missing, switch to unpaired.
             // TODO(fabian): Maybe still preserve pairing information?
             auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::Unpaired>();
@@ -421,6 +421,10 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
         addAlignment(rec, r1, r2, cls.first);
     } else {
         addAlignment(rec, r2, r1, cls.first);
+    }
+
+    if (!rec.isRead1First()) {
+        rec.swapSegmentOrder();
     }
 
     records.push_back(std::move(rec));
