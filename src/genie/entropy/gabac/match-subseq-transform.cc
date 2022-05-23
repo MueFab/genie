@@ -56,7 +56,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
             while ((offset < symbolsSize) &&
-                   (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i) < matchBufferSize)) {
+                   (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i) < (matchBufferSize - 1u))) {
                 offset++;
             }
             offset -= i;
