@@ -66,12 +66,12 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
                     (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
-            std::get<1>(state).setRead1First(false);
+            std::get<1>(state).setRead1First(true);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
         case core::GenConst::PAIR_R2_UNPAIRED:
-            std::get<1>(state).setRead1First(true);
+            std::get<1>(state).setRead1First(false);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
@@ -82,9 +82,6 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
-    if (!std::get<1>(state).isRead1First()) {
-        std::get<1>(state).swapSegmentOrder();
-    }
     return std::get<1>(state);
 }
 
@@ -100,7 +97,7 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
         if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
             meta.num_segments = 2;
             const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
-            meta.first1 = SAME_REC_DATA & 1u;
+            meta.first1 = !(SAME_REC_DATA & 1u);
             const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
             meta.position[1] = meta.position[0] + DELTA;
         }

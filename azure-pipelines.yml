@@ -217,45 +217,45 @@ stages:
         testRunTitle: 'gabac-$(artifactName)-$(Build.SourceVersion)'
 
 
-  - job: 'Memory'
-    strategy:
-      matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
-          fileExt: ''
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - bash: |
-          sudo apt-get install valgrind
-      displayName: 'Installation prerequisites (Linux)'
-      condition: eq( variables['Agent.OS'], 'Linux' )
+#  - job: 'Memory'
+#    strategy:
+#      matrix:
+#        ubuntu2004:
+#          imageName: 'ubuntu-20.04'
+#          artifactName: 'ubuntu2004'
+#          fileExt: ''
+#    pool:
+#      vmImage: $(imageName)
+#    steps:
+#    - bash: |
+#          sudo apt-get install valgrind
+#      displayName: 'Installation prerequisites (Linux)'
+#      condition: eq( variables['Agent.OS'], 'Linux' )
 
-    - bash: |
-        git clone https://github.com/samtools/htslib.git
-        cd htslib
-        git checkout tags/1.12
-        git submodule update --init --recursive
-        autoreconf -i
-        ./configure
-        make -j
-        sudo make install
-      displayName: 'Install HTSLib (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#    - bash: |
+#        git clone https://github.com/samtools/htslib.git
+#        cd htslib
+#        git checkout tags/1.12
+#        git submodule update --init --recursive
+#        autoreconf -i
+#        ./configure
+#        make -j
+#        sudo make install
+#      displayName: 'Install HTSLib (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
+#    - download: current
+#      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+#      displayName: 'Download binaries'
 
-    - bash: |
-        mkdir cmake-build-release
-        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
-        chmod +x cmake-build-release/bin/*
-      displayName: 'Copy binaries'
+#    - bash: |
+#        mkdir cmake-build-release
+#        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
+#        chmod +x cmake-build-release/bin/*
+#      displayName: 'Copy binaries'
 
-    - bash: ci/memory_test.sh
-      displayName: 'Genie run memory tests'
+#    - bash: ci/memory_test.sh
+#      displayName: 'Genie run memory tests'
 
 
   - job: 'Conformance_Roundtrip'

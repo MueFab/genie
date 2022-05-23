@@ -42,8 +42,10 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 compress_roundtrip () {
     genie_encoder_parameters="$1"
     genie_decoder_ref_parameter=""
-    if [[ "$genie_encoder_parameters" == *"--embedded-ref none"* ]]; then
-         genie_decoder_ref_parameter="--input-ref-file $fasta_file"
+    genie_transcoder_ref_parameter="--no_ref"
+    if [[ "$genie_encoder_parameters" == *"-r "* ]]; then
+         genie_decoder_ref_parameter="-r $fasta_file"
+         genie_transcoder_ref_parameter="-r $fasta_file"
     fi
     echo "-----------------Genie transcode input"
     eval $timing_command \
@@ -51,7 +53,8 @@ compress_roundtrip () {
         -i $sam_file \
         -w $working_dir \
         -o $working_dir/transcoded.mgrec -f \
-        --no_ref \
+        $genie_transcoder_ref_parameter \
+        -c \
         || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     echo "-----------------input transcoded:"
@@ -75,8 +78,6 @@ compress_roundtrip () {
     rm $working_dir/output.mgb.json
     rm $working_dir/output.mgb.unsupported.mgrec
 
- #   exit 0
-
     echo "-----------------Genie decompress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
@@ -95,6 +96,7 @@ compress_roundtrip () {
         -i $working_dir/output.mgrec \
         -w $working_dir \
         -o $working_dir/output.sam \
+        $genie_transcoder_ref_parameter \
         -f \
         || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
@@ -102,47 +104,51 @@ compress_roundtrip () {
     echo "-----------------Output transcoded:"
     ls -l $working_dir/output.sam
 
+
     echo "-----------------Check output files:"
-#    $git_root_dir/ci/sam_tools/sam_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
+    $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
     echo "-----------------Output files ok!"
 
-    rm $working_dir/output.sam
+  rm $working_dir/output.sam
 
-#    if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
-#        echo "-----------------Refdecoder decompress"
-#        eval $timing_command \
-#            $MPEGG_REF_DECODER \
-#            -i $working_dir/output.mgb \
-#            -o $working_dir/output.mgrec \
-#            || { echo "Reference decoder ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
+    if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
+        echo "-----------------Refdecoder decompress"
+        eval $timing_command \
+            $MPEGG_REF_DECODER \
+            -i $working_dir/output.mgb \
+            -o $working_dir/output.mgrec \
+            $genie_decoder_ref_parameter \
+            || { echo "Reference decoder ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
         rm $working_dir/output.mgb
 
-#        echo "-----------------Refdecoder decoded:"
-#        ls -l $working_dir/output.mgrec
+        echo "-----------------Refdecoder decoded:"
+        ls -l $working_dir/output.mgrec
 
-#        echo "-----------------Refdecoder output transcode"
-#    eval $timing_command \
-#        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-sam \
-#        -i $working_dir/output.mgrec \
-#        -o $working_dir/output.sam 
-#        -f \
-#        || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
+        echo "-----------------Refdecoder output transcode"
+    eval $timing_command \
+        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-sam \
+        -i $working_dir/output.mgrec \
+        -o $working_dir/output.sam \
+        -f \
+        $genie_transcoder_ref_parameter \
+        || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
-#        rm $working_dir/output.mgrec
+        rm $working_dir/output.mgrec
 
-#        echo "-----------------Refdecoder output transcoded:"
-#        ls -l $working_dir/output.sam
+        echo "-----------------Refdecoder output transcoded:"
+        ls -l $working_dir/output.sam
 
-#        echo "-----------------Check output files:"
-#        $git_root_dir/ci/sam_tools/sam_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters_refdecoder || { echo "Invalid output!" ; exit 1; }
-#        echo "-----------------Output files ok!"
+        echo "-----------------Check output files:"
+        $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
+        echo "-----------------Output files ok!"
 
-#        rm $working_dir/output.sam
-#    fi
+        rm $working_dir/output.sam
+    fi
 }
 
 #compress_roundtrip "--qv none --read-ids none --low-latency"
 compress_roundtrip "--low-latency"
+compress_roundtrip "--low-latency -r $fasta_file"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref relevant --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref full --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref none --qv none --read-ids none --raw-ref --low-latency"
