@@ -55,10 +55,8 @@ TEST_F(MatchCodingTest, voidInput) {
         EXPECT_EQ(transformSubset[2].size(), 0);
 
         // decode
-        EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(cfg, &transformSubset));
+        EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&transformSubset));
         EXPECT_EQ(transformSubset[0].size(), 0);
-        EXPECT_EQ(transformSubset[1].size(), 0);
-        EXPECT_EQ(transformSubset[2].size(), 0);
     }
 }
 

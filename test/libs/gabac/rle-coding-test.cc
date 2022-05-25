@@ -58,7 +58,6 @@ TEST(RleCodingTest, singlePositivValue) {
     // decode
     genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
     values = transformSubset[0];
-
     expectedValues = {42};
 
     EXPECT_EQ(values, expectedValues);
@@ -89,7 +88,6 @@ TEST(RleCodingTest, singleNegativeValue) {
     // decode
     genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
     values = transformSubset[0];
-
     expectedValues = {uint64_t(-42)};
 
     EXPECT_EQ(values, expectedValues);
@@ -120,7 +118,6 @@ TEST(RleCodingTest, triggerGuard) {
     // decode
     genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
     values = transformSubset[0];
-
     expectedValues = {1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 1, 1, 1, 3};
 
     EXPECT_EQ(values, expectedValues);
@@ -157,7 +154,6 @@ TEST(RleCodingTest, semiRandom) {
     // decode
     genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
     values = transformSubset[0];
-
     expectedValues = {uint64_t(-3438430427565543845LL),
                       uint64_t(-3438430427565543845LL),
                       8686590606261860295LL,
@@ -235,14 +231,14 @@ TEST(RleCodingTest, roundTripCoding) {
 
     std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
     auto cfg = createConfig(2);
-    //auto subsetCopy = transformSubset;
+    // auto subsetCopy = transformSubset;
 
     // encode + decode
     EXPECT_NO_THROW(genie::entropy::gabac::transformRleCoding(cfg, &transformSubset));
 
     // compare result with another version
     // EXPECT_NO_THROW(rleEncoding(cfg, subsetCopy));
-    //EXPECT_EQ(subsetCopy, transformSubset);
+    // EXPECT_EQ(subsetCopy, transformSubset);
 
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset));
 
