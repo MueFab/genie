@@ -71,7 +71,7 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     lengths = {};
     expectedRawValues = {uint64_t(-1), 2, uint64_t(-3), 4, 4, uint64_t(-3), 2, uint64_t(-1)};
 
-    auto cfg = createConfig(0);  // TODO: ask about 0
+    auto cfg = createConfig(1);
     transformSubset = {rawValues};
 
     EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(cfg, &transformSubset));
