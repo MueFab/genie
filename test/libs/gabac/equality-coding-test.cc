@@ -23,8 +23,6 @@ TEST(EqualityCodingTest, voidInput) {
     // decoding
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformEqualityCoding(&transformSubset));
     values = transformSubset[0];
-    flags = transformSubset[1];
-    EXPECT_EQ(flags.size(), 0);
     EXPECT_EQ(values.size(), 0);
 }
 
@@ -46,8 +44,6 @@ TEST(EqualityCodingTest, singlePositiveValue) {
     // decoding
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformEqualityCoding(&transformSubset));
     values = transformSubset[0];
-    flags = transformSubset[1];
-    // EXPECT_EQ(flags.size(), 0);
     EXPECT_EQ(values.size(), 1);
     EXPECT_EQ(values.get(0), 42);
 }
