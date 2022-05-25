@@ -127,15 +127,13 @@ std::vector<genie::core::record::Record> splitRecord(genie::core::record::Record
             box2.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
                 box.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
-            ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(),
-                                    genie::core::record::AlignmentBox(box));
+            ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(), genie::core::record::AlignmentBox(box));
 
             ret.emplace_back(input.getNumberOfTemplateSegments(), input.getClassID(), std::string(input.getName()),
                              std::string(input.getGroup()), input.getFlags(), !input.isRead1First());
             ret.back().setQVDepth(1);
             ret.back().getSegments().emplace_back(input.getSegments()[1]);
-            ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(),
-                                    genie::core::record::AlignmentBox(box2));
+            ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(), genie::core::record::AlignmentBox(box2));
     }
     return ret;
 }
@@ -266,6 +264,9 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
                 queries.emplace_back();
                 ret = sam_reader.readSamQuery(queries.back());
                 if (ret == EOF) {
+                    if (queries.back().empty()) {
+                        queries.pop_back();
+                    }
                     break;
                 }
                 UTILS_DIE_IF(ret, "Error reading sam query: " + std::string(strerror(ret)));
@@ -596,33 +597,35 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         }
     }
 
-    while (true) {
-        auto* reader = heap.top();
-        heap.pop();
-        auto rec = reader->moveRecord();
-        rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
+    if (!heap.empty()) {
+        while (true) {
+            auto* reader = heap.top();
+            heap.pop();
+            auto rec = reader->moveRecord();
+            rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
 
-        if (fix_ecigar(rec, refs, refinf)) {
-            rec.write(total_output_writer);
-        } else {
-            removed_unsupported_base++;
-        }
+            if (fix_ecigar(rec, refs, refinf)) {
+                rec.write(total_output_writer);
+            } else {
+                removed_unsupported_base++;
+            }
 
-        if (reader->getRecord()) {
-            heap.push(reader);
-        } else {
-            auto path = reader->getPath();
-            std::cerr << path << " depleted" << std::endl;
-            for (auto it = readers.begin(); it != readers.end(); ++it) {
-                if (it->get() == reader) {
-                    readers.erase(it);
+            if (reader->getRecord()) {
+                heap.push(reader);
+            } else {
+                auto path = reader->getPath();
+                std::cerr << path << " depleted" << std::endl;
+                for (auto it = readers.begin(); it != readers.end(); ++it) {
+                    if (it->get() == reader) {
+                        readers.erase(it);
+                        break;
+                    }
+                }
+                std::remove(path.c_str());
+
+                if (heap.empty()) {
                     break;
                 }
-            }
-            std::remove(path.c_str());
-
-            if (heap.empty()) {
-                break;
             }
         }
     }
@@ -753,14 +756,12 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
     }
     // This read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-         (s == 1))) {
+        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) && (s == 1))) {
         flags |= 0x4;
     }
     // Paired read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-         (s == 0))) {
+        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) && (s == 0))) {
         flags |= 0x8;
     }
     // First or second read?
@@ -825,8 +826,7 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
     auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
                           ? genie::core::record::AlignmentSplit::Type::UNPAIRED
                           : record.getAlignments()[0].getAlignmentSplits().front()->getType();
-    if ((s == 1 &&
-         split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
+    if ((s == 1 && split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
         (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
         // Paired read is first read
         pnext = std::to_string(record.getAlignments()[0].getPosition() + 1);
