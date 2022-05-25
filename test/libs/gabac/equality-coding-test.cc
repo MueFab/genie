@@ -83,7 +83,7 @@ TEST(EqualityCodingTest, semiRandom) {
     EXPECT_EQ(resValues, values);
 }
 
-void equalityEncodeTest(std::vector<genie::util::DataBlock>& transformedSubseqs) {
+/* void equalityEncodeTest(std::vector<genie::util::DataBlock>& transformedSubseqs) {
     uint8_t wordsize = transformedSubseqs.front().getWordSize();
     transformedSubseqs.resize(2);
     transformedSubseqs[0].swap(&transformedSubseqs[1]);
@@ -111,7 +111,7 @@ void equalityEncodeTest(std::vector<genie::util::DataBlock>& transformedSubseqs)
         }
     }
     rawValues.resize(symbolIndex);
-}
+} */
 
 TEST(EqualityCodingTest, roundTripCoding) {
     genie::util::DataBlock values(0, 8);
@@ -123,12 +123,12 @@ TEST(EqualityCodingTest, roundTripCoding) {
     gabac_tests::fillVectorRandomGeometric(&values);
 
     std::vector<genie::util::DataBlock> transformSubset = {values, flags};
-    auto subsetCopy = transformSubset;
+    // auto subsetCopy = transformSubset;
     EXPECT_NO_THROW(genie::entropy::gabac::transformEqualityCoding(&transformSubset));
 
     // run another version to test against
-    EXPECT_NO_THROW(equalityEncodeTest(subsetCopy));
-    EXPECT_EQ(subsetCopy, transformSubset);
+    // EXPECT_NO_THROW(equalityEncodeTest(subsetCopy));
+    // EXPECT_EQ(subsetCopy, transformSubset);
 
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformEqualityCoding(&transformSubset));
     auto result = transformSubset[0];
