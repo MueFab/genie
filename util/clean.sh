@@ -1,14 +1,10 @@
 #!/bin/bash 
 
-git_root_dir="$(git rev-parse --show-toplevel)"
-genie="$git_root_dir/cmake-build-release/bin/genie"
-samtools="samtools"
-#$genie transcode-sam -i "$1" -o "$1.mgrec" -r "$2" -c -f
-#$genie transcode-sam -i "$1.mgrec" -o "$1.tmp.sam" -f -r "$2"
+genie="/home/muenteferi/nobackup/genie/cmake-build-release/bin/genie"
+samtools="/home/muenteferi/nobackup/samtools-build/bin/samtools"
 
-#samtools view -H "$1" > "$1.clean.sam"
-#cat "$1.tmp.sam" >> "$1.clean.sam"
-
-#rm "$1.tmp.sam"
-
-$genie transcode-sam -i "$1" -o "-.mgrec" -r "$2" -c -f | $genie transcode-sam -i "-.mgrec" -o "-.sam" -f -r "$2" | $samtools sort  -@ 6 -O BAM
+cat "$1" | \
+$samtools sort -n -@ 6 -O SAM | \
+$genie transcode-sam -i "-.sam" -o "-.mgrec" -r "$2" -c -f -w ./tmp -t 6 | \
+$genie transcode-sam -i "-.mgrec" -o "-.sam" -f -r "$2" -w ./tmp2 | \
+$samtools sort  -@ 6 -O BAM
