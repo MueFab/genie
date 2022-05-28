@@ -165,61 +165,6 @@ TEST(RleCodingTest, semiRandom) {
     EXPECT_EQ(values, expectedValues);
 }
 
-/* void rleEncoding(const genie::entropy::paramcabac::Subsequence& subseqCfg,
-                 std::vector<genie::util::DataBlock>& transformedSubseqs) {
-    uint8_t wordsize = transformedSubseqs.front().getWordSize();
-    transformedSubseqs.resize(2);
-    transformedSubseqs[0].swap(&transformedSubseqs[1]);
-
-    const auto guard = (uint8_t)subseqCfg.getTransformParameters().getParam();
-
-    // genie::util::DataBlock symbols(0, 1);
-    // symbols.swap(&transformedSubseqs[0]);
-    transformedSubseqs[0].clear();
-
-    genie::util::DataBlock& lengths = ((transformedSubseqs)[0]);
-    genie::util::DataBlock& rawValues = ((transformedSubseqs)[1]);
-    lengths.setWordSize(1);
-    rawValues.setWordSize(wordsize);
-
-    uint64_t lastSymbol = 0;
-    size_t symbolIndex = 0;
-    size_t runValue = 0;
-    for (size_t i = 0; i < rawValues.size(); ++i) {
-        uint64_t symbol = rawValues.get(i);
-
-        if (lastSymbol != symbol && runValue > 0) {
-            rawValues.set(symbolIndex++, lastSymbol);
-
-            // check guard
-            while (runValue > guard) {
-                lengths.push_back(guard);
-                runValue -= guard;
-            }
-
-            if (runValue > 0) {
-                lengths.push_back(runValue - 1);
-            }
-            runValue = 0;
-        }
-        lastSymbol = symbol;
-        ++runValue;
-    }
-
-    if (runValue > 0) {
-        rawValues.set(symbolIndex++, lastSymbol);
-
-        // check guard
-        while (runValue >= guard) {
-            lengths.push_back(guard);
-            runValue -= guard;
-        }
-        lengths.push_back(runValue - 1);
-    }
-
-    rawValues.resize(symbolIndex);
-} */
-
 TEST(RleCodingTest, roundTripCoding) {
     genie::util::DataBlock values(0, 8);
     genie::util::DataBlock lengths(0, 1);
@@ -231,15 +176,9 @@ TEST(RleCodingTest, roundTripCoding) {
 
     std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
     auto cfg = createConfig(2);
-    // auto subsetCopy = transformSubset;
 
     // encode + decode
     EXPECT_NO_THROW(genie::entropy::gabac::transformRleCoding(cfg, &transformSubset));
-
-    // compare result with another version
-    // EXPECT_NO_THROW(rleEncoding(cfg, subsetCopy));
-    // EXPECT_EQ(subsetCopy, transformSubset);
-
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset));
 
     EXPECT_EQ(values, transformSubset[0]);
