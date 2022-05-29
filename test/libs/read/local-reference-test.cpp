@@ -16,7 +16,7 @@ TEST(LocalReferenceTest, shiftedReads) {
         localRef.addSingleRead(reference.substr(pos, 5), cigar, pos);
     }
 
-    EXPECT_EQ(reference, localRef.getReference(0, reference.size()));
+    EXPECT_EQ(reference, localRef.getReference(0, static_cast<uint32_t>(reference.size())));
 }
 
 TEST(LocalReferenceTest, majorityVoteNull) {
@@ -37,7 +37,7 @@ TEST(LocalReferenceTest, majorityVoteDraw) {
 
     // A should win vs C, C vs G and so on
     localRef.addSingleRead("AGGNN", "5=", 0);
-    localRef.addSingleRead("CCTT0", "4=", 0);
+    localRef.addSingleRead("CCTT0", "5=", 0);
     EXPECT_EQ(localRef.getReference(0, 5), "ACGTN");
 }
 
