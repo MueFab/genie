@@ -67,6 +67,34 @@ TEST(LocalReferenceTest, deletion) {
     EXPECT_EQ(localRef.getReference(0, 9), "AACGAATGA");
 }
 
+TEST(LocalReferenceTest, softClip) {
+    LocalReference localRef(1024);
+
+    localRef.addSingleRead("AGAGA", "(1)3=(1)", 0);
+    EXPECT_EQ(localRef.getReference(0, 3), "GAG");
+
+    // should not change ref
+    localRef.addSingleRead("AAA", "(3)", 0);
+    EXPECT_EQ(localRef.getReference(0, 3), "GAG");
+
+    // should change ref
+    localRef.addSingleRead("AAA", "(1)1=(1)", 0);
+    EXPECT_EQ(localRef.getReference(0, 3), "AAG");
+}
+
+// TEST(LocalReferenceTest, hardClip) {
+//
+// }
+
+TEST(LocalReferenceTest, bufferOverflow) {
+    LocalReference localRef(8);
+
+    localRef.addSingleRead("AAAA", "4=", 0);
+    localRef.addSingleRead("GGGG", "4=", 0);
+    localRef.addSingleRead("TTTT", "4=", 0);
+    EXPECT_EQ(localRef.getReference(0, 4), "GGGG");
+}
+
 TEST(LocalReferenceTest, wrongUsage) {
     // too long read
     LocalReference localRef(2);
