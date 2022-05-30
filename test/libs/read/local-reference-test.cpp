@@ -86,6 +86,27 @@ TEST(LocalReferenceTest, softClip) {
 //
 // }
 
+TEST(LocalReferenceTest, mixedCigar) {
+    LocalReference localRef(1024);
+
+    // mix of deletion and insertions
+    localRef.addSingleRead("AAAA", "4-4+", 0);
+    localRef.addSingleRead("AAAA", "2+4-2+", 0);
+    localRef.addSingleRead("AAAA", "4+4-", 0);
+    EXPECT_EQ(localRef.getReference(0, 4), std::string("\0\0\0\0", 4));
+
+    // mixed all
+    localRef = LocalReference(1024);
+
+    localRef.addSingleRead("AGTCGT", "[4](2)2=2-2+[2]", 0);
+    EXPECT_EQ(localRef.getReference(0, 4), std::string("TC\0\0", 4));
+
+    localRef.addSingleRead("AGTCGT", "(2)2=(2)", 3);
+    EXPECT_EQ(localRef.getReference(0, 5), std::string("TC\0TC", 5));
+    localRef.addSingleRead("AAAAA", "2+1=(2)", 2);
+    EXPECT_EQ(localRef.getReference(0, 5), std::string("TCATC", 5));
+}
+
 TEST(LocalReferenceTest, bufferOverflow) {
     LocalReference localRef(8);
 
