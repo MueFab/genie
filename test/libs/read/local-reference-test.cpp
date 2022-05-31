@@ -82,10 +82,6 @@ TEST(LocalReferenceTest, softClip) {
     EXPECT_EQ(localRef.getReference(0, 3), "AAG");
 }
 
-// TEST(LocalReferenceTest, hardClip) {
-//
-// }
-
 TEST(LocalReferenceTest, mixedCigar) {
     LocalReference localRef(1024);
 
@@ -124,9 +120,4 @@ TEST(LocalReferenceTest, wrongUsage) {
     // wrong cigar-length
     localRef = LocalReference(32);
     EXPECT_THROW(localRef.addSingleRead("AAA", "1+1=", 0), genie::util::RuntimeException);
-
-    // wrong read order TODO: is the order important?
-    localRef = LocalReference(32);
-    localRef.addSingleRead("AAA", "3=", 2);
-    EXPECT_THROW(localRef.addSingleRead("CCCCC", "5=", 0), genie::util::RuntimeException);
 }
