@@ -251,6 +251,15 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
+        if (r.getClassID() == core::record::ClassType::CLASS_U &&
+            r.getNumberOfTemplateSegments() != r.getSegments().size()) {
+            current_unpaired_u_Chunk.getData().emplace_back(std::move(r));
+            if (current_unpaired_u_Chunk.getData().size() >= auSize) {
+                queueFinishedChunk(current_unpaired_u_Chunk);
+            }
+            continue;
+        }
+
         ReferenceManager::ReferenceExcerpt record_reference;
 
         // Unaligned reads can't be ref based, otherwise check if reference available
@@ -304,6 +313,9 @@ void ClassifierRegroup::flush() {
                 queueFinishedChunk(classblock);
             }
         }
+    }
+    if (!current_unpaired_u_Chunk.getData().empty()) {
+        queueFinishedChunk(current_unpaired_u_Chunk);
     }
 }
 
