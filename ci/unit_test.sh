@@ -36,6 +36,12 @@ then
     exit 1
 fi
 
+if [[ ! -x $git_root_dir/cmake-build-debug/bin/read-tests$fileExt ]]
+then
+    echo "Read test not found. Please build genie in debug mode first."
+    exit 1
+fi
+
 ############ Run ###############
 
 echo "Running unit tests:"
@@ -51,3 +57,7 @@ echo "Gabac..."
 cd $git_root_dir/cmake-build-debug/bin
 ./gabac-tests$fileExt --gtest_output=xml:gabac_test.xml --gtest_brief=1 || { echo 'Gabac test failed!' ; exit 1; }
 echo "Gabac test passed!"
+echo "Read..."
+cd $git_root_dir/cmake-build-debug/bin
+./read-tests$fileExt --gtest_output=xml:read_test.xml --gtest_brief=1 || { echo 'Read test failed!' ; exit 1; }
+echo "Read test passed!"
