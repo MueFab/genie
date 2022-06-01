@@ -55,7 +55,8 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
             return 2;
         }
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            if (chunk.isReferenceOnly()) {
+            if (chunk.isReferenceOnly() ||
+                chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
                 return 2;
             }
             if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {

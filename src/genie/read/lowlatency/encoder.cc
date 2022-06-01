@@ -53,6 +53,12 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         }
         if (r.getSegments().size() > 1) {
             state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
+        } else if (r.getNumberOfTemplateSegments() > 1) {
+            if (r.getRead1First()) {
+                state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+            } else {
+                state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+            }
         }
     }
     watch.pause();

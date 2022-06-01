@@ -35,6 +35,7 @@ class ClassifierRegroup : public Classifier {
     using PairedBlock = std::vector<ClassBlock>;    //!< @brief
     using RefNoRefBlock = std::vector<PairedBlock>;
     RefNoRefBlock currentChunks;                                //!< @brief
+    record::Chunk current_unpaired_u_Chunk;                     //! @brief
     ReferenceManager* refMgr;                                   //!< @brief
     int16_t currentSeqID;                                       //!< @brief
     std::vector<std::pair<size_t, size_t>> currentSeqCoverage;  //!< @brief
