@@ -147,8 +147,8 @@ compress_roundtrip () {
 }
 
 #compress_roundtrip "--qv none --read-ids none --low-latency"
-compress_roundtrip "--low-latency"
-compress_roundtrip "--low-latency -r $fasta_file"
+compress_roundtrip ""
+compress_roundtrip "-r $fasta_file"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref relevant --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref full --qv none --read-ids none --raw-ref --low-latency"
 #compress_roundtrip "--input-ref-file $fasta_file --embedded-ref none --qv none --read-ids none --raw-ref --low-latency"
