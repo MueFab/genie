@@ -11,7 +11,7 @@ static std::unique_ptr<LogConfiguration> currentConfig;
 // -----------------------------------------------------------------------------
 
 void setLogging(const LogConfiguration& c){
-    currentConfig = ssstd::unique_ptr<LogConfiguration>(new LogConfiguration(c));
+    currentConfig = std::unique_ptr<LogConfiguration>(new LogConfiguration(c));
 }
 
 // -----------------------------------------------------------------------------
