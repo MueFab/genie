@@ -86,9 +86,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
         "calculated for unaligned records. \nThis will increase encoding speed, \nbut decrease compression rate.\n");
 
     rawStreams = false;
-    app.add_flag(
-        "--write-raw-streams", rawStreams,
-        "Flag, if set raw uncompressed descriptors will be written out\n");
+    app.add_flag("--write-raw-streams", rawStreams, "Flag, if set raw uncompressed descriptors will be written out\n");
 
     refMode = "none";
     // Deactivated for now, as broken in connection with part 1
@@ -279,7 +277,7 @@ void ProgramOptions::validate() {
 
     std::cerr << std::endl;
 
-    UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless", "QVMode " + qvMode + " unknown");
+    UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless" && qvMode != "calq", "QVMode " + qvMode + " unknown");
     UTILS_DIE_IF(refMode != "none" && refMode != "relevant" && refMode != "full", "RefMode " + refMode + " unknown");
     UTILS_DIE_IF(readNameMode != "none" && readNameMode != "lossless", "Read name mode " + readNameMode + " unknown");
 

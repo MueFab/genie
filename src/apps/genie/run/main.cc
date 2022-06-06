@@ -24,6 +24,7 @@
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
+#include "genie/quality/qvcalq/encoder.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
 
@@ -189,6 +190,9 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     attachImporter(*flow, pOpts, inputFiles, outputFiles);
     if (pOpts.qvMode == "none") {
         flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
+    }
+    if (pOpts.qvMode == "calq") {
+        flow->setQVCoder(genie::util::make_unique<genie::quality::qvcalq::Encoder>(), 0);
     }
     if (pOpts.readNameMode == "none") {
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
