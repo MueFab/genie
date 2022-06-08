@@ -10,6 +10,7 @@ add_library(genie-qvcalq ${source_files})
 
 target_link_libraries(genie-qvcalq PUBLIC genie-core)
 target_link_libraries(genie-qvcalq PUBLIC genie-paramqv1)
+target_link_libraries(genie-qvcalq PUBLIC calq)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)

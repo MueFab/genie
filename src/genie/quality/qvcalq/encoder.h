@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include "calq/calq_coder.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/qv-encoder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
@@ -25,7 +26,9 @@ namespace qvcalq {
  * @brief
  */
 class Encoder : public core::QVEncoder {
-
+ private:
+    calq::SideInformation getSideInformation(const core::record::Chunk& record);
+    calq::EncodingBlock getEncodingBlock(const core::record::Chunk& record);
  public:
     /**
      * @brief
