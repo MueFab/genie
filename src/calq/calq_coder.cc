@@ -56,6 +56,12 @@ static uint32_t computeLength(const std::string& cigar){
             case '(':
             case '[':
                 break;
+            case 'A':
+            case 'C':
+            case 'G':
+            case 'T':
+                ++posMax;
+                break;
             default:
                 throwErrorException("Bad CIGAR string");
         }
