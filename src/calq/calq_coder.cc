@@ -40,15 +40,22 @@ static uint32_t computeLength(const std::string& cigar){
                 posMax += opLen;
                 break;
             case 'I':
+            case'+':
             case 'S':
+            case ')':
                 break;
             case 'D':
+            case'-':
             case 'N':
                 posMax += opLen;
                 break;
             case 'H':
+            case']':
             case 'P':
                 break;  // these have been clipped
+            case '(':
+            case '[':
+                break;
             default:
                 throwErrorException("Bad CIGAR string");
         }
@@ -56,6 +63,7 @@ static uint32_t computeLength(const std::string& cigar){
     }
     return posMax;
 }
+
 
 // -----------------------------------------------------------------------------
 

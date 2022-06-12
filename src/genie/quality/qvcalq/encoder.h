@@ -31,6 +31,8 @@ class Encoder : public core::QVEncoder {
 //    calq::EncodingBlock getEncodingBlock(const core::record::Chunk& record);
 
     void encodeAligned(const core::record::Chunk& chunk); // , core::AccessUnit::Descriptor& desc);
+
+
  public:
     /**
      * @brief
