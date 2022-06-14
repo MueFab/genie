@@ -88,20 +88,13 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
         sideInformation.positions.push_back(f_alignment.getPosition());
         sideInformation.cigars.push_back(f_alignment.getAlignment().getECigar());
         sideInformation.sequences.push_back(f_segment.getSequence());
-
-        if (f_alignment.getAlignment().getECigar() == "5=T95=") {
-            std::cout << "lol";
-        }
-
         input.qvalues.push_back(f_segment.getQualities().front());
 
         // add second read info
         if (rec.getSegments().size() == 2) {
-            //            std::cout<<"mapped 2  \n";
             auto& s_segment = rec.getSegments()[1];
             if (rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
                 core::record::AlignmentSplit::Type::SAME_REC) {
-                auto type = rec.getAlignments().front().getAlignmentSplits().front()->getType();
                 UTILS_DIE("WRONG TYPE");
             }
 
@@ -111,7 +104,6 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
             sideInformation.positions.push_back(f_alignment.getPosition() + s_alignment->getDelta());
             sideInformation.cigars.push_back(s_alignment->getAlignment().getECigar());
             sideInformation.sequences.push_back(s_segment.getSequence());
-
             input.qvalues.push_back(s_segment.getQualities().front());
         }
     }
