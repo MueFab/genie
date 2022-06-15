@@ -34,24 +34,11 @@ std::vector<T> apply_permutation(const std::vector<T>& vec, const std::vector<st
     return sorted_vec;
 }
 
-template <typename T>
-void apply_permutation_in_place(std::vector<T>& vec, const std::vector<std::size_t>& p) {
-    std::vector<bool> done(vec.size());
-    for (std::size_t i = 0; i < vec.size(); ++i) {
-        if (done[i]) {
-            continue;
-        }
-        done[i] = true;
-        std::size_t prev_j = i;
-        std::size_t j = p[i];
-        while (i != j) {
-            std::swap(vec[prev_j], vec[j]);
-            done[j] = true;
-            prev_j = j;
-            j = p[j];
-        }
-    }
+void Encoder::setupReturn(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
+                          core::AccessUnit::Descriptor& desc){
+
 }
+
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     //    util::Watch watch;
@@ -93,16 +80,15 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
         // add second read info
         if (rec.getSegments().size() == 2) {
             auto& s_segment = rec.getSegments()[1];
-            if (rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                core::record::AlignmentSplit::Type::SAME_REC) {
-                UTILS_DIE("WRONG TYPE");
-            }
 
-            auto* s_alignment = dynamic_cast<const core::record::alignment_split::SameRec*>(
-                rec.getAlignments().front().getAlignmentSplits().front().get());
+            UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
+                         core::record::AlignmentSplit::Type::SAME_REC, "Wrong Type");
 
-            sideInformation.positions.push_back(f_alignment.getPosition() + s_alignment->getDelta());
-            sideInformation.cigars.push_back(s_alignment->getAlignment().getECigar());
+            auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
+                *rec.getAlignments().front().getAlignmentSplits().front().get());
+
+            sideInformation.positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
+            sideInformation.cigars.push_back(s_alignment.getAlignment().getECigar());
             sideInformation.sequences.push_back(s_segment.getSequence());
             input.qvalues.push_back(s_segment.getQualities().front());
         }
@@ -115,11 +101,6 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
     sideInformation.sequences = apply_permutation(sideInformation.sequences, p);
     input.qvalues = apply_permutation(input.qvalues, p);
 
-    // inplace sort
-    //    apply_permutation_in_place(sideInformation.positions, p);
-    //    apply_permutation_in_place(sideInformation.cigars, p);
-    //    apply_permutation_in_place(sideInformation.sequences, p);
-    //    apply_permutation_in_place(input.qvalues, p);
 
     sideInformation.posOffset = sideInformation.positions.front();
 

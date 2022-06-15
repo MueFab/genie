@@ -34,24 +34,16 @@ static uint32_t computeLength(const std::string& cigar) {
             continue;
         }
         switch (cigar[cigarIdx]) {
-            case 'M':
             case '=':
-            case 'X':
                 posMax += opLen;
                 break;
-            case 'I':
             case '+':
-            case 'S':
             case ')':
                 break;
-            case 'D':
             case '-':
-            case 'N':
                 posMax += opLen;
                 break;
-            case 'H':
             case ']':
-            case 'P':
                 break;  // these have been clipped
             case '(':
             case '[':
@@ -60,6 +52,7 @@ static uint32_t computeLength(const std::string& cigar) {
             case 'C':
             case 'G':
             case 'T':
+            case 'N':
                 ++posMax;
                 break;
             default:

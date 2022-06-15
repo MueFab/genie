@@ -174,11 +174,10 @@ void QualEncoder::encodeMappedQual(const EncodingRead& samRecord) {
             case 'C':
             case 'G':
             case 'T':
+            case 'N':
                 opLen = 1;
                 /* fall through */
-            case 'M':
             case '=':
-            case 'X':
                 // Encode opLen quality values with computed quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
                     uint8_t q = uint8_t(samRecord.qvalues[qualIdx++]) - qualityValueOffset_;
@@ -187,9 +186,7 @@ void QualEncoder::encodeMappedQual(const EncodingRead& samRecord) {
                     out->stepindices.at(quantizerIndex).push_back(qualityValueIndex);
                 }
                 break;
-            case 'I':
             case '+':
-            case 'S':
             case ')':
                 // Encode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
@@ -198,14 +195,10 @@ void QualEncoder::encodeMappedQual(const EncodingRead& samRecord) {
                     out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS - 1)).push_back(qualityValueIndex);
                 }
                 break;
-            case 'D':
             case '-':
-            case 'N':
                 quantizerIndicesIdx += opLen;
                 break;  // do nothing as these bases are not present
-            case 'H':
             case ']':
-            case 'P':
                 break;  // these have been clipped
             case '(':
             case '[':
