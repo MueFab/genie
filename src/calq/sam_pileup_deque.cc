@@ -156,11 +156,10 @@ void SAMPileupDeque::add(const EncodingRead& r, uint8_t qvalOffset, uint8_t hqSo
             case 'C':
             case 'G':
             case 'T':
+            case 'N':
                 opLen = 1;
                 /* fall through */
-            case 'M':
             case '=':
-            case 'X':
                 for (size_t i = 0; i < opLen; i++) {
                     this->pileups_[pileupIdx].pos = static_cast<uint32_t>(this->posMin() + pileupIdx);
                     this->pileups_[pileupIdx].seq += r.sequence[idx];
@@ -180,7 +179,6 @@ void SAMPileupDeque::add(const EncodingRead& r, uint8_t qvalOffset, uint8_t hqSo
                 }
                 break;
 
-            case 'S':
             case ')':
                 for (int l = 0; l < static_cast<int>(opLen); ++l) {
                     if (r.qvalues[idx + l] >= HQ_SOFTCLIP_THRESHOLD) {
@@ -188,18 +186,12 @@ void SAMPileupDeque::add(const EncodingRead& r, uint8_t qvalOffset, uint8_t hqSo
                     }
                 }
                 /* fall through */
-            case 'I':
             case '+':
                 idx += opLen;
                 break;
-            case 'D':
             case '-':
-            case 'N':
                 pileupIdx += opLen;
                 break;
-            case 'H':
-            case 'P':
-                break;  // these have been clipped
             case '(':
             case '[':
             case ']':
