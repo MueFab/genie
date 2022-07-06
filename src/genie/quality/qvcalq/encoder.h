@@ -27,11 +27,10 @@ namespace qvcalq {
  */
 class Encoder : public core::QVEncoder {
  private:
-//    calq::SideInformation getSideInformation(const core::record::Chunk& record);
-//    calq::EncodingBlock getEncodingBlock(const core::record::Chunk& record);
 
-    void encodeAligned(const core::record::Chunk& chunk); // , core::AccessUnit::Descriptor& desc);
-
+    void setUpParameters(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc);
+    void encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
+    void encodeUnaligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
 
  public:
     /**

@@ -34,24 +34,26 @@ std::vector<T> apply_permutation(const std::vector<T>& vec, const std::vector<st
     return sorted_vec;
 }
 
-void Encoder::setupReturn(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
-                          core::AccessUnit::Descriptor& desc){
+// void Encoder::setUpParameters(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
+//                            core::AccessUnit::Descriptor& desc) {}
 
-}
-
+void Encoder::setUpParameters(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {}
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
-    //    util::Watch watch;
+    util::Watch watch;
+    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+        setUpParameters(*param, desc);
 
     const ClassType& classType = chunk.getData()[0].getClassID();
     calq::SideInformation sideInformation;
     calq::EncodingBlock encodingBlock;
 
     if (classType == ClassType::CLASS_U) {
-        // TODO: Unmapped, maybe just copy qvwriteout
+        encodeAligned(chunk, desc);
         std::cout << "unmapped" << std::endl;
     } else {
-        encodeAligned(chunk);
+        encodeAligned(chunk, desc);
     }
 
     UTILS_DIE("DEBUG exit");
@@ -61,7 +63,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     //    return std::make_tuple(std::move(param), std::move(desc), stats);
 }
 
-void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::AccessUnit::Descriptor& desc);
+void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc) {
     // default options
     calq::EncodingOptions encodingOptions;
     calq::SideInformation sideInformation;
@@ -82,7 +84,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
             auto& s_segment = rec.getSegments()[1];
 
             UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                         core::record::AlignmentSplit::Type::SAME_REC, "Wrong Type");
+                             core::record::AlignmentSplit::Type::SAME_REC,
+                         "Wrong Type");
 
             auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
                 *rec.getAlignments().front().getAlignmentSplits().front().get());
@@ -101,13 +104,14 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk) {  // , core::Acce
     sideInformation.sequences = apply_permutation(sideInformation.sequences, p);
     input.qvalues = apply_permutation(input.qvalues, p);
 
-
     sideInformation.posOffset = sideInformation.positions.front();
 
     calq::encode(encodingOptions, sideInformation, input, &output);
 
     return;
 }
+
+void Encoder::encodeUnaligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
