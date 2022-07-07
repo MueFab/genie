@@ -7,8 +7,8 @@
 #include "genie/quality/qvcalq//encoder.h"
 #include <string>
 #include <utility>
-#include "genie/quality/calq/calq_coder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/util/watch.h"
 #include "iostream"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,13 +37,41 @@ std::vector<T> apply_permutation(const std::vector<T>& vec, const std::vector<st
 // void Encoder::setUpParameters(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
 //                            core::AccessUnit::Descriptor& desc) {}
 
-void Encoder::setUpParameters(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {}
+
+paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec){
+    paramqv1::Codebook codebook(vec[0], vec[1]);
+    for(size_t i=2; i<vec.size(); ++i){
+        codebook.addEntry(vec[i]);
+    }
+    return codebook;
+}
+
+void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {
+
+    // add codebooks from calq to param
+    paramqv1::ParameterSet set;
+    for(auto& codeVec:block.codeBooks){
+        auto codebook = codebookFromVector(codeVec);
+        set.addCodeBook(std::move(codebook));
+    }
+    param.setQvps(std::move(set));
+
+    // setup desc
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_1));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_2));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_3));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_4));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_5));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_6));
+}
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     util::Watch watch;
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
-        setUpParameters(*param, desc);
 
     const ClassType& classType = chunk.getData()[0].getClassID();
     calq::SideInformation sideInformation;
@@ -70,6 +98,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
     calq::EncodingBlock input;
     calq::DecodingBlock output;
 
+    uint64_t size = 0;
+
     for (const auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
         auto& f_alignment = rec.getAlignments().front();
@@ -78,6 +108,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
         sideInformation.cigars.push_back(f_alignment.getAlignment().getECigar());
         sideInformation.sequences.push_back(f_segment.getSequence());
         input.qvalues.push_back(f_segment.getQualities().front());
+
+        size += f_segment.getQualities().front().size();
 
         // add second read info
         if (rec.getSegments().size() == 2) {
@@ -94,6 +126,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
             sideInformation.cigars.push_back(s_alignment.getAlignment().getECigar());
             sideInformation.sequences.push_back(s_segment.getSequence());
             input.qvalues.push_back(s_segment.getQualities().front());
+
+            size += s_segment.getQualities().front().size();
         }
     }
 
@@ -107,6 +141,9 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
     sideInformation.posOffset = sideInformation.positions.front();
 
     calq::encode(encodingOptions, sideInformation, input, &output);
+
+    // output.quantizerIndices.size() = 26076809
+    //
 
     return;
 }
