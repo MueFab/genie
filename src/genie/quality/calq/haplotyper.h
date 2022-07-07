@@ -12,9 +12,9 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq/filter_buffer.h"
-#include "calq/genotyper.h"
-#include "calq/softclip_spreader.h"
+#include "filter_buffer.h"
+#include "genotyper.h"
+#include "softclip_spreader.h"
 
 // -----------------------------------------------------------------------------
 

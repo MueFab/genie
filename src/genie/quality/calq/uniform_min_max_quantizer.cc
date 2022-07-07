@@ -1,4 +1,4 @@
-#include "calq/uniform_min_max_quantizer.h"
+#include "uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 

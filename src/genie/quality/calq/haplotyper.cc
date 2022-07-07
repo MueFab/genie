@@ -1,4 +1,4 @@
-#include "calq/haplotyper.h"
+#include "haplotyper.h"
 
 // -----------------------------------------------------------------------------
 
@@ -10,8 +10,8 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq/calq_coder.h"
-#include "calq/error_exception_reporter.h"
+#include "calq_coder.h"
+#include "error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

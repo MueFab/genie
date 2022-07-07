@@ -1,4 +1,4 @@
-#include "calq/softclip_spreader.h"
+#include "softclip_spreader.h"
 
 // -----------------------------------------------------------------------------
 

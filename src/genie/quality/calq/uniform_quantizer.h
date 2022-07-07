@@ -1,9 +1,9 @@
-#ifndef CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
-#define CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#ifndef CALQ_UNIFORM_QUANTIZER_H_
+#define CALQ_UNIFORM_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
-#include "calq/uniform_quantizer.h"
+#include "quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -11,15 +11,14 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-class UniformMinMaxQuantizer : public UniformQuantizer
+class UniformQuantizer : public Quantizer
 {
  public:
-    UniformMinMaxQuantizer(const int& valueMin,
-                           const int& valueMax,
-                           const int& nrSteps
+    UniformQuantizer(const int& valueMin,
+                     const int& valueMax,
+                     const int& nrSteps
     );
-
-    ~UniformMinMaxQuantizer() override;
+    ~UniformQuantizer() override;
 };
 
 // -----------------------------------------------------------------------------
@@ -28,7 +27,7 @@ class UniformMinMaxQuantizer : public UniformQuantizer
 
 // -----------------------------------------------------------------------------
 
-#endif  // CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#endif  // CALQ_UNIFORM_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

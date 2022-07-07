@@ -3,9 +3,9 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq/calq_coder.h"
-#include "calq/exceptions.h"
-#include "calq/log.h"
+#include "calq_coder.h"
+#include "exceptions.h"
+#include "log.h"
 
 // -----------------------------------------------------------------------------
 

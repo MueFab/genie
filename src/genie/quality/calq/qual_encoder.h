@@ -11,10 +11,10 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq/genotyper.h"
-#include "calq/haplotyper.h"
-#include "calq/quantizer.h"
-#include "calq/sam_pileup_deque.h"
+#include "genotyper.h"
+#include "haplotyper.h"
+#include "quantizer.h"
+#include "sam_pileup_deque.h"
 
 // -----------------------------------------------------------------------------
 

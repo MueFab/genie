@@ -1,4 +1,4 @@
-#include "calq/exceptions.h"
+#include "sam_pileup.h"
 
 // -----------------------------------------------------------------------------
 
@@ -6,30 +6,49 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-Exception::Exception(const std::string& msg)
-        : msg_(msg){
+SAMPileup::SAMPileup()
+        : pos(0),
+        qual(""),
+        seq(""),
+        ref('N'),
+        hq_softcounter(0){
 }
 
 // -----------------------------------------------------------------------------
 
-Exception::Exception(const Exception& e) noexcept
-        : msg_(e.msg_){
+SAMPileup::~SAMPileup() = default;
+
+// -----------------------------------------------------------------------------
+
+bool SAMPileup::empty() const{
+    return seq.empty();
 }
 
 // -----------------------------------------------------------------------------
 
-Exception::~Exception() noexcept = default;
-
-// -----------------------------------------------------------------------------
-
-std::string Exception::getMessage() const{
-    return msg_;
+void SAMPileup::clear(){
+    pos = 0;
+    qual = "";
+    seq = "";
+    ref = 'N';
 }
 
 // -----------------------------------------------------------------------------
 
-const char *Exception::what() const noexcept{
-    return msg_.c_str();
+void SAMPileup::print() const{
+    printf("%6u: %s %s\n", pos, seq.c_str(), qual.c_str());
+}
+
+// -----------------------------------------------------------------------------
+
+void SAMPileup::printQual() const{
+    printf("%6u: %s\n", pos, qual.c_str());
+}
+
+// -----------------------------------------------------------------------------
+
+void SAMPileup::printSeq() const{
+    printf("%6u: %s\n", pos, seq.c_str());
 }
 
 // -----------------------------------------------------------------------------

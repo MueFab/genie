@@ -22,5 +22,5 @@ set(source_files
 
 add_library(calq ${source_files})
 
-get_filename_component(TOP_DIR ../ ABSOLUTE)
+get_filename_component(TOP_DIR ../../ ABSOLUTE)
 target_include_directories(calq PUBLIC "${TOP_DIR}")
