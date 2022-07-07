@@ -28,7 +28,7 @@ namespace qvcalq {
 class Encoder : public core::QVEncoder {
  private:
 
-    void setUpParameters(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc);
+    void setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc);
     void encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
     void encodeUnaligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
 
