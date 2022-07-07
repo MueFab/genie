@@ -1,8 +1,8 @@
-#include "calq/probability_distribution.h"
+#include "probability_distribution.h"
 
 // -----------------------------------------------------------------------------
 
-#include "calq/error_exception_reporter.h"
+#include "error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

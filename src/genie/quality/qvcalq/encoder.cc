@@ -7,7 +7,7 @@
 #include "genie/quality/qvcalq//encoder.h"
 #include <string>
 #include <utility>
-#include "calq/calq_coder.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/util/watch.h"
 #include "iostream"

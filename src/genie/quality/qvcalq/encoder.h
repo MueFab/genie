@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
-#include "calq/calq_coder.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/qv-encoder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"

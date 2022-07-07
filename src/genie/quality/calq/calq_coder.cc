@@ -1,4 +1,4 @@
-#include "calq/calq_coder.h"
+#include "calq_coder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -7,11 +7,11 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq/error_exception_reporter.h"
-#include "calq/lloyd_max_quantizer.h"
-#include "calq/qual_decoder.h"
-#include "calq/qual_encoder.h"
-#include "calq/uniform_min_max_quantizer.h"
+#include "error_exception_reporter.h"
+#include "lloyd_max_quantizer.h"
+#include "qual_decoder.h"
+#include "qual_encoder.h"
+#include "uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
