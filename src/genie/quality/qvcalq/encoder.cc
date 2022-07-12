@@ -45,18 +45,12 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     return codebook;
 }
 
-void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param,
-                              core::AccessUnit::Descriptor& desc) {
-    // setup desc
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_1));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_2));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_3));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_4));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_5));
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_6));
+core::GenSubIndex get_qv_steps(size_t i) {
+    UTILS_DIE_IF( i > 6, "QV_STEPS index out of range");
+    return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
+}
+
+void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param) {
 
     // add codebooks from calq to param
     paramqv1::ParameterSet set;
@@ -67,16 +61,19 @@ void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::Qualit
     param.setQvps(std::move(set));
 }
 
-void Encoder::fillDescriptor(const calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
-    // fill QV_PRESENT??
+void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
+
+    // empty QV_PRESENT
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+
+    // QV_CODEBOOK
+    desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.quantizerIndices), core::GenSub::QV_CODEBOOK));
 
     // fill QV_STEPS_0-6
     for (size_t i = 0; i < block.stepindices.size(); ++i) {
-        auto& subseq = desc.get(i + 2);
-        for (const auto& value : block.stepindices[i]) {
-            subseq.push(value);
-        }
+        core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i));
     }
+    //old 22sec // 8322
 }
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
