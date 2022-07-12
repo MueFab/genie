@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
-#include "genie/quality/calq/calq_coder.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/qv-encoder.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include "genie/util/stringview.h"
 
@@ -27,10 +27,13 @@ namespace qvcalq {
  */
 class Encoder : public core::QVEncoder {
  private:
-
-    void setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc);
-    void encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
+    void setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param,
+                         core::AccessUnit::Descriptor& desc);
+    void encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
+                       core::AccessUnit::Descriptor& desc);
     void encodeUnaligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc);
+
+    void fillDescriptor(const calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc);
 
  public:
     /**

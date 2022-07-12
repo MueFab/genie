@@ -37,25 +37,16 @@ std::vector<T> apply_permutation(const std::vector<T>& vec, const std::vector<st
 // void Encoder::setUpParameters(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
 //                            core::AccessUnit::Descriptor& desc) {}
 
-
-paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec){
+paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     paramqv1::Codebook codebook(vec[0], vec[1]);
-    for(size_t i=2; i<vec.size(); ++i){
+    for (size_t i = 2; i < vec.size(); ++i) {
         codebook.addEntry(vec[i]);
     }
     return codebook;
 }
 
-void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {
-
-    // add codebooks from calq to param
-    paramqv1::ParameterSet set;
-    for(auto& codeVec:block.codeBooks){
-        auto codebook = codebookFromVector(codeVec);
-        set.addCodeBook(std::move(codebook));
-    }
-    param.setQvps(std::move(set));
-
+void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param,
+                              core::AccessUnit::Descriptor& desc) {
     // setup desc
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
@@ -66,6 +57,26 @@ void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::Qualit
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_4));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_5));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_6));
+
+    // add codebooks from calq to param
+    paramqv1::ParameterSet set;
+    for (auto& codeVec : block.codeBooks) {
+        auto codebook = codebookFromVector(codeVec);
+        set.addCodeBook(std::move(codebook));
+    }
+    param.setQvps(std::move(set));
+}
+
+void Encoder::fillDescriptor(const calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
+    // fill QV_PRESENT??
+
+    // fill QV_STEPS_0-6
+    for (size_t i = 0; i < block.stepindices.size(); ++i) {
+        auto& subseq = desc.get(i + 2);
+        for (const auto& value : block.stepindices[i]) {
+            subseq.push(value);
+        }
+    }
 }
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
@@ -78,27 +89,25 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     calq::EncodingBlock encodingBlock;
 
     if (classType == ClassType::CLASS_U) {
-        encodeAligned(chunk, desc);
+        encodeUnaligned(chunk, desc);
         std::cout << "unmapped" << std::endl;
     } else {
-        encodeAligned(chunk, desc);
+        encodeAligned(chunk, *param, desc);
     }
 
-    UTILS_DIE("DEBUG exit");
-    //    core::stats::PerfStats stats;
-    //    stats.addDouble("time-qvcalq", watch.check());
+    core::stats::PerfStats stats;
+    stats.addDouble("time-qvcalq", watch.check());
 
-    //    return std::make_tuple(std::move(param), std::move(desc), stats);
+    return std::make_tuple(std::move(param), std::move(desc), stats);
 }
 
-void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc) {
+void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
+                            core::AccessUnit::Descriptor& desc) {
     // default options
     calq::EncodingOptions encodingOptions;
     calq::SideInformation sideInformation;
     calq::EncodingBlock input;
     calq::DecodingBlock output;
-
-    uint64_t size = 0;
 
     for (const auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
@@ -109,15 +118,13 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
         sideInformation.sequences.push_back(f_segment.getSequence());
         input.qvalues.push_back(f_segment.getQualities().front());
 
-        size += f_segment.getQualities().front().size();
-
         // add second read info
         if (rec.getSegments().size() == 2) {
             auto& s_segment = rec.getSegments()[1];
 
             UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
                              core::record::AlignmentSplit::Type::SAME_REC,
-                         "Wrong Type");
+                         "Wrong record type");
 
             auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
                 *rec.getAlignments().front().getAlignmentSplits().front().get());
@@ -126,8 +133,6 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
             sideInformation.cigars.push_back(s_alignment.getAlignment().getECigar());
             sideInformation.sequences.push_back(s_segment.getSequence());
             input.qvalues.push_back(s_segment.getQualities().front());
-
-            size += s_segment.getQualities().front().size();
         }
     }
 
@@ -141,9 +146,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, core::AccessUnit::
     sideInformation.posOffset = sideInformation.positions.front();
 
     calq::encode(encodingOptions, sideInformation, input, &output);
-
-    // output.quantizerIndices.size() = 26076809
-    //
+    setUpParameters(output, param, desc);
+    fillDescriptor(output, desc);
 
     return;
 }
