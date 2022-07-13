@@ -46,12 +46,11 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
 }
 
 core::GenSubIndex get_qv_steps(size_t i) {
-    UTILS_DIE_IF( i > 6, "QV_STEPS index out of range");
+    UTILS_DIE_IF(i > 6, "QV_STEPS index out of range");
     return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
 }
 
 void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param) {
-
     // add codebooks from calq to param
     paramqv1::ParameterSet set;
     for (auto& codeVec : block.codeBooks) {
@@ -62,7 +61,6 @@ void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::Qualit
 }
 
 void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
-
     // empty QV_PRESENT
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
 
@@ -73,13 +71,6 @@ void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descr
     for (size_t i = 0; i < block.stepindices.size(); ++i) {
         desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i)));
     }
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[0]), core::GenSub::QV_STEPS_0));
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[1]), core::GenSub::QV_STEPS_1);
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[2]), core::GenSub::QV_STEPS_2);
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[3]), core::GenSub::QV_STEPS_3);
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[4]), core::GenSub::QV_STEPS_4);
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[5]), core::GenSub::QV_STEPS_5);
-//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[6]), core::GenSub::QV_STEPS_6);
 }
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
@@ -106,12 +97,13 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
 
 void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                             core::AccessUnit::Descriptor& desc) {
-    // default options
+    // objects required for calq
     calq::EncodingOptions encodingOptions;
     calq::SideInformation sideInformation;
     calq::EncodingBlock input;
     calq::DecodingBlock output;
 
+    // fill calq objects
     for (const auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
         auto& f_alignment = rec.getAlignments().front();
@@ -146,8 +138,10 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     sideInformation.sequences = apply_permutation(sideInformation.sequences, p);
     input.qvalues = apply_permutation(input.qvalues, p);
 
+    // set offset
     sideInformation.posOffset = sideInformation.positions.front();
 
+    // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
     setUpParameters(output, param);
     fillDescriptor(output, desc);
