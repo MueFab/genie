@@ -71,9 +71,15 @@ void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descr
 
     // fill QV_STEPS_0-6
     for (size_t i = 0; i < block.stepindices.size(); ++i) {
-        core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i));
+        desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i)));
     }
-    //old 22sec // 8322
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[0]), core::GenSub::QV_STEPS_0));
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[1]), core::GenSub::QV_STEPS_1);
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[2]), core::GenSub::QV_STEPS_2);
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[3]), core::GenSub::QV_STEPS_3);
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[4]), core::GenSub::QV_STEPS_4);
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[5]), core::GenSub::QV_STEPS_5);
+//    core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[6]), core::GenSub::QV_STEPS_6);
 }
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
@@ -143,7 +149,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     sideInformation.posOffset = sideInformation.positions.front();
 
     calq::encode(encodingOptions, sideInformation, input, &output);
-    setUpParameters(output, param, desc);
+    setUpParameters(output, param);
     fillDescriptor(output, desc);
 
     return;
