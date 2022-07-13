@@ -50,7 +50,7 @@ core::GenSubIndex get_qv_steps(size_t i) {
     return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
 }
 
-void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::QualityValues1& param) {
+void Encoder::setUpParametersAligned(const calq::DecodingBlock& block, paramqv1::QualityValues1& param) {
     // add codebooks from calq to param
     paramqv1::ParameterSet set;
     for (auto& codeVec : block.codeBooks) {
@@ -60,7 +60,7 @@ void Encoder::setUpParameters(const calq::DecodingBlock& block, paramqv1::Qualit
     param.setQvps(std::move(set));
 }
 
-void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
+void Encoder::fillDescriptorAligned(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
     // empty QV_PRESENT
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
 
@@ -73,28 +73,6 @@ void Encoder::fillDescriptor(calq::DecodingBlock& block, core::AccessUnit::Descr
     }
 }
 
-core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
-    util::Watch watch;
-    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
-
-    const ClassType& classType = chunk.getData()[0].getClassID();
-    calq::SideInformation sideInformation;
-    calq::EncodingBlock encodingBlock;
-
-    if (classType == ClassType::CLASS_U) {
-        encodeUnaligned(chunk, desc);
-        std::cout << "unmapped" << std::endl;
-    } else {
-        encodeAligned(chunk, *param, desc);
-    }
-
-    core::stats::PerfStats stats;
-    stats.addDouble("time-qvcalq", watch.check());
-
-    return std::make_tuple(std::move(param), std::move(desc), stats);
-}
-
 void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                             core::AccessUnit::Descriptor& desc) {
     // objects required for calq
@@ -104,7 +82,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     calq::DecodingBlock output;
 
     // fill calq objects
-    for (const auto& rec : chunk.getData()) {
+    for (auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
         auto& f_alignment = rec.getAlignments().front();
 
@@ -143,13 +121,66 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 
     // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
-    setUpParameters(output, param);
-    fillDescriptor(output, desc);
+    setUpParametersAligned(output, param);
+    fillDescriptorAligned(output, desc);
 
     return;
 }
 
-void Encoder::encodeUnaligned(const core::record::Chunk& chunk, core::AccessUnit::Descriptor& desc) {}
+void Encoder::setUpUnaligned(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {
+    // setup param
+    paramqv1::ParameterSet set;
+    auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
+    set.addCodeBook(std::move(codebook));
+    param.setQvps(std::move(set));
+
+    // setup descriptor
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
+}
+
+// from qvwriteout/encoder
+void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc) {
+    for (const auto& q : s.getQualities()) {
+        for (const auto& c : q) {
+            UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
+            desc.get((uint16_t)desc.getSize() - 1).push(c - 33);
+        }
+    }
+}
+
+void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
+                              core::AccessUnit::Descriptor& desc) {
+    setUpUnaligned(param, desc);
+
+    for (const auto& rec : chunk.getData()) {
+        for (const auto& seg : rec.getSegments()) {
+            addQualities(seg, desc);
+        }
+    }
+}
+
+core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
+    util::Watch watch;
+    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+
+    const ClassType& classType = chunk.getData()[0].getClassID();
+    calq::SideInformation sideInformation;
+    calq::EncodingBlock encodingBlock;
+
+    if (classType == ClassType::CLASS_U) {
+        encodeUnaligned(chunk, *param, desc);
+    } else {
+        encodeAligned(chunk, *param, desc);
+    }
+
+    core::stats::PerfStats stats;
+    stats.addDouble("time-qvcalq", watch.check());
+
+    return std::make_tuple(std::move(param), std::move(desc), stats);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
