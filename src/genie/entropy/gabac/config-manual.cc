@@ -508,7 +508,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
 
                     trnsfSubsymID[0] = paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
                     break;
-                case 3:  // subSequenceID >= 2
+                default:  // subSequenceID >= 2
                     trnsfSubseqID = paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
                     outputSymbolSize[0] = 8;
                     codingSubSymSize[0] = 8;
