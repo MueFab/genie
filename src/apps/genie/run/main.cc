@@ -25,6 +25,7 @@
 #include "genie/module/default-setup.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/quality/qvcalq/encoder.h"
+#include "genie/quality/qvcalq/decoder.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
 
@@ -212,6 +213,10 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
     constexpr size_t BLOCKSIZE = 128000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
+
+    if (pOpts.qvMode == "calq") {
+        flow->setQVCoder(genie::util::make_unique<genie::quality::qvcalq::Decoder>(), 0);
+    }
 
     std::string json_uri_path = pOpts.inputRefFile;
     if (ghc::filesystem::exists(pOpts.inputFile + ".json") && ghc::filesystem::file_size(pOpts.inputFile + ".json")) {
