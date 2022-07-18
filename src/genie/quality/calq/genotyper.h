@@ -47,7 +47,7 @@ class Genotyper
                                                'C',
                                                'G',
                                                'T'};
-    const size_t ALLELE_ALPHABET_SIZE = 4;
+    static constexpr size_t ALLELE_ALPHABET_SIZE = 4;
 
     const std::vector<char> alleleAlphabet_;
     std::map<char, double> alleleLikelihoods_;

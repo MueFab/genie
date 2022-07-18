@@ -102,10 +102,10 @@ void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf){
 
 // -----------------------------------------------------------------------------
 
-LloydMaxQuantizer::LloydMaxQuantizer(size_t steps){
-    this->steps = steps;
-    borders.resize(steps, 0);
-    values.resize(steps, 0);
+LloydMaxQuantizer::LloydMaxQuantizer(size_t _steps){
+    this->steps = _steps;
+    borders.resize(_steps, 0);
+    values.resize(_steps, 0);
 }
 
 // -----------------------------------------------------------------------------
