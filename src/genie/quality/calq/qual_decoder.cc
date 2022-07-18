@@ -56,9 +56,14 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
         }
 
         switch (samRecord.cigar[cigarIdx]) {
-            case 'M':
+            case 'A':
+            case 'C':
+            case 'G':
+            case 'T':
+            case 'N':
+                opLen = 1;
+                /* fall through */
             case '=':
-            case 'X':
                 // Decode opLen quality value indices with computed
                 // quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
@@ -83,8 +88,8 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }
                 break;
-            case 'I':
-            case 'S':
+            case '+':
+            case ')':
                 // Decode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
                     int qualityValueIndex =
@@ -95,13 +100,14 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }
                 break;
-            case 'D':
-            case 'N':
+            case '-':
                 qvciPos += opLen;
                 break;  // do nothing as these bases are not present
-            case 'H':
-            case 'P':
+            case ']':
                 break;  // these have been clipped
+            case '(':
+            case '[':
+                break;  // ignore first clip char
             default:
                 throwErrorException("Bad CIGAR string");
         }
