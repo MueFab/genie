@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/quality/qvcalq//encoder.h"
+#include "genie/quality/qvcalq/encoder.h"
+#include "genie/quality/qvcalq/permutation.h"
 #include <string>
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
@@ -18,24 +19,6 @@ namespace quality {
 namespace qvcalq {
 
 using ClassType = core::record::ClassType;
-
-template <typename T>
-std::vector<std::size_t> sort_permutation(const std::vector<T>& vec) {
-    std::vector<std::size_t> p(vec.size());
-    std::iota(p.begin(), p.end(), 0);
-    std::sort(p.begin(), p.end(), [&](std::size_t i, std::size_t j) { return vec[i] < vec[j]; });
-    return p;
-}
-
-template <typename T>
-std::vector<T> apply_permutation(const std::vector<T>& vec, const std::vector<std::size_t>& p) {
-    std::vector<T> sorted_vec(vec.size());
-    std::transform(p.begin(), p.end(), sorted_vec.begin(), [&](std::size_t i) { return vec[i]; });
-    return sorted_vec;
-}
-
-// void Encoder::setUpParameters(const calq::DecodingBlock output, paramqv1::QualityValues1& param,
-//                            core::AccessUnit::Descriptor& desc) {}
 
 paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     paramqv1::Codebook codebook(vec[0], vec[1]);

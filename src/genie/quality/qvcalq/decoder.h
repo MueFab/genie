@@ -14,6 +14,7 @@
 #include <vector>
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/qv-decoder.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include "genie/util/watch.h"
 
@@ -27,6 +28,9 @@ namespace qvcalq {
  * @brief
  */
 class Decoder : public core::QVDecoder {
+ private:
+    void fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc, const quality::paramqv1::QualityValues1& param);
+
  public:
     /**
      * @brief
