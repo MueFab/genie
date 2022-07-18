@@ -52,9 +52,9 @@ Haplotyper::Haplotyper(size_t sigma,
         size_t size = kernel.calcMinSize(THRESHOLD, filterCutOff * 2 + 1);
 
         buffer = FilterBuffer(
-                [kernel](size_t pos, size_t size) -> double
+                [kernel](size_t pos, size_t _size) -> double
                 {
-                    return kernel.calcValue(pos, size);
+                    return kernel.calcValue(pos, _size);
                 }, size
         );
         localDistortion = kernel.calcValue((size - 1) / 2, size);
@@ -63,9 +63,9 @@ Haplotyper::Haplotyper(size_t sigma,
         size_t size = kernel.calcMinSize(filterCutOff * 2 + 1);
 
         buffer = FilterBuffer(
-                [kernel](size_t pos, size_t size) -> double
+                [kernel](size_t pos, size_t _size) -> double
                 {
-                    return kernel.calcValue(pos, size);
+                    return kernel.calcValue(pos, _size);
                 }, size
         );
         localDistortion = kernel.calcValue((size - 1) / 2, size);

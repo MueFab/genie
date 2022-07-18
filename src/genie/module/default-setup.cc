@@ -133,7 +133,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
 
     ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Decoder>());
     ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>&,
-                          genie::core::AccessUnit::Descriptor&) -> size_t {
+                          const std::vector<uint64_t>&, genie::core::AccessUnit::Descriptor&) -> size_t {
         UTILS_DIE_IF(param.getMode() != 1, "Unsupported QV decoding mode");
         return 0;
     });

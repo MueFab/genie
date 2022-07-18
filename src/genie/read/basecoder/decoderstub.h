@@ -36,6 +36,7 @@ class DecoderStub : public core::ReadDecoder {
         size_t numSegments;                                       //!< @brief
         size_t ref;                                               //!< @brief
         std::vector<std::string> ecigars;                         //!< @brief
+        std::vector<uint64_t> positions;                          //!< @brief
         std::unique_ptr<core::parameter::QualityValues> qvparam;  //!< @brief
 
         /**
@@ -93,7 +94,8 @@ class DecoderStub : public core::ReadDecoder {
      * @param rec
      * @param cig_vec
      */
-    virtual void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec);
+    virtual void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec,
+                           std::vector<uint64_t>& pos_vec);
 
     /**
      * @brief

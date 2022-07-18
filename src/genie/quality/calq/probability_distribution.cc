@@ -10,11 +10,11 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-ProbabilityDistribution::ProbabilityDistribution(size_t rangeMin,
-                                                 size_t rangeMax
+ProbabilityDistribution::ProbabilityDistribution(size_t _rangeMin,
+                                                 size_t _rangeMax
 ){
-    this->rangeMin = rangeMin;
-    this->pdf.resize(rangeMax - rangeMin + 1);
+    this->rangeMin = _rangeMin;
+    this->pdf.resize(_rangeMax - _rangeMin + 1);
 }
 
 // -----------------------------------------------------------------------------

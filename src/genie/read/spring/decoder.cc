@@ -268,12 +268,15 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     std::array<std::vector<Record>, 2> unmatched_records;
 
     std::vector<std::string> ecigars;
+    std::vector<uint64_t> positions;
     while (!au.get(core::GenSub::RTYPE).end()) {
         if (au.get(core::GenSub::RTYPE).pull() != 5) {
             ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+            positions.emplace_back(std::numeric_limits<uint64_t>::max());
             if (cp.paired_end) {
                 if (au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
                     ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                    positions.emplace_back(std::numeric_limits<uint64_t>::max());
                 }
             }
         } else {
@@ -292,7 +295,7 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
         UTILS_DIE("combinePairsFlag cannot be set to true when read names are not present for all records.");
 
     au.getStats().add(std::get<1>(names));
-    auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars,
+    auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars, positions,
                                 au.get(core::GenDesc::QV));
     au.getStats().add(std::get<1>(qvs));
     watch.resume();
