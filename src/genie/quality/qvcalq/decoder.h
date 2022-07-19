@@ -29,7 +29,15 @@ namespace qvcalq {
  */
 class Decoder : public core::QVDecoder {
  private:
-    void fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc, const quality::paramqv1::QualityValues1& param);
+    bool isAligned(const core::AccessUnit::Descriptor& desc);
+    std::vector<std::string> decodeAligned(const quality::paramqv1::QualityValues1& param,
+                                           const std::vector<std::string>& ecigar_vec,
+                                           const std::vector<uint64_t>& positions, core::AccessUnit::Descriptor& desc);
+    std::vector<std::string> decodeUnaligned(const quality::paramqv1::QualityValues1& param,
+                                             const std::vector<std::string>& ecigar_vec,
+                                             core::AccessUnit::Descriptor& desc);
+    void fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
+                   const quality::paramqv1::QualityValues1& param);
 
  public:
     /**
