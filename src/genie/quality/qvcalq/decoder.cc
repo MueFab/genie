@@ -38,8 +38,7 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     calq::EncodingBlock output;
     calq::DecodingBlock input;
 
-
-    sideInformation.qualOffset = 0;
+    sideInformation.qualOffset = 33;  // TODO ASK
     fillInput(input, desc, param);
 
     // fill sideInformation
@@ -87,7 +86,6 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
             });
     }
     return qv;
-
 }
 
 void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,

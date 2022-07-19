@@ -5,11 +5,11 @@
  */
 
 #include "genie/quality/qvcalq/encoder.h"
-#include "genie/quality/qvcalq/permutation.h"
 #include <string>
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
+#include "genie/quality/qvcalq/permutation.h"
 #include "genie/util/watch.h"
 #include "iostream"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 
     // set offset
     sideInformation.posOffset = sideInformation.positions.front();
-    sideInformation.qualOffset = 0;
+    sideInformation.qualOffset = 33;
 
     // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
