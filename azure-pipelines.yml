@@ -8,9 +8,9 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
+        macos1200:
+          imageName: 'macos-12'
+          artifactName: 'macos1200'
           binDir: 'bin'
         macos1100:
           imageName: 'macos-11'
@@ -88,9 +88,9 @@ stages:
           artifactName: 'ubuntu2004'
           architecture: ''
           binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
+        macos1200:
+          imageName: 'macos-12'
+          artifactName: 'macos1200'
           architecture: ''
           binDir: 'bin'
         macos1100:
@@ -150,9 +150,9 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
+        macos1200:
+          imageName: 'macos-12'
+          artifactName: 'macos1200'
           fileExt: ''
         macos1100:
           imageName: 'macos-11'
@@ -265,9 +265,9 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
+        macos1200:
+          imageName: 'macos-12'
+          artifactName: 'macos1200'
           fileExt: ''
         macos1100:
           imageName: 'macos-11'
@@ -359,9 +359,9 @@ stages:
   - job: 'OSX'
     strategy:
       matrix:
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
+        macos1200:
+          imageName: 'macos-12'
+          artifactName: 'macos1200'
           fileExt: ''
         macos1100:
           imageName: 'macos-11'
