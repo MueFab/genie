@@ -251,6 +251,11 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
     auto startPos = cigar_extended.find_first_not_of(']');
     uint64_t cigarOffset = startPos == std::string::npos ? 0 : startPos;
     if (container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
+        for (auto &c : sequence) {
+            if (c == 0) {
+                c = getAlphabetProperties(core::AlphabetID::ACGTN).lut[container.pull(core::GenSub::UREADS)];
+            }
+        }
         return;
     }
     while (!container.pull(core::GenSub::MMPOS_TERMINATOR)) {
