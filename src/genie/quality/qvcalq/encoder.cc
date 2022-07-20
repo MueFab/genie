@@ -151,8 +151,6 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
     const ClassType& classType = chunk.getData()[0].getClassID();
-    calq::SideInformation sideInformation;
-    calq::EncodingBlock encodingBlock;
 
     if (classType == ClassType::CLASS_U) {
         encodeUnaligned(chunk, *param, desc);
