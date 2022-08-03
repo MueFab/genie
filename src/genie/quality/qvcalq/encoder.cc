@@ -102,6 +102,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     // set offset
     sideInformation.posOffset = sideInformation.positions.front();
     sideInformation.qualOffset = 33;
+    encodingOptions.qualityValueMax = 93;
 
     // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
