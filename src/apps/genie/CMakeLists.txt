@@ -47,7 +47,7 @@ target_link_libraries(genie PRIVATE genie-mgrec)
 target_link_libraries(genie PRIVATE genie-mgb)
 target_link_libraries(genie PRIVATE genie-localassembly)
 target_link_libraries(genie PRIVATE genie-qvwriteout)
-target_link_libraries(genie PRIVATE genie-qvcalq)
+target_link_libraries(genie PRIVATE genie-calq)
 target_link_libraries(genie PRIVATE genie-util)
 
 if (${GENIE_USE_OPENMP})

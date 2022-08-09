@@ -4,11 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/quality/qvcalq/decoder.h"
+#include "genie/quality/calq/decoder.h"
 #include <string>
 #include <tuple>
 #include <vector>
-#include "genie/quality/qvcalq/permutation.h"
+#include "genie/quality/calq/permutation.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
