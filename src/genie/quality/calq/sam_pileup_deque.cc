@@ -149,7 +149,7 @@ void SAMPileupDeque::add(const EncodingRead& r, uint8_t qvalOffset, uint8_t hqSo
             continue;
         }
 
-        const auto HQ_SOFTCLIP_THRESHOLD = static_cast<const char>(hqSoftClipThreshold + qvalOffset);
+        const auto HQ_SOFTCLIP_THRESHOLD = static_cast<char>(hqSoftClipThreshold + qvalOffset);
 
         switch (r.cigar[cigarIdx]) {
             case 'A':
