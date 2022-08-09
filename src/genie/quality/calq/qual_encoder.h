@@ -27,8 +27,7 @@ struct DecodingBlock;
 enum struct Version;
 // -----------------------------------------------------------------------------
 
-struct EncodingRead
-{
+struct EncodingRead {
     uint32_t posMin;
     uint32_t posMax;
     std::string qvalues;
@@ -39,13 +38,9 @@ struct EncodingRead
 
 // -----------------------------------------------------------------------------
 
-class QualEncoder
-{
+class QualEncoder {
  public:
-    explicit QualEncoder(const EncodingOptions& options,
-                         const std::map<int, Quantizer>& quant,
-                         DecodingBlock *out
-    );
+    explicit QualEncoder(const EncodingOptions& options, const std::map<int, Quantizer>& quant, DecodingBlock* out);
     ~QualEncoder();
     void addMappedRecordToBlock(const EncodingRead& samRecord);
     void finishBlock();
@@ -71,7 +66,7 @@ class QualEncoder
 
     Haplotyper haplotyper_;
     Genotyper genotyper_;
-    DecodingBlock *out;
+    DecodingBlock* out;
     size_t posCounter;
 
     uint8_t hqSoftClipThreshold;
@@ -82,8 +77,6 @@ class QualEncoder
     // Double-ended queue holding the SAM records; records get popped when they
     // are finally encoded
     std::deque<EncodingRead> samRecordDeque_;
-
-    bool debugOut;
 
     Version version_;
 };

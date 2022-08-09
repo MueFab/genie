@@ -19,7 +19,6 @@ QualDecoder::QualDecoder(const DecodingBlock& b,
 )
         : posOffset_(positionOffset),
         qualityValueOffset_(qualityOffset),
-        uqvIdx_(0),
         qviIdx_(b.stepindices.size(), 0),
         quantizers_(0),
         out(o),
