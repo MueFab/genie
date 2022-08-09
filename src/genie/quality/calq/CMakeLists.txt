@@ -18,9 +18,17 @@ set(source_files
         softclip_spreader.cc
         uniform_min_max_quantizer.cc
         uniform_quantizer.cc
+        decoder.cc
+        encoder.cc
         )
 
-add_library(calq ${source_files})
+add_library(genie-calq ${source_files})
+
+target_link_libraries(genie-calq PUBLIC genie-core)
+target_link_libraries(genie-calq PUBLIC genie-paramqv1)
+#target_link_libraries(genie-calq PUBLIC calq)
 
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
-target_include_directories(calq PUBLIC "${TOP_DIR}")
+get_filename_component(THIS_DIR ./ ABSOLUTE)
+target_include_directories(genie-calq PUBLIC "${THIS_DIR}")
+target_include_directories(genie-calq PUBLIC "${TOP_DIR}")

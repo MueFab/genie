@@ -24,8 +24,8 @@
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
-#include "genie/quality/qvcalq/encoder.h"
-#include "genie/quality/qvcalq/decoder.h"
+#include "genie/quality/calq/encoder.h"
+#include "genie/quality/calq/decoder.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
 
