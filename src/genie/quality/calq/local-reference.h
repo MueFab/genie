@@ -27,9 +27,12 @@ class LocalReference {
  public:
     uint32_t cr_buf_max_size;  //!< @brief
 
-    std::vector<std::string> sequences;        //!< @brief
-    std::vector<uint64_t> sequence_positions;  //!< @brief
-    uint32_t crBufSize;                        //!< @brief
+    std::vector<std::vector<std::string>> sequences;        //!< @brief
+    std::vector<std::vector<uint64_t>> sequence_positions;  //!< @brief
+    std::vector<std::vector<std::string>> qualities;
+    uint32_t crBufSize;  //!< @brief
+    uint64_t minPos;
+    uint64_t maxPos;
 
     /**
      * @brief
@@ -37,14 +40,14 @@ class LocalReference {
      * @param len
      * @return
      */
-    std::string generateRef(uint32_t offset, uint32_t len);
+    //    std::string generateRef(uint32_t offset, uint32_t len);
 
     /**
      * @brief
      * @param offset_to_first
      * @return
      */
-    char majorityVote(uint32_t offset_to_first);
+    //    char majorityVote(uint32_t offset_to_first);
 
     /**
      * @brief
@@ -74,7 +77,13 @@ class LocalReference {
      * @param ecigar
      * @param position
      */
-    void addSingleRead(const std::string &record, const std::string &ecigar, uint64_t position);
+    //    void addSingleRead(const std::string &record, const std::string &ecigar, uint64_t position);
+
+    std::pair<std::string, std::string> getPileup(uint64_t pos);
+
+    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
+                       uint64_t position);
+
 
     /**
      * @brief
@@ -88,7 +97,7 @@ class LocalReference {
      * @param cigar
      * @return
      */
-    std::string getReference(uint32_t pos_offset, const std::string &cigar);
+    //    std::string getReference(uint32_t pos_offset, const std::string &cigar);
 
     /**
      * @brief
@@ -96,18 +105,18 @@ class LocalReference {
      * @param len
      * @return
      */
-    std::string getReference(uint32_t pos_offset, uint32_t len);
+    //    std::string getReference(uint32_t pos_offset, uint32_t len);
 
     /**
      * @brief
      * @return
      */
-    uint64_t getWindowBorder() const;
+    //    uint64_t getWindowBorder() const;
 
     /**
      * @brief
      */
-    void printWindow() const;
+    //    void printWindow() const;
 
     /**
      * @brief
@@ -118,8 +127,8 @@ class LocalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace localassembly
-}  // namespace read
+}  // namespace calq
+}  // namespace quality
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
