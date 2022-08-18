@@ -49,7 +49,11 @@ class LocalReference {
      */
     //    char majorityVote(uint32_t offset_to_first);
 
+    uint64_t getMinPos() const;
 
+    std::tuple<std::vector<std::vector<std::string>>, std::vector<std::vector<uint64_t>>,
+               std::vector<std::vector<std::string>>>
+    getRecordsBefore(uint64_t pos);
 
     void nextRecord();
     /**
