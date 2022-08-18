@@ -106,6 +106,8 @@ void LocalReference::addSingleRead(const std::string &seq, const std::string &qu
     auto seq_processed = preprocess(seq, ecigar);
     auto qual_processed = preprocess(qual, ecigar);
 
+    UTILS_DIE_IF(seq_processed.empty(), "Empty read");
+
     this->minPos = std::min(this->minPos, position);
     this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
 
@@ -162,8 +164,12 @@ std::pair<std::string, std::string> LocalReference::getPileup(uint64_t pos) {
                 continue;
             }
 
-            seqs.push_back(seq[pos - pos_read]);
-            quals.push_back(qual[pos - pos_read]);
+            char base = seq[pos - pos_read];
+
+            if (base != '0') {
+                seqs.push_back(seq[pos - pos_read]);
+                quals.push_back(qual[pos - pos_read]);
+            }
         }
     }
     return std::make_pair(seqs, quals);
@@ -321,6 +327,11 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t LocalReference::getMaxBufferSize() const { return cr_buf_max_size; }
+void LocalReference::nextRecord() {
+    sequences.emplace_back();
+    sequence_positions.emplace_back();
+    qualities.emplace_back();
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
