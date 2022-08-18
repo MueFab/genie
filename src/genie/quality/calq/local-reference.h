@@ -24,7 +24,6 @@ namespace calq {
  * @brief
  */
 class LocalReference {
- public:
     uint32_t cr_buf_max_size;  //!< @brief
 
     std::vector<std::vector<std::string>> sequences;        //!< @brief
@@ -34,6 +33,7 @@ class LocalReference {
     uint64_t minPos;
     uint64_t maxPos;
 
+ public:
     /**
      * @brief
      * @param offset
@@ -49,6 +49,9 @@ class LocalReference {
      */
     //    char majorityVote(uint32_t offset_to_first);
 
+
+
+    void nextRecord();
     /**
      * @brief
      * @param read
@@ -83,7 +86,6 @@ class LocalReference {
 
     void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
                        uint64_t position);
-
 
     /**
      * @brief
