@@ -327,10 +327,17 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t LocalReference::getMaxBufferSize() const { return cr_buf_max_size; }
+uint64_t LocalReference::getMinPos() const { return minPos; };
+
 void LocalReference::nextRecord() {
     sequences.emplace_back();
     sequence_positions.emplace_back();
     qualities.emplace_back();
+}
+std::tuple<std::vector<std::vector<std::string>>, std::vector<std::vector<uint64_t>>,
+           std::vector<std::vector<std::string>>>
+LocalReference::getRecordsBefore(uint64_t pos) {
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
