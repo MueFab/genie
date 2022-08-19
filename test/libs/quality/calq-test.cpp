@@ -131,3 +131,56 @@ TEST(CalqTest, localReferenceSoftClips) {
     EXPECT_EQ(seq, "AT");
     EXPECT_EQ(qual, "at");
 }
+
+TEST(CalqTest, localReferenceGetRecordsBefore) {
+    auto pileup = genie::quality::calq::LocalReference(1024);
+
+    pileup.nextRecord();
+    pileup.addSingleRead("AA", "aa", "2=", 1);
+    pileup.addSingleRead("AA", "aa", "2=", 3);
+
+    pileup.nextRecord();
+    pileup.addSingleRead("GG", "gg", "2=", 5);
+    pileup.addSingleRead("GG", "gg", "2=", 7);
+
+    EXPECT_EQ(pileup.getMinPos(), 1);
+
+    auto pileup_copy = pileup;
+
+    std::vector<std::vector<std::string>> seqs, quals;
+    std::vector<std::vector<uint64_t>> positions;
+
+    // nothing before pos
+    std::tie(positions, seqs, quals) = pileup_copy.getRecordsBefore(4);
+    EXPECT_TRUE(positions.empty());
+    EXPECT_TRUE(seqs.empty());
+    EXPECT_TRUE(quals.empty());
+
+    // one record before pos
+    std::tie(positions, seqs, quals) = pileup_copy.getRecordsBefore(6);
+    EXPECT_EQ(pileup_copy.getMinPos(), 5);
+    EXPECT_EQ(positions.size(), 1);
+    EXPECT_EQ(positions[0][0], 1);
+    EXPECT_EQ(positions[0][1], 3);
+    EXPECT_EQ(seqs[0][0], "AA");
+    EXPECT_EQ(seqs[0][1], "AA");
+    EXPECT_EQ(quals[0][0], "aa");
+    EXPECT_EQ(quals[0][1], "aa");
+
+    // remove all
+    std::tie(positions, seqs, quals) = pileup.getRecordsBefore(9);
+    EXPECT_TRUE(pileup.empty());
+    EXPECT_EQ(positions.size(), 2);
+    EXPECT_EQ(positions[0][0], 1);
+    EXPECT_EQ(positions[0][1], 3);
+    EXPECT_EQ(positions[1][0], 5);
+    EXPECT_EQ(positions[1][1], 7);
+    EXPECT_EQ(seqs[0][0], "AA");
+    EXPECT_EQ(seqs[0][1], "AA");
+    EXPECT_EQ(seqs[1][0], "GG");
+    EXPECT_EQ(seqs[1][1], "GG");
+    EXPECT_EQ(quals[0][0], "aa");
+    EXPECT_EQ(quals[0][1], "aa");
+    EXPECT_EQ(quals[1][0], "gg");
+    EXPECT_EQ(quals[1][1], "gg");
+}

@@ -51,7 +51,11 @@ class LocalReference {
 
     uint64_t getMinPos() const;
 
-    std::tuple<std::vector<std::vector<std::string>>, std::vector<std::vector<uint64_t>>,
+    bool empty();
+
+    static bool isRecordBeforePos(const std::vector<uint64_t>& positions, const std::vector<std::string>& seqs, uint64_t pos);
+
+    std::tuple<std::vector<std::vector<uint64_t>>, std::vector<std::vector<std::string>>,
                std::vector<std::vector<std::string>>>
     getRecordsBefore(uint64_t pos);
 
