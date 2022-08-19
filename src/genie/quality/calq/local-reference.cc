@@ -22,7 +22,7 @@ namespace calq {
 // ---------------------------------------------------------------------------------------------------------------------
 
 LocalReference::LocalReference(uint32_t _cr_buf_max_size)
-    : cr_buf_max_size(_cr_buf_max_size), crBufSize(0), minPos(0), maxPos(0) {}
+    : cr_buf_max_size(_cr_buf_max_size), crBufSize(0), minPos(-1), maxPos(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,8 +111,8 @@ void LocalReference::addSingleRead(const std::string &seq, const std::string &qu
     this->minPos = std::min(this->minPos, position);
     this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
 
-    sequences.back().push_back(std::move(seq_processed));
-    qualities.back().push_back(std::move(qual_processed));
+    sequences.back().emplace_back(std::move(seq_processed));
+    qualities.back().emplace_back(std::move(qual_processed));
     sequence_positions.back().push_back(position);
 }
 
@@ -327,17 +327,87 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t LocalReference::getMaxBufferSize() const { return cr_buf_max_size; }
-uint64_t LocalReference::getMinPos() const { return minPos; };
+uint64_t LocalReference::getMinPos() const { return minPos; }
 
 void LocalReference::nextRecord() {
     sequences.emplace_back();
     sequence_positions.emplace_back();
     qualities.emplace_back();
 }
-std::tuple<std::vector<std::vector<std::string>>, std::vector<std::vector<uint64_t>>,
+
+std::tuple<std::vector<std::vector<uint64_t>>, std::vector<std::vector<std::string>>,
            std::vector<std::vector<std::string>>>
 LocalReference::getRecordsBefore(uint64_t pos) {
+    // new vectors
+    std::vector<std::vector<std::string>> return_seqs, return_quals, new_seqs, new_quals;
+    std::vector<std::vector<uint64_t>> return_positions, new_positions;
 
+    if (pos <= this->minPos) {
+        // return empty vectors
+        return std::make_tuple(return_positions, return_seqs, return_quals);
+    }
+
+    if (pos > this->maxPos) {
+        // return all
+        this->minPos = -1;
+        this->maxPos = 0;
+
+        std::swap(this->sequence_positions, return_positions);
+        std::swap(this->sequences, return_seqs);
+        std::swap(this->qualities, return_quals);
+
+        return std::make_tuple(return_positions, return_seqs, return_quals);
+    }
+
+    for (uint64_t record_i = 0; record_i < this->sequence_positions.size(); ++record_i) {
+        auto &record_positions = this->sequence_positions[record_i];
+        auto &record_seqs = this->sequences[record_i];
+
+        // move record to according vector
+        if (isRecordBeforePos(record_positions, record_seqs, pos)) {
+            return_positions.emplace_back(std::move(this->sequence_positions[record_i]));
+            return_seqs.emplace_back(std::move(this->sequences[record_i]));
+            return_quals.emplace_back(std::move(this->qualities[record_i]));
+        } else {
+            new_positions.emplace_back(std::move(this->sequence_positions[record_i]));
+            new_seqs.emplace_back(std::move(this->sequences[record_i]));
+            new_quals.emplace_back(std::move(this->qualities[record_i]));
+        }
+    }
+
+    // assign new min/max values
+    this->minPos = -1;
+    for (auto &recordPositions : new_positions) {
+        for (auto read_pos : recordPositions) {
+            this->minPos = std::min(this->minPos, read_pos);
+        }
+    }
+    if (new_positions.empty()) {
+        this->maxPos = 0;
+    }
+
+    // assign new vectors to class
+    this->sequence_positions = std::move(new_positions);
+    this->sequences = std::move(new_seqs);
+    this->qualities = std::move(new_quals);
+
+    return std::make_tuple(return_positions, return_seqs, return_quals);
+}
+
+bool LocalReference::isRecordBeforePos(const std::vector<uint64_t> &positions, const std::vector<std::string> &seqs,
+                                       uint64_t pos) {
+    for (uint64_t read_i = 0; read_i < positions.size(); ++read_i) {
+        uint64_t readMaxPos = positions[read_i] + seqs[read_i].size() - 1;
+
+        if (readMaxPos >= pos) {
+            return false;
+        }
+    }
+
+    return true;
+}
+bool LocalReference::empty() {
+    return sequence_positions.empty() && sequences.empty() && qualities.empty();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
