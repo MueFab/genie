@@ -71,14 +71,16 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
 
     // Check quality value range
     for (auto const& samRecord : input.qvalues) {
-        for (auto const& q : samRecord) {
-            if ((static_cast<int>(q) - opt.qualityValueOffset) < opt.qualityValueMin) {
-                throwErrorException("Quality value too small");
+        for (auto const& read : samRecord) {
+            for (auto const& q : read) {
+                if ((static_cast<int>(q) - opt.qualityValueOffset) < opt.qualityValueMin) {
+                    throwErrorException("Quality value too small");
+                }
+                if ((static_cast<int>(q) - opt.qualityValueOffset) > opt.qualityValueMax) {
+                    throwErrorException("Quality value too large");
+                }
+                pdf.addToPdf((static_cast<size_t>(q) - opt.qualityValueOffset));
             }
-            if ((static_cast<int>(q) - opt.qualityValueOffset) > opt.qualityValueMax) {
-                throwErrorException("Quality value too large");
-            }
-            pdf.addToPdf((static_cast<size_t>(q) - opt.qualityValueOffset));
         }
     }
 
@@ -101,14 +103,8 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     // Encode the quality values
     QualEncoder qualEncoder(opt, quantizers, output);
     for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-        std::string ref;
-        uint32_t len = computeLength(sideInformation.cigars[i]);
-        if (opt.version == Version::V2) {
-            ref = sideInformation.reference.substr(sideInformation.positions[i] - sideInformation.positions[0], len);
-        }
-        EncodingRead r = {sideInformation.positions[i], sideInformation.positions[i] + len, input.qvalues[i],
-                          sideInformation.cigars[i],    sideInformation.sequences[i],       ref};
-        qualEncoder.addMappedRecordToBlock(r);
+        qualEncoder.addMappedRecordToBlock(input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
+                                           sideInformation.positions[i]);
     }
 
     qualEncoder.finishBlock();
@@ -118,13 +114,17 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
 
 void decode(const DecodingOptions&, const SideInformation& sideInformation, const DecodingBlock& input,
             EncodingBlock* output) {
+    (void)sideInformation;
+    (void)input;
+    (void)output;
     // Decode the quality values
-    QualDecoder qualDecoder(input, sideInformation.positions[0], sideInformation.qualOffset, output);
-    output->qvalues.clear();
-    for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-        DecodingRead r = {sideInformation.positions[i], sideInformation.cigars[i]};
-        qualDecoder.decodeMappedRecordFromBlock(r);
-    }
+    // TODO: Jan fixing api
+    //    QualDecoder qualDecoder(input, sideInformation.positions[0], sideInformation.qualOffset, output);
+    //    output->qvalues.clear();
+    //    for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
+    //        DecodingRead r = {sideInformation.positions[i], sideInformation.cigars[i]};
+    //        qualDecoder.decodeMappedRecordFromBlock(r);
+    //    }
 }
 
 // -----------------------------------------------------------------------------

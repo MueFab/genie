@@ -20,7 +20,7 @@ set(source_files
         uniform_quantizer.cc
         decoder.cc
         encoder.cc
-        local-reference.cc
+        record_pileup.cc
         )
 
 add_library(genie-calq ${source_files})

@@ -38,7 +38,7 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     calq::EncodingBlock output;
     calq::DecodingBlock input;
 
-    sideInformation.qualOffset = 33;  // TODO ASK
+    sideInformation.qualOffset = 33;
     fillInput(input, desc, param);
 
     // fill sideInformation

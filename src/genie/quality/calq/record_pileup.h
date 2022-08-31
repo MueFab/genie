@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_LOCAL_REFERENCE_H_
-#define SRC_GENIE_QUALITY_CALQ_LOCAL_REFERENCE_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
+#define SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace calq {
 /**
  * @brief
  */
-class LocalReference {
+class RecordPileup {
     std::vector<std::vector<std::string>> sequences;        //!< @brief
     std::vector<std::vector<uint64_t>> sequence_positions;  //!< @brief
     std::vector<std::vector<std::string>> qualities;
@@ -34,7 +34,7 @@ class LocalReference {
     /**
      * @brief
      */
-    explicit LocalReference();
+    explicit RecordPileup();
 
     /**
      *
@@ -119,7 +119,7 @@ class LocalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_LOCAL_REFERENCE_H_
+#endif  //SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
