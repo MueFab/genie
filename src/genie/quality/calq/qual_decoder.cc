@@ -112,7 +112,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
         }
         opLen = 0;
     }
-    out->qvalues.push_back(std::move(qual));
+//    out->qvalues.push_back(std::move(qual)); // TODO: jan
 }
 
 // -----------------------------------------------------------------------------

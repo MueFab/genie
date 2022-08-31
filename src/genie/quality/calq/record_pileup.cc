@@ -4,7 +4,6 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/quality/calq/local-reference.h"
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -12,6 +11,7 @@
 #include <map>
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/quality/calq/record_pileup.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,11 +21,11 @@ namespace calq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LocalReference::LocalReference() : minPos(-1), maxPos(0) {}
+RecordPileup::RecordPileup() : minPos(-1), maxPos(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string LocalReference::preprocess(const std::string &read, const std::string &cigar) {
+std::string RecordPileup::preprocess(const std::string &read, const std::string &cigar) {
     std::string result;
     size_t count = 0;
     size_t read_pos = 0;
@@ -83,7 +83,7 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalReference::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
+void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
                                    uint64_t position) {
     auto seq_processed = preprocess(seq, ecigar);
     auto qual_processed = preprocess(qual, ecigar);
@@ -100,7 +100,7 @@ void LocalReference::addSingleRead(const std::string &seq, const std::string &qu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<std::string, std::string> LocalReference::getPileup(uint64_t pos) {
+std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
     UTILS_DIE_IF((pos < this->minPos || pos > this->maxPos), "Position out of range");
 
     std::string seqs, quals;
@@ -128,7 +128,7 @@ std::pair<std::string, std::string> LocalReference::getPileup(uint64_t pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalReference::addRead(const core::record::Record &s) {
+void RecordPileup::addRead(const core::record::Record &s) {
     sequences.emplace_back();
     sequence_positions.emplace_back();
     qualities.emplace_back();
@@ -161,7 +161,7 @@ void LocalReference::addRead(const core::record::Record &s) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
+uint32_t RecordPileup::lengthFromCigar(const std::string &cigar) {
     uint32_t len = 0;
     uint32_t count = 0;
     for (char cigar_pos : cigar) {
@@ -202,11 +202,11 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t LocalReference::getMinPos() const { return minPos; }
+uint64_t RecordPileup::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalReference::nextRecord() {
+void RecordPileup::nextRecord() {
     sequences.emplace_back();
     sequence_positions.emplace_back();
     qualities.emplace_back();
@@ -216,7 +216,7 @@ void LocalReference::nextRecord() {
 
 std::tuple<std::vector<std::vector<uint64_t>>, std::vector<std::vector<std::string>>,
            std::vector<std::vector<std::string>>>
-LocalReference::getRecordsBefore(uint64_t pos) {
+RecordPileup::getRecordsBefore(uint64_t pos) {
     // new vectors
     std::vector<std::vector<std::string>> return_seqs, return_quals, new_seqs, new_quals;
     std::vector<std::vector<uint64_t>> return_positions, new_positions;
@@ -275,7 +275,7 @@ LocalReference::getRecordsBefore(uint64_t pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LocalReference::isRecordBeforePos(const std::vector<uint64_t> &positions, const std::vector<std::string> &seqs,
+bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions, const std::vector<std::string> &seqs,
                                        uint64_t pos) {
     for (uint64_t read_i = 0; read_i < positions.size(); ++read_i) {
         uint64_t readMaxPos = positions[read_i] + seqs[read_i].size() - 1;
@@ -290,7 +290,7 @@ bool LocalReference::isRecordBeforePos(const std::vector<uint64_t> &positions, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LocalReference::empty() { return sequence_positions.empty() && sequences.empty() && qualities.empty(); }
+bool RecordPileup::empty() { return sequence_positions.empty() && sequences.empty() && qualities.empty(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

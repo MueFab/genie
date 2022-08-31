@@ -14,6 +14,7 @@
 #include "genotyper.h"
 #include "haplotyper.h"
 #include "quantizer.h"
+#include "record_pileup.h"
 #include "sam_pileup_deque.h"
 
 // -----------------------------------------------------------------------------
@@ -42,16 +43,18 @@ class QualEncoder {
  public:
     explicit QualEncoder(const EncodingOptions& options, const std::map<int, Quantizer>& quant, DecodingBlock* out);
     ~QualEncoder();
-    void addMappedRecordToBlock(const EncodingRead& samRecord);
+    void addMappedRecordToBlock(const std::vector<std::string>& qvalues, const std::vector<std::string>& seqs,
+                                const std::vector<std::string>& cigars, const std::vector<std::uint32_t>& positions);
     void finishBlock();
     size_t nrMappedRecords() const;
 
  private:
-    void encodeMappedQual(const EncodingRead& samRecord);
+    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint32_t pos);
 
  private:
     // Sizes & counters
     size_t nrMappedRecords_;
+    size_t minPosUnencoded;
 
     int NR_QUANTIZERS;
 
@@ -63,6 +66,7 @@ class QualEncoder {
 
     // Pileup
     SAMPileupDeque samPileupDeque_;
+    genie::quality::calq::RecordPileup recordPileup;
 
     Haplotyper haplotyper_;
     Genotyper genotyper_;

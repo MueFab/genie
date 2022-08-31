@@ -28,20 +28,20 @@ struct SideInformation
      * 1-based leftmost mapping position for each read.
      * Needed for: Encoding, Decoding.
      */
-    std::vector<uint32_t> positions;
+    std::vector<std::vector<uint32_t>> positions;
 
     /**
      * Base sequence for each read.
      * Needed for: Encoding, Decoding (only using sequence lengths, so the
      * exact characters are not important)
      */
-    std::vector<std::string> sequences;
+    std::vector<std::vector<std::string>> sequences;
 
     /**
      * Cigar string for each read.
      * Needed for: Encoding.
      */
-    std::vector<std::string> cigars;
+    std::vector<std::vector<std::string>> cigars;
 
     /**
      * Reference sequence starting from the first mapped base through the last
@@ -74,7 +74,7 @@ struct EncodingBlock
     /**
      * Sequences of quality values for each read (mapped).
      */
-    std::vector<std::string> qvalues;
+    std::vector<std::vector<std::string>> qvalues;
 };
 
 // -----------------------------------------------------------------------------

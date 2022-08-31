@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "genie/quality/calq/local-reference.h"
+#include "genie/quality/calq/record_pileup.h"
 
 TEST(CalqTest, localReferenceBasic) {
-    auto pileup = genie::quality::calq::LocalReference();
+    auto pileup = genie::quality::calq::RecordPileup();
 
     // usually done in addRead, but i dont want to craft records
     // first "record"
@@ -54,7 +54,7 @@ TEST(CalqTest, localReferenceBasic) {
 }
 
 TEST(CalqTest, localReferenceInsertions) {
-    auto pileup = genie::quality::calq::LocalReference();
+    auto pileup = genie::quality::calq::RecordPileup();
 
     pileup.nextRecord();
     pileup.addSingleRead("GGAAAA", "ggaaaa", "2+4=", 0);
@@ -77,7 +77,7 @@ TEST(CalqTest, localReferenceInsertions) {
 }
 
 TEST(CalqTest, localReferenceDeletions) {
-    auto pileup = genie::quality::calq::LocalReference();
+    auto pileup = genie::quality::calq::RecordPileup();
 
     pileup.nextRecord();
     pileup.addSingleRead("AA", "aa", "1=2-1=", 0);
@@ -107,7 +107,7 @@ TEST(CalqTest, localReferenceDeletions) {
 }
 
 TEST(CalqTest, localReferenceSoftClips) {
-    auto pileup = genie::quality::calq::LocalReference();
+    auto pileup = genie::quality::calq::RecordPileup();
 
     pileup.nextRecord();
     pileup.addSingleRead("AAGGAA", "aaggaa", "2=(2)2=", 0);
@@ -133,7 +133,7 @@ TEST(CalqTest, localReferenceSoftClips) {
 }
 
 TEST(CalqTest, localReferenceGetRecordsBefore) {
-    auto pileup = genie::quality::calq::LocalReference();
+    auto pileup = genie::quality::calq::RecordPileup();
 
     pileup.nextRecord();
     pileup.addSingleRead("AA", "aa", "2=", 1);
