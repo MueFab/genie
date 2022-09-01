@@ -83,20 +83,38 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
-                                   uint64_t position) {
-    auto seq_processed = preprocess(seq, ecigar);
-    auto qual_processed = preprocess(qual, ecigar);
+void RecordPileup::addRecord(::calq::EncodingRecord &r) {
 
-    UTILS_DIE_IF(seq_processed.empty(), "Empty read");
+    nextRecord();
 
-    this->minPos = std::min(this->minPos, position);
-    this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
+    for(size_t i=0; i<r.cigars.size();++i){
+        auto seq_processed = preprocess(r.sequences[i], r.cigars[i]);
+        auto qual_processed = preprocess(r.qvalues[i], r.cigars[i]);
 
-    sequences.back().emplace_back(std::move(seq_processed));
-    qualities.back().emplace_back(std::move(qual_processed));
-    sequence_positions.back().push_back(position);
+        this->minPos = std::min(this->minPos, r.positions[i]);
+        this->maxPos = std::max(this->maxPos, r.positions[i] + seq_processed.length() - 1);
+
+        preprocessed_qvalues.back().emplace_back(std::move(seq_processed));
+        preprocessed_sequences.back().emplace_back(std::move(qual_processed));
+    }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
+//                                   uint64_t position) {
+//    auto seq_processed = preprocess(seq, ecigar);
+//    auto qual_processed = preprocess(qual, ecigar);
+//
+//    UTILS_DIE_IF(seq_processed.empty(), "Empty read");
+//
+//    this->minPos = std::min(this->minPos, position);
+//    this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
+//
+//    sequences.back().emplace_back(std::move(seq_processed));
+//    qualities.back().emplace_back(std::move(qual_processed));
+//    sequence_positions.back().push_back(position);
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -105,11 +123,11 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
 
     std::string seqs, quals;
 
-    for (uint64_t i = 0; i < this->sequence_positions.size(); ++i) {
-        for (uint64_t read_i = 0; read_i < this->sequence_positions[i].size(); ++read_i) {
-            const auto pos_read = this->sequence_positions[i][read_i];
-            const auto &seq = this->sequences[i][read_i];
-            const auto &qual = this->qualities[i][read_i];
+    for (uint64_t i = 0; i < this->records.size(); ++i) {
+        for (uint64_t read_i = 0; read_i < records[i].positions.size(); ++read_i) {
+            const auto pos_read = records[i].positions[read_i];
+            const auto &seq = preprocessed_sequences[i][read_i];
+            const auto &qual = preprocessed_qvalues[i][read_i];
 
             if ((pos < pos_read) || (pos > pos_read + seq.size() - 1)) {
                 continue;
@@ -126,38 +144,7 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
     return std::make_pair(seqs, quals);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 
-void RecordPileup::addRead(const core::record::Record &s) {
-    sequences.emplace_back();
-    sequence_positions.emplace_back();
-    qualities.emplace_back();
-
-    const auto &seq1 = s.getSegments()[0].getSequence();
-    const auto &qual1 = s.getSegments()[0].getQualities().front();
-    const auto &cigar1 = s.getAlignments().front().getAlignment().getECigar();
-    const auto pos1 = s.getAlignments().front().getPosition();
-
-    addSingleRead(seq1, qual1, cigar1, pos1);
-
-    if (s.getSegments().size() != 1) {
-        return;
-    }
-
-    UTILS_DIE_IF(s.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                     core::record::AlignmentSplit::Type::SAME_REC,
-                 "Only same record split alignments supported");
-
-    const auto ptr = s.getAlignments().front().getAlignmentSplits().front().get();
-    const auto &rec = dynamic_cast<const core::record::alignment_split::SameRec &>(*ptr);
-
-    const auto &seq2 = s.getSegments()[1].getSequence();
-    const auto &qual2 = s.getSegments()[1].getQualities().front();
-    const auto &cigar2 = rec.getAlignment().getECigar();
-    const auto pos2 = s.getAlignments().front().getPosition() + rec.getDelta();
-
-    addSingleRead(seq2, qual2, cigar2, pos2);
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -207,9 +194,8 @@ uint64_t RecordPileup::getMinPos() const { return minPos; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void RecordPileup::nextRecord() {
-    sequences.emplace_back();
-    sequence_positions.emplace_back();
-    qualities.emplace_back();
+    preprocessed_qvalues.emplace_back();
+    preprocessed_sequences.emplace_back();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -291,6 +277,7 @@ bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions, con
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool RecordPileup::empty() { return sequence_positions.empty() && sequences.empty() && qualities.empty(); }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
