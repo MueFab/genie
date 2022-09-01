@@ -80,6 +80,19 @@ struct EncodingBlock
 // -----------------------------------------------------------------------------
 
 /**
+ * Record containing data of multiple reads
+ */
+struct EncodingRecord{
+    std::vector<std::string> qvalues;
+    std::vector<std::string> sequences;
+    std::vector<std::string> cigars;
+    std::vector<uint64_t> positions;
+};
+
+
+// -----------------------------------------------------------------------------
+
+/**
  * Quantizer types. Static uniform, adaptive lloyd quantizer.
  */
 enum struct QuantizerType

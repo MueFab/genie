@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include "genie/core/record/record.h"
+#include "calq_coder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,9 +25,9 @@ namespace calq {
  * @brief
  */
 class RecordPileup {
-    std::vector<std::vector<std::string>> sequences;        //!< @brief
-    std::vector<std::vector<uint64_t>> sequence_positions;  //!< @brief
-    std::vector<std::vector<std::string>> qualities;
+    std::vector<::calq::EncodingRecord> records;
+    std::vector<std::vector<std::string>> preprocessed_qvalues;
+    std::vector<std::vector<std::string>> preprocessed_sequences;
     uint64_t minPos;
     uint64_t maxPos;
 
@@ -50,14 +51,14 @@ class RecordPileup {
      * @param ecigar
      * @param position
      */
-    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
-                       uint64_t position);
+//    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
+//                       uint64_t position);
 
     /**
      * @brief
      * @param s
      */
-    void addRead(const core::record::Record &s);
+    void addRecord(::calq::EncodingRecord &r);
 
     /**
      *
