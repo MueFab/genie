@@ -86,6 +86,8 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
 void RecordPileup::addRecord(::calq::EncodingRecord &r) {
     nextRecord();
 
+    records.emplace_back(r);
+
     for (size_t i = 0; i < r.cigars.size(); ++i) {
         auto seq_processed = preprocess(r.sequences[i], r.cigars[i]);
         auto qual_processed = preprocess(r.qvalues[i], r.cigars[i]);
@@ -93,8 +95,8 @@ void RecordPileup::addRecord(::calq::EncodingRecord &r) {
         this->minPos = std::min(this->minPos, r.positions[i]);
         this->maxPos = std::max(this->maxPos, r.positions[i] + seq_processed.length() - 1);
 
-        preprocessed_qvalues.back().emplace_back(std::move(seq_processed));
-        preprocessed_sequences.back().emplace_back(std::move(qual_processed));
+        preprocessed_qvalues.back().emplace_back(std::move(qual_processed));
+        preprocessed_sequences.back().emplace_back(std::move(seq_processed));
     }
 }
 
