@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/quality/calq/record_pileup.h"
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -11,7 +12,6 @@
 #include <map>
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/quality/calq/record_pileup.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -84,10 +84,9 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void RecordPileup::addRecord(::calq::EncodingRecord &r) {
-
     nextRecord();
 
-    for(size_t i=0; i<r.cigars.size();++i){
+    for (size_t i = 0; i < r.cigars.size(); ++i) {
         auto seq_processed = preprocess(r.sequences[i], r.cigars[i]);
         auto qual_processed = preprocess(r.qvalues[i], r.cigars[i]);
 
@@ -101,20 +100,20 @@ void RecordPileup::addRecord(::calq::EncodingRecord &r) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
-//                                   uint64_t position) {
-//    auto seq_processed = preprocess(seq, ecigar);
-//    auto qual_processed = preprocess(qual, ecigar);
+// void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
+//                                    uint64_t position) {
+//     auto seq_processed = preprocess(seq, ecigar);
+//     auto qual_processed = preprocess(qual, ecigar);
 //
-//    UTILS_DIE_IF(seq_processed.empty(), "Empty read");
+//     UTILS_DIE_IF(seq_processed.empty(), "Empty read");
 //
-//    this->minPos = std::min(this->minPos, position);
-//    this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
+//     this->minPos = std::min(this->minPos, position);
+//     this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
 //
-//    sequences.back().emplace_back(std::move(seq_processed));
-//    qualities.back().emplace_back(std::move(qual_processed));
-//    sequence_positions.back().push_back(position);
-//}
+//     sequences.back().emplace_back(std::move(seq_processed));
+//     qualities.back().emplace_back(std::move(qual_processed));
+//     sequence_positions.back().push_back(position);
+// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -143,8 +142,6 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
     }
     return std::make_pair(seqs, quals);
 }
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -193,6 +190,10 @@ uint64_t RecordPileup::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t RecordPileup::getMaxPos() const { return maxPos; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void RecordPileup::nextRecord() {
     preprocessed_qvalues.emplace_back();
     preprocessed_sequences.emplace_back();
@@ -200,16 +201,14 @@ void RecordPileup::nextRecord() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<std::vector<std::vector<uint64_t>>, std::vector<std::vector<std::string>>,
-           std::vector<std::vector<std::string>>>
-RecordPileup::getRecordsBefore(uint64_t pos) {
+std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
     // new vectors
-    std::vector<std::vector<std::string>> return_seqs, return_quals, new_seqs, new_quals;
-    std::vector<std::vector<uint64_t>> return_positions, new_positions;
+    std::vector<std::vector<std::string>> new_pre_seqs, new_pre_quals;
+    std::vector<::calq::EncodingRecord> return_records, new_records;
 
     if (pos <= this->minPos) {
         // return empty vectors
-        return std::make_tuple(return_positions, return_seqs, return_quals);
+        return return_records;
     }
 
     if (pos > this->maxPos) {
@@ -217,54 +216,49 @@ RecordPileup::getRecordsBefore(uint64_t pos) {
         this->minPos = -1;
         this->maxPos = 0;
 
-        std::swap(this->sequence_positions, return_positions);
-        std::swap(this->sequences, return_seqs);
-        std::swap(this->qualities, return_quals);
+        this->preprocessed_qvalues.clear();
+        this->preprocessed_sequences.clear();
+        std::swap(this->records, return_records);
 
-        return std::make_tuple(return_positions, return_seqs, return_quals);
+        return return_records;
     }
 
-    for (uint64_t record_i = 0; record_i < this->sequence_positions.size(); ++record_i) {
-        auto &record_positions = this->sequence_positions[record_i];
-        auto &record_seqs = this->sequences[record_i];
+    for (uint64_t record_i = 0; record_i < this->records.size(); ++record_i) {
+        auto &record_positions = this->records[record_i].positions;
+        auto &record_seqs = this->preprocessed_sequences[record_i];
 
         // move record to according vector
         if (isRecordBeforePos(record_positions, record_seqs, pos)) {
-            return_positions.emplace_back(std::move(this->sequence_positions[record_i]));
-            return_seqs.emplace_back(std::move(this->sequences[record_i]));
-            return_quals.emplace_back(std::move(this->qualities[record_i]));
+            return_records.emplace_back(std::move(this->records[record_i]));
+
         } else {
-            new_positions.emplace_back(std::move(this->sequence_positions[record_i]));
-            new_seqs.emplace_back(std::move(this->sequences[record_i]));
-            new_quals.emplace_back(std::move(this->qualities[record_i]));
+            new_records.emplace_back(std::move(this->records[record_i]));
+            new_pre_quals.emplace_back(std::move(this->preprocessed_qvalues[record_i]));
+            new_pre_seqs.emplace_back(std::move(this->preprocessed_sequences[record_i]));
         }
     }
 
     // assign new min/max values
-    this->minPos = -1;
-    for (auto &recordPositions : new_positions) {
-        for (auto read_pos : recordPositions) {
-            this->minPos = std::min(this->minPos, read_pos);
-        }
-    }
-    if (new_positions.empty()) {
-        this->maxPos = 0;
-    }
+    this->minPos = this->records.front().positions.front();
 
     // assign new vectors to class
-    this->sequence_positions = std::move(new_positions);
-    this->sequences = std::move(new_seqs);
-    this->qualities = std::move(new_quals);
+    this->records = std::move(new_records);
+    this->preprocessed_sequences = std::move(new_pre_seqs);
+    this->preprocessed_qvalues = std::move(new_pre_quals);
 
-    return std::make_tuple(return_positions, return_seqs, return_quals);
+    return return_records;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions, const std::vector<std::string> &seqs,
-                                       uint64_t pos) {
+std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() { return this->records; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions,
+                                     const std::vector<std::string> &preprocessed_seqs, uint64_t pos) {
     for (uint64_t read_i = 0; read_i < positions.size(); ++read_i) {
-        uint64_t readMaxPos = positions[read_i] + seqs[read_i].size() - 1;
+        uint64_t readMaxPos = positions[read_i] + preprocessed_seqs[read_i].size() - 1;
 
         if (readMaxPos >= pos) {
             return false;
@@ -276,8 +270,7 @@ bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions, con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool RecordPileup::empty() { return sequence_positions.empty() && sequences.empty() && qualities.empty(); }
-
+bool RecordPileup::empty() { return records.empty(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

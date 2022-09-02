@@ -12,8 +12,8 @@
 #include <limits>
 #include <string>
 #include <vector>
-#include "genie/core/record/record.h"
 #include "calq_coder.h"
+#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,8 +51,8 @@ class RecordPileup {
      * @param ecigar
      * @param position
      */
-//    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
-//                       uint64_t position);
+    //    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
+    //                       uint64_t position);
 
     /**
      * @brief
@@ -65,6 +65,12 @@ class RecordPileup {
      * @return
      */
     uint64_t getMinPos() const;
+
+    /**
+     *
+     * @return
+     */
+    uint64_t getMaxPos() const;
 
     /**
      *
@@ -87,9 +93,15 @@ class RecordPileup {
      * @param pos
      * @return
      */
-    std::tuple<std::vector<std::vector<uint64_t>>, std::vector<std::vector<std::string>>,
-               std::vector<std::vector<std::string>>>
-    getRecordsBefore(uint64_t pos);
+    std::vector<::calq::EncodingRecord> getRecordsBefore(uint64_t pos);
+
+    /**
+     *
+     * @return
+     */
+    std::vector<::calq::EncodingRecord> getAllRecords();
+
+ private:
 
     /**
      * @brief
@@ -120,7 +132,7 @@ class RecordPileup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  //SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

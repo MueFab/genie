@@ -48,12 +48,10 @@ QualEncoder::~QualEncoder() = default;
 
 // -----------------------------------------------------------------------------
 
-void QualEncoder::addMappedRecordToBlock(const std::vector<std::string>& seqs, const std::vector<std::string>& qvalues,
-                                         const std::vector<std::string>& cigars,
-                                         const std::vector<std::uint32_t>& positions) {
+void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
     if (nrMappedRecords() == 0) {
-        posOffset_ = positions.front();
-        minPosUnencoded = positions.front();
+        posOffset_ = record.positions.front();
+        minPosUnencoded = record.positions.front();
 
         out->codeBooks.clear();
         out->stepindices.clear();
@@ -68,19 +66,15 @@ void QualEncoder::addMappedRecordToBlock(const std::vector<std::string>& seqs, c
         out->quantizerIndices.clear();
     }
 
-    for (size_t i = 0; i < positions.size(); ++i) {
-        recordPileup.addSingleRead(seqs[i], qvalues[i], cigars[i], positions[i]);
-    }
-    recordPileup.nextRecord();
+    recordPileup.addRecord(record);
 
     // calc quantizers
-    while(minPosUnencoded < positions.front()){
-
+    while (minPosUnencoded < record.positions.front()) {
         std::string pos_seqs, pos_qvalues;
 
         std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
 
-        if(!pos_seqs.empty()){
+        if (!pos_seqs.empty()) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
         }
@@ -89,58 +83,39 @@ void QualEncoder::addMappedRecordToBlock(const std::vector<std::string>& seqs, c
     }
 
     // encode qvalues
-    recordPileup.getRecordsBefore()
+    auto recordsToEncode = recordPileup.getRecordsBefore(minPosUnencoded + 1);
 
-
-
-
-
+    for (auto& r : recordsToEncode) {
+        for (size_t i = 0; i < r.positions.size(); ++i) {
+            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
+        }
+    }
 
     ++nrMappedRecords_;
 }
-
 
 // -----------------------------------------------------------------------------
 
 void QualEncoder::finishBlock() {
     // Compute all remaining quantizers
-    if (version_ == Version::V2) {
-        while (!samPileupDeque_.empty()) {
-            auto k = static_cast<uint8_t>(haplotyper_.push(samPileupDeque_.front().seq, samPileupDeque_.front().qual,
-                                                           samPileupDeque_.front().hq_softcounter,
-                                                           samPileupDeque_.front().ref));
-            ++posCounter;
-            if (posCounter > haplotyper_.getOffset()) {
-                out->quantizerIndices.push_back(k);
-            }
-            samPileupDeque_.pop_front();
-        }
+    while (minPosUnencoded <= recordPileup.getMaxPos()) {
+        std::string pos_seqs, pos_qvalues;
+        std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
 
-        // Empty pipeline
-        size_t offset = std::min(posCounter, haplotyper_.getOffset());
-        for (size_t i = 0; i < offset; ++i) {
-            uint8_t k = static_cast<uint8_t>(haplotyper_.push("", "", 0, 'N'));
-            out->quantizerIndices.push_back(k);
+        if (!pos_seqs.empty()) {
+            auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
+            out->quantizerIndices.push_back(l);
         }
-    } else {
-        // Compute all remaining quantizers
-        while (!samPileupDeque_.empty()) {
-            auto k =
-                uint8_t(genotyper_.computeQuantizerIndex(samPileupDeque_.front().seq, samPileupDeque_.front().qual));
-            out->quantizerIndices.push_back(k);
-            samPileupDeque_.pop_front();
-        }
+        ++minPosUnencoded;
     }
 
-    // TODO(muenteferi): borders of blocks probably too low activity
-
-    // Process all remaining records from queue
-    while (!samRecordDeque_.empty()) {
-        encodeMappedQual(samRecordDeque_.front());
-        samRecordDeque_.pop_front();
+    // Encode remaining records
+    auto records = recordPileup.getAllRecords();
+    for (auto& r : records) {
+        for (size_t i = 0; i < r.positions.size(); ++i) {
+            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
+        }
     }
-
-    posCounter = 0;
 }
 
 // -----------------------------------------------------------------------------

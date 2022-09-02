@@ -28,7 +28,7 @@ struct SideInformation
      * 1-based leftmost mapping position for each read.
      * Needed for: Encoding, Decoding.
      */
-    std::vector<std::vector<uint32_t>> positions;
+    std::vector<std::vector<uint64_t>> positions;
 
     /**
      * Base sequence for each read.
