@@ -69,10 +69,17 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
         auto& f_segment = rec.getSegments().front();
         auto& f_alignment = rec.getAlignments().front();
 
-        sideInformation.positions.push_back(f_alignment.getPosition());
-        sideInformation.cigars.push_back(f_alignment.getAlignment().getECigar());
-        sideInformation.sequences.push_back(f_segment.getSequence());
-        input.qvalues.push_back(f_segment.getQualities().front());
+        std::vector<std::string> qvalues;
+        std::vector<std::string> sequences;
+        std::vector<std::string> cigars;
+        std::vector<uint64_t> positions;
+
+
+
+        positions.push_back(f_alignment.getPosition());
+        cigars.push_back(f_alignment.getAlignment().getECigar());
+        sequences.push_back(f_segment.getSequence());
+        qvalues.push_back(f_segment.getQualities().front());
 
         // add second read info
         if (rec.getSegments().size() == 2) {
@@ -85,22 +92,24 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
             auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
                 *rec.getAlignments().front().getAlignmentSplits().front().get());
 
-            sideInformation.positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
-            sideInformation.cigars.push_back(s_alignment.getAlignment().getECigar());
-            sideInformation.sequences.push_back(s_segment.getSequence());
-            input.qvalues.push_back(s_segment.getQualities().front());
+            positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
+            cigars.push_back(s_alignment.getAlignment().getECigar());
+            sequences.push_back(s_segment.getSequence());
+            qvalues.push_back(s_segment.getQualities().front());
         }
+
+        input.qvalues.emplace_back(std::move(qvalues));
+        sideInformation.sequences.emplace_back(std::move(sequences));
+        sideInformation.cigars.emplace_back(std::move(cigars));
+        sideInformation.positions.emplace_back(std::move(positions));
+
+
+
     }
 
-    // sort the values so the positions are in order
-    auto p = sort_permutation(sideInformation.positions);
-    sideInformation.positions = apply_permutation(sideInformation.positions, p);
-    sideInformation.cigars = apply_permutation(sideInformation.cigars, p);
-    sideInformation.sequences = apply_permutation(sideInformation.sequences, p);
-    input.qvalues = apply_permutation(input.qvalues, p);
 
     // set offset
-    sideInformation.posOffset = sideInformation.positions.front();
+    sideInformation.posOffset = sideInformation.positions.front().front();
     sideInformation.qualOffset = 33;
     encodingOptions.qualityValueMax = 93;
 
