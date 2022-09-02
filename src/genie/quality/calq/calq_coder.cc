@@ -64,8 +64,6 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     }
 
     qualEncoder.finishBlock();
-
-    return;
 }
 
 // -----------------------------------------------------------------------------

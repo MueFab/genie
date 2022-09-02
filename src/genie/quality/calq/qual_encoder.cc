@@ -77,15 +77,15 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
         if (!pos_seqs.empty()) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
-        }else{
-            out->quantizerIndices.push_back(0); // TODO: jan check
+        } else {
+            out->quantizerIndices.push_back(0);  // TODO: jan check
         }
 
         ++minPosUnencoded;
     }
 
     // encode qvalues
-    auto recordsToEncode = recordPileup.getRecordsBefore(minPosUnencoded + 1);
+    auto recordsToEncode = recordPileup.getRecordsBefore(minPosUnencoded);
 
     for (auto& r : recordsToEncode) {
         for (size_t i = 0; i < r.positions.size(); ++i) {
@@ -107,8 +107,8 @@ void QualEncoder::finishBlock() {
         if (!pos_seqs.empty()) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
-        }else{
-            out->quantizerIndices.push_back(0); // TODO: jan check
+        } else {
+            out->quantizerIndices.push_back(0);  // TODO: jan check
         }
         ++minPosUnencoded;
     }
