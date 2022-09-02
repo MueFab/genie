@@ -147,47 +147,6 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t RecordPileup::lengthFromCigar(const std::string &cigar) {
-    uint32_t len = 0;
-    uint32_t count = 0;
-    for (char cigar_pos : cigar) {
-        if (std::isdigit(cigar_pos)) {
-            count *= 10;
-            count += cigar_pos - '0';
-            continue;
-        }
-        if (cigar_pos == '(' || cigar_pos == '[') {
-            continue;
-        }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
-            len += 1;
-            continue;
-        }
-        switch (cigar_pos) {
-            case '=':
-            case '-':
-            case '*':
-            case '/':
-            case '%':
-                len += count;
-                count = 0;
-                break;
-
-            case '+':
-            case ')':
-            case ']':
-                count = 0;
-                break;
-            default:
-                UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
-        }
-        count = 0;
-    }
-    return len;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint64_t RecordPileup::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -253,7 +212,9 @@ std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() { return this->records; }
+std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() {
+
+    return this->records; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

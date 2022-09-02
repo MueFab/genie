@@ -45,16 +45,6 @@ class RecordPileup {
     std::pair<std::string, std::string> getPileup(uint64_t pos);
 
     /**
-     *
-     * @param sequence
-     * @param qualities
-     * @param ecigar
-     * @param position
-     */
-    //    void addSingleRead(const std::string &sequence, const std::string &qualities, const std::string &ecigar,
-    //                       uint64_t position);
-
-    /**
      * @brief
      * @param s
      */
@@ -102,7 +92,6 @@ class RecordPileup {
     std::vector<::calq::EncodingRecord> getAllRecords();
 
  private:
-
     /**
      * @brief
      */
@@ -115,13 +104,6 @@ class RecordPileup {
      * @return
      */
     static std::string preprocess(const std::string &read, const std::string &cigar);
-
-    /**
-     * @brief
-     * @param cigar
-     * @return
-     */
-    static uint32_t lengthFromCigar(const std::string &cigar);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

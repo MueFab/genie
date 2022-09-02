@@ -74,8 +74,6 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
         std::vector<std::string> cigars;
         std::vector<uint64_t> positions;
 
-
-
         positions.push_back(f_alignment.getPosition());
         cigars.push_back(f_alignment.getAlignment().getECigar());
         sequences.push_back(f_segment.getSequence());
@@ -102,11 +100,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
         sideInformation.sequences.emplace_back(std::move(sequences));
         sideInformation.cigars.emplace_back(std::move(cigars));
         sideInformation.positions.emplace_back(std::move(positions));
-
-
-
     }
-
 
     // set offset
     sideInformation.posOffset = sideInformation.positions.front().front();

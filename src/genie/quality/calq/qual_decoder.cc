@@ -12,17 +12,13 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-QualDecoder::QualDecoder(const DecodingBlock& b,
-                         uint32_t positionOffset,
-                         uint8_t qualityOffset,
-                         EncodingBlock *o
-)
-        : posOffset_(positionOffset),
-        qualityValueOffset_(qualityOffset),
-        qviIdx_(b.stepindices.size(), 0),
-        quantizers_(0),
-        out(o),
-        in(b){
+QualDecoder::QualDecoder(const DecodingBlock& b, uint32_t positionOffset, uint8_t qualityOffset, EncodingBlock* o)
+    : posOffset_(positionOffset),
+      qualityValueOffset_(qualityOffset),
+      qviIdx_(b.stepindices.size(), 0),
+      quantizers_(0),
+      out(o),
+      in(b) {
     out->qvalues.clear();
     for (const auto& q : b.codeBooks) {
         std::map<int, int> steps;
@@ -39,7 +35,7 @@ QualDecoder::~QualDecoder() = default;
 
 // -----------------------------------------------------------------------------
 
-void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
+void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
     std::string qual;
 
     size_t cigarIdx = 0;
@@ -49,8 +45,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
 
     for (cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
         if (isdigit(samRecord.cigar[cigarIdx])) {
-            opLen = opLen * 10 + (size_t) samRecord.cigar[cigarIdx]
-                    - (size_t) '0';
+            opLen = opLen * 10 + (size_t)samRecord.cigar[cigarIdx] - (size_t)'0';
             continue;
         }
 
@@ -66,23 +61,12 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
                 // Decode opLen quality value indices with computed
                 // quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
-                    uint8_t quantizerIndex =
-                            in.quantizerIndices[qvciPos++]; //TODO - '0';
-
+                    uint8_t quantizerIndex = in.quantizerIndices[qvciPos++];
 
                     uint8_t qualityValueIndex =
-                            in.stepindices.at(
-                                    static_cast<size_t>(quantizerIndex)
-                            )[qviIdx_[quantizerIndex]++]; //TODO - '0';
+                        in.stepindices.at(static_cast<size_t>(quantizerIndex))[qviIdx_[quantizerIndex]++];
 
-
-                    uint8_t q =
-                            uint8_t(
-                                    quantizers_.at(quantizerIndex)
-                                            .indexToReconstructionValue(
-                                                    qualityValueIndex
-                                            )
-                            );
+                    uint8_t q = uint8_t(quantizers_.at(quantizerIndex).indexToReconstructionValue(qualityValueIndex));
 
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }
@@ -92,10 +76,8 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
                 // Decode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
                     int qualityValueIndex =
-                            in.stepindices.at(quantizers_.size() - 1)
-                            [qviIdx_[quantizers_.size() - 1]++]; //TODO  - '0';
-                    int q = quantizers_.at(quantizers_.size() - 1)
-                            .indexToReconstructionValue(qualityValueIndex);
+                        in.stepindices.at(quantizers_.size() - 1)[qviIdx_[quantizers_.size() - 1]++];
+                    int q = quantizers_.at(quantizers_.size() - 1).indexToReconstructionValue(qualityValueIndex);
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }
                 break;
@@ -112,7 +94,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord){
         }
         opLen = 0;
     }
-//    out->qvalues.push_back(std::move(qual)); // TODO: jan
+    out->qvalues[0].push_back(std::move(qual));
 }
 
 // -----------------------------------------------------------------------------
