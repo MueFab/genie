@@ -24,7 +24,7 @@ struct DecodingBlock;
 // -----------------------------------------------------------------------------
 
 struct DecodingRead {
-    uint32_t posMin;
+    uint64_t posMin;
     std::string cigar;
 };
 

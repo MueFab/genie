@@ -18,52 +18,6 @@
 namespace calq {
 
 // -----------------------------------------------------------------------------
-// TODO: look here
-static uint32_t computeLength(const std::string& cigar) {
-    // Compute 0-based first position and 0-based last position this record
-    // is mapped to on the reference used for alignment
-    uint32_t posMax = 0;
-
-    size_t cigarIdx = 0;
-    size_t cigarLen = cigar.length();
-    uint32_t opLen = 0;  // length of current CIGAR operation
-
-    for (cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
-        if (isdigit(cigar[cigarIdx])) {
-            opLen = opLen * 10 + (uint32_t)cigar[cigarIdx] - (uint32_t)'0';
-            continue;
-        }
-        switch (cigar[cigarIdx]) {
-            case '=':
-                posMax += opLen;
-                break;
-            case '+':
-            case ')':
-                break;
-            case '-':
-                posMax += opLen;
-                break;
-            case ']':
-                break;  // these have been clipped
-            case '(':
-            case '[':
-                break;  // ignore first char of clips
-            case 'A':
-            case 'C':
-            case 'G':
-            case 'T':
-            case 'N':
-                ++posMax;
-                break;
-            default:
-                throwErrorException("Bad CIGAR string");
-        }
-        opLen = 0;
-    }
-    return posMax;
-}
-
-// -----------------------------------------------------------------------------
 
 void encode(const EncodingOptions& opt, const SideInformation& sideInformation, const EncodingBlock& input,
             DecodingBlock* output) {
@@ -104,30 +58,28 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     QualEncoder qualEncoder(opt, quantizers, output);
 
     for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-
         ::calq::EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
                                          sideInformation.positions[i]};
         qualEncoder.addMappedRecordToBlock(record);
     }
 
     qualEncoder.finishBlock();
+
+    return;
 }
 
 // -----------------------------------------------------------------------------
 
 void decode(const DecodingOptions&, const SideInformation& sideInformation, const DecodingBlock& input,
             EncodingBlock* output) {
-    (void)sideInformation;
-    (void)input;
-    (void)output;
     // Decode the quality values
-    // TODO: Jan fixing api
-    //    QualDecoder qualDecoder(input, sideInformation.positions[0], sideInformation.qualOffset, output);
-    //    output->qvalues.clear();
-    //    for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-    //        DecodingRead r = {sideInformation.positions[i], sideInformation.cigars[i]};
-    //        qualDecoder.decodeMappedRecordFromBlock(r);
-    //    }
+    QualDecoder qualDecoder(input, sideInformation.positions[0][0], sideInformation.qualOffset, output);
+    output->qvalues.clear();
+    output->qvalues.emplace_back();
+    for (size_t i = 0; i < sideInformation.positions[0].size(); ++i) {
+        DecodingRead r = {sideInformation.positions[0][i], sideInformation.cigars[0][i]};
+        qualDecoder.decodeMappedRecordFromBlock(r);
+    }
 }
 
 // -----------------------------------------------------------------------------

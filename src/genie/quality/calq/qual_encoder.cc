@@ -77,6 +77,8 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
         if (!pos_seqs.empty()) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
+        }else{
+            out->quantizerIndices.push_back(0); // TODO: jan check
         }
 
         ++minPosUnencoded;
@@ -105,6 +107,8 @@ void QualEncoder::finishBlock() {
         if (!pos_seqs.empty()) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
+        }else{
+            out->quantizerIndices.push_back(0); // TODO: jan check
         }
         ++minPosUnencoded;
     }
@@ -116,6 +120,8 @@ void QualEncoder::finishBlock() {
             encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
         }
     }
+
+    posCounter = 0;
 }
 
 // -----------------------------------------------------------------------------

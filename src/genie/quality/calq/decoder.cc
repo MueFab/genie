@@ -27,35 +27,23 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
                                                 const std::vector<std::string>& ecigar_vec,
                                                 const std::vector<uint64_t>& positions,
                                                 core::AccessUnit::Descriptor& desc) {
-    // sort
-//    auto permutation = sort_permutation(positions);
-//    auto sortedPos = apply_permutation(positions, permutation);
-//    auto sortedCigars = apply_permutation(ecigar_vec, permutation);
-//
-//    // calq variables
-//    calq::DecodingOptions options;  // default options
-//    calq::SideInformation sideInformation;
-//    calq::EncodingBlock output;
-//    calq::DecodingBlock input;
-//
-//    sideInformation.qualOffset = 33;
-//    fillInput(input, desc, param);
-//
-//    // fill sideInformation
-//    sideInformation.positions.insert(sideInformation.positions.end(), sortedPos.begin(), sortedPos.end());
-//    sideInformation.cigars = std::move(sortedCigars);
-//
-//    calq::decode(options, sideInformation, input, &output);
-//
-//    // resort because of needed sort for calq
-//    std::vector<std::string> qualityStrings(output.qvalues.size());
-//
-//    for (size_t i = 0; i < qualityStrings.size(); ++i) {
-//        qualityStrings[i] = std::move(output.qvalues[permutation[i]]);
-//    }
+    // calq variables
+    calq::DecodingOptions options;  // default options
+    calq::SideInformation sideInformation;
+    calq::EncodingBlock output;
+    calq::DecodingBlock input;
 
-    std::vector<std::string> qualityStrings;
-    return qualityStrings;
+    sideInformation.posOffset = positions[0];
+    sideInformation.qualOffset = 33;
+    fillInput(input, desc, param);
+
+    // fill sideInformation
+    sideInformation.positions.emplace_back(positions);
+    sideInformation.cigars.emplace_back(ecigar_vec);
+
+    calq::decode(options, sideInformation, input, &output);
+
+    return output.qvalues.front();
 }
 
 std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::QualityValues1& param_casted,
