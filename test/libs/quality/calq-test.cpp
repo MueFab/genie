@@ -3,7 +3,7 @@
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/calq/record_pileup.h"
 
-TEST(CalqTest, localReferenceBasic) {
+TEST(CalqTest, recordPileupBasic) {
     auto pileup = genie::quality::calq::RecordPileup();
 
     // usually done in addRead, but i dont want to craft records
@@ -35,7 +35,6 @@ TEST(CalqTest, localReferenceBasic) {
 
     pileup.addRecord(record);
 
-
     // test results
     std::string seq, qual;
 
@@ -66,134 +65,170 @@ TEST(CalqTest, localReferenceBasic) {
     EXPECT_ANY_THROW(pileup.getPileup(16));
 }
 //
-// TEST(CalqTest, localReferenceInsertions) {
-//    auto pileup = genie::quality::calq::RecordPileup();
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("GGAAAA", "ggaaaa", "2+4=", 0);
-//    pileup.addSingleRead("AGGAAA", "aggaaa", "1=2+3=", 0);
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("AAAGAA", "aaagaa", "3=1+2=", 0);
-//    pileup.addSingleRead("AAAAGG", "aaaagg", "4=2+", 0);
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("GGAGGG", "ggaggg", "2+1=3+", 0);
-//    pileup.addSingleRead("AAAAAA", "aaaaaa", "6=", 0);
-//
-//    std::string seq, qual;
-//    for (size_t i = 0; i < 6; ++i) {
-//        std::tie(seq, qual) = pileup.getPileup(i);
-//        EXPECT_EQ(seq.find_first_not_of("A"), std::string::npos);
-//        EXPECT_EQ(qual.find_first_not_of("a"), std::string::npos);
-//    }
-//}
-//
-// TEST(CalqTest, localReferenceDeletions) {
-//    auto pileup = genie::quality::calq::RecordPileup();
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("AA", "aa", "1=2-1=", 0);
-//    pileup.addSingleRead("GG", "gg", "2=", 1);
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("TT", "tt", "1=2-1=", 0);
-//    pileup.addSingleRead("CC", "cc", "2=", 1);
-//
-//    std::string seq, qual;
-//
-//    std::tie(seq, qual) = pileup.getPileup(0);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//
-//    std::tie(seq, qual) = pileup.getPileup(1);
-//    EXPECT_EQ(seq, "GC");
-//    EXPECT_EQ(qual, "gc");
-//
-//    std::tie(seq, qual) = pileup.getPileup(2);
-//    EXPECT_EQ(seq, "GC");
-//    EXPECT_EQ(qual, "gc");
-//
-//    std::tie(seq, qual) = pileup.getPileup(3);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//}
-//
-// TEST(CalqTest, localReferenceSoftClips) {
-//    auto pileup = genie::quality::calq::RecordPileup();
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("AAGGAA", "aaggaa", "2=(2)2=", 0);
-//    pileup.addSingleRead("TGTTGT", "tgttgt", "1=(1)2=(1)1=", 0);
-//
-//    std::string seq, qual;
-//
-//    std::tie(seq, qual) = pileup.getPileup(0);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//
-//    std::tie(seq, qual) = pileup.getPileup(1);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//
-//    std::tie(seq, qual) = pileup.getPileup(2);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//
-//    std::tie(seq, qual) = pileup.getPileup(3);
-//    EXPECT_EQ(seq, "AT");
-//    EXPECT_EQ(qual, "at");
-//}
-//
-// TEST(CalqTest, localReferenceGetRecordsBefore) {
-//    auto pileup = genie::quality::calq::RecordPileup();
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("AA", "aa", "2=", 1);
-//    pileup.addSingleRead("AA", "aa", "2=", 3);
-//
-//    pileup.nextRecord();
-//    pileup.addSingleRead("GG", "gg", "2=", 5);
-//    pileup.addSingleRead("GG", "gg", "2=", 7);
-//
-//    EXPECT_EQ(pileup.getMinPos(), 1);
-//
-//    auto pileup_copy = pileup;
-//
-//    std::vector<std::vector<std::string>> seqs, quals;
-//    std::vector<std::vector<uint64_t>> positions;
-//
-//    // nothing before pos
-//    std::tie(positions, seqs, quals) = pileup_copy.getRecordsBefore(4);
-//    EXPECT_TRUE(positions.empty());
-//    EXPECT_TRUE(seqs.empty());
-//    EXPECT_TRUE(quals.empty());
-//
-//    // one record before pos
-//    std::tie(positions, seqs, quals) = pileup_copy.getRecordsBefore(6);
-//    EXPECT_EQ(pileup_copy.getMinPos(), 5);
-//    EXPECT_EQ(positions.size(), 1);
-//    EXPECT_EQ(positions[0][0], 1);
-//    EXPECT_EQ(positions[0][1], 3);
-//    EXPECT_EQ(seqs[0][0], "AA");
-//    EXPECT_EQ(seqs[0][1], "AA");
-//    EXPECT_EQ(quals[0][0], "aa");
-//    EXPECT_EQ(quals[0][1], "aa");
-//
-//    // remove all
-//    std::tie(positions, seqs, quals) = pileup.getRecordsBefore(9);
-//    EXPECT_TRUE(pileup.empty());
-//    EXPECT_EQ(positions.size(), 2);
-//    EXPECT_EQ(positions[0][0], 1);
-//    EXPECT_EQ(positions[0][1], 3);
-//    EXPECT_EQ(positions[1][0], 5);
-//    EXPECT_EQ(positions[1][1], 7);
-//    EXPECT_EQ(seqs[0][0], "AA");
-//    EXPECT_EQ(seqs[0][1], "AA");
-//    EXPECT_EQ(seqs[1][0], "GG");
-//    EXPECT_EQ(seqs[1][1], "GG");
-//    EXPECT_EQ(quals[0][0], "aa");
-//    EXPECT_EQ(quals[0][1], "aa");
-//    EXPECT_EQ(quals[1][0], "gg");
-//    EXPECT_EQ(quals[1][1], "gg");
-//}
+TEST(CalqTest, recordPileupInsertions) {
+    auto pileup = genie::quality::calq::RecordPileup();
+
+    ::calq::EncodingRecord record;
+
+    // first record
+    record.sequences = {"GGAAAA", "AGGAAA"};
+    record.qvalues = {"ggaaaa", "aggaaa"};
+    record.cigars = {"2+4=", "1=2+3="};
+    record.positions = {0, 0};
+
+    pileup.addRecord(record);
+
+    // second record
+    record.sequences = {"AAAGAA", "AAAAGG"};
+    record.qvalues = {"aaagaa", "aaaagg"};
+    record.cigars = {"3=1+2=", "4=2+"};
+    record.positions = {0, 0};
+
+    pileup.addRecord(record);
+
+    // third record
+    record.sequences = {"GGAGGG", "AAAAAA"};
+    record.qvalues = {"ggaggg", "aaaaaa"};
+    record.cigars = {"2+1=3+", "6="};
+    record.positions = {0, 0};
+
+    pileup.addRecord(record);
+
+    // testing results
+    std::string seq, qual;
+    for (size_t i = 0; i < 6; ++i) {
+        std::tie(seq, qual) = pileup.getPileup(i);
+        EXPECT_EQ(seq.find_first_not_of('A'), std::string::npos);
+        EXPECT_EQ(qual.find_first_not_of('a'), std::string::npos);
+    }
+}
+
+TEST(CalqTest, recordPileupDeletions) {
+    auto pileup = genie::quality::calq::RecordPileup();
+
+    ::calq::EncodingRecord record;
+
+    // first record
+    record.sequences = {"AA", "GG"};
+    record.qvalues = {"aa", "gg"};
+    record.cigars = {"1=2-1=", "2="};
+    record.positions = {0, 1};
+
+    pileup.addRecord(record);
+
+    // second record
+    record.sequences = {"TT", "CC"};
+    record.qvalues = {"tt", "cc"};
+    record.cigars = {"1=2-1=", "2="};
+    record.positions = {0, 1};
+
+    pileup.addRecord(record);
+
+    std::string seq, qual;
+
+    std::tie(seq, qual) = pileup.getPileup(0);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+
+    std::tie(seq, qual) = pileup.getPileup(1);
+    EXPECT_EQ(seq, "GC");
+    EXPECT_EQ(qual, "gc");
+
+    std::tie(seq, qual) = pileup.getPileup(2);
+    EXPECT_EQ(seq, "GC");
+    EXPECT_EQ(qual, "gc");
+
+    std::tie(seq, qual) = pileup.getPileup(3);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+}
+
+TEST(CalqTest, recordPileupSoftClips) {
+    auto pileup = genie::quality::calq::RecordPileup();
+
+    ::calq::EncodingRecord record;
+
+    // first record
+    record.sequences = {"AAGGAA", "TGTTGT"};
+    record.qvalues = {"aaggaa", "tgttgt"};
+    record.cigars = {"2=(2)2=", "1=(1)2=(1)1="};
+    record.positions = {0, 0};
+
+    pileup.addRecord(record);
+
+    std::string seq, qual;
+
+    std::tie(seq, qual) = pileup.getPileup(0);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+
+    std::tie(seq, qual) = pileup.getPileup(1);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+
+    std::tie(seq, qual) = pileup.getPileup(2);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+
+    std::tie(seq, qual) = pileup.getPileup(3);
+    EXPECT_EQ(seq, "AT");
+    EXPECT_EQ(qual, "at");
+}
+
+TEST(CalqTest, recordPileupGetRecordsBefore) {
+    auto pileup = genie::quality::calq::RecordPileup();
+
+    ::calq::EncodingRecord record;
+
+    // first record
+    record.sequences = {"AA", "AA"};
+    record.qvalues = {"aa", "aa"};
+    record.cigars = {"2=", "2="};
+    record.positions = {1, 3};
+
+    pileup.addRecord(record);
+
+    // second record
+    record.sequences = {"GG", "GG"};
+    record.qvalues = {"gg", "gg"};
+    record.cigars = {"2=", "2="};
+    record.positions = {5, 7};
+
+    pileup.addRecord(record);
+
+    EXPECT_EQ(pileup.getMinPos(), 1);
+
+    auto pileup_copy = pileup;
+
+    // nothing before pos
+    auto records = pileup_copy.getRecordsBefore(4);
+    EXPECT_TRUE(records.empty());
+
+    // one record before pos
+    records = pileup_copy.getRecordsBefore(6);
+    EXPECT_EQ(pileup_copy.getMinPos(), 5);
+    EXPECT_EQ(records.size(), 1);
+    EXPECT_EQ(records[0].positions[0], 1);
+    EXPECT_EQ(records[0].positions[1], 3);
+    EXPECT_EQ(records[0].sequences[0], "AA");
+    EXPECT_EQ(records[0].sequences[1], "AA");
+    EXPECT_EQ(records[0].qvalues[0], "aa");
+    EXPECT_EQ(records[0].qvalues[1], "aa");
+
+    // remove all
+    records = pileup.getRecordsBefore(9);
+    EXPECT_TRUE(pileup.empty());
+    EXPECT_EQ(records.size(), 2);
+    EXPECT_EQ(records[0].positions[0], 1);
+    EXPECT_EQ(records[0].positions[1], 3);
+    EXPECT_EQ(records[0].sequences[0], "AA");
+    EXPECT_EQ(records[0].sequences[1], "AA");
+    EXPECT_EQ(records[0].qvalues[0], "aa");
+    EXPECT_EQ(records[0].qvalues[1], "aa");
+    EXPECT_EQ(records[1].positions[0], 5);
+    EXPECT_EQ(records[1].positions[1], 7);
+    EXPECT_EQ(records[1].sequences[0], "GG");
+    EXPECT_EQ(records[1].sequences[1], "GG");
+    EXPECT_EQ(records[1].qvalues[0], "gg");
+    EXPECT_EQ(records[1].qvalues[1], "gg");
+}

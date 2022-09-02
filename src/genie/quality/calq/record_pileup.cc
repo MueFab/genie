@@ -240,13 +240,13 @@ std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos)
         }
     }
 
-    // assign new min/max values
-    this->minPos = this->records.front().positions.front();
-
     // assign new vectors to class
     this->records = std::move(new_records);
     this->preprocessed_sequences = std::move(new_pre_seqs);
     this->preprocessed_qvalues = std::move(new_pre_quals);
+
+    // assign new min/max values
+    this->minPos = this->records.front().positions.front();
 
     return return_records;
 }
