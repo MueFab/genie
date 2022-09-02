@@ -43,8 +43,7 @@ class QualEncoder {
  public:
     explicit QualEncoder(const EncodingOptions& options, const std::map<int, Quantizer>& quant, DecodingBlock* out);
     ~QualEncoder();
-    void addMappedRecordToBlock(const std::vector<std::string>& qvalues, const std::vector<std::string>& seqs,
-                                const std::vector<std::string>& cigars, const std::vector<std::uint32_t>& positions);
+    void addMappedRecordToBlock(EncodingRecord& record);
     void finishBlock();
     size_t nrMappedRecords() const;
 
