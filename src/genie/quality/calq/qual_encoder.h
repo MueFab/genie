@@ -15,7 +15,6 @@
 #include "haplotyper.h"
 #include "quantizer.h"
 #include "record_pileup.h"
-#include "sam_pileup_deque.h"
 
 // -----------------------------------------------------------------------------
 
@@ -64,7 +63,6 @@ class QualEncoder {
     uint32_t posOffset_;
 
     // Pileup
-    SAMPileupDeque samPileupDeque_;
     genie::quality::calq::RecordPileup recordPileup;
 
     Haplotyper haplotyper_;

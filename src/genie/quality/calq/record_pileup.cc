@@ -7,11 +7,8 @@
 #include "genie/quality/calq/record_pileup.h"
 #include <algorithm>
 #include <cctype>
-#include <iostream>
-#include <limits>
 #include <map>
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -99,23 +96,6 @@ void RecordPileup::addRecord(::calq::EncodingRecord &r) {
         preprocessed_sequences.back().emplace_back(std::move(seq_processed));
     }
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// void RecordPileup::addSingleRead(const std::string &seq, const std::string &qual, const std::string &ecigar,
-//                                    uint64_t position) {
-//     auto seq_processed = preprocess(seq, ecigar);
-//     auto qual_processed = preprocess(qual, ecigar);
-//
-//     UTILS_DIE_IF(seq_processed.empty(), "Empty read");
-//
-//     this->minPos = std::min(this->minPos, position);
-//     this->maxPos = std::max(this->maxPos, position + seq_processed.length() - 1);
-//
-//     sequences.back().emplace_back(std::move(seq_processed));
-//     qualities.back().emplace_back(std::move(qual_processed));
-//     sequence_positions.back().push_back(position);
-// }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -212,9 +192,7 @@ std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() {
-
-    return this->records; }
+std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() { return this->records; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
