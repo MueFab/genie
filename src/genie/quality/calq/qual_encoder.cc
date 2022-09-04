@@ -24,7 +24,6 @@ QualEncoder::QualEncoder(const EncodingOptions& options, const std::map<int, Qua
 
       qualityValueOffset_(options.qualityValueOffset),
       posOffset_(0),
-      samPileupDeque_(),
       recordPileup(),
       haplotyper_(options.filterSize, options.polyploidy, options.qualityValueOffset,
                   static_cast<size_t>(NR_QUANTIZERS), options.hqSoftClipPropagation, options.hqSoftClipStreak,
@@ -78,7 +77,7 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
         } else {
-            out->quantizerIndices.push_back(0);  // TODO: jan check
+            out->quantizerIndices.push_back(out->quantizerIndices.back());  // TODO: jan check
         }
 
         ++minPosUnencoded;
@@ -108,7 +107,7 @@ void QualEncoder::finishBlock() {
             auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
         } else {
-            out->quantizerIndices.push_back(0);  // TODO: jan check
+            out->quantizerIndices.push_back(out->quantizerIndices.back());  // TODO: jan check
         }
         ++minPosUnencoded;
     }
