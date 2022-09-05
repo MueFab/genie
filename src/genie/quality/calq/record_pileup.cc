@@ -80,7 +80,7 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RecordPileup::addRecord(::calq::EncodingRecord &r) {
+void RecordPileup::addRecord(EncodingRecord &r) {
     nextRecord();
 
     records.emplace_back(r);
@@ -142,10 +142,10 @@ void RecordPileup::nextRecord() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
+std::vector<EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
     // new vectors
     std::vector<std::vector<std::string>> new_pre_seqs, new_pre_quals;
-    std::vector<::calq::EncodingRecord> return_records, new_records;
+    std::vector<EncodingRecord> return_records, new_records;
 
     if (pos <= this->minPos) {
         // return empty vectors
@@ -192,7 +192,7 @@ std::vector<::calq::EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<::calq::EncodingRecord> RecordPileup::getAllRecords() { return this->records; }
+std::vector<EncodingRecord> RecordPileup::getAllRecords() { return this->records; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,11 +7,13 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 // -----------------------------------------------------------------------------
 
-void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf){
+void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf) {
     size_t index = 0;
     size_t pos = pdf.getRangeMin();
 
@@ -20,9 +22,8 @@ void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf){
             if (pos >= borders[index]) {
                 break;
             }
-            this->lut_[pos] = std::pair<int, int>(
-                    static_cast<const int&>(index),
-                    static_cast<const int&>(std::round(values[index])));
+            this->lut_[pos] =
+                std::pair<int, int>(static_cast<const int&>(index), static_cast<const int&>(std::round(values[index])));
             pos += 1;
         }
         index += 1;
@@ -35,10 +36,7 @@ void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf){
 
 // -----------------------------------------------------------------------------
 
-double LloydMaxQuantizer::calcCentroid(size_t left,
-                                       size_t right,
-                                       const ProbabilityDistribution& pdf
-){
+double LloydMaxQuantizer::calcCentroid(size_t left, size_t right, const ProbabilityDistribution& pdf) {
     double sum = 0;
     double weightSum = 0;
 
@@ -46,7 +44,7 @@ double LloydMaxQuantizer::calcCentroid(size_t left,
 
     if (right == pdf.getRangeMax() + 1) {
         sum += pdf[pdf.size() - 1];
-        weightSum += (right) * pdf[pdf.size() - 1];
+        weightSum += (right)*pdf[pdf.size() - 1];
         right -= 1;
     }
 
@@ -55,14 +53,12 @@ double LloydMaxQuantizer::calcCentroid(size_t left,
         weightSum += i * pdf[i - pdf.getRangeMin()];
     }
 
-    return (sum > THRESHOLD) ?
-           (weightSum / sum) :
-           (std::floor((left + right) / 2.0));
+    return (sum > THRESHOLD) ? (weightSum / sum) : (std::floor((left + right) / 2.0));
 }
 
 // -----------------------------------------------------------------------------
 
-void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf){
+void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf) {
     // Step 1: Init
     double stepSize = pdf.size() / static_cast<double>(steps);
     for (size_t i = 0; i < steps; ++i) {
@@ -78,10 +74,7 @@ void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf){
         double right = borders[k];
 
         // Calc centroid
-        double centroid = calcCentroid(
-                static_cast<size_t>(ceil(left)),
-                static_cast<size_t>(floor(right)), pdf
-        );
+        double centroid = calcCentroid(static_cast<size_t>(ceil(left)), static_cast<size_t>(floor(right)), pdf);
 
         change = std::max(change, std::abs(values[k] - centroid));
         values[k] = centroid;
@@ -102,7 +95,7 @@ void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf){
 
 // -----------------------------------------------------------------------------
 
-LloydMaxQuantizer::LloydMaxQuantizer(size_t _steps){
+LloydMaxQuantizer::LloydMaxQuantizer(size_t _steps) {
     this->steps = _steps;
     borders.resize(_steps, 0);
     values.resize(_steps, 0);
@@ -110,11 +103,14 @@ LloydMaxQuantizer::LloydMaxQuantizer(size_t _steps){
 
 // -----------------------------------------------------------------------------
 
-void LloydMaxQuantizer::build(const ProbabilityDistribution& pdf){
+void LloydMaxQuantizer::build(const ProbabilityDistribution& pdf) {
     calcBorders(pdf);
     fillLUT(pdf);
 }
+
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

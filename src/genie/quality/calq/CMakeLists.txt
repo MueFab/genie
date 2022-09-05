@@ -13,8 +13,6 @@ set(source_files
         qual_decoder.cc
         qual_encoder.cc
         quantizer.cc
-        sam_pileup.cc
-        sam_pileup_deque.cc
         softclip_spreader.cc
         uniform_min_max_quantizer.cc
         uniform_quantizer.cc
@@ -27,7 +25,6 @@ add_library(genie-calq ${source_files})
 
 target_link_libraries(genie-calq PUBLIC genie-core)
 target_link_libraries(genie-calq PUBLIC genie-paramqv1)
-#target_link_libraries(genie-calq PUBLIC calq)
 
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
 get_filename_component(THIS_DIR ./ ABSOLUTE)

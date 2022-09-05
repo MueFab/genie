@@ -14,7 +14,8 @@
 #include "uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
-
+namespace genie {
+namespace quality {
 namespace calq {
 
 // -----------------------------------------------------------------------------
@@ -58,8 +59,8 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     QualEncoder qualEncoder(opt, quantizers, output);
 
     for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
-        ::calq::EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
-                                         sideInformation.positions[i]};
+        EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],
+                                 sideInformation.positions[i]};
         qualEncoder.addMappedRecordToBlock(record);
     }
 
@@ -83,6 +84,8 @@ void decode(const DecodingOptions&, const SideInformation& sideInformation, cons
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

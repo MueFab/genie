@@ -2,19 +2,14 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 // -----------------------------------------------------------------------------
 
-UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& valueMin,
-                                               const int& valueMax,
-                                               const int& nrSteps
-)
-        : UniformQuantizer(
-        valueMin,
-        valueMax,
-        nrSteps
-){
+UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& valueMin, const int& valueMax, const int& nrSteps)
+    : UniformQuantizer(valueMin, valueMax, nrSteps) {
     // Change the smallest and largest reconstruction values
 
     int smallestIndex = 0;
@@ -48,6 +43,8 @@ UniformMinMaxQuantizer::~UniformMinMaxQuantizer() = default;
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

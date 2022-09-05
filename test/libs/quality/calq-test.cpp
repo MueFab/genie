@@ -9,7 +9,7 @@ TEST(CalqTest, recordPileupBasic) {
     // usually done in addRead, but i dont want to craft records
     // first "record"
 
-    ::calq::EncodingRecord record;
+    genie::quality::calq::EncodingRecord record;
 
     // first record
     record.sequences = {"AAAA", "GGGG"};
@@ -68,7 +68,7 @@ TEST(CalqTest, recordPileupBasic) {
 TEST(CalqTest, recordPileupInsertions) {
     auto pileup = genie::quality::calq::RecordPileup();
 
-    ::calq::EncodingRecord record;
+    genie::quality::calq::EncodingRecord record;
 
     // first record
     record.sequences = {"GGAAAA", "AGGAAA"};
@@ -106,7 +106,7 @@ TEST(CalqTest, recordPileupInsertions) {
 TEST(CalqTest, recordPileupDeletions) {
     auto pileup = genie::quality::calq::RecordPileup();
 
-    ::calq::EncodingRecord record;
+    genie::quality::calq::EncodingRecord record;
 
     // first record
     record.sequences = {"AA", "GG"};
@@ -146,7 +146,7 @@ TEST(CalqTest, recordPileupDeletions) {
 TEST(CalqTest, recordPileupSoftClips) {
     auto pileup = genie::quality::calq::RecordPileup();
 
-    ::calq::EncodingRecord record;
+    genie::quality::calq::EncodingRecord record;
 
     // first record
     record.sequences = {"AAGGAA", "TGTTGT"};
@@ -178,7 +178,7 @@ TEST(CalqTest, recordPileupSoftClips) {
 TEST(CalqTest, recordPileupGetRecordsBefore) {
     auto pileup = genie::quality::calq::RecordPileup();
 
-    ::calq::EncodingRecord record;
+    genie::quality::calq::EncodingRecord record;
 
     // first record
     record.sequences = {"AA", "AA"};

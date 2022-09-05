@@ -5,10 +5,6 @@
  */
 
 #include "genie/quality/calq/decoder.h"
-#include <string>
-#include <tuple>
-#include <vector>
-#include "genie/quality/calq/permutation.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
