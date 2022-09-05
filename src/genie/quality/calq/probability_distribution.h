@@ -1,5 +1,5 @@
-#ifndef CALQ_PROBABILITY_DISTRIBUTION_H_
-#define CALQ_PROBABILITY_DISTRIBUTION_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
+#define SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 
@@ -11,11 +11,12 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 // Samples a probability distribution
-class ProbabilityDistribution
-{
+class ProbabilityDistribution {
  private:
     std::vector<size_t> pdf;
 
@@ -23,14 +24,10 @@ class ProbabilityDistribution
     size_t rangeMin;
 
  public:
-    ProbabilityDistribution(size_t rangeMin,
-                            size_t rangeMax
-    );
+    ProbabilityDistribution(size_t rangeMin, size_t rangeMax);
 
     // Increases counter of value
-    void addToPdf(size_t qualScore,
-                  size_t number = 1
-    );
+    void addToPdf(size_t qualScore, size_t number = 1);
 
     // Reset all counters to zero
     void resetPdf();
@@ -54,10 +51,12 @@ class ProbabilityDistribution
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 
-#endif  // CALQ_PROBABILITY_DISTRIBUTION_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

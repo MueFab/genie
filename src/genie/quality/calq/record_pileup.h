@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
-#define SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_RECORD_PILEUP_H_
+#define SRC_GENIE_QUALITY_CALQ_RECORD_PILEUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace calq {
  * @brief
  */
 class RecordPileup {
-    std::vector<::calq::EncodingRecord> records;
+    std::vector<EncodingRecord> records;
     std::vector<std::vector<std::string>> preprocessed_qvalues;
     std::vector<std::vector<std::string>> preprocessed_sequences;
     uint64_t minPos;
@@ -48,7 +48,7 @@ class RecordPileup {
      * @brief
      * @param s
      */
-    void addRecord(::calq::EncodingRecord &r);
+    void addRecord(EncodingRecord &r);
 
     /**
      *
@@ -83,13 +83,13 @@ class RecordPileup {
      * @param pos
      * @return
      */
-    std::vector<::calq::EncodingRecord> getRecordsBefore(uint64_t pos);
+    std::vector<EncodingRecord> getRecordsBefore(uint64_t pos);
 
     /**
      *
      * @return
      */
-    std::vector<::calq::EncodingRecord> getAllRecords();
+    std::vector<EncodingRecord> getAllRecords();
 
  private:
     /**
@@ -114,7 +114,7 @@ class RecordPileup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_Record_Pileup_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_RECORD_PILEUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

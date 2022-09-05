@@ -1,5 +1,5 @@
-#ifndef CALQ_LOG_H_
-#define CALQ_LOG_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_LOG_H_
+#define SRC_GENIE_QUALITY_CALQ_LOG_H_
 
 // -----------------------------------------------------------------------------
 
@@ -9,13 +9,14 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 /**
  * Output streams for logging
  */
-struct LogConfiguration
-{
+struct LogConfiguration {
     /**
      * Output to stdout
      */
@@ -64,10 +65,12 @@ LogConfiguration getStandard();
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 
-#endif  // CALQ_LOG_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_LOG_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

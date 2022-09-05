@@ -1,5 +1,5 @@
-#ifndef CALQ_EXCEPTIONS_H_
-#define CALQ_EXCEPTIONS_H_
+#ifndef SRC_GENIE_QUALITY_CALQ__EXCEPTIONS_H_
+#define SRC_GENIE_QUALITY_CALQ__EXCEPTIONS_H_
 
 // -----------------------------------------------------------------------------
 
@@ -9,6 +9,8 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 // -----------------------------------------------------------------------------
@@ -16,8 +18,7 @@ namespace calq {
 /**
  * Default exception
  */
-class Exception : public std::exception
-{
+class Exception : public std::exception {
  public:
     /**
      * Create new exception
@@ -42,7 +43,7 @@ class Exception : public std::exception
     /**
      * Get message
      */
-    const char *what() const noexcept override;
+    const char* what() const noexcept override;
 
  protected:
     std::string msg_;
@@ -53,25 +54,24 @@ class Exception : public std::exception
 /**
  * Error exception
  */
-class ErrorException : public Exception
-{
+class ErrorException : public Exception {
  public:
     /**
      * Constructor
      * @param msg
      */
-    explicit ErrorException(const std::string& msg)
-            : Exception(msg){
-    }
+    explicit ErrorException(const std::string& msg) : Exception(msg) {}
 };
 
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 
-#endif  // CALQ_EXCEPTIONS_H_
+#endif  // SRC_GENIE_QUALITY_CALQ__EXCEPTIONS_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

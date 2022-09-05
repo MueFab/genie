@@ -2,6 +2,8 @@
 
 #include <memory>
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 // -----------------------------------------------------------------------------
@@ -10,13 +12,13 @@ static std::unique_ptr<LogConfiguration> currentConfig;
 
 // -----------------------------------------------------------------------------
 
-void setLogging(const LogConfiguration& c){
+void setLogging(const LogConfiguration& c) {
     currentConfig = std::unique_ptr<LogConfiguration>(new LogConfiguration(c));
 }
 
 // -----------------------------------------------------------------------------
 
-LogConfiguration getLogging(){
+LogConfiguration getLogging() {
     if (!currentConfig) {
         setLogging(loggingPresets::getStandard());
     }
@@ -29,28 +31,15 @@ namespace loggingPresets {
 
 // -----------------------------------------------------------------------------
 
-LogConfiguration getSilent(){
-    return {[](const std::string&)
-            {
-            },
-            [](const std::string&)
-            {
-            }
-    };
+LogConfiguration getSilent() {
+    return {[](const std::string&) {}, [](const std::string&) {}};
 }
 
 // -----------------------------------------------------------------------------
 
-LogConfiguration getStandard(){
-    return {[](const std::string& msg)
-            {
-                std::cout << msg << std::endl;
-            },
-            [](const std::string& msg)
-            {
-                std::cerr << msg << std::endl;
-            }
-    };
+LogConfiguration getStandard() {
+    return {[](const std::string& msg) { std::cout << msg << std::endl; },
+            [](const std::string& msg) { std::cerr << msg << std::endl; }};
 }
 
 // -----------------------------------------------------------------------------
@@ -60,6 +49,8 @@ LogConfiguration getStandard(){
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

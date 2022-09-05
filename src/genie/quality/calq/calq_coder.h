@@ -1,5 +1,5 @@
-#ifndef CALQ_CALQ_CODER_H_
-#define CALQ_CALQ_CODER_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_CODER_H_
+#define SRC_GENIE_QUALITY_CALQ_CODER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -16,14 +16,15 @@
 
 // -----------------------------------------------------------------------------
 
+namespace genie {
+namespace quality {
 namespace calq {
 
 /**
  * Side information used to encode / decode quality values. It is not encoded
  * itself. All reads have to be mapped and sorted by their mapping position.
  */
-struct SideInformation
-{
+struct SideInformation {
     /**
      * 1-based leftmost mapping position for each read.
      * Needed for: Encoding, Decoding.
@@ -69,8 +70,7 @@ struct SideInformation
 /**
  * Block of quality values to be encoded.
  */
-struct EncodingBlock
-{
+struct EncodingBlock {
     /**
      * Sequences of quality values for each read (mapped).
      */
@@ -82,35 +82,26 @@ struct EncodingBlock
 /**
  * Record containing data of multiple reads
  */
-struct EncodingRecord{
+struct EncodingRecord {
     std::vector<std::string> qvalues;
     std::vector<std::string> sequences;
     std::vector<std::string> cigars;
     std::vector<uint64_t> positions;
 };
 
-
 // -----------------------------------------------------------------------------
 
 /**
  * Quantizer types. Static uniform, adaptive lloyd quantizer.
  */
-enum struct QuantizerType
-{
-    UNIFORM,
-    LLOYD_MAX
-};
+enum struct QuantizerType { UNIFORM, LLOYD_MAX };
 
 // -----------------------------------------------------------------------------
 
 /**
  * Filter for calq V2. Smooth gauss vs hard rectangle.
  */
-enum struct FilterType
-{
-    GAUSS,
-    RECTANGLE
-};
+enum struct FilterType { GAUSS, RECTANGLE };
 
 // -----------------------------------------------------------------------------
 
@@ -118,19 +109,14 @@ enum struct FilterType
  * V1: Original Calq version. Based on genotype certainty, using no reference
  * V2: Based on variant probability, using reference
  */
-enum struct Version
-{
-    V1,
-    V2
-};
+enum struct Version { V1, V2 };
 
 // -----------------------------------------------------------------------------
 
 /**
  * Additional parameters for encoding
  */
-struct EncodingOptions
-{
+struct EncodingOptions {
     /**
      * Output additional pileup information (warning: very verbose)
      */
@@ -173,7 +159,6 @@ struct EncodingOptions
      * to trigger the propagation
      */
     size_t hqSoftClipStreak = 7;
-
 
     /**
      * Lowest Quantization step number
@@ -226,17 +211,14 @@ struct EncodingOptions
 /**
  * Decoding parameters
  */
-struct DecodingOptions
-{
-};
+struct DecodingOptions {};
 
 // -----------------------------------------------------------------------------
 
 /**
  * Encoded streams that can be decoded by calq.
  */
-struct DecodingBlock
-{
+struct DecodingBlock {
     /**
      *  Quantizer selection
      */
@@ -261,11 +243,8 @@ struct DecodingBlock
  * @param input Encoded quality values
  * @param output Decoded quality values
  */
-void decode(const DecodingOptions& opt,
-            const SideInformation& sideInformation,
-            const DecodingBlock& input,
-            EncodingBlock *output
-);
+void decode(const DecodingOptions& opt, const SideInformation& sideInformation, const DecodingBlock& input,
+            EncodingBlock* output);
 
 // -----------------------------------------------------------------------------
 
@@ -276,19 +255,18 @@ void decode(const DecodingOptions& opt,
  * @param input Decoded quality values
  * @param output Encoded quality values
  */
-void encode(const EncodingOptions& opt,
-            const SideInformation& sideInformation,
-            const EncodingBlock& input,
-            DecodingBlock *output
-);
+void encode(const EncodingOptions& opt, const SideInformation& sideInformation, const EncodingBlock& input,
+            DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
 
 }  // namespace calq
+}  // namespace quality
+}  // namespace genie
 
 // -----------------------------------------------------------------------------
 
-#endif  // CALQ_CALQ_CODER_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_CODER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
