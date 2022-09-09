@@ -101,15 +101,14 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 
     // set offset
     sideInformation.posOffset = sideInformation.positions.front().front();
-    sideInformation.qualOffset = 33;
-    encodingOptions.qualityValueMax = 93;
+    encodingOptions.qualityValueOffset = 0;
+    encodingOptions.qualityValueMin = 33; // ascii !
+    encodingOptions.qualityValueMax = 126; // ascii ~
 
     // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
     setUpParametersAligned(output, param);
     fillDescriptorAligned(output, desc);
-
-    return;
 }
 
 void Encoder::setUpUnaligned(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {

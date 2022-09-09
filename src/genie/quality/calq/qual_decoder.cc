@@ -63,7 +63,11 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                 // Decode opLen quality value indices with computed
                 // quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
-                    uint8_t quantizerIndex = in.quantizerIndices[qvciPos++];
+                    uint8_t quantizerIndex = 0;
+
+                    if (!in.quantizerIndices.empty()) {
+                        quantizerIndex = in.quantizerIndices[qvciPos++];
+                    }
 
                     uint8_t qualityValueIndex =
                         in.stepindices.at(static_cast<size_t>(quantizerIndex))[qviIdx_[quantizerIndex]++];
