@@ -30,7 +30,7 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     calq::DecodingBlock input;
 
     sideInformation.posOffset = positions[0];
-    sideInformation.qualOffset = 33;
+    sideInformation.qualOffset = 0; // TODO: check
     fillInput(input, desc, param);
 
     // fill sideInformation
