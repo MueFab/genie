@@ -42,9 +42,9 @@ then
     exit 1
 fi
 
-if [[ ! -x $git_root_dir/cmake-build-debug/bin/calq-tests$fileExt ]]
+if [[ ! -x $git_root_dir/cmake-build-debug/bin/quality-tests$fileExt ]]
 then
-    echo "Calq test not found. Please build genie in debug mode first."
+    echo "Quality test not found. Please build genie in debug mode first."
     exit 1
 fi
 
@@ -67,7 +67,7 @@ echo "Read..."
 cd $git_root_dir/cmake-build-debug/bin
 ./read-tests$fileExt --gtest_output=xml:read_test.xml --gtest_brief=1 || { echo 'Read test failed!' ; exit 1; }
 echo "Read test passed!"
-echo "Calq..."
+echo "Quality..."
 cd $git_root_dir/cmake-build-debug/bin
-./calq-tests$fileExt --gtest_output=xml:calq.xml --gtest_brief=1 || { echo 'Calq test failed!' ; exit 1; }
-echo "Calq test passed!"
+./quality-tests$fileExt --gtest_output=xml:calq.xml --gtest_brief=1 || { echo 'Quality test failed!' ; exit 1; }
+echo "Qquality test passed!"
