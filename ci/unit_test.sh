@@ -70,4 +70,4 @@ echo "Read test passed!"
 echo "Quality..."
 cd $git_root_dir/cmake-build-debug/bin
 ./quality-tests$fileExt --gtest_output=xml:calq.xml --gtest_brief=1 || { echo 'Quality test failed!' ; exit 1; }
-echo "Qquality test passed!"
+echo "Quality test passed!"

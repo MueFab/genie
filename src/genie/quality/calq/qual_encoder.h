@@ -49,7 +49,9 @@ class QualEncoder {
     size_t nrMappedRecords() const;
 
  private:
-    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint32_t pos);
+    void quantizeUntil(uint64_t pos);
+    void encodeRecords(std::vector<EncodingRecord> records);
+    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos);
 
  private:
     // Sizes & counters
@@ -62,7 +64,7 @@ class QualEncoder {
     uint8_t qualityValueOffset_;
 
     // 0-based position offset of this block
-    uint32_t posOffset_;
+    uint64_t posOffset_;
 
     // Pileup
     genie::quality::calq::RecordPileup recordPileup;

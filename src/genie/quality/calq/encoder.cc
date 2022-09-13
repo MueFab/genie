@@ -26,7 +26,7 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
 }
 
 core::GenSubIndex get_qv_steps(size_t i) {
-    UTILS_DIE_IF(i > 6, "QV_STEPS index out of range");
+    UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
     return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
 }
 
@@ -47,7 +47,7 @@ void Encoder::fillDescriptorAligned(calq::DecodingBlock& block, core::AccessUnit
     // QV_CODEBOOK
     desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.quantizerIndices), core::GenSub::QV_CODEBOOK));
 
-    // fill QV_STEPS_0-6
+    // fill QV_STEPS_0-7
     for (size_t i = 0; i < block.stepindices.size(); ++i) {
         desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i)));
     }
@@ -102,8 +102,8 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     // set offset
     sideInformation.posOffset = sideInformation.positions.front().front();
     encodingOptions.qualityValueOffset = 0;
-    encodingOptions.qualityValueMin = 33; // ascii !
-    encodingOptions.qualityValueMax = 126; // ascii ~
+    encodingOptions.qualityValueMin = 33;   // ascii !
+    encodingOptions.qualityValueMax = 126;  // ascii ~
 
     // encoding + filling genie objects
     calq::encode(encodingOptions, sideInformation, input, &output);
@@ -161,7 +161,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     core::stats::PerfStats stats;
     stats.addDouble("time-qvcalq", watch.check());
 
-    return std::make_tuple(std::move(param), std::move(desc), stats);
+    return std::make_tuple(std::move(param), (desc), stats);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
