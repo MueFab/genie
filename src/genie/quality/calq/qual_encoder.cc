@@ -49,6 +49,36 @@ QualEncoder::~QualEncoder() = default;
 
 // -----------------------------------------------------------------------------
 
+void QualEncoder::quantizeUntil(uint64_t pos) {
+    while (minPosUnencoded < pos) {
+        std::string pos_seqs;
+        std::string pos_qvalues;
+
+        std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
+
+        if (!pos_seqs.empty()) {
+            auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
+            out->quantizerIndices.push_back(l);
+        } else {
+            out->quantizerIndices.push_back(out->quantizerIndices.back());
+        }
+
+        ++minPosUnencoded;
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void QualEncoder::encodeRecords(std::vector<EncodingRecord> records) {
+    for (auto& r : records) {
+        for (size_t i = 0; i < r.positions.size(); ++i) {
+            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+
 void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
     if (nrMappedRecords() == 0) {
         posOffset_ = record.positions.front();
@@ -64,35 +94,25 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
                 out->codeBooks.back().push_back(static_cast<uint8_t>(pair.second));
             }
         }
+
+        // unaligned
+        const auto& map = quantizers_[NR_QUANTIZERS - 1].inverseLut();
+        out->codeBooks.emplace_back();
+        out->stepindices.emplace_back();
+        for (const auto& pair : map) {
+            out->codeBooks.back().push_back(static_cast<uint8_t>(pair.second));
+        }
+
         out->quantizerIndices.clear();
     }
 
     recordPileup.addRecord(record);
 
     // calc quantizers
-    while (minPosUnencoded < record.positions.front()) {
-        std::string pos_seqs, pos_qvalues;
-
-        std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
-
-        if (!pos_seqs.empty()) {
-            auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
-            out->quantizerIndices.push_back(l);
-        } else {
-            out->quantizerIndices.push_back(out->quantizerIndices.back());  // TODO: jan check
-        }
-
-        ++minPosUnencoded;
-    }
+    quantizeUntil(record.positions.front());
 
     // encode qvalues
-    auto recordsToEncode = recordPileup.getRecordsBefore(minPosUnencoded);
-
-    for (auto& r : recordsToEncode) {
-        for (size_t i = 0; i < r.positions.size(); ++i) {
-            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
-        }
-    }
+    encodeRecords(recordPileup.getRecordsBefore(minPosUnencoded));
 
     ++nrMappedRecords_;
 }
@@ -101,26 +121,10 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
 
 void QualEncoder::finishBlock() {
     // Compute all remaining quantizers
-    while (minPosUnencoded <= recordPileup.getMaxPos()) {
-        std::string pos_seqs, pos_qvalues;
-        std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
-
-        if (!pos_seqs.empty()) {
-            auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
-            out->quantizerIndices.push_back(l);
-        } else {
-            out->quantizerIndices.push_back(out->quantizerIndices.back());  // TODO: jan check
-        }
-        ++minPosUnencoded;
-    }
+    quantizeUntil(recordPileup.getMaxPos() + 1);
 
     // Encode remaining records
-    auto records = recordPileup.getAllRecords();
-    for (auto& r : records) {
-        for (size_t i = 0; i < r.positions.size(); ++i) {
-            encodeMappedQual(r.qvalues[i], r.cigars[i], r.positions[i]);
-        }
-    }
+    encodeRecords(recordPileup.getAllRecords());
 
     posCounter = 0;
 }
@@ -130,14 +134,13 @@ void QualEncoder::finishBlock() {
 size_t QualEncoder::nrMappedRecords() const { return nrMappedRecords_; }
 
 // -----------------------------------------------------------------------------
-void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint32_t pos) {
-    size_t cigarIdx = 0;
+void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos) {
     size_t cigarLen = cigar.length();
     size_t opLen = 0;  // length of current CIGAR operation
     size_t qualIdx = 0;
     size_t quantizerIndicesIdx = pos - posOffset_;
 
-    for (cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
+    for (size_t cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
         if (isdigit(cigar[cigarIdx])) {
             opLen = opLen * 10 + (size_t)cigar[cigarIdx] - (size_t)'0';
             continue;
@@ -165,8 +168,8 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 // Encode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
                     auto q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
-                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS - 1).valueToIndex(q));
-                    out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS - 1)).push_back(qualityValueIndex);
+                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS-1).valueToIndex(q));
+                    out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS)).push_back(qualityValueIndex);
                 }
                 break;
             case '-':
