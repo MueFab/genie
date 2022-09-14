@@ -39,7 +39,7 @@ Haplotyper::Haplotyper(size_t sigma, size_t ploidy, size_t qualOffset, size_t nr
       DEBUG(debug),
       squashedActivity(squashed) {
     if (filterType == FilterType::GAUSS) {
-        GaussKernel kernel(sigma);
+        GaussKernel kernel(static_cast<double>(sigma));
         double THRESHOLD = 0.0000001;
         size_t size = kernel.calcMinSize(THRESHOLD, filterCutOff * 2 + 1);
 
@@ -47,7 +47,7 @@ Haplotyper::Haplotyper(size_t sigma, size_t ploidy, size_t qualOffset, size_t nr
             FilterBuffer([kernel](size_t pos, size_t _size) -> double { return kernel.calcValue(pos, _size); }, size);
         localDistortion = kernel.calcValue((size - 1) / 2, size);
     } else if (filterType == FilterType::RECTANGLE) {
-        RectangleKernel kernel(sigma);
+        RectangleKernel kernel(static_cast<double>(sigma));
         size_t size = kernel.calcMinSize(filterCutOff * 2 + 1);
 
         buffer =
