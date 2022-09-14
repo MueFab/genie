@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <vector>
 #include <utility>
+#include <vector>
 
-#include "genie/quality/calq/encoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
+#include "genie/quality/calq/encoder.h"
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     core::stats::PerfStats stats;
     stats.addDouble("time-qvcalq", watch.check());
 
-    return std::make_tuple(std::move(param), (desc), stats);
+    return std::make_tuple(std::move(param), desc, stats);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
