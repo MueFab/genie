@@ -15,7 +15,6 @@ namespace qvcalq {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Decoder::isAligned(const core::AccessUnit::Descriptor& desc) {
-    // TODO: better check
     return desc.getSize() != 3;
 }
 

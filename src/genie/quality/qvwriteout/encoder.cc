@@ -106,7 +106,6 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
                                      .getECigar(),
                                  desc);
         }
-
     }
 
     core::stats::PerfStats stats;

@@ -4,6 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <vector>
+#include <utility>
+
 #include "genie/quality/calq/encoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
@@ -152,8 +155,6 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
-
-    std::vector<uint8_t> stepindices;
 
     // encode values
     for (const auto& rec : chunk.getData()) {

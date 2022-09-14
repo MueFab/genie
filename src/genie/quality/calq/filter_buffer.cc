@@ -108,7 +108,7 @@ double RectangleKernel::calcValue(size_t pos, size_t size) const {
 // -----------------------------------------------------------------------------
 
 size_t RectangleKernel::calcMinSize(size_t maximum) const {
-    return (size_t)std::min(SIZE * 2 + 1, static_cast<double>(maximum));
+    return static_cast<size_t>(std::min(SIZE * 2 + 1, static_cast<double>(maximum)));
 }
 
 // -----------------------------------------------------------------------------

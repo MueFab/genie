@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_QUALITY_QVCALQ_ENCODER_H_
-#define SRC_GENIE_QUALITY_QVCALQ_ENCODER_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_ENCODER_H_
+#define SRC_GENIE_QUALITY_CALQ_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ class Encoder : public core::QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_QVCALQ_ENCODER_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
