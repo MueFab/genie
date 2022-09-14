@@ -17,6 +17,8 @@ namespace qvcalq {
 
 using ClassType = core::record::ClassType;
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     paramqv1::Codebook codebook(vec[0], vec[1]);
     for (size_t i = 2; i < vec.size(); ++i) {
@@ -25,42 +27,17 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
     return codebook;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 core::GenSubIndex get_qv_steps(size_t i) {
     UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
     return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
 }
 
-void Encoder::setUpParametersAligned(const calq::DecodingBlock& block, paramqv1::QualityValues1& param) {
-    // add codebooks from calq to param
-    paramqv1::ParameterSet set;
-    for (auto& codeVec : block.codeBooks) {
-        auto codebook = codebookFromVector(codeVec);
-        set.addCodeBook(std::move(codebook));
-    }
-    param.setQvps(std::move(set));
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::fillDescriptorAligned(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc) {
-    // empty QV_PRESENT
-    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
-
-    // QV_CODEBOOK
-    desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.quantizerIndices), core::GenSub::QV_CODEBOOK));
-
-    // fill QV_STEPS_0-7
-    for (size_t i = 0; i < block.stepindices.size(); ++i) {
-        desc.add(core::AccessUnit::Subsequence(util::DataBlock(&block.stepindices[i]), get_qv_steps(i)));
-    }
-}
-
-void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
-                            core::AccessUnit::Descriptor& desc) {
-    // objects required for calq
-    calq::EncodingOptions encodingOptions;
-    calq::SideInformation sideInformation;
-    calq::EncodingBlock input;
-    calq::DecodingBlock output;
-
+void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
+                                 calq::SideInformation& sideInformation, calq::EncodingBlock& input) {
     // fill calq objects
     for (auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
@@ -101,15 +78,46 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 
     // set offset
     sideInformation.posOffset = sideInformation.positions.front().front();
-    encodingOptions.qualityValueOffset = 0;
-    encodingOptions.qualityValueMin = 33;   // ascii !
-    encodingOptions.qualityValueMax = 126;  // ascii ~
-
-    // encoding + filling genie objects
-    calq::encode(encodingOptions, sideInformation, input, &output);
-    setUpParametersAligned(output, param);
-    fillDescriptorAligned(output, desc);
+    opt.qualityValueOffset = 0;
+    opt.qualityValueMin = 33;   // ascii !
+    opt.qualityValueMax = 126;  // ascii ~
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
+                            core::AccessUnit::Descriptor& desc) {
+    // objects required for calq
+    calq::EncodingOptions encodingOptions;
+    calq::SideInformation sideInformation;
+    calq::EncodingBlock input;
+    calq::DecodingBlock output;
+
+    fillCalqStructures(chunk, encodingOptions, sideInformation, input);
+
+    calq::encode(encodingOptions, sideInformation, input, &output);
+
+    // add codebooks from calq to param
+    paramqv1::ParameterSet set;
+    for (auto& codeVec : output.codeBooks) {
+        auto codebook = codebookFromVector(codeVec);
+        set.addCodeBook(std::move(codebook));
+    }
+    param.setQvps(std::move(set));
+
+    // setup descriptor and fill
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+
+    // QV_CODEBOOK
+    desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.quantizerIndices), core::GenSub::QV_CODEBOOK));
+
+    // fill QV_STEPS_0-7
+    for (size_t i = 0; i < output.stepindices.size(); ++i) {
+        desc.add(core::AccessUnit::Subsequence(util::DataBlock(&output.stepindices[i]), get_qv_steps(i)));
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
                            calq::UniformMinMaxQuantizer& quantizer) {
@@ -122,6 +130,8 @@ void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Des
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
@@ -152,6 +162,8 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     util::Watch watch;

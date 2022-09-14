@@ -19,6 +19,8 @@ bool Decoder::isAligned(const core::AccessUnit::Descriptor& desc) {
     return desc.getSize() != 3;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::QualityValues1& param,
                                                 const std::vector<std::string>& ecigar_vec,
                                                 const std::vector<uint64_t>& positions,
@@ -30,7 +32,7 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     calq::DecodingBlock input;
 
     sideInformation.posOffset = positions[0];
-    sideInformation.qualOffset = 0;  // TODO: check
+    sideInformation.qualOffset = 0;
     fillInput(input, desc, param);
 
     // fill sideInformation
@@ -42,18 +44,16 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     return output.qvalues.front();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::QualityValues1& param_casted,
                                                   const std::vector<std::string>& ecigar_vec,
                                                   core::AccessUnit::Descriptor& desc) {
-    // from qvwriteout
-
-    auto codebook = param_casted.getCodebook(0).getEntries();
-
     std::vector<std::string> qv;
+    auto codebook = param_casted.getCodebook(0).getEntries();
 
     for (const auto& ecigar : ecigar_vec) {
         qv.emplace_back();
-
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
             [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
@@ -67,6 +67,8 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
     }
     return qv;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
                         const quality::paramqv1::QualityValues1& param) {
@@ -87,6 +89,8 @@ void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor
         input.codeBooks.push_back(param.getCodebook(i).getEntries());
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const core::parameter::QualityValues& param, const std::vector<std::string>& ecigar_vec,
