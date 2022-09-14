@@ -1,6 +1,6 @@
 @HD	VN:1.6	SO:queryname
 @SQ	SN:ref	LN:100
-@PG	ID:samtools	PN:samtools	VN:1.15.1	CL:samtools sort -n -o calq_sample.sam calq_sample_unsorted.sam
+@PG	ID:samtools	PN:samtools	VN:1.10	CL:samtools sort -n -o calq_sample.sam calq_sample.sam
 read1.1	0	ref	1	60	26M	*	0	0	AGAGAGTCTCTCAGAGAGTCTCTCAC	ABCDEFGHIJKLMNOPQRSTUVWXYZ
 read1.2	0	ref	1	60	26M	*	0	0	AGAGAGTCTCTCAGAGAGTCTCTCAC	~~~~~~~~~~~~~~~~~~~~~~~~~~
 read1.3	0	ref	1	60	26M	*	0	0	AGAGAGTCTCTCAGAGAGTCTCTCAC	~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -17,3 +17,4 @@ read5.3	0	ref	121	60	26M	*	0	0	AAAACCCCCCCCCCCCCCCCCCCCCC	~~~~~~~~~~~~~~~~~~~~~~
 read5.4	0	ref	121	60	26M	*	0	0	AAAATTTTTTTTTTTTTTTTTTTTTT	pppppppppppppppppppppppppp
 read5.5	0	ref	121	60	26M	*	0	0	AAAAAGTCAGTCAGTCAGTCAGTCAG	WWWWWWWWWWWWWWWWWWWWWWWWWW
 read6.1	0	ref	151	60	10M6I10M	*	0	0	AAAAAAAAAAGGGGGGTTTTTTTTTT	ABCDEFGHIJKLMNOPQRSTUVWXYZ
+read7.2	0	ref	0	60	10M	*	0	0	AAAAAGGGGG	ABCDEFGHIJ

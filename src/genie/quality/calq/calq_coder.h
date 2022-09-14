@@ -56,7 +56,7 @@ struct SideInformation {
      * First position of read (including unmapped).
      * Needed for: Encoding, Decoding
      */
-    uint32_t posOffset;
+    uint64_t posOffset;
 
     /**
      * Quality value format offset.
@@ -259,6 +259,18 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
             DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Encode quality values.
+ * @param opt Encoding options.
+ * @param input Decoded quality values
+ * @param output Encoded quality values
+ */
+void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input,
+            DecodingBlock* output);
+
+// -----------------------------------------------------------------------------
+
 
 }  // namespace calq
 }  // namespace quality
