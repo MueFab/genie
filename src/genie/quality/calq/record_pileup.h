@@ -12,6 +12,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <utility>
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/core/record/record.h"
 
@@ -35,7 +36,7 @@ class RecordPileup {
     /**
      * @brief
      */
-    explicit RecordPileup();
+    RecordPileup();
 
     /**
      *

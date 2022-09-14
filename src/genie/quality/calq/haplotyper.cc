@@ -214,8 +214,8 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
 // -----------------------------------------------------------------------------
 
 size_t Haplotyper::getQuantizerIndex(double activity) {
-    return (size_t)std::min(std::floor((activity / localDistortion) * nr_quantizers),
-                            static_cast<double>(nr_quantizers - 1));
+    return static_cast<size_t>(
+        std::min(std::floor((activity / localDistortion) * nr_quantizers), static_cast<double>(nr_quantizers - 1)));
 }
 
 // -----------------------------------------------------------------------------

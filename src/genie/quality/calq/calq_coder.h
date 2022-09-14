@@ -4,8 +4,8 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_CODER_H_
-#define SRC_GENIE_QUALITY_CALQ_CODER_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
+#define SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -284,7 +284,7 @@ void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input,
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_CODER_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

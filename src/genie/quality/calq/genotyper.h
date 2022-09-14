@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ__GENOTYPER_H_
-#define SRC_GENIE_QUALITY_CALQ__GENOTYPER_H_
+#ifndef SRC_GENIE_QUALITY_CALQ_GENOTYPER_H_
+#define SRC_GENIE_QUALITY_CALQ_GENOTYPER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ class Genotyper {
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ__GENOTYPER_H_
+#endif  // SRC_GENIE_QUALITY_CALQ_GENOTYPER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

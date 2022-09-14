@@ -140,7 +140,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
 
     for (size_t cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
         if (isdigit(cigar[cigarIdx])) {
-            opLen = opLen * 10 + (size_t)cigar[cigarIdx] - (size_t)'0';
+            opLen = opLen * 10 + static_cast<size_t>(cigar[cigarIdx]) - static_cast<size_t>('0');
             continue;
         }
 
