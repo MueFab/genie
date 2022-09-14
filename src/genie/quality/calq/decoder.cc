@@ -72,7 +72,7 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
 void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
                         const quality::paramqv1::QualityValues1& param) {
     // quantizerIndices + istepIndices
-    for (size_t i = 1; i < desc.getSize(); ++i) {
+    for (uint16_t i = 1; i < desc.getSize(); ++i) {
         auto data = static_cast<uint8_t*>(desc.get(i).getData().getData());
         auto size = desc.get(i).getData().size();
 
