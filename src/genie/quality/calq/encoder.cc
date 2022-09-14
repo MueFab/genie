@@ -111,10 +111,30 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
     fillDescriptorAligned(output, desc);
 }
 
-void Encoder::setUpUnaligned(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc) {
-    // setup param
+void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
+                           calq::UniformMinMaxQuantizer& quantizer) {
+    auto& subsequence = desc.get((uint16_t)desc.getSize() - 1);
+
+    for (const auto& q : s.getQualities()) {
+        for (const auto& c : q) {
+            auto index = static_cast<uint8_t>(quantizer.valueToIndex(c));
+            subsequence.push(index);
+        }
+    }
+}
+
+void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
+                              core::AccessUnit::Descriptor& desc) {
+    // create quantizer
+    calq::UniformMinMaxQuantizer quantizer(33, 126, 8);
+
+    // set codebook
+    std::vector<uint8_t> codebookVec;
+    for (const auto& pair : quantizer.inverseLut()) {
+        codebookVec.push_back(static_cast<uint8_t>(pair.second));
+    }
+    auto codebook = codebookFromVector(codebookVec);
     paramqv1::ParameterSet set;
-    auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
     set.addCodeBook(std::move(codebook));
     param.setQvps(std::move(set));
 
@@ -122,25 +142,13 @@ void Encoder::setUpUnaligned(paramqv1::QualityValues1& param, core::AccessUnit::
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
     desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
-}
 
-// from qvwriteout/encoder
-void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc) {
-    for (const auto& q : s.getQualities()) {
-        for (const auto& c : q) {
-            UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-            desc.get((uint16_t)desc.getSize() - 1).push(c - 33);
-        }
-    }
-}
+    std::vector<uint8_t> stepindices;
 
-void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
-                              core::AccessUnit::Descriptor& desc) {
-    setUpUnaligned(param, desc);
-
+    // encode values
     for (const auto& rec : chunk.getData()) {
         for (const auto& seg : rec.getSegments()) {
-            addQualities(seg, desc);
+            addQualities(seg, desc, quantizer);
         }
     }
 }

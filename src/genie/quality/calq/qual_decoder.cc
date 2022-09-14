@@ -63,7 +63,6 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                 // quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
                     uint8_t quantizerIndex = 0;
-
                     if (!in.quantizerIndices.empty()) {
                         quantizerIndex = in.quantizerIndices[qvciPos++];
                     }

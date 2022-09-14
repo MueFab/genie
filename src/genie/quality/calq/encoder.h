@@ -13,6 +13,7 @@
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/qv-encoder.h"
 #include "genie/quality/calq/calq_coder.h"
+#include "genie/quality/calq/uniform_min_max_quantizer.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include "genie/util/stringview.h"
 
@@ -31,9 +32,8 @@ class Encoder : public core::QVEncoder {
     void fillDescriptorAligned(calq::DecodingBlock& block, core::AccessUnit::Descriptor& desc);
     void encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                        core::AccessUnit::Descriptor& desc);
-
-    void setUpUnaligned(paramqv1::QualityValues1& param, core::AccessUnit::Descriptor& desc);
-    void addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc);
+    void addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
+                      calq::UniformMinMaxQuantizer& quantizer);
     void encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                          core::AccessUnit::Descriptor& desc);
 
