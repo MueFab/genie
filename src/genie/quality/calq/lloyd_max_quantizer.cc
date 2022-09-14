@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "lloyd_max_quantizer.h"
+#include "genie/quality/calq/lloyd_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 

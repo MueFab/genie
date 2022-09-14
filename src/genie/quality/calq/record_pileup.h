@@ -12,7 +12,7 @@
 #include <limits>
 #include <string>
 #include <vector>
-#include "calq_coder.h"
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

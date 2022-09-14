@@ -18,9 +18,9 @@
 
 // -----------------------------------------------------------------------------
 
-#include "filter_buffer.h"
-#include "genotyper.h"
-#include "softclip_spreader.h"
+#include "genie/quality/calq/filter_buffer.h"
+#include "genie/quality/calq/genotyper.h"
+#include "genie/quality/calq/softclip_spreader.h"
 
 // -----------------------------------------------------------------------------
 

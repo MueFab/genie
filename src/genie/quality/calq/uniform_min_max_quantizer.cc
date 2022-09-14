@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "uniform_min_max_quantizer.h"
+#include "genie/quality/calq/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 

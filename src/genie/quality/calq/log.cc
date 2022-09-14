@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "log.h"
+#include "genie/quality/calq/log.h"
 
 #include <memory>
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "calq_coder.h"
+#include "genie/quality/calq/calq_coder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -13,11 +13,11 @@
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
-#include "lloyd_max_quantizer.h"
-#include "qual_decoder.h"
-#include "qual_encoder.h"
-#include "uniform_min_max_quantizer.h"
+#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/quality/calq/lloyd_max_quantizer.h"
+#include "genie/quality/calq/qual_decoder.h"
+#include "genie/quality/calq/qual_encoder.h"
+#include "genie/quality/calq/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 namespace genie {

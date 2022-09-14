@@ -17,10 +17,10 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genotyper.h"
-#include "haplotyper.h"
-#include "quantizer.h"
-#include "record_pileup.h"
+#include "genie/quality/calq/genotyper.h"
+#include "genie/quality/calq/haplotyper.h"
+#include "genie/quality/calq/quantizer.h"
+#include "genie/quality/calq/record_pileup.h"
 
 // -----------------------------------------------------------------------------
 
