@@ -144,8 +144,10 @@ void RecordPileup::nextRecord() {
 
 std::vector<EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
     // new vectors
-    std::vector<std::vector<std::string>> new_pre_seqs, new_pre_quals;
-    std::vector<EncodingRecord> return_records, new_records;
+    std::vector<std::vector<std::string>> new_pre_seqs;
+    std::vector<std::vector<std::string>> new_pre_quals;
+    std::vector<EncodingRecord> return_records;
+    std::vector<EncodingRecord> new_records;
 
     if (pos <= this->minPos) {
         // return empty vectors
@@ -154,7 +156,7 @@ std::vector<EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
 
     if (pos > this->maxPos) {
         // return all
-        this->minPos = -1;
+        this->minPos = static_cast<uint64_t>(-1);
         this->maxPos = 0;
 
         this->preprocessed_qvalues.clear();
