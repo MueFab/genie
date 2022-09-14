@@ -28,7 +28,7 @@ void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf) {
             if (pos >= borders[index]) {
                 break;
             }
-            this->lut_[pos] =
+            this->lut_[static_cast<int>(pos)] =
                 std::pair<int, int>(static_cast<const int&>(index), static_cast<const int&>(std::round(values[index])));
             pos += 1;
         }
@@ -36,7 +36,7 @@ void LloydMaxQuantizer::fillLUT(const ProbabilityDistribution& pdf) {
     }
 
     for (index = 0; index < borders.size(); ++index) {
-        inverseLut_[index] = static_cast<int>(std::round(values[index]));
+        inverseLut_[static_cast<int>(index)] = static_cast<int>(std::round(values[index]));
     }
 }
 
