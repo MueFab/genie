@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "filter_buffer.h"
+#include "genie/quality/calq/filter_buffer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
+#include "genie/quality/calq/error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

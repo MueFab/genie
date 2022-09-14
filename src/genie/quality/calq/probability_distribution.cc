@@ -4,11 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "probability_distribution.h"
+#include "genie/quality/calq/probability_distribution.h"
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
+#include "genie/quality/calq/error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

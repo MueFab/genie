@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotyper.h"
+#include "genie/quality/calq/genotyper.h"
 
 // -----------------------------------------------------------------------------
 
@@ -19,8 +19,8 @@
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
-#include "log.h"
+#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/quality/calq/log.h"
 
 // -----------------------------------------------------------------------------
 

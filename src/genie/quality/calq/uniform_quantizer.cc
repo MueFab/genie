@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "uniform_quantizer.h"
+#include "genie/quality/calq/uniform_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
+#include "genie/quality/calq/error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

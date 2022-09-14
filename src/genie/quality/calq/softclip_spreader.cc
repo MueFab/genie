@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "softclip_spreader.h"
+#include "genie/quality/calq/softclip_spreader.h"
 
 // -----------------------------------------------------------------------------
 

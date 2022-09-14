@@ -17,9 +17,9 @@
 
 // -----------------------------------------------------------------------------
 
-#include "exceptions.h"
-#include "probability_distribution.h"
-#include "quantizer.h"
+#include "genie/quality/calq/exceptions.h"
+#include "genie/quality/calq/probability_distribution.h"
+#include "genie/quality/calq/quantizer.h"
 
 // -----------------------------------------------------------------------------
 

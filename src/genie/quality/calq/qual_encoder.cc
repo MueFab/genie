@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "qual_encoder.h"
+#include "genie/quality/calq/qual_encoder.h"
 
 // -----------------------------------------------------------------------------
 
@@ -14,8 +14,8 @@
 
 // -----------------------------------------------------------------------------
 
-#include "calq_coder.h"
-#include "error_exception_reporter.h"
+#include "genie/quality/calq/calq_coder.h"
+#include "genie/quality/calq/error_exception_reporter.h"
 
 // -----------------------------------------------------------------------------
 

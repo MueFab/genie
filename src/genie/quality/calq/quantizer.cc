@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "quantizer.h"
+#include "genie/quality/calq/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -13,8 +13,8 @@
 
 // -----------------------------------------------------------------------------
 
-#include "error_exception_reporter.h"
-#include "log.h"
+#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/quality/calq/log.h"
 
 // -----------------------------------------------------------------------------
 
