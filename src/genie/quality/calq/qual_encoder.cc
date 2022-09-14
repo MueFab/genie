@@ -35,13 +35,7 @@ QualEncoder::QualEncoder(const EncodingOptions& options, const std::map<int, Qua
 
       out(o),
 
-      posCounter(0),
-      hqSoftClipThreshold(options.hqSoftClipThreshold),
-      quantizers_(quant),
-
-      samRecordDeque_(),
-
-      version_(options.version) {}
+      quantizers_(quant) {}
 
 // -----------------------------------------------------------------------------
 
@@ -125,8 +119,6 @@ void QualEncoder::finishBlock() {
 
     // Encode remaining records
     encodeRecords(recordPileup.getAllRecords());
-
-    posCounter = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -168,7 +160,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 // Encode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
                     auto q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
-                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS-1).valueToIndex(q));
+                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS - 1).valueToIndex(q));
                     out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS)).push_back(qualityValueIndex);
                 }
                 break;
