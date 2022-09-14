@@ -72,18 +72,9 @@ class QualEncoder {
     Haplotyper haplotyper_;
     Genotyper genotyper_;
     DecodingBlock* out;
-    size_t posCounter;
-
-    uint8_t hqSoftClipThreshold;
 
     // Quantizers
     std::map<int, Quantizer> quantizers_;
-
-    // Double-ended queue holding the SAM records; records get popped when they
-    // are finally encoded
-    std::deque<EncodingRead> samRecordDeque_;
-
-    Version version_;
 };
 
 // -----------------------------------------------------------------------------

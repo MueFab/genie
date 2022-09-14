@@ -34,13 +34,13 @@ struct DecodingRead {
 
 class QualDecoder {
  public:
-    QualDecoder(const DecodingBlock& in, uint32_t positionOffset, uint8_t qualityOffset, EncodingBlock* out);
+    QualDecoder(const DecodingBlock& in, uint64_t positionOffset, uint8_t qualityOffset, EncodingBlock* out);
     ~QualDecoder();
 
     void decodeMappedRecordFromBlock(const DecodingRead& samRecord);
 
  private:
-    uint32_t posOffset_;
+    uint64_t posOffset_;
     int qualityValueOffset_;
 
     std::vector<size_t> qviIdx_;

@@ -14,7 +14,7 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-QualDecoder::QualDecoder(const DecodingBlock& b, uint32_t positionOffset, uint8_t qualityOffset, EncodingBlock* o)
+QualDecoder::QualDecoder(const DecodingBlock& b, uint64_t positionOffset, uint8_t qualityOffset, EncodingBlock* o)
     : posOffset_(positionOffset),
       qualityValueOffset_(qualityOffset),
       qviIdx_(b.stepindices.size(), 0),
@@ -40,12 +40,11 @@ QualDecoder::~QualDecoder() = default;
 void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
     std::string qual;
 
-    size_t cigarIdx = 0;
     size_t cigarLen = samRecord.cigar.length();
     size_t opLen = 0;
     size_t qvciPos = samRecord.posMin - posOffset_;
 
-    for (cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
+    for (size_t cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
         if (isdigit(samRecord.cigar[cigarIdx])) {
             opLen = opLen * 10 + (size_t)samRecord.cigar[cigarIdx] - (size_t)'0';
             continue;
