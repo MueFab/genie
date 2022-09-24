@@ -21,7 +21,7 @@
 
 namespace genie {
 namespace quality {
-namespace qvcalq {
+namespace calq {
 
 /**
  * @brief
@@ -48,7 +48,7 @@ class Encoder : public core::QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace qvcalq
+}  // namespace calq
 }  // namespace quality
 }  // namespace genie
 
