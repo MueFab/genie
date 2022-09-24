@@ -16,7 +16,7 @@
 
 namespace genie {
 namespace quality {
-namespace qvcalq {
+namespace calq {
 
 using ClassType = core::record::ClassType;
 
@@ -187,7 +187,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace qvcalq
+}  // namespace calq
 }  // namespace quality
 }  // namespace genie
 

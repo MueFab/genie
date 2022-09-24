@@ -10,7 +10,7 @@
 
 namespace genie {
 namespace quality {
-namespace qvcalq {
+namespace calq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace qvcalq
+}  // namespace calq
 }  // namespace quality
 }  // namespace genie
 

@@ -23,9 +23,9 @@
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
-#include "genie/quality/qvwriteout/encoder-none.h"
-#include "genie/quality/calq/encoder.h"
 #include "genie/quality/calq/decoder.h"
+#include "genie/quality/calq/encoder.h"
+#include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
 
@@ -193,7 +193,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
     }
     if (pOpts.qvMode == "calq") {
-        flow->setQVCoder(genie::util::make_unique<genie::quality::qvcalq::Encoder>(), 0);
+        flow->setQVCoder(genie::util::make_unique<genie::quality::calq::Encoder>(), 0);
     }
     if (pOpts.readNameMode == "none") {
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
@@ -213,10 +213,6 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
     constexpr size_t BLOCKSIZE = 128000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
-
-    if (pOpts.qvMode == "calq") {
-        flow->setQVCoder(genie::util::make_unique<genie::quality::qvcalq::Decoder>(), 0);
-    }
 
     std::string json_uri_path = pOpts.inputRefFile;
     if (ghc::filesystem::exists(pOpts.inputFile + ".json") && ghc::filesystem::file_size(pOpts.inputFile + ".json")) {
