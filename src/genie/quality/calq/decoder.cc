@@ -14,9 +14,7 @@ namespace calq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Decoder::isAligned(const core::AccessUnit::Descriptor& desc) {
-    return desc.getSize() != 3;
-}
+bool Decoder::isAligned(const core::AccessUnit::Descriptor& desc) { return desc.getSize() != 3; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -94,10 +92,15 @@ void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const core::parameter::QualityValues& param, const std::vector<std::string>& ecigar_vec,
     const std::vector<uint64_t>& positions, core::AccessUnit::Descriptor& desc) {
-    util::Watch watch;
-    const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
-
     std::vector<std::string> resultQV;
+    core::stats::PerfStats stats;
+    util::Watch watch;
+
+    if (desc.isEmpty()) {
+        return std::make_tuple(resultQV, stats);
+    }
+
+    const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
 
     if (isAligned(desc)) {
         resultQV = decodeAligned(param_casted, ecigar_vec, positions, desc);
@@ -105,7 +108,6 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
         resultQV = decodeUnaligned(param_casted, ecigar_vec, desc);
     }
 
-    core::stats::PerfStats stats;
     stats.addDouble("time-qvcalq", watch.check());
     return std::make_tuple(resultQV, stats);
 }
