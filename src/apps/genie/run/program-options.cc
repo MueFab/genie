@@ -60,7 +60,8 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     qvMode = "lossless";
     app.add_option("--qv", qvMode,
                    "How to encode quality values. \nPossible values are \n"
-                   "\"lossless\" (default, keep all values) and \n\"none\" (discard all values).\n");
+                   "\"lossless\" (default, keep all values), \n\"calq\" (quantize values with calq) and \n\"none\" "
+                   "(discard all values).\n");
 
     readNameMode = "lossless";
     app.add_option("--read-ids", readNameMode,
