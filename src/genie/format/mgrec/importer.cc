@@ -43,16 +43,17 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
     if (!checkSupport) {
         return true;
     }
-   /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
-        rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
-        discarded_missing_pair_U++;
-        return false;
-    }*/
+    /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+         rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
+         discarded_missing_pair_U++;
+         return false;
+     }*/
     for (const auto& a : rec.getAlignments()) {
-        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
-            discarded_HM++;
-            return false;
-        }
+        // TODO (hackspiel): ask if removable
+        //        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
+        //            discarded_HM++;
+        //            return false;
+        //        }
         if (!isECigarSupported(a.getAlignment().getECigar())) {
             discarded_splices++;
             return false;
