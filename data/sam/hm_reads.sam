@@ -1,0 +1,4 @@
+@HD	VN:1.6	SO:queryname
+@SQ	SN:ref	LN:100
+read	73	ref	1	60	10M	*	0	0	AAAAAGGGGG	ABCDEFGHIJ
+read	133	ref	0	60	*	*	0	0	TTTTTCCCCC	KLMNOPQRST
