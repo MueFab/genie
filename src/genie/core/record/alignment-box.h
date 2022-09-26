@@ -96,6 +96,11 @@ class AlignmentBox {
     void addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment);
 
     /**
+     * @brief Remove all alignment_splits
+     */
+    void clearAlignmentSplits();
+
+    /**
      * @brief
      */
     AlignmentBox();

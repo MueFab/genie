@@ -25,6 +25,16 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::checkAndClearAlignmentHM() {
+    if (class_ID == ClassType::CLASS_HM) {
+        for (auto &r : alignmentInfo) {
+            r.clearAlignmentSplits();
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Record::patchRefID(size_t refID) {
     sharedAlignmentInfo = AlignmentSharedData(static_cast<uint16_t>(refID), sharedAlignmentInfo.getAsDepth());
 }
@@ -160,6 +170,7 @@ void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
         UTILS_DIE_IF(_seq_id != sharedAlignmentInfo.getSeqID(), "Incompatible seq id");
     }
     alignmentInfo.push_back(std::move(rec));
+    checkAndClearAlignmentHM();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

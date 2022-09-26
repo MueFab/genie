@@ -49,7 +49,13 @@ class Record {
 
     std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief
 
+    /**
+     * @brief Remove invalid alignment splits
+     */
+    void checkAndClearAlignmentHM();
+
  public:
+
     /**
      * @brief
      */

@@ -43,7 +43,13 @@ AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_t
     }
 }
 
-//------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AlignmentBox::clearAlignmentSplits() {
+    this->splitAlignmentInfo.clear();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 AlignmentBox::AlignmentBox() : mapping_pos(0), alignment(), splitAlignmentInfo(0) {}
 
