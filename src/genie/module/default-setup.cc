@@ -45,24 +45,24 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>(writeRawStreams));
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false, writeRawStreams));
-    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(writeRawStreams));
+    //    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(writeRawStreams));
     ret->addReadCoder(
         genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false, writeRawStreams));
     ret->addReadCoder(
         genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().empty()) {
-            return 2;
+            return 1; // from 2
         }
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
             if (chunk.isReferenceOnly() ||
                 chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
-                return 2;
+                return 1; // from 2
             }
             if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {
-                return 4;
+                return 3; // from 4
             } else {
-                return 3;
+                return 2; // from 3
             }
         } else {
             if (chunk.getRef().isEmpty()) {
