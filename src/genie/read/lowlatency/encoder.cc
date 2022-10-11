@@ -46,10 +46,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
                 state.readLength = 0;
             }
 
-            for (auto c : s.getSequence()) {
-                state.streams.push(core::GenSub::UREADS,
-                                   core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
-            }
+//            for (auto c : s.getSequence()) {
+//                state.streams.push(core::GenSub::UREADS,
+//                                   core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
+//            }
         }
         if (r.getSegments().size() > 1) {
             state.streams.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);

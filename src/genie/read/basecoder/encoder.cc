@@ -124,7 +124,12 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         container.push(core::GenSub::RLEN, SEQUENCE2.length() - 1);
         container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
-        if (rec.getClassID() != genie::core::record::ClassType::CLASS_HM) {
+        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
+            for (auto c : rec.getSegments().back().getSequence()) {
+                container.push(core::GenSub::UREADS,
+                               core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
+            }
+        } else {
             const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
             encodeAdditionalSegment(srec, rec.isRead1First());
 
