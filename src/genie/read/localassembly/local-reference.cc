@@ -108,7 +108,7 @@ void LocalReference::addRead(const core::record::Record &s) {
     const auto pos1 = s.getAlignments().front().getPosition();
     addSingleRead(seq1, cigar1, pos1);
 
-    if (s.getSegments().size() == 1) {
+    if (s.getSegments().size() == 1 || s.getClassID() == genie::core::record::ClassType::CLASS_HM) {
         return;
     }
 

@@ -43,7 +43,7 @@ Encoder::Encoder(uint64_t startingMappingPos)
 void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     // TODO(Fabian): Splices
     const auto &ALIGNMENT =
-        rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
+        rec.getAlignments().front();            // TODO(Fabian): Multiple alignments. Currently only 1 supported
     const auto &RECORD = rec.getSegments()[0];  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
@@ -92,18 +92,13 @@ const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1) {
-    const auto LENGTH = length - 1;
-    container.push(core::GenSub::RLEN, LENGTH);
-
+void Encoder::encodeAdditionalSegment(const core::record::alignment_split::SameRec &srec, bool first1) {
     const auto RCOMP = srec.getAlignment().getRComp();
     container.push(core::GenSub::RCOMP, RCOMP);
 
     // TODO(Fabian): MSCORE depth != 1
     const auto MSCORE = srec.getAlignment().getMappingScores().front();
     container.push(core::GenSub::MSCORE, MSCORE);
-
-    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
     const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(!first1);  // FIRST1 is encoded in least significant bit
@@ -124,13 +119,19 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
     // Check if record is paired
     if (rec.getSegments().size() > 1) {
         // Same record
-        const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
         const auto &SEQUENCE2 = rec.getSegments()[1].getSequence();
-        const auto LENGTH2 = SEQUENCE2.length();
-        encodeAdditionalSegment(LENGTH2, srec, rec.isRead1First());
 
-        const auto &CIGAR2 = srec.getAlignment().getECigar();
-        clips.second = encodeCigar(SEQUENCE2, CIGAR2, ref2, rec.getClassID());
+        container.push(core::GenSub::RLEN, SEQUENCE2.length() - 1);
+        container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
+
+        if (rec.getClassID() != genie::core::record::ClassType::CLASS_HM) {
+            const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
+            encodeAdditionalSegment(srec, rec.isRead1First());
+
+            const auto &CIGAR2 = srec.getAlignment().getECigar();
+            clips.second = encodeCigar(SEQUENCE2, CIGAR2, ref2, rec.getClassID());
+        }
+
     } else if (rec.getNumberOfTemplateSegments() > 1) {
         // Unpaired
         if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==

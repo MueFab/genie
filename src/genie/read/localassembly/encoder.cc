@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include "genie/core/record/class-type.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include "genie/util/watch.h"
 
@@ -79,7 +80,7 @@ std::pair<std::string, std::string> Encoder::getReferences(const core::record::R
         state.maxPos = std::max(state.maxPos, end);
     }
 
-    if (r.getSegments().size() > 1) {
+    if (r.getSegments().size() > 1 && r.getClassID() != genie::core::record::ClassType::CLASS_HM) {
         const auto& srec = *reinterpret_cast<const core::record::alignment_split::SameRec*>(
             r.getAlignments().front().getAlignmentSplits().front().get());
         auto begin = r.getAlignments().front().getPosition() + srec.getDelta();

@@ -46,7 +46,7 @@ class Encoder {
      * @param length
      * @param srec
      */
-    void encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1);
+    void encodeAdditionalSegment(const core::record::alignment_split::SameRec &srec, bool first1);
 
     /**
      * @brief
