@@ -80,8 +80,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                             b.load();
                             b.parse();
                         }
-                        UTILS_DIE_IF(ret.getHeader().getClass() == genie::core::record::ClassType::CLASS_HM,
-                                     "Class HM not supported");
+//                        UTILS_DIE_IF(ret.getHeader().getClass() == genie::core::record::ClassType::CLASS_HM,
+//                                     "Class HM not supported");
                         ret.debugPrint(parameters.at(ret.getHeader().getParameterID()));
                         return ret;
                     } else {

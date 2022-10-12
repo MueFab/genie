@@ -96,8 +96,8 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Decoder>());
     auto lld = genie::util::make_unique<genie::read::lowlatency::Decoder>();
-    ret->setRefDecoder(lld.get());
-    ret->addReadCoder(std::move(lld));
+    ret->setRefDecoder(lld.get()); // TODO (hackspiel): change to localassambly
+//    ret->addReadCoder(std::move(lld));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
@@ -105,9 +105,9 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
                     if (au.getParameters().getNumberTemplateSegments() >= 2) {
-                        return 4;
+                        return 3; // from 4
                     } else {
-                        return 3;
+                        return 2; // from 3
                     }
                     break;
                 case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
@@ -124,7 +124,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
             }
         } else {
             if (au.getClassType() == core::record::ClassType::CLASS_U) {
-                return 2;
+                return 1; // TODO (hackspiel): check right (From 2)
             } else {
                 return 0;
             }

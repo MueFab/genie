@@ -144,10 +144,10 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     std::string ecigar = std::move(cigar);
     decodeMismatches(clip_offset, sequence, ecigar);
 
+    std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
     alignment.addMappingScore((int32_t)MSCORE);
 
-    std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
     std::get<1>(ret) =
@@ -208,16 +208,17 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
-    const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
-    const auto MSCORE = (int32_t)container.pull(core::GenSub::MSCORE);
-
     std::string ecigar = std::move(cigar);
     decodeMismatches(softclip_offset, sequence, ecigar);
 
-    core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
-    alignment.addMappingScore(MSCORE);
-    std::get<0>(state).addAlignmentSplit(
-        genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
+    if (std::get<1>(state).getClassID() != genie::core::record::ClassType::CLASS_HM) {
+        const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
+        const auto MSCORE = (int32_t)container.pull(core::GenSub::MSCORE);
+        core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
+        alignment.addMappingScore(MSCORE);
+        std::get<0>(state).addAlignmentSplit(
+            genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
+    }
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(state).addSegment(std::move(segment));
