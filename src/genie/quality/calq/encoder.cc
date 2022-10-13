@@ -64,13 +64,22 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
                              core::record::AlignmentSplit::Type::SAME_REC,
                          "Wrong record type");
 
-            auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
-                *rec.getAlignments().front().getAlignmentSplits().front().get());
-
-            positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
-            cigars.push_back(s_alignment.getAlignment().getECigar());
             sequences.push_back(s_segment.getSequence());
             qvalues.push_back(s_segment.getQualities().front());
+
+            if (rec.getClassID() == core::record::ClassType::CLASS_HM) {
+                positions.push_back(positions.back());
+                // create cigar like "x+"
+                std::string cigar = std::to_string(qvalues.back().size());
+                cigar.append("+");
+            } else {
+                auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
+                    *rec.getAlignments().front().getAlignmentSplits().front().get());
+
+                positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
+                cigars.push_back(s_alignment.getAlignment().getECigar());
+            }
+
         }
 
         input.qvalues.emplace_back(std::move(qvalues));
@@ -79,11 +88,17 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
         sideInformation.positions.emplace_back(std::move(positions));
     }
 
-    // set offset
+    // set offset and options
     sideInformation.posOffset = sideInformation.positions.front().front();
     opt.qualityValueOffset = 0;
     opt.qualityValueMin = 33;   // ascii !
     opt.qualityValueMax = 126;  // ascii ~
+
+    //    auto classID = chunk.getData().front().getClassID();
+    //    if(classID == genie::core::record::ClassType::CLASS_HM || classID == genie::core::record::ClassType::CLASS_U
+    //    || classID == genie::core::record::ClassType::CLASS_I){
+    //        opt.hasUnaligned = true;
+    //    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

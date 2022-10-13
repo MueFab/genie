@@ -206,10 +206,15 @@ struct EncodingOptions {
      */
     QuantizerType quantizerType = QuantizerType::UNIFORM;
 
-    /***
+    /**
      * Calq version used
      */
     Version version = Version::V1;
+
+    /**
+     * Flag for unaligned
+     */
+     bool hasUnaligned = false;
 };
 
 // -----------------------------------------------------------------------------
