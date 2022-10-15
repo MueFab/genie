@@ -32,6 +32,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     std::vector<std::string> ecigars;
+    std::vector<uint64_t> positions;
     // FIXME: loop condition is only correct if all records have the full number of reads
     size_t i = 0;
     size_t rec_i = 0;
@@ -55,6 +56,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
         for (size_t j = 0; j < num_segments; ++j) {
             size_t length = data.getParameters().getReadLength();
             ecigars.emplace_back(length, '+');
+            positions.emplace_back(std::numeric_limits<uint64_t>::max());
             if (!length) {
                 length = data.pull(core::GenSub::RLEN) + 1;
             }
@@ -76,7 +78,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
 
     data.getStats().addDouble("time-lowlatency", watch.check());
     watch.reset();
-    auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
+    auto qvs = this->qvcoder->process(qvparam, ecigars, positions, qvStream);
     size_t qvCounter = 0;
     if (!std::get<0>(qvs).empty()) {
         for (auto& r : ret.getData()) {

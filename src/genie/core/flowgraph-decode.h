@@ -149,7 +149,7 @@ class FlowGraphDecode : public FlowGraph {
      */
     void setQVSelector(
         std::function<size_t(const genie::core::parameter::QualityValues& param, const std::vector<std::string>& ecigar,
-                             genie::core::AccessUnit::Descriptor& desc)>
+                             const std::vector<uint64_t>& positions, genie::core::AccessUnit::Descriptor& desc)>
             fun);
 
     /**
