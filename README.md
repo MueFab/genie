@@ -109,7 +109,7 @@ Following CLI-Arguments are available:
 * --force / -f: Flag, if set already existing output files are overridden.
 * --input-ref-file: Path to a reference fasta file. Only relevant for aligned records. If no path is provided, a computed reference will be used instead.
 * --working-dir / -w: Path to a directory where temporary files can be stored. If no path is provided, the current working dir is used. Please make sure that enough space is available.
-* --qv: How to encode quality values. Possible values are "lossless" (default, keep all values) and "none" (discard all values).
+* --qv: How to encode quality values. Possible values are "lossless" (default, keep all values), "calq" (quantize values with calq) and "none" (discard all values).
 * --read-ids: How to encode read ids. Possible values are "lossless" (default, keep all values) and "none" (discard all values).
 * --low-latency: Flag, if set no global reference will be calculated for unaligned records. This will increase encoding speed, but decrease compression rate.
 * --combine-pairs: Flag, if provided to a decoding operation, unaligned reads will get matched to their mate again. Note: has no effect if encoded with --low-latency in case of aligned reads only. Does not work if encoded with --read-ids "none"
