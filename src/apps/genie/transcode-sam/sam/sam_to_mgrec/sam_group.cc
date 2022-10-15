@@ -399,9 +399,9 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
     SamRecord *r2 = tuple.second;
 
     if (r1 && r2 && r1->getRID() != r2->getRID()) {
-        genie::core::record::Record rec1(2, cls.second, r1->moveQname(), "Genie",
+        genie::core::record::Record rec1(2, cls.second, r1->moveQname(), "",
                                          std::get<1>(convertFlags2Mpeg(r1->getFlag())), true);
-        genie::core::record::Record rec2(2, cls.second, r2->moveQname(), "Genie",
+        genie::core::record::Record rec2(2, cls.second, r2->moveQname(), "",
                                          std::get<1>(convertFlags2Mpeg(r2->getFlag())), false);
 
         addSegment(rec1, r1);

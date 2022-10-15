@@ -32,6 +32,7 @@ class QVDecoder {
      */
     virtual std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const parameter::QualityValues& param,
                                                                                  const std::vector<std::string>& ecigar,
+                                                                                 const std::vector<uint64_t>& positions,
                                                                                  AccessUnit::Descriptor& desc) = 0;
     /**
      * @brief For polymorphic destruction

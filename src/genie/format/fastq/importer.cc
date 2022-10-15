@@ -66,7 +66,7 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
 
 core::record::Record Importer::buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data) {
     auto ret = core::record::Record(uint8_t(data.size()), core::record::ClassType::CLASS_U,
-                                    data[Files::FIRST][Lines::ID].substr(1), "Genie", 0);
+                                    data[Files::FIRST][Lines::ID].substr(1), "", 0);
 
     for (auto &cur_rec : data) {
         auto seg = core::record::Segment(std::move(cur_rec[Lines::SEQUENCE]));

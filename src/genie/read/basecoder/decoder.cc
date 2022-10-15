@@ -151,7 +151,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
     std::get<1>(ret) =
-        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "Genie", FLAGS);
+        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "", FLAGS);
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(ret).addSegment(std::move(segment));
