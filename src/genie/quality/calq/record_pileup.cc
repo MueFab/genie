@@ -89,6 +89,10 @@ void RecordPileup::addRecord(EncodingRecord &r) {
         auto seq_processed = preprocess(r.sequences[i], r.cigars[i]);
         auto qual_processed = preprocess(r.qvalues[i], r.cigars[i]);
 
+        if (seq_processed.empty()) {
+            return;
+        }
+
         this->minPos = std::min(this->minPos, r.positions[i]);
         this->maxPos = std::max(this->maxPos, r.positions[i] + seq_processed.length() - 1);
 
@@ -106,6 +110,11 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
 
     for (uint64_t i = 0; i < this->records.size(); ++i) {
         for (uint64_t read_i = 0; read_i < records[i].positions.size(); ++read_i) {
+
+            if(preprocessed_sequences[i].size() <= read_i){
+                break;
+            }
+
             const auto pos_read = records[i].positions[read_i];
             const auto &seq = preprocessed_sequences[i][read_i];
             const auto &qual = preprocessed_qvalues[i][read_i];

@@ -60,10 +60,6 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
         if (rec.getSegments().size() == 2) {
             auto& s_segment = rec.getSegments()[1];
 
-            UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                             core::record::AlignmentSplit::Type::SAME_REC,
-                         "Wrong record type");
-
             sequences.push_back(s_segment.getSequence());
             qvalues.push_back(s_segment.getQualities().front());
 
@@ -72,6 +68,8 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
                 // create cigar like "x+"
                 std::string cigar = std::to_string(qvalues.back().size());
                 cigar.append("+");
+                cigars.push_back(std::move(cigar));
+
             } else {
                 auto& s_alignment = dynamic_cast<core::record::alignment_split::SameRec&>(
                     *rec.getAlignments().front().getAlignmentSplits().front().get());
@@ -79,6 +77,9 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
                 positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
                 cigars.push_back(s_alignment.getAlignment().getECigar());
             }
+
+            sequences.push_back(s_segment.getSequence());
+            qvalues.push_back(s_segment.getQualities().front());
         }
 
         input.qvalues.emplace_back(std::move(qvalues));
@@ -89,6 +90,7 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
 
     // set offset and options
     sideInformation.posOffset = sideInformation.positions.front().front();
+    sideInformation.classType = chunk.getData().front().getClassID();
     opt.qualityValueOffset = 0;
     opt.qualityValueMin = 33;   // ascii !
     opt.qualityValueMax = 126;  // ascii ~

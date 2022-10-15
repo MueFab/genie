@@ -1,8 +1,8 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #ifndef SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
 #define SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
@@ -18,6 +18,7 @@
 
 // -----------------------------------------------------------------------------
 
+#include "genie/core/record/class-type.h"
 #include "genie/quality/calq/log.h"
 
 // -----------------------------------------------------------------------------
@@ -69,6 +70,11 @@ struct SideInformation {
      * Needed for: Encoding, Decoding
      */
     uint8_t qualOffset;
+
+    /**
+     * ClassType
+     */
+    genie::core::record::ClassType classType = genie::core::record::ClassType::NONE;
 };
 
 // -----------------------------------------------------------------------------
@@ -214,7 +220,7 @@ struct EncodingOptions {
     /**
      * Flag for unaligned
      */
-     bool hasUnaligned = false;
+    bool hasUnaligned = false;
 };
 
 // -----------------------------------------------------------------------------
@@ -277,11 +283,9 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
  * @param input Decoded quality values
  * @param output Encoded quality values
  */
-void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input,
-            DecodingBlock* output);
+void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input, DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
-
 
 }  // namespace calq
 }  // namespace quality
