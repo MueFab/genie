@@ -4,9 +4,9 @@ stages:
   - job: 'Debug'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           binDir: 'bin'
         macos1200:
           imageName: 'macos-12'
@@ -34,8 +34,8 @@ stages:
         sudo apt-get update
         sudo apt-get install cppcheck
         sudo apt-get install doxygen
-      displayName: 'Install prerequisites (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Install prerequisites (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
@@ -54,12 +54,12 @@ stages:
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - bash: ./ci/src_test.sh
-      displayName: 'Check source code (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Check source code (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: ./ci/build.sh doc
-      displayName: 'Build documentation (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Build documentation (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: ./ci/build.sh debug
       displayName: 'Genie build'
@@ -77,15 +77,15 @@ stages:
 
     - publish: cmake-build-debug/documentation/html
       artifact: 'genie-documentation-$(Build.SourceVersion)'
-      displayName: 'Publish documentation (ubuntu2004)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Publish documentation (ubuntu2204)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
   - job: 'Release'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           architecture: ''
           binDir: 'bin'
         macos1200:
@@ -146,9 +146,9 @@ stages:
   - job: 'Unit'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
         macos1200:
           imageName: 'macos-12'
@@ -220,9 +220,9 @@ stages:
 #  - job: 'Memory'
 #    strategy:
 #      matrix:
-#        ubuntu2004:
-#          imageName: 'ubuntu-20.04'
-#          artifactName: 'ubuntu2004'
+#        ubuntu2204:
+#          imageName: 'ubuntu-22.04'
+#          artifactName: 'ubuntu2204'
 #          fileExt: ''
 #    pool:
 #      vmImage: $(imageName)
@@ -261,9 +261,9 @@ stages:
   - job: 'Conformance_Roundtrip'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
         macos1200:
           imageName: 'macos-12'
@@ -343,9 +343,9 @@ stages:
   - job: 'Debian'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
     pool:
       vmImage: $(imageName)
