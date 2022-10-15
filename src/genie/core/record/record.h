@@ -55,7 +55,6 @@ class Record {
     void checkAndClearAlignmentHM();
 
  public:
-
     /**
      * @brief
      */

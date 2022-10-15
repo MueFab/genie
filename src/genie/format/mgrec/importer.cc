@@ -49,7 +49,6 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
          return false;
      }*/
     for (const auto& a : rec.getAlignments()) {
-        // TODO (hackspiel): ask if removable
         //        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
         //            discarded_HM++;
         //            return false;
