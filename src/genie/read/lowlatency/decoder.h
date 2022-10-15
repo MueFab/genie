@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include <limits>
 #include "genie/core/read-decoder.h"
 #include "genie/core/ref-decoder.h"
 
