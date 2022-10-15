@@ -79,7 +79,6 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
                 positions.push_back(f_alignment.getPosition() + s_alignment.getDelta());
                 cigars.push_back(s_alignment.getAlignment().getECigar());
             }
-
         }
 
         input.qvalues.emplace_back(std::move(qvalues));
