@@ -110,8 +110,7 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
 
     for (uint64_t i = 0; i < this->records.size(); ++i) {
         for (uint64_t read_i = 0; read_i < records[i].positions.size(); ++read_i) {
-
-            if(preprocessed_sequences[i].size() <= read_i){
+            if (preprocessed_sequences[i].size() <= read_i) {
                 break;
             }
 
