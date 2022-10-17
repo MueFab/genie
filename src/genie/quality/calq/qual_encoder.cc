@@ -25,10 +25,13 @@ namespace calq {
 
 // -----------------------------------------------------------------------------
 
-QualEncoder::QualEncoder(const EncodingOptions& options, const std::map<int, Quantizer>& quant, DecodingBlock* o)
+QualEncoder::QualEncoder(const EncodingOptions& options, const SideInformation& sideInfo,
+                         const std::map<int, Quantizer>& quant, DecodingBlock* o)
     : nrMappedRecords_(0),
       minPosUnencoded(0),
       NR_QUANTIZERS(options.quantizationMax - options.quantizationMin + 1),
+      hasUnalignedValues(sideInfo.classType == genie::core::record::ClassType::CLASS_HM ||
+                         sideInfo.classType == genie::core::record::ClassType::CLASS_I),
 
       qualityValueOffset_(options.qualityValueOffset),
       posOffset_(0),
@@ -95,12 +98,14 @@ void QualEncoder::addMappedRecordToBlock(EncodingRecord& record) {
             }
         }
 
-        // unaligned
-        const auto& map = quantizers_[NR_QUANTIZERS - 1].inverseLut();
-        out->codeBooks.emplace_back();
-        out->stepindices.emplace_back();
-        for (const auto& pair : map) {
-            out->codeBooks.back().push_back(static_cast<uint8_t>(pair.second));
+        // create object for unaligned values
+        if (hasUnalignedValues) {
+            const auto& map = quantizers_[NR_QUANTIZERS - 1].inverseLut();
+            out->codeBooks.emplace_back();
+            out->stepindices.emplace_back();
+            for (const auto& pair : map) {
+                out->codeBooks.back().push_back(static_cast<uint8_t>(pair.second));
+            }
         }
 
         out->quantizerIndices.clear();

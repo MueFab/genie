@@ -62,7 +62,7 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     }
 
     // Encode the quality values
-    QualEncoder qualEncoder(opt, quantizers, output);
+    QualEncoder qualEncoder(opt, sideInformation, quantizers, output);
 
     for (size_t i = 0; i < sideInformation.positions.size(); ++i) {
         EncodingRecord record = {input.qvalues[i], sideInformation.sequences[i], sideInformation.cigars[i],

@@ -17,6 +17,7 @@
 
 // -----------------------------------------------------------------------------
 
+#include "genie/core/record/class-type.h"
 #include "genie/quality/calq/genotyper.h"
 #include "genie/quality/calq/haplotyper.h"
 #include "genie/quality/calq/quantizer.h"
@@ -35,20 +36,10 @@ struct DecodingBlock;
 enum struct Version;
 // -----------------------------------------------------------------------------
 
-struct EncodingRead {
-    uint32_t posMin;
-    uint32_t posMax;
-    std::string qvalues;
-    std::string cigar;
-    std::string sequence;
-    std::string reference;
-};
-
-// -----------------------------------------------------------------------------
-
 class QualEncoder {
  public:
-    explicit QualEncoder(const EncodingOptions& options, const std::map<int, Quantizer>& quant, DecodingBlock* out);
+    explicit QualEncoder(const EncodingOptions& options, const SideInformation& sideInfo,
+                         const std::map<int, Quantizer>& quant, DecodingBlock* out);
     ~QualEncoder();
     void addMappedRecordToBlock(EncodingRecord& record);
     void finishBlock();
@@ -59,12 +50,13 @@ class QualEncoder {
     void encodeRecords(std::vector<EncodingRecord> records);
     void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos);
 
- private:
     // Sizes & counters
     size_t nrMappedRecords_;
     size_t minPosUnencoded;
 
     int NR_QUANTIZERS;
+
+    bool hasUnalignedValues;
 
     // Quality value offset for this block
     uint8_t qualityValueOffset_;

@@ -106,7 +106,8 @@ void RecordPileup::addRecord(EncodingRecord &r) {
 std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
     UTILS_DIE_IF((pos < this->minPos || pos > this->maxPos), "Position out of range");
 
-    std::string seqs, quals;
+    std::string seqs;
+    std::string quals;
 
     for (uint64_t i = 0; i < this->records.size(); ++i) {
         for (uint64_t read_i = 0; read_i < records[i].positions.size(); ++read_i) {
