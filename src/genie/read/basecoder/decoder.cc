@@ -208,10 +208,15 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
-    std::string ecigar = std::move(cigar);
-    decodeMismatches(softclip_offset, sequence, ecigar);
+    if (std::get<1>(state).getClassID() == genie::core::record::ClassType::CLASS_HM) {
+        // decode uread part of HM
+        for (auto &c : sequence) {
+            c = getAlphabetProperties(core::AlphabetID::ACGTN).lut[container.pull(core::GenSub::UREADS)];
+        }
+    } else {
+        std::string ecigar = std::move(cigar);
+        decodeMismatches(softclip_offset, sequence, ecigar);
 
-    if (std::get<1>(state).getClassID() != genie::core::record::ClassType::CLASS_HM) {
         const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
         const auto MSCORE = (int32_t)container.pull(core::GenSub::MSCORE);
         core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
