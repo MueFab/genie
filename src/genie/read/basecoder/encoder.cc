@@ -131,6 +131,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
                                core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
             }
             container.push(core::GenSub::PAIR_SAME_REC, !rec.isRead1First());
+            //            container.push(core::GenSub::MMPOS_TERMINATOR, core::GenConst::MMPOS_TERMINATE);
         } else {
             const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
             encodeAdditionalSegment(srec, rec.isRead1First());

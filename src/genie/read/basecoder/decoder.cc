@@ -106,6 +106,10 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
     auto deletions = numberDeletions(meta.num_segments);
     for (size_t i = 0; i < meta.num_segments; ++i) {
         meta.length[i] = (length ? length : container.pull(core::GenSub::RLEN) + 1) + deletions[i];
+        // TODO(hackspiel): write better
+        if (container.getClassType() == genie::core::record::ClassType::CLASS_HM && i > 0) {
+            meta.length[i] -= deletions[i];
+        }
     }
     return meta;
 }
