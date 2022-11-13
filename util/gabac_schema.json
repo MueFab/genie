@@ -1,0 +1,219 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "https://example.com/example.json",
+    "type": "object",
+    "title": "Gabac config",
+    "required": [
+        "descriptor_subsequence_ID",
+        "transform_subseq_cfgs",
+        "transform_subseq_parameters"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "descriptor_subsequence_ID": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 10,
+            "title": "The subsequence ID inside the descriptor"
+        },
+        "transform_subseq_cfgs": {
+            "type": "array",
+            "title": "List of parameters for each transformed subsequence",
+            "Description": "Number of elements must be equal to NO_TRANSFORM(1), MATCH_CODING(3), EQUALITY_CODING(2), RLE_CODING(2)",
+            "items": {
+                "type": "object",
+                "title": "Object for one transformed subsequence",
+                "required": [
+                    "cabac_binarization",
+                    "support_values",
+                    "transform_ID_subsym"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "cabac_binarization": {
+                        "type": "object",
+                        "title": "How values are binarized",
+                        "required": [
+                            "binarization_ID",
+                            "bypass_flag",
+                            "cabac_context_parameters"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "binarization_ID": {
+                                "type": "integer",
+                                "title": "Selection of binarization",
+                                "minimum": 0,
+                                "maximum": 9,
+                                "default": 0,
+                                "description": "BI(0), TU(1), EG(2), SEG(3), TEG(4), STEG(5), SUTU(6), SSUTU(6), DTU(8), SDTU(9)"
+                            },
+                            "bypass_flag": {
+                                "type": "boolean",
+                                "title": "Bypass flag",
+                                "default": false
+                            },
+                            "cabac_binarization_parameters": {
+                                "type": "object",
+                                "title": "Binarization parameters",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "cmax":{
+                                        "type": "integer",
+                                        "title": "TU maximum value",
+                                        "minimum": 0,
+                                        "maximum": 255,
+                                        "default": 255
+                                     },
+                                     "cmax_teg":{
+                                        "type": "integer",
+                                        "title": "TEG/STEG maximum value",
+                                        "minimum": 0,
+                                        "maximum": 255,
+                                        "default": 255
+                                     },
+                                     "cmax_dtu":{
+                                        "type": "integer",
+                                        "title": "DTU/SDTU maximum value",
+                                        "minimum": 0,
+                                        "maximum": 255,
+                                        "default": 255
+                                     },
+                                     "split_unit_size":{
+                                        "type": "integer",
+                                        "title": "SUTU/SSUTU maximum value",
+                                        "minimum": 0,
+                                        "maximum": 255,
+                                        "default": 8
+                                     }
+                                }
+                            },
+                            "cabac_context_parameters": {
+                                "type": "object",
+                                "title": "CABAC context",
+                                "required": [
+                                    "adaptive_mode_flag"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                    "adaptive_mode_flag": {
+                                        "type": "boolean",
+                                        "title": "CABAC adaptive mode flag",
+                                        "default": true
+                                    },
+                                    "context_initialization_value": {
+                                        "type": "array",
+                                        "title": "CABAC context init",
+                                        "items": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 255,
+                                            "default": 0
+                                        }
+                                    },
+                                    "share_subsym_ctx_flag": {
+                                        "type": "boolean",
+                                        "title": "CABAC share subsymbol context flags",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "support_values": {
+                        "type": "object",
+                        "title": "The support_values Schema",
+                        "required": [
+                            "coding_order",
+                            "coding_subsym_size",
+                            "output_symbol_size"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "coding_order": {
+                                "type": "integer",
+                                "title": "CABAC encoding order",
+                                "minimum": 0,
+                                "maximum": 2,
+                                "default": 2
+                            },
+                            "coding_subsym_size": {
+                                "type": "integer",
+                                "title": "Subsymbol size in bits",
+                                "minimum": 1,
+                                "maximum": 64,
+                                "default": 32
+                            },
+                            "output_symbol_size": {
+                                "type": "integer",
+                                "title": "Symbol size in bits",
+                                "minimum": 1,
+                                "maximum": 64,
+                                "default": 32
+                            },
+                            "share_subsym_lut_flag": {
+                                "type": "boolean",
+                                "title": "Share LUT for subsymbols flag",
+                                "default": false
+                            },
+                            "share_subsym_prv_flag": {
+                                "type": "boolean",
+                                "title": "Share LUT for previous subsymbols flag",
+                                "default": false
+                            }
+                        }
+                    },
+                    "transform_ID_subsym": {
+                        "type": "integer",
+                        "title": "Transformed descriptor subsequence subsymbol transformation selection",
+                        "minimum": 0,
+                        "maximum": 2,
+                        "default": 0,
+                        "description": "NO_TRANSFORM(0), LUT_TRANSFORM(1), DIFF_TRANSFORM(2)"
+                    }
+                }
+            }
+        },
+        "transform_subseq_parameters": {
+            "type": "object",
+            "default": {},
+            "title": "Parameters for the subsequence transformation",
+            "required": [
+                "transform_ID_subseq"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "transform_ID_subseq": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 4,
+                    "title": "Selection of subsequence transformation",
+                    "description": "NO_TRANSFORM(0), EQUALITY_CODING(1), MATCH_CODING(2), RLE_CODING(3), MERGE_CODING(4)"
+                },
+                "match_coding_buffer_size": {
+                    "type": "integer",
+                    "default": 255,
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "title": "Matchcoding buffer size"
+                },
+                "rle_coding_guard": {
+                    "type": "integer",
+                    "default": 255,
+                    "minimum": 1,
+                    "maximum": 255,
+                    "title": "Maximum run length permitted"
+                },
+                "merge_coding_shift_size": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 255,
+                    "title": "Merge coding shift size"
+                }
+            }
+        }
+    }
+}
