@@ -356,9 +356,9 @@ stages:
       displayName: 'Download binaries'
     - bash: echo "Not yet implemented"
       displayName: 'Build debian package'
-  - job: 'OSX'
-    strategy:
-      matrix:
+#  - job: 'OSX'
+#    strategy:
+ #     matrix:
  #       macos1200:
  #         imageName: 'macos-12'
  #         artifactName: 'macos1200'
@@ -367,12 +367,12 @@ stages:
  #         imageName: 'macos-11'
  #         artifactName: 'macos1100'
  #         fileExt: ''
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - checkout: none
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-    - bash: echo "Not yet implemented"
-      displayName: 'Build OSX dmg'
+ #   pool:
+ #     vmImage: $(imageName)
+ #   steps:
+ #   - checkout: none
+ #   - download: current
+ #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+ #     displayName: 'Download binaries'
+ #   - bash: echo "Not yet implemented"
+ #     displayName: 'Build OSX dmg'
