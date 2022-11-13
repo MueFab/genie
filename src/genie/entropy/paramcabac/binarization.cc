@@ -96,7 +96,7 @@ bool Binarization::operator==(const Binarization& bin) const {
 
 Binarization::Binarization(nlohmann::json j) {
     binarization_ID = static_cast<BinarizationParameters::BinarizationId>(j["binarization_ID"]);
-    bypass_flag = j["bypass_flag"];
+    bypass_flag = static_cast<bool>(uint8_t (j["bypass_flag"]));
     cabac_binarization_parameters = BinarizationParameters(j["cabac_binarization_parameters"], binarization_ID);
     if (!bypass_flag) {
         cabac_context_parameters = Context(j["cabac_context_parameters"]);
@@ -108,7 +108,7 @@ Binarization::Binarization(nlohmann::json j) {
 nlohmann::json Binarization::toJson() const {
     nlohmann::json ret;
     ret["binarization_ID"] = static_cast<uint8_t>(binarization_ID);
-    ret["bypass_flag"] = bypass_flag;
+    ret["bypass_flag"] = static_cast<bool>(bypass_flag);
     ret["cabac_binarization_parameters"] = cabac_binarization_parameters.toJson(binarization_ID);
     if (!bypass_flag) {
         ret["cabac_context_parameters"] = cabac_context_parameters.toJson();
