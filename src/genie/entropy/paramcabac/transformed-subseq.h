@@ -124,7 +124,7 @@ class TransformedSubSeq {
      * @brief
      * @param j
      */
-    explicit TransformedSubSeq(nlohmann::json j);
+    explicit TransformedSubSeq(nlohmann::json j, bool last_transformed);
 
     /**
      * @brief
