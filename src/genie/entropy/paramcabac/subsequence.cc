@@ -136,8 +136,10 @@ Subsequence::Subsequence(nlohmann::json j) {
         descriptor_subsequence_ID = j["descriptor_subsequence_ID"];
     }
     transform_subseq_parameters = TransformedParameters(j["transform_subseq_parameters"]);
+    auto remaining_seqs = j["transform_subseq_cfgs"].size();
     for (const auto& it : j["transform_subseq_cfgs"]) {
-        transformSubseq_cfgs.emplace_back(it);
+        remaining_seqs--;
+        transformSubseq_cfgs.emplace_back(it, !remaining_seqs);
     }
 }
 
