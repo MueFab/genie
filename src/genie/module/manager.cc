@@ -23,8 +23,8 @@ void detect() {
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
     indPark.registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
-    indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
-                                                                &quality::paramqv1::QualityValues1::create);
+//    indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
+//                                                                &quality::paramqv1::QualityValues1::create);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
