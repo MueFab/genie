@@ -12,7 +12,7 @@
 #include <fstream>
 #include <string>
 #include "boost/optional/optional.hpp"
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 

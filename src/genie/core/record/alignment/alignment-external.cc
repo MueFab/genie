@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/alignment-external.h"
-#include "genie/core/record/alignment_external/none.h"
-#include "genie/core/record/alignment_external/other-rec.h"
+#include "alignment-external.h"
+#include "genie/core/record/alignment/alignment_external/none.h"
+#include "genie/core/record/alignment/alignment_external/other-rec.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"

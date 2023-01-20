@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/alignment_split/unpaired.h"
+#include "none.h"
 #include <memory>
 #include "genie/util/make-unique.h"
 
@@ -13,27 +13,26 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace alignment_split {
+namespace alignment_external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Unpaired::Unpaired() : AlignmentSplit(AlignmentSplit::Type::UNPAIRED) {}
+None::None() : AlignmentExternal(AlignmentExternal::Type::NONE) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Unpaired::write(util::BitWriter &writer) const { AlignmentSplit::write(writer); }
+void None::write(util::BitWriter &writer) const { AlignmentExternal::write(writer); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentSplit> Unpaired::clone() const {
-    auto ret = util::make_unique<Unpaired>();
-    ret->split_alignment = this->split_alignment;
+std::unique_ptr<AlignmentExternal> None::clone() const {
+    auto ret = util::make_unique<None>();
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
+}  // namespace alignment_external
 }  // namespace record
 }  // namespace core
 }  // namespace genie

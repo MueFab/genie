@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_OTHER_REC_H_
-#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_OTHER_REC_H_
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
-#include "genie/core/record/alignment-split.h"
+#include "genie/core/record/alignment/alignment-split.h"
+#include "genie/core/record/alignment/alignment.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -25,47 +26,48 @@ namespace alignment_split {
 /**
  * @brief
  */
-class OtherRec : public AlignmentSplit {
+class SameRec : public AlignmentSplit {
  private:
-    uint64_t split_pos;     //!< @brief
-    uint16_t split_seq_ID;  //!< @brief
+    int64_t delta;        //!< @brief
+    Alignment alignment;  //!< @brief
 
  public:
     /**
      * @brief
-     * @param _split_pos
-     * @param _split_seq_ID
      */
-    OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID);
+    SameRec();
 
     /**
      * @brief
-     * @return
+     * @param _delta
+     * @param _alignment
      */
-    uint64_t getNextPos() const;
+    SameRec(int64_t _delta, Alignment _alignment);
 
     /**
      * @brief
-     * @return
-     */
-    uint16_t getNextSeq() const;
-
-    /**
-     * @brief
+     * @param as_depth
      * @param reader
      */
-    explicit OtherRec(util::BitReader& reader);
-
-    /**
-     * @brief
-     */
-    OtherRec();
+    explicit SameRec(uint8_t as_depth, util::BitReader& reader);
 
     /**
      * @brief
      * @param writer
      */
     void write(util::BitWriter& writer) const override;
+
+    /**
+     * @brief
+     * @return
+     */
+    const Alignment& getAlignment() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    int64_t getDelta() const;
 
     /**
      * @brief
@@ -83,7 +85,7 @@ class OtherRec : public AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_OTHER_REC_H_
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 #include "genie/core/classifier.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

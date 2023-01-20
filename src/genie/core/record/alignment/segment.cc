@@ -4,63 +4,67 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/alignment_split/same-rec.h"
+#include "segment.h"
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
-namespace alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec() : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(0), alignment() {}
+Segment::Segment() : sequence(), quality_values() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec(int64_t _delta, Alignment _alignment)
-    : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(_delta), alignment(std::move(_alignment)) {}
+Segment::Segment(std::string&& _sequence) : sequence(std::move(_sequence)), quality_values() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
-    : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
-      delta(reader.readBypassBE<int64_t, 6>()),
-      alignment(as_depth, reader) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SameRec::write(util::BitWriter &writer) const {
-    AlignmentSplit::write(writer);
-    writer.writeBypassBE<int64_t, 6>(delta);
-    alignment.write(writer);
+Segment::Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader)
+    : sequence(length, 0), quality_values(qv_depth, std::string(length, 0)) {
+    reader.readBypass(&this->sequence[0], length);
+    for (auto& q : quality_values) {
+        reader.readBypass(&q[0], q.length());
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Alignment &SameRec::getAlignment() const { return alignment; }
+const std::string& Segment::getSequence() const { return sequence; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t SameRec::getDelta() const { return delta; }
+const std::vector<std::string>& Segment::getQualities() const { return quality_values; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentSplit> SameRec::clone() const {
-    auto ret = util::make_unique<SameRec>();
-    ret->delta = this->delta;
-    ret->alignment = this->alignment;
-    return ret;
+void Segment::addQualities(std::string&& qv) {
+    // Source:
+    //  From Section 10.2.16
+    // quality_values[rSeq][qs] array shall be a c(read_len[rSeg]), otherwise quality_values[rSeq][qs] shall be a
+    // c(1) string containing only one character corresponding to ASCII code 0
+    static const std::string NO_QUAL("\0", 1);
+    UTILS_DIE_IF(!((qv == NO_QUAL) || (qv.length() == sequence.length())), "QV and sequence lengths do not match");
+    quality_values.emplace_back(std::move(qv));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
+void Segment::write(util::BitWriter& writer) const {
+    writer.writeBypass(this->sequence.data(), this->sequence.length());
+    for (const auto& a : this->quality_values) {
+        writer.writeBypass(a.data(), a.length());
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace record
 }  // namespace core
 }  // namespace genie

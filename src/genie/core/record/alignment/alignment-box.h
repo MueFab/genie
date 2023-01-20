@@ -12,9 +12,9 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "genie/core/record/alignment-split.h"
-#include "genie/core/record/alignment.h"
-#include "genie/core/record/class-type.h"
+#include "alignment-split.h"
+#include "alignment.h"
+#include "class-type.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"

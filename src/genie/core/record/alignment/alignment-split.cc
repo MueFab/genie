@@ -4,9 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/alignment-shared-data.h"
+#include "alignment-split.h"
+#include "genie/core/record/alignment/alignment_split/other-rec.h"
+#include "genie/core/record/alignment/alignment_split/same-rec.h"
+#include "genie/core/record/alignment/alignment_split/unpaired.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,31 +21,31 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData() : seq_ID(0), as_depth(0) {}
+AlignmentSplit::AlignmentSplit(Type _split_alignment) : split_alignment(_split_alignment) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : seq_ID(_seq_ID), as_depth(_as_depth) {}
+void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeBypassBE(split_alignment); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentSharedData::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(seq_ID);
-    writer.writeBypassBE(as_depth);
+std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
+    Type type = reader.readBypassBE<Type>();
+    switch (type) {
+        case Type::SAME_REC:
+            return util::make_unique<alignment_split::SameRec>(as_depth, reader);
+        case Type::OTHER_REC:
+            return util::make_unique<alignment_split::OtherRec>(reader);
+        case Type::UNPAIRED:
+            return util::make_unique<alignment_split::Unpaired>();
+        default:
+            UTILS_DIE("Invalid SplitAlignmentType");
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData(util::BitReader &reader)
-    : seq_ID(reader.readBypassBE<uint16_t>()), as_depth(reader.readBypassBE<uint8_t>()) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t AlignmentSharedData::getSeqID() const { return seq_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t AlignmentSharedData::getAsDepth() const { return as_depth; }
+AlignmentSplit::Type AlignmentSplit::getType() const { return split_alignment; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

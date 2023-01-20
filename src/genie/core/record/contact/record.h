@@ -4,61 +4,51 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
-#define SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
+#ifndef SRC_GENIE_CORE_RECORD_CONTACT_H_
+#define SRC_GENIE_CORE_RECORD_CONTACT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/format-exporter.h"
-#include "genie/core/record/alignment/chunk.h"
-#include "genie/core/stats/perf-stats.h"
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/drain.h"
-#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace mgrec {
+namespace core {
+namespace record {
+namespace contact {
 
 /**
- * @brief
+ *  @brief
  */
-class Exporter : public core::FormatExporter {
-    util::BitWriter writer;  //!< @brief
-    util::OrderedLock lock;  //!< @brief
+class Record {
+ private:
+    // TODO: To be filled
 
  public:
     /**
      * @brief
-     * @param _file_1
      */
-    explicit Exporter(std::ostream& _file_1);
-
-    /**
-     * @brief
-     * @param t
-     * @param id
-     */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
-
-    /**
-     * @brief
-     * @param id
-     */
-    void skipIn(const util::Section& id) override;
+    Record();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgrec
-}  // namespace format
+}  // namespace contact
+}  // namespace record
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
+#endif  // SRC_GENIE_CORE_RECORD_CONTACT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

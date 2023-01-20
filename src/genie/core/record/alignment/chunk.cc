@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/chunk.h"
+#include "chunk.h"
 #include <utility>
 #include <vector>
 

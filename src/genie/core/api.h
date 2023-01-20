@@ -15,7 +15,7 @@
 #include <vector>
 #include "boost/variant/variant.hpp"
 #include "genie/core/constants.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

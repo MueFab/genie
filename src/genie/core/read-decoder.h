@@ -17,7 +17,7 @@
 #include "genie/core/module.h"
 #include "genie/core/name-decoder.h"
 #include "genie/core/qv-decoder.h"
-#include "genie/core/record/chunk.h"
+#include "genie/core/record/alignment/chunk.h"
 #include "genie/util/selector.h"
 #include "genie/util/side-selector.h"
 #include "genie/util/source.h"

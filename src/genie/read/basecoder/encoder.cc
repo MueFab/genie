@@ -11,7 +11,7 @@
 #include <iostream>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/core/record/alignment-box.h"
+#include "genie/core/record/alignment/alignment-box.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <limits>
 #include <utility>
-#include "genie/core/record/class-type.h"
+#include "genie/core/record/alignment/class-type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

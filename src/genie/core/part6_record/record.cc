@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/core/record/alignment-box.h"
-#include "genie/core/record/alignment-shared-data.h"
+#include "genie/core/record/alignment/alignment-box.h"
+#include "genie/core/record/alignment/alignment-shared-data.h"
+#include "genie/core/record/alignment/segment.h"
 #include "genie/core/record/alignment_external/none.h"
-#include "genie/core/record/segment.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"

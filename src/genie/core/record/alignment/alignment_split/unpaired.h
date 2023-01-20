@@ -4,16 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
-#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <memory>
-#include "genie/core/record/alignment-split.h"
-#include "genie/core/record/alignment.h"
-#include "genie/util/bitreader.h"
+#include "genie/core/record/alignment/alignment-split.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -26,48 +23,18 @@ namespace alignment_split {
 /**
  * @brief
  */
-class SameRec : public AlignmentSplit {
- private:
-    int64_t delta;        //!< @brief
-    Alignment alignment;  //!< @brief
-
+class Unpaired : public AlignmentSplit {
  public:
     /**
      * @brief
      */
-    SameRec();
-
-    /**
-     * @brief
-     * @param _delta
-     * @param _alignment
-     */
-    SameRec(int64_t _delta, Alignment _alignment);
-
-    /**
-     * @brief
-     * @param as_depth
-     * @param reader
-     */
-    explicit SameRec(uint8_t as_depth, util::BitReader& reader);
+    Unpaired();
 
     /**
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    const Alignment& getAlignment() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    int64_t getDelta() const;
+    void write(util::BitWriter &writer) const override;
 
     /**
      * @brief
@@ -85,7 +52,7 @@ class SameRec : public AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
