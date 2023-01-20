@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

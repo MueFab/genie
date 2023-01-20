@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/alignment.h"
+#include "alignment.h"
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"

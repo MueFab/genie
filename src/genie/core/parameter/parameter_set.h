@@ -17,7 +17,7 @@
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/parameter/descriptor_subseq_cfg.h"
 #include "genie/core/parameter/quality-values.h"
-#include "genie/core/record/class-type.h"
+#include "genie/core/record/alignment/class-type.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/runtime-exception.h"
 

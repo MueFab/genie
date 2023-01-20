@@ -14,16 +14,16 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "alignment-box.h"
+#include "alignment-external.h"
+#include "alignment-shared-data.h"
+#include "class-type.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment-box.h"
-#include "genie/core/record/alignment-external.h"
-#include "genie/core/record/alignment-shared-data.h"
-#include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/core/record/class-type.h"
-#include "genie/core/record/segment.h"
+#include "genie/core/record/alignment/alignment_split/same-rec.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "segment.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

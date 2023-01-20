@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 #include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/record.h"
+#include "genie/core/record/alignment/record.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/format/mgb/au_type_cfg.h"

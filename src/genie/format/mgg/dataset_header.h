@@ -18,7 +18,7 @@
 #include "genie/core/meta/blockheader/disabled.h"
 #include "genie/core/meta/blockheader/enabled.h"
 #include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/class-type.h"
+#include "genie/core/record/alignment/class-type.h"
 #include "genie/format/mgg/dataset_header/block_header_off_options.h"
 #include "genie/format/mgg/dataset_header/block_header_on_options.h"
 #include "genie/format/mgg/dataset_header/mit_class_config.h"

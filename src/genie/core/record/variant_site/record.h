@@ -4,13 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
-#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
+#ifndef SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
+#define SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cstdint>
 #include <memory>
-#include "genie/core/record/alignment-split.h"
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -18,41 +23,32 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace alignment_split {
+namespace variant_site {
 
 /**
- * @brief
+ *  @brief
  */
-class Unpaired : public AlignmentSplit {
+class Record {
+ private:
+    // TODO: To be filled
+
  public:
     /**
      * @brief
      */
-    Unpaired();
-
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter &writer) const override;
-
-    /**
-     * @brief
-     * @return
-     */
-    std::unique_ptr<AlignmentSplit> clone() const override;
+    Record();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
+}  // namespace variant_genotype
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
+#endif  // SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

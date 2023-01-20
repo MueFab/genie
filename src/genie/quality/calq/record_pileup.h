@@ -11,10 +11,10 @@
 
 #include <limits>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
+#include "genie/core/record/alignment/record.h"
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

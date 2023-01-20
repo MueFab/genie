@@ -4,61 +4,63 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
-#define SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
+#ifndef SRC_GENIE_CORE_RECORD_RECORD_VARIANT_SITE_H_
+#define SRC_GENIE_CORE_RECORD_RECORD_VARIANT_SITE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/format-exporter.h"
-#include "genie/core/record/alignment/chunk.h"
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment/alignment-box.h"
+#include "genie/core/record/alignment/alignment-external.h"
+#include "genie/core/record/alignment/alignment-shared-data.h"
+#include "genie/core/record/alignment/class-type.h"
+#include "genie/core/record/alignment/segment.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/core/stats/perf-stats.h"
+#include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/drain.h"
-#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace mgrec {
+namespace core {
+namespace record {
+namespace variant_site {
 
 /**
- * @brief
+ *  @brief
  */
-class Exporter : public core::FormatExporter {
-    util::BitWriter writer;  //!< @brief
-    util::OrderedLock lock;  //!< @brief
+class Record {
+ private:
+    // TODO: To be filled
 
  public:
     /**
      * @brief
-     * @param _file_1
      */
-    explicit Exporter(std::ostream& _file_1);
+    void patchRefID(size_t refID);
 
     /**
      * @brief
-     * @param t
-     * @param id
      */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
-
-    /**
-     * @brief
-     * @param id
-     */
-    void skipIn(const util::Section& id) override;
+    Record();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgrec
-}  // namespace format
+}  // namespace variant_site
+}  // namespace record
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
+#endif  // SRC_GENIE_CORE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

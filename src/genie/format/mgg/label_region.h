@@ -11,7 +11,7 @@
 
 #include <vector>
 #include "genie/core/meta/region.h"
-#include "genie/core/record/class-type.h"
+#include "genie/core/record/alignment/class-type.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
