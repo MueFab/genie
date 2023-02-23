@@ -1,44 +1,6 @@
-# Genie
-
-Open Source MPEG-G Codec
-
-[![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/mitogen.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build?definitionId=3&view=branches)
-
----
-
-## Usage policy
-
-The open source MPEG-G codec Genie is made available before scientific publication.
-
-This pre-publication software is preliminary and may contain errors.
-The software is provided in good faith, but without any express or implied warranties.
-We refer the reader to our [license](LICENSE).
-
-The goal of our policy is that early release should enable the progress of science.
-We kindly ask to refrain from publishing analyses that were conducted using this software while its development is in progress.
-
-## Dependencies
-
-* OpenMP for multithreading
-* htslib (https://github.com/samtools/htslib) for support of SAM files 
-* CMake 3.1 or greater
-* A compiler compliant to C++11
-* Doxygen in case you want to build the HTML-documentation
+# Usage
 
 ## Building
-
-Clone the repository:
-
-    git clone https://github.com/mitogen/genie.git
-
-Build all libraries and executables:
-
-    mkdir build
-    cd build
-    cmake ..
-    make
-
-This will generate the Genie application at ``build/bin/genie``.
 
 CMake-Options:
 
@@ -137,11 +99,5 @@ Following CLI-Arguments are available:
 * --force / -f: Flag, if set already existing output files are overridden.
 * --working-dir / -w: Path to a directory where temporary files can be stored. If no path is provided, the current working dir is used. Please make sure, that enough space is available.
 * --ref: Path to reference fasta file.
-    
-## Who do I talk to?
-
-Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
-
-Mikel Hernaez <[mhernaez@illinois.edu](mailto:mhernaez@illinois.edu)>
 
 

@@ -20,128 +20,60 @@ We kindly ask to refrain from publishing analyses that were conducted using this
 ## Dependencies
 
 * OpenMP for multithreading
-* htslib (https://github.com/samtools/htslib) for support of SAM files 
 * CMake 3.1 or greater
 * A compiler compliant to C++11
 * Doxygen in case you want to build the HTML-documentation
 
-## Building
+## Quickstart
 
-Clone the repository:
+### Building
 
-    git clone https://github.com/mitogen/genie.git
+We provide a script to quickly build and try genie. It will automatically check out the genie repository, build htslib as a dependeny for SAM file support, and download a few small example data for testing purposes.
 
-Build all libraries and executables:
+    mkdir genie_buildspace
+    cd genie_buildspace
+    wget https://github.com/MueFab/genie/tree/main/util/get_genie.sh
+    bash ./get_genie.sh
 
-    mkdir build
-    cd build
-    cmake ..
-    make
+Alternatively, you can manually build htslib and Genie using cmake.
 
-This will generate the Genie application at ``build/bin/genie``.
+### Verifying
 
-CMake-Options:
+To check that Genie is working correctly, you can execute the following commands.
+Transcoding from FASTQ and SAM into MPEG-G records:
 
-* -DBUILD_COVERAGE=ON: Build coverage 
-* -DBUILD_DOCUMENTATION=ON: Build the doxygen documentation
-* -DBUILD_TESTS=ON: Build test cases
-* -DGENIE_USE_OPENMP=OFF: Deactivate multithreading support (drops OpenMP dependency)
-* -DGENIE_SAM_SUPPORT=OFF: Deactivate SAM support (drops htslib dependency)
-* -DCMAKE_CXX_COMPILER="<path>": Specify a custom compiler path
-    
-## Quickstart Fastq
-Convert fastq to mgrec:
-    
-    genie transcode-fastq -i myfile_1.fastq --input-suppl-file  myfile_2.fastq -o myfile.mgrec
+    ./genie transcode-fastq -i ./data/example_1.fastq --input-suppl-file ./data/example_2.fastq -o ./data/transcoded_mgrec/unaligned.mgrec
+    ./genie transcode-sam -c -i ./data/example.sam -r ./data/example.fa -o ./data/transcoded_mgrec/aligned.mgrec
 
-Compress mgrec to mgb:
-    
-    genie run -i myfile.mgrec -o myfile.mgb
-    
-Decompress mgb to mgrec:
-    
-    genie run -i myfile.mgb -o myfile_decoded.mgrec
-    
-Convert mgrec to fastq:
-    
-    genie transcode-fastq -i myfile_decoded.mgrec  -o myfile_decoded_1.fastq --output-suppl-file  myfile_decoded_2.fastq
-    
-## Quickstart Sam
-Convert sam to mgrec:
-    
-    genie transcode-sam -i myfile.sam -o myfile.mgrec --ref myref.fasta  # myfile.sam must be sorted by read-ID!
-    
-Compress mgrec to mgb:
-    
-    genie run -i myfile.mgrec -o myfile.mgb
-    
-Decompress mgb to mgrec:
-    
-    genie run -i myfile.mgb -o myfile_decoded.mgrec
-    
-Convert mgrec to sam:
-    
-    genie transcode-sam -i myfile.mgrec -o myfile.sam
-    
-    
-## Genie Operations
-    
-The genie applications contains several operations which can be selected with the first command line option:
-    
-    genie <operation name> <operation specific arguments>
-    
-Following operations are available:
+Compression using the four encoding processes in Genie (Global Assembly Encoding, Low Latency Encoding, Local Assembly Encoding, Reference-Based Encoding):
 
-* help: Display information about available operations
-* run: Compress / Decompress between an MPEG-G compressed mgb-file and an uncompressed MPEG-G mgrec-file
-* gabac: Entropy encode a block of data
-* transcode-fastq: Convert between fastq and mgrec files
-* transcode-sam: Convert between sam and mgrec files
-    
-## Genie run
-The run operation performs compression from the mgrec file format (uncompressed MPEG-G records) into the mgb file format (compressed MPEG-G records) and vice versa. If a compression or decompression shall be performed is recognized by the file extensions ".mgb" and ".mgrec" provided to the -i and -o arguments.
-    
-Following CLI-Arguments are available:
-* --help / -h: Display information about CLI-Arguments
-* --input-file / -i (required): Input file path (mgb or mgrec).
-* --output-file / -o (required): Output file path (mgb or mgrec).
-* --threads / -t: Number of threads to use.
-* --force / -f: Flag, if set already existing output files are overridden.
-* --input-ref-file: Path to a reference fasta file. Only relevant for aligned records. If no path is provided, a computed reference will be used instead.
-* --working-dir / -w: Path to a directory where temporary files can be stored. If no path is provided, the current working dir is used. Please make sure that enough space is available.
-* --qv: How to encode quality values. Possible values are "lossless" (default, keep all values), "calq" (quantize values with calq) and "none" (discard all values).
-* --read-ids: How to encode read ids. Possible values are "lossless" (default, keep all values) and "none" (discard all values).
-* --low-latency: Flag, if set no global reference will be calculated for unaligned records. This will increase encoding speed, but decrease compression rate.
-* --combine-pairs: Flag, if provided to a decoding operation, unaligned reads will get matched to their mate again. Note: has no effect if encoded with --low-latency in case of aligned reads only. Does not work if encoded with --read-ids "none"
-    
-## Genie transcode-fastq
-Converts between fastq records and uncompressed MPEG-G records (mgrec). The direction of the conversion is recognized by the file extensions provided via the input and output file names.
-    
-Following CLI-Arguments are available:
-* --help / -h: Display information about CLI-Arguments
-* --input-file / -i (required): Input file path (mgb or mgrec).
-* --output-file / -o (required): Output file path (mgb or mgrec).
-* --threads / -t: Number of threads to use.
-* --force / -f: Flag, if set already existing output files are overridden.
-* --input-suppl-file: Path to second input fastq file in paired mode.
-* --output-suppl-file: Path to second output fastq file in paired mode.
+    # Unaligned data without low latency flag -> Global Assembly Encoding
+    ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/global_assembly.mgb
+    # Unaligned data with low latency flag -> Low Latency Encoding
+    ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/low_latency.mgb --low-latency
+    # Aligned data without any reference specified -> Local Assembly Encoding
+    ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/local_assembly.mgb
+    # Aligned data with reference specified -> Reference Based Encoding
+    ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/reference_based.mgb -r ./data/example.fa 
 
-## Genie transcode-sam
-Converts between sam records and uncompressed MPEG-G records (mgrec). The direction of the conversion is recognized by the file extensions provided via the input and output file names.
-    
-Following CLI-Arguments are available:
-* --help / -h: Display information about CLI-Arguments
-* --input-file / -i (required): Input file path (mgb or mgrec).
-* --output-file / -o (required): Output file path (mgb or mgrec).
-* --threads / -t: Number of threads to use.
-* --force / -f: Flag, if set already existing output files are overridden.
-* --working-dir / -w: Path to a directory where temporary files can be stored. If no path is provided, the current working dir is used. Please make sure, that enough space is available.
-* --ref: Path to reference fasta file.
-    
+Decompression:
+
+    ./genie run -i ./data/encoded/global_assembly.mgb -o ./data/decoded/global_assembly.mgrec
+    ./genie run -i ./data/encoded/low_latency.mgb -o ./data/decoded/low_latency.mgrec
+    ./genie run -i ./data/encoded/local_assembly.mgb -o ./data/decoded/local_assembly.mgrec
+    ./genie run -i ./data/encoded/reference_based.mgb -o ./data/decoded/reference_based.mgrec -r ./data/example.fa
+
+Transcoding from MPEG-G records back to FASTQ and SAM:
+
+    ./genie transcode-fastq -i ./data/decoded/global_assembly.mgrec -o ./data/transcoded_legacy/global_assembly_1.fastq --output-suppl-file ./data/transcoded_legacy/global_assembly_2.fastq
+    ./genie transcode-fastq -i ./data/decoded/low_latency.mgrec -o ./data/transcoded_legacy/low_latency_1.fastq --output-suppl-file ./data/transcoded_legacy/low_latency_2.fastq
+    ./genie transcode-sam -i ./data/decoded/local_assembly.mgrec -o ./data/transcoded_legacy/local_assembly.sam -r ./data/example.fa
+    ./genie transcode-sam -i ./data/decoded/reference_based.mgrec -o ./data/transcoded_legacy/reference_based.sam -r ./data/example.fa
+
 ## Who do I talk to?
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
-
-Mikel Hernaez <[mhernaez@illinois.edu](mailto:mhernaez@illinois.edu)>
+Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
+Fabian Müntefering <[muenteferi@tnt.uni-hannover.de](mailto:muenteferi@tnt.uni-hannover.de)>
 
 
