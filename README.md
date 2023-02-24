@@ -6,7 +6,7 @@ Open Source MPEG-G Codec
 
 ---
 
-## Usage policy
+## Usage Policy
 
 The open source MPEG-G codec Genie is made available before scientific publication.
 
@@ -17,29 +17,38 @@ We refer the reader to our [license](LICENSE).
 The goal of our policy is that early release should enable the progress of science.
 We kindly ask to refrain from publishing analyses that were conducted using this software while its development is in progress.
 
-## Dependencies
+## Mandatory Dependencies
 
-* OpenMP for multithreading
-* CMake 3.1 or greater
+* [OpenMP](https://en.wikipedia.org/wiki/OpenMP) for multithreading
+* [CMake](https://cmake.org) 3.1 or greater
 * A compiler compliant to C++11
-* Doxygen in case you want to build the HTML-documentation
+
+## Optional Dependencies
+
+* [Doxygen](https://www.doxygen.nl) for building the HTML documentation
+* [HTSlib](https://github.com/samtools/htslib) for SAM file support
 
 ## Quickstart
 
-### Building
+### Getting and Building Genie
 
-We provide a script to quickly build and try genie. It will automatically check out the genie repository, build htslib as a dependeny for SAM file support, and download a few small example data for testing purposes.
+We provide the script `get_genie.sh` to quickly build Genie.
+It will automatically clone the Genie repository, build HTSlib as a dependency for SAM file support, and download a few small example files for testing purposes.
 
     mkdir genie_buildspace
     cd genie_buildspace
     wget https://raw.githubusercontent.com/MueFab/genie/main/util/get_genie.sh
     bash ./get_genie.sh
 
-Alternatively, you can manually build htslib and Genie using cmake.
+The script will work only in the `genie_buildspace` directory.
+It will not modify any user or system directories.
+
+Alternatively, you can manually build HTSlib and Genie using CMake.
 
 ### Verifying
 
 To check that Genie is working correctly, you can execute the following commands.
+
 Transcoding from FASTQ and SAM into MPEG-G records:
 
     ./genie transcode-fastq -i ./data/example_1.fastq --input-suppl-file ./data/example_2.fastq -o ./data/transcoded_mgrec/unaligned.mgrec
@@ -49,10 +58,13 @@ Compression using the four encoding processes in Genie (Global Assembly Encoding
 
     # Unaligned data without low latency flag -> Global Assembly Encoding
     ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/global_assembly.mgb
+    
     # Unaligned data with low latency flag -> Low Latency Encoding
     ./genie run -i ./data/transcoded_mgrec/unaligned.mgrec -o ./data/encoded/low_latency.mgb --low-latency
+    
     # Aligned data without any reference specified -> Local Assembly Encoding
     ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/local_assembly.mgb
+    
     # Aligned data with reference specified -> Reference Based Encoding
     ./genie run -i ./data/transcoded_mgrec/aligned.mgrec -o ./data/encoded/reference_based.mgb -r ./data/example.fa 
 
@@ -81,10 +93,10 @@ Compare decoded files to originals (record order might be different, thus they m
     diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/reference_based.sam | sort)
     diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/local_assembly.sam | sort)
 
-## Who do I talk to?
+## Contact
 
-Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
-Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 Fabian Müntefering <[muenteferi@tnt.uni-hannover.de](mailto:muenteferi@tnt.uni-hannover.de)>
 
+Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 
+Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
