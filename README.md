@@ -70,6 +70,17 @@ Transcoding from MPEG-G records back to FASTQ and SAM:
     ./genie transcode-sam -i ./data/decoded/local_assembly.mgrec -o ./data/transcoded_legacy/local_assembly.sam -r ./data/example.fa
     ./genie transcode-sam -i ./data/decoded/reference_based.mgrec -o ./data/transcoded_legacy/reference_based.sam -r ./data/example.fa
 
+Compare decoded files to originals (record order might be different, thus they must be sorted before the comparison):
+    
+    diff <(sort ./data/example_1.fastq) <(sort ./data/transcoded_legacy/global_assembly_1.fastq)
+    diff <(sort ./data/example_2.fastq) <(sort ./data/transcoded_legacy/global_assembly_2.fastq)
+    diff <(sort ./data/example_1.fastq) <(sort ./data/transcoded_legacy/low_latency_1.fastq)
+    diff <(sort ./data/example_2.fastq) <(sort ./data/transcoded_legacy/low_latency_2.fastq)
+    
+    # First line is removed before comparison, as SAM files store the sorting of records in their header
+    diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/reference_based.sam | sort)
+    diff <(tail -n +2 ./data/example.sam | sort) <(tail -n +2 ./data/transcoded_legacy/local_assembly.sam | sort)
+
 ## Who do I talk to?
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
