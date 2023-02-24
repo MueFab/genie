@@ -32,7 +32,7 @@ We provide a script to quickly build and try genie. It will automatically check 
 
     mkdir genie_buildspace
     cd genie_buildspace
-    wget https://github.com/MueFab/genie/tree/main/util/get_genie.sh
+    wget https://raw.githubusercontent.com/MueFab/genie/main/util/get_genie.sh
     bash ./get_genie.sh
 
 Alternatively, you can manually build htslib and Genie using cmake.
