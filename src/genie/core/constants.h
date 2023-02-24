@@ -135,6 +135,7 @@ struct GenSub {
     static const GenSubIndex QV_STEPS_4;
     static const GenSubIndex QV_STEPS_5;
     static const GenSubIndex QV_STEPS_6;
+    static const GenSubIndex QV_STEPS_7;
 
     static const GenSubIndex RNAME_CABAC_0;
     static const GenSubIndex RNAME_CABAC_1;

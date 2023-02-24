@@ -8,6 +8,7 @@
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/record/alignment-box.h"
@@ -43,8 +44,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     // TODO(Fabian): Splices
     const auto &ALIGNMENT =
         rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
-    const auto &RECORD = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1]
-                                                                              : rec.getSegments()[0];  // First segment
+    const auto &RECORD = rec.getSegments()[0];  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
@@ -106,7 +106,7 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
-    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(first1);  // FIRST1 is encoded in least significant bit
+    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(!first1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
 
@@ -117,8 +117,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 
     encodeFirstSegment(rec);
 
-    const auto &SEQUENCE = !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1].getSequence()
-                                                                                : rec.getSegments()[0].getSequence();
+    const auto &SEQUENCE = rec.getSegments()[0].getSequence();
     const auto &CIGAR = rec.getAlignments().front().getAlignment().getECigar();  // TODO(Fabian): Multi-alignments
     clips.first = encodeCigar(SEQUENCE, CIGAR, ref1, rec.getClassID());
 
@@ -126,8 +125,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
     if (rec.getSegments().size() > 1) {
         // Same record
         const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
-        const auto &SEQUENCE2 =
-            rec.isRead1First() ? rec.getSegments()[1].getSequence() : rec.getSegments()[0].getSequence();
+        const auto &SEQUENCE2 = rec.getSegments()[1].getSequence();
         const auto LENGTH2 = SEQUENCE2.length();
         encodeAdditionalSegment(LENGTH2, srec, rec.isRead1First());
 
@@ -138,16 +136,16 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==
             core::record::AlignmentSplit::Type::UNPAIRED) {
             if (rec.isRead1First()) {
-                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
-            } else {
                 container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+            } else {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
             }
             // Other record
         } else {
             const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
             auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
             if (rec.isRead1First()) {
-                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
                     container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
@@ -156,7 +154,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
                     container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
                 }
             } else {
-                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
                     container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());

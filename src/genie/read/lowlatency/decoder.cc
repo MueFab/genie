@@ -32,20 +32,31 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     std::vector<std::string> ecigars;
+    std::vector<uint64_t> positions;
     // FIXME: loop condition is only correct if all records have the full number of reads
-    for (size_t i = 0; i < data.getNumReads() / data.getParameters().getNumberTemplateSegments(); ++i) {
+    size_t i = 0;
+    size_t rec_i = 0;
+    while (i < data.getNumReads()) {
         core::record::Record rec(uint8_t(data.getParameters().getNumberTemplateSegments()),
                                  core::record::ClassType::CLASS_U,
-                                 std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[i]), "", 0);
+                                 std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]), "", 0);
 
+        size_t num_segments = 1;
         if (data.getParameters().getNumberTemplateSegments() > 1) {
-            UTILS_DIE_IF(data.pull(core::GenSub::PAIR_DECODING_CASE) != core::GenConst::PAIR_SAME_RECORD,
-                         "Only same record pairs supported");
+            auto decoding_case = data.pull(core::GenSub::PAIR_DECODING_CASE);
+            if (decoding_case == core::GenConst::PAIR_SAME_RECORD) {
+                num_segments = 2;
+            } else if (decoding_case == core::GenConst::PAIR_R1_UNPAIRED) {
+                rec.setRead1First(true);
+            } else {
+                rec.setRead1First(false);
+            }
         }
 
-        for (size_t j = 0; j < data.getParameters().getNumberTemplateSegments(); ++j) {
+        for (size_t j = 0; j < num_segments; ++j) {
             size_t length = data.getParameters().getReadLength();
             ecigars.emplace_back(length, '+');
+            positions.emplace_back(std::numeric_limits<uint64_t>::max());
             if (!length) {
                 length = data.pull(core::GenSub::RLEN) + 1;
             }
@@ -61,11 +72,13 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
         }
 
         ret.getData().push_back(std::move(rec));
+        i += num_segments;
+        rec_i++;
     }
 
     data.getStats().addDouble("time-lowlatency", watch.check());
     watch.reset();
-    auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
+    auto qvs = this->qvcoder->process(qvparam, ecigars, positions, qvStream);
     size_t qvCounter = 0;
     if (!std::get<0>(qvs).empty()) {
         for (auto& r : ret.getData()) {

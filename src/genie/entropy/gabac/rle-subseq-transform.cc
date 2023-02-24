@@ -44,7 +44,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
         if (lastSym != curSym && runValue > 0) {
             rawValues->push_back(lastSym);
 
-            while (runValue >= guard) {
+            while (runValue > guard) {
                 lengths->push_back(guard);
                 runValue -= guard;
             }

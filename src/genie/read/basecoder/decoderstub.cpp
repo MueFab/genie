@@ -40,7 +40,7 @@ core::record::Chunk DecoderStub::decodeSequences(DecodingState& state, core::Acc
         auto refs = getReferences(meta, state);
 
         auto rec = decoder.pull(static_cast<uint16_t>(state.ref), std::move(refs), meta);
-        addECigar(rec, state.ecigars);
+        addECigar(rec, state.ecigars, state.positions);
         recordDecodedHook(state, rec);
 
         chunk.getData().emplace_back(std::move(rec));
@@ -63,14 +63,14 @@ void DecoderStub::decodeNames(DecodingState& state, core::record::Chunk& chunk) 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderStub::decodeQualities(DecodingState& state, core::record::Chunk& chunk) {
-    auto qvs = qvcoder->process(*state.qvparam, state.ecigars, state.qvStream);
+    auto qvs = qvcoder->process(*state.qvparam, state.ecigars, state.positions, state.qvStream);
     chunk.getStats().add(std::get<1>(qvs));
     if (std::get<0>(qvs).empty()) {
         return;
     }
     size_t qvCounter = 0;
     for (auto& r : chunk.getData()) {
-        auto& s_first = !r.isRead1First() && r.getSegments().size() == 2 ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_first = r.getSegments()[0];
         if (!std::get<0>(qvs)[qvCounter].empty()) {
             s_first.addQualities(std::move(std::get<0>(qvs)[qvCounter++]));
             r.setQVDepth(1);
@@ -80,7 +80,7 @@ void DecoderStub::decodeQualities(DecodingState& state, core::record::Chunk& chu
             continue;
         }
 
-        auto& s_second = r.isRead1First() ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_second = r.getSegments()[1];
         if (!std::get<0>(qvs)[qvCounter].empty()) {
             s_second.addQualities(std::move(std::get<0>(qvs)[qvCounter++]));
         }
@@ -89,14 +89,16 @@ void DecoderStub::decodeQualities(DecodingState& state, core::record::Chunk& chu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DecoderStub::addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec) {
-    const auto& s_first =
-        !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1] : rec.getSegments()[0];
+void DecoderStub::addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec,
+                            std::vector<uint64_t>& pos_vec) {
+    const auto& s_first = rec.getSegments()[0];
 
     if (rec.getAlignments().empty()) {
         cig_vec.emplace_back(std::to_string(s_first.getSequence().length()) + '+');
+        pos_vec.emplace_back(std::numeric_limits<uint64_t>::max());
     } else {
         cig_vec.emplace_back(rec.getAlignments().front().getAlignment().getECigar());
+        pos_vec.emplace_back(rec.getAlignments().front().getPosition());
     }
 
     if (rec.getSegments().size() == 1) {
@@ -104,14 +106,16 @@ void DecoderStub::addECigar(const core::record::Record& rec, std::vector<std::st
     }
 
     if (rec.getClassID() == core::record::ClassType::CLASS_HM) {
-        const auto& s_second = rec.isRead1First() ? rec.getSegments()[1] : rec.getSegments()[0];
+        const auto& s_second = rec.getSegments()[1];
         cig_vec.emplace_back(std::to_string(s_second.getSequence().length()) + '+');
+        pos_vec.emplace_back(std::numeric_limits<uint64_t>::max());
         return;
     }
 
     const auto& split = dynamic_cast<const core::record::alignment_split::SameRec*>(
         rec.getAlignments().front().getAlignmentSplits().front().get());
     cig_vec.emplace_back(split->getAlignment().getECigar());
+    pos_vec.emplace_back(rec.getAlignments().front().getPosition() + split->getDelta());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

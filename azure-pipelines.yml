@@ -4,18 +4,18 @@ stages:
   - job: 'Debug'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          binDir: 'bin'
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          binDir: 'bin'
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          binDir: 'bin'
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          binDir: 'bin'
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
@@ -34,8 +34,8 @@ stages:
         sudo apt-get update
         sudo apt-get install cppcheck
         sudo apt-get install doxygen
-      displayName: 'Install prerequisites (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Install prerequisites (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
@@ -54,12 +54,12 @@ stages:
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - bash: ./ci/src_test.sh
-      displayName: 'Check source code (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Check source code (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: ./ci/build.sh doc
-      displayName: 'Build documentation (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Build documentation (Ubuntu 22.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: ./ci/build.sh debug
       displayName: 'Genie build'
@@ -77,27 +77,27 @@ stages:
 
     - publish: cmake-build-debug/documentation/html
       artifact: 'genie-documentation-$(Build.SourceVersion)'
-      displayName: 'Publish documentation (ubuntu2004)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
+      displayName: 'Publish documentation (ubuntu2204)'
+      condition: eq( variables['artifactName'], 'ubuntu2204')
 
   - job: 'Release'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           architecture: ''
           binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          architecture: ''
-          binDir: 'bin'
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          architecture: ''
-          binDir: 'bin'
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          architecture: ''
+#          binDir: 'bin'
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          architecture: ''
+#          binDir: 'bin'
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
@@ -146,18 +146,18 @@ stages:
   - job: 'Unit'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          fileExt: ''
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          fileExt: ''
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
@@ -217,62 +217,62 @@ stages:
         testRunTitle: 'gabac-$(artifactName)-$(Build.SourceVersion)'
 
 
-  - job: 'Memory'
-    strategy:
-      matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
-          fileExt: ''
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - bash: |
-          sudo apt-get install valgrind
-      displayName: 'Installation prerequisites (Linux)'
-      condition: eq( variables['Agent.OS'], 'Linux' )
+#  - job: 'Memory'
+#    strategy:
+#      matrix:
+#        ubuntu2204:
+#          imageName: 'ubuntu-22.04'
+#          artifactName: 'ubuntu2204'
+#          fileExt: ''
+#    pool:
+#      vmImage: $(imageName)
+#    steps:
+#    - bash: |
+#          sudo apt-get install valgrind
+#      displayName: 'Installation prerequisites (Linux)'
+#      condition: eq( variables['Agent.OS'], 'Linux' )
 
-    - bash: |
-        git clone https://github.com/samtools/htslib.git
-        cd htslib
-        git checkout tags/1.12
-        git submodule update --init --recursive
-        autoreconf -i
-        ./configure
-        make -j
-        sudo make install
-      displayName: 'Install HTSLib (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#    - bash: |
+#        git clone https://github.com/samtools/htslib.git
+#        cd htslib
+#        git checkout tags/1.12
+#        git submodule update --init --recursive
+#        autoreconf -i
+#        ./configure
+#        make -j
+#        sudo make install
+#      displayName: 'Install HTSLib (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
+#    - download: current
+#      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+#      displayName: 'Download binaries'
 
-    - bash: |
-        mkdir cmake-build-release
-        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
-        chmod +x cmake-build-release/bin/*
-      displayName: 'Copy binaries'
+#    - bash: |
+#        mkdir cmake-build-release
+#        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
+#        chmod +x cmake-build-release/bin/*
+#      displayName: 'Copy binaries'
 
-    - bash: ci/memory_test.sh
-      displayName: 'Genie run memory tests'
+#    - bash: ci/memory_test.sh
+#      displayName: 'Genie run memory tests'
 
 
   - job: 'Conformance_Roundtrip'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          fileExt: ''
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          fileExt: ''
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
@@ -343,9 +343,9 @@ stages:
   - job: 'Debian'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
+        ubuntu2204:
+          imageName: 'ubuntu-22.04'
+          artifactName: 'ubuntu2204'
           fileExt: ''
     pool:
       vmImage: $(imageName)
@@ -356,23 +356,23 @@ stages:
       displayName: 'Download binaries'
     - bash: echo "Not yet implemented"
       displayName: 'Build debian package'
-  - job: 'OSX'
-    strategy:
-      matrix:
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - checkout: none
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-    - bash: echo "Not yet implemented"
-      displayName: 'Build OSX dmg'
+#  - job: 'OSX'
+#    strategy:
+ #     matrix:
+ #       macos1200:
+ #         imageName: 'macos-12'
+ #         artifactName: 'macos1200'
+ #         fileExt: ''
+ #       macos1100:
+ #         imageName: 'macos-11'
+ #         artifactName: 'macos1100'
+ #         fileExt: ''
+ #   pool:
+ #     vmImage: $(imageName)
+ #   steps:
+ #   - checkout: none
+ #   - download: current
+ #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+ #     displayName: 'Download binaries'
+ #   - bash: echo "Not yet implemented"
+ #     displayName: 'Build OSX dmg'

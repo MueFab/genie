@@ -26,8 +26,8 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
-                                                 std::vector<util::DataBlock> *const transformedSubseqs) {
+void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+                                   std::vector<util::DataBlock> *const transformedSubseqs) {
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
@@ -83,6 +83,10 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
             // Loop through the transformed sequences
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
+                uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
+                transformedSubseqs[i].setWordSize(wordsize);
+            }
+            for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
                 util::DataBlock decodedTransformedSubseq;
                 uint64_t numtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
@@ -108,10 +112,11 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                     gabac::StreamHandler::readBytes(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain,
                                                     &decodedTransformedSubseq);
 
+                    uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
                     // Decoding
                     subseqPayloadSizeUsed += (uint64_t)gabac::decodeTransformSubseq(
                         subseqCfg.getTransformSubseqCfg((uint8_t)i), (unsigned int)numtrnsfSymbols,
-                        &decodedTransformedSubseq, ioConf.outputWordsize, (dependency.size()) ? &dependency : nullptr);
+                        &decodedTransformedSubseq, wordsize, (dependency.size()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
             }
