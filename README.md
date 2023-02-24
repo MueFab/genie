@@ -19,21 +19,29 @@ We kindly ask to refrain from publishing analyses that were conducted using this
 
 ## Mandatory Dependencies
 
-* [OpenMP](https://en.wikipedia.org/wiki/OpenMP) for multithreading
-* [CMake](https://cmake.org) 3.1 or greater
-* A compiler compliant to C++11
+* [OpenMP](https://en.wikipedia.org/wiki/OpenMP) for multithreading (ubuntu: libomp-dev / fedora: libomp-devel)
+* [CMake](https://cmake.org) 3.1 or greater (ubuntu: cmake / fedora: cmake)
+* [make](https://www.gnu.org/software/make/) (ubuntu: build-essential / fedora: make)
+* A compiler compliant to C++11  (ubuntu: build-essential / fedora: gcc)
 
 ## Optional Dependencies
 
 * [Doxygen](https://www.doxygen.nl) for building the HTML documentation
-* [HTSlib](https://github.com/samtools/htslib) for SAM file support
+* [HTSlib](https://github.com/samtools/htslib) for SAM/BAM file support (ubuntu: libhts-dev / fedora: htslib-devel)
+    * GNU [autoconf](https://www.gnu.org/software/autoconf/) (ubuntu: autoconf / fedora: autoconf)
+    * GNU [automake](https://www.gnu.org/software/automake/) (ubuntu: automake / fedora: automake)
+    * [zlib](https://www.zlib.net/) development files (ubuntu: zlib1g-dev / fedora: zlib-devel)
+    * [libbz2](https://gitlab.com/bzip2/bzip2) development files (ubuntu: libbz2-dev / fedora: bzip2-devel)
+    * [liblzma](https://tukaani.org/xz/) development files (ubuntu: liblzma-dev / fedora: xz-devel)
+    * [libcurl](https://curl.se/) development files  (ubuntu: libcurl4-{gnutls,nss,openssl}-dev / fedora: libcurl-devel)
+    * [libcrypto](https://www.openssl.org/docs/man3.0/man7/crypto.html) development files (ubuntu: lib{gnutls,nss3,ssl}-dev / fedora: openssl-devel)
 
 ## Quickstart
 
 ### Getting and Building Genie
 
 We provide the script `get_genie.sh` to quickly build Genie.
-It will automatically clone the Genie repository, build HTSlib as a dependency for SAM file support, and download a few small example files for testing purposes.
+It will automatically clone the Genie repository, build HTSlib as a dependency for SAM file support, and download a few small example files for testing purposes. The script needs git and all dependencies for genie and htslib installed (listed above).
 
     mkdir genie_buildspace
     cd genie_buildspace
