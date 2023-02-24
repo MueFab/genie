@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 install_dir="$PWD/install" 
 mkdir -p install
 
@@ -13,14 +14,21 @@ make -j
 make install
 cd ..
 
+if [ -f "$install_dir/usr/lib/libhts.so" ]; then
+    HTS_SO="$install_dir/usr/lib/libhts.so"
+elif [ -f "$install_dir/usr/lib64/libhts.so" ]; then
+    HTS_SO="$install_dir/usr/lib64/libhts.so"
+fi
+
+
 #install Genie
 git clone https://github.com/MueFab/genie.git
 mv genie genie_repo
 cd genie_repo
-git checkout documentation
+git checkout main
 mkdir -p build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX="$install_dir" -DHTSlib_INCLUDE_DIR="$install_dir/usr/include" -DHTSlib_LIBRARY="$install_dir/usr/lib/libhts.so" ..
+cmake -DCMAKE_INSTALL_PREFIX="$install_dir" -DHTSlib_INCLUDE_DIR="$install_dir/usr/include" -DHTSlib_LIBRARY="$HTS_SO" ..
 make -j
 make install
 cd ..
