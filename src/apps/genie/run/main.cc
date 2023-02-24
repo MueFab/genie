@@ -23,6 +23,8 @@
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
+#include "genie/quality/calq/decoder.h"
+#include "genie/quality/calq/encoder.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
@@ -137,7 +139,7 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     std::istream* in_ptr = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
         inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
@@ -157,7 +159,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     genie::core::ClassifierRegroup::RefMode mode;
     if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
@@ -190,6 +192,9 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     if (pOpts.qvMode == "none") {
         flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
     }
+    if (pOpts.qvMode == "calq") {
+        flow->setQVCoder(genie::util::make_unique<genie::quality::calq::Encoder>(), 0);
+    }
     if (pOpts.readNameMode == "none") {
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
     }
@@ -205,7 +210,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
 

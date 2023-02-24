@@ -43,11 +43,11 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
     if (!checkSupport) {
         return true;
     }
-    if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+   /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
         rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
         discarded_missing_pair_U++;
         return false;
-    }
+    }*/
     for (const auto& a : rec.getAlignments()) {
         if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
             discarded_HM++;

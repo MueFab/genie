@@ -51,6 +51,7 @@ class Config {
     bool forceOverwrite;          //!< @brief
     bool help;                    //!< @brief
     bool no_ref;                  //!< @brief
+    bool clean;                   //!< @brief
     uint32_t num_threads;         //!< @brief
 
  private:

@@ -47,6 +47,7 @@ target_link_libraries(genie PRIVATE genie-mgrec)
 target_link_libraries(genie PRIVATE genie-mgb)
 target_link_libraries(genie PRIVATE genie-localassembly)
 target_link_libraries(genie PRIVATE genie-qvwriteout)
+target_link_libraries(genie PRIVATE genie-calq)
 target_link_libraries(genie PRIVATE genie-util)
 
 if (${GENIE_USE_OPENMP})
@@ -65,5 +66,7 @@ if (${GENIE_SAM_SUPPORT})
     target_link_libraries(genie PRIVATE ${HTSlib_LIBRARIES})
 endif ()
 
+
+set_target_properties(genie PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 install(TARGETS genie
         RUNTIME DESTINATION "usr/bin")

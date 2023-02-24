@@ -52,7 +52,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     endif()
     # Use -g with Release builds as well as Debug builds
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     #
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel") # Intel Compiler
     #
@@ -110,17 +110,35 @@ if(${BUILD_TESTS})
     include(GoogleTest)
 endif()
 
+
 if(${GENIE_USE_OPENMP})
-    find_package(OpenMP REQUIRED)
-    include_directories(${OpenMP_CXX_INCLUDE_DIRS})
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
-    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+    if(APPLE)
+        # libomp 15.0+ from brew is keg-only, so have to search in other locations.
+        # See https://github.com/Homebrew/homebrew-core/issues/112107#issuecomment-1278042927.
+        # execute_process(COMMAND brew --prefix libomp
+        #        OUTPUT_VARIABLE HOMEBREW_LIBOMP_PREFIX
+        #        OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # set(OpenMP_C_FLAGS
+        #        "-Xpreprocessor -fopenmp -I${HOMEBREW_LIBOMP_PREFIX}/include")
+        # set(OpenMP_CXX_FLAGS
+        #        "-Xpreprocessor -fopenmp -I${HOMEBREW_LIBOMP_PREFIX}/include")
+        # set(OpenMP_C_LIB_NAMES omp)
+        # set(OpenMP_CXX_LIB_NAMES omp)
+        # set(OpenMP_omp_LIBRARY ${HOMEBREW_LIBOMP_PREFIX}/lib/libomp.dylib)
+        # find_package(OpenMP REQUIRED)
+        set(GENIE_USE_OPENMP OFF)
     else()
-        message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
+        find_package(OpenMP REQUIRED)
+        include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+        elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
+        elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+        else()
+            message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
+        endif()
     endif()
 endif()
 
