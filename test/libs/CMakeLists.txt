@@ -1,5 +1,0 @@
-add_subdirectory(gabac)
-add_subdirectory(util)
-add_subdirectory(coding)
-add_subdirectory(read)
-add_subdirectory(quality)
