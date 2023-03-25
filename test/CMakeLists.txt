@@ -1,2 +1,2 @@
 add_subdirectory(example)
-add_subdirectory(libs)
+add_subdirectory(variantRecordTest)
