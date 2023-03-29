@@ -12,6 +12,7 @@
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "arrayType.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -85,6 +86,7 @@ Record::Record(util::BitReader& reader) {
             //   std::vector<uint64_t> info_value(infoTag.info_array_len);
             infoTag.info_value.resize(infoTag.info_array_len);
         }
+
         for (auto& inf : infoTag.info_value) {
             if (inf_size == 0) {
                 uint8_t read = 0xF;

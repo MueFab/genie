@@ -62,12 +62,12 @@ TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         std::istream is(&fb1);
         genie::util::BitReader reader(is);
         std::ofstream myfile("1.3.05_cut.geno_test.txt");
-        //do {
+        do {
             genie::core::record::variant_genotype::Record variant_geno_record(reader);
            
             variant_geno_record.write(myfile);
            
-       // } while (is.peek() != EOF);
+        } while (is.peek() != EOF);
         fb1.close();
         myfile.close();
     }
