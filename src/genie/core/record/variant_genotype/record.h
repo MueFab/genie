@@ -82,7 +82,7 @@ class Record {
     std::vector<std::vector<uint8_t>> phasing;
 
     uint8_t n_likelihoods;
-    std::vector<std::vector<uint8_t>> likelihoods; // type?
+    std::vector<std::vector<float>> likelihoods; // type?
 
     uint8_t linked_record;
     uint8_t link_name_len;

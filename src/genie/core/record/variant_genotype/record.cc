@@ -14,6 +14,7 @@
 #include "genie/util/runtime-exception.h"
 
 #include "record.h"
+#include "arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -172,6 +173,8 @@ Record::Record(util::BitReader& reader) : reader(reader) {
     sample_index_from = (reader.readBypassBE<uint32_t>());
     sample_count = (reader.readBypassBE<uint32_t>());
 
+    arrayType curType;
+
     format_count = (reader.readBypassBE<uint8_t>());
     if (format_count > 0) {
         format.resize(format_count);
@@ -185,7 +188,7 @@ Record::Record(util::BitReader& reader) : reader(reader) {
             for (auto& values : format_item.value) {
                 values.resize(format_item.array_len);
                 for (auto& value : values) {
-                    value = convertTypeToArray(format_item.type);
+                    value = curType.toArray(format_item.type, reader);
                 }
             }
         }
@@ -195,23 +198,21 @@ Record::Record(util::BitReader& reader) : reader(reader) {
 
     n_alleles_per_sample = (reader.readBypassBE<uint8_t>());
     alleles.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample));
-    for (auto& allele_sample : alleles) {
-        for (auto& allele : allele_sample) {
+    phasing.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample-1));
+    for (uint32_t i = 0; i < sample_count; ++i) {
+        for (auto& allele : alleles[i]) {
             allele = (reader.readBypassBE<uint8_t>());
         }
-    }
-    phasing.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample));
-    for (auto& phasing_sample : phasing) {
-        for (auto& phase : phasing_sample) {
+        for (auto& phase : phasing[i]) {
             phase = (reader.readBypassBE<uint8_t>());
         }
     }
-
+ 
     n_likelihoods = (reader.readBypassBE<uint8_t>());
-    likelihoods.resize(sample_count, std::vector<uint8_t>(n_likelihoods));
+    likelihoods.resize(sample_count, std::vector<float>(n_likelihoods));
     for (auto& likelihood_sample : likelihoods) {
         for (auto& likelihood : likelihood_sample) {
-            likelihood = (reader.readBypassBE<uint8_t>());
+            likelihood = (reader.readBypassBE<float>());
         }
     }
 
@@ -230,6 +231,8 @@ void Record::write(std::ostream& outputfile) const {
 
     outputfile << std::to_string(format_count) << ",";
 
+    arrayType curArray;
+
     for (auto format_item : format) {
         outputfile << std::to_string(format_item.len) << ",";
         outputfile << format_item.format << ",";
@@ -237,7 +240,7 @@ void Record::write(std::ostream& outputfile) const {
         outputfile << std::to_string(format_item.array_len) << ",";
         for (auto values : format_item.value) {
             for (auto value : values) {
-                outputfile << convertArrayToString(format_item.type, value) << ",";
+                outputfile << curArray.toString(format_item.type, value) << ",";
             }
         }
     }

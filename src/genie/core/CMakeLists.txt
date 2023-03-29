@@ -29,9 +29,11 @@ set(source_files
         record/alignment/alignment.cc
 
         record/variant_site/record.cc
+		record/variant_site/arrayType.cc
 
         record/variant_genotype/record.cc
-
+        record/variant_genotype/arrayType.cc
+		
         record/contact/record.cc
 
 
