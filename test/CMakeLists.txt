@@ -1,2 +1,3 @@
 add_subdirectory(example)
-add_subdirectory(variantRecordTest)
+add_subdirectory(variantSiteRecordTest)
+add_subdirectory(variantGenotypeRecordTest)
