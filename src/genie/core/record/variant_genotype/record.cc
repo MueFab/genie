@@ -235,7 +235,7 @@ void Record::write(std::ostream& outputfile) const {
 
     for (auto format_item : format) {
         outputfile << std::to_string(format_item.len) << ",";
-        outputfile << format_item.format << ",";
+        outputfile << '"' << format_item.format << '"' << ",";
         outputfile << std::to_string(format_item.type) << ",";
         outputfile << std::to_string(format_item.array_len) << ",";
         for (auto values : format_item.value) {
@@ -272,7 +272,7 @@ void Record::write(std::ostream& outputfile) const {
     outputfile << std::to_string(linked_record) << ",";
     if (linked_record) {
         outputfile << std::to_string(link_name_len) << ",";
-        outputfile << link_name << ",";
+        outputfile << '"' << link_name << '"' << ",";
         outputfile << std::to_string(reference_box_ID) << ",";
     }
 }
