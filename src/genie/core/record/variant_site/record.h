@@ -62,7 +62,6 @@ class Record {
     std::vector<Alt> alt;
 
     float depth;
-    float qual;
     float seq_qual;
     float map_qual;
     float map_num_qual_0;
@@ -77,6 +76,7 @@ class Record {
     std::string link_name;
     uint8_t reference_box_ID;
 
+    uint8_t determineSize(uint8_t selectType) const;
  public:
     /**
      * @brief

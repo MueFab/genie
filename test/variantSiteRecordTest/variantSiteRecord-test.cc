@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include "genie/util/bitreader.h"
 #include "genie/core/record/variant_site/record.h"
 
@@ -55,19 +54,17 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    auto currentdir = std::filesystem::current_path();
     
     
     std::filebuf fb1;
-    if (fb1.open("1.3.05_cut.site", std::ios::in)) {
+    if (fb1.open("1.3.05_cut.site", std::ios::in | std::ios::binary)) {
         std::istream is(&fb1);
         genie::util::BitReader reader(is);
-        genie::core::record::variant_site::Record variant_site_record(reader);
-        
-
-        std::ofstream myfile("test.txt");
-        variant_site_record.write(myfile);
-        fb1.close();
+        std::ofstream myfile("1.3.05_cut.site_test.txt");
+        do {
+            genie::core::record::variant_site::Record variant_site_record(reader);
+            variant_site_record.write(myfile);
+        } while (is.peek() != EOF);
         fb1.close();
         myfile.close();
     }

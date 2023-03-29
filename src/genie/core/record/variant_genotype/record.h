@@ -40,18 +40,24 @@ class info_field {
 /**
  *  @brief
  */
-class alt_allele {
-    uint32_t alt_len;   //!< @brief
-    std::string alt;    //!< @brief
-};
 
 /**
  *  @brief
  */
 class linked_record {
+ public:
     uint8_t link_name_len;     //!< @brief
     std::string link_name;     //!< @brief
     uint8_t reference_box_ID;  //!< @brief
+};
+
+class FormatField {
+ public:
+    uint8_t len;
+    std::string format;
+    uint8_t type;
+    uint8_t array_len;
+    std::vector<std::vector<std::vector<uint8_t>>> value;
 };
 
 /**
@@ -59,56 +65,46 @@ class linked_record {
  */
 class Record {
  private:
-    // TODO: To be filled
+    util::BitReader& reader;
+
     uint64_t variant_index;             //!< @brief
     uint32_t sample_index_from;         //!< @brief
-    uint32_t sample_cout;               //!< @brief
+    uint32_t sample_count;              //!< @brief
 
     uint8_t format_count;               //!< @brief
-    std::vector<uint8_t> format_len{};  //!< @brief
+    std::vector<FormatField> format;    //!< @brief
 
-    uint8_t ID_len;                     //!< @brief
-    std::string ID;                     //!< @brief
-    uint8_t description_len;            //!< @brief
-    std::string description;            //!< @brief
-    uint32_t ref_len;                   //!< @brief
-    std::string ref;                    //!< @brief
+    uint8_t genotype_present;
+    uint8_t likelihood_present;
 
-    uint8_t alt_count;                  //!< @brief
-    std::vector<alt_allele> alt;        //!< @brief
+    uint8_t n_alleles_per_sample;
+    std::vector<std::vector<uint8_t>> alleles;
+    std::vector<std::vector<uint8_t>> phasing;
 
-    float depth;                        //!< @brief
-    float seq_qual;                     //!< @brief
-    float map_qual;                     //!< @brief
-    float map_num_qual_0;               //!< @brief
+    uint8_t n_likelihoods;
+    std::vector<std::vector<uint8_t>> likelihoods; // type?
 
-    uint8_t filters_len;                //!< @brief
-    std::string filters;                //!< @brief
+    uint8_t linked_record;
+    uint8_t link_name_len;
+    std::string link_name;
+    uint8_t reference_box_ID;
 
-    uint8_t info_count;                 //!< @brief
-    std::vector<info_field> infoFields; //!< @brief
+    uint8_t determineSize(uint8_t selectType) const;
+    
+    std::vector<uint8_t> convertTypeToArray(uint8_t type);
+    std::string convertArrayToString(uint8_t type, std::vector<uint8_t> value) const;
 
-    uint8_t linked_record_en;           //!< @brief
-    linked_record linked_record;        //!< @brief
 
 
  public:
     /**
      * @brief
      */
-    Record();
-
-
-};
-
-#include "../../../util/bitreader.h"
-#include <istream>
-
-class ParseMrecs {
- public:
-    void parse_mpegg_genotype(const char* inputfile, Record& mpegg_genotype);   
+    Record(util::BitReader& reader) ;
+    void write(std::ostream& outputfile) const;
 
 };
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
