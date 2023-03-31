@@ -28,7 +28,99 @@ uint8_t Record::determineSize(uint8_t selectType) const {
     return 4;
 }
 
-Record::Record(util::BitReader& reader) {
+std::string Record::infoToCorrectString(std::string value, uint8_t selectType) const {
+    std::string outputstring;
+    auto type_size = determineSize(selectType);
+    if (selectType == 0)
+        outputstring = '"' + value + '"' + ",";
+    else {
+        if (selectType == 0) {
+            outputstring = '"' + value + '"' + ",";
+        } else if (selectType == 1 || selectType == 2 || selectType == 4 || selectType == 6 || selectType == 8 ||
+                   selectType == 10) {
+            uint64_t temp = 0;
+            memcpy(&temp, value.c_str(), type_size);
+            outputstring = std::to_string(temp) + ",";
+        } else if (selectType == 3) {
+            int8_t temp = 0;
+            memcpy(&temp, value.c_str(), type_size);
+            outputstring = std::to_string(temp) + ",";
+
+        } else if (selectType == 5) {
+            int16_t temp = 0;
+            memcpy(&temp, value.c_str(), type_size);
+            outputstring = std::to_string(temp) + ",";
+
+        } else if (selectType == 7 || selectType == 11) {
+            int32_t temp = 0;
+            char bytearray[4];
+            for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[3 - i];
+            memcpy(&temp, bytearray, type_size);
+            outputstring = std::to_string(temp) + ",";
+
+        } else if (selectType == 9) {
+            int64_t temp = 0;
+            char bytearray[8];
+            for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[7 - i];
+            memcpy(&temp, bytearray, type_size);
+            outputstring = std::to_string(temp) + ",";
+
+        } else if (selectType == 11) {
+            int32_t temp = 0;
+            memcpy(&temp, value.c_str(), type_size);
+            outputstring = std::to_string(temp) + ",";
+        }
+    }
+    return outputstring;
+}
+
+Record::Record(util::BitReader& reader) { read(reader); }
+
+void Record::write(std::ostream& outputfile) const {
+    outputfile << std::to_string(variant_index) << ",";
+    outputfile << std::to_string(seq_ID) << ",";
+    outputfile << std::to_string(pos) << ",";
+    outputfile << std::to_string(strand) << ",";
+    outputfile << std::to_string(ID_len) << ",";
+    outputfile << '"' << ID << '"' << ",";
+    outputfile << std::to_string(description_len) << ",";
+    outputfile << '"' << description << '"' << ",";
+    outputfile << std::to_string(ref_len) << ",";
+    outputfile << '"' << ref << '"' << ",";
+    outputfile << std::to_string(alt_count) << ",";
+
+    for (auto alt_inst : alt) {
+        outputfile << std::to_string(alt_inst.alt_len) << ",";
+        outputfile << '"' << alt_inst.alt << '"' << ",";
+    }
+
+    outputfile << std::to_string(depth) << ",";
+
+    outputfile << std::to_string(seq_qual) << ",";
+    outputfile << std::to_string(map_qual) << ",";
+    outputfile << std::to_string(map_num_qual_0) << ",";
+    outputfile << std::to_string(filters_len) << ",";
+    outputfile << '"' << filters << '"' << ",";
+    outputfile << std::to_string(info_count) << ",";
+    for (auto tag : info_tag) {
+        outputfile << std::to_string(tag.info_tag_len) << ",";
+        outputfile << '"' << tag.info_tag << '"' << ",";
+        outputfile << std::to_string(tag.info_type) << ",";
+        outputfile << std::to_string(tag.info_array_len) << ",";
+        for (auto value : tag.info_value) {
+            infoToCorrectString(value, tag.info_type);
+        }
+    }
+
+    outputfile << std::to_string(linked_record) << ",";
+    if (linked_record == 1) {
+        outputfile << std::to_string(link_name_len) << ",";
+        outputfile << '"' << link_name << '"' << ",";
+        outputfile << std::to_string(reference_box_ID);
+    }
+}
+
+void Record::read(genie::util::BitReader& reader) {
     variant_index = (reader.readBypassBE<uint64_t>());
     seq_ID = (reader.readBypassBE<uint16_t>());
     pos = (reader.readBypassBE<uint64_t, 5>());
@@ -83,7 +175,6 @@ Record::Record(util::BitReader& reader) {
         infoTag.info_array_len = reader.readBypassBE<uint8_t>();
 
         if (infoTag.info_array_len > 0) {
-            //   std::vector<uint64_t> info_value(infoTag.info_array_len);
             infoTag.info_value.resize(infoTag.info_array_len);
         }
 
@@ -100,6 +191,7 @@ Record::Record(util::BitReader& reader) {
             }
         }
     }
+
     linked_record = reader.readBypassBE<uint8_t, 1>();
     if (linked_record) {
         link_name_len = reader.readBypassBE<uint8_t>();
@@ -110,94 +202,7 @@ Record::Record(util::BitReader& reader) {
         reference_box_ID = reader.readBypassBE<uint8_t>();
     }
 }
-void Record::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(variant_index) << ",";
-    outputfile << std::to_string(seq_ID) << ",";
-    outputfile << std::to_string(pos) << ",";
-    outputfile << std::to_string(strand) << ",";
-    outputfile << std::to_string(ID_len) << ",";
-    outputfile << '"' << ID << '"' << ",";
-    outputfile << std::to_string(description_len) << ",";
-    outputfile << '"' << description << '"' << ",";
-    outputfile << std::to_string(ref_len) << ",";
-    outputfile << '"' << ref << '"' << ",";
-    outputfile << std::to_string(alt_count) << ",";
 
-    for (auto alt_inst : alt) {
-        outputfile << std::to_string(alt_inst.alt_len) << ",";
-        outputfile << '"' << alt_inst.alt << '"' << ",";
-    }
-
-    outputfile << std::to_string(depth) << ",";
-
-    outputfile << std::to_string(seq_qual) << ",";
-    outputfile << std::to_string(map_qual) << ",";
-    outputfile << std::to_string(map_num_qual_0) << ",";
-    outputfile << std::to_string(filters_len) << ",";
-    outputfile << '"' << filters << '"' << ",";
-    outputfile << std::to_string(info_count) << ",";
-    for (auto tag : info_tag) {
-        outputfile << std::to_string(tag.info_tag_len) << ",";
-        outputfile << '"' << tag.info_tag << '"' << ",";
-        outputfile << std::to_string(tag.info_type) << ",";
-        outputfile << std::to_string(tag.info_array_len) << ",";
-        uint8_t type_size = determineSize(tag.info_type);
-        for (auto value : tag.info_value) {
-            if (tag.info_type == 0)
-                outputfile << '"' << value << '"' << ",";
-            else {
-                if (tag.info_type == 0) {
-                    outputfile << '"' << value << '"' << ",";
-                } else if (tag.info_type == 1 || tag.info_type == 2 || tag.info_type == 4 || tag.info_type == 6 ||
-                           tag.info_type == 8 || tag.info_type == 10) {
-                    uint64_t temp = 0;
-                    memcpy(&temp, value.c_str(), type_size);
-                    /* auto shift = 8 * type_size - 8;
-                    for (auto value_byte : value) {
-                        temp += static_cast<uint64_t>(value_byte) << shift;
-                        shift -= 8;
-                    }*/
-                    outputfile << std::to_string(temp) << ",";
-                } else if (tag.info_type == 3) {
-                    int8_t temp = 0;
-                    memcpy(&temp, value.c_str(), type_size);
-                    outputfile << std::to_string(temp) << ",";
-
-                } else if (tag.info_type == 5) {
-                    int16_t temp = 0;
-                    memcpy(&temp, value.c_str(), type_size);
-                    outputfile << std::to_string(temp) << ",";
-
-                } else if (tag.info_type == 7 || tag.info_type == 11) {
-                    int32_t temp = 0;
-                    char bytearray[4];
-                    for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[3 - i];
-                    memcpy(&temp, bytearray, type_size);
-                    outputfile << std::to_string(temp) << ",";
-                    
-                } else if (tag.info_type == 9) {
-                    int64_t temp = 0;
-                    char bytearray[8];
-                    for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[7 - i];
-                    memcpy(&temp, bytearray, type_size);
-                     outputfile << std::to_string(temp) << ",";
- 
-                } else if (tag.info_type == 11) {
-                    int32_t temp = 0;
-                    memcpy(&temp, value.c_str(), type_size);
-                    outputfile << std::to_string(temp) << ",";
-                }
-            }
-        }
-    }
-
-    outputfile << std::to_string(linked_record) << ",";
-    if (linked_record == 1) {
-        outputfile << std::to_string(link_name_len) << ",";
-        outputfile << '"' << link_name << '"' << ",";
-        outputfile << std::to_string(reference_box_ID);
-    }
-}
 
 }  // namespace variant_site
 }  // namespace record
