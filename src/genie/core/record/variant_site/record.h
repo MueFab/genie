@@ -77,13 +77,69 @@ class Record {
     uint8_t reference_box_ID;
 
     uint8_t determineSize(uint8_t selectType) const;
+    std::string infoToCorrectString(std::string value, uint8_t selectType) const;
+
  public:
     /**
      * @brief
      */
+    Record()
+        : variant_index(0),
+          seq_ID(0),
+          pos(0),
+          strand(0),
+          ID_len(0),
+          ID(""),
+          description_len(0),
+          description(""),
+          ref_len(0),
+          ref(""),
+          alt_count(0),
+          alt(0),
+          depth(0),
+          seq_qual(0),
+          map_qual(0),
+          map_num_qual_0(0),
+          filters_len(0),
+          filters(""),
+          info_count(0),
+          info_tag(0),
+          linked_record(0),
+          link_name_len(0),
+          link_name(""),
+          reference_box_ID(0){};
+    /**
+     * @brief
+     */
     Record(genie::util::BitReader& reader);
-    
+    /**
+     * @brief
+     */
+    void read(genie::util::BitReader& reader);
+    /**
+     * @brief
+     */
     void write(std::ostream& outputfile) const;
+
+    uint64_t getVariantIndex() { return variant_index; }
+    uint16_t getSeqID() { return seq_ID; }
+    uint64_t getPos() { return pos; }
+    uint8_t getStrand() { return strand; }
+    std::string getID() { return ID; }
+    std::string getDescription() { return description; }
+    std::string getRef() { return ref; }
+    uint8_t getAltCount() { return alt_count; }
+    std::vector<Alt> getAlt() { return alt; }
+    float getDepth() { return depth; }
+    float getSeqQual() { return seq_qual; }
+    float getMapQual() { return map_qual; }
+    float getMapNumQual0() { return map_num_qual_0; }
+    std::string getFilters() { return filters; }
+    uint8_t getInfoCount() { return info_count; }
+    std::vector<Info_tag> getInfoTag() { return info_tag; }
+    bool isLinkedRecord() { return (linked_record == 0 ? false : true); }
+    std::string getLinkName() { return link_name; }
+    uint8_t getReferenceBoxID() { return reference_box_ID; }
 
 };
 
