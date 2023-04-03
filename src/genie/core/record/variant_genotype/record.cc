@@ -63,6 +63,8 @@ void Record::read(util::BitReader& reader) {
         for (auto& allele : alleles[i]) {
             allele = (reader.readBypassBE<uint8_t>());
         }
+    }
+    for (uint32_t i = 0; i < sample_count; ++i) {
         for (auto& phase : phasing[i]) {
             phase = (reader.readBypassBE<uint8_t>());
         }

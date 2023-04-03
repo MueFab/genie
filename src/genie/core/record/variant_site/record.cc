@@ -108,7 +108,7 @@ void Record::write(std::ostream& outputfile) const {
         outputfile << std::to_string(tag.info_type) << ",";
         outputfile << std::to_string(tag.info_array_len) << ",";
         for (auto value : tag.info_value) {
-            infoToCorrectString(value, tag.info_type);
+            outputfile << infoToCorrectString(value, tag.info_type);
         }
     }
 
