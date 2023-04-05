@@ -73,8 +73,6 @@ class FormatField {
  */
 class Record {
  private:
-    // util::BitReader& reader;
-
     uint64_t variant_index;      //!< @brief
     uint32_t sample_index_from;  //!< @brief
     uint32_t sample_count;       //!< @brief
@@ -118,6 +116,13 @@ class Record {
           link_name_len(0),
           link_name(""),
           reference_box_ID(0) {}
+
+    Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
+           std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
+           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
+           std::vector<std::vector<uint8_t>> phasing, uint8_t n_likelihoods,
+           std::vector<std::vector<float>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
+           std::string link_name = "", uint8_t reference_box_ID = 0);
 
     Record(util::BitReader& reader);
     void read(util::BitReader& reader);

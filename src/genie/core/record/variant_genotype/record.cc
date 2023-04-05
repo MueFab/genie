@@ -39,6 +39,29 @@ void FormatField::write(util::BitReader& reader, uint32_t sample_count) {
     }
 }
 
+Record::Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
+               std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
+               uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
+               std::vector<std::vector<uint8_t>> phasing, uint8_t n_likelihoods,
+               std::vector<std::vector<float>> likelihoods, uint8_t linked_record, uint8_t link_name_len ,
+               std::string link_name, uint8_t reference_box_ID)
+    : variant_index(variant_index),
+      sample_index_from(sample_index_from),
+      sample_count(sample_count),
+      format_count(format_count),
+      format(format),
+      genotype_present(genotype_present),
+      likelihood_present(likelihood_present),
+      n_alleles_per_sample(n_alleles_per_sample),
+      alleles(alleles),
+      phasing(phasing),
+      n_likelihoods(n_likelihoods),
+      likelihoods(likelihoods),
+      linked_record(linked_record),
+      link_name_len(link_name_len),
+      link_name(link_name),
+      reference_box_ID(reference_box_ID) {}
+
 Record::Record(util::BitReader& reader) { read(reader); }
 
 void Record::read(util::BitReader& reader) {

@@ -29,17 +29,17 @@ namespace variant_site {
 
 class Info_tag {
  public:
-    uint8_t info_tag_len;
-    std::string info_tag;
-    uint8_t info_type;
-    uint8_t info_array_len;
-    std::vector<std::string> info_value;
+    uint8_t info_tag_len{};
+    std::string info_tag{};
+    uint8_t info_type{};
+    uint8_t info_array_len{};
+    std::vector<std::string> info_value{};
 };
 
 class Alt {
  public:
-    uint32_t alt_len;
-    std::string alt;
+    uint32_t alt_len{};
+    std::string alt{};
 };
 
 /**

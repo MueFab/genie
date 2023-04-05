@@ -29,13 +29,17 @@ set(source_files
         record/alignment/alignment.cc
 
         record/variant_site/record.cc
-		record/variant_site/arrayType.cc
 
         record/variant_genotype/record.cc
         record/variant_genotype/arrayType.cc
-		
+
         record/contact/record.cc
 
+        record/annotation_parameter_set/record.cc
+
+        record/annotation_encoding_parameters/record.cc
+
+        record/tile_configuration/record.cc
 
         stats/perf-stats.cc
 
