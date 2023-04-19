@@ -38,6 +38,10 @@ set(source_files
         record/annotation_parameter_set/record.cc
 
         record/annotation_encoding_parameters/record.cc
+        record/annotation_encoding_parameters/LikelihoodParameters.cc
+        record/annotation_encoding_parameters/GenotypeParameters.cc
+        record/annotation_encoding_parameters/AttributeParameterSet.cc
+        record/annotation_encoding_parameters/AlgorithmParameters.cc
 
         record/tile_configuration/record.cc
 

@@ -61,10 +61,10 @@ class Record {
 
     std::vector<Alt> alt;
 
-    float depth;
-    float seq_qual;
-    float map_qual;
-    float map_num_qual_0;
+    uint32_t depth;
+    uint32_t seq_qual;
+    uint32_t map_qual;
+    uint32_t map_num_qual_0;
     uint8_t filters_len;
     std::string filters;
     uint8_t info_count;
@@ -130,10 +130,10 @@ class Record {
     std::string getRef() { return ref; }
     uint8_t getAltCount() { return alt_count; }
     std::vector<Alt> getAlt() { return alt; }
-    float getDepth() { return depth; }
-    float getSeqQual() { return seq_qual; }
-    float getMapQual() { return map_qual; }
-    float getMapNumQual0() { return map_num_qual_0; }
+    uint32_t getDepth() { return depth; }
+    uint32_t getSeqQual() { return seq_qual; }
+    uint32_t getMapQual() { return map_qual; }
+    uint32_t getMapNumQual0() { return map_num_qual_0; }
     std::string getFilters() { return filters; }
     uint8_t getInfoCount() { return info_count; }
     std::vector<Info_tag> getInfoTag() { return info_tag; }
