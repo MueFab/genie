@@ -4,20 +4,147 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
+#include "genie/core/record/variant_genotype/arrayType.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
 namespace annotation_encoding_parameters {
+
+
+void ContactMatrixParameters::read(util::BitReader& reader) {
+    num_samples = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < num_samples; ++i) {
+        sample_ID.push_back(reader.readBypassBE<uint8_t>());
+        std::string name;
+        reader.readBypass(name);
+        sample_name.push_back(name);
+    }
+
+    num_chrs = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < num_chrs; ++i) {
+        chr_ID.push_back(reader.readBypassBE<uint8_t>());
+        std::string name;
+        reader.readBypass(name);
+        chr_name.push_back(name);
+        chr_length.push_back(reader.readBypassBE<uint64_t>());
+    }
+
+    interval = reader.readBypassBE<uint32_t>();
+    tile_size = reader.readBypassBE<uint32_t>();
+
+    num_interval_multipliers = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < num_interval_multipliers; ++i) interval_multiplier.push_back(reader.readBypassBE<uint32_t>());
+
+    num_norm_methods = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < num_norm_methods; ++i) {
+        norm_method_ID.push_back(reader.readBypassBE<uint8_t>());
+        std::string name;
+        reader.readBypass(name);
+        chr_name.push_back(name);
+        reader.readBypass(name);
+        norm_method_name.push_back(name);
+        norm_method_mult_flag.push_back(static_cast<bool>(reader.read_b(1)));
+    }
+
+    num_norm_matrices = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < num_norm_matrices; ++i) {
+        norm_matrix_ID.push_back(reader.readBypassBE<uint8_t>());
+        std::string name;
+        reader.readBypass(name);
+        norm_matrix_name.push_back(name);
+    }
+}
+
+CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(reader); }
+
+void CompressorParameterSet::read(util::BitReader& reader) {
+    compressor_ID = reader.readBypassBE<uint8_t>();
+    n_compressor_steps = static_cast<uint8_t>(reader.read_b(4));
+    for (auto i = 0; i < n_compressor_steps; ++i) {
+        compressor_step_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
+        algorithm_ID.push_back(static_cast<uint8_t>(reader.read_b(5)));
+        use_default_pars.push_back(static_cast<bool>(reader.read_b(1)));
+        if (use_default_pars.back()) algorithm_parameters.read(reader);
+    }
+}
+
+DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
+
+void DescriptorConfiguration::read(util::BitReader& reader) {
+    descriptor_ID = static_cast<DescriptorID>(reader.readBypassBE<uint8_t>());
+    encoding_mode_ID = reader.readBypassBE<uint8_t>();
+    switch (descriptor_ID) {
+        case DescriptorID::GENOTYPE:
+            genotype_parameters.read(reader);
+            break;
+        case DescriptorID::LIKELIHOOD:
+            likelihood_parameters.read(reader);
+            break;
+        case DescriptorID::CONTACT:
+            contact_matrix_parameters.read(reader);
+            break;
+        default:
+            break;
+    }
+    algorithm_patarmeters.read(reader);
+}
+
+void Record::read(util::BitReader& reader) {
+    n_filter = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_filter; ++i) {
+        filter_ID_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string ID(filter_ID_len.back(), 0);
+        reader.readBypass(ID);
+        filter_ID.push_back(ID);
+        desc_len.push_back(static_cast<uint16_t>(reader.read_b(10)));
+        std::string desc(desc_len.back(), 0);
+        description.push_back(desc);
+    }
+
+    n_features_names = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_features_names; ++i) {
+        feature_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string name(feature_name_len.back(), 0);
+        reader.readBypass(name);
+        feature_name.push_back(name);
+    }
+
+    n_ontology_terms = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_ontology_terms; ++i) {
+        ontology_term_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string name(ontology_term_name_len.back(), 0);
+        reader.readBypass(name);
+        ontology_term_name.push_back(name);
+    }
+
+    n_descriptors = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_descriptors; ++i) {
+        DescriptorConfiguration descrConf(reader);
+        descriptor_configuration.push_back(descrConf);
+    }
+
+    n_compressors = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_compressors; ++i) {
+        CompressorParameterSet comprParSet(reader);
+        compressor_parameter_set.push_back(comprParSet);
+    }
+
+    n_attributes = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_compressors; ++i) {
+        AttributeParameterSet attrParSet(reader);
+        attribute_parameter_set.push_back(attrParSet);
+    }
+}
 
 }  // namespace annotation_encoding_parameters
 }  // namespace record

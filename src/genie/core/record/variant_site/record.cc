@@ -12,7 +12,6 @@
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-#include "arrayType.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -66,7 +65,7 @@ std::string Record::infoToCorrectString(std::string value, uint8_t selectType) c
             outputstring = std::to_string(temp) + ",";
 
         } else if (selectType == 11) {
-            int32_t temp = 0;
+            uint32_t temp = 0;
             memcpy(&temp, value.c_str(), type_size);
             outputstring = std::to_string(temp) + ",";
         }
@@ -151,10 +150,10 @@ void Record::read(genie::util::BitReader& reader) {
         alt.push_back(alt_inst);
     }
 
-    depth = reader.readBypassBE<float, 4>();
-    seq_qual = reader.readBypassBE<float, 4>();
-    map_qual = reader.readBypassBE<float, 4>();
-    map_num_qual_0 = reader.readBypassBE<float, 4>();
+    depth = reader.readBypassBE<uint32_t, 4>();
+    seq_qual = reader.readBypassBE<uint32_t, 4>();
+    map_qual = reader.readBypassBE<uint32_t, 4>();
+    map_num_qual_0 = reader.readBypassBE<uint32_t, 4>();
 
     filters_len = reader.readBypassBE<uint8_t>();
     if (filters_len > 0) {

@@ -88,7 +88,7 @@ class Record {
     std::vector<std::vector<uint8_t>> phasing;  //!< @brief
 
     uint8_t n_likelihoods;                        //!< @brief
-    std::vector<std::vector<float>> likelihoods;  //!< @brief
+    std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
     uint8_t linked_record;     //!< @brief
     uint8_t link_name_len;     //!< @brief
@@ -121,7 +121,7 @@ class Record {
            std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
            uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
            std::vector<std::vector<uint8_t>> phasing, uint8_t n_likelihoods,
-           std::vector<std::vector<float>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
+           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
            std::string link_name = "", uint8_t reference_box_ID = 0);
 
     Record(util::BitReader& reader);
@@ -140,7 +140,7 @@ class Record {
     std::vector<std::vector<uint8_t>> getAlleles() const;
     std::vector<std::vector<uint8_t>> getPhasing() const;
     uint8_t getNumberOfLikelihoods() const;
-    std::vector<std::vector<float>> getLikelihoods() const;
+    std::vector<std::vector<uint32_t>> getLikelihoods() const;
     bool isLinkedRecord() const;
     std::string getLinkName() const;
     uint8_t getReferenceBoxID() const;

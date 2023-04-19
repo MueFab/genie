@@ -80,6 +80,8 @@ TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         do {
             genie::core::record::variant_genotype::Record variant_geno_record(reader);
 
+            EXPECT_EQ(variant_geno_record.getSampleCount(), variant_geno_record.getAlleles().size());
+
             variant_geno_record.write(myfile);
 
         } while (is.peek() != EOF);
@@ -87,8 +89,6 @@ TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         myfile.close();
     }
 
-    EXPECT_EQ(0, 0);
-    ASSERT_EQ(0, 0);
 }
 
 TEST_F(VariantGenotypeRecordTests, recordFilledWithZeros) {  // NOLINT(cert-err58-cpp)
@@ -136,7 +136,7 @@ TEST_F(VariantGenotypeRecordTests, recordFilledWithOtherValues) {  // NOLINT(cer
     std::vector<std::vector<uint8_t>> phasing = {{4, 5}, {6, 7}};
 
     uint8_t n_likelihoods = 2;
-    std::vector<std::vector<float>> likelihoods = {{8, 9}, {10, 11}};
+    std::vector<std::vector<uint32_t>> likelihoods = {{8, 9}, {10, 11}};
 
     uint8_t linked_record = 0;
 

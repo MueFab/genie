@@ -43,7 +43,7 @@ Record::Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t samp
                std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
                uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
                std::vector<std::vector<uint8_t>> phasing, uint8_t n_likelihoods,
-               std::vector<std::vector<float>> likelihoods, uint8_t linked_record, uint8_t link_name_len ,
+               std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len,
                std::string link_name, uint8_t reference_box_ID)
     : variant_index(variant_index),
       sample_index_from(sample_index_from),
@@ -94,10 +94,10 @@ void Record::read(util::BitReader& reader) {
     }
 
     n_likelihoods = (reader.readBypassBE<uint8_t>());
-    likelihoods.resize(sample_count, std::vector<float>(n_likelihoods));
+    likelihoods.resize(sample_count, std::vector<uint32_t>(n_likelihoods));
     for (auto& likelihood_sample : likelihoods) {
         for (auto& likelihood : likelihood_sample) {
-            likelihood = (reader.readBypassBE<float>());
+            likelihood = (reader.readBypassBE<uint32_t>());
         }
     }
 
@@ -184,7 +184,7 @@ std::vector<std::vector<uint8_t>> Record::getPhasing() const { return phasing; }
 
 uint8_t Record::getNumberOfLikelihoods() const { return n_likelihoods; }
 
-std::vector<std::vector<float>> Record::getLikelihoods() const { return likelihoods; }
+std::vector<std::vector<uint32_t>> Record::getLikelihoods() const { return likelihoods; }
 
 bool Record::isLinkedRecord() const { return (linked_record == 0 ? false : true); }
 
