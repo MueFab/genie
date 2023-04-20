@@ -63,6 +63,12 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
             temp = std::to_string(value);
             break;
         }
+        case 12: { //double
+            uint64_t value;
+            memcpy(&value, &bytearray[0], 8);
+            temp = std::to_string(value);
+            break;
+        }
         default:  // csae 0
             temp.resize(bytearray.size() + 2);
             temp += '"';
@@ -120,6 +126,7 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
             memcpy(&byteArray[0], &temp, 8);
             break;
         }
+        case 12:
         case 10: {
             uint64_t temp;
             temp = static_cast<uint64_t>(reader.read_b(64));  // reader.readBypassBE<uint64_t>();

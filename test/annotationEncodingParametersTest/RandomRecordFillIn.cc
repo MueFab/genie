@@ -89,16 +89,14 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
 
     std::vector<uint8_t> attribute_miss_val = randomValForType(attribute_type);
 
-    for (auto& byte : attribute_miss_val) byte = randomU8();
-
     uint8_t strLen = randomU4() + 3;
     std::string attribute_miss_str = randomString(strLen);
 
     uint8_t compressor_ID = randomU8();
 
-    uint8_t n_steps_with_dependencies = randomU8();
+    uint8_t n_steps_with_dependencies = randomU4();
     std::vector<uint8_t> dependency_step_ID(n_steps_with_dependencies, 0);
-    for (auto& byte : dependency_step_ID) byte = randomU8();
+    for (auto& byte : dependency_step_ID) byte = randomU4();
     std::vector<uint8_t> n_dependencies(n_steps_with_dependencies, 0);
     for (auto& byte : n_dependencies) byte = randomU4();
     std::vector<std::vector<uint8_t>> dependency_var_ID(n_steps_with_dependencies, std::vector<uint8_t>());
@@ -136,6 +134,12 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
         n_pars, std::vector<std::vector<std::vector<std::vector<uint8_t>>>>(0));
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i] = randomU4();
+        par_type[i] = randomType();
+        par_num_array_dims[i] = randomU2();
+        par_array_dims[i].resize(par_num_array_dims[i]);
+        for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU8();
+        
+
     }
 
     return genie::core::record::annotation_encoding_parameters::AlgorithmParameters(
