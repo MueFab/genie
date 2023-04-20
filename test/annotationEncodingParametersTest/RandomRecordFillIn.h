@@ -28,10 +28,10 @@ class RandomAnnotationEncodingParameters {
 
     genie::core::record::annotation_encoding_parameters::AlgorithmParameters randomAlgorithmParameters();
 
+    uint8_t randomU4() { return static_cast<uint8_t>((rand() % 15)); }
  private:
-    uint8_t randomU4() { return static_cast<uint8_t>((rand() % (2 ^ 4))); }
-    uint8_t randomU8() { return static_cast<uint8_t>((rand() % (2 ^ 7)) + 1); }
-    uint16_t randomU16() { return static_cast<uint16_t>(rand() % (2 ^ 15) + 1); }
+    uint16_t randomU16() { return static_cast<uint16_t>(((rand() + rand()) % (65536 - 2)) + 1); }
+    uint8_t randomU8() { return static_cast<uint8_t>((rand() % (254) + 1)); }
     uint8_t randomU2() { return static_cast<uint8_t>(rand() % 4); }
     uint8_t randomType() { return static_cast<uint8_t>(rand() % 13); }
     bool randomBool() { return static_cast<bool>(rand() % 2); }
@@ -42,9 +42,7 @@ class RandomAnnotationEncodingParameters {
             uint8_t byteSeed = rand() % (26);
             random += static_cast<char>(byteSeed + 'a');
         }
-
         return random;
-        //.substr(0, len);
     }
 
     uint8_t typeSize(uint8_t selectType) const {

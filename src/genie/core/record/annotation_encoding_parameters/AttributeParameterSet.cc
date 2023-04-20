@@ -165,6 +165,8 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
             for (auto byte : attribute_miss_val) writer.write(byte, 8);
     }
     writer.write(attribute_miss_str);
+    writer.write(0, 8);
+
     writer.write(compressor_ID, 8);
     writer.write(n_steps_with_dependencies, 4);
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
@@ -207,7 +209,7 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
         outputfile << std::to_string(dependency_step_ID[i]) << ",";
         outputfile << std::to_string(n_dependencies[i]) << ",";
         for (auto j = 0; j < n_dependencies[i]; ++j) {
-            outputfile << std::to_string(dependency_ID[i][j]) << ",";
+            outputfile << std::to_string(dependency_var_ID[i][j]) << ",";
             outputfile << std::to_string(dependency_is_attribute[i][j]) << ",";
             outputfile << std::to_string(dependency_ID[i][j]) << ",";
         }

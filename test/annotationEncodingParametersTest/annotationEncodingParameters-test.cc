@@ -4,10 +4,10 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_encoding_parameters/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "RandomRecordFillIn.h"
 
 class AnnotationEncodingParametersTests : public ::testing::Test {
  protected:
@@ -54,6 +54,14 @@ class AnnotationEncodingParametersTests : public ::testing::Test {
     // }
 };
 
+TEST_F(AnnotationEncodingParametersTests, testthis) {  // NOLINT(cert-err58-cpp)
+    RandomAnnotationEncodingParameters test;
+    for (auto i = 0; i < 20; ++i) {
+        auto testVal = test.randomU4();
+        EXPECT_LE(testVal, 16);
+    }
+}
+
 TEST_F(AnnotationEncodingParametersTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -71,7 +79,6 @@ TEST_F(AnnotationEncodingParametersTests, Likelihoodtestrandom) {  // NOLINT(cer
     genie::core::record::annotation_encoding_parameters::LikelihoodParameters likelihoodParameters;
     RandomAnnotationEncodingParameters randomLikelihood;
     likelihoodParameters = randomLikelihood.randomLikelihood();
-
 }
 
 TEST_F(AnnotationEncodingParametersTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
@@ -282,28 +289,28 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetValues) {  // NOL
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
- uint16_t attribute_ID = 1;
+    uint16_t attribute_ID = 1;
     uint8_t attribute_name_len = 5;
- std::string attribute_name ="12345";
+    std::string attribute_name = "12345";
     uint8_t attribute_type = 1;
     uint8_t attribute_num_array_dims = 5;
-    std::vector<uint8_t> attribute_array_dims ={1, 2, 3, 4, 5};
+    std::vector<uint8_t> attribute_array_dims = {1, 2, 3, 4, 5};
 
-    std::vector<uint8_t> attribute_default_val={9, 8, 7, 6, 5};
-    bool attribute_miss_val_flag=true;
-    bool attribute_miss_default_flag=false;
+    std::vector<uint8_t> attribute_default_val = {9, 8, 7, 6, 5};
+    bool attribute_miss_val_flag = true;
+    bool attribute_miss_default_flag = false;
     std::vector<uint8_t> attribute_miss_val = {4, 3, 2, 1, 0};
 
-    std::string attribute_miss_str= "qwerty";
-    uint8_t compressor_ID=4;
+    std::string attribute_miss_str = "qwerty";
+    uint8_t compressor_ID = 4;
 
     uint8_t n_steps_with_dependencies = 3;
     std::vector<uint8_t> dependency_step_ID = {7, 5, 3};
     std::vector<uint8_t> n_dependencies = {2, 2, 2};
     std::vector<std::vector<uint8_t>> dependency_var_ID{{1, 1}, {2, 2}, {3, 3}, {4, 4}, {0, 0}};
-    std::vector<std::vector<bool>> dependency_is_attribute{{true, true}, {false, false}, {false, true}, {true, false}, {true, true}};
+    std::vector<std::vector<bool>> dependency_is_attribute{
+        {true, true}, {false, false}, {false, true}, {true, false}, {true, true}};
     std::vector<std::vector<uint16_t>> dependency_ID{{3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}};
-
 
     genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSet(
         attribute_ID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims,
@@ -314,7 +321,6 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetValues) {  // NOL
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
 }
 
-
 TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -322,12 +328,17 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetRandom) {  // NOL
 
     RandomAnnotationEncodingParameters randomattributeParameterSet;
     genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSet;
-    attributeParameterSet= randomattributeParameterSet.randomAttributeParameterSet();
+    attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
+    auto IDs = attributeParameterSet.getDependencyVarIDs();
+    for (auto i = 0; i < IDs.size(); ++i)
+        for (auto j = 0; j < IDs[i].size(); ++j) EXPECT_LE(IDs[i][j], 16) << "i= " << i << ", j= " << j << std::endl;
+        
+    
 
-       std::string name = "AttributeParameterSet_seed_";
+    std::string name = "AttributeParameterSet_seed_";
     name += std::to_string(rand() % 10);
 
-  std::ofstream outputfile;
+    std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
         genie::util::BitWriter writer(&outputfile);
@@ -341,8 +352,6 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetRandom) {  // NOL
         attributeParameterSet.write(txtfile);
         txtfile.close();
     }
-    
-
 }
 
 TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err58-cpp)
@@ -358,4 +367,27 @@ TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersZero) {  // NOLINT(
     EXPECT_EQ(algortihmParameters.getParNumberOfArrayDims().size(), 0);
     EXPECT_EQ(algortihmParameters.getParTypes().size(), 0);
     EXPECT_EQ(algortihmParameters.getParValues().size(), 0);
+}
+
+TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersWithValues) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+
+    uint8_t n_pars = 3;
+    std::vector<uint8_t> par_ID{8, 6, 0};
+    std::vector<uint8_t> par_type{1, 3, 4};
+    std::vector<uint8_t> par_num_array_dims{1, 1};
+    std::vector<std::vector<uint8_t>> par_array_dims{{7}, {5}};
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val{{{{{5}}}}, {{{{3}}}}, {{{{2}}}}};
+
+    genie::core::record::annotation_encoding_parameters::AlgorithmParameters algortihmParameters(
+        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+
+    EXPECT_EQ(algortihmParameters.getNumberOfPars(), n_pars);
+    EXPECT_EQ(algortihmParameters.getParArrayDims().size(), par_num_array_dims.size());
+    EXPECT_EQ(algortihmParameters.getParIDs().size(), par_ID.size());
+    EXPECT_EQ(algortihmParameters.getParNumberOfArrayDims()[0], par_num_array_dims[0]);
+    EXPECT_EQ(algortihmParameters.getParTypes()[1], par_type[1]);
+    EXPECT_EQ(algortihmParameters.getParValues()[0][0][0][0], par_val[0][0][0][0]);
 }
