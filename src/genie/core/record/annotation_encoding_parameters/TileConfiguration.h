@@ -18,48 +18,26 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
+#include "TileStructure.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
-namespace tile_configuration {
+namespace annotation_encoding_parameters {
 
-class TileStructure {
- private:
-    bool variable_size_tiles;
-    uint64_t n_tiles;
-    std::vector<std::vector<uint64_t>> start_index;
-    std::vector<std::vector<uint64_t>> end_index;
-    std::vector<uint64_t> tile_size;
-
-    uint64_t readVariableSize(util::BitReader& reader, uint8_t ATCoordSize);
-
- public:
-    TileStructure(bool variable_size_tiles, uint64_t n_tiles, std::vector<std::vector<uint64_t>> start_index,
-                  std::vector<std::vector<uint64_t>> end_index, std::vector<uint64_t> tile_size);
-
-    TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional);
-
-    TileStructure();
-
-    void read(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional);
-    void write(std::ostream& outputfile, bool two_dimensional);
-
-    bool isVariableSizeTiles() const { return variable_size_tiles; }
-    uint64_t getNumberOfTiles() const { return n_tiles; }
-    std::vector<std::vector<uint64_t>> getAllStartIndices() const { return start_index; }
-    std::vector<std::vector<uint64_t>> getALLEndIndices() const { return end_index; }
-    std::vector<uint64_t> getAllTileSizes() const { return tile_size; }
-};
 
 /**
  *  @brief
  */
-class Record {
+class TileConfiguration {
  private:
+    uint8_t AT_coord_size;
+
     uint8_t AG_class;
     bool attribute_contiguity;
+    
     bool two_dimensional;
 
     bool column_major_tile_order;
@@ -79,17 +57,20 @@ class Record {
     /**
      * @brief
      */
-    Record();
-    Record(util::BitReader& reader, uint8_t ATCoordSize);
-    Record(uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
+    TileConfiguration();
+    TileConfiguration(util::BitReader& reader, uint8_t AT_coord_size);
+    TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
            bool column_major_tile_order, uint8_t symmetry_mode, bool symmetry_minor_diagonal,
            bool attribute_dependent_tiles, TileStructure default_tile_structure, uint16_t n_add_tile_structures,
            std::vector<uint16_t> n_attributes, std::vector<std::vector<uint16_t>> attribute_ID,
            std::vector<uint8_t> n_descriptors, std::vector<std::vector<uint8_t>> descriptor_ID,
            std::vector<TileStructure> additional_tile_structure);
 
-    void read(util::BitReader& reader, uint8_t ATCoordSize);
-    void write(std::ostream& outputfile);
+    void read(util::BitReader& reader);
+    void write(std::ostream& outputfile) const;
+    void write(util::BitWriter& writer) const;
+    void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
+    void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }
@@ -110,7 +91,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace tile_configuration
+}  // namespace annotation_encoding_parameters
 }  // namespace record
 }  // namespace core
 }  // namespace genie

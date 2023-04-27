@@ -42,8 +42,9 @@ set(source_files
         record/annotation_encoding_parameters/GenotypeParameters.cc
         record/annotation_encoding_parameters/AttributeParameterSet.cc
         record/annotation_encoding_parameters/AlgorithmParameters.cc
-
-        record/tile_configuration/record.cc
+        record/annotation_encoding_parameters/ContactMatrixParameters.cc
+        record/annotation_encoding_parameters/TileConfiguation.cc
+        record/annotation_encoding_parameters/TileStructure.cc
 
         stats/perf-stats.cc
 

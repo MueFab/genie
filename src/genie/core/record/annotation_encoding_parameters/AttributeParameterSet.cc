@@ -25,12 +25,9 @@ namespace core {
 namespace record {
 namespace annotation_encoding_parameters {
 
-
 AttributeParameterSet::AttributeParameterSet(const AttributeParameterSet& rec) { *this = rec; }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-
 
 AttributeParameterSet::AttributeParameterSet()
     : attribute_ID(0),
@@ -77,8 +74,13 @@ AttributeParameterSet::AttributeParameterSet(
       n_dependencies(n_dependencies),
       dependency_var_ID(dependency_var_ID),
       dependency_is_attribute(dependency_is_attribute),
-      dependency_ID(dependency_ID) {}
-
+      dependency_ID(dependency_ID) {
+    if (!attribute_miss_val_flag) {
+        this->attribute_miss_default_flag = false;
+        this->attribute_miss_str = "";
+    }
+    if (attribute_miss_default_flag) this->attribute_miss_val.clear();
+}
 
 AttributeParameterSet& AttributeParameterSet::operator=(const AttributeParameterSet& rec) {
     if (this == &rec) {
@@ -106,19 +108,19 @@ AttributeParameterSet& AttributeParameterSet::operator=(const AttributeParameter
     return *this;
 }
 
-
-
 AttributeParameterSet::AttributeParameterSet(util::BitReader& reader) { read(reader); }
 
 void AttributeParameterSet::read(util::BitReader& reader) {
-    attribute_ID = reader.readBypassBE<uint16_t>();
-    attribute_name_len = reader.readBypassBE<uint8_t>();
+    attribute_ID = static_cast<uint16_t>(reader.read_b(16));
+    attribute_name_len = static_cast<uint8_t>(reader.read_b(8));
     attribute_name.resize(attribute_name_len);
-    reader.readBypass(attribute_name);
-    attribute_type = reader.readBypassBE<uint8_t>();
+    for (auto& attribute_nameChar : attribute_name) attribute_nameChar = static_cast<char>(reader.read_b(8));
+
+    attribute_type = static_cast<uint8_t>(reader.read_b(8));
     attribute_num_array_dims = static_cast<uint8_t>(reader.read_b(2));
+    attribute_array_dims.resize(attribute_num_array_dims);
     for (auto i = 0; i < attribute_num_array_dims; ++i)
-        attribute_array_dims.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        attribute_array_dims[0] = static_cast<uint8_t>(reader.read_b(8));
 
     variant_genotype::arrayType curType;
     attribute_default_val = curType.toArray(attribute_type, reader);
@@ -126,24 +128,38 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     if (attribute_miss_val_flag) {
         attribute_miss_default_flag = static_cast<bool>(reader.read_b(1));
         if (!attribute_miss_default_flag) attribute_miss_val = curType.toArray(attribute_type, reader);
-        reader.readBypass_null_terminated(attribute_miss_str);
+
+        char readChar = 'z';
+        do {
+            readChar = static_cast<char>(reader.read_b(8));
+            attribute_miss_str += readChar;
+        } while (readChar != '/0');
     }
     compressor_ID = static_cast<uint8_t>(reader.read_b(8));
 
     n_steps_with_dependencies = static_cast<uint8_t>(reader.read_b(4));
+
+    n_dependencies.resize(n_steps_with_dependencies);
+    dependency_step_ID.resize(n_steps_with_dependencies);
     dependency_var_ID.resize(n_steps_with_dependencies);
     dependency_is_attribute.resize(n_steps_with_dependencies);
-
+    dependency_ID.resize(n_steps_with_dependencies);
+ 
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
-        dependency_step_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
-        n_dependencies.push_back(static_cast<uint8_t>(reader.read_b(4)));
-        for (auto j = 0; j < n_dependencies.back(); ++j) {
-            dependency_var_ID[i].push_back(static_cast<uint8_t>(reader.read_b(4)));
-            dependency_is_attribute[i].push_back(static_cast<bool>(reader.read_b(1)));
-            if (dependency_is_attribute[i].back())
-                dependency_ID[i].push_back(static_cast<uint16_t>(reader.read_b(16)));
+        dependency_step_ID[i] = static_cast<uint8_t>(reader.read_b(4));
+        n_dependencies[i] = static_cast<uint8_t>(reader.read_b(4));
+        
+        dependency_var_ID[i].resize(n_dependencies[i]);
+        dependency_is_attribute[i].resize(n_dependencies[i]);
+        dependency_ID[i].resize(n_dependencies[i]);
+
+        for (auto j = 0; j < n_dependencies[i]; ++j) {
+            dependency_var_ID[i][j] = static_cast<uint8_t>(reader.read_b(4));
+            dependency_is_attribute[i][j] = static_cast<bool>(reader.read_b(1));
+            if (dependency_is_attribute[i][j])
+                dependency_ID[i][j] = static_cast<uint16_t>(reader.read_b(16));
             else
-                dependency_ID[i].push_back(static_cast<uint16_t>(reader.read_b(7)));
+                dependency_ID[i][j] = static_cast<uint16_t>(reader.read_b(7));
         }
     }
 }
@@ -156,7 +172,7 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
     writer.write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
 
-    for (auto i = attribute_default_val.size(); i > 0; --i) writer.write(attribute_default_val[i-1], 8);
+    for (auto i = attribute_default_val.size(); i > 0; --i) writer.write(attribute_default_val[i - 1], 8);
 
     writer.write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
@@ -192,7 +208,7 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
     outputfile << std::to_string(attribute_num_array_dims) << ",";
 
     for (auto array_dims : attribute_array_dims) {
-        outputfile << std::to_string(array_dims )<< ",";
+        outputfile << std::to_string(array_dims) << ",";
     }
 
     variant_genotype::arrayType curType;
@@ -203,8 +219,8 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
         if (!attribute_miss_default_flag) outputfile << curType.toString(attribute_type, attribute_miss_val) << ",";
         outputfile << '"' << (attribute_miss_str) << '"' << ",";
     }
-    outputfile << std::to_string(compressor_ID )<< ",";
-    outputfile << std::to_string(n_steps_with_dependencies )<< ",";
+    outputfile << std::to_string(compressor_ID) << ",";
+    outputfile << std::to_string(n_steps_with_dependencies) << ",";
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
         outputfile << std::to_string(dependency_step_ID[i]) << ",";
         outputfile << std::to_string(n_dependencies[i]) << ",";

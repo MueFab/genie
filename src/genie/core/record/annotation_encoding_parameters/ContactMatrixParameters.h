@@ -4,6 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#ifndef SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
@@ -15,8 +18,6 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#include "LikelihoodParameters.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -24,32 +25,33 @@ namespace core {
 namespace record {
 namespace annotation_encoding_parameters {
 
-LikelihoodParameters::LikelihoodParameters() : num_gl_per_sample(0), transform_flag(false), dtype_id(0) {}
+class ContactMatrixParameters {
+ private:
+    uint8_t num_samples{};
+    std::vector<uint8_t> sample_ID{};
+    std::vector<std::string> sample_name{};
+    uint8_t num_chrs{};
+    std::vector<uint8_t> chr_ID{};
+    std::vector<std::string> chr_name{};
+    std::vector<uint64_t> chr_length{};
 
-LikelihoodParameters::LikelihoodParameters(uint8_t num_gl_per_sample, bool transform_flag, uint8_t dtype_id)
-    : num_gl_per_sample(num_gl_per_sample), transform_flag(transform_flag), dtype_id(dtype_id) {
-    if (!transform_flag) dtype_id = 0;
-}
+    uint32_t interval{};
+    uint32_t tile_size{};
+    uint8_t num_interval_multipliers{};
+    std::vector<uint32_t> interval_multiplier{};
 
-LikelihoodParameters::LikelihoodParameters(util::BitReader& reader) { read(reader); }
+    uint8_t num_norm_methods{};
+    std::vector<uint8_t> norm_method_ID{};
+    std::vector<std::string> norm_method_name{};
+    std::vector<bool> norm_method_mult_flag{};
 
-void LikelihoodParameters::read(util::BitReader& reader) {
-    num_gl_per_sample = static_cast<uint8_t>(reader.read_b(8));
-    transform_flag = static_cast<bool>(reader.read_b(1));
-    if (transform_flag) dtype_id = static_cast<uint8_t>(reader.read_b(8));
-}
+    uint8_t num_norm_matrices{};
+    std::vector<uint8_t> norm_matrix_ID{};
+    std::vector<std::string> norm_matrix_name{};
 
-void LikelihoodParameters::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(num_gl_per_sample) << ",";
-    outputfile << std::to_string(transform_flag) << ",";
-    if (transform_flag) outputfile << std::to_string(dtype_id);
-}
-
-void LikelihoodParameters::write(util::BitWriter& writer) const {
-    writer.write(num_gl_per_sample, 8);
-    writer.write(transform_flag, 1);
-    if (transform_flag) writer.write(dtype_id, 8);
-}
+ public:
+    void read(util::BitReader& reader);
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +61,8 @@ void LikelihoodParameters::write(util::BitWriter& writer) const {
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

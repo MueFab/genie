@@ -54,23 +54,19 @@ void AlgorithmParameters::read(util::BitReader& reader) {
         for (auto j = 0; j < par_num_array_dims.back(); ++j) {
             par_array_dims[i].push_back(static_cast<uint8_t>(reader.read_b(8)));
         }
-        if (par_num_array_dims.back() == 0) {
-            if (par_num_array_dims.back() == 0)
-                par_val[i].resize(
-                    1, std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
-            if (par_num_array_dims.back() == 1)
-                par_val[i].resize(par_array_dims[i][0], std::vector<std::vector<std::vector<uint8_t>>>(
-                                                            1, std::vector<std::vector<uint8_t>>(1)));
-            if (par_num_array_dims.back() == 2)
-                par_val[i].resize(par_array_dims[i][0],
-                                  std::vector<std::vector<std::vector<uint8_t>>>(par_array_dims[i][1],
-                                                                                 std::vector<std::vector<uint8_t>>(1)));
-            if (par_num_array_dims.back() == 3)
-                par_val[i].resize(par_array_dims[i][0],
-                                  std::vector<std::vector<std::vector<uint8_t>>>(
-                                      par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
-            par_val[i][0][0][0] = types.toArray(par_type.back(), reader);
-        }
+        if (par_num_array_dims.back() == 0)
+            par_val[i].resize(1,
+                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims.back() == 1)
+            par_val[i].resize(par_array_dims[i][0],
+                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims.back() == 2)
+            par_val[i].resize(par_array_dims[i][0], std::vector<std::vector<std::vector<uint8_t>>>(
+                                                        par_array_dims[i][1], std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims.back() == 3)
+            par_val[i].resize(par_array_dims[i][0],
+                              std::vector<std::vector<std::vector<uint8_t>>>(
+                                  par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
         for (auto& d1 : par_val)
             for (auto& d2 : d1)
                 for (auto& d3 : d2)
