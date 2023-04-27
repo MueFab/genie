@@ -81,16 +81,17 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
 
     std::vector<uint8_t> attribute_array_dims{};
     for (auto i = 0; i < attribute_num_array_dims; ++i) attribute_array_dims.push_back(randomU8());
-    
+
     std::vector<uint8_t> attribute_default_val = randomValForType(attribute_type);
 
     bool attribute_miss_val_flag = randomBool();
     bool attribute_miss_default_flag = randomBool();
-
+    if (!attribute_miss_val_flag) attribute_miss_default_flag = false;
     std::vector<uint8_t> attribute_miss_val = randomValForType(attribute_type);
-
+    if (!attribute_miss_val_flag || attribute_miss_default_flag) attribute_miss_val.clear();
     uint8_t strLen = randomU4() + 3;
     std::string attribute_miss_str = randomString(strLen);
+    if (!attribute_miss_val_flag) attribute_miss_str = "";
 
     uint8_t compressor_ID = randomU8();
 
@@ -125,7 +126,8 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
 
 genie::core::record::annotation_encoding_parameters::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
-    uint8_t n_pars = randomU8();
+    uint8_t n_pars = randomU4();
+    // randomU8();
     std::vector<uint8_t> par_ID(n_pars, 0);
     std::vector<uint8_t> par_type(n_pars, 0);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
@@ -137,11 +139,137 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
         par_type[i] = randomType();
         par_num_array_dims[i] = randomU2();
         par_array_dims[i].resize(par_num_array_dims[i]);
-        for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU8();
-        
+        for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU4();  // randomU8();
+        if (par_num_array_dims[i] == 0)
+            par_val[i].resize(1,
+                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims[i] == 1)
+            par_val[i].resize(par_array_dims[i][0],
+                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims[i] == 2)
+            par_val[i].resize(par_array_dims[i][0], std::vector<std::vector<std::vector<uint8_t>>>(
+                                                        par_array_dims[i][1], std::vector<std::vector<uint8_t>>(1)));
+        if (par_num_array_dims[i] == 3)
+            par_val[i].resize(par_array_dims[i][0],
+                              std::vector<std::vector<std::vector<uint8_t>>>(
+                                  par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
 
+        for (auto& d1 : par_val)
+            for (auto& d2 : d1)
+                for (auto& d3 : d2)
+                    for (auto& d4 : d3) d4 = randomValForType(par_type[i]);
     }
 
     return genie::core::record::annotation_encoding_parameters::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+}
+
+genie::core::record::annotation_encoding_parameters::TileStructure
+RandomAnnotationEncodingParameters::randomTileStructure() {
+    uint8_t ATCoordSize = randomU2();
+    bool two_dimensional = randomBool();
+    return randomTileStructure(ATCoordSize, two_dimensional);
+}
+genie::core::record::annotation_encoding_parameters::TileStructure
+RandomAnnotationEncodingParameters::simpleTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
+    bool variable_size_tiles = false;
+    uint64_t n_tiles = 0;
+    uint8_t dimensions = two_dimensional ? 2 : 1;
+    std::vector<std::vector<uint64_t>> start_index;
+    std::vector<std::vector<uint64_t>> end_index;
+    std::vector<uint64_t> tile_size;
+    start_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+    end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+    tile_size.resize(dimensions, 0);
+
+    if (variable_size_tiles)
+        for (auto i = 0; i < n_tiles; ++i) {
+            for (auto j = 0; j < dimensions; ++j) {
+                start_index[i][j] = 0;
+                end_index[i][j] = 1;
+            }
+        }
+    else
+        for (auto j = 0; j < dimensions; ++j) tile_size[j] = 2;
+
+    return genie::core::record::annotation_encoding_parameters::TileStructure(
+        ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
+}
+
+genie::core::record::annotation_encoding_parameters::TileStructure
+RandomAnnotationEncodingParameters::randomTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
+    bool variable_size_tiles = randomBool();
+    uint64_t n_tiles = randomAtCoordSize(ATCoordSize);
+    if (n_tiles > 4096) n_tiles = n_tiles % 4096;
+    uint8_t dimensions = two_dimensional ? 2 : 1;
+    std::vector<std::vector<uint64_t>> start_index;
+    std::vector<std::vector<uint64_t>> end_index;
+    std::vector<uint64_t> tile_size;
+    start_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+    end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+    tile_size.resize(n_tiles, 0);
+    for (auto i = 0; i < n_tiles; ++i) {
+        if (variable_size_tiles)
+            for (auto j = 0; j < dimensions; ++j) {
+                start_index[i][j] = randomAtCoordSize(ATCoordSize);
+                end_index[i][j] = randomAtCoordSize(ATCoordSize);
+            }
+        else
+            tile_size[i] = randomAtCoordSize(ATCoordSize);
+    }
+
+    return genie::core::record::annotation_encoding_parameters::TileStructure(
+        ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
+}
+
+genie::core::record::annotation_encoding_parameters::TileConfiguration
+RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_size) {
+    uint8_t AG_class = randomU3();
+    bool attribute_contiguity = randomBool();
+
+    bool two_dimensional = randomBool();
+
+    bool column_major_tile_order = randomBool();
+    uint8_t symmetry_mode = randomU3();
+    bool symmetry_minor_diagonal = randomBool();
+
+    bool attribute_dependent_tiles = randomBool();
+
+    genie::core::record::annotation_encoding_parameters::TileStructure default_tile_structure =
+        simpleTileStructure(AT_coord_size, two_dimensional);
+
+    uint16_t n_add_tile_structures = 0;
+    std::vector<uint16_t> n_attributes;
+    std::vector<std::vector<uint16_t>> attribute_ID;
+    std::vector<uint8_t> n_descriptors;
+    std::vector<std::vector<uint8_t>> descriptor_ID;
+    std::vector<genie::core::record::annotation_encoding_parameters::TileStructure> additional_tile_structure;
+
+    if (attribute_dependent_tiles) {
+        n_add_tile_structures = randomU8();  // randomU16
+        n_attributes.resize(n_add_tile_structures);
+        descriptor_ID.resize(n_add_tile_structures, std::vector<uint8_t>(0));
+        attribute_ID.resize(n_add_tile_structures, std::vector<uint16_t>(0));
+        for (auto i = 0; i < n_add_tile_structures; ++i) {
+            n_attributes[i] = randomU8();  // randomU16
+            for (auto j = 0; j < n_attributes[i]; ++j) {
+                attribute_ID[i].push_back(randomU16());
+            }
+            n_descriptors.push_back(randomU8() / 2);
+            for (auto j = 0; j < n_descriptors[i]; ++j) {
+                descriptor_ID[i].push_back(randomU8() / 2);
+            }
+            additional_tile_structure.push_back(simpleTileStructure(AT_coord_size, two_dimensional));
+        }
+    }
+    return genie::core::record::annotation_encoding_parameters::TileConfiguration(
+        AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
+        symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures, n_attributes,
+        attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
+}
+
+genie::core::record::annotation_encoding_parameters::TileConfiguration
+RandomAnnotationEncodingParameters::randomTileConfiguration() {
+    uint8_t AT_coord_size = randomU8();
+    return randomTileConfiguration(AT_coord_size);
 }

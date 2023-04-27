@@ -28,13 +28,37 @@ class RandomAnnotationEncodingParameters {
 
     genie::core::record::annotation_encoding_parameters::AlgorithmParameters randomAlgorithmParameters();
 
-    uint8_t randomU4() { return static_cast<uint8_t>((rand() % 15)); }
+    genie::core::record::annotation_encoding_parameters::TileStructure randomTileStructure();
+   
+    genie::core::record::annotation_encoding_parameters::TileStructure randomTileStructure(uint8_t ATCoordSize,
+                                                                                           bool two_dimensional);
+   
+    genie::core::record::annotation_encoding_parameters::TileStructure simpleTileStructure(uint8_t ATCoordSize,
+                                                                                           bool two_dimensional); 
+    
+    genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration();
+    genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
+
  private:
-    uint16_t randomU16() { return static_cast<uint16_t>(((rand() + rand()) % (65536 - 2)) + 1); }
+    uint64_t randomU64() {
+        uint64_t randomnumber = randomU32() * randomU32();
+        return randomnumber;
+    }
+    uint32_t randomU32() {
+        uint32_t randomnumber = randomU16() * randomU16();
+        return randomnumber;
+    }
+    uint16_t randomU16() {
+        uint16_t randomnumber = static_cast<uint16_t>(rand() + rand());
+        return randomnumber;
+    }
     uint8_t randomU8() { return static_cast<uint8_t>((rand() % (254) + 1)); }
+    uint8_t randomU4() { return static_cast<uint8_t>((rand() % 15)); }
+    uint8_t randomU3() { return static_cast<uint8_t>(rand() % 8); }
     uint8_t randomU2() { return static_cast<uint8_t>(rand() % 4); }
-    uint8_t randomType() { return static_cast<uint8_t>(rand() % 13); }
     bool randomBool() { return static_cast<bool>(rand() % 2); }
+
+    uint8_t randomType() { return static_cast<uint8_t>(rand() % 13); }
 
     std::string randomString(uint8_t len) {
         std::string random = "rs";
@@ -86,6 +110,14 @@ class RandomAnnotationEncodingParameters {
             for (auto& byte : randomVal) byte = randomU8();
         }
         return randomVal;
+    }
+
+    uint64_t randomAtCoordSize(uint8_t ATCoordSize) {
+        if (ATCoordSize == 0) return randomU8();
+        if (ATCoordSize == 1) return randomU16();
+        if (ATCoordSize == 2) return randomU32();
+        if (ATCoordSize == 3) return randomU64();
+        return 0;
     }
 };
 

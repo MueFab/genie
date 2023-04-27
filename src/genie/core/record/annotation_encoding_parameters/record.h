@@ -22,6 +22,9 @@
 #include "GenotypeParameters.h"
 #include "AttributeParameterSet.h"
 #include "AlgorithmParameters.h"
+#include "ContactMatrixParameters.h"
+#include "TileConfiguration.h"
+#include "TileStructure.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -78,33 +81,7 @@ class CompressorParameterSet {
 };
 
 
-class ContactMatrixParameters {
- private:
-    uint8_t num_samples{};
-    std::vector<uint8_t> sample_ID{};
-    std::vector<std::string> sample_name{};
-    uint8_t num_chrs{};
-    std::vector<uint8_t> chr_ID{};
-    std::vector<std::string> chr_name{};
-    std::vector<uint64_t> chr_length{};
 
-    uint32_t interval{};
-    uint32_t tile_size{};
-    uint8_t num_interval_multipliers{};
-    std::vector<uint32_t> interval_multiplier{};
-
-    uint8_t num_norm_methods{};
-    std::vector<uint8_t> norm_method_ID{};
-    std::vector<std::string> norm_method_name{};
-    std::vector<bool> norm_method_mult_flag{};
-
-    uint8_t num_norm_matrices{};
-    std::vector<uint8_t> norm_matrix_ID{};
-    std::vector<std::string> norm_matrix_name{};
-
- public:
-    void read(util::BitReader& reader);
-};
 
 class DescriptorConfiguration {
  private:

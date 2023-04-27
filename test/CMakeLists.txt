@@ -1,5 +1,4 @@
 add_subdirectory(example)
 add_subdirectory(variantSiteRecordTest)
 add_subdirectory(variantGenotypeRecordTest)
-add_subdirectory(tileConfigurationTest)
 add_subdirectory(annotationEncodingParametersTest)
