@@ -18,13 +18,11 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#include "LikelihoodParameters.h"
-#include "GenotypeParameters.h"
 #include "AttributeParameterSet.h"
-#include "AlgorithmParameters.h"
-#include "ContactMatrixParameters.h"
 #include "TileConfiguration.h"
 #include "TileStructure.h"
+#include "DescriptorConfiguration.h"
+#include "CompressorParameterSet.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -32,70 +30,8 @@ namespace core {
 namespace record {
 namespace annotation_encoding_parameters {
 
-enum class DescriptorID {
-    SEQUENCEID = 1,
-    STARTPOS,
-    ENDPOS,
-    STRAND,
-    NAME,
-    DESCRIPTION,
-    LINKNAME,
-    LINKID,
-    DEPTH,
-    SEQQUALITY,
-    MAPQUALITY,
-    MAPNUMQUALITY0,
-    REFERENCE,
-    ALTERN,
-    GENOTYPE,
-    LIKELIHOOD,
-    FILTER,
-    FEATURENAME,
-    FEATUREID,
-    ONTOLOGYNAME,
-    ONTOLOGYID,
-    CONTACT,
-    ATTRIBUTE = 31
-};
 
 
-
-class CompressorParameterSet {
- private:
-    uint8_t compressor_ID;
-    uint8_t n_compressor_steps;
-    std::vector<uint8_t> compressor_step_ID;
-    std::vector<uint8_t> algorithm_ID;
-    std::vector<bool> use_default_pars;
-    AlgorithmParameters algorithm_parameters;
-    std::vector<uint8_t> n_in_vars;
-    std::vector<std::vector<uint8_t>> in_var_ID;
-    std::vector<std::vector<uint8_t>> prev_step_ID;
-    std::vector<std::vector<uint8_t>> prev_out_var_ID;
-    std::vector<uint8_t> n_completed_out_vars;
-    std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
- public:
-    CompressorParameterSet(util::BitReader& reader);
-    void read(util::BitReader& reader);
-};
-
-
-
-
-class DescriptorConfiguration {
- private:
-    DescriptorID descriptor_ID;
-    uint8_t encoding_mode_ID;
-    GenotypeParameters genotype_parameters;
-    LikelihoodParameters likelihood_parameters;
-    ContactMatrixParameters contact_matrix_parameters;
-    AlgorithmParameters algorithm_patarmeters;
-
- public:
-    DescriptorConfiguration(util::BitReader& reader);
-    void read(util::BitReader& reader);
-};
 
 /**
  *  @brief

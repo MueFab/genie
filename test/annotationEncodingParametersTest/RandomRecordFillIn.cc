@@ -268,8 +268,103 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
         attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 }
 
+genie::core::record::annotation_encoding_parameters::ContactMatrixParameters
+RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
+    uint8_t num_samples = randomU8();
+    std::vector<uint8_t> sample_ID(num_samples, 0);
+    for (auto& sampleID : sample_ID) sampleID = randomU8();
+    std::vector<std::string> sample_name(num_samples, "");
+    for (auto& sampleName : sample_name) sampleName = randomString(randomU4() + 2);
+    uint8_t num_chrs = randomU8();
+    std::vector<uint8_t> chr_ID(num_chrs, 0);
+    for (auto& chrID : chr_ID) chrID = randomU8();
+    std::vector<std::string> chr_name(num_chrs, "");
+    for (auto& chrName : chr_name) chrName = randomString(randomU4() + 2);
+    std::vector<uint64_t> chr_length(num_chrs, 0);
+    for (auto& length : chr_length) length = randomU64();
+
+    uint32_t interval = randomU32();
+    uint32_t tile_size = randomU32();
+    uint8_t num_interval_multipliers = randomU8();
+    std::vector<uint32_t> interval_multiplier(num_interval_multipliers, 0);
+    for (auto& intMult : interval_multiplier) intMult = randomU32();
+    uint8_t num_norm_methods = randomU8();
+    std::vector<uint8_t> norm_method_ID(num_norm_methods, 0);
+    for (auto& normMethodID : norm_method_ID) normMethodID = randomU8();
+    std::vector<std::string> norm_method_name(num_norm_methods, "");
+    for (auto& normMethodName : norm_method_name) normMethodName = randomString(randomU4() + 2);
+    std::vector<bool> norm_method_mult_flag(num_norm_methods, false);
+    for (auto i = 0; i < num_norm_methods; ++i) norm_method_mult_flag[i] = randomBool();
+
+    uint8_t num_norm_matrices = randomU8();
+    std::vector<uint8_t> norm_matrix_ID(num_norm_matrices, 0);
+    for (auto& ID : norm_matrix_ID) ID = randomU8();
+    std::vector<std::string> norm_matrix_name(num_norm_matrices, "");
+    for (auto& name : norm_matrix_name) name = randomString(randomU4() + 2);
+
+    return genie::core::record::annotation_encoding_parameters::ContactMatrixParameters(
+        num_samples, sample_ID, sample_name, num_chrs, chr_ID, chr_name, chr_length, interval, tile_size,
+        num_interval_multipliers, interval_multiplier, num_norm_methods, norm_method_ID, norm_method_name,
+        norm_method_mult_flag, num_norm_matrices, norm_matrix_ID, norm_matrix_name);
+}
+
+genie::core::record::annotation_encoding_parameters::ContactMatrixParameters
+RandomAnnotationEncodingParameters::simpleContactMatrixParameters() {
+    return genie::core::record::annotation_encoding_parameters::ContactMatrixParameters();
+}
+
 genie::core::record::annotation_encoding_parameters::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration() {
     uint8_t AT_coord_size = randomU8();
     return randomTileConfiguration(AT_coord_size);
+}
+
+genie::core::record::annotation_encoding_parameters::DescriptorConfiguration
+RandomAnnotationEncodingParameters::randomDescriptorConfiguration() {
+    genie::core::record::annotation_encoding_parameters::DescriptorID descriptorID =
+        static_cast<genie::core::record::annotation_encoding_parameters::DescriptorID>(randomU2());
+    uint8_t encoding_mode_ID = randomU8();
+
+    return genie::core::record::annotation_encoding_parameters::DescriptorConfiguration(
+        descriptorID, encoding_mode_ID, genie::core::record::annotation_encoding_parameters::GenotypeParameters(),
+        genie::core::record::annotation_encoding_parameters::LikelihoodParameters(), simpleContactMatrixParameters(),
+        genie::core::record::annotation_encoding_parameters::AlgorithmParameters());
+}
+
+genie::core::record::annotation_encoding_parameters::CompressorParameterSet
+RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
+    uint8_t compressor_ID = randomU8();
+    uint8_t n_compressor_steps = randomU4();
+    std::vector<uint8_t> compressor_step_ID(n_compressor_steps, 0);
+    for (auto& ID : compressor_step_ID) ID = randomU4();
+    std::vector<uint8_t> algorithm_ID(n_compressor_steps, 0);
+    for (auto& ID : algorithm_ID) ID = randomU4() + randomU4();
+    std::vector<bool> use_default_pars(n_compressor_steps);
+    std::vector<genie::core::record::annotation_encoding_parameters::AlgorithmParameters> algorithm_parameters;
+    for (auto i = 0; i < n_compressor_steps;++i) {
+        use_default_pars[i] = true;
+        // temporary set al to true, randomBool();
+            if (!use_default_pars[i])
+            algorithm_parameters.push_back(genie::core::record::annotation_encoding_parameters::AlgorithmParameters());
+    }
+    std::vector<uint8_t> n_in_vars(n_compressor_steps, 0);
+    std::vector<std::vector<uint8_t>> in_var_ID(n_compressor_steps);
+    std::vector<std::vector<uint8_t>> prev_step_ID(n_compressor_steps);
+    std::vector<std::vector<uint8_t>> prev_out_var_ID(n_compressor_steps);
+    std::vector<uint8_t> n_completed_out_vars(n_compressor_steps);
+    std::vector<std::vector<uint8_t>> completed_out_var_ID(n_compressor_steps);
+    for (auto i = 0; i < n_compressor_steps; ++i) {
+        n_in_vars[i] = randomU4();
+        for (auto j = 0; j < n_in_vars[i]; ++j) {
+            in_var_ID[i].push_back(randomU4());
+            prev_step_ID[i].push_back(randomU4());
+            prev_out_var_ID[i].push_back(randomU4());
+        }
+        n_completed_out_vars[i] = randomU4();
+        for (auto j = 0; j < n_completed_out_vars[i]; ++j) completed_out_var_ID[i].push_back(randomU4());
+    }
+
+    return genie::core::record::annotation_encoding_parameters::CompressorParameterSet(
+        compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
+        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }

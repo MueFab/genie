@@ -39,9 +39,14 @@ class RandomAnnotationEncodingParameters {
     genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration();
     genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
 
+    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters randomContactMatrixParameters();
+    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters simpleContactMatrixParameters();
+    genie::core::record::annotation_encoding_parameters::DescriptorConfiguration randomDescriptorConfiguration();
+    genie::core::record::annotation_encoding_parameters::CompressorParameterSet randomCompressorParameterSet();
+
  private:
     uint64_t randomU64() {
-        uint64_t randomnumber = randomU32() * randomU32();
+        uint64_t randomnumber = static_cast<uint64_t>(randomU32()) * static_cast<uint64_t>(randomU32());
         return randomnumber;
     }
     uint32_t randomU32() {
@@ -101,10 +106,10 @@ class RandomAnnotationEncodingParameters {
         if (size == 2)
             randomVal.push_back(static_cast<uint8_t>(randomBool()));
         else if (size == 0) {
-            uint8_t randomstrlen = randomU4() + 2;
-            randomVal.resize(static_cast<uint8_t>(randomstrlen + 1), 0);
-            std::string randomval = randomString(randomstrlen);
-            for (auto i = 0; i < randomstrlen; ++i) randomVal[i] = randomval[i];
+            uint8_t randomstrlen = randomU4() + 3;
+            randomVal.resize(randomstrlen, 0);
+            std::string randomval = randomString(randomstrlen-1);
+            for (auto i = 0; i < randomstrlen-1; ++i) randomVal[i] = randomval[i];
         } else {
             randomVal.resize(size / 8);
             for (auto& byte : randomVal) byte = randomU8();

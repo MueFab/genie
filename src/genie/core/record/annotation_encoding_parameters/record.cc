@@ -30,30 +30,10 @@ void CompressorParameterSet::read(util::BitReader& reader) {
         compressor_step_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
         algorithm_ID.push_back(static_cast<uint8_t>(reader.read_b(5)));
         use_default_pars.push_back(static_cast<bool>(reader.read_b(1)));
-        if (use_default_pars.back()) algorithm_parameters.read(reader);
+        if (use_default_pars.back()) algorithm_parameters[i].read(reader);
     }
 }
 
-DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
-
-void DescriptorConfiguration::read(util::BitReader& reader) {
-    descriptor_ID = static_cast<DescriptorID>(reader.readBypassBE<uint8_t>());
-    encoding_mode_ID = reader.readBypassBE<uint8_t>();
-    switch (descriptor_ID) {
-        case DescriptorID::GENOTYPE:
-            genotype_parameters.read(reader);
-            break;
-        case DescriptorID::LIKELIHOOD:
-            likelihood_parameters.read(reader);
-            break;
-        case DescriptorID::CONTACT:
-            contact_matrix_parameters.read(reader);
-            break;
-        default:
-            break;
-    }
-    algorithm_patarmeters.read(reader);
-}
 
 void Record::read(util::BitReader& reader) {
     n_filter = reader.readBypassBE<uint8_t>();
