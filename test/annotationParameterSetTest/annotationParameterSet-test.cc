@@ -8,16 +8,15 @@
 #include "genie/core/record/annotation_encoding_parameters/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "annotationEncodingParameters-test.h"
 
 #define GENERATE_TEST_FILES true
 
-class AnnotationEncodingParametersTests : public ::testing::Test {
+class AnnotationParameterSetTests : public ::testing::Test {
  protected:
     // Do any necessary setup for your tests here
-    AnnotationEncodingParametersTests() = default;
+    AnnotationParameterSetTests() = default;
 
-    ~AnnotationEncodingParametersTests() override = default;
+    ~AnnotationParameterSetTests() override = default;
 
     // Use SetUp instead of the constructor in the following cases:
     // - In the body of a constructor (or destructor), it's not possible to
@@ -57,22 +56,22 @@ class AnnotationEncodingParametersTests : public ::testing::Test {
     // }
 };
 
-TEST_F(AnnotationEncodingParametersTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_encoding_parameters::LikelihoodParameters likelihoodParameters;
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
 
     EXPECT_FALSE(likelihoodParameters.isTransformFlag());
     EXPECT_EQ(likelihoodParameters.getDtypeID(), 0);
     EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), 0);
 }
-TEST_F(AnnotationEncodingParametersTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_encoding_parameters::LikelihoodParameters likelihoodParameters;
-    genie::core::record::annotation_encoding_parameters::LikelihoodParameters likelihoodParametersCheck;
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParametersCheck;
     RandomAnnotationEncodingParameters randomLikelihood;
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
@@ -112,18 +111,18 @@ TEST_F(AnnotationEncodingParametersTests, Likelihoodtestrandom) {  // NOLINT(cer
 
 }
 
-TEST_F(AnnotationEncodingParametersTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_encoding_parameters::LikelihoodParameters likelihoodParameters(128, true, 45);
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters(128, true, 45);
 
     EXPECT_TRUE(likelihoodParameters.isTransformFlag());
     EXPECT_EQ(likelihoodParameters.getDtypeID(), 45);
     EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), 128);
 }
 
-TEST_F(AnnotationEncodingParametersTests, GenotypeParametersConstructValues) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, GenotypeParametersConstructValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -131,11 +130,11 @@ TEST_F(AnnotationEncodingParametersTests, GenotypeParametersConstructValues) {  
     uint8_t max_ploidy = 1;
     bool no_reference_flag = true;
     bool not_available_flag = false;
-    genie::core::record::annotation_encoding_parameters::BinarizationID binarization_ID =
-        genie::core::record::annotation_encoding_parameters::BinarizationID::BIT_PLANE;
+    genie::core::record::annotation_parameter_set::BinarizationID binarization_ID =
+        genie::core::record::annotation_parameter_set::BinarizationID::BIT_PLANE;
     uint8_t num_bit_plane = 2;
-    genie::core::record::annotation_encoding_parameters::ConcatAxis concat_axis =
-        genie::core::record::annotation_encoding_parameters::ConcatAxis::DO_NOT_CONCAT;
+    genie::core::record::annotation_parameter_set::ConcatAxis concat_axis =
+        genie::core::record::annotation_parameter_set::ConcatAxis::DO_NOT_CONCAT;
     std::vector<bool> sort_variants_rows_flag{false, true, true, false, false};
     std::vector<bool> sort_variants_cols_flag{true, true, false, false, true};
     std::vector<bool> transpose_variants_mat_flag{true, false, false, true, true};
@@ -148,7 +147,7 @@ TEST_F(AnnotationEncodingParametersTests, GenotypeParametersConstructValues) {  
     bool phases_codec_ID = true;
     bool phases_value = true;
 
-    genie::core::record::annotation_encoding_parameters::GenotypeParameters genotypeParameters(
+    genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParameters(
         max_ploidy, no_reference_flag, not_available_flag, binarization_ID, num_bit_plane, concat_axis,
         sort_variants_rows_flag, sort_variants_cols_flag, transpose_variants_mat_flag, variants_codec_ID,
         encode_phases_data_flag, sort_phases_rows_flag, sort_phases_cols_flag, transpose_phases_mat_flag,
@@ -174,15 +173,15 @@ TEST_F(AnnotationEncodingParametersTests, GenotypeParametersConstructValues) {  
 }
 
 
-TEST_F(AnnotationEncodingParametersTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters randomgenotypeParameters;
 
-    genie::core::record::annotation_encoding_parameters::GenotypeParameters genotypeParameters;
-    genie::core::record::annotation_encoding_parameters::GenotypeParameters genotypeParametersCheck;
+    genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParameters;
+    genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParametersCheck;
     genotypeParameters = randomgenotypeParameters.randomGenotypeParameters();
 
     std::stringstream InOut;
@@ -232,17 +231,17 @@ TEST_F(AnnotationEncodingParametersTests, GenotypeParameterWriteRandom) {  // NO
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AttributeParameterSetZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSet;
+    genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSet;
 
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 0);
 }
 
-TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetValues) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -270,7 +269,7 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetValues) {  // NOL
         {true, true}, {false, false}, {false, true}, {true, false}, {true, true}};
     std::vector<std::vector<uint16_t>> dependency_ID{{3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}};
 
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSet(
+    genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSet(
         attribute_ID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims,
         attribute_array_dims, attribute_default_val, attribute_miss_val_flag, attribute_miss_default_flag,
         attribute_miss_val, attribute_miss_str, compressor_ID, n_steps_with_dependencies, dependency_step_ID,
@@ -279,14 +278,14 @@ TEST_F(AnnotationEncodingParametersTests, AttributeParameterSetValues) {  // NOL
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
 }
 
-TEST_F(AnnotationEncodingParametersTests, DISABLED_AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, DISABLED_AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters randomattributeParameterSet;
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSet;
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet attributeParameterSetCheck;
+    genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSet;
+    genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSetCheck;
     attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
 
     std::stringstream InOut(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
@@ -331,12 +330,12 @@ TEST_F(AnnotationEncodingParametersTests, DISABLED_AttributeParameterSetRandom) 
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AlgorithmParametersZero) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::AlgorithmParameters algortihmParameters;
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algortihmParameters;
 
     EXPECT_EQ(algortihmParameters.getNumberOfPars(), 0);
     EXPECT_EQ(algortihmParameters.getParArrayDims().size(), 0);
@@ -346,7 +345,7 @@ TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersZero) {  // NOLINT(
     EXPECT_EQ(algortihmParameters.getParValues().size(), 0);
 }
 
-TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersWithValues) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AlgorithmParametersWithValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -358,7 +357,7 @@ TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersWithValues) {  // N
     std::vector<std::vector<uint8_t>> par_array_dims{{7}, {5}};
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val{{{{{5}}}}, {{{{3}}}}, {{{{2}}}}};
 
-    genie::core::record::annotation_encoding_parameters::AlgorithmParameters algortihmParameters(
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algortihmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
     EXPECT_EQ(algortihmParameters.getNumberOfPars(), n_pars);
@@ -369,13 +368,13 @@ TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersWithValues) {  // N
     EXPECT_EQ(algortihmParameters.getParValues()[0][0][0][0], par_val[0][0][0][0]);
 }
 
-TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AlgorithmParametersRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters randomAlgorithmParameters;
-    genie::core::record::annotation_encoding_parameters::AlgorithmParameters algorithmParameters;
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters;
     algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters();
 
     std::string name = "TestFiles/AlgorithmParameters_seed_";
@@ -400,12 +399,12 @@ TEST_F(AnnotationEncodingParametersTests, AlgorithmParametersRandom) {  // NOLIN
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileStructureZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileStructureZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::TileStructure tileStructure;
+    genie::core::record::annotation_parameter_set::TileStructure tileStructure;
 
     EXPECT_FALSE(tileStructure.isVariableSizeTiles());
     EXPECT_EQ(tileStructure.getALLEndIndices().size(), 0);
@@ -414,7 +413,7 @@ TEST_F(AnnotationEncodingParametersTests, TileStructureZeros) {  // NOLINT(cert-
     EXPECT_EQ(tileStructure.getNumberOfTiles(), 0);
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileStructurevalues) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileStructurevalues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -425,7 +424,7 @@ TEST_F(AnnotationEncodingParametersTests, TileStructurevalues) {  // NOLINT(cert
     std::vector<std::vector<uint64_t>> start_index{{1}, {2}, {3}, {4}};
     std::vector<std::vector<uint64_t>> end_index{{5}, {6}, {7}, {8}};
     std::vector<uint64_t> tile_size = {8, 16, 25, 64};
-    genie::core::record::annotation_encoding_parameters::TileStructure tileStructure(
+    genie::core::record::annotation_parameter_set::TileStructure tileStructure(
         two_dimensional, ATCoordSize, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
     EXPECT_TRUE(tileStructure.isVariableSizeTiles());
     EXPECT_EQ(tileStructure.getALLEndIndices().size(), n_tiles);
@@ -434,13 +433,13 @@ TEST_F(AnnotationEncodingParametersTests, TileStructurevalues) {  // NOLINT(cert
     EXPECT_EQ(tileStructure.getNumberOfTiles(), n_tiles);
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters RandomTileStructure;
-    genie::core::record::annotation_encoding_parameters::TileStructure tileStructure;
+    genie::core::record::annotation_parameter_set::TileStructure tileStructure;
     uint8_t ATCoordSize = static_cast<uint8_t>(rand() % 4);
     bool two_dimensional = static_cast<bool>(rand() % 2);
     tileStructure = RandomTileStructure.randomTileStructure(ATCoordSize, two_dimensional);
@@ -469,23 +468,23 @@ TEST_F(AnnotationEncodingParametersTests, TileStructureRandom) {  // NOLINT(cert
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileConfigurationZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileConfigurationZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::TileConfiguration tileConfiguration;
+    genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration;
 
     EXPECT_EQ(tileConfiguration.getAttributeGroupClass(), 0);
     EXPECT_EQ(tileConfiguration.getAttributeIDs().size(), 0);
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileConfigurationRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileConfigurationRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
     RandomAnnotationEncodingParameters randomTileConfiguration;
-    genie::core::record::annotation_encoding_parameters::TileConfiguration tileConfiguration;
+    genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration;
 
     tileConfiguration = randomTileConfiguration.randomTileConfiguration();
 
@@ -511,15 +510,15 @@ TEST_F(AnnotationEncodingParametersTests, TileConfigurationRandom) {  // NOLINT(
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, TileConfigurationRandomSimpleStructure) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, TileConfigurationRandomSimpleStructure) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
     RandomAnnotationEncodingParameters randomTileConfiguration;
-    genie::core::record::annotation_encoding_parameters::TileConfiguration tileConfiguration;
+    genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration;
     uint8_t ATCoordSize = static_cast<uint8_t>(rand() % 4);
     tileConfiguration = randomTileConfiguration.randomTileConfiguration(ATCoordSize);
-    genie::core::record::annotation_encoding_parameters::TileConfiguration tileConfigurationCheck;
+    genie::core::record::annotation_parameter_set::TileConfiguration tileConfigurationCheck;
 
     std::stringstream InOut;
     //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
@@ -556,26 +555,26 @@ TEST_F(AnnotationEncodingParametersTests, TileConfigurationRandomSimpleStructure
 #endif
 }
 
-TEST_F(AnnotationEncodingParametersTests, ContactMatrixZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, ContactMatrixZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters cmParameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters cmParameters;
     EXPECT_EQ(cmParameters.getInterval(), uint8_t(0));
     EXPECT_EQ(cmParameters.getNumberOfSamples(), uint8_t(0));
     EXPECT_EQ(cmParameters.getNumberOfNormalizationMethods(), uint8_t(0));
 }
 
 
-TEST_F(AnnotationEncodingParametersTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters contactMatrixParameters;
-    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters contactMatrixParametersCheck;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParametersCheck;
 
     contactMatrixParameters = RandomContactMatrixParameters.randomContactMatrixParameters();
 
@@ -617,14 +616,14 @@ TEST_F(AnnotationEncodingParametersTests, ContactMatrixRandom) {  // NOLINT(cert
 }
 
 
-TEST_F(AnnotationEncodingParametersTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_encoding_parameters::DescriptorConfiguration descriptorConfiguration;
-    genie::core::record::annotation_encoding_parameters::DescriptorConfiguration descriptorConfigurationCheck;
+    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration;
+    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfigurationCheck;
 
     descriptorConfiguration = RandomContactMatrixParameters.randomDescriptorConfiguration();
 
@@ -661,26 +660,26 @@ TEST_F(AnnotationEncodingParametersTests, DescriptorConfigurationRandom) {  // N
 }
 
 
-TEST_F(AnnotationEncodingParametersTests, CompressorParameterSetZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, CompressorParameterSetZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    genie::core::record::annotation_encoding_parameters::CompressorParameterSet compressorParameterset;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterset;
     EXPECT_EQ(compressorParameterset.getCompressorID(), uint8_t(0));
     EXPECT_EQ(compressorParameterset.getCompressorStepIDs().size(), 0);
     EXPECT_EQ(compressorParameterset.getNumberOfCompletedOutVars().size(), 0);
 }
 
 
-TEST_F(AnnotationEncodingParametersTests, CompressorParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_encoding_parameters::CompressorParameterSet compressorParameterSet;
-    genie::core::record::annotation_encoding_parameters::CompressorParameterSet compressorParameterSetCheck;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSetCheck;
 
     compressorParameterSet = RandomContactMatrixParameters.randomCompressorParameterSet();
 
