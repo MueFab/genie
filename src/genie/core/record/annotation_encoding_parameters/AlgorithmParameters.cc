@@ -23,7 +23,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 AlgorithmParameters::AlgorithmParameters()
     : n_pars(0), par_ID{}, par_type{}, par_num_array_dims{}, par_array_dims{}, par_val{} {}
 

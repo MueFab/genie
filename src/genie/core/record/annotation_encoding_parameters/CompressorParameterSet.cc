@@ -22,7 +22,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 CompressorParameterSet::CompressorParameterSet()
     : compressor_ID(0),

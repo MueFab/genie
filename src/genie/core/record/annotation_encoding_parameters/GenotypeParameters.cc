@@ -23,7 +23,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 GenotypeParameters::GenotypeParameters()
     : max_ploidy(0),
@@ -50,7 +50,7 @@ GenotypeParameters::GenotypeParameters()
 GenotypeParameters::GenotypeParameters(util::BitReader& reader) { read(reader); }
 
 GenotypeParameters::GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
-                                       annotation_encoding_parameters::BinarizationID binarization_ID,
+                                       annotation_parameter_set::BinarizationID binarization_ID,
                                        uint8_t num_bit_plane, ConcatAxis concat_axis,
                                        std::vector<bool> sort_variants_rows_flag,
                                        std::vector<bool> sort_variants_cols_flag,
