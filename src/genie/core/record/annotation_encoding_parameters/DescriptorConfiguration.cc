@@ -22,7 +22,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 DescriptorConfiguration::DescriptorConfiguration() : descriptor_ID(DescriptorID::GENOTYPE), encoding_mode_ID(0) {}
 DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
 

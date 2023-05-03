@@ -18,24 +18,10 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 
-CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(reader); }
-
-void CompressorParameterSet::read(util::BitReader& reader) {
-    compressor_ID = reader.readBypassBE<uint8_t>();
-    n_compressor_steps = static_cast<uint8_t>(reader.read_b(4));
-    for (auto i = 0; i < n_compressor_steps; ++i) {
-        compressor_step_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
-        algorithm_ID.push_back(static_cast<uint8_t>(reader.read_b(5)));
-        use_default_pars.push_back(static_cast<bool>(reader.read_b(1)));
-        if (use_default_pars.back()) algorithm_parameters[i].read(reader);
-    }
-}
-
-
-void Record::read(util::BitReader& reader) {
+void AnnotationEncodingParameters::read(util::BitReader& reader) {
     n_filter = reader.readBypassBE<uint8_t>();
     for (auto i = 0; i < n_filter; ++i) {
         filter_ID_len.push_back(static_cast<uint8_t>(reader.read_b(6)));

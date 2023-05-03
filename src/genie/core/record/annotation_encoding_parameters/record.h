@@ -28,9 +28,38 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
+    class AnnotationEncodingParameters {
+ private:
+        uint8_t n_filter;
+        std::vector<uint8_t> filter_ID_len;
+        std::vector<std::string> filter_ID;
+        std::vector<uint16_t> desc_len;
+        std::vector<std::string> description;
 
+        uint8_t n_features_names;
+        std::vector<uint8_t> feature_name_len;
+        std::vector<std::string> feature_name;
+
+        uint8_t n_ontology_terms;
+        std::vector<uint8_t> ontology_term_name_len;
+        std::vector<std::string> ontology_term_name;
+
+        uint8_t n_descriptors;
+        std::vector<DescriptorConfiguration> descriptor_configuration;
+
+        uint8_t n_compressors;
+        std::vector<CompressorParameterSet> compressor_parameter_set;
+
+        uint8_t n_attributes;
+        std::vector<AttributeParameterSet> attribute_parameter_set;
+
+     public:
+        AnnotationEncodingParameters();
+        void read(util::BitReader& reader);
+
+    };
 
 
 /**

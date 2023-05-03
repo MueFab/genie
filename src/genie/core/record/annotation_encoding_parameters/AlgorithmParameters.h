@@ -23,7 +23,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 class AlgorithmParameters {
  private:

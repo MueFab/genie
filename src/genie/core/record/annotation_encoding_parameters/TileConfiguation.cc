@@ -21,7 +21,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 TileConfiguration::TileConfiguration()
     : AT_coord_size(0),

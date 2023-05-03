@@ -22,7 +22,7 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace annotation_encoding_parameters {
+namespace annotation_parameter_set {
 
 LikelihoodParameters::LikelihoodParameters() : num_gl_per_sample(0), transform_flag(false), dtype_id(0) {}
 
