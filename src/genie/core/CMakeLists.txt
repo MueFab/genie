@@ -45,6 +45,8 @@ set(source_files
         record/annotation_encoding_parameters/ContactMatrixParameters.cc
         record/annotation_encoding_parameters/TileConfiguation.cc
         record/annotation_encoding_parameters/TileStructure.cc
+        record/annotation_encoding_parameters/DescriptorConfiguration.cc
+        record/annotation_encoding_parameters/CompressorParameterSet.cc
 
         stats/perf-stats.cc
 

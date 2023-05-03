@@ -42,7 +42,7 @@ void LikelihoodParameters::read(util::BitReader& reader) {
 void LikelihoodParameters::write(std::ostream& outputfile) const {
     outputfile << std::to_string(num_gl_per_sample) << ",";
     outputfile << std::to_string(transform_flag) << ",";
-    if (transform_flag) outputfile << std::to_string(dtype_id);
+    if (transform_flag) outputfile << std::to_string(dtype_id) << ",";
 }
 
 void LikelihoodParameters::write(util::BitWriter& writer) const {

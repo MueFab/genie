@@ -129,11 +129,11 @@ void AttributeParameterSet::read(util::BitReader& reader) {
         attribute_miss_default_flag = static_cast<bool>(reader.read_b(1));
         if (!attribute_miss_default_flag) attribute_miss_val = curType.toArray(attribute_type, reader);
 
-        char readChar = 'z';
+        char readChar = 0;
         do {
             readChar = static_cast<char>(reader.read_b(8));
             attribute_miss_str += readChar;
-        } while (readChar != '/0');
+        } while (readChar != 0);
     }
     compressor_ID = static_cast<uint8_t>(reader.read_b(8));
 
