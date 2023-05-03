@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,9 +17,12 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/tile_configuration/Record.h"
-#include "genie/util/annotation_encoding_parameters/Record.h"
 
+#include "AttributeParameterSet.h"
+#include "TileConfiguration.h"
+#include "TileStructure.h"
+#include "DescriptorConfiguration.h"
+#include "CompressorParameterSet.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -27,38 +30,84 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
+    class AnnotationEncodingParameters {
+ private:
+        uint8_t n_filter;
+        std::vector<uint8_t> filter_ID_len;
+        std::vector<std::string> filter_ID;
+        std::vector<uint16_t> desc_len;
+        std::vector<std::string> description;
+
+        uint8_t n_features_names;
+        std::vector<uint8_t> feature_name_len;
+        std::vector<std::string> feature_name;
+
+        uint8_t n_ontology_terms;
+        std::vector<uint8_t> ontology_term_name_len;
+        std::vector<std::string> ontology_term_name;
+
+        uint8_t n_descriptors;
+        std::vector<DescriptorConfiguration> descriptor_configuration;
+
+        uint8_t n_compressors;
+        std::vector<CompressorParameterSet> compressor_parameter_set;
+
+        uint8_t n_attributes;
+        std::vector<AttributeParameterSet> attribute_parameter_set;
+
+     public:
+        AnnotationEncodingParameters();
+        void read(util::BitReader& reader);
+
+    };
+
+
 /**
  *  @brief
  */
 class Record {
  private:
-    uint8_t parameter_set_ID;
-    uint8_t AT_ID;
-    uint8_t AT_alphabet_ID;
-    uint8_t AT_coord_size;
-    bool AT_pos_40_bits_flag;
-    uint8_t n_aux_attribute_groups;
-    tile_configuration::Record tile_config;
-    annotation_encoding_parameters::Record annotation_encoding_parameters;
+    uint8_t n_filter;
+    std::vector<uint8_t> filter_ID_len;
+    std::vector<std::string> filter_ID;
+    std::vector<uint16_t> desc_len;
+    std::vector<std::string> description;
+
+    uint8_t n_features_names;
+    std::vector<uint8_t> feature_name_len;
+    std::vector<std::string> feature_name;
+
+    uint8_t n_ontology_terms;
+    std::vector<uint8_t> ontology_term_name_len;
+    std::vector<std::string> ontology_term_name;
+
+    uint8_t n_descriptors;
+    std::vector<DescriptorConfiguration> descriptor_configuration;
+
+    uint8_t n_compressors;
+    std::vector<CompressorParameterSet> compressor_parameter_set;
+
+    uint8_t n_attributes;
+    std::vector<AttributeParameterSet> attribute_parameter_set;
 
  public:
     /**
      * @brief
      */
     Record();
-
+    void read(util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_parameter_set
+}  // namespace annotation_encoding_parameters
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_CONTACT_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

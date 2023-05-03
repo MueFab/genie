@@ -36,17 +36,15 @@ set(source_files
         record/contact/record.cc
 
         record/annotation_parameter_set/record.cc
-
-        record/annotation_encoding_parameters/record.cc
-        record/annotation_encoding_parameters/LikelihoodParameters.cc
-        record/annotation_encoding_parameters/GenotypeParameters.cc
-        record/annotation_encoding_parameters/AttributeParameterSet.cc
-        record/annotation_encoding_parameters/AlgorithmParameters.cc
-        record/annotation_encoding_parameters/ContactMatrixParameters.cc
-        record/annotation_encoding_parameters/TileConfiguation.cc
-        record/annotation_encoding_parameters/TileStructure.cc
-        record/annotation_encoding_parameters/DescriptorConfiguration.cc
-        record/annotation_encoding_parameters/CompressorParameterSet.cc
+        record/annotation_parameter_set/LikelihoodParameters.cc
+        record/annotation_parameter_set/GenotypeParameters.cc
+        record/annotation_parameter_set/AttributeParameterSet.cc
+        record/annotation_parameter_set/AlgorithmParameters.cc
+        record/annotation_parameter_set/ContactMatrixParameters.cc
+        record/annotation_parameter_set/TileConfiguation.cc
+        record/annotation_parameter_set/TileStructure.cc
+        record/annotation_parameter_set/DescriptorConfiguration.cc
+        record/annotation_parameter_set/CompressorParameterSet.cc
 
         stats/perf-stats.cc
 
