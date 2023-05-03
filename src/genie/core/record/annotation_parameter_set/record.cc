@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
+#include "genie/core/record/variant_genotype/arrayType.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -19,10 +20,55 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-    
 
+void AnnotationEncodingParameters::read(util::BitReader& reader) {
+    n_filter = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_filter; ++i) {
+        filter_ID_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string ID(filter_ID_len.back(), 0);
+        reader.readBypass(ID);
+        filter_ID.push_back(ID);
+        desc_len.push_back(static_cast<uint16_t>(reader.read_b(10)));
+        std::string desc(desc_len.back(), 0);
+        description.push_back(desc);
+    }
 
-}  // namespace annotation_parameter_set
+    n_features_names = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_features_names; ++i) {
+        feature_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string name(feature_name_len.back(), 0);
+        reader.readBypass(name);
+        feature_name.push_back(name);
+    }
+
+    n_ontology_terms = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_ontology_terms; ++i) {
+        ontology_term_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        std::string name(ontology_term_name_len.back(), 0);
+        reader.readBypass(name);
+        ontology_term_name.push_back(name);
+    }
+
+    n_descriptors = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_descriptors; ++i) {
+        DescriptorConfiguration descrConf(reader);
+        descriptor_configuration.push_back(descrConf);
+    }
+
+    n_compressors = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_compressors; ++i) {
+        CompressorParameterSet comprParSet(reader);
+        compressor_parameter_set.push_back(comprParSet);
+    }
+
+    n_attributes = reader.readBypassBE<uint8_t>();
+    for (auto i = 0; i < n_compressors; ++i) {
+        AttributeParameterSet attrParSet(reader);
+        attribute_parameter_set.push_back(attrParSet);
+    }
+}
+
+}  // namespace annotation_encoding_parameters
 }  // namespace record
 }  // namespace core
 }  // namespace genie
