@@ -20,29 +20,29 @@
 
 class RandomAnnotationEncodingParameters {
  public:
-    genie::core::record::annotation_encoding_parameters::LikelihoodParameters randomLikelihood();
+    genie::core::record::annotation_parameter_set::LikelihoodParameters randomLikelihood();
 
-    genie::core::record::annotation_encoding_parameters::GenotypeParameters randomGenotypeParameters();
+    genie::core::record::annotation_parameter_set::GenotypeParameters randomGenotypeParameters();
 
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet randomAttributeParameterSet();
+    genie::core::record::annotation_parameter_set::AttributeParameterSet randomAttributeParameterSet();
 
-    genie::core::record::annotation_encoding_parameters::AlgorithmParameters randomAlgorithmParameters();
+    genie::core::record::annotation_parameter_set::AlgorithmParameters randomAlgorithmParameters();
 
-    genie::core::record::annotation_encoding_parameters::TileStructure randomTileStructure();
+    genie::core::record::annotation_parameter_set::TileStructure randomTileStructure();
    
-    genie::core::record::annotation_encoding_parameters::TileStructure randomTileStructure(uint8_t ATCoordSize,
+    genie::core::record::annotation_parameter_set::TileStructure randomTileStructure(uint8_t ATCoordSize,
                                                                                            bool two_dimensional);
    
-    genie::core::record::annotation_encoding_parameters::TileStructure simpleTileStructure(uint8_t ATCoordSize,
+    genie::core::record::annotation_parameter_set::TileStructure simpleTileStructure(uint8_t ATCoordSize,
                                                                                            bool two_dimensional); 
     
-    genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration();
-    genie::core::record::annotation_encoding_parameters::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
+    genie::core::record::annotation_parameter_set::TileConfiguration randomTileConfiguration();
+    genie::core::record::annotation_parameter_set::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
 
-    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters randomContactMatrixParameters();
-    genie::core::record::annotation_encoding_parameters::ContactMatrixParameters simpleContactMatrixParameters();
-    genie::core::record::annotation_encoding_parameters::DescriptorConfiguration randomDescriptorConfiguration();
-    genie::core::record::annotation_encoding_parameters::CompressorParameterSet randomCompressorParameterSet();
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters randomContactMatrixParameters();
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters simpleContactMatrixParameters();
+    genie::core::record::annotation_parameter_set::DescriptorConfiguration randomDescriptorConfiguration();
+    genie::core::record::annotation_parameter_set::CompressorParameterSet randomCompressorParameterSet();
 
  private:
     uint64_t randomU64() {

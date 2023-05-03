@@ -9,33 +9,33 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::annotation_encoding_parameters::LikelihoodParameters
+genie::core::record::annotation_parameter_set::LikelihoodParameters
 RandomAnnotationEncodingParameters::randomLikelihood() {
     uint8_t num_gl_per_sample = randomU8();
     bool transform_flag = randomBool();
     uint8_t dtype_id = randomU8();
-    return genie::core::record::annotation_encoding_parameters::LikelihoodParameters(num_gl_per_sample, transform_flag,
+    return genie::core::record::annotation_parameter_set::LikelihoodParameters(num_gl_per_sample, transform_flag,
                                                                                      dtype_id);
 }
 
-genie::core::record::annotation_encoding_parameters::GenotypeParameters
+genie::core::record::annotation_parameter_set::GenotypeParameters
 RandomAnnotationEncodingParameters::randomGenotypeParameters() {
     uint8_t max_ploidy = randomU8();
     bool no_reference_flag = randomBool();
     bool not_available_flag = randomBool();
-    genie::core::record::annotation_encoding_parameters::BinarizationID binarization_ID =
-        static_cast<genie::core::record::annotation_encoding_parameters::BinarizationID>(randomBool());
+    genie::core::record::annotation_parameter_set::BinarizationID binarization_ID =
+        static_cast<genie::core::record::annotation_parameter_set::BinarizationID>(randomBool());
     uint8_t num_bit_plane = 0;
-    genie::core::record::annotation_encoding_parameters::ConcatAxis concat_axis =
-        genie::core::record::annotation_encoding_parameters::ConcatAxis::DO_NOT_CONCAT;
-    if (binarization_ID == genie::core::record::annotation_encoding_parameters::BinarizationID::BIT_PLANE) {
+    genie::core::record::annotation_parameter_set::ConcatAxis concat_axis =
+        genie::core::record::annotation_parameter_set::ConcatAxis::DO_NOT_CONCAT;
+    if (binarization_ID == genie::core::record::annotation_parameter_set::BinarizationID::BIT_PLANE) {
         num_bit_plane = randomU8();
-        concat_axis = static_cast<genie::core::record::annotation_encoding_parameters::ConcatAxis>(rand() % 3);
+        concat_axis = static_cast<genie::core::record::annotation_parameter_set::ConcatAxis>(rand() % 3);
     }
 
     uint8_t num_variants_payloads = 1;
-    if (concat_axis == genie::core::record::annotation_encoding_parameters::ConcatAxis::DO_NOT_CONCAT &&
-        binarization_ID == genie::core::record::annotation_encoding_parameters::BinarizationID::BIT_PLANE)
+    if (concat_axis == genie::core::record::annotation_parameter_set::ConcatAxis::DO_NOT_CONCAT &&
+        binarization_ID == genie::core::record::annotation_parameter_set::BinarizationID::BIT_PLANE)
         num_variants_payloads = num_bit_plane;
 
     std::vector<bool> sort_variants_rows_flag{};
@@ -63,14 +63,14 @@ RandomAnnotationEncodingParameters::randomGenotypeParameters() {
         phases_value = randomBool();
     }
 
-    return genie::core::record::annotation_encoding_parameters::GenotypeParameters(
+    return genie::core::record::annotation_parameter_set::GenotypeParameters(
         max_ploidy, no_reference_flag, not_available_flag, binarization_ID, num_bit_plane, concat_axis,
         sort_variants_rows_flag, sort_variants_cols_flag, transpose_variants_mat_flag, variants_codec_ID,
         encode_phases_data_flag, sort_phases_rows_flag, sort_phases_cols_flag, transpose_phases_mat_flag,
         phases_codec_ID, phases_value);
 }
 
-genie::core::record::annotation_encoding_parameters::AttributeParameterSet
+genie::core::record::annotation_parameter_set::AttributeParameterSet
 RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
     uint16_t attribute_ID = randomU16();
     uint8_t attribute_name_len = randomU8();
@@ -116,7 +116,7 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
                 dependency_ID[i][j] = (randomU8() / 2);
         }
     }
-    genie::core::record::annotation_encoding_parameters::AttributeParameterSet attr(
+    genie::core::record::annotation_parameter_set::AttributeParameterSet attr(
         attribute_ID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims,
         attribute_array_dims, attribute_default_val, attribute_miss_val_flag, attribute_miss_default_flag,
         attribute_miss_val, attribute_miss_str, compressor_ID, n_steps_with_dependencies, dependency_step_ID,
@@ -124,7 +124,7 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
     return attr;
 }
 
-genie::core::record::annotation_encoding_parameters::AlgorithmParameters
+genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
     uint8_t n_pars = randomU4();
     // randomU8();
@@ -160,17 +160,17 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
                     for (auto& d4 : d3) d4 = randomValForType(par_type[i]);
     }
 
-    return genie::core::record::annotation_encoding_parameters::AlgorithmParameters(
+    return genie::core::record::annotation_parameter_set::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
-genie::core::record::annotation_encoding_parameters::TileStructure
+genie::core::record::annotation_parameter_set::TileStructure
 RandomAnnotationEncodingParameters::randomTileStructure() {
     uint8_t ATCoordSize = randomU2();
     bool two_dimensional = randomBool();
     return randomTileStructure(ATCoordSize, two_dimensional);
 }
-genie::core::record::annotation_encoding_parameters::TileStructure
+genie::core::record::annotation_parameter_set::TileStructure
 RandomAnnotationEncodingParameters::simpleTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
     bool variable_size_tiles = false;
     uint64_t n_tiles = 0;
@@ -192,11 +192,11 @@ RandomAnnotationEncodingParameters::simpleTileStructure(uint8_t ATCoordSize, boo
     else
         for (auto j = 0; j < dimensions; ++j) tile_size[j] = 2;
 
-    return genie::core::record::annotation_encoding_parameters::TileStructure(
+    return genie::core::record::annotation_parameter_set::TileStructure(
         ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
 }
 
-genie::core::record::annotation_encoding_parameters::TileStructure
+genie::core::record::annotation_parameter_set::TileStructure
 RandomAnnotationEncodingParameters::randomTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
     bool variable_size_tiles = randomBool();
     uint64_t n_tiles = randomAtCoordSize(ATCoordSize);
@@ -218,11 +218,11 @@ RandomAnnotationEncodingParameters::randomTileStructure(uint8_t ATCoordSize, boo
             tile_size[i] = randomAtCoordSize(ATCoordSize);
     }
 
-    return genie::core::record::annotation_encoding_parameters::TileStructure(
+    return genie::core::record::annotation_parameter_set::TileStructure(
         ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
 }
 
-genie::core::record::annotation_encoding_parameters::TileConfiguration
+genie::core::record::annotation_parameter_set::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_size) {
     uint8_t AG_class = randomU3();
     bool attribute_contiguity = randomBool();
@@ -235,7 +235,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
 
     bool attribute_dependent_tiles = randomBool();
 
-    genie::core::record::annotation_encoding_parameters::TileStructure default_tile_structure =
+    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure =
         simpleTileStructure(AT_coord_size, two_dimensional);
 
     uint16_t n_add_tile_structures = 0;
@@ -243,7 +243,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
     std::vector<std::vector<uint16_t>> attribute_ID;
     std::vector<uint8_t> n_descriptors;
     std::vector<std::vector<uint8_t>> descriptor_ID;
-    std::vector<genie::core::record::annotation_encoding_parameters::TileStructure> additional_tile_structure;
+    std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
 
     if (attribute_dependent_tiles) {
         n_add_tile_structures = randomU8();  // randomU16
@@ -262,13 +262,13 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
             additional_tile_structure.push_back(simpleTileStructure(AT_coord_size, two_dimensional));
         }
     }
-    return genie::core::record::annotation_encoding_parameters::TileConfiguration(
+    return genie::core::record::annotation_parameter_set::TileConfiguration(
         AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
         symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures, n_attributes,
         attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 }
 
-genie::core::record::annotation_encoding_parameters::ContactMatrixParameters
+genie::core::record::annotation_parameter_set::ContactMatrixParameters
 RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
     uint8_t num_samples = randomU8();
     std::vector<uint8_t> sample_ID(num_samples, 0);
@@ -302,36 +302,36 @@ RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
     std::vector<std::string> norm_matrix_name(num_norm_matrices, "");
     for (auto& name : norm_matrix_name) name = randomString(randomU4() + 2);
 
-    return genie::core::record::annotation_encoding_parameters::ContactMatrixParameters(
+    return genie::core::record::annotation_parameter_set::ContactMatrixParameters(
         num_samples, sample_ID, sample_name, num_chrs, chr_ID, chr_name, chr_length, interval, tile_size,
         num_interval_multipliers, interval_multiplier, num_norm_methods, norm_method_ID, norm_method_name,
         norm_method_mult_flag, num_norm_matrices, norm_matrix_ID, norm_matrix_name);
 }
 
-genie::core::record::annotation_encoding_parameters::ContactMatrixParameters
+genie::core::record::annotation_parameter_set::ContactMatrixParameters
 RandomAnnotationEncodingParameters::simpleContactMatrixParameters() {
-    return genie::core::record::annotation_encoding_parameters::ContactMatrixParameters();
+    return genie::core::record::annotation_parameter_set::ContactMatrixParameters();
 }
 
-genie::core::record::annotation_encoding_parameters::TileConfiguration
+genie::core::record::annotation_parameter_set::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration() {
     uint8_t AT_coord_size = randomU8();
     return randomTileConfiguration(AT_coord_size);
 }
 
-genie::core::record::annotation_encoding_parameters::DescriptorConfiguration
+genie::core::record::annotation_parameter_set::DescriptorConfiguration
 RandomAnnotationEncodingParameters::randomDescriptorConfiguration() {
-    genie::core::record::annotation_encoding_parameters::DescriptorID descriptorID =
-        static_cast<genie::core::record::annotation_encoding_parameters::DescriptorID>(randomU2());
+    genie::core::record::annotation_parameter_set::DescriptorID descriptorID =
+        static_cast<genie::core::record::annotation_parameter_set::DescriptorID>(randomU2());
     uint8_t encoding_mode_ID = randomU8();
 
-    return genie::core::record::annotation_encoding_parameters::DescriptorConfiguration(
-        descriptorID, encoding_mode_ID, genie::core::record::annotation_encoding_parameters::GenotypeParameters(),
-        genie::core::record::annotation_encoding_parameters::LikelihoodParameters(), simpleContactMatrixParameters(),
-        genie::core::record::annotation_encoding_parameters::AlgorithmParameters());
+    return genie::core::record::annotation_parameter_set::DescriptorConfiguration(
+        descriptorID, encoding_mode_ID, genie::core::record::annotation_parameter_set::GenotypeParameters(),
+        genie::core::record::annotation_parameter_set::LikelihoodParameters(), simpleContactMatrixParameters(),
+        genie::core::record::annotation_parameter_set::AlgorithmParameters());
 }
 
-genie::core::record::annotation_encoding_parameters::CompressorParameterSet
+genie::core::record::annotation_parameter_set::CompressorParameterSet
 RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     uint8_t compressor_ID = randomU8();
     uint8_t n_compressor_steps = randomU4();
@@ -340,12 +340,12 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     std::vector<uint8_t> algorithm_ID(n_compressor_steps, 0);
     for (auto& ID : algorithm_ID) ID = randomU4() + randomU4();
     std::vector<bool> use_default_pars(n_compressor_steps);
-    std::vector<genie::core::record::annotation_encoding_parameters::AlgorithmParameters> algorithm_parameters;
+    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
     for (auto i = 0; i < n_compressor_steps;++i) {
         use_default_pars[i] = true;
         // temporary set al to true, randomBool();
             if (!use_default_pars[i])
-            algorithm_parameters.push_back(genie::core::record::annotation_encoding_parameters::AlgorithmParameters());
+            algorithm_parameters.push_back(genie::core::record::annotation_parameter_set::AlgorithmParameters());
     }
     std::vector<uint8_t> n_in_vars(n_compressor_steps, 0);
     std::vector<std::vector<uint8_t>> in_var_ID(n_compressor_steps);
@@ -364,7 +364,7 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
         for (auto j = 0; j < n_completed_out_vars[i]; ++j) completed_out_var_ID[i].push_back(randomU4());
     }
 
-    return genie::core::record::annotation_encoding_parameters::CompressorParameterSet(
+    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
         compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }
