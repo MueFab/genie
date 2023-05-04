@@ -39,8 +39,8 @@ DescriptorConfiguration::DescriptorConfiguration(DescriptorID descriptor_ID, uin
       algorithm_patarmeters(algorithm_patarmeters) {}
 
 void DescriptorConfiguration::read(util::BitReader& reader) {
-    descriptor_ID = static_cast<DescriptorID>(reader.readBypassBE<uint8_t>());
-    encoding_mode_ID = reader.readBypassBE<uint8_t>();
+    descriptor_ID = static_cast<DescriptorID>(static_cast<uint8_t>(reader.read_b(8)));
+    encoding_mode_ID = static_cast<uint8_t>(reader.read_b(8));
     switch (descriptor_ID) {
         case DescriptorID::GENOTYPE:
             genotype_parameters.read(reader);
