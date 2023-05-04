@@ -15,7 +15,7 @@ RandomAnnotationEncodingParameters::randomLikelihood() {
     bool transform_flag = randomBool();
     uint8_t dtype_id = randomU8();
     return genie::core::record::annotation_parameter_set::LikelihoodParameters(num_gl_per_sample, transform_flag,
-                                                                                     dtype_id);
+                                                                               dtype_id);
 }
 
 genie::core::record::annotation_parameter_set::GenotypeParameters
@@ -164,14 +164,13 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
-genie::core::record::annotation_parameter_set::TileStructure
-RandomAnnotationEncodingParameters::randomTileStructure() {
+genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEncodingParameters::randomTileStructure() {
     uint8_t ATCoordSize = randomU2();
     bool two_dimensional = randomBool();
     return randomTileStructure(ATCoordSize, two_dimensional);
 }
-genie::core::record::annotation_parameter_set::TileStructure
-RandomAnnotationEncodingParameters::simpleTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
+genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEncodingParameters::simpleTileStructure(
+    uint8_t ATCoordSize, bool two_dimensional) {
     bool variable_size_tiles = false;
     uint64_t n_tiles = 0;
     uint8_t dimensions = two_dimensional ? 2 : 1;
@@ -196,8 +195,8 @@ RandomAnnotationEncodingParameters::simpleTileStructure(uint8_t ATCoordSize, boo
         ATCoordSize, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
 }
 
-genie::core::record::annotation_parameter_set::TileStructure
-RandomAnnotationEncodingParameters::randomTileStructure(uint8_t ATCoordSize, bool two_dimensional) {
+genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEncodingParameters::randomTileStructure(
+    uint8_t ATCoordSize, bool two_dimensional) {
     bool variable_size_tiles = randomBool();
     uint64_t n_tiles = randomAtCoordSize(ATCoordSize);
     if (n_tiles > 4096) n_tiles = n_tiles % 4096;
@@ -341,10 +340,10 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     for (auto& ID : algorithm_ID) ID = randomU4() + randomU4();
     std::vector<bool> use_default_pars(n_compressor_steps);
     std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-    for (auto i = 0; i < n_compressor_steps;++i) {
+    for (auto i = 0; i < n_compressor_steps; ++i) {
         use_default_pars[i] = true;
         // temporary set al to true, randomBool();
-            if (!use_default_pars[i])
+        if (!use_default_pars[i])
             algorithm_parameters.push_back(genie::core::record::annotation_parameter_set::AlgorithmParameters());
     }
     std::vector<uint8_t> n_in_vars(n_compressor_steps, 0);
@@ -367,4 +366,47 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     return genie::core::record::annotation_parameter_set::CompressorParameterSet(
         compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
+}
+
+genie::core::record::annotation_parameter_set::AnnotationEncodingParameters
+RandomAnnotationEncodingParameters::randomAnnotationEncodingParameters() {
+    uint8_t n_filter = randomU8();
+    std::vector<uint8_t> filter_ID_len;
+    std::vector<std::string> filter_ID;
+    std::vector<uint16_t> desc_len;
+    std::vector<std::string> description;
+
+    for (auto i = 0; i < n_filter; ++i) filter_ID_len.push_back(randomU6());
+    for (auto i = 0; i < n_filter; ++i) filter_ID.push_back(randomString(filter_ID_len[i]));
+    for (auto i = 0; i < n_filter; ++i) desc_len.push_back(randomU6());
+    for (auto i = 0; i < n_filter; ++i) description.push_back(randomString(desc_len[i]));
+
+    uint8_t n_features_names = randomU8();
+    std::vector<uint8_t> feature_name_len;
+    std::vector<std::string> feature_name;
+    for (auto i = 0; i < n_features_names; ++i) feature_name_len.push_back(randomU6());
+    for (auto i = 0; i < n_features_names; ++i) feature_name.push_back(randomString(feature_name_len[i]));
+
+    uint8_t n_ontology_terms = randomU8();
+    std::vector<uint8_t> ontology_term_name_len;
+    std::vector<std::string> ontology_term_name;
+    for (auto i = 0; i < n_ontology_terms; ++i) ontology_term_name_len.push_back(randomU6());
+    for (auto i = 0; i < n_ontology_terms; ++i) ontology_term_name.push_back(randomString(ontology_term_name_len[i]));
+
+    uint8_t n_descriptors = randomU8();
+    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration(
+        n_descriptors, genie::core::record::annotation_parameter_set::DescriptorConfiguration());
+
+    uint8_t n_compressors = randomU8();
+    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set(
+        n_compressors, genie::core::record::annotation_parameter_set::CompressorParameterSet());
+
+    uint8_t n_attributes = randomU8();
+    std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set(
+        n_attributes, genie::core::record::annotation_parameter_set::AttributeParameterSet());
+
+    return genie::core::record::annotation_parameter_set::AnnotationEncodingParameters(
+        n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
+        n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
+        n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
 }

@@ -30,7 +30,7 @@ AttributeParameterSet::AttributeParameterSet(const AttributeParameterSet& rec) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AttributeParameterSet::AttributeParameterSet()
-    : attribute_ID(0),
+    : attribute_ID(2),
       attribute_name_len(0),
       attribute_name{},
       attribute_type(0),
@@ -120,7 +120,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     attribute_num_array_dims = static_cast<uint8_t>(reader.read_b(2));
     attribute_array_dims.resize(attribute_num_array_dims);
     for (auto i = 0; i < attribute_num_array_dims; ++i)
-        attribute_array_dims[0] = static_cast<uint8_t>(reader.read_b(8));
+        attribute_array_dims[i] = static_cast<uint8_t>(reader.read_b(8));
 
     variant_genotype::arrayType curType;
     attribute_default_val = curType.toArray(attribute_type, reader);
@@ -132,7 +132,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
         char readChar = 0;
         do {
             readChar = static_cast<char>(reader.read_b(8));
-            attribute_miss_str += readChar;
+            if (readChar != 0) attribute_miss_str += readChar;
         } while (readChar != 0);
     }
     compressor_ID = static_cast<uint8_t>(reader.read_b(8));
@@ -144,11 +144,11 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     dependency_var_ID.resize(n_steps_with_dependencies);
     dependency_is_attribute.resize(n_steps_with_dependencies);
     dependency_ID.resize(n_steps_with_dependencies);
- 
+
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
         dependency_step_ID[i] = static_cast<uint8_t>(reader.read_b(4));
         n_dependencies[i] = static_cast<uint8_t>(reader.read_b(4));
-        
+
         dependency_var_ID[i].resize(n_dependencies[i]);
         dependency_is_attribute[i].resize(n_dependencies[i]);
         dependency_ID[i].resize(n_dependencies[i]);
@@ -162,17 +162,19 @@ void AttributeParameterSet::read(util::BitReader& reader) {
                 dependency_ID[i][j] = static_cast<uint16_t>(reader.read_b(7));
         }
     }
+    reader.flush();
 }
 
 void AttributeParameterSet::write(util::BitWriter& writer) const {
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
-    writer.write(attribute_name);
+    for (auto byte : attribute_name) writer.write(byte, 8);
     writer.write(attribute_type, 8);
     writer.write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
 
     for (auto i = attribute_default_val.size(); i > 0; --i) writer.write(attribute_default_val[i - 1], 8);
+    //   for (auto value : attribute_default_val) writer.write(value, 8);
 
     writer.write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
@@ -180,7 +182,7 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
         if (!attribute_miss_default_flag)
             for (auto byte : attribute_miss_val) writer.write(byte, 8);
     }
-    writer.write(attribute_miss_str);
+    for (auto byte : attribute_miss_str) writer.write(byte, 8);
     writer.write(0, 8);
 
     writer.write(compressor_ID, 8);
@@ -233,7 +235,7 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

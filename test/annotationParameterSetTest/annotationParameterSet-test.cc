@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "RandomRecordFillIn.h"
-#include "genie/core/record/annotation_encoding_parameters/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -107,8 +107,6 @@ TEST_F(AnnotationParameterSetTests, Likelihoodtestrandom) {  // NOLINT(cert-err5
     }
 
 #endif
-
-
 }
 
 TEST_F(AnnotationParameterSetTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
@@ -171,7 +169,6 @@ TEST_F(AnnotationParameterSetTests, GenotypeParametersConstructValues) {  // NOL
     EXPECT_EQ(genotypeParameters.isPhasesCodecID(), phases_codec_ID);
     EXPECT_EQ(genotypeParameters.isPhasesValue(), phases_value);
 }
-
 
 TEST_F(AnnotationParameterSetTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -278,7 +275,7 @@ TEST_F(AnnotationParameterSetTests, AttributeParameterSetValues) {  // NOLINT(ce
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
 }
 
-TEST_F(AnnotationParameterSetTests, DISABLED_AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AnnotationParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -295,9 +292,8 @@ TEST_F(AnnotationParameterSetTests, DISABLED_AttributeParameterSetRandom) {  // 
     strwriter.flush();
     attributeParameterSetCheck.read(strreader);
 
-    //    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(),
-    //    attributeParameterSetCheck.areDependeciesAttributes());
-    //    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
+    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(), attributeParameterSetCheck.areDependeciesAttributes());
+    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
     EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
     EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
     EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
@@ -566,7 +562,6 @@ TEST_F(AnnotationParameterSetTests, ContactMatrixZeros) {  // NOLINT(cert-err58-
     EXPECT_EQ(cmParameters.getNumberOfNormalizationMethods(), uint8_t(0));
 }
 
-
 TEST_F(AnnotationParameterSetTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -615,7 +610,6 @@ TEST_F(AnnotationParameterSetTests, ContactMatrixRandom) {  // NOLINT(cert-err58
 #endif
 }
 
-
 TEST_F(AnnotationParameterSetTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -659,18 +653,16 @@ TEST_F(AnnotationParameterSetTests, DescriptorConfigurationRandom) {  // NOLINT(
 #endif
 }
 
-
 TEST_F(AnnotationParameterSetTests, CompressorParameterSetZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterset;
-    EXPECT_EQ(compressorParameterset.getCompressorID(), uint8_t(0));
+    EXPECT_EQ(compressorParameterset.getCompressorID(), uint8_t(1));
     EXPECT_EQ(compressorParameterset.getCompressorStepIDs().size(), 0);
     EXPECT_EQ(compressorParameterset.getNumberOfCompletedOutVars().size(), 0);
 }
-
 
 TEST_F(AnnotationParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -680,6 +672,7 @@ TEST_F(AnnotationParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
     genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet;
     genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSetCheck;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSetCheck2;
 
     compressorParameterSet = RandomContactMatrixParameters.randomCompressorParameterSet();
 
@@ -688,14 +681,27 @@ TEST_F(AnnotationParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     genie::util::BitWriter strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     compressorParameterSet.write(strwriter);
+    compressorParameterSet.write(strwriter);
     strwriter.flush();
     compressorParameterSetCheck.read(strreader);
+    compressorParameterSetCheck2.read(strreader);
 
     EXPECT_EQ(compressorParameterSet.getCompressorID(), compressorParameterSetCheck.getCompressorID());
+    EXPECT_EQ(compressorParameterSet.getCompressorID(), compressorParameterSetCheck2.getCompressorID());
     EXPECT_EQ(compressorParameterSet.getNumberOfCompressorSteps(),
               compressorParameterSetCheck.getNumberOfCompressorSteps());
     EXPECT_EQ(compressorParameterSet.getCompressorStepIDs(), compressorParameterSetCheck.getCompressorStepIDs());
+    EXPECT_EQ(compressorParameterSet.getAlgorithmIDs(), compressorParameterSetCheck.getAlgorithmIDs());
+    EXPECT_EQ(compressorParameterSet.IsDefaultParsUsed(), compressorParameterSetCheck.IsDefaultParsUsed());
+    EXPECT_EQ(compressorParameterSet.getAlgorithmParameters().size(),
+              compressorParameterSetCheck.getAlgorithmParameters().size());
+    EXPECT_EQ(compressorParameterSet.getInVarsIDs(), compressorParameterSetCheck.getInVarsIDs());
+    EXPECT_EQ(compressorParameterSet.getPreviousStepIDs(), compressorParameterSetCheck.getPreviousStepIDs());
     EXPECT_EQ(compressorParameterSet.getNumberInVars(), compressorParameterSetCheck.getNumberInVars());
+    EXPECT_EQ(compressorParameterSet.getPreviousOutVarIDs(), compressorParameterSetCheck.getPreviousOutVarIDs());
+    EXPECT_EQ(compressorParameterSet.getNumberOfCompletedOutVars(),
+              compressorParameterSetCheck.getNumberOfCompletedOutVars());
+    EXPECT_EQ(compressorParameterSet.getCompetedOutVarIDs(), compressorParameterSetCheck.getCompetedOutVarIDs());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/CompressorParameterSet_seed_";
@@ -713,6 +719,73 @@ TEST_F(AnnotationParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
         compressorParameterSet.write(txtfile);
+        txtfile.close();
+    }
+#endif
+}
+
+TEST_F(AnnotationParameterSetTests, annotationEncodingParametersZeros) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotationEncodingParameters;
+    EXPECT_EQ(annotationEncodingParameters.getNumberOfFilters(), uint8_t(0));
+    EXPECT_EQ(annotationEncodingParameters.getNumberOfAttributes(), 0);
+    EXPECT_EQ(annotationEncodingParameters.getNumberOfOntologyTerms(), 0);
+    EXPECT_EQ(annotationEncodingParameters.getDescriptorConfigurations().size(), 0);
+}
+
+TEST_F(AnnotationParameterSetTests, annotationEncodingParametersRandom) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+
+    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotationEncodingParameters;
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotationEncodingParametersCheck;
+
+    annotationEncodingParameters = RandomContactMatrixParameters.randomAnnotationEncodingParameters();
+
+    std::stringstream InOut;
+    genie::util::BitWriter strwriter(&InOut);
+    genie::util::BitReader strreader(InOut);
+    annotationEncodingParameters.write(strwriter);
+    strwriter.flush();
+    annotationEncodingParametersCheck.read(strreader);
+
+    EXPECT_EQ(annotationEncodingParameters.getNumberOfFilters(),
+              annotationEncodingParametersCheck.getNumberOfFilters());
+    EXPECT_EQ(annotationEncodingParameters.getFilterIDLengths(),
+              annotationEncodingParametersCheck.getFilterIDLengths());
+    EXPECT_EQ(annotationEncodingParameters.getFilterIDs(), annotationEncodingParametersCheck.getFilterIDs());
+    EXPECT_EQ(annotationEncodingParameters.getDescriptionLengths(),
+              annotationEncodingParametersCheck.getDescriptionLengths());
+    EXPECT_EQ(annotationEncodingParameters.getDescriptions(), annotationEncodingParametersCheck.getDescriptions());
+
+    EXPECT_EQ(annotationEncodingParameters.getNumberOfAttributes(),
+              annotationEncodingParametersCheck.getNumberOfAttributes());
+    EXPECT_EQ(annotationEncodingParameters.getDescriptions(), annotationEncodingParametersCheck.getDescriptions());
+    EXPECT_EQ(annotationEncodingParameters.getFeatureNames(), annotationEncodingParametersCheck.getFeatureNames());
+    EXPECT_EQ(annotationEncodingParameters.getOntologyTermNameLengths(),
+              annotationEncodingParametersCheck.getOntologyTermNameLengths());
+
+#if GENERATE_TEST_FILES
+    std::string name = "TestFiles/AnnotationEncodingParameters_seed_";
+    name += std::to_string(rand() % 10);
+
+    std::ofstream outputfile;
+    outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
+    if (outputfile.is_open()) {
+        genie::util::BitWriter writer(&outputfile);
+        annotationEncodingParameters.write(writer);
+        writer.flush();
+        outputfile.close();
+    }
+    std::ofstream txtfile;
+    txtfile.open(name + ".txt", std::ios::out);
+    if (txtfile.is_open()) {
+        annotationEncodingParameters.write(txtfile);
         txtfile.close();
     }
 #endif

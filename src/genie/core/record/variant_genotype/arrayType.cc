@@ -142,7 +142,7 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
             break;
         }
         default:  // case 0
-            uint8_t read = 0xF;
+            uint8_t read = static_cast<uint8_t>(reader.read_b(8));  
             do {
                 read = static_cast<uint8_t>(reader.read_b(8));  
                 if (read != 0) byteArray.push_back(read);

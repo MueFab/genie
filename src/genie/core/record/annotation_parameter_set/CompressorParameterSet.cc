@@ -25,7 +25,7 @@ namespace record {
 namespace annotation_parameter_set {
 
 CompressorParameterSet::CompressorParameterSet()
-    : compressor_ID(0),
+    : compressor_ID(1),
       n_compressor_steps(0),
       compressor_step_ID{},
       algorithm_ID{},
@@ -58,9 +58,7 @@ CompressorParameterSet::CompressorParameterSet(
       prev_step_ID(prev_step_ID),
       prev_out_var_ID(prev_out_var_ID),
       n_completed_out_vars(n_completed_out_vars),
-      completed_out_var_ID(completed_out_var_ID) {
-
-}
+      completed_out_var_ID(completed_out_var_ID) {}
 
 void CompressorParameterSet::read(util::BitReader& reader) {
     compressor_ID = static_cast<uint8_t>(reader.read_b(8));
@@ -94,6 +92,7 @@ void CompressorParameterSet::read(util::BitReader& reader) {
         for (auto j = 0; j < n_completed_out_vars[i]; ++j)
             completed_out_var_ID[i].push_back(static_cast<uint8_t>(reader.read_b(4)));
     }
+    reader.flush();
 }
 
 void CompressorParameterSet::write(std::ostream& outputfile) const {
@@ -145,7 +144,7 @@ void CompressorParameterSet::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

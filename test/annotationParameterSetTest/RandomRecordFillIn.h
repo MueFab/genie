@@ -14,7 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/record/annotation_encoding_parameters/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,6 +43,7 @@ class RandomAnnotationEncodingParameters {
     genie::core::record::annotation_parameter_set::ContactMatrixParameters simpleContactMatrixParameters();
     genie::core::record::annotation_parameter_set::DescriptorConfiguration randomDescriptorConfiguration();
     genie::core::record::annotation_parameter_set::CompressorParameterSet randomCompressorParameterSet();
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters randomAnnotationEncodingParameters();
 
  private:
     uint64_t randomU64() {
@@ -57,17 +58,22 @@ class RandomAnnotationEncodingParameters {
         uint16_t randomnumber = static_cast<uint16_t>(rand() + rand());
         return randomnumber;
     }
-    uint8_t randomU8() { return static_cast<uint8_t>((rand() % (254) + 1)); }
-    uint8_t randomU4() { return static_cast<uint8_t>((rand() % 15)); }
+    uint16_t randomU10() { return randomU16() % 1024; }
+    
+    uint8_t randomU8() { return static_cast<uint8_t>(rand() % 256); }
+    uint8_t randomU7() { return static_cast<uint8_t>(rand() % 128); }
+    uint8_t randomU6() { return static_cast<uint8_t>(rand() % 64); }
+
+    uint8_t randomU4() { return static_cast<uint8_t>((rand() % 16)); }
     uint8_t randomU3() { return static_cast<uint8_t>(rand() % 8); }
     uint8_t randomU2() { return static_cast<uint8_t>(rand() % 4); }
     bool randomBool() { return static_cast<bool>(rand() % 2); }
 
     uint8_t randomType() { return static_cast<uint8_t>(rand() % 13); }
 
-    std::string randomString(uint8_t len) {
-        std::string random = "rs";
-        for (auto i = 2; i < len; ++i) {
+    std::string randomString(uint16_t len) {
+        std::string random = "";
+        for (auto i = 0; i < len; ++i) {
             uint8_t byteSeed = rand() % (26);
             random += static_cast<char>(byteSeed + 'a');
         }
