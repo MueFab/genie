@@ -72,6 +72,11 @@ TileConfiguration::TileConfiguration(util::BitReader& reader, uint8_t AT_coord_s
     read(reader);
 }
 
+void TileConfiguration::read(util::BitReader& reader, uint8_t ATCoordSize) {
+    AT_coord_size = ATCoordSize;
+    read(reader);
+}
+
 void TileConfiguration::read(util::BitReader& reader) {
     AG_class = static_cast<uint8_t>(reader.read_b(3));
     attribute_contiguity = static_cast<uint8_t>(reader.read_b(1));

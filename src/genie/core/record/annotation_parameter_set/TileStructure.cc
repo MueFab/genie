@@ -39,7 +39,9 @@ uint8_t TileStructure::coordSizeInBits(uint8_t size) const {
     }
 }
 
-TileStructure::TileStructure() : variable_size_tiles(false), n_tiles(0), start_index{}, end_index{}, tile_size{} {}
+TileStructure::TileStructure()
+    : variable_size_tiles(false), n_tiles(0), start_index{}, end_index{}, tile_size{0}, two_dimensional(false) {
+}
 
 TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional)
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
@@ -58,6 +60,7 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool var
 
 void TileStructure::read(util::BitReader& reader, uint8_t AT_coordsize, bool twoDimensional) {
     this->ATCoordSize = AT_coordsize;
+    if (!two_dimensional && twoDimensional) tile_size.resize(2); 
     this->two_dimensional = twoDimensional;
     read(reader);
 }
