@@ -66,6 +66,7 @@ class TileConfiguration {
            std::vector<uint8_t> n_descriptors, std::vector<std::vector<uint8_t>> descriptor_ID,
            std::vector<TileStructure> additional_tile_structure);
 
+    void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
     void write(std::ostream& outputfile) const;
     void write(util::BitWriter& writer) const;

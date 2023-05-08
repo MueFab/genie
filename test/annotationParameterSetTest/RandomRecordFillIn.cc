@@ -127,17 +127,25 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
 genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
     uint8_t n_pars = randomU4();
+    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
+    for (auto& num : par_num_array_dims) num = randomU2();
+    return randomAlgorithmParameters(n_pars, par_num_array_dims);
+}
+
+    genie::core::record::annotation_parameter_set::AlgorithmParameters
+RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars, std::vector<uint8_t> parNumArrayDims) {
+    uint8_t n_pars = nuMOfpars;
     // randomU8();
     std::vector<uint8_t> par_ID(n_pars, 0);
     std::vector<uint8_t> par_type(n_pars, 0);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
+    par_num_array_dims = parNumArrayDims;
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(
         n_pars, std::vector<std::vector<std::vector<std::vector<uint8_t>>>>(0));
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i] = randomU4();
         par_type[i] = randomType();
-        par_num_array_dims[i] = randomU2();
         par_array_dims[i].resize(par_num_array_dims[i]);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU4();  // randomU8();
         if (par_num_array_dims[i] == 0)
@@ -154,10 +162,11 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
                               std::vector<std::vector<std::vector<uint8_t>>>(
                                   par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
 
-        for (auto& d1 : par_val)
-            for (auto& d2 : d1)
-                for (auto& d3 : d2)
-                    for (auto& d4 : d3) d4 = randomValForType(par_type[i]);
+        for (auto j = 0; j < par_val[i].size(); ++ j)
+            for (auto k = 0; k < par_val[i][j].size(); ++k)
+                for (auto l = 0; l < par_val[i][j][k].size(); ++l) {
+                    par_val[i][j][k][l] = randomValForType(par_type[i]);
+                }     
     }
 
     return genie::core::record::annotation_parameter_set::AlgorithmParameters(
@@ -409,4 +418,22 @@ RandomAnnotationEncodingParameters::randomAnnotationEncodingParameters() {
         n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
         n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
         n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
+}
+
+genie::core::record::annotation_parameter_set::Record
+RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
+    uint8_t parameter_set_ID = randomU8();
+    uint8_t AT_ID = randomU8();
+    uint8_t AT_alphabet_ID = randomU8();
+    uint8_t AT_coord_size = randomU2();
+    bool AT_pos_40_bits_flag = randomBool();
+    uint8_t n_aux_attribute_groups = randomU3();
+    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration(
+        n_aux_attribute_groups);
+
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters;
+
+    return genie::core::record::annotation_parameter_set::Record(parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size,
+                                                                 AT_pos_40_bits_flag, n_aux_attribute_groups,
+                                                                 tile_configuration, annotation_encoding_parameters);
 }

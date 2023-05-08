@@ -122,6 +122,7 @@ void AnnotationEncodingParameters::write(std::ostream& outputfile) const {
     for (auto i = 0; i < n_filter; ++i) {
         outputfile << std::to_string(filter_ID_len[i]) << ",";
         outputfile << '"' << filter_ID[i] << '"' << ",";
+        outputfile << std::to_string(desc_len[i]) << ",";
         outputfile << '"' << description[i] << '"' << ",";
     }
     outputfile << std::to_string(n_features_names) << ",";
