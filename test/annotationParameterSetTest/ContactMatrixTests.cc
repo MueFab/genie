@@ -1,22 +1,21 @@
+
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iostream>
 #include "RandomRecordFillIn.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/core/record/annotation_parameter_set/ContactMatrixParameters.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
-#define GENERATE_TEST_FILES true
-
-class AnnotationParameterSetTests : public ::testing::Test {
+class ContactMatrixTests : public ::testing::Test {
  protected:
     // Do any necessary setup for your tests here
-    AnnotationParameterSetTests() = default;
+    ContactMatrixTests() = default;
 
-    ~AnnotationParameterSetTests() override = default;
+    ~ContactMatrixTests() override = default;
 
     // Use SetUp instead of the constructor in the following cases:
     // - In the body of a constructor (or destructor), it's not possible to
@@ -57,54 +56,60 @@ class AnnotationParameterSetTests : public ::testing::Test {
 };
 
 
-TEST_F(AnnotationParameterSetTests, annotationParameterSetZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(ContactMatrixTests, ContactMatrixZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::Record record;
 
-    EXPECT_EQ(record.getParameterSetID(), (uint8_t)0);
-    EXPECT_EQ(record.getATID(), 0);
-    EXPECT_EQ(record.getATAlphbetID(), 0);
-    EXPECT_EQ(record.getATCoordSize(), 0);
-    EXPECT_FALSE(record.isATPos$0Bits());
-    EXPECT_EQ(record.getNumberOfAuxAttributeGroups(), 0);
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters cmParameters;
+    EXPECT_EQ(cmParameters.getInterval(), uint8_t(0));
+    EXPECT_EQ(cmParameters.getNumberOfSamples(), uint8_t(0));
+    EXPECT_EQ(cmParameters.getNumberOfNormalizationMethods(), uint8_t(0));
 }
 
-TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(ContactMatrixTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
     RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSetCheck;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParametersCheck;
 
-    annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
+    contactMatrixParameters = RandomContactMatrixParameters.randomContactMatrixParameters();
 
     std::stringstream InOut;
+    //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
     genie::util::BitWriter strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    annotationParameterSet.write(strwriter);
+    contactMatrixParameters.write(strwriter);
     strwriter.flush();
-    annotationParameterSetCheck.read(strreader);
+    contactMatrixParametersCheck.read(strreader);
+
+    EXPECT_EQ(contactMatrixParameters.getNumberOfSamples(), contactMatrixParametersCheck.getNumberOfSamples());
+    EXPECT_EQ(contactMatrixParameters.getSampleIDs(), contactMatrixParametersCheck.getSampleIDs());
+    EXPECT_EQ(contactMatrixParameters.getSampleNames(), contactMatrixParametersCheck.getSampleNames());
+    EXPECT_EQ(contactMatrixParameters.getNumberOfChromosomes(), contactMatrixParametersCheck.getNumberOfChromosomes());
+    EXPECT_EQ(contactMatrixParameters.getChromosomeIDs(), contactMatrixParametersCheck.getChromosomeIDs());
+    EXPECT_EQ(contactMatrixParameters.getChromosomeNames(), contactMatrixParametersCheck.getChromosomeNames());
+    EXPECT_EQ(contactMatrixParameters.getChromsomeLength(), contactMatrixParametersCheck.getChromsomeLength());
 
 #if GENERATE_TEST_FILES
-    std::string name = "TestFiles/AnnotationParameterSet_seed_";
+    std::string name = "TestFiles/ContactMatrixParameters_seed_";
     name += std::to_string(rand() % 10);
 
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
         genie::util::BitWriter writer(&outputfile);
-        annotationParameterSet.write(writer);
+        contactMatrixParameters.write(writer);
         writer.flush();
         outputfile.close();
     }
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        annotationParameterSet.write(txtfile);
+        contactMatrixParameters.write(txtfile);
         txtfile.close();
     }
 #endif

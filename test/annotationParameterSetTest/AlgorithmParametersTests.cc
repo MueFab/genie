@@ -1,22 +1,21 @@
+
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iostream>
 #include "RandomRecordFillIn.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
-#define GENERATE_TEST_FILES true
-
-class AnnotationParameterSetTests : public ::testing::Test {
+class AlgorithmParametersTests : public ::testing::Test {
  protected:
     // Do any necessary setup for your tests here
-    AnnotationParameterSetTests() = default;
+    AlgorithmParametersTests() = default;
 
-    ~AnnotationParameterSetTests() override = default;
+    ~AlgorithmParametersTests() override = default;
 
     // Use SetUp instead of the constructor in the following cases:
     // - In the body of a constructor (or destructor), it's not possible to
@@ -57,55 +56,67 @@ class AnnotationParameterSetTests : public ::testing::Test {
 };
 
 
-TEST_F(AnnotationParameterSetTests, annotationParameterSetZeros) {  // NOLINT(cert-err58-cpp)
+TEST_F(AlgorithmParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::Record record;
 
-    EXPECT_EQ(record.getParameterSetID(), (uint8_t)0);
-    EXPECT_EQ(record.getATID(), 0);
-    EXPECT_EQ(record.getATAlphbetID(), 0);
-    EXPECT_EQ(record.getATCoordSize(), 0);
-    EXPECT_FALSE(record.isATPos$0Bits());
-    EXPECT_EQ(record.getNumberOfAuxAttributeGroups(), 0);
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algortihmParameters;
+
+    EXPECT_EQ(algortihmParameters.getNumberOfPars(), 0);
+    EXPECT_EQ(algortihmParameters.getParArrayDims().size(), 0);
+    EXPECT_EQ(algortihmParameters.getParIDs().size(), 0);
+    EXPECT_EQ(algortihmParameters.getParNumberOfArrayDims().size(), 0);
+    EXPECT_EQ(algortihmParameters.getParTypes().size(), 0);
+    EXPECT_EQ(algortihmParameters.getParValues().size(), 0);
 }
 
-TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
+TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSetCheck;
-
-    annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
+    RandomAnnotationEncodingParameters randomAlgorithmParameters;
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters;
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParametersCheck;
+    uint8_t nPars = static_cast<uint8_t>(rand() % 16);
+    uint8_t numArray = 0;
+    std::vector<uint8_t> parNumArrayDims(nPars, numArray);
+    algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);
 
     std::stringstream InOut;
     genie::util::BitWriter strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
-    annotationParameterSet.write(strwriter);
+    algorithmParameters.write(strwriter);
     strwriter.flush();
-    annotationParameterSetCheck.read(strreader);
+    algorithmParametersCheck.read(strreader);
+
+    EXPECT_EQ(algorithmParameters.getNumberOfPars(), algorithmParametersCheck.getNumberOfPars());
+    EXPECT_EQ(algorithmParameters.getParIDs(), algorithmParametersCheck.getParIDs());
+    EXPECT_EQ(algorithmParameters.getParNumberOfArrayDims(), algorithmParametersCheck.getParNumberOfArrayDims());
+    EXPECT_EQ(algorithmParameters.getParTypes(), algorithmParametersCheck.getParTypes());
+    // EXPECT_EQ(algorithmParameters.getParValues(), algorithmParametersCheck.getParValues());
 
 #if GENERATE_TEST_FILES
-    std::string name = "TestFiles/AnnotationParameterSet_seed_";
+    std::string name = "TestFiles/AlgorithmParameters_";
+    name += std::to_string(numArray);
+    name += "_seed_";
     name += std::to_string(rand() % 10);
 
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
         genie::util::BitWriter writer(&outputfile);
-        annotationParameterSet.write(writer);
+        algorithmParameters.write(writer);
         writer.flush();
         outputfile.close();
     }
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        annotationParameterSet.write(txtfile);
+        algorithmParameters.write(txtfile);
         txtfile.close();
     }
+
 #endif
 }

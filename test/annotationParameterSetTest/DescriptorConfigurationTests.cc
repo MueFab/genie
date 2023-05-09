@@ -1,16 +1,21 @@
+
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 #include <gtest/gtest.h>
 
-#include <fstream>
-#include <iostream>
-#include "genie/core/record/variant_site/record.h"
-#include "genie/util/bitreader.h"
+#include "RandomRecordFillIn.h"
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
-class VariantSiteRecordTests : public ::testing::Test {
+class DescriptorConfigurationTests : public ::testing::Test {
  protected:
     // Do any necessary setup for your tests here
-    VariantSiteRecordTests() = default;
+    DescriptorConfigurationTests() = default;
 
-    ~VariantSiteRecordTests() override = default;
+    ~DescriptorConfigurationTests() override = default;
 
     // Use SetUp instead of the constructor in the following cases:
     // - In the body of a constructor (or destructor), it's not possible to
@@ -38,58 +43,58 @@ class VariantSiteRecordTests : public ::testing::Test {
     //   SetUp()/TearDown().
 
     void SetUp() override {
+        srand(static_cast<unsigned int>(time(NULL)));
         // Code here will be called immediately before each test
     }
 
     void TearDown() override {
         // Code here will be called immediately after each test
     }
-
     // void sharedSubroutine() {
     //    // If needed, define subroutines for your tests to share
     // }
 };
 
-#include <array>
 
-std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    // windows _pclose, _popen  and linux pclose, popen
-#ifdef _WIN32
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd, "r"), _pclose);
-#else
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-#endif
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-    return result;
-}
-
-TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
+TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
 
-    std::filebuf fb1;
-    std::string filename = gitRootDir.substr(0, gitRootDir.length() - 1) + "/data/records/1.3.05_cut.site";
-    if (fb1.open(filename, std::ios::in | std::ios::binary)) {
-        std::istream is(&fb1);
-        genie::util::BitReader reader(is);
-        std::ofstream myfile("1.3.05_cut.site_test.txt");
-        do {
-            genie::core::record::variant_site::Record variant_site_record(reader);
-            variant_site_record.write(myfile);
-        } while (is.peek() != EOF);
-        fb1.close();
-        myfile.close();
+    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration;
+    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfigurationCheck;
+
+    descriptorConfiguration = RandomContactMatrixParameters.randomDescriptorConfiguration();
+
+    std::stringstream InOut;
+    //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
+    genie::util::BitWriter strwriter(&InOut);
+    genie::util::BitReader strreader(InOut);
+    descriptorConfiguration.write(strwriter);
+    strwriter.flush();
+    descriptorConfigurationCheck.read(strreader);
+
+    EXPECT_EQ(descriptorConfiguration.getDescriptorID(), descriptorConfigurationCheck.getDescriptorID());
+    EXPECT_EQ(descriptorConfiguration.getEncodingModeID(), descriptorConfigurationCheck.getEncodingModeID());
+
+#if GENERATE_TEST_FILES
+    std::string name = "TestFiles/DescriptorConfiguration_seed_";
+    name += std::to_string(rand() % 10);
+
+    std::ofstream outputfile;
+    outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
+    if (outputfile.is_open()) {
+        genie::util::BitWriter writer(&outputfile);
+        descriptorConfiguration.write(writer);
+        writer.flush();
+        outputfile.close();
     }
-
-    EXPECT_EQ(0, 0);
-    ASSERT_EQ(0, 0);
+    std::ofstream txtfile;
+    txtfile.open(name + ".txt", std::ios::out);
+    if (txtfile.is_open()) {
+        descriptorConfiguration.write(txtfile);
+        txtfile.close();
+    }
+#endif
 }
