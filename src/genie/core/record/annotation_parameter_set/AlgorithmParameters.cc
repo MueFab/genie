@@ -67,10 +67,10 @@ void AlgorithmParameters::read(util::BitReader& reader) {
             par_val[i].resize(par_array_dims[i][0],
                               std::vector<std::vector<std::vector<uint8_t>>>(
                                   par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
-        for (auto& d1 : par_val)
+        for (auto& d1 : par_val[i])
             for (auto& d2 : d1)
                 for (auto& d3 : d2)
-                    for (auto& d4 : d3) d4 = types.toArray(par_type[i], reader);
+                    d3 = types.toArray(par_type[i], reader);
     }
 }
 
@@ -93,16 +93,18 @@ void AlgorithmParameters::write(std::ostream& outputfile) const {
 }
 
 void AlgorithmParameters::write(util::BitWriter& writer) const {
+    variant_genotype::arrayType types;
     writer.write(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
         writer.write(par_ID[i], 4);
         writer.write(par_type[i], 8);
         writer.write(par_num_array_dims[i], 2);
-        for (auto j = 0; j < par_num_array_dims[i]; ++j) writer.write(par_array_dims[i][j], 8);
+        for (auto j = 0; j < par_num_array_dims[i]; ++j) {
+            writer.write(par_array_dims[i][j], 8);
+        }
         for (auto par_d1 : par_val[i])
             for (auto par_d2 : par_d1)
-                for (auto par_d3 : par_d2)
-                    for (auto byte : par_d3) writer.write(byte, 8);
+                for (auto par_d3 : par_d2) types.toFile(par_type[i], par_d3, writer);
     }
 }
 

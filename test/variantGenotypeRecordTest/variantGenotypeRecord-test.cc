@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "genie/core/record/variant_genotype/arrayType.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/util/bitreader.h"
 
@@ -65,6 +66,42 @@ std::string exec(const char* cmd) {
     }
     return result;
 }
+
+TEST_F(VariantGenotypeRecordTests, arrayTypeConversion) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    genie::core::record::variant_genotype::arrayType testTypes;
+    {
+        std::stringstream outputfile;
+        genie::util::BitWriter strwriter(&outputfile);
+        genie::util::BitReader strreader(outputfile);
+        uint8_t type = 6;
+        uint16_t temp = 1023;
+        strwriter.write(temp, 16);
+        auto byteArray = testTypes.toArray(type, strreader);
+        auto stringout = testTypes.toString(type, byteArray);
+        EXPECT_STREQ(stringout.c_str(), std::to_string(temp).c_str());
+    }
+    {
+        std::stringstream outputfile;
+        genie::util::BitWriter strwriter(&outputfile);
+        genie::util::BitReader strreader(outputfile);
+        uint8_t type = 11;
+        uint32_t temp = 0x292361ab;
+        std::vector<uint8_t> writeArray(4, 0);
+        memcpy(&writeArray[0], &temp,4);
+
+        testTypes.toFile(type, writeArray, strwriter);
+
+        //strwriter.write(temp, 32);
+        //for (auto byte : writeArray) strwriter.write(byte, 8);
+        auto byteArray = testTypes.toArray(type, strreader);
+        auto stringout = testTypes.toString(type, byteArray);
+        EXPECT_STREQ(stringout.c_str(), std::to_string(temp).c_str());
+    }
+}
+
 TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -88,7 +125,6 @@ TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         fb1.close();
         myfile.close();
     }
-
 }
 
 TEST_F(VariantGenotypeRecordTests, recordFilledWithZeros) {  // NOLINT(cert-err58-cpp)

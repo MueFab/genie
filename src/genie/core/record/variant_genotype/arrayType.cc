@@ -83,8 +83,10 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
 std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
     std::vector<uint8_t> byteArray;
     switch (type) {
-        case 1:
         case 2:
+            byteArray.push_back(static_cast<uint8_t>(reader.read_b(1)));
+            break;
+        case 1:
         case 4:
             byteArray.push_back(static_cast<uint8_t>(reader.read_b(8)));
             break;
@@ -151,6 +153,16 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
     }
 
     return byteArray;
+}
+
+void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, util::BitWriter& writer) const {
+    if (type == 2) {
+        writer.write(bytearray[0], 1);
+    } else if (type == 0) {
+        for (auto i = 0; i < bytearray.size(); ++i) writer.write(bytearray[i], 8);
+    } else {
+        for (auto i = bytearray.size() ; i > 0; --i) writer.write(bytearray[i-1], 8);
+    }
 }
 
 }  // namespace variant_genotype
