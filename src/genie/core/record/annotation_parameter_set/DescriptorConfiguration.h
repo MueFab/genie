@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_DESCRIPTORCONFIGURATION_H_
-#define SRC_GENIE_CORE_RECORD_DESCRIPTORCONFIGURATION_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_DESCRIPTORCONFIGURATION_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_DESCRIPTORCONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,11 +18,10 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-
-#include "LikelihoodParameters.h"
-#include "GenotypeParameters.h"
 #include "AlgorithmParameters.h"
 #include "ContactMatrixParameters.h"
+#include "GenotypeParameters.h"
+#include "LikelihoodParameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +30,7 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-    enum class DescriptorID {
+enum class DescriptorID {
     SEQUENCEID = 1,
     STARTPOS,
     ENDPOS,
@@ -57,7 +56,6 @@ namespace annotation_parameter_set {
     ATTRIBUTE = 31
 };
 
- 
 class DescriptorConfiguration {
  private:
     DescriptorID descriptor_ID;
@@ -69,7 +67,7 @@ class DescriptorConfiguration {
 
  public:
     DescriptorConfiguration();
-    DescriptorConfiguration(util::BitReader& reader);
+    explicit DescriptorConfiguration(util::BitReader& reader);
     DescriptorConfiguration(DescriptorID descriptor_ID, uint8_t encoding_mode_ID,
                             GenotypeParameters genotype_parameters, LikelihoodParameters likelihood_parameters,
                             ContactMatrixParameters contact_matrix_parameters,
@@ -85,18 +83,16 @@ class DescriptorConfiguration {
     AlgorithmParameters getAlgorithmParameters() const { return algorithm_patarmeters; }
 };
 
-
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_DESCRIPTORCONFIGURATION_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_DESCRIPTORCONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

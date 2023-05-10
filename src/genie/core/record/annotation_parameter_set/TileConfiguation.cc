@@ -148,8 +148,9 @@ void TileConfiguration::write(util::BitWriter& writer, bool skipEmbeddedRecord) 
         writer.write(column_major_tile_order, 1);
         writer.write(symmetry_mode, 3);
         writer.write(symmetry_minor_diagonal, 2);
-    } else
+    } else {
         writer.write(0, 3);
+    }
     writer.write(attribute_dependent_tiles, 1);
     default_tile_structure.write(writer, skipEmbeddedRecord);
     if (attribute_dependent_tiles) {
@@ -169,7 +170,7 @@ void TileConfiguration::write(util::BitWriter& writer, bool skipEmbeddedRecord) 
 
 void TileConfiguration::write(util::BitWriter& writer) const { write(writer, false); }
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

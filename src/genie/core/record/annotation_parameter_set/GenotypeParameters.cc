@@ -135,8 +135,9 @@ void GenotypeParameters::write(util::BitWriter& writer) const {
         writer.write(sort_phases_cols_flag, 1);
         writer.write(transpose_phases_mat_flag, 1);
         writer.write(phases_codec_ID, 1);
-    } else
+    } else {
         writer.write(phases_value, 1);
+    }
 }
 void GenotypeParameters::write(std::ostream& outputfile) const {
     outputfile << std::to_string(max_ploidy) << ",";
@@ -159,14 +160,15 @@ void GenotypeParameters::write(std::ostream& outputfile) const {
         outputfile << std::to_string(sort_phases_cols_flag) << ",";
         outputfile << std::to_string(transpose_phases_mat_flag) << ",";
         outputfile << std::to_string(phases_codec_ID) << ",";
-    } else
+    } else {
         outputfile << std::to_string(phases_value);
+    }
 }
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

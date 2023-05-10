@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATIONENPARAMETERSET_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATIONENPARAMETERSET_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ANNOTATIONENPARAMETERSET_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -153,7 +153,7 @@ void ContactMatrixParameters::write(std::ostream& outputfile) const {
         outputfile << std::to_string(norm_method_mult_flag[i]) << ",";
     }
     outputfile << std::to_string(num_norm_matrices) << ",";
-    for (auto i = 0; i < num_norm_matrices; ++i){
+    for (auto i = 0; i < num_norm_matrices; ++i) {
         outputfile << std::to_string(norm_matrix_ID[i]) << ",";
         outputfile << '"' << norm_matrix_name[i] << '"' << ",";
     }
@@ -200,7 +200,7 @@ void ContactMatrixParameters::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

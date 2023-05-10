@@ -53,7 +53,7 @@ void LikelihoodParameters::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

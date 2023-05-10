@@ -40,8 +40,7 @@ uint8_t TileStructure::coordSizeInBits(uint8_t size) const {
 }
 
 TileStructure::TileStructure()
-    : variable_size_tiles(false), n_tiles(0), start_index{}, end_index{}, tile_size{0}, two_dimensional(false) {
-}
+    : variable_size_tiles(false), n_tiles(0), start_index{}, end_index{}, tile_size{0}, two_dimensional(false) {}
 
 TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional)
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
@@ -60,11 +59,10 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool var
 
 void TileStructure::read(util::BitReader& reader, uint8_t AT_coordsize, bool twoDimensional) {
     this->ATCoordSize = AT_coordsize;
-    if (!two_dimensional && twoDimensional) tile_size.resize(2); 
+    if (!two_dimensional && twoDimensional) tile_size.resize(2);
     this->two_dimensional = twoDimensional;
     read(reader);
 }
-
 
 void TileStructure::read(util::BitReader& reader) {
     reader.read_b(7);
@@ -87,11 +85,9 @@ void TileStructure::read(util::BitReader& reader) {
     }
 }
 
-
 void TileStructure::write(std::ostream& outputfile, bool skipEmbeddedRecord) const {
     if (!skipEmbeddedRecord) write(outputfile);
 }
-
 
 void TileStructure::write(std::ostream& outputfile) const {
     outputfile << std::to_string(variable_size_tiles) << ",";
@@ -104,8 +100,9 @@ void TileStructure::write(std::ostream& outputfile) const {
                 outputfile << std::to_string(end_index[i][j]) << ",";
             }
         }
-    } else
+    } else {
         for (auto j = 0; j < dimensions; ++j) outputfile << std::to_string(tile_size[j]) << ",";
+    }
 }
 
 void TileStructure::write(util::BitWriter& writer, bool skipEmbeddedRecord) const {
@@ -130,7 +127,7 @@ void TileStructure::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie

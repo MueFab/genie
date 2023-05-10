@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_COMPRESSORPARAMETERSET_H_
-#define SRC_GENIE_CORE_RECORD_COMPRESSORPARAMETERSET_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORPARAMETERSET_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORPARAMETERSET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ class CompressorParameterSet {
 
  public:
     CompressorParameterSet();
-    CompressorParameterSet(util::BitReader& reader);
+    explicit CompressorParameterSet(util::BitReader& reader);
     CompressorParameterSet(uint8_t compressor_ID, uint8_t n_compressor_steps, std::vector<uint8_t> compressor_step_ID,
                            std::vector<uint8_t> algorithm_ID, std::vector<bool> use_default_pars,
                            std::vector<AlgorithmParameters> algorithm_parameters, std::vector<uint8_t> n_in_vars,
@@ -71,14 +71,14 @@ class CompressorParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_COMPRESSORPARAMETERSET_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORPARAMETERSET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

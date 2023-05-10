@@ -152,30 +152,30 @@ void AnnotationEncodingParameters::write(std::ostream& outputfile) const {
 void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
     writer.write(n_filter, 8);
     for (auto i = 0; i < n_filter; ++i) {
-        writer.write(filter_ID_len[i],6);
+        writer.write(filter_ID_len[i], 6);
         for (auto byte : filter_ID[i]) writer.write(byte, 8);
-        writer.write(desc_len[i],10);
+        writer.write(desc_len[i], 10);
         for (auto byte : description[i]) writer.write(byte, 8);
     }
-    writer.write(n_features_names,8);
+    writer.write(n_features_names, 8);
     for (auto i = 0; i < n_features_names; ++i) {
-        writer.write(feature_name_len[i],6);
+        writer.write(feature_name_len[i], 6);
         for (auto byte : feature_name[i]) writer.write(byte, 8);
     }
-    writer.write(n_ontology_terms,8);
+    writer.write(n_ontology_terms, 8);
     for (auto i = 0; i < n_ontology_terms; ++i) {
-        writer.write(ontology_term_name_len[i],6);
+        writer.write(ontology_term_name_len[i], 6);
         for (auto byte : ontology_term_name[i]) writer.write(byte, 8);
     }
-    writer.write(n_descriptors,8);
+    writer.write(n_descriptors, 8);
     for (auto i = 0; i < n_descriptors; ++i) {
         descriptor_configuration[i].write(writer);
     }
-    writer.write(n_compressors,8);
+    writer.write(n_compressors, 8);
     for (auto i = 0; i < n_compressors; ++i) {
         compressor_parameter_set[i].write(writer);
     }
-    writer.write(n_attributes,8);
+    writer.write(n_attributes, 8);
     for (auto i = 0; i < n_attributes; ++i) {
         attribute_parameter_set[i].write(writer);
     }

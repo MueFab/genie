@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ATTRIBUTEPARAMETERSET_H_
-#define SRC_GENIE_CORE_RECORD_ATTRIBUTEPARAMETERSET_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ATTRIBUTEPARAMETERSET_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ATTRIBUTEPARAMETERSET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ class AttributeParameterSet {
                           std::vector<std::vector<uint8_t>> dependency_var_ID,
                           std::vector<std::vector<bool>> dependency_is_attribute,
                           std::vector<std::vector<uint16_t>> dependency_ID);
-    AttributeParameterSet(util::BitReader& reader);
+    explicit AttributeParameterSet(util::BitReader& reader);
 
     /**
      * @brief
@@ -122,14 +122,14 @@ class AttributeParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ATTRIBUTEPARAMETERSET_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ATTRIBUTEPARAMETERSET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
