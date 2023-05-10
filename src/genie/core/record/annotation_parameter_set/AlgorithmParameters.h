@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ALGORITHMPARAMETERS_H_
-#define SRC_GENIE_CORE_RECORD_ALGORITHMPARAMETERS_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ALGORITHMPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ALGORITHMPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ class AlgorithmParameters {
 
  public:
     AlgorithmParameters();
-    AlgorithmParameters(util::BitReader& reader);
+    explicit AlgorithmParameters(util::BitReader& reader);
     AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<uint8_t> par_type,
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
@@ -55,14 +55,14 @@ class AlgorithmParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ALGORITHMPARAMETERS_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ALGORITHMPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ANNOTATIONENCODINGPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ANNOTATIONENCODINGPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ class AnnotationEncodingParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ANNOTATIONENCODINGPARAMETERS_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_ANNOTATIONENCODINGPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

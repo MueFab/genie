@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_TILE_CONFIGURATION_H_
-#define SRC_GENIE_CORE_RECORD_TILE_CONFIGURATION_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_TILECONFIGURATION_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_TILECONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,6 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-
 /**
  *  @brief
  */
@@ -37,7 +36,7 @@ class TileConfiguration {
 
     uint8_t AG_class;
     bool attribute_contiguity;
-    
+
     bool two_dimensional;
 
     bool column_major_tile_order;
@@ -60,11 +59,12 @@ class TileConfiguration {
     TileConfiguration();
     TileConfiguration(util::BitReader& reader, uint8_t AT_coord_size);
     TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
-           bool column_major_tile_order, uint8_t symmetry_mode, bool symmetry_minor_diagonal,
-           bool attribute_dependent_tiles, TileStructure default_tile_structure, uint16_t n_add_tile_structures,
-           std::vector<uint16_t> n_attributes, std::vector<std::vector<uint16_t>> attribute_ID,
-           std::vector<uint8_t> n_descriptors, std::vector<std::vector<uint8_t>> descriptor_ID,
-           std::vector<TileStructure> additional_tile_structure);
+                      bool column_major_tile_order, uint8_t symmetry_mode, bool symmetry_minor_diagonal,
+                      bool attribute_dependent_tiles, TileStructure default_tile_structure,
+                      uint16_t n_add_tile_structures, std::vector<uint16_t> n_attributes,
+                      std::vector<std::vector<uint16_t>> attribute_ID, std::vector<uint8_t> n_descriptors,
+                      std::vector<std::vector<uint8_t>> descriptor_ID,
+                      std::vector<TileStructure> additional_tile_structure);
 
     void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
@@ -92,14 +92,14 @@ class TileConfiguration {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_CONTACT_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_TILECONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_GENOTYPEPARAMETERS_H_
-#define SRC_GENIE_CORE_RECORD_GENOTYPEPARAMETERS_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_GENOTYPEPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_GENOTYPEPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ class GenotypeParameters {
 
  public:
     GenotypeParameters();
-    GenotypeParameters(util::BitReader& reader);
+    explicit GenotypeParameters(util::BitReader& reader);
     GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
                        annotation_parameter_set::BinarizationID binarization_ID, uint8_t num_bit_plane,
                        ConcatAxis concat_axis, std::vector<bool> sort_variants_rows_flag,
@@ -85,14 +85,14 @@ class GenotypeParameters {
 };
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_GENOTYPEPARAMETERS_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_GENOTYPEPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

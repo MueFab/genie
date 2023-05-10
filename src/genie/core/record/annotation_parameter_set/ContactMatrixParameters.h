@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
-#define SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_CONTACTMATRIXPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_CONTACTMATRIXPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -95,14 +95,14 @@ class ContactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_CONTACTMATRIXPARAMETERS_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_CONTACTMATRIXPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

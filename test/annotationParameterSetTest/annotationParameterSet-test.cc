@@ -9,7 +9,7 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#define GENERATE_TEST_FILES true
+#define GENERATE_TEST_FILES false
 
 class AnnotationParameterSetTests : public ::testing::Test {
  protected:

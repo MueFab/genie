@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_LIKELIHOODPARAMETERS_H_
-#define SRC_GENIE_CORE_RECORD_LIKELIHOODPARAMETERS_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_LIKELIHOODPARAMETERS_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_LIKELIHOODPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-    class LikelihoodParameters {
+class LikelihoodParameters {
  private:
     uint8_t num_gl_per_sample;
     bool transform_flag;
@@ -34,7 +34,7 @@ namespace annotation_parameter_set {
  public:
     LikelihoodParameters();
     LikelihoodParameters(uint8_t num_gl_per_sample, bool transform_flag, uint8_t dtype_id);
-    LikelihoodParameters(util::BitReader& reader);
+    explicit LikelihoodParameters(util::BitReader& reader);
     void read(util::BitReader& reader);
     void write(std::ostream& outputfile) const;
     void write(util::BitWriter& writer) const;
@@ -44,17 +44,16 @@ namespace annotation_parameter_set {
     uint8_t getDtypeID() const { return dtype_id; }
 };
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_encoding_parameters
+}  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_LIKELIHOODPARAMETERS_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_LIKELIHOODPARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
