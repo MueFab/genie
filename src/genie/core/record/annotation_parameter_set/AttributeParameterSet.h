@@ -61,6 +61,10 @@ class AttributeParameterSet {
                           std::vector<std::vector<uint8_t>> dependency_var_ID,
                           std::vector<std::vector<bool>> dependency_is_attribute,
                           std::vector<std::vector<uint16_t>> dependency_ID);
+    /**
+     * @brief
+     * @param reader
+     */
     explicit AttributeParameterSet(util::BitReader& reader);
 
     /**
@@ -75,25 +79,21 @@ class AttributeParameterSet {
      */
     AttributeParameterSet& operator=(const AttributeParameterSet& rec);
 
-
-
     /**
      * @brief
-     * @param rec
-     * @return
+     * @param reader
      */
     void read(util::BitReader& reader);
 
     /**
      * @brief
-     * @param rec
-     * @return
+     * @param writer
      */
     void write(util::BitWriter& writer) const;
+
     /**
      * @brief
-     * @param rec
-     * @return
+     * @param outputfile
      */
     void write(std::ostream& outputfile) const;
 
