@@ -166,6 +166,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
 }
 
 void AttributeParameterSet::write(util::BitWriter& writer) const {
+    variant_genotype::arrayType curType;
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
     for (auto byte : attribute_name) writer.write(byte, 8);
@@ -173,17 +174,15 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
     writer.write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
 
-    for (auto i = attribute_default_val.size(); i > 0; --i) writer.write(attribute_default_val[i - 1], 8);
-    //   for (auto value : attribute_default_val) writer.write(value, 8);
+    curType.toFile(attribute_type, attribute_default_val, writer);
 
     writer.write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
         writer.write(attribute_miss_default_flag, 1);
-        if (!attribute_miss_default_flag)
-            for (auto byte : attribute_miss_val) writer.write(byte, 8);
+        if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
+        for (auto byte : attribute_miss_str) writer.write(byte, 8);
+        writer.write(0, 8);
     }
-    for (auto byte : attribute_miss_str) writer.write(byte, 8);
-    writer.write(0, 8);
 
     writer.write(compressor_ID, 8);
     writer.write(n_steps_with_dependencies, 4);

@@ -55,7 +55,6 @@ class AttributeParameterSetTests : public ::testing::Test {
     // }
 };
 
-
 TEST_F(AttributeParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -110,18 +109,18 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     strwriter.flush();
     attributeParameterSetCheck.read(strreader);
 
-    //    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(),
-    //    attributeParameterSetCheck.areDependeciesAttributes());
-    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
-    EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
-    EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
-    EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
+    EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
     EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());
-    EXPECT_EQ(attributeParameterSet.getAttributeNameLength(), attributeParameterSetCheck.getAttributeNameLength());
+    EXPECT_EQ(attributeParameterSet.getAttributeType(), attributeParameterSetCheck.getAttributeType());
     EXPECT_EQ(attributeParameterSet.getAttributeNumberOFArrayDims(),
               attributeParameterSetCheck.getAttributeNumberOFArrayDims());
-    EXPECT_EQ(attributeParameterSet.getAttributeType(), attributeParameterSetCheck.getAttributeType());
-    EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
+    EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
+    EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
+    EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
+    EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
+    EXPECT_EQ(attributeParameterSet.getCompressorID(), attributeParameterSetCheck.getCompressorID());
+    EXPECT_EQ(attributeParameterSet.areDependeciesAttributes(), attributeParameterSetCheck.areDependeciesAttributes());
+    EXPECT_EQ(attributeParameterSet.getAttributeNameLength(), attributeParameterSetCheck.getAttributeNameLength());
 
 #if GENERATE_TEST_FILES
 
