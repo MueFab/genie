@@ -10,6 +10,7 @@
 #include <string>
 #include "cli11/CLI11.hpp"
 #include "genie/gabac/main.h"
+#include "genie/annotation/main.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/module/manager.h"
 //#include "genie/capsulator/main.h"
@@ -32,10 +33,11 @@ static void printCmdLine(int argc, char* argv[]) {
 int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
+const int versionnr = 1;
 int help(int, char*[]) {
-    std::cerr << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
-              << "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
+    std::cerr << "Version: " << std::to_string(versionnr) << "\n\n"
+              << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
+              << "help\nrun\nannotation\ntranscode-fastq\ntranscode-sam\n\n"
               << "To learn more about an operation, type \"genie <operation> --help\"." << std::endl;
     return 0;
 }
@@ -71,8 +73,11 @@ int main(int argc, char* argv[]) {
 //#endif
         } else if (operation == "gabac") {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-//        } else if (operation == "capsulate") {
-//            genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+            //        } else if (operation == "capsulate") {
+            //            genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+        } else if (operation == "annotation") {
+            genieapp::annotation::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+            UTILS_DIE("not yet implemented");
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {
