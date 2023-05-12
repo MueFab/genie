@@ -7,6 +7,8 @@ set(source_files
         gabac/code.cc
         gabac/main.cc
         gabac/program-options.cc
+        annotation/main.cc
+        annotation/program-options.cc
         )
 
 add_executable(genie ${source_files})
