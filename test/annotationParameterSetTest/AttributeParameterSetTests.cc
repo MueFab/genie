@@ -5,10 +5,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 // ---------------------------------------------------------------------------------------------------------------------
+#define GENERATE_TEST_FILES false
 
 class AttributeParameterSetTests : public ::testing::Test {
  protected:
@@ -102,12 +105,18 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSetCheck;
     attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
 
-    std::stringstream InOut(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
+    std::stringstream InOut;
     genie::util::BitWriter strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     attributeParameterSet.write(strwriter);
     strwriter.flush();
     attributeParameterSetCheck.read(strreader);
+    std::stringstream TestOut;
+    genie::util::BitWriter teststrwriter(&TestOut);
+    attributeParameterSetCheck.write(teststrwriter);
+    teststrwriter.flush();
+
+    EXPECT_EQ(InOut.str(), TestOut.str());
 
     EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
     EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());
@@ -116,6 +125,7 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
               attributeParameterSetCheck.getAttributeNumberOFArrayDims());
     EXPECT_EQ(attributeParameterSet.getAttributeArrayDims(), attributeParameterSetCheck.getAttributeArrayDims());
     EXPECT_EQ(attributeParameterSet.getAttributeDefaultValue(), attributeParameterSetCheck.getAttributeDefaultValue());
+    EXPECT_EQ(attributeParameterSet.isAttributeMissedValue(), attributeParameterSetCheck.isAttributeMissedValue());
     EXPECT_EQ(attributeParameterSet.getAttributeMissedValues(), attributeParameterSetCheck.getAttributeMissedValues());
     EXPECT_EQ(attributeParameterSet.getAttributeMissedString(), attributeParameterSetCheck.getAttributeMissedString());
     EXPECT_EQ(attributeParameterSet.getCompressorID(), attributeParameterSetCheck.getCompressorID());

@@ -44,26 +44,29 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     n_pars = static_cast<uint8_t>(reader.read_b(4));
     par_array_dims.resize(n_pars);
     par_val.resize(n_pars);
+    par_ID.resize(n_pars);
+    par_type.resize(n_pars);
+    par_num_array_dims.resize(n_pars);
 
     variant_genotype::arrayType types;
 
     for (auto i = 0; i < n_pars; ++i) {
-        par_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
-        par_type.push_back(static_cast<uint8_t>(reader.read_b(8)));
-        par_num_array_dims.push_back(static_cast<uint8_t>(reader.read_b(2)));
-        for (auto j = 0; j < par_num_array_dims.back(); ++j) {
+        par_ID[i]=(static_cast<uint8_t>(reader.read_b(4)));
+        par_type[i]=(static_cast<uint8_t>(reader.read_b(8)));
+        par_num_array_dims[i]=(static_cast<uint8_t>(reader.read_b(2)));
+        for (auto j = 0; j < par_num_array_dims[i]; ++j) {
             par_array_dims[i].push_back(static_cast<uint8_t>(reader.read_b(8)));
         }
-        if (par_num_array_dims.back() == 0)
+        if (par_num_array_dims[i] == 0)
             par_val[i].resize(1,
                               std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
-        if (par_num_array_dims.back() == 1)
+        if (par_num_array_dims[i] == 1)
             par_val[i].resize(par_array_dims[i][0],
                               std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
-        if (par_num_array_dims.back() == 2)
+        if (par_num_array_dims[i] == 2)
             par_val[i].resize(par_array_dims[i][0], std::vector<std::vector<std::vector<uint8_t>>>(
                                                         par_array_dims[i][1], std::vector<std::vector<uint8_t>>(1)));
-        if (par_num_array_dims.back() == 3)
+        if (par_num_array_dims[i] == 3)
             par_val[i].resize(par_array_dims[i][0],
                               std::vector<std::vector<std::vector<uint8_t>>>(
                                   par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));

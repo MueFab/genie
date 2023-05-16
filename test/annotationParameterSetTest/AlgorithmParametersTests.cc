@@ -5,9 +5,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#define GENERATE_TEST_FILES true
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 class AlgorithmParametersTests : public ::testing::Test {
@@ -90,12 +94,21 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     algorithmParameters.write(strwriter);
     strwriter.flush();
     algorithmParametersCheck.read(strreader);
+    std::stringstream TestOut;
+    genie::util::BitWriter teststrwriter(&TestOut);
+    algorithmParametersCheck.write(teststrwriter);
+    teststrwriter.flush();
+    EXPECT_EQ(InOut.str(), TestOut.str());
+
+
+     EXPECT_EQ(algorithmParameters.getParArrayDims(), algorithmParametersCheck.getParArrayDims());
+
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(), algorithmParametersCheck.getNumberOfPars());
     EXPECT_EQ(algorithmParameters.getParIDs(), algorithmParametersCheck.getParIDs());
     EXPECT_EQ(algorithmParameters.getParNumberOfArrayDims(), algorithmParametersCheck.getParNumberOfArrayDims());
     EXPECT_EQ(algorithmParameters.getParTypes(), algorithmParametersCheck.getParTypes());
-    // EXPECT_EQ(algorithmParameters.getParValues(), algorithmParametersCheck.getParValues());
+    EXPECT_EQ(algorithmParameters.getParValues(), algorithmParametersCheck.getParValues());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AlgorithmParameters_";

@@ -5,10 +5,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 // ---------------------------------------------------------------------------------------------------------------------
+#define GENERATE_TEST_FILES false
 
 class CompressorParameterSetTests : public ::testing::Test {
  protected:

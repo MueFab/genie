@@ -73,7 +73,7 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
 
             temp += '"';
             if (bytearray.size() > 0)
-                for (auto i = 0; i < bytearray.size() - 1; ++i) temp += bytearray[i];
+                for (auto i = 0; i < bytearray.size(); ++i) temp += bytearray[i];
             temp += '"';
             break;
     }
@@ -145,10 +145,11 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
         }
         default:  // case 0
             uint8_t read = static_cast<uint8_t>(reader.read_b(8));
-            do {
-                read = static_cast<uint8_t>(reader.read_b(8));
-                if (read != 0) byteArray.push_back(read);
-            } while (read != 0);
+            
+            while (read != 0) {
+               byteArray.push_back(read);
+               read = static_cast<uint8_t>(reader.read_b(8));
+            } ;
             break;
     }
 
@@ -160,8 +161,9 @@ void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, util::BitWr
         writer.write(bytearray[0], 1);
     } else if (type == 0) {
         for (auto i = 0; i < bytearray.size(); ++i) writer.write(bytearray[i], 8);
+         writer.write(0, 8);
     } else {
-        for (auto i = bytearray.size() ; i > 0; --i) writer.write(bytearray[i-1], 8);
+        for (auto i = bytearray.size(); i > 0; --i) writer.write(bytearray[i - 1], 8);
     }
 }
 

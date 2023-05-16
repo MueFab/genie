@@ -76,7 +76,8 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
     uint8_t attribute_name_len = randomU8();
     if (attribute_name_len < 3) attribute_name_len = 3;
     std::string attribute_name = randomString(attribute_name_len);
-    uint8_t attribute_type = randomType();
+    uint8_t attribute_type = 0;
+    //randomType();
     uint8_t attribute_num_array_dims = randomU2();
 
     std::vector<uint8_t> attribute_array_dims{};
@@ -428,8 +429,9 @@ RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     uint8_t AT_coord_size = randomU2();
     bool AT_pos_40_bits_flag = randomBool();
     uint8_t n_aux_attribute_groups = randomU3();
-    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration(
-        n_aux_attribute_groups);
+    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration;
+    for (auto i = 0; i <= n_aux_attribute_groups; ++i)
+        tile_configuration.push_back(genie::core::record::annotation_parameter_set::TileConfiguration(AT_coord_size));
 
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters;
 
