@@ -56,7 +56,6 @@ class AnnotationParameterSetTests : public ::testing::Test {
     // }
 };
 
-
 TEST_F(AnnotationParameterSetTests, annotationParameterSetZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -88,6 +87,20 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     annotationParameterSet.write(strwriter);
     strwriter.flush();
     annotationParameterSetCheck.read(strreader);
+    std::stringstream testOut;
+    genie::util::BitWriter teststrwriter(&testOut);
+    annotationParameterSetCheck.write(teststrwriter);
+
+    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+    EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
+    EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
+    EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());
+    EXPECT_EQ(annotationParameterSet.isATPos$0Bits(), annotationParameterSetCheck.isATPos$0Bits());
+
+    EXPECT_EQ(annotationParameterSet.getTileConfigurations().size(),
+              annotationParameterSetCheck.getTileConfigurations().size());
+
+    EXPECT_EQ(InOut.str(), testOut.str());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AnnotationParameterSet_seed_";

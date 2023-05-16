@@ -124,8 +124,8 @@ class RandomAnnotationEncodingParameters {
         else if (size == 0) {
             uint8_t randomstrlen = randomU4() + 3;
             randomVal.resize(randomstrlen, 0);
-            std::string randomval = randomString(randomstrlen - 1);
-            for (auto i = 0; i < randomstrlen - 1; ++i) randomVal[i] = randomval[i];
+            std::string randomval = randomString(randomstrlen);
+            for (auto i = 0; i < randomstrlen; ++i) randomVal[i] = randomval[i];
         } else {
             randomVal.resize(size / 8);
             for (auto& byte : randomVal) byte = randomU8();

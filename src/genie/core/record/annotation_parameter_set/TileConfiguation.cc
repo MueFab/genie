@@ -40,6 +40,24 @@ TileConfiguration::TileConfiguration()
       descriptor_ID{},
       additional_tile_structure{} {}
 
+TileConfiguration::TileConfiguration(uint8_t AT_coord_size)
+    : AT_coord_size(AT_coord_size),
+        AG_class(0),
+        attribute_contiguity(false),
+        two_dimensional(false),
+        column_major_tile_order(false),
+        symmetry_mode(0),
+        symmetry_minor_diagonal(false),
+        attribute_dependent_tiles(false),
+        default_tile_structure{AT_coord_size, two_dimensional},
+        n_add_tile_structures(0),
+        n_attributes{},
+        attribute_ID{},
+        n_descriptors{},
+        descriptor_ID{},
+        additional_tile_structure{} { 
+    }
+
 TileConfiguration::TileConfiguration(
     uint8_t AT_coord_size, uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
     bool column_major_tile_order, uint8_t symmetry_mode, bool symmetry_minor_diagonal, bool attribute_dependent_tiles,

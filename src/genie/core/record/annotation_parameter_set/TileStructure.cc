@@ -40,12 +40,33 @@ uint8_t TileStructure::coordSizeInBits(uint8_t size) const {
 }
 
 TileStructure::TileStructure()
-    : variable_size_tiles(false), n_tiles(0), start_index{}, end_index{}, tile_size{0}, two_dimensional(false) {}
+    : variable_size_tiles(false),
+      n_tiles(0),
+      start_index{},
+      end_index{},
+      tile_size{0},
+      two_dimensional(false),
+      ATCoordSize(0) {}
 
 TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional)
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
     read(reader);
 }
+TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional)
+    : ATCoordSize(ATCoordSize),
+      variable_size_tiles(false),
+      n_tiles(0),
+      start_index{},
+      end_index{},
+      tile_size{0},
+      two_dimensional(two_dimensional) {
+    if (two_dimensional)
+        tile_size.resize(2);
+    else
+        tile_size.resize(1);
+
+}
+
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
                              std::vector<std::vector<uint64_t>> start_index,
                              std::vector<std::vector<uint64_t>> end_index, std::vector<uint64_t> tile_size)
@@ -79,7 +100,7 @@ void TileStructure::read(util::BitReader& reader) {
             }
         }
     } else {
-        tile_size.resize(two_dimensional);
+        tile_size.resize(dimensions);
         for (auto& dimension : tile_size)
             dimension = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
     }

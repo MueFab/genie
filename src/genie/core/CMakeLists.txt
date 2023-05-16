@@ -36,6 +36,7 @@ set(source_files
         record/data_unit/record.cc
 
         record/contact/record.cc
+		record/annotation_access_unit/record.cc
 
         record/annotation_parameter_set/record.cc
         record/annotation_parameter_set/LikelihoodParameters.cc

@@ -5,10 +5,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 // ---------------------------------------------------------------------------------------------------------------------
+#define GENERATE_TEST_FILES false
 
 class TileConfigurationTests : public ::testing::Test {
  protected:

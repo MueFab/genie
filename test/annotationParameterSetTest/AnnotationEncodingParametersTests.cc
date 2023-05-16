@@ -5,10 +5,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
+#define GENERATE_TEST_FILES false
+
 
 class AnnotationEncodingParametersTests : public ::testing::Test {
  protected:
@@ -84,6 +88,10 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     annotationEncodingParameters.write(strwriter);
     strwriter.flush();
     annotationEncodingParametersCheck.read(strreader);
+    std::stringstream TestOUt;
+    genie::util::BitWriter teststrwriter(&TestOUt);
+    annotationEncodingParametersCheck.write(teststrwriter);
+    teststrwriter.flush();
 
     EXPECT_EQ(annotationEncodingParameters.getNumberOfFilters(),
               annotationEncodingParametersCheck.getNumberOfFilters());
@@ -100,6 +108,8 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     EXPECT_EQ(annotationEncodingParameters.getFeatureNames(), annotationEncodingParametersCheck.getFeatureNames());
     EXPECT_EQ(annotationEncodingParameters.getOntologyTermNameLengths(),
               annotationEncodingParametersCheck.getOntologyTermNameLengths());
+
+    EXPECT_EQ(InOut.str(), TestOUt.str());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AnnotationEncodingParameters_seed_";

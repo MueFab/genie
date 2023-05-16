@@ -5,10 +5,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 // ---------------------------------------------------------------------------------------------------------------------
+
+#define GENERATE_TEST_FILES false
 
 class DescriptorConfigurationTests : public ::testing::Test {
  protected:
@@ -68,12 +72,17 @@ TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT
     descriptorConfiguration = RandomContactMatrixParameters.randomDescriptorConfiguration();
 
     std::stringstream InOut;
-    //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
     genie::util::BitWriter strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     descriptorConfiguration.write(strwriter);
     strwriter.flush();
     descriptorConfigurationCheck.read(strreader);
+
+    std::stringstream TestOut;
+    genie::util::BitWriter teststrwriter(&TestOut);
+    descriptorConfigurationCheck.write(teststrwriter);
+    teststrwriter.flush();
+    EXPECT_EQ(InOut.str(), TestOut.str());
 
     EXPECT_EQ(descriptorConfiguration.getDescriptorID(), descriptorConfigurationCheck.getDescriptorID());
     EXPECT_EQ(descriptorConfiguration.getEncodingModeID(), descriptorConfigurationCheck.getEncodingModeID());
