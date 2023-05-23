@@ -161,7 +161,7 @@ void GenotypeParameters::write(std::ostream& outputfile) const {
         outputfile << std::to_string(transpose_phases_mat_flag) << ",";
         outputfile << std::to_string(phases_codec_ID) << ",";
     } else {
-        outputfile << std::to_string(phases_value);
+        outputfile << std::to_string(phases_value) << ",";
     }
 }
 
