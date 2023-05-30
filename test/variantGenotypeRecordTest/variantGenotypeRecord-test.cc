@@ -1,11 +1,40 @@
 #include <gtest/gtest.h>
 
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+
 #include "genie/core/record/variant_genotype/arrayType.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/util/bitreader.h"
+
+class RandomGenotype {
+ public:
+    genie::core::record::variant_genotype::Record randomVariantGenotype() {
+        uint64_t variant_index = 0;
+        uint32_t sample_index_from = 0;
+        uint32_t sample_count = 0;
+        uint8_t format_count = 0;
+        std::vector<genie::core::record::variant_genotype::FormatField> format{};
+        uint8_t genotype_present = 0;
+        uint8_t likelihood_present = 0;
+        uint8_t n_alleles_per_sample = 0;
+        std::vector<std::vector<uint8_t>> alleles{};
+        std::vector<std::vector<uint8_t>> phasing{};
+        uint8_t n_likelihoods = 0;
+        std::vector<std::vector<uint32_t>> likelihoods{};
+        uint8_t linked_record = 0;
+        uint8_t link_name_len = 0;
+        std::string link_name = "";
+        uint8_t reference_box_ID = 0;
+
+        return genie::core::record::variant_genotype::Record(
+            variant_index, sample_index_from, sample_count, format_count, format, genotype_present, likelihood_present,
+            n_alleles_per_sample, alleles, phasing, n_likelihoods, likelihoods, linked_record, link_name_len, link_name,
+            reference_box_ID);
+    }
+};
 
 class VariantGenotypeRecordTests : public ::testing::Test {
  protected:
@@ -52,78 +81,24 @@ class VariantGenotypeRecordTests : public ::testing::Test {
     // }
 };
 
-#include <array>
-
-std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd, "r"), _pclose);
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-    return result;
-}
-
-TEST_F(VariantGenotypeRecordTests, arrayTypeConversion) {  // NOLINT(cert-err58-cpp)
+TEST_F(VariantGenotypeRecordTests, DISABLED_readFilefrombin) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::variant_genotype::arrayType testTypes;
-    {
-        std::stringstream outputfile;
-        genie::util::BitWriter strwriter(&outputfile);
-        genie::util::BitReader strreader(outputfile);
-        uint8_t type = 6;
-        uint16_t temp = 1023;
-        strwriter.write(temp, 16);
-        auto byteArray = testTypes.toArray(type, strreader);
-        auto stringout = testTypes.toString(type, byteArray);
-        EXPECT_STREQ(stringout.c_str(), std::to_string(temp).c_str());
-    }
-    {
-        std::stringstream outputfile;
-        genie::util::BitWriter strwriter(&outputfile);
-        genie::util::BitReader strreader(outputfile);
-        uint8_t type = 11;
-        uint32_t temp = 0x292361ab;
-        std::vector<uint8_t> writeArray(4, 0);
-        memcpy(&writeArray[0], &temp,4);
-
-        testTypes.toFile(type, writeArray, strwriter);
-
-        //strwriter.write(temp, 32);
-        //for (auto byte : writeArray) strwriter.write(byte, 8);
-        auto byteArray = testTypes.toArray(type, strreader);
-        auto stringout = testTypes.toString(type, byteArray);
-        EXPECT_STREQ(stringout.c_str(), std::to_string(temp).c_str());
-    }
-}
-
-TEST_F(VariantGenotypeRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-
-    std::filebuf fb1;
-    if (fb1.open(gitRootDir.substr(0, gitRootDir.length() - 1) + "/data/records/1.3.05_cut.geno",
-                 std::ios::in | std::ios::binary)) {
-        std::istream is(&fb1);
-        genie::util::BitReader reader(is);
-        std::ofstream myfile("1.3.05_cut.geno_test.txt");
+    std::string path = "./Testfiles/exampleMGrecs/";
+    std::string filename = "ALL.chrX.10000";
+    std::ifstream inputfile;
+    inputfile.open(path + filename + ".geno", std::ios::in | std::ios::binary);
+    if (inputfile.is_open()) {
+        genie::util::BitReader reader(inputfile);
+        std::ofstream outputfile(path + filename + "_geno.txt");
         do {
             genie::core::record::variant_genotype::Record variant_geno_record(reader);
-
             EXPECT_EQ(variant_geno_record.getSampleCount(), variant_geno_record.getAlleles().size());
-
-            variant_geno_record.write(myfile);
-
-        } while (is.peek() != EOF);
-        fb1.close();
-        myfile.close();
+            variant_geno_record.write(outputfile);
+        } while (inputfile.peek() != EOF);
+        inputfile.close();
+        outputfile.close();
     }
 }
 

@@ -136,7 +136,6 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
     genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars, std::vector<uint8_t> parNumArrayDims) {
     uint8_t n_pars = nuMOfpars;
-    // randomU8();
     std::vector<uint8_t> par_ID(n_pars, 0);
     std::vector<uint8_t> par_type(n_pars, 0);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
@@ -247,7 +246,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
     genie::core::record::annotation_parameter_set::TileStructure default_tile_structure =
         simpleTileStructure(AT_coord_size, two_dimensional);
 
-    uint16_t n_add_tile_structures = 0;
+    uint16_t n_add_tile_structures = randomU16();
     std::vector<uint16_t> n_attributes;
     std::vector<std::vector<uint16_t>> attribute_ID;
     std::vector<uint8_t> n_descriptors;

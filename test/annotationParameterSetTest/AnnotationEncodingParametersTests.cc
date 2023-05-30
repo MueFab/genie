@@ -5,13 +5,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include <gtest/gtest.h>
+#include <array>
 #include <fstream>
 #include <iostream>
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
-#define GENERATE_TEST_FILES false
+#define GENERATE_TEST_FILES true
 
 
 class AnnotationEncodingParametersTests : public ::testing::Test {
@@ -76,11 +77,11 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
+    RandomAnnotationEncodingParameters RandomAnnotationEncodingParameters;
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotationEncodingParameters;
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotationEncodingParametersCheck;
 
-    annotationEncodingParameters = RandomContactMatrixParameters.randomAnnotationEncodingParameters();
+    annotationEncodingParameters = RandomAnnotationEncodingParameters.randomAnnotationEncodingParameters();
 
     std::stringstream InOut;
     genie::util::BitWriter strwriter(&InOut);
