@@ -50,44 +50,24 @@ class VariantSiteRecordTests : public ::testing::Test {
     // }
 };
 
-#include <array>
-
-std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    // windows _pclose, _popen  and linux pclose, popen
-#ifdef _WIN32
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd, "r"), _pclose);
-#else
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-#endif
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-    return result;
-}
-
 TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
+    std::string path = "./Testfiles/exampleMGrecs/";
+    std::string filename = "ALL.chrX.10000";
+    std::ifstream inputfile;
+    inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
 
-    std::filebuf fb1;
-    std::string filename = gitRootDir.substr(0, gitRootDir.length() - 1) + "/data/records/1.3.05_cut.site";
-    if (fb1.open(filename, std::ios::in | std::ios::binary)) {
-        std::istream is(&fb1);
-        genie::util::BitReader reader(is);
-        std::ofstream myfile("1.3.05_cut.site_test.txt");
+      if (inputfile.is_open()) {
+        genie::util::BitReader reader(inputfile);
+        std::ofstream outputfile(path + filename + "_site.txt");
         do {
             genie::core::record::variant_site::Record variant_site_record(reader);
-            variant_site_record.write(myfile);
-        } while (is.peek() != EOF);
-        fb1.close();
-        myfile.close();
+            variant_site_record.write(outputfile);
+        } while (inputfile.peek() != EOF);
+        inputfile.close();
+        outputfile.close();
     }
 
     EXPECT_EQ(0, 0);
