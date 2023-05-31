@@ -36,7 +36,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-    ProgramOptions pOpts(argc, argv);
+    ProgramOptions programOptions(argc, argv);
 
     return 0;
 }
