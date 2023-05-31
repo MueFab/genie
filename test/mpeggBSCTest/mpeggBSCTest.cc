@@ -70,11 +70,6 @@ class MpeggBSCTests : public ::testing::Test {
     // }
 };
 
-#include <stdlib.h>
-#include <string.h>
-#include "genie/entropy/mpegg-codecs/include/mpegg-codecs.h"
-#include "genie/entropy/mpegg-codecs/libbsc/libbsc.h"
-#include "genie/entropy/mpegg-codecs/test/test-utils.h"
 TEST_F(MpeggBSCTests, ExampleTest) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -189,23 +184,6 @@ TEST_F(MpeggBSCTests, ExampleTest) {  // NOLINT(cert-err58-cpp)
     //---------------------------------------------------------//
     //---------------------annotation access unit  ------------//
 
-    /* std::string filename = "Testfiles\\exampleMGrecs\\ALL.chrX.10000.site";
-
-       int rc = 0;
-    //   int ret;
-       unsigned char *inputBuffer = NULL;
-    //   unsigned char *compressedBuffer = NULL;
-    //   unsigned char *decompressedBuffer = NULL;
-
-       size_t inputSize = 0;
-       size_t compBuffSize = 0;
-       size_t decBuffSize = 0;
-       if (inputSize != decBuffSize) compBuffSize++;
-
-         if ((inputBuffer = load_binary_file(filename.c_str(), &inputSize)) == NULL) {
-           rc = 1;
-       }
-       */
 
     bool is_attribute = false;
     uint16_t attribute_ID = false;

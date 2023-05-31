@@ -63,18 +63,8 @@ int main(int argc, char* argv[]) {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
             stat(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-//        } else if (operation == "transcode-fasta") {
-//            genieapp::transcode_fasta::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-//        } else if (operation == "transcode-fastq") {
-//            genieapp::transcode_fastq::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-//#ifdef GENIE_SAM_SUPPORT
-//        } else if (operation == "transcode-sam") {
-//            genieapp::transcode_sam::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-//#endif
         } else if (operation == "gabac") {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-            //        } else if (operation == "capsulate") {
-            //            genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "annotation") {
             genieapp::annotation::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
             UTILS_DIE("not yet implemented");
