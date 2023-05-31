@@ -13,11 +13,20 @@
 #include "genie/core/access-unit.h"
 #include "genie/core/module.h"
 #include "genie/core/parameter/descriptor_present/decoder.h"
+#include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
+
+class EntropyEncoderAnnotation {
+ public:
+    virtual ~EntropyEncoderAnnotation() = default;
+    virtual core::record::annotation_access_unit::Record process(
+        core::record::annotation_parameter_set::DescriptorConfiguration& desc) = 0;
+};
 
 /**
  * @brief Interface for entropy coders. They convert raw access units to access unit payloads
