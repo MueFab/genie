@@ -2,8 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "genie/BSC/main.h"
-
 #include "genie//core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie//core/record/annotation_parameter_set/TileStructure.h"
 #include "genie//core/record/annotation_parameter_set/record.h"
