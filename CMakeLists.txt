@@ -159,7 +159,7 @@ set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 include_directories("${CMAKE_SOURCE_DIR}/src/apps")
 include_directories("${CMAKE_SOURCE_DIR}/src/libs")
 include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/thirdparty")
-
+add_subdirectory("thirdparty/codecs")
 
 #==============================================================================
 # Subdirectories
