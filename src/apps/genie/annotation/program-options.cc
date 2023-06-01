@@ -27,6 +27,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
 
     app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
     app.add_option("-o,--output-file", outputFile, "")->mandatory(true);
+    this->task = "encode";
+    app.add_option("-t,--task", this->task, "Task ('encode' or 'decode')");
+    this->codec = "bsc";
+    app.add_option("-c,--codec", this->codec, "codec ('bsc' or 'default')");
 
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "");
@@ -111,13 +115,15 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() const {
     auto files = genie::util::tokenize(inputFile, ';');
-
+    if (this->task != "encode" && this->task != "decode") {
+        UTILS_DIE("Task '" + this->task + "' is invalid");
+    }
     for (const auto &f : files) {
         validateInputFile(f);
         std::cout << "Input file: " << f << " with size " << size_string(ghc::filesystem::file_size(f)) << std::endl;
     }
 
-    //    validateOutputFile(outputFile, forceOverwrite);
+    validateOutputFile(outputFile, forceOverwrite);
     std::cout << "Output file: " << outputFile << " with "
               << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
 }

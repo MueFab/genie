@@ -27,15 +27,15 @@ class ProgramOptions {
      * @param argv
      */
     ProgramOptions(int argc, char *argv[]);
+    ~ProgramOptions() = default;
 
  public:
     std::string inputFile;  //!< @brief
-
     std::string outputFile;  //!< @brief
-
     bool forceOverwrite;  //!< @brief
-
-    bool help;  //!< @brief
+    std::string task;     //!< @brief
+    std::string codec;    //!< @brief
+    bool help;            //!< @brief
 
  private:
     /**

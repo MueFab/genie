@@ -9,6 +9,7 @@ set(source_files
         gabac/program-options.cc
         annotation/main.cc
         annotation/program-options.cc
+        annotation/Code.cc
         )
 
 add_executable(genie ${source_files})
@@ -16,6 +17,8 @@ add_executable(genie ${source_files})
 target_link_libraries(genie PRIVATE genie-util)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-gabac)
+#target_link_libraries(genie PRIVATE libbsc)
+#target_link_libraries(genie PRIVATE Api)
 # TODO: To be implemented later
 #target_link_libraries(genie PRIVATE genie-mgrec)
 #target_link_libraries(genie PRIVATE genie-mgg)
