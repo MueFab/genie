@@ -13,5 +13,6 @@ add_definitions(-DLIBBSC_SORT_TRANSFORM_SUPPORT -D_LARGEFILE64_SOURCE -DBSC_ALLO
 
 add_library(Libbsc OBJECT ${Libbsc_sources})
 
+
 set_property(TARGET Libbsc PROPERTY POSITION_INDEPENDENT_CODE ON)
 

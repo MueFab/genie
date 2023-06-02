@@ -182,6 +182,18 @@ void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
     writer.flush();
 }
 
+size_t AnnotationEncodingParameters::writeSize() const { 
+    size_t writeSizeInBits = 8 + n_filter * 6 + 8 + n_features_names * 6 + n_ontology_terms * 6;
+    for (auto name : filter_ID) writeSizeInBits += 8 * name.length();
+    for (auto name : description) writeSizeInBits += 8 * name.length();
+    for (auto name : feature_name) writeSizeInBits += 8 * name.length();
+    for (auto name : ontology_term_name) writeSizeInBits += 8 * name.length();
+    for (auto descriptor : descriptor_configuration) writeSizeInBits += descriptor.writeSize();
+    for (auto compressor : compressor_parameter_set) writeSizeInBits += compressor.writeSize();
+    for (auto attribute : attribute_parameter_set) writeSizeInBits += attribute.writeSize();
+    
+    return size_t(); }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set

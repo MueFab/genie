@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -36,24 +37,31 @@ class Code {
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
     using AnnotationAccessUnit = genie::core::record::annotation_access_unit::Record;
     using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+    using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
+    using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
 
     uint8_t encodingMode = 3;  // BSC
     const DescriptorID descriptorID = DescriptorID::ATTRIBUTE;
     uint64_t fileSize = 197974;
-    uint8_t AT_coord_size = 0;
-    uint8_t AG_class = 1;
-    uint8_t AT_ID = 1;
+    const uint8_t AT_coord_size = 2;
+    const uint8_t AG_class = 1;
+    const uint8_t AT_ID = 1;
     bool variable_size_tiles = false;
     bool attribute_contiguity = false;
     bool two_dimensional = false;
     bool column_major_tile_order = false;
 
-    int bsc_init_done = 0;
-
     AnnotationParameterSet annotationParameterSet;
     AnnotationAccessUnit annotationAccessUnit;
 
+    std::string inputFileName = "in.mgrecs";
+    std::string outputFileName = "out.mgb";
+    std::stringstream compressedData{};
+
     void fillAnnotationParameterSet();
+    DescriptorConfiguration fillDescriptorConfiguration();
+    AnnotationEncodingParameters fillAnnotationEncodingParameters();
+
     void fillAnntationAccessUnit();
     void encodeData();
 };

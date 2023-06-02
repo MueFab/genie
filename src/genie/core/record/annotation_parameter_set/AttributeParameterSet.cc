@@ -232,6 +232,7 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
         }
     }
 }
+size_t AttributeParameterSet::writeSize() const { return size_t(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set
