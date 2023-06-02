@@ -232,7 +232,16 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
         }
     }
 }
-size_t AttributeParameterSet::writeSize() const { return size_t(); }
+size_t AttributeParameterSet::writeSize() const {
+    size_t writeSizeInBits = 16 + 8 + 8 * attribute_name_len + 8 + attribute_num_array_dims * 8;
+    if (attribute_type == 2) {
+        writeSizeInBits += 1;
+    } else {
+        writeSizeInBits += attribute_default_val.size() * 8;
+    }
+    writeSizeInBits += 1 + 8 + 4;
+    return writeSizeInBits;
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set
