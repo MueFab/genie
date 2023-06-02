@@ -68,6 +68,12 @@ void Record::write(util::BitWriter& writer) const {
     annotation_encoding_parameters.write(writer);
 }
 
+size_t Record::writeSize() const { 
+    size_t writeSizeInBits = 8 + 8 + 8 + 2 + 2 + 1 + 3;
+    for (auto tileConfiguration : tile_configuration) writeSizeInBits += tileConfiguration.writeSize();
+    writeSizeInBits += annotation_encoding_parameters.writeSize();
+    return size_t(); }
+
 void Record::write(std::ostream& outputfile) const {
     outputfile << std::to_string(parameter_set_ID) << ",";
     outputfile << std::to_string(AT_ID) << ",";

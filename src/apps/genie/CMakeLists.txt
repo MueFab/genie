@@ -17,6 +17,7 @@ add_executable(genie ${source_files})
 target_link_libraries(genie PRIVATE genie-util)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-gabac)
+target_link_libraries(genie PRIVATE mpeggCodecs-static)
 #target_link_libraries(genie PRIVATE libbsc)
 #target_link_libraries(genie PRIVATE Api)
 # TODO: To be implemented later

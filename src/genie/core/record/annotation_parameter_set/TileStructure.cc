@@ -64,7 +64,6 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional)
         tile_size.resize(2);
     else
         tile_size.resize(1);
-
 }
 
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
@@ -144,6 +143,16 @@ void TileStructure::write(util::BitWriter& writer) const {
     } else {
         for (auto j = 0; j < dimensions; ++j) writer.write(tile_size[j], coordSizeInBits(ATCoordSize));
     }
+}
+
+size_t TileStructure::writeSize() const {
+    size_t writeSizeInBits = 7 + 1 + static_cast<size_t>(coordSizeInBits(ATCoordSize));
+    if (variable_size_tiles) {
+        writeSizeInBits += static_cast<size_t>(coordSizeInBits(ATCoordSize)) * 2 * n_tiles * (two_dimensional ? 2 : 1);
+    } else {
+        writeSizeInBits += static_cast<size_t>(coordSizeInBits(ATCoordSize)) * (two_dimensional ? 2 : 1);
+    }
+    return writeSizeInBits;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
