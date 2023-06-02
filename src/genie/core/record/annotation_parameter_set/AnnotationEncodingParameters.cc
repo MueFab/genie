@@ -188,11 +188,12 @@ size_t AnnotationEncodingParameters::writeSize() const {
     for (auto name : description) writeSizeInBits += 8 * name.length();
     for (auto name : feature_name) writeSizeInBits += 8 * name.length();
     for (auto name : ontology_term_name) writeSizeInBits += 8 * name.length();
-    for (auto descriptor : descriptor_configuration) writeSizeInBits += descriptor.writeSize();
-    for (auto compressor : compressor_parameter_set) writeSizeInBits += compressor.writeSize();
+   // for (auto descriptor : descriptor_configuration) writeSizeInBits += descriptor.writeSize();
+  //  for (auto compressor : compressor_parameter_set) writeSizeInBits += compressor.writeSize();
     for (auto attribute : attribute_parameter_set) writeSizeInBits += attribute.writeSize();
     
-    return size_t(); }
+    return writeSizeInBits;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
