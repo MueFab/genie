@@ -4,28 +4,25 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCK_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCK_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCKHEADER_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCKHEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
-#include <fstream>
-#include <iostream>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-
-#include "BlockHeader.h"
-#include "BlockPayload.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -33,34 +30,30 @@ namespace core {
 namespace record {
 namespace annotation_access_unit {
 
-class Block {
+class BlockHeader {
  private:
-    BlockHeader block_header;
-    BlockPayload block_payload;
-    uint8_t numChrs;
+    bool attribute_contiguity;
+    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
+    uint16_t attribute_ID;
+    bool indexed;
+    uint32_t block_payload_size;
 
  public:
-    Block();
-    Block(BlockHeader block_header, BlockPayload block_payload, uint8_t numChrs);
-    Block(util::BitReader& reader, uint8_t numChrs);
+    BlockHeader();
+    BlockHeader(bool attribute_contiguity, genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID,
+                uint16_t attribute_ID, bool indexed, uint32_t block_payload_size);
 
-    Block(const Block& b) {
-        block_header = b.block_header;
-        block_payload = b.block_payload;
-        numChrs = b.numChrs;
-    }
+    void read(genie::util::BitReader& reader);
 
-    Block& operator=(const Block& b) {
-        block_header = b.block_header;
-        block_payload = b.block_payload;
-        numChrs = b.numChrs;
-        return *this;
-    }
-
-    void read(util::BitReader& reader);
-    void read(util::BitReader& reader, uint8_t numChrs);
     void write(util::BitWriter& writer);
+
+    genie::core::record::annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptor_ID; }
+    uint16_t getAttributeID() const { return attribute_ID; }
+    bool isIndexed() const { return indexed; }
+    uint32_t getBlockPayloadSize() const { return block_payload_size; }
 };
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +64,7 @@ class Block {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCK_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_BLOCKHEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

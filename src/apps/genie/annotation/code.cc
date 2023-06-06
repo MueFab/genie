@@ -4,6 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <fstream>
+#include <iostream>
 #include <sstream>
 
 #include "code.h"
@@ -16,6 +18,13 @@
 //#include "mpegg-codecs.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
+#ifdef _WIN32
+#include <windows.h>
+#define SYSERROR() GetLastError()
+#else
+#include <errno.h>
+#define SYSERROR() errno
+#endif
 
 namespace genieapp {
 namespace annotation {
@@ -26,9 +35,47 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
     : inputFileName(inputFileName), outputFileName(outputFileName), compressedData{} {
     if (encodeMode != 3) return;
 
+    std::cerr << "calling fillAnnotationParameterSet()...\n";
     fillAnnotationParameterSet();
+    std::cerr << "calling encodeData()...\n";
     encodeData();
-    fillAnntationAccessUnit();
+    std::cerr << "calling fillAnnotationAccessUnit()...\n";
+    fillAnnotationAccessUnit();
+
+    std::stringstream parameterSetStream;
+    genie::util::BitWriter parameterSetWriter(&parameterSetStream);
+    std::stringstream accessStream;
+    genie::util::BitWriter accessWriter(&accessStream);
+    annotationParameterSet.write(parameterSetWriter);
+    annotationAccessUnit.write(accessWriter);
+
+    std::ofstream outputFile;
+    std::cerr << "opening file " << OutputFileName << std::endl;
+    outputFile.open("TestFiles/test.mgb", std::ios::binary | std::ios::out);
+    if (outputFile.is_open()) {
+        std::cerr << "writing to output...\n";
+        genie::util::BitWriter dataUnitWriter(&outputFile);
+
+        uint8_t data_unit_type = 3;
+        uint64_t data_unit_size = (parameterSetWriter.getBitsWritten() + 10 + 8 + 22) / 8;
+        dataUnitWriter.write(data_unit_type, 8);
+        dataUnitWriter.write(0, 10);
+        dataUnitWriter.write(data_unit_size, 22);
+        dataUnitWriter.write(&parameterSetStream);
+        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
+
+        data_unit_type = 4;
+        data_unit_size = (accessWriter.getBitsWritten() + 8 + 29 + 3) / 8;
+        dataUnitWriter.write(data_unit_type, 8);
+        dataUnitWriter.write(0, 3);
+        dataUnitWriter.write(data_unit_size, 29);
+        dataUnitWriter.write(&accessStream);
+        dataUnitWriter.flush();
+        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
+        outputFile.close();
+    } else {
+        std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -132,7 +179,7 @@ genie::core::record::annotation_parameter_set::AnnotationEncodingParameters Code
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void genieapp::annotation::Code::fillAnntationAccessUnit() {
+void genieapp::annotation::Code::fillAnnotationAccessUnit() {
     bool is_attribute = false;
     uint16_t attribute_ID = false;
     uint64_t n_tiles_per_col = 0;
@@ -156,17 +203,13 @@ void genieapp::annotation::Code::fillAnntationAccessUnit() {
     genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
     genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
     std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
-    std::string filename = "testFiles/exampleMGrecs/ALL.chrX.10000_site.compressed";
-    std::ifstream compressedFile;
-    compressedFile.open(filename, std::ios::binary | std::ios::in);
 
-    std::stringstream stringPayload;
-    stringPayload << compressedFile.rdbuf();
-    std::string generic_payload = stringPayload.str();
+    std::string generic_payload = compressedData.str();
     uint8_t num_chrs = 0;
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
-        descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload, generic_payload);
+        descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
+        static_cast<uint16_t>(generic_payload.size()), compressedData);
 
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     genie::core::record::annotation_access_unit::Block block(block_header, block_payload, num_chrs);
@@ -184,8 +227,8 @@ void genieapp::annotation::Code::fillAnntationAccessUnit() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 void genieapp::annotation::Code::encodeData() {
-    std::ofstream infile;
-    infile.open(inputFileName, std::ios::binary | std::ios::out);
+    std::ifstream infile;
+    infile.open(inputFileName, std::ios::binary);
 
     std::stringstream wholeTestFile;
     if (infile.is_open()) {
@@ -196,12 +239,13 @@ void genieapp::annotation::Code::encodeData() {
     unsigned char *dest = NULL;
     size_t destLen = 0;
     size_t srcLen = wholeTestFile.str().size();
-    // const char src[] = wholeTestFile.str().c_str();
+    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
     mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)wholeTestFile.str().c_str(), srcLen,
                        MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
                        MPEGG_BSC_CODER_QLFC_STATIC);
-    compressedData << dest;
+    compressedData.write((const char *)dest, destLen);
+    std::cout << "compressedData length: " << std::to_string(compressedData.str().size()) << std::endl;
 }
 
 }  // namespace annotation

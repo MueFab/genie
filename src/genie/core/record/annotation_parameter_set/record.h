@@ -53,7 +53,6 @@ class Record {
     void read(util::BitReader& reader);
     void write(std::ostream& outputfile) const;
     void write(util::BitWriter& writer) const;
-    size_t writeSize() const;
 
     uint8_t getParameterSetID() const { return parameter_set_ID; }
     uint8_t getATID() const { return AT_ID; }

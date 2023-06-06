@@ -97,8 +97,6 @@ class AttributeParameterSet {
      */
     void write(std::ostream& outputfile) const;
 
-    size_t writeSize() const;
-
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }
     std::string getAttributeName() const { return attribute_name; }

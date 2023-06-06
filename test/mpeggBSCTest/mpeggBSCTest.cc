@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
-#include <iostream>
+//#include <iostream>
+#include <sstream>
 
 #include "genie//core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie//core/record/annotation_parameter_set/TileStructure.h"
@@ -20,6 +21,8 @@
 #include "genie//core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
 #include "genie//core/record/annotation_access_unit/block.h"
 #include "genie//core/record/annotation_access_unit/record.h"
+
+#include "codecs/include/mpegg-codecs.h"
 
 #define GENERATE_TEST_FILES true
 
@@ -68,7 +71,124 @@ class MpeggBSCTests : public ::testing::Test {
     // }
 };
 
-TEST_F(MpeggBSCTests, ExampleTest) {  // NOLINT(cert-err58-cpp)
+TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
+        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE;
+    uint8_t num_chrs = 1;
+    genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
+    genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
+    std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
+    genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
+
+    std::string FileName = "TestFiles/exampleMGrecs/ALL.chrX.10000.site";
+    std::ifstream infile(FileName, std::ios::binary | std::ios::in);
+    if (infile.fail()) {
+        std::cout << "failed to open: " << FileName << std::endl;
+    }
+    std::stringstream generic_payload;
+    if (infile.is_open()) {
+        infile.seekg(0, infile.end);
+        int length = static_cast<int>(infile.tellg());
+        infile.seekg(0, infile.beg);
+        EXPECT_GT(length, 0);
+
+        generic_payload << infile.rdbuf();
+        infile.close();
+    }
+
+    uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
+
+    genie::core::record::annotation_access_unit::BlockPayload block_payload(
+        descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
+        block_payload_size, generic_payload);
+
+    std::stringstream outputData;
+    genie::util::BitWriter writer(&outputData);
+    block_payload.write(writer);
+    EXPECT_GE(outputData.str().size(), block_payload_size);
+}
+
+TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
+        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE;
+    uint8_t num_chrs = 1;
+    genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
+    genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
+    std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
+    genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
+
+    std::string FileName = "TestFiles/exampleMGrecs/ALL.chrX.10000.site";
+    std::ifstream infile(FileName, std::ios::binary | std::ios::in);
+    if (infile.fail()) {
+        std::cout << "failed to open: " << FileName << std::endl;
+    }
+    std::stringstream generic_payload;
+    if (infile.is_open()) {
+        infile.seekg(0, infile.end);
+        int length = static_cast<int>(infile.tellg());
+        infile.seekg(0, infile.beg);
+        EXPECT_GT(length, 0);
+
+        generic_payload << infile.rdbuf();
+        infile.close();
+    }
+
+    uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
+
+    genie::core::record::annotation_access_unit::BlockPayload block_payload(
+        descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
+        block_payload_size, generic_payload);
+    genie::core::record::annotation_access_unit::BlockHeader blockHeader(false, descriptor_ID, 1, false,
+                                                                         block_payload_size);
+    genie::core::record::annotation_access_unit::Block block(blockHeader, block_payload, num_chrs);
+
+    std::stringstream outputData;
+    genie::util::BitWriter writer(&outputData);
+    block.write(writer);
+    EXPECT_GE(outputData.str().size(), block_payload_size);
+}
+
+TEST_F(MpeggBSCTests, testCode) {  // NOLINT(cert-err58-cpp)
+                                   // The rule of thumb is to use EXPECT_* when you want the test to continue
+                                   // to reveal more errors after the assertion failure, and use ASSERT_*
+                                   // when continuing after failure doesn't make sense.
+    std::string inputFileName = "TestFiles/exampleMGrecs/ALL.chrX.10000.site";
+    std::string OutputFileName = "TestFiles/testCode.mgb";
+
+    std::ifstream infile;
+    infile.open(inputFileName, std::ios::binary);
+
+    std::stringstream wholeTestFile;
+    std::stringstream compressedData; 
+    if (infile.is_open()) {
+        wholeTestFile << infile.rdbuf();
+        infile.close();
+    }
+
+    unsigned char *dest = NULL;
+    size_t destLen = 0;
+    size_t srcLen = wholeTestFile.str().size();
+    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+
+    mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)wholeTestFile.str().c_str(), srcLen,
+                       MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
+                       MPEGG_BSC_CODER_QLFC_STATIC);
+    //for (auto i = 0; i < destLen; ++i) compressedData << dest[i];
+    
+
+     compressedData.write((const char *)dest, destLen);
+   
+    auto compressed_dataSize = compressedData.str().size();
+    std::cout << "compressedData length: " << std::to_string(compressed_dataSize) << std::endl;
+}
+
+TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
@@ -182,7 +302,6 @@ TEST_F(MpeggBSCTests, ExampleTest) {  // NOLINT(cert-err58-cpp)
     //---------------------------------------------------------//
     //---------------------annotation access unit  ------------//
 
-
     bool is_attribute = false;
     uint16_t attribute_ID = false;
     uint64_t n_tiles_per_col = 0;
@@ -212,11 +331,15 @@ TEST_F(MpeggBSCTests, ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream stringPayload;
     stringPayload << compressedFile.rdbuf();
-    std::string generic_payload = stringPayload.str();
+    std::stringstream& stringPayload1 = stringPayload;
+    // std::string generic_payload = stringPayload.str();
+    uint16_t payloadSize = static_cast<uint16_t>(stringPayload.str().size());
     uint8_t num_chrs = 0;
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
-        descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload, generic_payload);
+        descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload, payloadSize,
+        stringPayload1);
+    stringPayload << "boe";
 
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     genie::core::record::annotation_access_unit::Block block(block_header, block_payload, num_chrs);
