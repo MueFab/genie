@@ -62,7 +62,7 @@ class Code {
     DescriptorConfiguration fillDescriptorConfiguration();
     AnnotationEncodingParameters fillAnnotationEncodingParameters();
 
-    void fillAnntationAccessUnit();
+    void fillAnnotationAccessUnit();
     void encodeData();
 };
 

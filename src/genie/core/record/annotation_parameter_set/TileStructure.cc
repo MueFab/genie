@@ -145,15 +145,6 @@ void TileStructure::write(util::BitWriter& writer) const {
     }
 }
 
-size_t TileStructure::writeSize() const {
-    size_t writeSizeInBits = 7 + 1 + static_cast<size_t>(coordSizeInBits(ATCoordSize));
-    if (variable_size_tiles) {
-        writeSizeInBits += static_cast<size_t>(coordSizeInBits(ATCoordSize)) * 2 * n_tiles * (two_dimensional ? 2 : 1);
-    } else {
-        writeSizeInBits += static_cast<size_t>(coordSizeInBits(ATCoordSize)) * (two_dimensional ? 2 : 1);
-    }
-    return writeSizeInBits;
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

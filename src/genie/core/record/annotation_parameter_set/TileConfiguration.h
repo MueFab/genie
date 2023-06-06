@@ -73,7 +73,6 @@ class TileConfiguration {
     void write(util::BitWriter& writer) const;
     void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
     void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
-    size_t writeSize() const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }

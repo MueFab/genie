@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
             genieapp::gabac::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "annotation") {
             genieapp::annotation::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-            UTILS_DIE("not yet implemented");
+           
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {

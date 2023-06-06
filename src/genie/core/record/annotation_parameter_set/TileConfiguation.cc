@@ -184,24 +184,6 @@ void TileConfiguration::write(util::BitWriter& writer, bool skipEmbeddedRecord) 
 
 void TileConfiguration::write(util::BitWriter& writer) const { write(writer, false); }
 
-size_t TileConfiguration::writeSize() const {
-    size_t writeSizeInBits = 3 + 1 + 1;
-    if (two_dimensional)
-        writeSizeInBits += 6 + 1 + 3 + 2;
-    else
-        writeSizeInBits += 3;
-    writeSizeInBits += default_tile_structure.writeSize();
-    if (attribute_dependent_tiles) {
-        writeSizeInBits += 16 + n_add_tile_structures * (16 + 7);
-        for (auto i = 0; i < n_add_tile_structures; ++i) {
-            writeSizeInBits += n_attributes[i] * 16 + n_descriptors[i] * 7;
-            writeSizeInBits += additional_tile_structure[i].writeSize();
-        }
-    }
-
-    return size_t();
-}
-
 }  // namespace annotation_parameter_set
 }  // namespace record
 }  // namespace core

@@ -53,7 +53,6 @@ class TileStructure {
     void write(util::BitWriter& writer) const;
     void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
     void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
-    size_t writeSize() const;
 
     bool isVariableSizeTiles() const { return variable_size_tiles; }
     uint64_t getNumberOfTiles() const { return n_tiles; }

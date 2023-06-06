@@ -34,6 +34,8 @@ namespace annotation {
 int main(int argc, char* argv[]) {
     ProgramOptions programOptions(argc, argv);
     if (programOptions.task == "encode") {
+        std::cerr << "calling Code...\n"; 
+        Code code(programOptions.inputFile, programOptions.outputFile);
     } else if (programOptions.task == "decode") {
         UTILS_DIE("not yet implemented: " + std::string(programOptions.task));
     } else {

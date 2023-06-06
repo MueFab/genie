@@ -75,6 +75,7 @@ class DescriptorConfiguration {
     void read(util::BitReader& reader);
     void write(std::ostream& outputfile) const;
     void write(util::BitWriter& writer) const;
+
     DescriptorID getDescriptorID() const { return descriptor_ID; }
     uint8_t getEncodingModeID() const { return encoding_mode_ID; }
     GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }

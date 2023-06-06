@@ -39,6 +39,8 @@ set(source_files
 
         record/annotation_access_unit/record.cc
         record/annotation_access_unit/block.cc
+        record/annotation_access_unit/BlockHeader.cc
+        record/annotation_access_unit/BlockPayload.cc
         record/annotation_access_unit/AnnotationAccessUnitHeader.cc
 
         record/annotation_parameter_set/record.cc
