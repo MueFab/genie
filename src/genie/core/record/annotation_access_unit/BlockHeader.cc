@@ -20,7 +20,6 @@ namespace core {
 namespace record {
 namespace annotation_access_unit {
 
-
 BlockHeader::BlockHeader()
     : attribute_contiguity(false),
       descriptor_ID(genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE),
@@ -53,6 +52,14 @@ void BlockHeader::write(util::BitWriter& writer) {
     writer.write(0, 2);
     writer.write(indexed, 1);
     writer.write(block_payload_size, 29);
+}
+
+void BlockHeader::write(std::ostream& outputfile) const {
+    outputfile << std::to_string(static_cast<uint8_t>(descriptor_ID)) << ",";
+    if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE)
+        outputfile << std::to_string(attribute_ID) << ",";
+    outputfile << std::to_string(indexed) << ",";
+    outputfile << std::to_string(block_payload_size) << ",";
 }
 
 }  // namespace annotation_access_unit

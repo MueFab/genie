@@ -3,8 +3,6 @@
 
 namespace genie {
 namespace core {
-namespace record {
-namespace variant_genotype {
 
 std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) const {
     std::string temp;
@@ -167,7 +165,5 @@ void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, util::BitWr
     }
 }
 
-}  // namespace variant_genotype
-}  // namespace record
 }  // namespace core
 }  // namespace genie

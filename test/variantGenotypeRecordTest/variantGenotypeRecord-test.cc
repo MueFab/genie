@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "genie/core/record/variant_genotype/arrayType.h"
+#include "genie/core/arrayType.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/util/bitreader.h"
 

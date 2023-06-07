@@ -16,7 +16,7 @@
 #include "genie/util/bitwriter.h"
 
 #include "AlgorithmParameters.h"
-#include "genie/core/record/variant_genotype/arrayType.h"
+#include "genie/core/arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     par_type.resize(n_pars);
     par_num_array_dims.resize(n_pars);
 
-    variant_genotype::arrayType types;
+    arrayType types;
 
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i]=(static_cast<uint8_t>(reader.read_b(4)));
@@ -78,7 +78,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
 }
 
 void AlgorithmParameters::write(std::ostream& outputfile) const {
-    variant_genotype::arrayType types;
+    arrayType types;
     outputfile << std::to_string(n_pars) << ",";
     for (auto i = 0; i < n_pars; ++i) {
         outputfile << std::to_string(par_ID[i]) << ",";
@@ -96,7 +96,7 @@ void AlgorithmParameters::write(std::ostream& outputfile) const {
 }
 
 void AlgorithmParameters::write(util::BitWriter& writer) const {
-    variant_genotype::arrayType types;
+    arrayType types;
     writer.write(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
         writer.write(par_ID[i], 4);
