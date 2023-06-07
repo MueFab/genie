@@ -18,6 +18,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,8 +65,7 @@ class AnnotationAccessUnitHeader {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               bool variable_size_tiles, uint8_t ATCoordSize);
 
-    void write(util::BitWriter& writer) const;
-    void write(std::ostream& outputfile) const;
+    void write(core::Writer& writer) const;
 
     bool ISAttribute() const { return is_attribute; }
     uint16_t getAttributeID() const { return attribute_ID; }

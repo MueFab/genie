@@ -17,6 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,7 +69,7 @@ class ContactMatrixParameters {
 
     void write(std::ostream& outputfile) const;
 
-    void write(util::BitWriter& writer) const;
+    void write(core::Writer& writer) const;
 
     uint8_t getNumberOfSamples() const { return num_samples; }
     std::vector<uint8_t> getSampleIDs() const { return sample_ID; }

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "genie/core/writer.h"
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/ContactMatrixParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ TEST_F(ContactMatrixTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream InOut;
     //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     contactMatrixParameters.write(strwriter);
     strwriter.flush();
@@ -104,7 +105,7 @@ TEST_F(ContactMatrixTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         contactMatrixParameters.write(writer);
         writer.flush();
         outputfile.close();
@@ -112,7 +113,8 @@ TEST_F(ContactMatrixTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        contactMatrixParameters.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        contactMatrixParameters.write(txtWriter);
         txtfile.close();
     }
 #endif

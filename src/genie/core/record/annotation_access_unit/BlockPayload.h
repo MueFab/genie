@@ -23,6 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -94,23 +95,23 @@ class GenotypePayload {
     void read(util::BitReader& reader,
               genie::core::record::annotation_parameter_set::GenotypeParameters& genotypeParameters);
     void read(util::BitReader& reader);
-    void write(util::BitWriter& writer) { writer.write(0, 1); }
+    void write(core::Writer& writer) const { writer.write(0, 1); }
 };
 
 class LikelihoodPayload {
  public:
     void read(util::BitReader& reader) { reader.read_b(1); }
-    void write(util::BitWriter& writer) { writer.write(0, 1); }
+    void write(core::Writer& writer) const { writer.write(0, 1); }
 };
 class ContactMatrixBinPayload {
  public:
     void read(util::BitReader& reader) { reader.read_b(1); }
-    void write(util::BitWriter& writer) { writer.write(0, 1); }
+    void write(core::Writer& writer) const { writer.write(0, 1); }
 };
 class ContactMatrixMatPayload {
  public:
     void read(util::BitReader& reader) { reader.read_b(1); }
-    void write(util::BitWriter& writer) { writer.write(0, 1); }
+    void write(core::Writer& writer) const { writer.write(0, 1); }
 };
 
 class BlockPayload {
@@ -160,7 +161,7 @@ class BlockPayload {
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
               uint8_t numChrs);
-    void write(util::BitWriter& writer);
+    void write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 #define GENERATE_TEST_FILES false
 
@@ -82,13 +83,13 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     annotationParameterSet = RandomContactMatrixParameters.randomAnnotationParameterSet();
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     annotationParameterSet.write(strwriter);
     strwriter.flush();
     annotationParameterSetCheck.read(strreader);
     std::stringstream testOut;
-    genie::util::BitWriter teststrwriter(&testOut);
+    genie::core::Writer teststrwriter(&testOut);
     annotationParameterSetCheck.write(teststrwriter);
 
     EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
@@ -109,7 +110,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         annotationParameterSet.write(writer);
         writer.flush();
         outputfile.close();
@@ -117,6 +118,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
+        genie::core::Writer txtWriter(&txtfile, true);
         annotationParameterSet.write(txtfile);
         txtfile.close();
     }

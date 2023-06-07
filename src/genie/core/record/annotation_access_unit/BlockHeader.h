@@ -23,6 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -45,8 +46,7 @@ class BlockHeader {
 
     void read(genie::util::BitReader& reader);
 
-    void write(util::BitWriter& writer);
-    void write(std::ostream& outputfile) const;
+    void write(core::Writer& writer) const;
 
     genie::core::record::annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }

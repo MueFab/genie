@@ -7,10 +7,11 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
+#include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
-#define GENERATE_TEST_FILES true
+#define GENERATE_TEST_FILES false
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -89,13 +90,13 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     algorithmParameters.write(strwriter);
     strwriter.flush();
     algorithmParametersCheck.read(strreader);
     std::stringstream TestOut;
-    genie::util::BitWriter teststrwriter(&TestOut);
+    genie::core::Writer teststrwriter(&TestOut);
     algorithmParametersCheck.write(teststrwriter);
     teststrwriter.flush();
     EXPECT_EQ(InOut.str(), TestOut.str());
@@ -119,7 +120,7 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         algorithmParameters.write(writer);
         writer.flush();
         outputfile.close();
@@ -127,7 +128,8 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        algorithmParameters.write(txtfile);
+        genie::core::Writer txtwriter(&txtfile, true);
+        algorithmParameters.write(txtwriter);
         txtfile.close();
     }
 

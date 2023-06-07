@@ -8,11 +8,12 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
-#define GENERATE_TEST_FILES true
+#define GENERATE_TEST_FILES false
 
 
 class AnnotationEncodingParametersTests : public ::testing::Test {
@@ -84,13 +85,13 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     annotationEncodingParameters = RandomAnnotationEncodingParameters.randomAnnotationEncodingParameters();
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     annotationEncodingParameters.write(strwriter);
     strwriter.flush();
     annotationEncodingParametersCheck.read(strreader);
     std::stringstream TestOUt;
-    genie::util::BitWriter teststrwriter(&TestOUt);
+    genie::core::Writer teststrwriter(&TestOUt);
     annotationEncodingParametersCheck.write(teststrwriter);
     teststrwriter.flush();
 
@@ -119,7 +120,7 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         annotationEncodingParameters.write(writer);
         writer.flush();
         outputfile.close();
@@ -127,7 +128,8 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        annotationEncodingParameters.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        annotationEncodingParameters.write(txtWriter);
         txtfile.close();
     }
 #endif

@@ -95,30 +95,7 @@ void CompressorParameterSet::read(util::BitReader& reader) {
     reader.flush();
 }
 
-void CompressorParameterSet::write(std::ostream& outputfile) const {
-    uint8_t algorithm_index = 0;
-    outputfile << std::to_string(compressor_ID) << ",";
-    outputfile << std::to_string(n_compressor_steps) << ",";
-    for (auto i = 0; i < n_compressor_steps; ++i) {
-        outputfile << std::to_string(compressor_step_ID[i]) << ",";
-        outputfile << std::to_string(algorithm_ID[i]) << ",";
-        outputfile << std::to_string(use_default_pars[i]) << ",";
-        if (!use_default_pars[i]) {
-            algorithm_parameters[algorithm_index].write(outputfile);
-            algorithm_index++;
-        }
-        outputfile << std::to_string(n_in_vars[i]) << ",";
-        for (auto j = 0; j < n_in_vars[i]; ++j) {
-            outputfile << std::to_string(in_var_ID[i][j]) << ",";
-            outputfile << std::to_string(prev_step_ID[i][j]) << ",";
-            outputfile << std::to_string(prev_out_var_ID[i][j]) << ",";
-        }
-        outputfile << std::to_string(n_completed_out_vars[i]) << ",";
-        for (auto ID : completed_out_var_ID[i]) outputfile << std::to_string(ID) << ",";
-    }
-}
-
-void CompressorParameterSet::write(util::BitWriter& writer) const {
+void CompressorParameterSet::write(core::Writer& writer) const {
     writer.write(compressor_ID, 8);
     writer.write(n_compressor_steps, 4);
     uint8_t algorithm_index = 0;

@@ -165,7 +165,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     reader.flush();
 }
 
-void AttributeParameterSet::write(util::BitWriter& writer) const {
+void AttributeParameterSet::write(core::Writer& writer) const {
     arrayType curType;
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
@@ -199,38 +199,6 @@ void AttributeParameterSet::write(util::BitWriter& writer) const {
         }
     }
     writer.flush();
-}
-
-void AttributeParameterSet::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(attribute_ID) << ",";
-    outputfile << std::to_string(attribute_name_len) << ",";
-    outputfile << '"' << attribute_name << '"' << ",";
-    outputfile << std::to_string(attribute_type) << ",";
-    outputfile << std::to_string(attribute_num_array_dims) << ",";
-
-    for (auto array_dims : attribute_array_dims) {
-        outputfile << std::to_string(array_dims) << ",";
-    }
-
-    arrayType curType;
-    outputfile << curType.toString(attribute_type, attribute_default_val) << ",";
-    outputfile << std::to_string(attribute_miss_val_flag) << ",";
-    if (attribute_miss_val_flag) {
-        outputfile << std::to_string(attribute_miss_default_flag) << ",";
-        if (!attribute_miss_default_flag) outputfile << curType.toString(attribute_type, attribute_miss_val) << ",";
-        outputfile << '"' << (attribute_miss_str) << '"' << ",";
-    }
-    outputfile << std::to_string(compressor_ID) << ",";
-    outputfile << std::to_string(n_steps_with_dependencies) << ",";
-    for (auto i = 0; i < n_steps_with_dependencies; ++i) {
-        outputfile << std::to_string(dependency_step_ID[i]) << ",";
-        outputfile << std::to_string(n_dependencies[i]) << ",";
-        for (auto j = 0; j < n_dependencies[i]; ++j) {
-            outputfile << std::to_string(dependency_var_ID[i][j]) << ",";
-            outputfile << std::to_string(dependency_is_attribute[i][j]) << ",";
-            outputfile << std::to_string(dependency_ID[i][j]) << ",";
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

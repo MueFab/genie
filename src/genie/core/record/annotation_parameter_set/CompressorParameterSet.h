@@ -17,6 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 #include "AlgorithmParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -52,8 +53,7 @@ class CompressorParameterSet {
                            std::vector<std::vector<uint8_t>> completed_out_var_ID);
 
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
+    void write(core::Writer& writer) const;
 
     uint8_t getCompressorID() const { return compressor_ID; }
     uint8_t getNumberOfCompressorSteps() const { return n_compressor_steps; }

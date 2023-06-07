@@ -17,7 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -89,13 +89,8 @@ class AttributeParameterSet {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const;
+    void write(core::Writer& writer) const;
 
-    /**
-     * @brief
-     * @param outputfile
-     */
-    void write(std::ostream& outputfile) const;
 
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }

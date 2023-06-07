@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "genie/core/writer.h"
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         tileStructure.write(writer);
         writer.flush();
         outputfile.close();
@@ -119,9 +120,10 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
+        genie::core::Writer txtWriter(&txtfile, true);
         txtfile << std::to_string(two_dimensional) << ",";
         txtfile << std::to_string(ATCoordSize) << ",";
-        tileStructure.write(txtfile);
+        tileStructure.write(txtWriter);
         txtfile.close();
     }
 #endif

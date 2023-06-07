@@ -57,19 +57,7 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
     algorithm_patarmeters.read(reader);
 }
 
-void DescriptorConfiguration::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(static_cast<uint8_t>(descriptor_ID)) << ",";
-    outputfile << std::to_string(encoding_mode_ID) << ",";
-    if (descriptor_ID == DescriptorID::GENOTYPE)
-        genotype_parameters.write(outputfile);
-    else if (descriptor_ID == DescriptorID::LIKELIHOOD)
-        likelihood_parameters.write(outputfile);
-    else if (descriptor_ID == DescriptorID::CONTACT)
-        contact_matrix_parameters.write(outputfile);
-    algorithm_patarmeters.write(outputfile);
-}
-
-void DescriptorConfiguration::write(util::BitWriter& writer) const {
+void DescriptorConfiguration::write(core::Writer& writer) const {
     writer.write(static_cast<uint8_t>(descriptor_ID), 8);
     writer.write(encoding_mode_ID, 8);
     if (descriptor_ID == DescriptorID::GENOTYPE)

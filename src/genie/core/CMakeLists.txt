@@ -55,6 +55,7 @@ set(source_files
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
 
         arrayType.cc
+        writer.cc
 
         stats/perf-stats.cc
 
