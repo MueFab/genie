@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "record.h"
+#include "genie/core/record/variant_site/record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
+
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -30,9 +31,9 @@ uint8_t Record::determineSize(uint8_t selectType) const {
 std::string Record::infoToCorrectString(std::string value, uint8_t selectType) const {
     std::string outputstring;
     auto type_size = determineSize(selectType);
-    if (selectType == 0)
+    if (selectType == 0) {
         outputstring = '"' + value + '"' + ",";
-    else {
+    } else {
         if (selectType == 0) {
             outputstring = '"' + value + '"' + ",";
         } else if (selectType == 1 || selectType == 2 || selectType == 4 || selectType == 6 || selectType == 8 ||
@@ -201,7 +202,6 @@ void Record::read(genie::util::BitReader& reader) {
         reference_box_ID = reader.readBypassBE<uint8_t>();
     }
 }
-
 
 }  // namespace variant_site
 }  // namespace record

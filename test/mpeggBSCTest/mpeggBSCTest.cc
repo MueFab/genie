@@ -165,7 +165,7 @@ TEST_F(MpeggBSCTests, testCode) {  // NOLINT(cert-err58-cpp)
     infile.open(inputFileName, std::ios::binary);
 
     std::stringstream wholeTestFile;
-    std::stringstream compressedData; 
+    std::stringstream compressedData;
     if (infile.is_open()) {
         wholeTestFile << infile.rdbuf();
         infile.close();
@@ -179,11 +179,10 @@ TEST_F(MpeggBSCTests, testCode) {  // NOLINT(cert-err58-cpp)
     mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)wholeTestFile.str().c_str(), srcLen,
                        MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
                        MPEGG_BSC_CODER_QLFC_STATIC);
-    //for (auto i = 0; i < destLen; ++i) compressedData << dest[i];
-    
+    // for (auto i = 0; i < destLen; ++i) compressedData << dest[i];
 
-     compressedData.write((const char *)dest, destLen);
-   
+    compressedData.write((const char *)dest, destLen);
+
     auto compressed_dataSize = compressedData.str().size();
     std::cout << "compressedData length: " << std::to_string(compressed_dataSize) << std::endl;
 }
@@ -331,7 +330,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream stringPayload;
     stringPayload << compressedFile.rdbuf();
-    std::stringstream& stringPayload1 = stringPayload;
+    std::stringstream &stringPayload1 = stringPayload;
     // std::string generic_payload = stringPayload.str();
     uint16_t payloadSize = static_cast<uint16_t>(stringPayload.str().size());
     uint8_t num_chrs = 0;
@@ -351,7 +350,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     genie::core::record::annotation_access_unit::Record annotationAccessUnit(
         AT_ID, AT_type, AT_subtype, AG_class, annotation_access_unit_header, blocks, attribute_contiguity,
-        two_dimensional, column_major_tile_order, AT_coord_size, n_blocks, num_chrs);
+        two_dimensional, column_major_tile_order, AT_coord_size, variable_size_tiles, n_blocks, num_chrs);
 
     //--------------------------------------------------------//
 #if GENERATE_TEST_FILES

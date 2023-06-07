@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
+
+#include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/util/bitreader.h"
 
 #include "genie/util/make-unique.h"
@@ -44,8 +45,8 @@ Record::Record(util::BitReader& reader, bool attributeContiguity, bool twoDimens
 
 Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
                AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> block,
-               bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize, uint64_t n_blocks,
-               uint8_t numChrs)
+               bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize,
+               bool variable_size_tiles, uint64_t n_blocks, uint8_t numChrs)
     : AT_ID(AT_ID),
       AT_type(AT_type),
       AT_subtype(AT_subtype),
@@ -84,10 +85,10 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
 }
 
 void Record::write(core::Writer& writer) const {
-    writer.write(AT_ID,8);
-    writer.write(static_cast<uint8_t>(AT_type),4);
-    writer.write(AT_subtype,4);
-    writer.write(AG_class,3);
+    writer.write(AT_ID, 8);
+    writer.write(static_cast<uint8_t>(AT_type), 4);
+    writer.write(AT_subtype, 4);
+    writer.write(AG_class, 3);
     writer.write(0, 5);
     annotation_access_unit_header.write(writer);
     for (auto& blocki : block) blocki.write(writer);

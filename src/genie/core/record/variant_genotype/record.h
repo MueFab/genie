@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_H_
-#define SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_H_
+#ifndef SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,10 +40,6 @@ class info_field {
 /**
  *  @brief
  */
-
-/**
- *  @brief
- */
 class linked_record {
  public:
     uint8_t link_name_len;     //!< @brief
@@ -59,7 +55,7 @@ class FormatField {
     uint8_t array_len;
     std::vector<std::vector<std::vector<uint8_t>>> value_array;
 
-    FormatField() : len(0), format(""), type(0), array_len(0), value_array(0){};
+    FormatField() : len(0), format(""), type(0), array_len(0), value_array(0) {}
 
     FormatField(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
                 std::vector<std::vector<std::vector<uint8_t>>> value)
@@ -87,7 +83,7 @@ class Record {
     std::vector<std::vector<uint8_t>> alleles;  //!< @brief
     std::vector<std::vector<uint8_t>> phasing;  //!< @brief
 
-    uint8_t n_likelihoods;                        //!< @brief
+    uint8_t n_likelihoods;                           //!< @brief
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
     uint8_t linked_record;     //!< @brief
@@ -124,7 +120,7 @@ class Record {
            std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
            std::string link_name = "", uint8_t reference_box_ID = 0);
 
-    Record(util::BitReader& reader);
+    explicit Record(util::BitReader& reader);
     void read(util::BitReader& reader);
     void write(std::ostream& outputfile) const;
 
@@ -155,7 +151,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_H_
+#endif  // SRC_GENIE_CORE_RECORD_VARIANT_GENOTYPE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

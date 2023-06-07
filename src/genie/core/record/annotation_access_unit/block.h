@@ -22,7 +22,6 @@
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 #include "genie/core/writer.h"
 
 #include "BlockHeader.h"

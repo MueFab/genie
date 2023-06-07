@@ -10,20 +10,19 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <fstream>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 #include "genie/core/writer.h"
+#include "genie/util/bitreader.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -134,7 +133,7 @@ class BlockPayload {
                  GenotypePayload genotype_payload, LikelihoodPayload likelihood_payload,
                  std::vector<ContactMatrixBinPayload> cm_bin_payload, ContactMatrixMatPayload cm_mat_payload,
                  uint16_t block_payload_size, std::stringstream& generic_payload);
- 
+
     BlockPayload(const BlockPayload& bp) {
         descriptor_ID = bp.descriptor_ID;
         num_chrs = bp.num_chrs;
