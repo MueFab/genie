@@ -30,7 +30,6 @@ class Code {
     /**
      * @brief
      */
-
     Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode = 3);
 
  private:

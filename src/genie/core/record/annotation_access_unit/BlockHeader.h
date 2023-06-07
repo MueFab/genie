@@ -46,6 +46,7 @@ class BlockHeader {
     void read(genie::util::BitReader& reader);
 
     void write(util::BitWriter& writer);
+    void write(std::ostream& outputfile) const;
 
     genie::core::record::annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }

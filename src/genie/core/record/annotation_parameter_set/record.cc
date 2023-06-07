@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/core/record/variant_genotype/arrayType.h"
+#include "genie/core/arrayType.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"

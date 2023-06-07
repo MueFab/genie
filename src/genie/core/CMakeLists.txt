@@ -31,7 +31,6 @@ set(source_files
         record/variant_site/record.cc
 
         record/variant_genotype/record.cc
-        record/variant_genotype/arrayType.cc
 
         record/data_unit/record.cc
 
@@ -55,6 +54,7 @@ set(source_files
         record/annotation_parameter_set/CompressorParameterSet.cc
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
 
+        arrayType.cc
 
         stats/perf-stats.cc
 

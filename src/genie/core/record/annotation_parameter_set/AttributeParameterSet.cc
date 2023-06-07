@@ -16,7 +16,7 @@
 #include "genie/util/bitwriter.h"
 
 #include "AttributeParameterSet.h"
-#include "genie/core/record/variant_genotype/arrayType.h"
+#include "genie/core/arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     for (auto i = 0; i < attribute_num_array_dims; ++i)
         attribute_array_dims[i] = static_cast<uint8_t>(reader.read_b(8));
 
-    variant_genotype::arrayType curType;
+    arrayType curType;
     attribute_default_val = curType.toArray(attribute_type, reader);
     attribute_miss_val_flag = static_cast<bool>(reader.read_b(1));
     if (attribute_miss_val_flag) {
@@ -166,7 +166,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
 }
 
 void AttributeParameterSet::write(util::BitWriter& writer) const {
-    variant_genotype::arrayType curType;
+    arrayType curType;
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
     for (auto byte : attribute_name) writer.write(byte, 8);
@@ -212,7 +212,7 @@ void AttributeParameterSet::write(std::ostream& outputfile) const {
         outputfile << std::to_string(array_dims) << ",";
     }
 
-    variant_genotype::arrayType curType;
+    arrayType curType;
     outputfile << curType.toString(attribute_type, attribute_default_val) << ",";
     outputfile << std::to_string(attribute_miss_val_flag) << ",";
     if (attribute_miss_val_flag) {

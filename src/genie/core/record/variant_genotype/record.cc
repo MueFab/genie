@@ -13,7 +13,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
-#include "arrayType.h"
+#include "genie/core/arrayType.h"
 #include "record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
