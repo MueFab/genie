@@ -58,7 +58,7 @@ class TileConfiguration {
      * @brief
      */
     TileConfiguration();
-    TileConfiguration(uint8_t AT_coord_size);
+    explicit TileConfiguration(uint8_t AT_coord_size);
     TileConfiguration(util::BitReader& reader, uint8_t AT_coord_size);
     TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
                       bool column_major_tile_order, uint8_t symmetry_mode, bool symmetry_minor_diagonal,

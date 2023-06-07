@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_H_
+#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,11 +17,10 @@
 
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
+#include "genie/core/writer.h"
 
-#include "genie/core/writer.h"
 #include "AnnotationAccessUnitHeader.h"
-#include "genie/core/writer.h"
-#include "block.h"
+#include "genie/core/record/annotation_access_unit/block.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -56,13 +55,14 @@ class Record {
      * @brief
      */
     Record();
-    Record(util::BitReader& reader);
+    explicit Record(util::BitReader& reader);
     Record(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
            uint8_t ATCoordSize, uint8_t numChrs);
 
     Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
            AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> block, bool attributeContiguity,
-           bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize, uint64_t n_blocks, uint8_t numChrs);
+           bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize, bool variable_size_tiles,
+           uint64_t n_blocks, uint8_t numChrs);
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
@@ -80,7 +80,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_H_
+#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_ACCESS_UNIT_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

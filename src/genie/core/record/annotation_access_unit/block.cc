@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "block.h"
 #include <algorithm>
 #include <string>
 #include <utility>
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/core/record/annotation_access_unit/block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

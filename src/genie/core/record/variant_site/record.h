@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
-#define SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
+#ifndef SRC_GENIE_CORE_RECORD_VARIANT_SITE_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_VARIANT_SITE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-
-#include <ostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -107,11 +107,11 @@ class Record {
           linked_record(0),
           link_name_len(0),
           link_name(""),
-          reference_box_ID(0){};
+          reference_box_ID(0) {}
     /**
      * @brief
      */
-    Record(genie::util::BitReader& reader);
+    explicit Record(genie::util::BitReader& reader);
     /**
      * @brief
      */
@@ -140,7 +140,6 @@ class Record {
     bool isLinkedRecord() { return (linked_record == 0 ? false : true); }
     std::string getLinkName() { return link_name; }
     uint8_t getReferenceBoxID() { return reference_box_ID; }
-
 };
 
 class Parse_Record {
@@ -156,7 +155,7 @@ class Parse_Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_VARIANT_SITE_H_
+#endif  // SRC_GENIE_CORE_RECORD_VARIANT_SITE_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

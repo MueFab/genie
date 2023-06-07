@@ -8,14 +8,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "code.h"
+#include "apps/genie/annotation/code.h"
 #include "codecs/api/mpegg_utils.h"
 #include "filesystem/filesystem.hpp"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
-//#include "codecs/libbsc/libbsc.h"
 #include "codecs/include/mpegg-codecs.h"
-//#include "mpegg-codecs.h"
 #include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -222,7 +220,7 @@ void genieapp::annotation::Code::fillAnnotationAccessUnit() {
 
     genie::core::record::annotation_access_unit::Record record(
         AT_ID, AT_type, AT_subtype, AG_class, annotation_access_unit_header, blocks, attribute_contiguity,
-        two_dimensional, column_major_tile_order, AT_coord_size, n_blocks, num_chrs);
+        two_dimensional, column_major_tile_order, AT_coord_size, variable_size_tiles, n_blocks, num_chrs);
     annotationAccessUnit = record;
 }
 

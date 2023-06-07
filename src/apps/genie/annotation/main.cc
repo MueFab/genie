@@ -11,8 +11,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/annotation/program-options.h"
 #include "apps/genie/annotation/code.h"
+#include "apps/genie/annotation/program-options.h"
 
 #include "genie/module/default-setup.h"
 #include "genie/util/watch.h"
@@ -27,14 +27,10 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 int main(int argc, char* argv[]) {
     ProgramOptions programOptions(argc, argv);
     if (programOptions.task == "encode") {
-        std::cerr << "calling Code...\n"; 
+        std::cerr << "calling Code...\n";
         Code code(programOptions.inputFile, programOptions.outputFile);
     } else if (programOptions.task == "decode") {
         UTILS_DIE("not yet implemented: " + std::string(programOptions.task));

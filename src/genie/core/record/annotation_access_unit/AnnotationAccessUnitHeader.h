@@ -14,12 +14,11 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "block.h"
+
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/core/writer.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/writer.h"
+#include "genie/util/bitreader.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -51,15 +50,14 @@ class AnnotationAccessUnitHeader {
 
  public:
     AnnotationAccessUnitHeader();
-    AnnotationAccessUnitHeader(util::BitReader& reader);
+    explicit AnnotationAccessUnitHeader(util::BitReader& reader);
     AnnotationAccessUnitHeader(util::BitReader& reader, bool attributeContiguity, bool twoDimensional,
                                bool columnMajorTileOrder, bool variable_size_tiles, uint8_t ATCoordSize);
     AnnotationAccessUnitHeader(bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
                                bool variable_size_tiles, uint8_t ATCoordSize, bool is_attribute, uint16_t attribute_ID,
                                genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID,
-                               uint64_t n_tiles_per_col, uint64_t n_tiles_per_row,
-                               uint64_t n_blocks, uint64_t tile_index_1, bool tile_index_2_exists,
-                               uint64_t tile_index_2);
+                               uint64_t n_tiles_per_col, uint64_t n_tiles_per_row, uint64_t n_blocks,
+                               uint64_t tile_index_1, bool tile_index_2_exists, uint64_t tile_index_2);
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
