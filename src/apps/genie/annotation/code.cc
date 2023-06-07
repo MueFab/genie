@@ -16,6 +16,7 @@
 //#include "codecs/libbsc/libbsc.h"
 #include "codecs/include/mpegg-codecs.h"
 //#include "mpegg-codecs.h"
+#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -43,9 +44,9 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
     fillAnnotationAccessUnit();
 
     std::stringstream parameterSetStream;
-    genie::util::BitWriter parameterSetWriter(&parameterSetStream);
+    genie::core::Writer parameterSetWriter(&parameterSetStream);
     std::stringstream accessStream;
-    genie::util::BitWriter accessWriter(&accessStream);
+    genie::core::Writer accessWriter(&accessStream);
     annotationParameterSet.write(parameterSetWriter);
     annotationAccessUnit.write(accessWriter);
 

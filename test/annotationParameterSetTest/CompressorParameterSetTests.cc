@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
+#include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
@@ -84,7 +85,7 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
 
     std::stringstream InOut;
     //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     compressorParameterSet.write(strwriter);
     compressorParameterSet.write(strwriter);
@@ -116,7 +117,7 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         compressorParameterSet.write(writer);
         writer.flush();
         outputfile.close();
@@ -124,7 +125,8 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        compressorParameterSet.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        compressorParameterSet.write(txtWriter);
         txtfile.close();
     }
 #endif

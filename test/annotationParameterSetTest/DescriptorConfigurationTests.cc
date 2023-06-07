@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
+#include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
@@ -92,14 +93,14 @@ TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT
     descriptorConfiguration = RandomContactMatrixParameters.randomDescriptorConfiguration();
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     descriptorConfiguration.write(strwriter);
     strwriter.flush();
     descriptorConfigurationCheck.read(strreader);
 
     std::stringstream TestOut;
-    genie::util::BitWriter teststrwriter(&TestOut);
+    genie::core::Writer teststrwriter(&TestOut);
     descriptorConfigurationCheck.write(teststrwriter);
     teststrwriter.flush();
     EXPECT_EQ(InOut.str(), TestOut.str());
@@ -114,7 +115,7 @@ TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         descriptorConfiguration.write(writer);
         writer.flush();
         outputfile.close();
@@ -122,7 +123,8 @@ TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        descriptorConfiguration.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile);
+        descriptorConfiguration.write(txtWriter);
         txtfile.close();
     }
 #endif

@@ -130,36 +130,7 @@ void ContactMatrixParameters::read(util::BitReader& reader) {
     }
 }
 
-void ContactMatrixParameters::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(num_samples) << ",";
-    for (auto i = 0; i < num_samples; ++i) {
-        outputfile << std::to_string(sample_ID[i]) << ",";
-        outputfile << '"' << sample_name[i] << '"' << ",";
-    }
-    outputfile << std::to_string(num_chrs) << ",";
-    for (auto i = 0; i < num_chrs; ++i) {
-        outputfile << std::to_string(chr_ID[i]) << ",";
-        outputfile << '"' << chr_name[i] << '"' << ",";
-        outputfile << std::to_string(chr_length[i]) << ",";
-    }
-    outputfile << std::to_string(interval) << ",";
-    outputfile << std::to_string(tile_size) << ",";
-    outputfile << std::to_string(num_interval_multipliers) << ",";
-    for (auto i = 0; i < num_interval_multipliers; ++i) outputfile << std::to_string(interval_multiplier[i]) << ",";
-    outputfile << std::to_string(num_norm_methods) << ",";
-    for (auto i = 0; i < num_norm_methods; ++i) {
-        outputfile << std::to_string(norm_method_ID[i]) << ",";
-        outputfile << '"' << norm_method_name[i] << '"' << ",";
-        outputfile << std::to_string(norm_method_mult_flag[i]) << ",";
-    }
-    outputfile << std::to_string(num_norm_matrices) << ",";
-    for (auto i = 0; i < num_norm_matrices; ++i) {
-        outputfile << std::to_string(norm_matrix_ID[i]) << ",";
-        outputfile << '"' << norm_matrix_name[i] << '"' << ",";
-    }
-}
-
-void ContactMatrixParameters::write(util::BitWriter& writer) const {
+void ContactMatrixParameters::write(core::Writer& writer) const {
     writer.write(num_samples, 8);
     for (auto i = 0; i < num_samples; ++i) {
         writer.write(sample_ID[i], 8);

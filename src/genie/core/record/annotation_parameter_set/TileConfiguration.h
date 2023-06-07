@@ -17,6 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 #include "TileStructure.h"
 
@@ -73,6 +74,7 @@ class TileConfiguration {
     void write(util::BitWriter& writer) const;
     void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
     void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
+    void write(core::Writer& writer) const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }

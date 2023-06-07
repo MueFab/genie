@@ -72,7 +72,7 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader, bool attributeCon
     read(reader);
 }
 
-void AnnotationAccessUnitHeader::write(util::BitWriter& writer) const {
+void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
     if (attribute_contiguity) {
         writer.write(is_attribute, 1);
         if (is_attribute)
@@ -94,8 +94,6 @@ void AnnotationAccessUnitHeader::write(util::BitWriter& writer) const {
     }
     writer.flush();
 }
-
-void AnnotationAccessUnitHeader::write(std::ostream& outputfile) const { outputfile << "not implemented\n"; }
 
 void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
     if (attribute_contiguity) {

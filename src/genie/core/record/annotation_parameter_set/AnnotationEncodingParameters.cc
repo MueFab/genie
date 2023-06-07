@@ -117,39 +117,8 @@ void AnnotationEncodingParameters::read(util::BitReader& reader) {
     reader.flush();
 }
 
-void AnnotationEncodingParameters::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(n_filter) << ",";
-    for (auto i = 0; i < n_filter; ++i) {
-        outputfile << std::to_string(filter_ID_len[i]) << ",";
-        outputfile << '"' << filter_ID[i] << '"' << ",";
-        outputfile << std::to_string(desc_len[i]) << ",";
-        outputfile << '"' << description[i] << '"' << ",";
-    }
-    outputfile << std::to_string(n_features_names) << ",";
-    for (auto i = 0; i < n_features_names; ++i) {
-        outputfile << std::to_string(feature_name_len[i]) << ",";
-        outputfile << '"' << feature_name[i] << '"' << ",";
-    }
-    outputfile << std::to_string(n_ontology_terms) << ",";
-    for (auto i = 0; i < n_ontology_terms; ++i) {
-        outputfile << std::to_string(ontology_term_name_len[i]) << ",";
-        outputfile << '"' << ontology_term_name[i] << '"' << ",";
-    }
-    outputfile << std::to_string(n_descriptors) << ",";
-    for (auto i = 0; i < n_descriptors; ++i) {
-        descriptor_configuration[i].write(outputfile);
-    }
-    outputfile << std::to_string(n_compressors) << ",";
-    for (auto i = 0; i < n_compressors; ++i) {
-        compressor_parameter_set[i].write(outputfile);
-    }
-    outputfile << std::to_string(n_attributes) << ",";
-    for (auto i = 0; i < n_attributes; ++i) {
-        attribute_parameter_set[i].write(outputfile);
-    }
-}
 
-void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
+void AnnotationEncodingParameters::write(core::Writer& writer) const {
     writer.write(n_filter, 8);
     for (auto i = 0; i < n_filter; ++i) {
         writer.write(filter_ID_len[i], 6);
@@ -181,7 +150,6 @@ void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
     }
     writer.flush();
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

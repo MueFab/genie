@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <sstream>
+
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -141,7 +143,7 @@ void BlockPayload::read(util::BitReader& reader,
     read(reader);
 }
 
-void BlockPayload::write(util::BitWriter& writer) {
+void BlockPayload::write(core::Writer& writer) const {
     if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
         genotype_payload.write(writer);
     } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::LIKELIHOOD) {
@@ -150,10 +152,13 @@ void BlockPayload::write(util::BitWriter& writer) {
         for (auto binPayload : cm_bin_payload) binPayload.write(writer);
         cm_mat_payload.write(writer);
     } else {
-        writer.write(&generic_payload);
+        std::stringstream gp;
+        gp << generic_payload.rdbuf();
+        writer.write(&gp);
     }
     writer.flush();
 }
+
 }  // namespace annotation_access_unit
 }  // namespace record
 }  // namespace core

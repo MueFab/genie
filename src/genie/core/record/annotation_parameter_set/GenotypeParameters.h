@@ -17,6 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,6 +65,7 @@ class GenotypeParameters {
     void read(util::BitReader& reader);
     void write(util::BitWriter& writer) const;
     void write(std::ostream& outputfile) const;
+    void write(core::Writer& writer) const;
 
     uint8_t getMaxPloidy() const { return max_ploidy; }
     bool isNoReference() const { return no_reference_flag; }

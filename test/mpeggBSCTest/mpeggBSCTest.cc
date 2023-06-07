@@ -24,7 +24,7 @@
 
 #include "codecs/include/mpegg-codecs.h"
 
-#define GENERATE_TEST_FILES true
+#define GENERATE_TEST_FILES false
 
 class MpeggBSCTests : public ::testing::Test {
  protected:
@@ -106,7 +106,7 @@ TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
         block_payload_size, generic_payload);
 
     std::stringstream outputData;
-    genie::util::BitWriter writer(&outputData);
+    genie::core::Writer writer(&outputData);
     block_payload.write(writer);
     EXPECT_GE(outputData.str().size(), block_payload_size);
 }
@@ -149,7 +149,7 @@ TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
     genie::core::record::annotation_access_unit::Block block(blockHeader, block_payload, num_chrs);
 
     std::stringstream outputData;
-    genie::util::BitWriter writer(&outputData);
+    genie::core::Writer writer(&outputData);
     block.write(writer);
     EXPECT_GE(outputData.str().size(), block_payload_size);
 }
@@ -363,7 +363,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
         uint8_t data_unit_type = 3;
         uint64_t data_unit_size = 24;
         if (testfile.is_open()) {
-            genie::util::BitWriter writer(&testfile);
+            genie::core::Writer writer(&testfile);
             writer.write(data_unit_type, 8);
             writer.write(0, 10);
             writer.write(data_unit_size, 22);
@@ -374,9 +374,10 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
         std::ofstream txtfile;
         txtfile.open(name + ".txt", std::ios::out);
         if (txtfile.is_open()) {
+            genie::core::Writer txtWriter(&txtfile, true);
             txtfile << std::to_string(data_unit_type) << ",";
             txtfile << std::to_string(data_unit_size) << ",";
-            annotationParameterSet.write(txtfile);
+            annotationParameterSet.write(txtWriter);
             txtfile.close();
         }
     }
@@ -387,7 +388,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
         uint8_t data_unit_type = 3;
         uint64_t data_unit_size = 197993;
         if (testfile.is_open()) {
-            genie::util::BitWriter writer(&testfile);
+            genie::core::Writer writer(&testfile);
             writer.write(data_unit_type, 8);
             writer.write(0, 10);
             writer.write(data_unit_size, 22);
@@ -403,7 +404,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
         uint8_t data_unit_type = 3;
         uint64_t data_unit_size = 24;
         if (testfile.is_open()) {
-            genie::util::BitWriter writer(&testfile);
+            genie::core::Writer writer(&testfile);
             writer.write(data_unit_type, 8);
             writer.write(0, 10);
             writer.write(data_unit_size, 22);

@@ -145,6 +145,22 @@ void TileStructure::write(util::BitWriter& writer) const {
     }
 }
 
+void TileStructure::write(core::Writer& writer) const {
+    writer.write(0, 7);
+    writer.write(variable_size_tiles, 1);
+    writer.write(n_tiles, coordSizeInBits(ATCoordSize));
+    auto dimensions = two_dimensional ? 2 : 1;
+    if (variable_size_tiles) {
+        for (auto i = 0; i < n_tiles; ++i)
+            for (auto j = 0; j < dimensions; ++j) {
+                writer.write(start_index[i][j], coordSizeInBits(ATCoordSize));
+                writer.write(end_index[i][j], coordSizeInBits(ATCoordSize));
+            }
+    } else {
+        for (auto j = 0; j < dimensions; ++j) writer.write(tile_size[j], coordSizeInBits(ATCoordSize));
+    }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

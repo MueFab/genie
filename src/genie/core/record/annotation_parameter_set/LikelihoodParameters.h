@@ -17,7 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -36,8 +36,7 @@ class LikelihoodParameters {
     LikelihoodParameters(uint8_t num_gl_per_sample, bool transform_flag, uint8_t dtype_id);
     explicit LikelihoodParameters(util::BitReader& reader);
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
+    void write(Writer& writer) const;
 
     uint8_t getNumGLPerSample() const { return num_gl_per_sample; }
     bool isTransformFlag() const { return transform_flag; }

@@ -86,7 +86,7 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         tileConfiguration.write(writer);
         writer.flush();
         outputfile.close();
@@ -94,7 +94,8 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        tileConfiguration.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        tileConfiguration.write(txtWriter);
         txtfile.close();
     }
 #endif
@@ -112,7 +113,7 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
 
     std::stringstream InOut;
     //(std::stringstream::in | std::stringstream::out | std::stringstream::binary);
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     tileConfiguration.write(strwriter);
     strwriter.flush();
@@ -130,7 +131,7 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         tileConfiguration.write(writer);
         writer.flush();
         outputfile.close();
@@ -138,8 +139,9 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
+        genie::core::Writer txtWriter(&txtfile, true);
         txtfile << std::to_string(ATCoordSize) << ",";
-        tileConfiguration.write(txtfile);
+        tileConfiguration.write(txtWriter);
         txtfile.close();
     }
 #endif

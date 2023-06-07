@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
+#include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
@@ -120,7 +121,7 @@ TEST_F(GenotypeParametersTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-
     genotypeParameters = randomgenotypeParameters.randomGenotypeParameters();
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     genotypeParameters.write(strwriter);
     strwriter.flush();
@@ -151,7 +152,7 @@ TEST_F(GenotypeParametersTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         genotypeParameters.write(writer);
         writer.flush();
         outputfile.close();
@@ -159,7 +160,8 @@ TEST_F(GenotypeParametersTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        genotypeParameters.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        genotypeParameters.write(txtWriter);
         txtfile.close();
     }
 

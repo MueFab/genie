@@ -14,18 +14,24 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <sstream>
+
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
 #include "AnnotationEncodingParameters.h"
 #include "TileConfiguration.h"
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
 namespace annotation_parameter_set {
+
+
 
 /**
  *  @brief
@@ -51,8 +57,7 @@ class Record {
            AnnotationEncodingParameters annotation_encoding_parameters);
 
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
+    void write(Writer& writer) const;
 
     uint8_t getParameterSetID() const { return parameter_set_ID; }
     uint8_t getATID() const { return AT_ID; }

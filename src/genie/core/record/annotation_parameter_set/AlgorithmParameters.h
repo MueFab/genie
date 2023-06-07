@@ -17,6 +17,7 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,8 +43,7 @@ class AlgorithmParameters {
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
+    void write(core::Writer& writer) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }

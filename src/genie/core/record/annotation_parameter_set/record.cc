@@ -51,12 +51,13 @@ void Record::read(util::BitReader& reader) {
     AT_coord_size = static_cast<uint8_t>(reader.read_b(2));
     AT_pos_40_bits_flag = static_cast<bool>(reader.read_b(1));
     n_aux_attribute_groups = static_cast<uint8_t>(reader.read_b(3));
-    tile_configuration.resize(n_aux_attribute_groups+1);
+    tile_configuration.resize(n_aux_attribute_groups + 1);
     for (auto i = 0; i <= n_aux_attribute_groups; ++i) tile_configuration[i].read(reader, AT_coord_size);
     annotation_encoding_parameters.read(reader);
 }
 
-void Record::write(util::BitWriter& writer) const {
+
+void Record::write(Writer& writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(AT_ID, 8);
     writer.write(AT_alphabet_ID, 8);
@@ -66,17 +67,6 @@ void Record::write(util::BitWriter& writer) const {
     writer.write(n_aux_attribute_groups, 3);
     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
     annotation_encoding_parameters.write(writer);
-}
-
-void Record::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(parameter_set_ID) << ",";
-    outputfile << std::to_string(AT_ID) << ",";
-    outputfile << std::to_string(AT_alphabet_ID) << ",";
-    outputfile << std::to_string(AT_coord_size) << ",";
-    outputfile << std::to_string(AT_pos_40_bits_flag) << ",";
-    outputfile << std::to_string(n_aux_attribute_groups) << ",";
-    for (auto tileConfiguration : tile_configuration) tileConfiguration.write(outputfile);
-    annotation_encoding_parameters.write(outputfile);
 }
 
 }  // namespace annotation_parameter_set

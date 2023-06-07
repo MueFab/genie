@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "RandomRecordFillIn.h"
-
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 #define GENERATE_TEST_FILES false
 
@@ -69,7 +69,7 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream outputfile;
 
-    genie::util::BitWriter strwriter(&outputfile);
+    genie::core::Writer strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
     likelihoodParameters.write(strwriter);
     strwriter.flush();
@@ -86,7 +86,7 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (testfile.is_open()) {
-        genie::util::BitWriter writer(&testfile);
+        genie::core::Writer writer(&testfile);
         likelihoodParameters.write(writer);
         writer.flush();
         testfile.close();
@@ -94,7 +94,8 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        likelihoodParameters.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        likelihoodParameters.write(txtWriter);
         txtfile.close();
     }
 

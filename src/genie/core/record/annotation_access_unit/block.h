@@ -23,6 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/writer.h"
 
 #include "BlockHeader.h"
 #include "BlockPayload.h"
@@ -59,7 +60,7 @@ class Block {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t numChrs);
-    void write(util::BitWriter& writer);
+    void write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

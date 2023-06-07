@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "genie/core/writer.h"
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -106,13 +107,13 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     attributeParameterSet = randomattributeParameterSet.randomAttributeParameterSet();
 
     std::stringstream InOut;
-    genie::util::BitWriter strwriter(&InOut);
+    genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     attributeParameterSet.write(strwriter);
     strwriter.flush();
     attributeParameterSetCheck.read(strreader);
     std::stringstream TestOut;
-    genie::util::BitWriter teststrwriter(&TestOut);
+    genie::core::Writer teststrwriter(&TestOut);
     attributeParameterSetCheck.write(teststrwriter);
     teststrwriter.flush();
 
@@ -140,7 +141,7 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     std::ofstream outputfile;
     outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
     if (outputfile.is_open()) {
-        genie::util::BitWriter writer(&outputfile);
+        genie::core::Writer writer(&outputfile);
         attributeParameterSet.write(writer);
         writer.flush();
         outputfile.close();
@@ -148,7 +149,8 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     std::ofstream txtfile;
     txtfile.open(name + ".txt", std::ios::out);
     if (txtfile.is_open()) {
-        attributeParameterSet.write(txtfile);
+        genie::core::Writer txtWriter(&txtfile, true);
+        attributeParameterSet.write(txtWriter);
         txtfile.close();
     }
 #endif

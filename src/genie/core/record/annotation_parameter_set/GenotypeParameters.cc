@@ -165,6 +165,33 @@ void GenotypeParameters::write(std::ostream& outputfile) const {
     }
 }
 
+void GenotypeParameters::write(core::Writer& writer) const {
+    writer.write(max_ploidy, 8);
+    writer.write(no_reference_flag, 1);
+    writer.write(not_available_flag, 1);
+    writer.write(static_cast<uint8_t>(binarization_ID), 3);
+    if (binarization_ID == BinarizationID::BIT_PLANE) {
+        writer.write(num_bit_plane, 8);
+        writer.write(static_cast<uint8_t>(concat_axis), 8);
+    }
+
+    for (auto i = 0; i < num_variants_payloads; ++i) {
+        writer.write(sort_variants_rows_flag[i], 1);
+        writer.write(sort_variants_cols_flag[i], 1);
+        writer.write(transpose_variants_mat_flag[i], 1);
+        writer.write(variants_codec_ID[i], 8);
+    }
+    writer.write(encode_phases_data_flag, 1);
+    if (encode_phases_data_flag) {
+        writer.write(sort_phases_rows_flag, 1);
+        writer.write(sort_phases_cols_flag, 1);
+        writer.write(transpose_phases_mat_flag, 1);
+        writer.write(phases_codec_ID, 1);
+    } else {
+        writer.write(phases_value, 1);
+    }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

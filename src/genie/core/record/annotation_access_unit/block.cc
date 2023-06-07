@@ -38,7 +38,8 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
     numChrs = num_Chrs;
     read(reader);
 }
-void Block::write(util::BitWriter& writer) {
+
+void Block::write(core::Writer& writer) const {
     block_header.write(writer);
     block_payload.write(writer);
 }

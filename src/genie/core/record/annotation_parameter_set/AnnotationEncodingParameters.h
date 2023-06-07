@@ -67,9 +67,7 @@ class AnnotationEncodingParameters {
                                  std::vector<AttributeParameterSet> attribute_parameter_set);
 
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
-    size_t writeSize() const;
+    void write(core::Writer& writer) const;
 
     uint8_t getNumberOfFilters() const { return n_filter; }
     std::vector<uint8_t> getFilterIDLengths() const { return filter_ID_len; }

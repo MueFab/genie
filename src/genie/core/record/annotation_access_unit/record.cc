@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
@@ -83,7 +83,7 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
     read(reader);
 }
 
-void Record::write(util::BitWriter& writer) {
+void Record::write(core::Writer& writer) const {
     writer.write(AT_ID,8);
     writer.write(static_cast<uint8_t>(AT_type),4);
     writer.write(AT_subtype,4);

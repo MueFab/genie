@@ -18,6 +18,7 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
+#include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -51,6 +52,8 @@ class TileStructure {
     void read(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional);
     void write(std::ostream& outputfile) const;
     void write(util::BitWriter& writer) const;
+    void write(core::Writer& writer) const;
+
     void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
     void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
 

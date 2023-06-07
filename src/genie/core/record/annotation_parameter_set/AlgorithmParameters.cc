@@ -77,25 +77,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     }
 }
 
-void AlgorithmParameters::write(std::ostream& outputfile) const {
-    arrayType types;
-    outputfile << std::to_string(n_pars) << ",";
-    for (auto i = 0; i < n_pars; ++i) {
-        outputfile << std::to_string(par_ID[i]) << ",";
-        outputfile << std::to_string(par_type[i]) << ",";
-        outputfile << std::to_string(par_num_array_dims[i]) << ",";
-        for (auto dims : par_array_dims[i]) {
-            outputfile << std::to_string(dims) << ",";
-        }
-        for (auto par_d1 : par_val[i])
-            for (auto par_d2 : par_d1)
-                for (auto par_d3 : par_d2) {
-                    outputfile << types.toString(par_type[i], par_d3) << ",";
-                }
-    }
-}
-
-void AlgorithmParameters::write(util::BitWriter& writer) const {
+void AlgorithmParameters::write(core::Writer& writer) const {
     arrayType types;
     writer.write(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
@@ -110,7 +92,6 @@ void AlgorithmParameters::write(util::BitWriter& writer) const {
                 for (auto par_d3 : par_d2) types.toFile(par_type[i], par_d3, writer);
     }
 }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set
