@@ -50,7 +50,7 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
 
     std::ofstream outputFile;
     std::cerr << "opening file " << OutputFileName << std::endl;
-    outputFile.open("TestFiles/test.mgb", std::ios::binary | std::ios::out);
+    outputFile.open(OutputFileName, std::ios::binary | std::ios::out);
     if (outputFile.is_open()) {
         std::cerr << "writing to output...\n";
         genie::util::BitWriter dataUnitWriter(&outputFile);
