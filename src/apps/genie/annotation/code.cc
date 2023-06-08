@@ -10,11 +10,11 @@
 
 #include "apps/genie/annotation/code.h"
 #include "codecs/api/mpegg_utils.h"
+#include "codecs/include/mpegg-codecs.h"
 #include "filesystem/filesystem.hpp"
+#include "genie/core/writer.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
-#include "codecs/include/mpegg-codecs.h"
-#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -30,15 +30,26 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode)
+Code::Code(std::string inputFileName, std::string OutputFileName) {
+    bool testOutput = false;
+    uint8_t encodeMode = 3;
+    Code(inputFileName, outputFileName, encodeMode, testOutput);
+}
+
+Code::Code(std::string inputFileName, std::string OutputFileName, bool testOutput) {
+    uint8_t encodeMode = 3;
+    Code(inputFileName, outputFileName, encodeMode, testOutput);
+}
+
+genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode,
+                                 bool testOutput)
     : inputFileName(inputFileName), outputFileName(outputFileName), compressedData{} {
     if (encodeMode != 3) return;
-
-    std::cerr << "calling fillAnnotationParameterSet()...\n";
+    std::cerr << "calling fillAnnotationParameterSet "  << std::endl;
     fillAnnotationParameterSet();
-    std::cerr << "calling encodeData()...\n";
+    std::cerr << "calling encodeData " << std::endl;
     encodeData();
-    std::cerr << "calling fillAnnotationAccessUnit()...\n";
+    std::cerr << "calling fillAnnotationAccessUnit " << std::endl;
     fillAnnotationAccessUnit();
 
     std::stringstream parameterSetStream;
@@ -48,30 +59,49 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
     annotationParameterSet.write(parameterSetWriter);
     annotationAccessUnit.write(accessWriter);
 
+    std::ofstream txtFile;
+    if (testOutput) {
+        std::string txtName = OutputFileName + ".txt";
+        std::cerr << "opening file " << txtName << std::endl;
+        txtFile.open(txtName, std::ios::out);
+    }
+
     std::ofstream outputFile;
     std::cerr << "opening file " << OutputFileName << std::endl;
     outputFile.open(OutputFileName, std::ios::binary | std::ios::out);
-    if (outputFile.is_open()) {
-        std::cerr << "writing to output...\n";
-        genie::util::BitWriter dataUnitWriter(&outputFile);
 
+    if (outputFile.is_open()) {
+        genie::core::Writer dataUnitWriter(&outputFile);
         uint8_t data_unit_type = 3;
-        uint64_t data_unit_size = (parameterSetWriter.getBitsWritten() + 10 + 8 + 22) / 8;
+        uint64_t ParameterSet_size = (parameterSetWriter.getBitsWritten() + 10 + 8 + 22) / 8;
         dataUnitWriter.write(data_unit_type, 8);
         dataUnitWriter.write(0, 10);
-        dataUnitWriter.write(data_unit_size, 22);
+        dataUnitWriter.write(ParameterSet_size, 22);
         dataUnitWriter.write(&parameterSetStream);
-        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
 
         data_unit_type = 4;
-        data_unit_size = (accessWriter.getBitsWritten() + 8 + 29 + 3) / 8;
+        uint64_t Accessunit_size = (accessWriter.getBitsWritten() + 8 + 29 + 3) / 8;
         dataUnitWriter.write(data_unit_type, 8);
         dataUnitWriter.write(0, 3);
-        dataUnitWriter.write(data_unit_size, 29);
+        dataUnitWriter.write(Accessunit_size, 29);
         dataUnitWriter.write(&accessStream);
         dataUnitWriter.flush();
         std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
         outputFile.close();
+        if (testOutput) {
+            genie::core::Writer txtWriter(&txtFile, true);
+            txtWriter.write(3, 8);
+            txtWriter.write(0, 10);
+            txtWriter.write(ParameterSet_size, 22);
+            annotationParameterSet.write(txtWriter);
+
+            txtWriter.write(4, 8);
+            txtWriter.write(0, 3);
+            txtWriter.write(Accessunit_size, 29);
+            annotationAccessUnit.write(txtWriter);
+            txtWriter.flush();
+            txtFile.close();
+        }
     } else {
         std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
     }

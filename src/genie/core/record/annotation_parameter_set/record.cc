@@ -51,7 +51,7 @@ void Record::read(util::BitReader& reader) {
     AT_coord_size = static_cast<uint8_t>(reader.read_b(2));
     AT_pos_40_bits_flag = static_cast<bool>(reader.read_b(1));
     n_aux_attribute_groups = static_cast<uint8_t>(reader.read_b(3));
-    tile_configuration.resize(n_aux_attribute_groups + 1);
+    tile_configuration.resize(static_cast<size_t>(n_aux_attribute_groups) + 1);
     for (auto i = 0; i <= n_aux_attribute_groups; ++i) tile_configuration[i].read(reader, AT_coord_size);
     annotation_encoding_parameters.read(reader);
 }

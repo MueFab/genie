@@ -32,6 +32,9 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     this->codec = "bsc";
     app.add_option("-c,--codec", this->codec, "codec ('bsc' or 'default')");
 
+    testfileoutput = false;
+    app.add_flag("--csv", testfileoutput, "comma seperated file");
+
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "");
 
