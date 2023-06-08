@@ -34,7 +34,9 @@ inline uint64_t DataBlock::divByWordSize(uint64_t val) const { return val >> lgW
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t DataBlock::modByWordSize(uint64_t val) const { return val & ((1 << lgWordSize) - 1); }
+inline uint64_t DataBlock::modByWordSize(uint64_t val) const {
+    return val & ((1 << static_cast<uint64_t> (lgWordSize)) - 1);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

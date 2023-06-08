@@ -30,7 +30,9 @@ class Code {
     /**
      * @brief
      */
-    Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode = 3);
+    Code(std::string inputFileName, std::string OutputFileName);
+    Code(std::string inputFileName, std::string OutputFileName, bool testOutput);
+    Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode, bool testOutput = false);
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
