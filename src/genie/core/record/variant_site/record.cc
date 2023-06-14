@@ -89,9 +89,9 @@ void Record::write(std::ostream& outputfile) const {
     outputfile << '"' << ref << '"' << ",";
     outputfile << std::to_string(alt_count) << ",";
 
-    for (auto alt_inst : alt) {
-        outputfile << std::to_string(alt_inst.alt_len) << ",";
-        outputfile << '"' << alt_inst.alt << '"' << ",";
+    for (auto i = 0; i < alt_count; ++i) {
+        outputfile << std::to_string(alt_len[i]) << ",";
+        outputfile << '"' << altern[i] << '"' << ",";
     }
 
     outputfile << std::to_string(depth) << ",";
@@ -120,12 +120,13 @@ void Record::write(std::ostream& outputfile) const {
     }
 }
 
-void Record::read(genie::util::BitReader& reader) {
-    variant_index = (reader.readBypassBE<uint64_t>());
-    seq_ID = (reader.readBypassBE<uint16_t>());
-    pos = (reader.readBypassBE<uint64_t, 5>());
-    strand = (reader.readBypassBE<uint8_t>());
-    ID_len = (reader.readBypassBE<uint8_t>());
+bool Record::read(genie::util::BitReader& reader) {
+    variant_index = reader.readBypassBE<uint64_t>();
+    if (!reader.isGood()) return false;
+    seq_ID = reader.readBypassBE<uint16_t>();
+    pos = reader.readBypassBE<uint64_t, 5>();
+    strand = reader.readBypassBE<uint8_t>();
+    ID_len = reader.readBypassBE<uint8_t>();
     if (ID_len > 0) {
         ID.resize(ID_len);
         reader.readBypass(&ID[0], ID_len);
@@ -142,13 +143,10 @@ void Record::read(genie::util::BitReader& reader) {
     }
     alt_count = reader.readBypassBE<uint8_t>();
     for (auto i = 0; i < alt_count; ++i) {
-        Alt alt_inst;
-        alt_inst.alt_len = reader.readBypassBE<uint32_t>();
-        if (alt_inst.alt_len > 0) {
-            alt_inst.alt.resize(alt_inst.alt_len);
-            reader.readBypass(&alt_inst.alt[0], alt_inst.alt_len);
-        }
-        alt.push_back(alt_inst);
+        alt_len.push_back(reader.readBypassBE<uint32_t>());
+        std::string altlist(alt_len.back(), 0);
+        reader.readBypass(&altlist[0], alt_len.back());
+        altern.push_back(altlist);
     }
 
     depth = reader.readBypassBE<uint32_t, 4>();
@@ -201,6 +199,7 @@ void Record::read(genie::util::BitReader& reader) {
         }
         reference_box_ID = reader.readBypassBE<uint8_t>();
     }
+    return true;
 }
 
 }  // namespace variant_site
