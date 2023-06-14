@@ -30,26 +30,34 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Code::Code(std::string inputFileName, std::string OutputFileName) {
-    bool testOutput = false;
-    uint8_t encodeMode = 3;
-    Code(inputFileName, outputFileName, encodeMode, testOutput);
+enum class codecs { BSC, ABC };
+ codecs convertStringToCodec(std::string inputString) {
+    if (inputString == "BSC")
+        return codecs::BSC;
+    else
+        return codecs::ABC;
 }
 
-Code::Code(std::string inputFileName, std::string OutputFileName, bool testOutput) {
-    uint8_t encodeMode = 3;
-    Code(inputFileName, outputFileName, encodeMode, testOutput);
-}
+Code::Code(std::string inputFileName, std::string OutputFileName)
+    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), false) {}
+
+Code::Code(std::string inputFileName, std::string OutputFileName, bool testOutput)
+    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), testOutput) {}
+
+Code::Code(std::string inputFileName, std::string OutputFileName, std::string encodeString, bool testOutput)
+    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), testOutput) {}
 
 genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode,
                                  bool testOutput)
     : inputFileName(inputFileName), outputFileName(outputFileName), compressedData{} {
-    if (encodeMode != 3) return;
-    std::cerr << "calling fillAnnotationParameterSet "  << std::endl;
+    if (encodeMode != 3) UTILS_DIE("No Valid codec selected ");
+    if (inputFileName.empty()) {
+        std::cerr << ("No Valid Inputs ") << std::endl;
+        return;
+    }
+
     fillAnnotationParameterSet();
-    std::cerr << "calling encodeData " << std::endl;
     encodeData();
-    std::cerr << "calling fillAnnotationAccessUnit " << std::endl;
     fillAnnotationAccessUnit();
 
     std::stringstream parameterSetStream;
@@ -62,12 +70,10 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
     std::ofstream txtFile;
     if (testOutput) {
         std::string txtName = OutputFileName + ".txt";
-        std::cerr << "opening file " << txtName << std::endl;
         txtFile.open(txtName, std::ios::out);
     }
 
     std::ofstream outputFile;
-    std::cerr << "opening file " << OutputFileName << std::endl;
     outputFile.open(OutputFileName, std::ios::binary | std::ios::out);
 
     if (outputFile.is_open()) {

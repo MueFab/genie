@@ -36,7 +36,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     app.add_flag("--csv", testfileoutput, "comma seperated file");
 
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "");
+    app.add_flag("-f,--force", forceOverwrite, "overwrite outputfile");
 
     try {
         app.parse(argc, argv);

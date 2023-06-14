@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <iostream>
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/record/variant_site/VariantSiteParser.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 
@@ -54,12 +56,13 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
+
     std::string path = "./Testfiles/exampleMGrecs/";
     std::string filename = "ALL.chrX.10000";
     std::ifstream inputfile;
     inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
 
-      if (inputfile.is_open()) {
+    if (inputfile.is_open()) {
         genie::util::BitReader reader(inputfile);
         std::ofstream outputfile(path + filename + "_site.txt");
         do {
@@ -68,6 +71,27 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         } while (inputfile.peek() != EOF);
         inputfile.close();
         outputfile.close();
+    }
+
+    EXPECT_EQ(0, 0);
+    ASSERT_EQ(0, 0);
+}
+
+TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+    std::string path = "./Testfiles/exampleMGrecs/";
+    std::string filename = "ALL.chrX.10000";
+    std::ifstream inputfile;
+    inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
+    std::map<DescriptorID, std::stringstream> outputstream;
+
+    if (inputfile.is_open()) {
+        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream);
+        EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
+        EXPECT_EQ(parser.getNumberOfRows(), 10000);
     }
 
     EXPECT_EQ(0, 0);

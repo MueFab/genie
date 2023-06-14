@@ -36,11 +36,6 @@ class Info_tag {
     std::vector<std::string> info_value{};
 };
 
-class Alt {
- public:
-    uint32_t alt_len{};
-    std::string alt{};
-};
 
 /**
  *  @brief
@@ -59,7 +54,8 @@ class Record {
     std::string ref;
     uint8_t alt_count;
 
-    std::vector<Alt> alt;
+    std::vector <uint32_t> alt_len;
+    std::vector <std::string> altern;
 
     uint32_t depth;
     uint32_t seq_qual;
@@ -95,7 +91,8 @@ class Record {
           ref_len(0),
           ref(""),
           alt_count(0),
-          alt(0),
+          alt_len(0),
+          altern(0),
           depth(0),
           seq_qual(0),
           map_qual(0),
@@ -115,7 +112,7 @@ class Record {
     /**
      * @brief
      */
-    void read(genie::util::BitReader& reader);
+    bool read(genie::util::BitReader& reader);
     /**
      * @brief
      */
@@ -129,7 +126,8 @@ class Record {
     std::string getDescription() { return description; }
     std::string getRef() { return ref; }
     uint8_t getAltCount() { return alt_count; }
-    std::vector<Alt> getAlt() { return alt; }
+
+    std::vector<std::string> getAlt() { return altern; }
     uint32_t getDepth() { return depth; }
     uint32_t getSeqQual() { return seq_qual; }
     uint32_t getMapQual() { return map_qual; }
@@ -142,9 +140,6 @@ class Record {
     uint8_t getReferenceBoxID() { return reference_box_ID; }
 };
 
-class Parse_Record {
- private:
-};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
