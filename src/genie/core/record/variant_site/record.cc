@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/core/record/variant_site/record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <cstring>
 
+#include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
