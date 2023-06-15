@@ -1,5 +1,6 @@
 #include "arrayType.h"
 #include "genie/util/bitreader.h"
+#include <cstring>
 
 namespace genie {
 namespace core {
