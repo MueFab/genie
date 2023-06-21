@@ -74,7 +74,6 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     }
 
     EXPECT_EQ(0, 0);
-    ASSERT_EQ(0, 0);
 }
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
@@ -95,5 +94,4 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
 
     EXPECT_EQ(0, 0);
-    ASSERT_EQ(0, 0);
 }

@@ -103,7 +103,7 @@ void Record::write(std::ostream& outputfile) const {
     outputfile << std::to_string(filters_len) << ",";
     outputfile << '"' << filters << '"' << ",";
     outputfile << std::to_string(info_count) << ",";
-    for (auto tag : info_tag) {
+    for (const auto& tag : info_tag) {
         outputfile << std::to_string(tag.info_tag_len) << ",";
         outputfile << '"' << tag.info_tag << '"' << ",";
         outputfile << std::to_string(tag.info_type) << ",";

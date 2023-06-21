@@ -34,6 +34,13 @@ class Info_tag {
     uint8_t info_type{};
     uint8_t info_array_len{};
     std::vector<std::string> info_value{};
+    Info_tag& operator=(const Info_tag& other) {
+        info_tag_len = other.info_tag_len;
+        info_tag = other.info_tag;
+        info_type = other.info_type;
+        info_array_len = other.info_array_len;
+        info_value = other.info_value;
+    }
 };
 
 
@@ -118,26 +125,26 @@ class Record {
      */
     void write(std::ostream& outputfile) const;
 
-    uint64_t getVariantIndex() { return variant_index; }
-    uint16_t getSeqID() { return seq_ID; }
-    uint64_t getPos() { return pos; }
-    uint8_t getStrand() { return strand; }
-    std::string getID() { return ID; }
-    std::string getDescription() { return description; }
-    std::string getRef() { return ref; }
-    uint8_t getAltCount() { return alt_count; }
+    uint64_t getVariantIndex() const { return variant_index; }
+    uint16_t getSeqID() const { return seq_ID; }
+    uint64_t getPos() const { return pos; }
+    uint8_t getStrand() const { return strand; }
+    std::string getID() const { return ID; }
+    std::string getDescription() const { return description; }
+    std::string getRef() const { return ref; }
+    uint8_t getAltCount() const { return alt_count; }
 
-    std::vector<std::string> getAlt() { return altern; }
-    uint32_t getDepth() { return depth; }
-    uint32_t getSeqQual() { return seq_qual; }
-    uint32_t getMapQual() { return map_qual; }
-    uint32_t getMapNumQual0() { return map_num_qual_0; }
-    std::string getFilters() { return filters; }
-    uint8_t getInfoCount() { return info_count; }
-    std::vector<Info_tag> getInfoTag() { return info_tag; }
-    bool isLinkedRecord() { return (linked_record == 0 ? false : true); }
-    std::string getLinkName() { return link_name; }
-    uint8_t getReferenceBoxID() { return reference_box_ID; }
+    std::vector<std::string> getAlt() const { return altern; }
+    uint32_t getDepth() const { return depth; }
+    uint32_t getSeqQual() const { return seq_qual; }
+    uint32_t getMapQual() const { return map_qual; }
+    uint32_t getMapNumQual0() const { return map_num_qual_0; }
+    std::string getFilters() const { return filters; }
+    uint8_t getInfoCount() const { return info_count; }
+    std::vector<Info_tag> getInfoTag()const { return info_tag; }
+    bool isLinkedRecord() const { return (linked_record == 0 ? false : true); }
+    std::string getLinkName() const { return link_name; }
+    uint8_t getReferenceBoxID() const { return reference_box_ID; }
 };
 
 
