@@ -1,6 +1,6 @@
 #include "arrayType.h"
-#include "genie/util/bitreader.h"
 #include <cstring>
+#include "genie/util/bitreader.h"
 
 namespace genie {
 namespace core {
@@ -77,6 +77,47 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
             break;
     }
     return temp;
+}
+
+uint8_t arrayType::getDefaultBitsize(uint8_t type) {
+    if (type == 0 || type == 1 || type == 3 || type == 4) return 8;
+    if (type == 2) return 1;
+    if (type == 5 || type == 6) return 16;
+    if (type == 7 || type == 8 || type == 11) return 32;
+    if (type == 9 || type == 10 || type == 12) return 64;
+    return 0;
+}
+
+uint64_t arrayType::getDefaultValue(uint8_t type) {
+    switch (type) {
+        case 0:
+        case 1:
+        case 2:
+            return 0;
+        case 3:
+            return 0x80;
+        case 4:
+            return 0xFF;
+        case 5:
+            return 0x8000;
+        case 6:
+            return 0xFFFF;
+        case 7:
+            return 0x80000000;
+        case 8:
+            return 0xFFFFFFFF;
+        case 9:
+            return 0x8000000000000000;
+        case 10:
+            return 0xFFFFFFFFFFFFFFFF;
+        case 11:
+            return 0x7F800001;
+        case 12:
+            return 0x7FFF000000000001;
+        default:
+            break;
+    }
+    return 0;
 }
 
 std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
