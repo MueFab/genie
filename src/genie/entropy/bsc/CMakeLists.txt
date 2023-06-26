@@ -2,7 +2,6 @@ project("genie-bsc")
 
 set(source_files
     encoder.cc
-    decoder.cc
     
 )
 add_library(genie-bsc ${source_files})
