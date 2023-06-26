@@ -5,10 +5,12 @@
  */
 
 #include <algorithm>
+#include <cstring>
+#include <sstream>
 #include <string>
 #include <utility>
-#include <cstring>
 
+#include "..\annotation_parameter_set\record.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -20,6 +22,29 @@ namespace genie {
 namespace core {
 namespace record {
 namespace variant_site {
+
+AttributeData::AttributeData()
+    : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), value{} {}
+
+AttributeData::AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength)
+    : attributeNameLength(length), attributeName(name), attributeType(type), attributeArrayDims(arrayLength), value{} {}
+
+AttributeData& AttributeData::operator=(const AttributeData& other) {
+    attributeNameLength = other.attributeNameLength;
+    attributeName = other.attributeName;
+    attributeType = other.attributeType;
+    attributeArrayDims = other.attributeArrayDims;
+    value << other.value.rdbuf();
+    return *this;
+}
+
+AttributeData::AttributeData(const AttributeData& other)  {
+    attributeNameLength = other.attributeNameLength;
+    attributeName = other.attributeName;
+    attributeType = other.attributeType;
+    attributeArrayDims = other.attributeArrayDims;
+    value << other.value.rdbuf();
+}
 
 uint8_t Record::determineSize(uint8_t selectType) const {
     if (selectType == 0) return 0;

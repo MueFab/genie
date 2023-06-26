@@ -8,12 +8,12 @@
 #include <string>
 #include <utility>
 
+#include "genie/core/arrayType.h"
 #include "genie/core/record/variant_site/VariantSiteParser.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/core/arrayType.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -61,9 +61,10 @@ void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(0, 8);
     fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(variantSite.getRef());
     fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(0, 8);
+    const auto& altArray = variantSite.getAlt();
 
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
-        const auto altern = variantSite.getAlt()[i];
+        const auto& altern = altArray[i];
         for (const auto& alt : altern) {
             fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternTranslate(alt), 3);
         }
@@ -85,39 +86,39 @@ void VaritanSiteParser::ParseOne() {
         AttributeData temp;
         auto size = variantSite.getInfoCount();
         attributeInfo.resize(size, temp);
+        const auto& infoTag = variantSite.getInfoTag();
         for (auto i = 0; i < size; ++i) {
-            const auto info = variantSite.getInfoTag()[i];
+            const auto& info = infoTag[i];
             AttributeData data(info.info_tag_len, info.info_tag, info.info_type, info.info_array_len);
             attributeInfo[i] = data;
         }
     }
 
-    auto attributeInfoSize = attributeInfo.size();
-    for (auto i = 0; i < attributeInfoSize; ++i) {
-        Writer writer(&attributeInfo[i].getValue());
-        if (variantSite.getInfoTag().size() != variantSite.getInfoCount()) {
-            std::cerr << "error in size" << std::endl;
-        }
-
-        if (i < variantSite.getInfoCount()) {            
-            const auto valueArray = variantSite.getInfoTag()[i].info_value;
-            for (const auto& value : valueArray) {
-                writer.write(value);
-                if (variantSite.getInfoTag()[i].info_type == 0) writer.write(0, 8);
-            }
-        } else {
-            arrayType typeDefault;
-            auto bitSize = typeDefault.getDefaultBitsize(attributeInfo[i].getAttributeType());
-            auto value = typeDefault.getDefaultValue(attributeInfo[i].getAttributeType());
-
-            for (auto j = 0; j < attributeInfo[i].getArrayLength(); ++j) {
-                writer.write(value,bitSize);
-            }
-        }
+    for (uint8_t i = 0; i < attributeInfo.size(); ++i) {
+        ParseAttribute(i);
     }
 }
 
-void VaritanSiteParser::ParseAttribute() {}
+void VaritanSiteParser::ParseAttribute(uint8_t index) {
+    Writer writer(&attributeInfo[index].getValue());
+    const auto& infoTag = variantSite.getInfoTag();
+
+    if (index < variantSite.getInfoCount()) {
+        const auto& valueArray = infoTag[index].info_value;
+        for (const auto& value : valueArray) {
+            writer.write(value);
+            if (variantSite.getInfoTag()[index].info_type == 0) writer.write(0, 8);
+        }
+    } else {
+        arrayType typeDefault;
+        auto bitSize = typeDefault.getDefaultBitsize(attributeInfo[index].getAttributeType());
+        auto value = typeDefault.getDefaultValue(attributeInfo[index].getAttributeType());
+
+        for (auto j = 0; j < attributeInfo[index].getArrayLength(); ++j) {
+            writer.write(value, bitSize);
+        }
+    }
+}
 
 void VaritanSiteParser::writeDanglingBits() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQUENCEID)].flush();

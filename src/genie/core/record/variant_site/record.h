@@ -27,6 +27,31 @@ namespace core {
 namespace record {
 namespace variant_site {
 
+
+class AttributeData {
+ public:
+    AttributeData();
+    AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength);
+
+    AttributeData& operator=(const AttributeData& other);
+
+    AttributeData(const AttributeData& other);
+
+    uint8_t getAttributeNameLength() const { return attributeNameLength; }
+    std::string getAttributeName() const { return attributeName; }
+    uint8_t getAttributeType() const { return attributeType; }
+    uint8_t getArrayLength() const { return attributeArrayDims; }
+    std::stringstream& getValue() { return value; }
+
+ private:
+    uint8_t attributeNameLength;
+    std::string attributeName;
+    uint8_t attributeType;
+    uint8_t attributeArrayDims;
+    std::stringstream value;
+};
+
+
 class Info_tag {
  public:
     uint8_t info_tag_len{};
