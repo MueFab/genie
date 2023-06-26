@@ -10,12 +10,15 @@
 // ---------------------------------------------------------------------------------------------------------------------
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/record/variant_site/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +28,8 @@ namespace annotation {
 /**
  * @brief
  */
+
+
 class Code {
  public:
     /**

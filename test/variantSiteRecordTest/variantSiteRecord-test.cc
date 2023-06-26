@@ -86,9 +86,10 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::ifstream inputfile;
     inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
     std::map<DescriptorID, std::stringstream> outputstream;
-
+    std::vector<genie::core::record::variant_site::AttributeData> info;
     if (inputfile.is_open()) {
-        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream);
+        
+        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream,info);
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
     }

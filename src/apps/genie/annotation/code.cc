@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <istream>
 #include <sstream>
 
 #include "apps/genie/annotation/code.h"
@@ -15,6 +16,8 @@
 #include "genie/core/writer.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
+
+#include "genie/core/record/variant_site/VariantSiteParser.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -31,7 +34,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum class codecs { BSC, ABC };
- codecs convertStringToCodec(std::string inputString) {
+codecs convertStringToCodec(std::string inputString) {
     if (inputString == "BSC")
         return codecs::BSC;
     else
@@ -54,6 +57,12 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
+    }
+    std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream> output;
+    std::vector<genie::core::record::variant_site::AttributeData> info;
+    {
+        std::ifstream site_MGrecs(inputFileName, std::ios::binary);
+        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info);
     }
 
     fillAnnotationParameterSet();

@@ -32,58 +32,20 @@ namespace core {
 namespace record {
 namespace variant_site {
 
-class AttributeData {
- public:
-    AttributeData() : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), value{} {}
-    AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength)
-        : attributeNameLength(length),
-          attributeName(name),
-          attributeType(type),
-          attributeArrayDims(arrayLength),
-          value{} {}
-
-    AttributeData& operator=(const AttributeData& other) {
-        attributeNameLength = other.attributeNameLength;
-        attributeName = other.attributeName;
-        attributeType = other.attributeType;
-        attributeArrayDims = other.attributeArrayDims;
-        value << other.value.rdbuf();
-        return *this;
-    }
-
-    AttributeData(const AttributeData& other) {
-        attributeNameLength = other.attributeNameLength;
-        attributeName = other.attributeName;
-        attributeType = other.attributeType;
-        attributeArrayDims = other.attributeArrayDims;
-        value << other.value.rdbuf();
-    }
-
-    uint8_t getAttributeNameLength() const { return attributeNameLength; }
-    std::string getAttributeName() const { return attributeName; }
-    uint8_t getAttributeType() const { return attributeType; }
-    uint8_t getArrayLength() const { return attributeArrayDims; }
-    std::stringstream& getValue() { return value; }
-
- private:
-    uint8_t attributeNameLength;
-    std::string attributeName;
-    uint8_t attributeType;
-    uint8_t attributeArrayDims;
-    std::stringstream value;
-};
 
 class VaritanSiteParser {
  public:
+     using AttributeData = genie::core::record::variant_site::AttributeData;
     VaritanSiteParser(std::istream& site_MGrecs,
-                      std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream>& output)
+                      std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream>& output,
+                      std::vector<AttributeData>& info)
         : siteMGrecs(site_MGrecs),
           dataFields(output),
           variantSite{},
           rowsPerTile(0),
           fieldWriter{},
           numberOfRows(0),
-          attributeInfo{} {
+          attributeInfo(info) {
         init();
         util::BitReader reader(siteMGrecs);
         while (fillRecord(reader)) {
@@ -100,16 +62,16 @@ class VaritanSiteParser {
     variant_site::Record variantSite;
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
-    std::map<DescriptorID, std::stringstream>& dataFields;
     std::vector<Writer> fieldWriter;
-    std::vector<AttributeData> attributeInfo;
+    std::map<DescriptorID, std::stringstream>& dataFields;
+    std::vector<AttributeData>& attributeInfo;
     size_t numberOfRows;
 
     void addWriter(DescriptorID id);
     void init();
     bool fillRecord(util::BitReader reader);
     void ParseOne();
-    void ParseAttribute();
+    void ParseAttribute(uint8_t index);
     void writeDanglingBits();
     uint8_t AlternTranslate(char alt) const;
 };
