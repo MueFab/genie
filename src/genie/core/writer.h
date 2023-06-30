@@ -24,6 +24,18 @@ class Writer {
  public:
     Writer(std::ostream* writer, bool log = false) : logwriter(writer), binwriter{writer}, writingLog(log){};
     /**
+     * @brief Write a specified number of bits, reserved are not written to log
+     * @param value Data to write. The LSBs will be written.
+     * @param bits How many bits to write, range 1 to 64
+     */
+    void write(uint64_t value, uint8_t bits, bool reserved) {
+        if (reserved) {
+            if (!writingLog) write(value, bits);
+        } else {
+            write(value, bits);
+        }
+    }
+    /**
      * @brief Write a specified number of bits
      * @param value Data to write. The LSBs will be written.
      * @param bits How many bits to write, range 1 to 64
@@ -40,10 +52,14 @@ class Writer {
      * @param string String to write.
      */
     void write(const std::string& string) {
-        if (writingLog)
-            *logwriter << '"' << string << '"' << ",";
-        else
-            binwriter.write(string);
+        if (writingLog) {
+            if (string.empty())
+                *logwriter << '"' << '"' << ",";
+            else
+                *logwriter << '"' << string << '"' << ",";
+        } else {
+            if (!string.empty()) binwriter.write(string);
+        }
     }
     /**
      * @brief Write the whole data from another stream. Basically appending the data to this stream.

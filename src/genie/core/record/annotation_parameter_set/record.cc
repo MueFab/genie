@@ -58,10 +58,11 @@ void Record::read(util::BitReader& reader) {
 
 
 void Record::write(Writer& writer) const {
+    const bool reserved = true;
     writer.write(parameter_set_ID, 8);
     writer.write(AT_ID, 8);
     writer.write(AT_alphabet_ID, 8);
-    writer.write(0, 2);
+    writer.write(0, 2, reserved);
     writer.write(AT_coord_size, 2);
     writer.write(AT_pos_40_bits_flag, 1);
     writer.write(n_aux_attribute_groups, 3);

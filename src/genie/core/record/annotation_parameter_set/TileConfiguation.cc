@@ -14,7 +14,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
-#include "TileConfiguration.h"
+#include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -189,12 +189,12 @@ void TileConfiguration::write(core::Writer& writer) const {
     writer.write(attribute_contiguity, 1);
     writer.write(two_dimensional, 1);
     if (two_dimensional) {
-        writer.write(0, 6);
+        writer.write(0, 6, true);
         writer.write(column_major_tile_order, 1);
         writer.write(symmetry_mode, 3);
         writer.write(symmetry_minor_diagonal, 2);
     } else {
-        writer.write(0, 3);
+        writer.write(0, 3, true);
     }
     writer.write(attribute_dependent_tiles, 1);
     default_tile_structure.write(writer);

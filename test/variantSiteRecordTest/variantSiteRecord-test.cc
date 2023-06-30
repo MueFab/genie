@@ -85,13 +85,25 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::string filename = "ALL.chrX.10000";
     std::ifstream inputfile;
     inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
+
+    filename = "ALL.chrX.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.infotags.json";
+    std::ifstream infoFieldsFile;
+    infoFieldsFile.open(path + filename, std::ios::in);
+    std::stringstream infoFields;
+    if (infoFieldsFile.is_open()) {
+        infoFields << infoFieldsFile.rdbuf();
+        infoFieldsFile.close();
+    }
     std::map<DescriptorID, std::stringstream> outputstream;
-    std::vector<genie::core::record::variant_site::AttributeData> info;
+    std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     if (inputfile.is_open()) {
-        
-        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream,info);
+        //     std::stringstream infoFields( "[\"LDAF\", \"AVGPOST\", \"RSQ\", \"ERATE\", \"THETA\", \"CIEND\",
+        //     \"CIPOS\", \"END\", \"HOMLEN\", \"HOMSEQ\", \"SVLEN\", \"SVTYPE\", \"AC\", \"AN\", \"AA\", \"AF\",
+        //     \"AMR_AF\", \"ASN_AF\", \"AFR_AF\", \"EUR_AF\", \"VT\", \"SNPSOURCE\"]");
+        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, infoFields);
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
+        inputfile.close();
     }
 
     EXPECT_EQ(0, 0);
