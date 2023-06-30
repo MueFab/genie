@@ -21,8 +21,8 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#include "AnnotationEncodingParameters.h"
-#include "TileConfiguration.h"
+#include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
+#include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/writer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 

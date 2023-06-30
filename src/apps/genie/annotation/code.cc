@@ -18,6 +18,7 @@
 #include "genie/util/string-helpers.h"
 
 #include "genie/core/record/variant_site/VariantSiteParser.h"
+#include "genie/entropy/bsc/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -59,10 +60,15 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
         return;
     }
     std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream> output;
-    std::vector<genie::core::record::variant_site::AttributeData> info;
+    std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     {
+        std::stringstream infoFields(
+            "[\"LDAF\", \"AVGPOST\", \"RSQ\", \"ERATE\", \"THETA\", \"CIEND\", \"CIPOS\", \"END\", \"HOMLEN\", "
+            "\"HOMSEQ\", \"SVLEN\", \"SVTYPE\", \"AC\", \"AN\", \"AA\", \"AF\", \"AMR_AF\", \"ASN_AF\", \"AFR_AF\", "
+            "\"EUR_AF\", \"VT\", \"SNPSOURCE\"]");
+
         std::ifstream site_MGrecs(inputFileName, std::ios::binary);
-        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info);
+        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info, infoFields);
     }
 
     fillAnnotationParameterSet();
@@ -279,6 +285,15 @@ void genieapp::annotation::Code::encodeData() {
         wholeTestFile << infile.rdbuf();
         infile.close();
     }
+    genie::entropy::bsc::BSCParameters bscParameters;
+    bscParameters.blockSorter = MPEGG_BSC_BLOCKSORTER_BWT;
+    bscParameters.coder = MPEGG_BSC_CODER_QLFC_STATIC;
+    bscParameters.lzpHashSize = MPEGG_BSC_DEFAULT_LZPHASHSIZE;
+    bscParameters.lzpMinLen = MPEGG_BSC_DEFAULT_LZPMINLEN;
+
+    genie::entropy::bsc::BSCEncoder encoder;
+    encoder.configure(bscParameters);
+    encoder.encode(wholeTestFile, compressedData);
 
     unsigned char *dest = NULL;
     size_t destLen = 0;

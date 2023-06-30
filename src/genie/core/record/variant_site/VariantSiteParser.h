@@ -32,13 +32,13 @@ namespace core {
 namespace record {
 namespace variant_site {
 
-
 class VaritanSiteParser {
  public:
-     using AttributeData = genie::core::record::variant_site::AttributeData;
+    using AttributeData = genie::core::record::variant_site::AttributeData;
+
     VaritanSiteParser(std::istream& site_MGrecs,
                       std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream>& output,
-                      std::vector<AttributeData>& info)
+                      std::map<std::string, AttributeData>& info, std::stringstream& jsonInfoFields)
         : siteMGrecs(site_MGrecs),
           dataFields(output),
           variantSite{},
@@ -46,6 +46,8 @@ class VaritanSiteParser {
           fieldWriter{},
           numberOfRows(0),
           attributeInfo(info) {
+        infoFieldsJSON = jsonInfoFields.str();
+        if (!infoFieldsJSON.empty()) ParseInfoFields();
         init();
         util::BitReader reader(siteMGrecs);
         while (fillRecord(reader)) {
@@ -64,14 +66,18 @@ class VaritanSiteParser {
     uint64_t rowsPerTile;
     std::vector<Writer> fieldWriter;
     std::map<DescriptorID, std::stringstream>& dataFields;
-    std::vector<AttributeData>& attributeInfo;
+    std::map<std::string, AttributeData>& attributeInfo;
     size_t numberOfRows;
+    std::string infoFieldsJSON;
+    std::vector<std::string> infoFields;
 
     void addWriter(DescriptorID id);
     void init();
     bool fillRecord(util::BitReader reader);
     void ParseOne();
     void ParseAttribute(uint8_t index);
+    void ParseAttribute(std::string infoTagfield);
+    void ParseInfoFields();
     void writeDanglingBits();
     uint8_t AlternTranslate(char alt) const;
 };

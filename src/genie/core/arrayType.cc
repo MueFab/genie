@@ -80,7 +80,8 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
 }
 
 uint8_t arrayType::getDefaultBitsize(uint8_t type) {
-    if (type == 0 || type == 1 || type == 3 || type == 4) return 8;
+    if (type == 0) return 0;
+    if (type == 1 || type == 3 || type == 4) return 8;
     if (type == 2) return 1;
     if (type == 5 || type == 6) return 16;
     if (type == 7 || type == 8 || type == 11) return 32;
@@ -199,11 +200,17 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
 void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, core::Writer& writer) const {
     if (type == 2) {
         writer.write(bytearray[0], 1);
-    } else if (type == 0) {
-        for (auto i = 0; i < bytearray.size(); ++i) writer.write(bytearray[i], 8);
-        writer.write(0, 8);
+    } else if (type == 0) {  // string
+        std::string stringOut;
+        if (bytearray.size() > 0)
+            for (auto byte : bytearray) stringOut += byte;
+        writer.write(stringOut);
+        // for (auto i = 0; i < bytearray.size(); ++i) writer.write(bytearray[i], 8);
+        writer.write(0, 8, true);
     } else {
-        for (auto i = bytearray.size(); i > 0; --i) writer.write(bytearray[i - 1], 8);
+        uint64_t writeValue = 0;
+        for (auto i = 0; i < bytearray.size(); ++i) writeValue += static_cast<uint64_t>(bytearray[i]) << (i * 8);
+        writer.write(writeValue, static_cast<uint8_t>(bytearray.size()) * 8);
     }
 }
 

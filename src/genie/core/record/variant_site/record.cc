@@ -24,17 +24,20 @@ namespace record {
 namespace variant_site {
 
 AttributeData::AttributeData()
-    : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), value{} {}
+    : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), data{} {}
+
+AttributeData::AttributeData(uint8_t length, std::string name)
+    : attributeNameLength(length), attributeName(name), attributeType(0), attributeArrayDims(0), data{} {}
 
 AttributeData::AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength)
-    : attributeNameLength(length), attributeName(name), attributeType(type), attributeArrayDims(arrayLength), value{} {}
+    : attributeNameLength(length), attributeName(name), attributeType(type), attributeArrayDims(arrayLength), data{} {}
 
 AttributeData& AttributeData::operator=(const AttributeData& other) {
     attributeNameLength = other.attributeNameLength;
     attributeName = other.attributeName;
     attributeType = other.attributeType;
     attributeArrayDims = other.attributeArrayDims;
-    value << other.value.rdbuf();
+    data << other.data.rdbuf();
     return *this;
 }
 
@@ -43,7 +46,7 @@ AttributeData::AttributeData(const AttributeData& other)  {
     attributeName = other.attributeName;
     attributeType = other.attributeType;
     attributeArrayDims = other.attributeArrayDims;
-    value << other.value.rdbuf();
+    data << other.data.rdbuf();
 }
 
 uint8_t Record::determineSize(uint8_t selectType) const {
