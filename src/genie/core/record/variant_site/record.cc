@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include "..\annotation_parameter_set\record.h"
+#include "../annotation_parameter_set/record.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
