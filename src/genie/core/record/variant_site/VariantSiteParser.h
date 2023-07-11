@@ -48,7 +48,8 @@ class VaritanSiteParser {
           numberOfRows(0),
           attributeData(info),
           attributeStream(attributeStream),
-          numberOfAttributes(0) {
+          numberOfAttributes(0),
+          startPos(0) {
         infoFieldsJSON = jsonInfoFields.str();
         if (!infoFieldsJSON.empty()) ParseInfoFields();
         init();
@@ -84,6 +85,7 @@ class VaritanSiteParser {
 
     const uint8_t AlternEndLine = 0x06;
     const uint8_t AlternEnd = 0x07;
+    uint64_t startPos = 0;
 
     void addWriter(DescriptorID id);
     void init();
