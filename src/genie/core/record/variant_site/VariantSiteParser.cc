@@ -66,7 +66,7 @@ bool VaritanSiteParser::fillRecord(util::BitReader reader) {
 void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQUENCEID)].write(variantSite.getSeqID(), 16);
     fieldWriter[static_cast<size_t>(DescriptorID::STARTPOS)].write(variantSite.getPos(), 40);
-    fieldWriter[static_cast<size_t>(DescriptorID::STRAND)].write(variantSite.getStrand(), 8);
+    fieldWriter[static_cast<size_t>(DescriptorID::STRAND)].write(variantSite.getStrand(), 2);
     fieldWriter[static_cast<size_t>(DescriptorID::NAME)].write(variantSite.getID());
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(variantSite.getDescription());
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(0, 8);
