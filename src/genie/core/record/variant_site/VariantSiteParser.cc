@@ -91,6 +91,8 @@ void VaritanSiteParser::ParseOne() {
         fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].write(variantSite.getLinkName());
         fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].write(0, 8);
         fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].write(variantSite.getReferenceBoxID(), 8);
+    } else {
+        fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].write(255, 8);
     }
     std::map<std::string, AttributeData>::iterator it;
     for (it = attributeData.begin(); it != attributeData.end(); it++) {
