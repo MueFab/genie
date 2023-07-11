@@ -49,7 +49,7 @@ void BlockHeader::write(core::Writer& writer) const {
     writer.write(static_cast<uint8_t>(descriptor_ID), 8);
     if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE)
         writer.write(attribute_ID, 16);
-    writer.write(0, 2);
+    writer.write_reserved(2);
     writer.write(indexed, 1);
     writer.write(block_payload_size, 29);
 }

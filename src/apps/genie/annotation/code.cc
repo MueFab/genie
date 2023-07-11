@@ -18,7 +18,7 @@
 #include "genie/util/string-helpers.h"
 
 #include "genie/core/record/variant_site/VariantSiteParser.h"
-#include "genie/entropy/bsc/encoder.h"
+//#include "genie/entropy/bsc/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -68,7 +68,9 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
             "\"EUR_AF\", \"VT\", \"SNPSOURCE\"]");
 
         std::ifstream site_MGrecs(inputFileName, std::ios::binary);
-        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info, infoFields);
+        std::map<std::string, std::stringstream> attributeStream;
+        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info,
+                                                                               attributeStream, infoFields);
     }
 
     fillAnnotationParameterSet();
@@ -254,12 +256,15 @@ void genieapp::annotation::Code::fillAnnotationAccessUnit() {
     genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
     std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
 
-    std::string generic_payload = compressedData.str();
+    uint8_t readByte;
+    std::vector<uint8_t> payloadVector;
+    while (compressedData >> readByte) payloadVector.push_back(readByte);
+  //  std::string generic_payload = compressedData.str();
     uint8_t num_chrs = 0;
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
         descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
-        static_cast<uint16_t>(generic_payload.size()), compressedData);
+        static_cast<uint16_t>(payloadVector.size()), payloadVector);
 
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     genie::core::record::annotation_access_unit::Block block(block_header, block_payload, num_chrs);
@@ -285,7 +290,7 @@ void genieapp::annotation::Code::encodeData() {
         wholeTestFile << infile.rdbuf();
         infile.close();
     }
-    genie::entropy::bsc::BSCParameters bscParameters;
+    /* genie::entropy::bsc::BSCParameters bscParameters;
     bscParameters.blockSorter = MPEGG_BSC_BLOCKSORTER_BWT;
     bscParameters.coder = MPEGG_BSC_CODER_QLFC_STATIC;
     bscParameters.lzpHashSize = MPEGG_BSC_DEFAULT_LZPHASHSIZE;
@@ -305,6 +310,35 @@ void genieapp::annotation::Code::encodeData() {
                        MPEGG_BSC_CODER_QLFC_STATIC);
     compressedData.write((const char *)dest, destLen);
     std::cout << "compressedData length: " << std::to_string(compressedData.str().size()) << std::endl;
+    */
+}
+
+void genieapp::annotation::TempEncoder::encode(const std::stringstream &input, std::stringstream &output) {
+    // uint8_t lzpHashSize = MPEGG_BSC_DEFAULT_LZPHASHSIZE;
+    //  uint8_t lzpMinLen = MPEGG_BSC_DEFAULT_LZPMINLEN;
+    //  uint8_t blockSorter = MPEGG_BSC_BLOCKSORTER_BWT;
+    //  uint16_t coder = MPEGG_BSC_CODER_QLFC_STATIC;
+
+    unsigned char *dest = NULL;
+    size_t destLen = 0;
+    size_t srcLen = input.str().size();
+    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+
+    mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)input.str().c_str(), srcLen,
+                       MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
+                       MPEGG_BSC_CODER_QLFC_STATIC);
+    output.write((const char *)dest, destLen);
+    //   std::cout << "compressedData length: " << std::to_string(output.str().size()) << std::endl;
+
+    /*
+            unsigned char *dest = NULL;
+            size_t destLen = 0;
+            size_t srcLen = input.str().size();
+            std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+
+            mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)input.str().c_str(), srcLen, lzpHashSize,
+       lzpMinLen, blockSorter, coder); output.write((const char *)dest, destLen);
+        }*/
 }
 
 }  // namespace annotation

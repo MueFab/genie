@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/core/record/annotation_access_unit/block.h"
 #include <algorithm>
 #include <string>
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/core/record/annotation_access_unit/block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,9 +38,27 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
     read(reader);
 }
 
-void Block::write(core::Writer& writer) const {
+void Block::write(core::Writer& writer) {
     block_header.write(writer);
     block_payload.write(writer);
+}
+
+void Block::set(BlockVectorData blockData) {
+    numChrs = 0;
+    const bool attribute_contiguity = false;
+    const bool indexed = false;
+    uint32_t blockSize = static_cast<uint32_t>(blockData.getData().size());
+    BlockHeader header(attribute_contiguity, blockData.getDescriptorID(), blockData.getAttributeID(), indexed,
+                       blockSize);
+    GenotypePayload genotype_payload;
+    LikelihoodPayload likelihood_payload;
+    std::vector<ContactMatrixBinPayload> cm_bin_payload;
+    ContactMatrixMatPayload cm_mat_payload;
+    BlockPayload payload(blockData.getDescriptorID(), numChrs, genotype_payload, likelihood_payload,
+                               cm_bin_payload,
+                         cm_mat_payload, blockSize, blockData.getData());
+    block_header = header;
+    block_payload = payload;
 }
 
 }  // namespace annotation_access_unit

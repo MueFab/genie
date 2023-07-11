@@ -99,11 +99,15 @@ TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
         infile.close();
     }
 
+    uint8_t readByte;
+    std::vector<uint8_t> payloadVector;
+    while (generic_payload >> readByte) payloadVector.push_back(readByte);
+
     uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
         descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
-        block_payload_size, generic_payload);
+        block_payload_size, payloadVector);
 
     std::stringstream outputData;
     genie::core::Writer writer(&outputData);
@@ -138,12 +142,15 @@ TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
         generic_payload << infile.rdbuf();
         infile.close();
     }
+    std::vector<uint8_t> payloadvector;
+    uint8_t readByte;
+    while (generic_payload >> readByte) payloadvector.push_back(readByte);
 
     uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
         descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
-        block_payload_size, generic_payload);
+        block_payload_size, payloadvector);
     genie::core::record::annotation_access_unit::BlockHeader blockHeader(false, descriptor_ID, 1, false,
                                                                          block_payload_size);
     genie::core::record::annotation_access_unit::Block block(blockHeader, block_payload, num_chrs);
@@ -330,15 +337,18 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     std::stringstream stringPayload;
     stringPayload << compressedFile.rdbuf();
-    std::stringstream &stringPayload1 = stringPayload;
+    uint8_t readByte;
+    std::vector<uint8_t> payloadVector;
+    while (stringPayload >> readByte) payloadVector.push_back(readByte);
+
     // std::string generic_payload = stringPayload.str();
+
     uint16_t payloadSize = static_cast<uint16_t>(stringPayload.str().size());
     uint8_t num_chrs = 0;
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
         descriptorID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload, payloadSize,
-        stringPayload1);
-    stringPayload << "boe";
+        payloadVector);
 
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     genie::core::record::annotation_access_unit::Block block(block_header, block_payload, num_chrs);

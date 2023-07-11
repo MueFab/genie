@@ -8,15 +8,6 @@
 #define SRC_GENIE_ENTROPY_BSC_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-encoder.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/watch.h"
-
-#include "codecs/api/mpegg_utils.h"
-#include "codecs/include/mpegg-codecs.h"
-
 #ifdef _WIN32
 #include <windows.h>
 #define SYSERROR() GetLastError()
@@ -24,6 +15,17 @@
 #include <errno.h>
 #define SYSERROR() errno
 #endif
+
+#include <sstream>
+
+#include "genie/core/access-unit.h"
+#include "genie/core/entropy-encoder.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/watch.h"
+
+#include "apps/genie/annotation/code.h"
+#include "codecs/api/mpegg_utils.h"
+#include "codecs/include/mpegg-codecs.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -47,16 +49,23 @@ class BSCEncoder {
           blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
           coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
 
-    void encode(const std::stringstream &input, std::stringstream &output) {
-        unsigned char *dest = NULL;
-        size_t destLen = 0;
-        size_t srcLen = input.str().size();
+    void encode(std::stringstream &input, std::stringstream &output) {
+        const size_t srcLen = input.str().size();
+        char *dest = new char[srcLen];
+        input.read(dest, srcLen);
+        unsigned char* destination;
+        size_t destLen = srcLen;
         std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
-        mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)input.str().c_str(), srcLen, lzpHashSize, lzpMinLen,
+         mpegg_bsc_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen, lzpHashSize,
+         lzpMinLen,
                            blockSorter, coder);
+
         output.write((const char *)dest, destLen);
-        std::cout << "compressedData length: " << std::to_string(output.str().size()) << std::endl;
+        if (destLen != srcLen) {
+            std::cerr << "foutje?\n";
+        }
+        delete[] dest;
     }
 
     void configure(const BSCParameters bscParameters) {

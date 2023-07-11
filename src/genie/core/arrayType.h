@@ -29,6 +29,7 @@ class arrayType {
 
     uint8_t getDefaultBitsize(uint8_t type);
     uint64_t getDefaultValue(uint8_t type);
+    std::vector<uint8_t> toArray(uint8_t type, uint64_t value);
 };
 
 }  // namespace core

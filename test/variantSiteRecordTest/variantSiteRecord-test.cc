@@ -2,9 +2,12 @@
 
 #include <fstream>
 #include <iostream>
+#include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/variant_site/VariantSiteParser.h"
 #include "genie/core/record/variant_site/record.h"
+#include "genie/entropy/bsc/encoder.h"
 #include "genie/util/bitreader.h"
 
 class VariantSiteRecordTests : public ::testing::Test {
@@ -75,6 +78,85 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
 
     EXPECT_EQ(0, 0);
 }
+TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    uint64_t variant_index = 1;
+    uint16_t seq_ID = 1;
+    uint64_t pos = 1;
+    uint8_t strand = 1;
+    uint8_t ID_len = 2;
+    std::string ID = "UH";
+    uint8_t description_len = 3;
+    std::string description = "Poe";
+    uint32_t ref_len = 1;
+    std::string ref = "K";
+    uint8_t alt_count = 5;
+
+    std::vector<uint32_t> alt_len{3, 2, 5, 1, 2};
+    std::vector<std::string> altern{"TCC", "AG", "TCGNT", "G", "NN"};
+
+    uint32_t depth = 1;
+    uint32_t seq_qual = 13241;
+    uint32_t map_qual = 0;
+    uint32_t map_num_qual_0 = 1313;
+    uint8_t filters_len = 0;
+    std::string filters = "";
+    uint8_t info_count = 3;
+    std::vector<genie::core::record::variant_site::Info_tag> info_tag;
+    genie::core::record::variant_site::Info_tag infoTag;
+    infoTag.info_array_len = 1;
+    infoTag.info_tag = "AA";
+    infoTag.info_tag_len = 2;
+    infoTag.info_type = 1;  // char
+    infoTag.infoValue.resize(infoTag.info_array_len);
+    infoTag.infoValue[0].push_back(63);
+    info_tag.push_back(infoTag);
+
+    infoTag.info_tag = "CD";
+    infoTag.info_type = 6;  // unsigned int
+    infoTag.infoValue[0][0] = 24;
+    infoTag.infoValue[0].push_back(0);
+    info_tag.push_back(infoTag);
+
+    infoTag.info_tag = "EF";
+    infoTag.info_type = 0;  // string
+    infoTag.infoValue[0][1] = 'A';
+    infoTag.infoValue[0][1] = 'B';
+    infoTag.infoValue[0].push_back('C');
+    info_tag.push_back(infoTag);
+
+    uint8_t linked_record = 0;
+    uint8_t link_name_len = 0;
+    std::string link_name = "";
+    uint8_t reference_box_ID = 0;
+    genie::core::record::variant_site::Record variant_site_record(
+        variant_index, seq_ID, pos, strand, ID_len, ID, description_len, description, ref_len, ref, alt_count, alt_len,
+        altern, depth, seq_qual, map_qual, map_num_qual_0, filters_len, filters, info_count, info_tag, linked_record,
+        link_name_len, link_name, reference_box_ID);
+
+    std::stringstream output;
+    genie::core::Writer writer(&output);
+    variant_site_record.write(writer);
+    genie::util::BitReader reader(output);
+    genie::core::record::variant_site::Record variant_site_record_check(reader);
+    std::stringstream checkOut;
+    genie::core::Writer writerCheck(&checkOut);
+    variant_site_record_check.write(writerCheck);
+
+    EXPECT_EQ(variant_site_record.getAlt(), variant_site_record_check.getAlt());
+    EXPECT_EQ(variant_site_record.getInfoCount(), variant_site_record_check.getInfoCount());
+    for (auto i = 0; i < variant_site_record.getInfoCount(); ++i) {
+        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_type, variant_site_record_check.getInfoTag()[i].info_type);
+        EXPECT_EQ(variant_site_record.getInfoTag()[i].infoValue, variant_site_record_check.getInfoTag()[i].infoValue)
+            << " index: " << std::to_string(i) << "\n";
+        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_array_len,
+                  variant_site_record_check.getInfoTag()[i].info_array_len);
+        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_tag, variant_site_record_check.getInfoTag()[i].info_tag);
+    }
+    EXPECT_EQ(output.str(), checkOut.str());
+}
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -96,15 +178,212 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
     std::map<DescriptorID, std::stringstream> outputstream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
+    std::map<std::string, std::stringstream> attributeStream;
     if (inputfile.is_open()) {
-        //     std::stringstream infoFields( "[\"LDAF\", \"AVGPOST\", \"RSQ\", \"ERATE\", \"THETA\", \"CIEND\",
-        //     \"CIPOS\", \"END\", \"HOMLEN\", \"HOMSEQ\", \"SVLEN\", \"SVTYPE\", \"AC\", \"AN\", \"AA\", \"AF\",
-        //     \"AMR_AF\", \"ASN_AF\", \"AFR_AF\", \"EUR_AF\", \"VT\", \"SNPSOURCE\"]");
-        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, infoFields);
+        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, attributeStream,
+                                                                    infoFields);
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
         inputfile.close();
     }
+    //----------------------------------------------------//
+    std::map<DescriptorID, std::stringstream> encodedDescriptors;
+    genie::entropy::bsc::BSCEncoder encoder;
+    for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
+        encoder.encode(it->second, encodedDescriptors[it->first]);
+    }
+    std::map<std::string, std::stringstream> encodedAttributes;
+    for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
+        encoder.encode(it->second, encodedAttributes[it->first]);
+    }
+    
 
-    EXPECT_EQ(0, 0);
+    //----------------------------------------------------//
+    // default values
+    bool attributeContiguity = false;
+    bool twoDimensional = false;
+    bool columnMajorTileOrder = false;
+    uint8_t ATCoordSize = 3;
+    bool variable_size_tiles = false;
+    uint8_t AT_subtype = 1;
+    uint8_t AG_class = 1;
+    uint64_t n_tiles_per_col = 1;
+    uint64_t n_tiles_per_row = 1;
+    uint64_t tile_index_1 = 0;
+    bool tile_index_2_exists = false;
+    uint64_t tile_index_2 = 0;
+    bool is_attribute = false;
+    uint16_t attribute_ID = 0;
+    auto descriptor_ID = genie::core::record::annotation_parameter_set::DescriptorID::STARTPOS;
+    uint8_t AT_ID = 0;
+    genie::core::record::annotation_access_unit::AnnotationType AT_type =
+        genie::core::record::annotation_access_unit::AnnotationType::VARIANTS;
+    uint8_t numChrs = 0;
+    uint8_t parameter_set_ID = 1;
+    uint8_t AT_alphabet_ID = 0;
+    bool AT_pos_40_bits_flag = false;
+    uint8_t n_aux_attribute_groups = 0;
+    bool attribute_dependent_tiles = false;
+    uint16_t n_add_tile_structures = 0;
+    bool symmetry_mode = false;
+    bool symmetry_minor_diagonal = false;
+    uint8_t encoding_mode_ID = 3;
+    //----------------------------------------------------//
+
+    std::vector<uint16_t> nAttributes;
+    std::vector<std::vector<uint16_t>> attribute_IDs;
+    std::vector<uint8_t> nDescriptors;
+    std::vector<std::vector<uint8_t>> descriptor_IDs;
+    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure;
+    std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
+    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
+
+    genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
+        ATCoordSize, AG_class, attributeContiguity, twoDimensional, columnMajorTileOrder, symmetry_mode,
+        symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures, nAttributes,
+        attribute_IDs, nDescriptors, descriptor_IDs, additional_tile_structure);
+    tile_configurations.push_back(tileConfiguration);
+
+    uint8_t n_filter = 0;
+    std::vector<uint8_t> filter_ID_len;
+    std::vector<std::string> filter_ID;
+    std::vector<uint16_t> desc_len;
+    std::vector<std::string> description;
+
+    uint8_t n_features_names = 0;
+    std::vector<uint8_t> feature_name_len;
+    std::vector<std::string> feature_name;
+
+    uint8_t n_ontology_terms = 0;
+    std::vector<uint8_t> ontology_term_name_len;
+    std::vector<std::string> ontology_term_name;
+
+    uint8_t n_compressors = 0;
+    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set;
+
+    genie::core::record::annotation_parameter_set::GenotypeParameters genotype_parameters;
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
+    uint8_t n_pars = 1;
+    std::vector<uint8_t> par_ID(n_pars, 0);
+    std::vector<uint8_t> par_type(n_pars, 4);
+    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
+    par_num_array_dims = {0};
+    std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(
+        n_pars, std::vector<std::vector<std::vector<std::vector<uint8_t>>>>(0));
+
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
+        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+
+    uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
+    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
+
+    for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
+        DescriptorID DescrID = it->first;
+        genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
+            DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
+            algorithmParameters);
+        descriptor_configuration.push_back(descrConf);
+    }
+
+    uint8_t n_attributes = static_cast<uint8_t>(encodedAttributes.size());
+    std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
+    for (auto it = encodedAttributes.begin(); it != encodedAttributes.end(); ++it) {
+        genie::core::arrayType deftype;
+        uint16_t attrID = info[it->first].getAttributeID();
+        std::string attribute_name = info[it->first].getAttributeName();
+        uint8_t attribute_name_len = static_cast<uint8_t>(attribute_name.length());
+        uint8_t attribute_type = info[it->first].getAttributeType();
+        uint8_t attribute_num_array_dims = info[it->first].getArrayLength();
+        std::vector<uint8_t> attribute_array_dims;
+        if (info[it->first].getArrayLength() == 1) {
+            attribute_num_array_dims = 0;
+        } else {
+            attribute_num_array_dims = 1;
+            attribute_array_dims.push_back(info[it->first].getArrayLength());
+        }
+        std::vector<uint8_t> attribute_default_val =
+            deftype.toArray(attribute_type, deftype.getDefaultValue(attribute_type));
+        bool attribute_miss_val_flag = true;
+        bool attribute_miss_default_flag = false;
+        std::vector<uint8_t> attribute_miss_val = attribute_default_val;
+        std::string attribute_miss_str = "";
+        uint8_t compressor_ID = 0;
+        uint8_t n_steps_with_dependencies = 0;
+        std::vector<uint8_t> dependency_step_ID;
+        std::vector<uint8_t> n_dependencies;
+        std::vector<std::vector<uint8_t>> dependency_var_ID;
+        std::vector<std::vector<bool>> dependency_is_attribute;
+        std::vector<std::vector<uint16_t>> dependency_ID;
+
+        genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSet(
+            attrID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims, attribute_array_dims,
+            attribute_default_val, attribute_miss_val_flag, attribute_miss_default_flag, attribute_miss_val,
+            attribute_miss_str, compressor_ID, n_steps_with_dependencies, dependency_step_ID, n_dependencies,
+            dependency_var_ID, dependency_is_attribute, dependency_ID);
+        attribute_parameter_set.push_back(attributeParameterSet);
+    }
+
+    genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
+        n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
+        n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
+        n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
+
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet(
+        parameter_set_ID, AT_ID, AT_alphabet_ID, ATCoordSize, AT_pos_40_bits_flag, n_aux_attribute_groups,
+        tile_configurations, annotation_encoding_parameters);
+
+    //----------------------------------------------------//
+    {
+        std::vector<genie::core::record::annotation_access_unit::Block> blocks;
+        for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
+            std::vector<uint8_t> data;
+            uint8_t readbyte;
+            while (it->second >> readbyte) data.push_back(readbyte);
+            genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, 0, data);
+            genie::core::record::annotation_access_unit::Block blockn;
+            blockn.set(blockInfo);
+            blocks.push_back(blockn);
+        }
+
+        for (auto it = encodedAttributes.begin(); it != encodedAttributes.end(); ++it) {
+            auto attributeID = info[it->first].getAttributeID();
+            std::vector<uint8_t> data;
+            uint8_t readbyte;
+            while (it->second >> readbyte) data.push_back(readbyte);
+            genie::core::record::annotation_access_unit::BlockVectorData blockInfo(DescriptorID::ATTRIBUTE, attributeID,
+                                                                                   data);
+            genie::core::record::annotation_access_unit::Block blockn;
+            blockn.set(blockInfo);
+            blocks.push_back(blockn);
+        }
+        uint64_t n_blocks = blocks.size();
+        genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
+            attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
+            attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
+            tile_index_2);
+        genie::core::record::annotation_access_unit::Record annotationAccessUnittot(
+            AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
+            twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
+        std::string name = "TestFiles/CompleteWithEncoding";
+
+        std::ofstream testfile;
+        testfile.open(name + ".bin", std::ios::binary | std::ios::out);
+        if (testfile.is_open()) {
+            genie::core::Writer writer(&testfile);
+            annotationParameterSet.write(writer);
+            annotationAccessUnittot.write(writer);
+            writer.flush();
+            testfile.close();
+        }
+        std::ofstream txtfile;
+        txtfile.open(name + ".txt", std::ios::out);
+        if (txtfile.is_open()) {
+            genie::core::Writer txtWriter(&txtfile, true);
+            annotationParameterSet.write(txtWriter);
+            annotationAccessUnittot.write(txtWriter);
+            txtfile.close();
+        }
+    }
 }

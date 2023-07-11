@@ -46,10 +46,16 @@ void VaritanSiteParser::init() {
     addWriter(DescriptorID::ALTERN);          // 14
     addWriter(DescriptorID::FILTER);          // 17
                                               // addWriter(DescriptorID::ATTRIBUTE);       // 31
+    uint16_t attributeID = 0;
     for (auto infoField : infoFields) {
-        AttributeData attribute(static_cast<uint8_t>(infoField.length()), infoField);
-        attributeInfo[infoField] = attribute;
+        Writer writer(&attributeStream[infoField]);
+        attributeWriter.push_back(writer);
+
+        AttributeData attribute(static_cast<uint8_t>(infoField.length()), infoField, attributeID);
+        attributeData[infoField] = attribute;
+        attributeID++;
     }
+    numberOfAttributes = attributeID;
 }
 
 bool VaritanSiteParser::fillRecord(util::BitReader reader) {
@@ -86,20 +92,22 @@ void VaritanSiteParser::ParseOne() {
         fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].write(0, 8);
         fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].write(variantSite.getReferenceBoxID(), 8);
     }
-
-    for (uint8_t i = 0; i < variantSite.getInfoCount(); ++i) {
-        ParseAttribute(i);
+    std::map<std::string, AttributeData>::iterator it;
+    for (it = attributeData.begin(); it != attributeData.end(); it++) {
+        ParseAttribute(it->first);
     }
 }
 
 void VaritanSiteParser::ParseAttribute(uint8_t index) {
     const auto infoTag = variantSite.getInfoTag()[index].info_tag;
-    attributeInfo[infoTag].setAttributeType(variantSite.getInfoTag()[index].info_type);
-    attributeInfo[infoTag].setArrayLength(variantSite.getInfoTag()[index].info_array_len);
-    Writer writer(&attributeInfo[infoTag].getValue());
-    for (const auto value : variantSite.getInfoTag()[index].info_value) {
-        for (const auto byte : value) writer.write(byte, 8);
-        if (attributeInfo[infoTag].getAttributeType() == 0) writer.write(0, 8);
+    attributeData[infoTag].setAttributeType(variantSite.getInfoTag()[index].info_type);
+    attributeData[infoTag].setArrayLength(variantSite.getInfoTag()[index].info_array_len);
+
+    const auto& tag = variantSite.getInfoTag();
+    for (const auto& value : tag[index].infoValue) {
+        arrayType toval;
+        toval.toFile(attributeData[infoTag].getAttributeType(), value, attributeWriter[index]);
+        if (attributeData[infoTag].getAttributeType() == 0) attributeWriter[index].write(0, 8, true);
     }
 }
 
@@ -115,12 +123,12 @@ void VaritanSiteParser::ParseAttribute(std::string infoTagfield) {
     if (matchLocation < infoArray.size()) {
         ParseAttribute(matchLocation);
     } else {  // insert default values
-        Writer writer(&attributeInfo[infoTagfield].getValue());
         arrayType def;
-        auto defaultType = attributeInfo[infoTagfield].getAttributeType();
+        auto defaultType = attributeData[infoTagfield].getAttributeType();
         auto defaultValue = def.getDefaultValue(defaultType);
         auto defaultSize = def.getDefaultBitsize(defaultType);
-        for (auto i = 0; i < attributeInfo[infoTagfield].getArrayLength(); ++i) writer.write(defaultValue, defaultSize);
+        for (auto i = 0; i < attributeData[infoTagfield].getArrayLength(); ++i)
+            attributeWriter[attributeData[infoTagfield].getAttributeID()].write(defaultValue, defaultSize);
     }
 }
 
@@ -133,6 +141,22 @@ void VaritanSiteParser::ParseInfoFields() {
         infoField.erase(std::remove(infoField.begin(), infoField.end(), '"'), infoField.end());
         infoField.erase(std::remove(infoField.begin(), infoField.end(), ' '), infoField.end());
         infoFields.push_back(infoField);
+    }
+}
+
+void VaritanSiteParser::ParseInfoField(std::string id) {
+    std::stringstream infoFieldsList;
+    infoFieldsList << infoFieldsJSON.substr(1, infoFieldsJSON.size() - 2);
+    // std::vector<std::string> read;
+    for (std::string read; infoFieldsList.getline(&read[0], 64);) {
+        if (read.size() < 3) continue;  // read = "{" or "}"
+        read.erase(std::remove(read.begin(), read.end(), '"'), read.end());
+        read.erase(std::remove(read.begin(), read.end(), ','), read.end());
+        auto posColumn = read.find(':');
+        std::string IDField = read.substr(0, posColumn - 1);
+        std::string value = read.substr(posColumn + 1);
+        if (IDField == "ID") {
+        }
     }
 }
 

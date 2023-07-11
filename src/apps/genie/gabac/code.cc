@@ -12,11 +12,13 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <limits>
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/entropy/gabac/gabac.h"
+#include "..\annotation\code.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,3 +102,4 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+

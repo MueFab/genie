@@ -38,14 +38,17 @@ class VaritanSiteParser {
 
     VaritanSiteParser(std::istream& site_MGrecs,
                       std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream>& output,
-                      std::map<std::string, AttributeData>& info, std::stringstream& jsonInfoFields)
+                      std::map<std::string, AttributeData>& info,
+                      std::map<std::string, std::stringstream>& attributeStream, std::stringstream& jsonInfoFields)
         : siteMGrecs(site_MGrecs),
           dataFields(output),
           variantSite{},
           rowsPerTile(0),
           fieldWriter{},
           numberOfRows(0),
-          attributeInfo(info) {
+          attributeData(info),
+          attributeStream(attributeStream),
+          numberOfAttributes(0) {
         infoFieldsJSON = jsonInfoFields.str();
         if (!infoFieldsJSON.empty()) ParseInfoFields();
         init();
@@ -61,15 +64,25 @@ class VaritanSiteParser {
 
  private:
     using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+
     variant_site::Record variantSite;
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
-    std::vector<Writer> fieldWriter;
-    std::map<DescriptorID, std::stringstream>& dataFields;
-    std::map<std::string, AttributeData>& attributeInfo;
     size_t numberOfRows;
+
     std::string infoFieldsJSON;
     std::vector<std::string> infoFields;
+    std::map<std::string, uint8_t> infoFieldType;
+
+    std::vector<Writer> fieldWriter;
+    std::map<DescriptorID, std::stringstream>& dataFields;
+
+    std::vector<Writer> attributeWriter;
+    std::map<std::string, std::stringstream>& attributeStream;
+    std::map<std::string, AttributeData> attributeData;
+    uint16_t numberOfAttributes;
+
+    // std::vector<std::stringstream> dataAttributes;
 
     void addWriter(DescriptorID id);
     void init();
@@ -78,6 +91,7 @@ class VaritanSiteParser {
     void ParseAttribute(uint8_t index);
     void ParseAttribute(std::string infoTagfield);
     void ParseInfoFields();
+    void ParseInfoField(std::string id);
     void writeDanglingBits();
     uint8_t AlternTranslate(char alt) const;
 };
