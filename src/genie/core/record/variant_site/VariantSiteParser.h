@@ -82,7 +82,8 @@ class VaritanSiteParser {
     std::map<std::string, AttributeData> attributeData;
     uint16_t numberOfAttributes;
 
-    // std::vector<std::stringstream> dataAttributes;
+    const uint8_t AlternEndLine = 0x06;
+    const uint8_t AlternEnd = 0x07;
 
     void addWriter(DescriptorID id);
     void init();

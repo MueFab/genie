@@ -70,16 +70,24 @@ void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::NAME)].write(variantSite.getID());
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(variantSite.getDescription());
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(0, 8);
-    fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(variantSite.getRef());
-    fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(0, 8);
-    const auto& altArray = variantSite.getAlt();
 
+    const auto& reference = variantSite.getRef();
+    for (const auto& ref : reference) {
+        fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(ref, 3);
+    }
+    fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEnd, 3);
+
+    fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(0, 8);
+
+    const auto& altArray = variantSite.getAlt();
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
         const auto& altern = altArray[i];
         for (const auto& alt : altern) {
             fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternTranslate(alt), 3);
         }
+        fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEndLine, 3);
     }
+    fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEnd, 3);
 
     fieldWriter[static_cast<size_t>(DescriptorID::DEPTH)].write(variantSite.getDepth(), 32);
     fieldWriter[static_cast<size_t>(DescriptorID::SEQQUALITY)].write(variantSite.getSeqQual(), 32);
