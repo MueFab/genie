@@ -214,5 +214,17 @@ void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, core::Write
     }
 }
 
+std::vector<uint8_t> arrayType::toArray(uint8_t type, uint64_t value) {
+    std::vector<uint64_t> returnValue;
+    auto NrOfBytes = (getDefaultValue(type) + 7) / 8;
+    returnValue.resize(NrOfBytes);
+    for (auto i = 0; i < NrOfBytes; ++i) {
+        returnValue[i] = value & 0xFF;
+        value = value >> 8;
+    }
+
+    return std::vector<uint8_t>();
+}
+
 }  // namespace core
 }  // namespace genie

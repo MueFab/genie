@@ -21,8 +21,8 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/GenotypeParameters.h"
-#include "genie/util/bitreader.h"
 #include "genie/core/writer.h"
+#include "genie/util/bitreader.h"
 
 #include "BlockHeader.h"
 #include "BlockPayload.h"
@@ -32,6 +32,49 @@ namespace genie {
 namespace core {
 namespace record {
 namespace annotation_access_unit {
+
+class BlockData {
+ public:
+    BlockData(annotation_parameter_set::DescriptorID descriptorID, std::stringstream data)
+        : descriptorID(descriptorID), data(data), thisIsAttribute(false), attributeID(0) {}
+
+    BlockData(annotation_parameter_set::DescriptorID descriptorID, uint16_t attributeID, std::stringstream& data)
+        : descriptorID(descriptorID), attributeID(attributeID), data(data), thisIsAttribute(true) {}
+
+    annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptorID; }
+    uint16_t getAttributeID() const { return attributeID; }
+    bool isAttribute() const { return thisIsAttribute; }
+    std::stringstream& getData() { return data; }
+
+ private:
+    annotation_parameter_set::DescriptorID descriptorID;
+    uint16_t attributeID;
+    bool thisIsAttribute;
+    std::stringstream& data;
+};
+
+
+class BlockVectorData {
+ public:
+    BlockVectorData(annotation_parameter_set::DescriptorID descriptorID, std::vector<uint8_t> data)
+        : descriptorID(descriptorID), data(data), thisIsAttribute(false), attributeID(0) {}
+
+    BlockVectorData(annotation_parameter_set::DescriptorID descriptorID, uint16_t attributeID, std::vector<uint8_t>& data)
+        : descriptorID(descriptorID), attributeID(attributeID), data(data), thisIsAttribute(true) {}
+
+    annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptorID; }
+    uint16_t getAttributeID() const { return attributeID; }
+    bool isAttribute() const { return thisIsAttribute; }
+    std::vector<uint8_t>& getData() { return data; }
+
+ private:
+    annotation_parameter_set::DescriptorID descriptorID;
+    uint16_t attributeID;
+    bool thisIsAttribute;
+    std::vector<uint8_t>& data;
+};
+
+
 
 class Block {
  private:
@@ -59,7 +102,8 @@ class Block {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t numChrs);
-    void write(core::Writer& writer) const;
+    void write(core::Writer& writer) ;
+    void set(BlockVectorData blockData);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -113,6 +113,8 @@ class ContactMatrixMatPayload {
     void write(core::Writer& writer) const { writer.write(0, 1); }
 };
 
+//----------------------------------------------------------------------------------//
+
 class BlockPayload {
  private:
     genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
@@ -121,47 +123,27 @@ class BlockPayload {
     LikelihoodPayload likelihood_payload;
     std::vector<ContactMatrixBinPayload> cm_bin_payload;
     ContactMatrixMatPayload cm_mat_payload;
-    uint16_t block_payload_size;
-    std::stringstream generic_payload;
+    uint32_t block_payload_size;
+    std::vector<uint8_t> generic_payload;
 
  public:
     BlockPayload();
-    BlockPayload(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+    BlockPayload(util::BitReader& reader,
+                       genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
                  uint8_t numChrs);
 
     BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs,
                  GenotypePayload genotype_payload, LikelihoodPayload likelihood_payload,
                  std::vector<ContactMatrixBinPayload> cm_bin_payload, ContactMatrixMatPayload cm_mat_payload,
-                 uint16_t block_payload_size, std::stringstream& generic_payload);
-
-    BlockPayload(const BlockPayload& bp) {
-        descriptor_ID = bp.descriptor_ID;
-        num_chrs = bp.num_chrs;
-        genotype_payload = bp.genotype_payload;
-        likelihood_payload = bp.likelihood_payload;
-        cm_bin_payload = bp.cm_bin_payload;
-        cm_mat_payload = bp.cm_mat_payload;
-        block_payload_size = block_payload_size;
-        generic_payload << bp.generic_payload.rdbuf();
-    }
-
-    BlockPayload& operator=(const BlockPayload& bp) {
-        descriptor_ID = bp.descriptor_ID;
-        num_chrs = bp.num_chrs;
-        genotype_payload = bp.genotype_payload;
-        likelihood_payload = bp.likelihood_payload;
-        cm_bin_payload = bp.cm_bin_payload;
-        cm_mat_payload = bp.cm_mat_payload;
-        block_payload_size = block_payload_size;
-        generic_payload << bp.generic_payload.rdbuf();
-        return *this;
-    }
-
+                 uint32_t block_payload_size, const std::vector<uint8_t>& generic_payload);
+ 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
               uint8_t numChrs);
-    void write(core::Writer& writer) const;
+    void write(core::Writer& writer);
 };
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

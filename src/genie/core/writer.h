@@ -35,6 +35,7 @@ class Writer {
             write(value, bits);
         }
     }
+    void write_reserved(uint8_t bits) { write(0, bits, true); }
     /**
      * @brief Write a specified number of bits
      * @param value Data to write. The LSBs will be written.
@@ -66,7 +67,11 @@ class Writer {
      * @param in Data source
      */
     void write(std::istream* in) {
-        if (!writingLog) binwriter.write(in);
+        uint8_t byte;
+        if (!writingLog)
+            while (in->read((char*)&byte, sizeof(byte))) {
+                binwriter.write(byte, 8);
+            }
     };
 
     /**

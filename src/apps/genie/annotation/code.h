@@ -25,10 +25,14 @@
 namespace genieapp {
 namespace annotation {
 
+class TempEncoder {
+ public:
+    void encode(const std::stringstream &input, std::stringstream &output);
+};
+
 /**
  * @brief
  */
-
 
 class Code {
  public:

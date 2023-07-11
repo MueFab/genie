@@ -45,7 +45,6 @@ class BlockHeader {
                 uint16_t attribute_ID, bool indexed, uint32_t block_payload_size);
 
     void read(genie::util::BitReader& reader);
-
     void write(core::Writer& writer) const;
 
     genie::core::record::annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptor_ID; }

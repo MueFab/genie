@@ -68,7 +68,7 @@ class Record {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               uint8_t ATCoordSize, uint8_t numChrs);
 
-    void write(core::Writer& writer) const;
+    void write(core::Writer& writer) ;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

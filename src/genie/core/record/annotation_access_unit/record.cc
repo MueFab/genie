@@ -44,7 +44,7 @@ Record::Record(util::BitReader& reader, bool attributeContiguity, bool twoDimens
 }
 
 Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_t AG_class,
-               AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> block,
+               AnnotationAccessUnitHeader annotation_access_unit_header, std::vector<Block> blocks,
                bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, uint8_t ATCoordSize,
                bool variable_size_tiles, uint64_t n_blocks, uint8_t numChrs)
     : AT_ID(AT_ID),
@@ -52,14 +52,18 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
       AT_subtype(AT_subtype),
       AG_class(AG_class),
       annotation_access_unit_header(annotation_access_unit_header),
-      block(block),
+      // block(block),
       attribute_contiguity(attributeContiguity),
       two_dimensional(twoDimensional),
       column_major_tile_order(columnMajorTileOrder),
       variable_size_tiles(variable_size_tiles),
       n_blocks(n_blocks),
       numChrs(numChrs),
-      AT_coord_size(ATCoordSize) {}
+      AT_coord_size(ATCoordSize) {
+    this->block.resize(n_blocks);
+    for (auto i = 0; i < blocks.size(); ++i)
+    this->block[i] = blocks[i];
+}
 
 void Record::read(util::BitReader& reader) {
     AT_ID = static_cast<uint8_t>(reader.read_b(8));
@@ -84,7 +88,7 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
     read(reader);
 }
 
-void Record::write(core::Writer& writer) const {
+void Record::write(core::Writer& writer) {
     writer.write(AT_ID, 8);
     writer.write(static_cast<uint8_t>(AT_type), 4);
     writer.write(AT_subtype, 4);

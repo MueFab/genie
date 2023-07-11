@@ -6,9 +6,9 @@
 
 #include "BlockPayload.h"
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <utility>
-#include <sstream>
 
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -87,6 +87,7 @@ void GenotypePayload::read(util::BitReader& reader) {
 
 RowColIDsPayload::RowColIDsPayload() : nbits_per_elem(0), nelements(0), row_col_ids_elements{} {}
 
+
 BlockPayload::BlockPayload()
     : descriptor_ID(genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE),
       num_chrs(0),
@@ -98,25 +99,27 @@ BlockPayload::BlockPayload()
       generic_payload{} {}
 
 BlockPayload::BlockPayload(util::BitReader& reader,
-                           genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs) {
+                                       genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+                                       uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
     read(reader);
 }
 
-BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs,
-                           GenotypePayload genotype_payload, LikelihoodPayload likelihood_payload,
-                           std::vector<ContactMatrixBinPayload> cm_bin_payload, ContactMatrixMatPayload cm_mat_payload,
-                           uint16_t block_payload_size, std::stringstream& genericPayload)
+BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+                                       uint8_t numChrs, GenotypePayload genotype_payload,
+                                       LikelihoodPayload likelihood_payload,
+                                       std::vector<ContactMatrixBinPayload> cm_bin_payload,
+                                       ContactMatrixMatPayload cm_mat_payload, uint32_t block_payload_size,
+                                       const std::vector<uint8_t>& genericPayload)
     : descriptor_ID(descriptorID),
       num_chrs(numChrs),
       genotype_payload(genotype_payload),
       likelihood_payload(likelihood_payload),
       cm_bin_payload(cm_bin_payload),
       cm_mat_payload(cm_mat_payload),
-      block_payload_size(block_payload_size) {
-    generic_payload << genericPayload.rdbuf();
-}
+      block_payload_size(block_payload_size),
+      generic_payload(genericPayload) {}
 
 void BlockPayload::read(util::BitReader& reader) {
     if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
@@ -131,19 +134,20 @@ void BlockPayload::read(util::BitReader& reader) {
         }
         cm_mat_payload.read(reader);
     } else {
-        generic_payload << static_cast<char>(reader.read_b(8));
+        generic_payload.push_back(static_cast<uint8_t>(reader.read_b(8)));
     }
     reader.flush();
 }
 
 void BlockPayload::read(util::BitReader& reader,
-                        genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs) {
+                              genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+                              uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
     read(reader);
 }
 
-void BlockPayload::write(core::Writer& writer) const {
+void BlockPayload::write(core::Writer& writer) {
     if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
         genotype_payload.write(writer);
     } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::LIKELIHOOD) {
@@ -152,9 +156,7 @@ void BlockPayload::write(core::Writer& writer) const {
         for (auto binPayload : cm_bin_payload) binPayload.write(writer);
         cm_mat_payload.write(writer);
     } else {
-        std::stringstream gp;
-        gp << generic_payload.rdbuf();
-        writer.write(&gp);
+         for (const auto& byte : generic_payload) writer.write(byte, 8, true);
     }
     writer.flush();
 }
