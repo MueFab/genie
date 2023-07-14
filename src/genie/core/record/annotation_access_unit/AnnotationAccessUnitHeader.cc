@@ -46,7 +46,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
     bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, bool variable_size_tiles,
     uint8_t ATCoordSize, bool is_attribute, uint16_t attribute_ID,
     genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID, uint64_t n_tiles_per_col,
-    uint64_t n_tiles_per_row, uint64_t n_blocks, uint64_t tile_index_1, bool tile_index_2_exists, uint64_t tile_index_2)
+    uint64_t n_tiles_per_row, uint64_t nblocks, uint64_t tile_index_1, bool tile_index_2_exists, uint64_t tile_index_2)
     : attribute_contiguity(attributeContiguity),
       two_dimensional(twoDimensional),
       column_major_tile_order(columnMajorTileOrder),
@@ -57,7 +57,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
       descriptor_ID(descriptor_ID),
       n_tiles_per_col(n_tiles_per_col),
       n_tiles_per_row(n_tiles_per_row),
-      n_blocks(n_blocks),
+      n_blocks(nblocks),
       tile_index_1(tile_index_1),
       tile_index_2_exists(tile_index_2_exists),
       tile_index_2(tile_index_2) {}

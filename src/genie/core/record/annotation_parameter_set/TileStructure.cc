@@ -146,7 +146,7 @@ void TileStructure::write(util::BitWriter& writer) const {
 }
 
 void TileStructure::write(core::Writer& writer) const {
-    writer.write(0, 7, true);
+    writer.write_reserved(7);
     writer.write(variable_size_tiles, 1);
     writer.write(n_tiles, coordSizeInBits(ATCoordSize));
     auto dimensions = two_dimensional ? 2 : 1;

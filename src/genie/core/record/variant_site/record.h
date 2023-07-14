@@ -32,8 +32,7 @@ class AttributeData {
  public:
     AttributeData();
     AttributeData(uint8_t length, std::string name, uint16_t attributeID);
-    AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength, uint16_t attributeID
-                 );
+    AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength, uint16_t attributeID);
 
     AttributeData& operator=(const AttributeData& other);
 

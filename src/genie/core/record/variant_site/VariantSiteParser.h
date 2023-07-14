@@ -80,7 +80,7 @@ class VaritanSiteParser {
 
     std::vector<Writer> attributeWriter;
     std::map<std::string, std::stringstream>& attributeStream;
-    std::map<std::string, AttributeData> attributeData;
+    std::map<std::string, AttributeData>& attributeData;
     uint16_t numberOfAttributes;
 
     const uint8_t AlternEndLine = 0x06;
