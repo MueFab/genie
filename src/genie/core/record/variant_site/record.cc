@@ -46,6 +46,7 @@ AttributeData& AttributeData::operator=(const AttributeData& other) {
     attributeName = other.attributeName;
     attributeType = other.attributeType;
     attributeArrayDims = other.attributeArrayDims;
+    attributeID = other.attributeID;
     return *this;
 }
 
@@ -54,6 +55,7 @@ AttributeData::AttributeData(const AttributeData& other) {
     attributeName = other.attributeName;
     attributeType = other.attributeType;
     attributeArrayDims = other.attributeArrayDims;
+    attributeID = other.attributeID;
 }
 
 uint8_t Record::determineSize(uint8_t selectType) const {
