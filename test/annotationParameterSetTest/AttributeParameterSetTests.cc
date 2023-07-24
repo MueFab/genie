@@ -94,6 +94,15 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cer
         n_dependencies, dependency_var_ID, dependency_is_attribute, dependency_ID);
 
     EXPECT_EQ(attributeParameterSet.getCompressorID(), 4);
+
+    std::stringstream InOut;
+    genie::core::Writer strwriter(&InOut);
+    attributeParameterSet.write(strwriter);
+
+        genie::core::Writer writeSize;
+    auto size = attributeParameterSet.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
 }
 
 TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cert-err58-cpp)
@@ -118,6 +127,11 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     teststrwriter.flush();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
+
+        genie::core::Writer writeSize;
+    auto size = attributeParameterSet.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
 
     EXPECT_EQ(attributeParameterSet.getAttriubuteID(), attributeParameterSetCheck.getAttriubuteID());
     EXPECT_EQ(attributeParameterSet.getAttributeName(), attributeParameterSetCheck.getAttributeName());

@@ -90,6 +90,11 @@ TEST_F(ContactMatrixTests, ContactMatrixRandom) {  // NOLINT(cert-err58-cpp)
     strwriter.flush();
     contactMatrixParametersCheck.read(strreader);
 
+        genie::core::Writer writeSize;
+    auto size = contactMatrixParameters.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
+
     EXPECT_EQ(contactMatrixParameters.getNumberOfSamples(), contactMatrixParametersCheck.getNumberOfSamples());
     EXPECT_EQ(contactMatrixParameters.getSampleIDs(), contactMatrixParametersCheck.getSampleIDs());
     EXPECT_EQ(contactMatrixParameters.getSampleNames(), contactMatrixParametersCheck.getSampleNames());

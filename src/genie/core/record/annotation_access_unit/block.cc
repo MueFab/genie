@@ -38,7 +38,7 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
     read(reader);
 }
 
-void Block::write(core::Writer& writer) {
+void Block::write(core::Writer& writer) const {
     block_header.write(writer);
     block_payload.write(writer);
 }
@@ -59,6 +59,11 @@ void Block::set(BlockVectorData blockData) {
                          cm_mat_payload, blockSize, blockData.getData());
     block_header = header;
     block_payload = payload;
+}
+
+size_t Block::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 }  // namespace annotation_access_unit

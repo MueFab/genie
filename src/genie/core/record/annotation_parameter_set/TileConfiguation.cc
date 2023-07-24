@@ -78,10 +78,23 @@ TileConfiguration::TileConfiguration(
       n_descriptors(n_descriptors),
       descriptor_ID(descriptor_ID),
       additional_tile_structure(additional_tile_structure) {
-    if (!two_dimensional) {
-        column_major_tile_order = false;
-        symmetry_mode = 0;
-        symmetry_minor_diagonal = false;
+    if (!this->two_dimensional) {
+        this->column_major_tile_order = false;
+        this->symmetry_mode = 0;
+        this->symmetry_minor_diagonal = false;
+    }
+    if (!this->attribute_dependent_tiles) {
+        n_add_tile_structures = 0;
+        n_attributes.clear();
+        attribute_ID.clear();
+        n_descriptors.clear();
+        descriptor_ID.clear();
+    } else {
+        n_attributes.resize(n_add_tile_structures);
+        attribute_ID.resize(n_add_tile_structures);
+        n_descriptors.resize(n_add_tile_structures);
+        descriptor_ID.resize(n_add_tile_structures);
+        additional_tile_structure.resize(n_add_tile_structures);
     }
 }
 
@@ -96,15 +109,18 @@ void TileConfiguration::read(util::BitReader& reader, uint8_t ATCoordSize) {
 
 void TileConfiguration::read(util::BitReader& reader) {
     AG_class = static_cast<uint8_t>(reader.read_b(3));
-    attribute_contiguity = static_cast<uint8_t>(reader.read_b(1));
-    two_dimensional = static_cast<uint8_t>(reader.read_b(1));
+    attribute_contiguity = static_cast<bool>(reader.read_b(1));
+    two_dimensional = static_cast<bool>(reader.read_b(1));
     if (two_dimensional) {
         reader.read_b(6);
-        column_major_tile_order = static_cast<uint8_t>(reader.read_b(1));
+        column_major_tile_order = static_cast<bool>(reader.read_b(1));
         symmetry_mode = static_cast<uint8_t>(reader.read_b(3));
-        symmetry_minor_diagonal = static_cast<uint8_t>(reader.read_b(1));
+        symmetry_minor_diagonal = static_cast<bool>(reader.read_b(1));
     } else {
         reader.read_b(3);
+        symmetry_minor_diagonal = false;
+        symmetry_mode = 0;
+        column_major_tile_order = false;
     }
     attribute_dependent_tiles = static_cast<bool>(reader.read_b(1));
     default_tile_structure.read(reader, AT_coord_size, two_dimensional);
@@ -126,63 +142,10 @@ void TileConfiguration::read(util::BitReader& reader) {
             for (auto j = 0; j < n_descriptors[i]; ++j) {
                 descriptor_ID[i][j] = static_cast<uint8_t>(reader.read_b(7));
             }
-            additional_tile_structure[i].read(reader);
+            additional_tile_structure[i].read(reader, AT_coord_size, two_dimensional);
         }
     }
 }
-
-void TileConfiguration::write(std::ostream& outputfile, bool skipEmbeddedRecord) const {
-    outputfile << std::to_string(AG_class) << ",";
-    outputfile << std::to_string(attribute_contiguity) << ",";
-    outputfile << std::to_string(two_dimensional) << ",";
-    if (two_dimensional) {
-        outputfile << std::to_string(column_major_tile_order) << ",";
-        outputfile << std::to_string(symmetry_mode) << ",";
-        outputfile << std::to_string(symmetry_minor_diagonal) << ",";
-    }
-    outputfile << std::to_string(attribute_dependent_tiles) << ",";
-    default_tile_structure.write(outputfile, skipEmbeddedRecord);
-    if (attribute_dependent_tiles) {
-        outputfile << std::to_string(n_add_tile_structures) << ",";
-        for (auto i = 0; i < n_add_tile_structures; ++i) {
-            outputfile << std::to_string(n_attributes[i]) << ",";
-            for (auto ID : attribute_ID[i]) outputfile << std::to_string(ID) << ",";
-            outputfile << std::to_string(n_descriptors[i]) << ",";
-            for (auto ID : descriptor_ID[i]) outputfile << std::to_string(ID) << ",";
-            additional_tile_structure[i].write(outputfile, skipEmbeddedRecord);
-        }
-    }
-}
-
-void TileConfiguration::write(std::ostream& outputfile) const { write(outputfile, false); }
-
-void TileConfiguration::write(util::BitWriter& writer, bool skipEmbeddedRecord) const {
-    writer.write(AG_class, 3);
-    writer.write(attribute_contiguity, 1);
-    writer.write(two_dimensional, 1);
-    if (two_dimensional) {
-        writer.write(0, 6);
-        writer.write(column_major_tile_order, 1);
-        writer.write(symmetry_mode, 3);
-        writer.write(symmetry_minor_diagonal, 2);
-    } else {
-        writer.write(0, 3);
-    }
-    writer.write(attribute_dependent_tiles, 1);
-    default_tile_structure.write(writer, skipEmbeddedRecord);
-    if (attribute_dependent_tiles) {
-        writer.write(n_add_tile_structures, 16);
-        for (auto i = 0; i < n_add_tile_structures; ++i) {
-            writer.write(n_attributes[i], 16);
-            for (auto ID : attribute_ID[i]) writer.write(ID, 16);
-            writer.write(n_descriptors[i], 7);
-            for (auto ID : descriptor_ID[i]) writer.write(ID, 7);
-            additional_tile_structure[i].write(writer, skipEmbeddedRecord);
-        }
-    }
-}
-
-void TileConfiguration::write(util::BitWriter& writer) const { write(writer, false); }
 
 void TileConfiguration::write(core::Writer& writer) const {
     writer.write(AG_class, 3);
@@ -192,7 +155,7 @@ void TileConfiguration::write(core::Writer& writer) const {
         writer.write_reserved(6);
         writer.write(column_major_tile_order, 1);
         writer.write(symmetry_mode, 3);
-        writer.write(symmetry_minor_diagonal, 2);
+        writer.write(symmetry_minor_diagonal, 1);
     } else {
         writer.write_reserved(3);
     }
@@ -208,6 +171,11 @@ void TileConfiguration::write(core::Writer& writer) const {
             additional_tile_structure[i].write(writer);
         }
     }
+}
+
+size_t TileConfiguration::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 }  // namespace annotation_parameter_set

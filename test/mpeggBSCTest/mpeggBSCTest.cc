@@ -181,7 +181,7 @@ TEST_F(MpeggBSCTests, testCode) {  // NOLINT(cert-err58-cpp)
     unsigned char *dest = NULL;
     size_t destLen = 0;
     size_t srcLen = wholeTestFile.str().size();
-    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+//    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
     mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)wholeTestFile.str().c_str(), srcLen,
                        MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,

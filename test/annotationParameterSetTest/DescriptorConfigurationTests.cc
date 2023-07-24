@@ -104,7 +104,10 @@ TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT
     descriptorConfigurationCheck.write(teststrwriter);
     teststrwriter.flush();
     EXPECT_EQ(InOut.str(), TestOut.str());
-
+    genie::core::Writer writeSize;
+    auto size = descriptorConfiguration.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(TestOut.str().size(), size / 8);
     EXPECT_EQ(descriptorConfiguration.getDescriptorID(), descriptorConfigurationCheck.getDescriptorID());
     EXPECT_EQ(descriptorConfiguration.getEncodingModeID(), descriptorConfigurationCheck.getEncodingModeID());
 

@@ -158,6 +158,8 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(output.str(), checkOut.str());
 }
 
+#define COMPRESSED false
+
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -179,16 +181,18 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::map<DescriptorID, std::stringstream> outputstream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     std::map<std::string, std::stringstream> attributeStream;
+    genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, attributeStream,
+                                                                infoFields);
     if (inputfile.is_open()) {
-        genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, attributeStream,
-                                                                    infoFields);
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
         inputfile.close();
     }
     //----------------------------------------------------//
+#if COMPRESSED
     std::map<DescriptorID, std::stringstream> encodedDescriptors;
     genie::entropy::bsc::BSCEncoder encoder;
+
     for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
         encoder.encode(it->second, encodedDescriptors[it->first]);
     }
@@ -196,7 +200,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
         encoder.encode(it->second, encodedAttributes[it->first]);
     }
-    
+#endif
 
     //----------------------------------------------------//
     // default values
@@ -228,13 +232,18 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     bool symmetry_mode = false;
     bool symmetry_minor_diagonal = false;
     uint8_t encoding_mode_ID = 3;
-    //----------------------------------------------------//
+
+    uint64_t n_tiles = 1;
+    std::vector<std::vector<uint64_t>> start_index;
+    std::vector<std::vector<uint64_t>> end_index;
+    std::vector<uint64_t> tile_size(1, parser.getNumberOfRows());
 
     std::vector<uint16_t> nAttributes;
     std::vector<std::vector<uint16_t>> attribute_IDs;
     std::vector<uint8_t> nDescriptors;
     std::vector<std::vector<uint8_t>> descriptor_IDs;
-    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure;
+    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure(
+        ATCoordSize, twoDimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
     std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
 
@@ -258,38 +267,83 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::vector<uint8_t> ontology_term_name_len;
     std::vector<std::string> ontology_term_name;
 
-    uint8_t n_compressors = 0;
-    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set;
+    uint8_t n_pars = 4;
+    std::vector<uint8_t> par_ID{1, 2, 3, 4};
+    std::vector<uint8_t> par_type{4, 4, 4, 4};
+    std::vector<uint8_t> par_num_array_dims(4, 0);
+    std::vector<uint8_t> values{MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
+                                MPEGG_BSC_CODER_QLFC_STATIC};
 
-    genie::core::record::annotation_parameter_set::GenotypeParameters genotype_parameters;
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
-    uint8_t n_pars = 1;
-    std::vector<uint8_t> par_ID(n_pars, 0);
-    std::vector<uint8_t> par_type(n_pars, 4);
-    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
-    par_num_array_dims = {0};
-    std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(
-        n_pars, std::vector<std::vector<std::vector<std::vector<uint8_t>>>>(0));
+    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
+    //   genie::core::arrayType toar;
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
+    std::vector<std::vector<std::vector<uint8_t>>> temp2;
+    std::vector<std::vector<uint8_t>> temp3;
+    std::vector<uint8_t> temp4(1, 0);
+    temp3.resize(n_pars, temp4);
+    temp2.resize(1, temp3);
+    temp.resize(1, temp2);
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
+
+    for (auto l = 0; l < par_val.size(); ++l) {
+        for (auto k = 0; k < par_val[l].size(); ++k)
+            for (auto j = 0; j < par_val[l][k].size(); ++j)
+                for (auto i = 0; i < par_val[l][k][j].size(); ++i) {
+                    par_val[l][k][j][i][0] = values[i];
+                }
+    }
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
-    uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
-    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
+    uint8_t n_compressors = 1;
+    uint8_t compressor_ID = 1;
+    uint8_t n_compressor_steps = 1;
+    std::vector<uint8_t> compressor_step_ID{0};
+    std::vector<uint8_t> algorithm_ID{3};
+    std::vector<bool> use_default_pars{true};
+    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
+    std::vector<uint8_t> n_in_vars{0};
+    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
+    std::vector<std::vector<uint8_t>> prev_step_ID;
+    std::vector<std::vector<uint8_t>> prev_out_var_ID;
+    std::vector<uint8_t> n_completed_out_vars{0};
+    std::vector<std::vector<uint8_t>> completed_out_var_ID;
 
+        genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+        compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
+        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
+    std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
+        compressorParameterSet};
+
+    genie::core::record::annotation_parameter_set::GenotypeParameters genotype_parameters;
+    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
+
+    std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
+#if COMPRESSED
+    uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
     for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
+#else
+    uint8_t n_descriptors = static_cast<uint8_t>(outputstream.size());
+    for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
+#endif
         DescriptorID DescrID = it->first;
         genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
             DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
             algorithmParameters);
+
         descriptor_configuration.push_back(descrConf);
     }
 
-    uint8_t n_attributes = static_cast<uint8_t>(encodedAttributes.size());
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
+#if COMPRESSED
+    uint8_t n_attributes = static_cast<uint8_t>(encodedAttributes.size());
     for (auto it = encodedAttributes.begin(); it != encodedAttributes.end(); ++it) {
+#else
+    uint8_t n_attributes = static_cast<uint8_t>(attributeStream.size());
+    for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
+#endif
         genie::core::arrayType deftype;
         uint16_t attrID = info[it->first].getAttributeID();
         std::string attribute_name = info[it->first].getAttributeName();
@@ -309,7 +363,6 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         bool attribute_miss_default_flag = false;
         std::vector<uint8_t> attribute_miss_val = attribute_default_val;
         std::string attribute_miss_str = "";
-        uint8_t compressor_ID = 0;
         uint8_t n_steps_with_dependencies = 0;
         std::vector<uint8_t> dependency_step_ID;
         std::vector<uint8_t> n_dependencies;
@@ -337,7 +390,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     //----------------------------------------------------//
     {
         std::vector<genie::core::record::annotation_access_unit::Block> blocks;
+#if COMPRESSED
         for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
+#else
+        for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
+#endif
             std::vector<uint8_t> data;
             uint8_t readbyte;
             while (it->second >> readbyte) data.push_back(readbyte);
@@ -347,7 +404,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
             blocks.push_back(blockn);
         }
 
+#if COMPRESSED
         for (auto it = encodedAttributes.begin(); it != encodedAttributes.end(); ++it) {
+#else
+        for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
+#endif
             auto attributeID = info[it->first].getAttributeID();
             std::vector<uint8_t> data;
             uint8_t readbyte;
@@ -358,7 +419,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
             blockn.set(blockInfo);
             blocks.push_back(blockn);
         }
-        uint64_t n_blocks = blocks.size();
+        uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
         genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
             attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
             attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
@@ -366,22 +427,89 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         genie::core::record::annotation_access_unit::Record annotationAccessUnittot(
             AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
             twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
-        std::string name = "TestFiles/CompleteWithEncoding";
+
+#if COMPRESSED
+        std::string subname = "Compressed";
+#else
+        std::string subname = "NotCompressed";
+#endif
+        std::string name = "TestFiles/Complete" + subname;
+#if false
+        {
+            std::ofstream aauBinFile;
+            std::ofstream aauTxtFile;
+            aauBinFile.open("TestFiles/AAU" + subname + ".bin", std::ios::binary | std::ios::out);
+            aauTxtFile.open("TestFiles/AAU" + subname + ".txt", std::ios::out);
+            genie::core::Writer aauBinWriter(&aauBinFile);
+            genie::core::Writer aauTxtWriter(&aauTxtFile, true);
+            aauBinWriter.write(4, 8);
+            aauTxtWriter.write(4, 8);
+            aauBinWriter.write_reserved(10);
+            aauTxtWriter.write_reserved(10);
+            auto size = annotationAccessUnittot.getSize();
+            EXPECT_EQ(size % 8, 0);
+            if (size % 8 != 0) size += (8 - size % 8);
+            aauBinWriter.write(size / 8, 22);
+            aauTxtWriter.write(size / 8, 22);
+            annotationAccessUnittot.write(aauBinWriter);
+            annotationAccessUnittot.write(aauTxtWriter);
+            aauBinFile.close();
+            aauTxtFile.close();
+        }
+#endif
+        std::stringstream aps_size;
+        std::stringstream aau_size;
+        {
+            genie::core::Writer aps(&aps_size);
+            annotationParameterSet.write(aps);
+            EXPECT_EQ(aps_size.str().size(), annotationParameterSet.getSize() / 8);
+            genie::core::Writer aau(&aau_size);
+            annotationAccessUnittot.write(aau);
+            EXPECT_EQ(aau_size.str().size(), annotationAccessUnittot.getSize() / 8);
+        }
+        auto apsByteSize = aps_size.str().size();
+        auto aauByteSize = aau_size.str().size();
 
         std::ofstream testfile;
         testfile.open(name + ".bin", std::ios::binary | std::ios::out);
         if (testfile.is_open()) {
             genie::core::Writer writer(&testfile);
+
+            writer.write(3, 8);
+            writer.write_reserved(10);
+            //    auto size = annotationParameterSet.getSize();
+            //    EXPECT_EQ(size % 8, 0);
+            //    if (size % 8 != 0) size += (8 - size % 8);
+            writer.write(apsByteSize, 22);
             annotationParameterSet.write(writer);
+
+            writer.write(4, 8);
+            writer.write_reserved(3);
+            //      size = annotationAccessUnittot.getSize();
+            //       EXPECT_EQ(size % 8, 0);
+            //      if (size % 8 != 0) size += (8 - size % 8);
+            //      EXPECT_EQ(size % 8, 0);
+            writer.write(aauByteSize, 29);
             annotationAccessUnittot.write(writer);
-            writer.flush();
             testfile.close();
         }
         std::ofstream txtfile;
         txtfile.open(name + ".txt", std::ios::out);
         if (txtfile.is_open()) {
             genie::core::Writer txtWriter(&txtfile, true);
+
+            txtWriter.write(3, 8);
+            txtWriter.write_reserved(10);
+            //         auto size = annotationParameterSet.getSize();
+            //          if (size % 8 != 0) size += (8 - size % 8);
+            txtWriter.write(apsByteSize, 22);
             annotationParameterSet.write(txtWriter);
+
+            txtWriter.write(4, 8);
+            txtWriter.write_reserved(3);
+            //        size = annotationAccessUnittot.getSize();
+            //        if (size % 8 != 0) size += (8 - size % 8);
+            txtWriter.write(aauByteSize, 29);
             annotationAccessUnittot.write(txtWriter);
             txtfile.close();
         }

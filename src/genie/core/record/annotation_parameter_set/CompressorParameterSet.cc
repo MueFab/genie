@@ -114,9 +114,14 @@ void CompressorParameterSet::write(core::Writer& writer) const {
             writer.write(prev_out_var_ID[i][j], 4);
         }
         writer.write(n_completed_out_vars[i], 4);
-        for (auto ID : completed_out_var_ID[i]) writer.write(ID, 4);
+        for (auto j = 0; j < n_completed_out_vars[i]; ++j) writer.write(completed_out_var_ID[i][j], 4);
     }
     writer.flush();
+}
+
+size_t CompressorParameterSet::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

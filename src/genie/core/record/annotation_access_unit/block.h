@@ -102,8 +102,9 @@ class Block {
 
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, uint8_t numChrs);
-    void write(core::Writer& writer) ;
+    void write(core::Writer& writer) const;
     void set(BlockVectorData blockData);
+    size_t getSize(core::Writer& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -73,6 +73,7 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader, bool attributeCon
 }
 
 void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
+    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size); 
     if (attribute_contiguity) {
         writer.write(is_attribute, 1);
         if (is_attribute)
@@ -81,21 +82,27 @@ void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
             writer.write(static_cast<uint8_t>(descriptor_ID), 7);
         if (two_dimensional && !variable_size_tiles) {
             if (column_major_tile_order)
-                writer.write(n_tiles_per_col, (AT_coord_size + 1) * 8);
+                writer.write(n_tiles_per_col, ATCoordBits);
             else
-                writer.write(n_tiles_per_row, (AT_coord_size + 1) * 8);
-            writer.write(n_blocks, (AT_coord_size + 1) * 8);
+                writer.write(n_tiles_per_row, ATCoordBits);
         }
+        writer.write(n_blocks, ATCoordBits);
     } else {
-        writer.write(tile_index_1, (AT_coord_size + 1) * 8);
+        writer.write(tile_index_1, ATCoordBits);
         writer.write(tile_index_2_exists, 1);
-        if (tile_index_2_exists) writer.write(tile_index_2, (AT_coord_size + 1) * 8);
+        if (tile_index_2_exists) writer.write(tile_index_2, ATCoordBits);
         writer.write(n_blocks, 16);
     }
     writer.flush();
 }
 
+size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
+}
+
 void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
+    uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size); 
     if (attribute_contiguity) {
         is_attribute = static_cast<bool>(reader.read_b(1));
         if (is_attribute) {
@@ -105,16 +112,16 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
         }
         if (two_dimensional && !variable_size_tiles) {
             if (column_major_tile_order) {
-                n_tiles_per_col = static_cast<uint64_t>(reader.read_b(8 * (AT_coord_size + 1)));
+                n_tiles_per_col = static_cast<uint64_t>(reader.read_b(ATCoordBits));
             } else {
-                n_tiles_per_row = static_cast<uint64_t>(reader.read_b(8 * (AT_coord_size + 1)));
+                n_tiles_per_row = static_cast<uint64_t>(reader.read_b(ATCoordBits));
             }
-            n_blocks = static_cast<uint64_t>(reader.read_b(8 * (AT_coord_size + 1)));
+            n_blocks = static_cast<uint64_t>(reader.read_b(ATCoordBits));
         }
     } else {
-        tile_index_1 = static_cast<uint64_t>(reader.read_b(8 * (AT_coord_size + 1)));
+        tile_index_1 = static_cast<uint64_t>(reader.read_b(ATCoordBits));
         tile_index_2_exists = static_cast<bool>(reader.read_b(1));
-        if (tile_index_2_exists) tile_index_2 = static_cast<uint64_t>(reader.read_b(8 * (AT_coord_size + 1)));
+        if (tile_index_2_exists) tile_index_2 = static_cast<uint64_t>(reader.read_b(ATCoordBits));
         n_blocks = static_cast<uint64_t>(reader.read_b(16));
     }
     reader.flush();

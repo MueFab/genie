@@ -167,28 +167,21 @@ void AttributeParameterSet::read(util::BitReader& reader) {
 
 void AttributeParameterSet::write(core::Writer& writer) const {
     arrayType curType;
-  //  writer.write("startAttributeParameterSet");
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
     writer.write(attribute_name);
-    //for (auto byte : attribute_name) writer.write(byte, 8);
     writer.write(attribute_type, 8);
     writer.write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
-  //  writer.write("attributeDefaultVal");
     curType.toFile(attribute_type, attribute_default_val, writer);
 
-  //  writer.write("attributemiss_val_flag");
     writer.write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
         writer.write(attribute_miss_default_flag, 1);
         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-        //     for (auto byte : attribute_miss_str) writer.write(byte, 8);
-    //    writer.write("attribute_miss_str");
         writer.write(attribute_miss_str);
-        writer.write(0, 8, true);
+        writer.write_reserved(8);
     }
-   // writer.write("compressor_ID");
 
     writer.write(compressor_ID, 8);
     writer.write(n_steps_with_dependencies, 4);
@@ -205,7 +198,11 @@ void AttributeParameterSet::write(core::Writer& writer) const {
         }
     }
     writer.flush();
-   // writer.write("EndAttributeParameterSet");
+}
+
+size_t AttributeParameterSet::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,11 @@ void LikelihoodParameters::write(Writer& writer) const {
     if (transform_flag) writer.write(dtype_id, 8);
 }
 
+size_t LikelihoodParameters::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set

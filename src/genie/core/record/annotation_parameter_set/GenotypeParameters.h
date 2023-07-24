@@ -66,6 +66,7 @@ class GenotypeParameters {
     void write(util::BitWriter& writer) const;
     void write(std::ostream& outputfile) const;
     void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getMaxPloidy() const { return max_ploidy; }
     bool isNoReference() const { return no_reference_flag; }

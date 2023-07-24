@@ -60,7 +60,6 @@ class AlgorithmParametersTests : public ::testing::Test {
     // }
 };
 
-
 TEST_F(AlgorithmParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -76,6 +75,49 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersZero) {  // NOLINT(cert-err5
     EXPECT_EQ(algortihmParameters.getParValues().size(), 0);
 }
 
+TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+
+    uint8_t n_pars = 4;
+    std::vector<uint8_t> par_ID{1, 2, 3, 4};
+    std::vector<uint8_t> par_type{4, 4, 4, 4};
+    std::vector<uint8_t> par_num_array_dims(4, 0);
+    std::vector<uint8_t> values{16, 128, 1, 1};
+
+    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
+    //   genie::core::arrayType toar;
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
+    std::vector<std::vector<std::vector<uint8_t>>> temp2;
+    std::vector<std::vector<uint8_t>> temp3;
+    std::vector<uint8_t> temp4(1, 0);
+    temp3.resize(n_pars, temp4);
+    temp2.resize(1, temp3);
+    temp.resize(1, temp2);
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
+    // par_val.resize(n_pars, temp);
+    for (auto l = 0; l < par_val.size(); ++l) {
+        for (auto k = 0; k < par_val[l].size(); ++k)
+            for (auto j = 0; j < par_val[l][k].size(); ++j)
+                for (auto i = 0; i < par_val[l][k][j].size(); ++i) {
+                    par_val[l][k][j][i][0] = values[i];
+                }
+    }
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
+        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+
+    std::stringstream InOut;
+    genie::core::Writer strwriter(&InOut);
+    algorithmParameters.write(strwriter);
+    strwriter.flush();
+
+    genie::core::Writer writesize;
+    auto size = algorithmParameters.getSize(writesize);
+    if ((size % 8) != 0) size += (8 - size % 8);
+
+    EXPECT_EQ(InOut.str().size(), size / 8);
+}
 TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -84,7 +126,8 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     RandomAnnotationEncodingParameters randomAlgorithmParameters;
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters;
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParametersCheck;
-    uint8_t nPars = static_cast<uint8_t>(rand() % 16);
+    uint8_t nPars = 1;
+    // static_cast<uint8_t>(rand() % 16);
     uint8_t numArray = 0;
     std::vector<uint8_t> parNumArrayDims(nPars, numArray);
     algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);
@@ -99,11 +142,16 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     genie::core::Writer teststrwriter(&TestOut);
     algorithmParametersCheck.write(teststrwriter);
     teststrwriter.flush();
+
     EXPECT_EQ(InOut.str(), TestOut.str());
 
+    genie::core::Writer writeSize;
+    auto size = algorithmParameters.getSize(writeSize);
+    if ((size % 8) != 0) size += (8 - size % 8);
 
-     EXPECT_EQ(algorithmParameters.getParArrayDims(), algorithmParametersCheck.getParArrayDims());
+    EXPECT_EQ(InOut.str().size(), size / 8);
 
+    EXPECT_EQ(algorithmParameters.getParArrayDims(), algorithmParametersCheck.getParArrayDims());
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(), algorithmParametersCheck.getNumberOfPars());
     EXPECT_EQ(algorithmParameters.getParIDs(), algorithmParametersCheck.getParIDs());

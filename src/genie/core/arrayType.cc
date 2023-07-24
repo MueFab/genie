@@ -1,5 +1,6 @@
 #include "arrayType.h"
 #include <cstring>
+#include <iostream>
 #include "genie/util/bitreader.h"
 
 namespace genie {
@@ -79,7 +80,7 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
     return temp;
 }
 
-uint8_t arrayType::getDefaultBitsize(uint8_t type) {
+uint8_t arrayType::getDefaultBitsize(uint8_t type) const {
     if (type == 0) return 0;
     if (type == 1 || type == 3 || type == 4) return 8;
     if (type == 2) return 1;
@@ -89,7 +90,7 @@ uint8_t arrayType::getDefaultBitsize(uint8_t type) {
     return 0;
 }
 
-uint64_t arrayType::getDefaultValue(uint8_t type) {
+uint64_t arrayType::getDefaultValue(uint8_t type) const {
     switch (type) {
         case 0:
         case 1:
@@ -205,25 +206,32 @@ void arrayType::toFile(uint8_t type, std::vector<uint8_t> bytearray, core::Write
         if (bytearray.size() > 0)
             for (auto byte : bytearray) stringOut += byte;
         writer.write(stringOut);
-        // for (auto i = 0; i < bytearray.size(); ++i) writer.write(bytearray[i], 8);
         writer.write(0, 8, true);
     } else {
         uint64_t writeValue = 0;
-        for (auto i = 0; i < bytearray.size(); ++i) writeValue += static_cast<uint64_t>(bytearray[i]) << (i * 8);
-        writer.write(writeValue, static_cast<uint8_t>(bytearray.size()) * 8);
+        if (bytearray.size() == 0) {
+    //        std::cerr << "nothing to write\n";
+        }
+        else {
+            uint8_t byteSize = getDefaultBitsize(type);
+            byteSize /= 8;
+            if (byteSize == 0) byteSize = 1;
+
+            for (auto i = 0; (i < byteSize); ++i) writeValue += static_cast<uint64_t>(bytearray[i]) << (i * 8);
+            writer.write(writeValue, static_cast<uint8_t>(byteSize) * 8);
+        }
     }
 }
 
 std::vector<uint8_t> arrayType::toArray(uint8_t type, uint64_t value) {
-    std::vector<uint64_t> returnValue;
-    auto NrOfBytes = (getDefaultValue(type) + 7) / 8;
+    std::vector<uint8_t> returnValue;
+    auto NrOfBytes = (getDefaultBitsize(type) + 7) / 8;
     returnValue.resize(NrOfBytes);
     for (auto i = 0; i < NrOfBytes; ++i) {
         returnValue[i] = value & 0xFF;
         value = value >> 8;
     }
-
-    return std::vector<uint8_t>();
+    return returnValue;
 }
 
 }  // namespace core

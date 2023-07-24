@@ -39,7 +39,7 @@ class AnnotationAccessUnitHeader {
 
     bool is_attribute;
     uint16_t attribute_ID;
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
+    annotation_parameter_set::DescriptorID descriptor_ID;
     uint64_t n_tiles_per_col;
     uint64_t n_tiles_per_row;
     uint64_t n_blocks;
@@ -55,7 +55,7 @@ class AnnotationAccessUnitHeader {
                                bool columnMajorTileOrder, bool variable_size_tiles, uint8_t ATCoordSize);
     AnnotationAccessUnitHeader(bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
                                bool variable_size_tiles, uint8_t ATCoordSize, bool is_attribute, uint16_t attribute_ID,
-                               genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID,
+                               annotation_parameter_set::DescriptorID descriptor_ID,
                                uint64_t n_tiles_per_col, uint64_t n_tiles_per_row, uint64_t n_blocks,
                                uint64_t tile_index_1, bool tile_index_2_exists, uint64_t tile_index_2);
 
@@ -64,6 +64,7 @@ class AnnotationAccessUnitHeader {
               bool variable_size_tiles, uint8_t ATCoordSize);
 
     void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
 
     bool ISAttribute() const { return is_attribute; }
     uint16_t getAttributeID() const { return attribute_ID; }

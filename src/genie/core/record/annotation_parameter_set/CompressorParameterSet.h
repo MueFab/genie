@@ -55,6 +55,8 @@ class CompressorParameterSet {
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
 
+    size_t getSize(core::Writer& writesize) const;
+
     uint8_t getCompressorID() const { return compressor_ID; }
     uint8_t getNumberOfCompressorSteps() const { return n_compressor_steps; }
     std::vector<uint8_t> getCompressorStepIDs() const { return compressor_step_ID; }

@@ -59,7 +59,6 @@ class CompressorParameterSetTests : public ::testing::Test {
     // }
 };
 
-
 TEST_F(CompressorParameterSetTests, CompressorParameterSetZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
@@ -69,6 +68,57 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetZeros) {  // NOLINT(ce
     EXPECT_EQ(compressorParameterset.getCompressorID(), uint8_t(1));
     EXPECT_EQ(compressorParameterset.getCompressorStepIDs().size(), 0);
     EXPECT_EQ(compressorParameterset.getNumberOfCompletedOutVars().size(), 0);
+}
+
+TEST_F(CompressorParameterSetTests, FixedValues) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    uint8_t n_pars = 4;
+    std::vector<uint8_t> par_ID{1, 2, 3, 4};
+    std::vector<uint8_t> par_type{4, 4, 4, 4};
+    std::vector<uint8_t> par_num_array_dims(4, 0);
+    std::vector<uint8_t> values{1, 16, 128, 0};
+
+    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
+    //   genie::core::arrayType toar;
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
+    std::vector<std::vector<std::vector<uint8_t>>> temp2;
+    std::vector<std::vector<uint8_t>> temp3;
+    std::vector<uint8_t> temp4(1, 0);
+    temp3.resize(n_pars, temp4);
+    temp2.resize(1, temp3);
+    temp.resize(1, temp2);
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
+    // par_val.resize(n_pars, temp);
+    for (auto l = 0; l < par_val.size(); ++l) {
+        for (auto k = 0; k < par_val[l].size(); ++k)
+            for (auto j = 0; j < par_val[l][k].size(); ++j)
+                for (auto i = 0; i < par_val[l][k][j].size(); ++i) {
+                    par_val[l][k][j][i][0] = values[i];
+                }
+    }
+
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
+        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+
+    uint8_t compressor_ID = 1;
+    uint8_t n_compressor_steps = 1;
+    std::vector<uint8_t> compressor_step_ID{0};
+    std::vector<uint8_t> algorithm_ID{3};
+    std::vector<bool> use_default_pars{true};
+    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters{
+        algorithmParameters};
+    std::vector<uint8_t> n_in_vars{0};
+    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
+    std::vector<std::vector<uint8_t>> prev_step_ID;
+    std::vector<std::vector<uint8_t>> prev_out_var_ID;
+    std::vector<uint8_t> n_completed_out_vars{0};
+    std::vector<std::vector<uint8_t>> completed_out_var_ID;
+
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+        compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
+        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }
 
 TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(cert-err58-cpp)

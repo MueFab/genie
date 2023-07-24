@@ -17,7 +17,9 @@
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/AnnotationParameterSet/Record.h"
+
+#include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,10 +28,22 @@ namespace core {
 namespace record {
 namespace data_unit {
 
-class RawReference {};
-class ParameterSet {};
-class AccessUnit {};
-class AnnotationAccessUnit {};
+class RawReference {
+ public:
+    size_t getSize() const { return 0; }
+};
+class ParameterSet {
+ public:
+    size_t getSize() const { return 0; }
+};
+class AccessUnit {
+ public:
+    size_t getSize() const { return 0; }
+};
+class AnnotationAccessUnit {
+ public:
+    size_t getSize() const { return 0; }
+};
 
 /**
  *  @brief
@@ -38,11 +52,12 @@ class Record {
  private:
     uint8_t data_unit_type;
     uint64_t data_unit_size;
-    RawReference raw_reference;
-    ParameterSet parameter_set;
-    AccessUnit access_unit;
-    genie::core::record::AnnotationParameterSet::Record annotation_Parameter_set;
-    AnnotationAccessUnit annotation_access_unit;
+    RawReference rawReference;
+    ParameterSet parameterSet;
+    AccessUnit accessUnit;
+    genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
+
 
  public:
     /**
@@ -50,6 +65,12 @@ class Record {
      */
     Record();
 
+    Record(RawReference rawReference);
+    Record(ParameterSet parameterSet);
+    Record(AccessUnit accessUnit);
+
+    Record(annotation_access_unit::Record annotationAccessUnit);
+    Record(annotation_parameter_set::Record annotationParameterSet);
 
 };
 

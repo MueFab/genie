@@ -61,8 +61,7 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
       numChrs(numChrs),
       AT_coord_size(ATCoordSize) {
     this->block.resize(n_blocks);
-    for (auto i = 0; i < blocks.size(); ++i)
-    this->block[i] = blocks[i];
+    for (auto i = 0; i < blocks.size(); ++i) this->block[i] = blocks[i];
 }
 
 void Record::read(util::BitReader& reader) {
@@ -88,14 +87,24 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
     read(reader);
 }
 
-void Record::write(core::Writer& writer) {
+void Record::write(core::Writer& writer) const {
     writer.write(AT_ID, 8);
     writer.write(static_cast<uint8_t>(AT_type), 4);
     writer.write(AT_subtype, 4);
     writer.write(AG_class, 3);
-    writer.write(0, 5);
+    writer.write_reserved(5);
     annotation_access_unit_header.write(writer);
     for (auto& blocki : block) blocki.write(writer);
+}
+
+size_t Record::getSize() const {
+    core::Writer writesize;
+    return getSize(writesize);
+}
+
+size_t Record::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 }  // namespace annotation_access_unit

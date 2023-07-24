@@ -26,6 +26,11 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
+
+
+
+
+
 class AlgorithmParameters {
  private:
     uint8_t n_pars;
@@ -44,6 +49,7 @@ class AlgorithmParameters {
 
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }

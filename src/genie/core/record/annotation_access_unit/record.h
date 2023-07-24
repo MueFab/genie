@@ -16,8 +16,8 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
 #include "genie/core/writer.h"
+#include "genie/util/bitreader.h"
 
 #include "AnnotationAccessUnitHeader.h"
 #include "genie/core/record/annotation_access_unit/block.h"
@@ -68,7 +68,9 @@ class Record {
     void read(util::BitReader& reader, bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder,
               uint8_t ATCoordSize, uint8_t numChrs);
 
-    void write(core::Writer& writer) ;
+    void write(core::Writer& writer) const;
+    size_t getSize() const;
+    size_t getSize(core::Writer& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

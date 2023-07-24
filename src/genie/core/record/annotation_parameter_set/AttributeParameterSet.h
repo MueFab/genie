@@ -91,6 +91,7 @@ class AttributeParameterSet {
      */
     void write(core::Writer& writer) const;
 
+    size_t getSize(core::Writer& writesize) const;
 
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }
