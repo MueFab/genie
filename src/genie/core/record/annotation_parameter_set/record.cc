@@ -56,18 +56,28 @@ void Record::read(util::BitReader& reader) {
     annotation_encoding_parameters.read(reader);
 }
 
-
 void Record::write(Writer& writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(AT_ID, 8);
     writer.write(AT_alphabet_ID, 8);
-    writer.write_reserved(2);   
+    writer.write_reserved(2);
     writer.write(AT_coord_size, 2);
     writer.write(AT_pos_40_bits_flag, 1);
     writer.write(n_aux_attribute_groups, 3);
     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
     annotation_encoding_parameters.write(writer);
 }
+
+size_t Record::getSize() const {
+    core::Writer writesize;
+    return getSize(writesize);
+}
+
+size_t Record::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
+}
+
 
 }  // namespace annotation_parameter_set
 }  // namespace record

@@ -77,7 +77,7 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
     if (attribute_name_len < 3) attribute_name_len = 3;
     std::string attribute_name = randomString(attribute_name_len);
     uint8_t attribute_type = 0;
-    //randomType();
+    // randomType();
     uint8_t attribute_num_array_dims = randomU2();
 
     std::vector<uint8_t> attribute_array_dims{};
@@ -133,7 +133,7 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
     return randomAlgorithmParameters(n_pars, par_num_array_dims);
 }
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters
+genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars, std::vector<uint8_t> parNumArrayDims) {
     uint8_t n_pars = nuMOfpars;
     std::vector<uint8_t> par_ID(n_pars, 0);
@@ -152,21 +152,21 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars,
             par_val[i].resize(1,
                               std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
         if (par_num_array_dims[i] == 1)
-            par_val[i].resize(par_array_dims[i][0],
-                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
+            par_val[i].resize(1, std::vector<std::vector<std::vector<uint8_t>>>(
+                                     1, std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
         if (par_num_array_dims[i] == 2)
-            par_val[i].resize(par_array_dims[i][0], std::vector<std::vector<std::vector<uint8_t>>>(
-                                                        par_array_dims[i][1], std::vector<std::vector<uint8_t>>(1)));
+            par_val[i].resize(1, std::vector<std::vector<std::vector<uint8_t>>>(
+                                     par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
         if (par_num_array_dims[i] == 3)
-            par_val[i].resize(par_array_dims[i][0],
+            par_val[i].resize(par_array_dims[i][2],
                               std::vector<std::vector<std::vector<uint8_t>>>(
-                                  par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][2])));
+                                  par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
 
-        for (auto j = 0; j < par_val[i].size(); ++ j)
-            for (auto k = 0; k < par_val[i][j].size(); ++k)
-                for (auto l = 0; l < par_val[i][j][k].size(); ++l) {
-                    par_val[i][j][k][l] = randomValForType(par_type[i]);
-                }     
+        for (auto j = 0; j < par_val[i].size(); ++j)
+            for (auto k = 0; k < par_val[j][i].size(); ++k)
+                for (auto l = 0; l < par_val[k][j][i].size(); ++l) {
+                    par_val[l][k][j][i] = randomValForType(par_type[i]);
+                }
     }
 
     return genie::core::record::annotation_parameter_set::AlgorithmParameters(
@@ -213,17 +213,20 @@ genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEnc
     std::vector<std::vector<uint64_t>> start_index;
     std::vector<std::vector<uint64_t>> end_index;
     std::vector<uint64_t> tile_size;
-    start_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
-    end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
-    tile_size.resize(n_tiles, 0);
-    for (auto i = 0; i < n_tiles; ++i) {
-        if (variable_size_tiles)
+    if (variable_size_tiles) {
+        start_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+        end_index.resize(n_tiles, std::vector<uint64_t>(dimensions, 0));
+        for (auto i = 0; i < n_tiles; ++i) {
             for (auto j = 0; j < dimensions; ++j) {
                 start_index[i][j] = randomAtCoordSize(ATCoordSize);
                 end_index[i][j] = randomAtCoordSize(ATCoordSize);
             }
-        else
+        }
+    } else {
+        tile_size.resize(dimensions);
+        for (auto i = 0; i < dimensions; ++i) {
             tile_size[i] = randomAtCoordSize(ATCoordSize);
+        }
     }
 
     return genie::core::record::annotation_parameter_set::TileStructure(
@@ -323,7 +326,7 @@ RandomAnnotationEncodingParameters::simpleContactMatrixParameters() {
 
 genie::core::record::annotation_parameter_set::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration() {
-    uint8_t AT_coord_size = randomU8();
+    uint8_t AT_coord_size = randomU2();
     return randomTileConfiguration(AT_coord_size);
 }
 

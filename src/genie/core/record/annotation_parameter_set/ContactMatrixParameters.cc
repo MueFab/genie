@@ -137,7 +137,7 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
         for (auto byte : sample_name[i]) {
             writer.write(byte, 8);
         }
-        writer.write(0, 8);
+        writer.write_reserved(8);
     }
     writer.write(num_chrs, 8);
     for (auto i = 0; i < num_chrs; ++i) {
@@ -145,7 +145,7 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
         for (auto byte : chr_name[i]) {
             writer.write(byte, 8);
         }
-        writer.write(0, 8);
+        writer.write_reserved(8);
         writer.write(chr_length[i], 64);
     }
     writer.write(interval, 32);
@@ -157,16 +157,21 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
     for (auto i = 0; i < num_norm_methods; ++i) {
         writer.write(norm_method_ID[i], 8);
         for (auto byte : norm_method_name[i]) writer.write(byte, 8);
-        writer.write(0, 8);
+        writer.write_reserved(8);
         writer.write(norm_method_mult_flag[i], 1);
-        writer.write(0, 7);
+        writer.write_reserved(7);
     }
     writer.write(num_norm_matrices, 8);
     for (auto i = 0; i < num_norm_matrices; ++i) {
         writer.write(norm_matrix_ID[i], 8);
         for (auto byte : norm_matrix_name[i]) writer.write(byte, 8);
-        writer.write(0, 8);
+        writer.write_reserved(8);
     }
+}
+
+size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

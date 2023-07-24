@@ -103,6 +103,9 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
               annotationParameterSetCheck.getTileConfigurations().size());
 
     EXPECT_EQ(InOut.str(), testOut.str());
+    auto size = annotationParameterSet.getSize();
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AnnotationParameterSet_seed_";
@@ -215,11 +218,19 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
 
         uint8_t n_pars = 4;
         std::vector<uint8_t> par_ID{1, 2, 3, 4};
-        std::vector<uint8_t> par_type{4, 4, 4, 6};
+        std::vector<uint8_t> par_type{4, 4, 4, 4};
         std::vector<uint8_t> par_num_array_dims{0, 0, 0, 0};
         std::vector<std::vector<uint8_t>> par_array_dims;
-        std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val{
-            {{{{0}}}}, {{{{1}}}}, {{{{2}}}}, {{{{0,3}}}}};
+        // std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val{
+        //    {{{{0}}}}, {{{{1}}}}, {{{{2}}}}, {{{{3}}}}};
+        std::vector<uint8_t> val1{10};
+        std::vector<uint8_t> val2{11};
+        std::vector<uint8_t> val3{12};
+        std::vector<uint8_t> val4{13};
+        std::vector<std::vector<uint8_t>> val11{val1, val2, val3, val4};
+        std::vector<std::vector<std::vector<uint8_t>>> val12(1, val11);
+        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> val13(1, val12);
+        std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, val13);
 
         genie::core::record::annotation_parameter_set::AlgorithmParameters algorithm_patarmeters(
             n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
@@ -250,7 +261,8 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         genie::core::arrayType typeval;
 
         std::vector<uint8_t> attribute_default_val;
-        if (attribute_type != 0) attribute_default_val.resize((static_cast<size_t>(typeval.getDefaultBitsize(attribute_type))+7)/8);
+        if (attribute_type != 0)
+            attribute_default_val.resize((static_cast<size_t>(typeval.getDefaultBitsize(attribute_type)) + 7) / 8);
 
         bool attribute_miss_val_flag = true;
         bool attribute_miss_default_flag = false;
@@ -291,7 +303,6 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet(
         parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size, AT_pos_40_bits_flag, n_aux_attribute_groups,
         tileConfigurationArray, annotation_encoding_parameters);
-
 
 #if 1
     std::string name = "TestFiles/AnnotationParameterSet_site";

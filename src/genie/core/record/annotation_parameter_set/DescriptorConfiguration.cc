@@ -69,6 +69,11 @@ void DescriptorConfiguration::write(core::Writer& writer) const {
     algorithm_patarmeters.write(writer);
 }
 
+size_t DescriptorConfiguration::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation_parameter_set

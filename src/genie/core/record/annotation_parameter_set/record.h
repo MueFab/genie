@@ -31,9 +31,6 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-
-
-
 /**
  *  @brief
  */
@@ -59,6 +56,9 @@ class Record {
 
     void read(util::BitReader& reader);
     void write(Writer& writer) const;
+
+    size_t getSize() const;
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getParameterSetID() const { return parameter_set_ID; }
     uint8_t getATID() const { return AT_ID; }

@@ -51,6 +51,7 @@ class BlockHeader {
     uint16_t getAttributeID() const { return attribute_ID; }
     bool isIndexed() const { return indexed; }
     uint32_t getBlockPayloadSize() const { return block_payload_size; }
+    size_t getSize() const;
 };
 
 

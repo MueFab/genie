@@ -38,6 +38,8 @@ class LikelihoodParameters {
     void read(util::BitReader& reader);
     void write(Writer& writer) const;
 
+    size_t getSize(core::Writer& writesize) const;
+
     uint8_t getNumGLPerSample() const { return num_gl_per_sample; }
     bool isTransformFlag() const { return transform_flag; }
     uint8_t getDtypeID() const { return dtype_id; }

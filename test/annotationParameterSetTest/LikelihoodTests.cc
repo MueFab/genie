@@ -68,16 +68,19 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
     std::stringstream outputfile;
-
     genie::core::Writer strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
     likelihoodParameters.write(strwriter);
     strwriter.flush();
     likelihoodParametersCheck.read(strreader);
 
-    // EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
+ //   EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
     EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), likelihoodParametersCheck.getNumGLPerSample());
     EXPECT_EQ(likelihoodParameters.isTransformFlag(), likelihoodParametersCheck.isTransformFlag());
+    genie::core::Writer writeSize;
+    auto size = likelihoodParameters.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(outputfile.str().size(), size / 8);
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/LikelihoodParameters_seed_";
@@ -101,7 +104,6 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
 
 #endif
 }
-
 
 TEST_F(LikelihoodTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue

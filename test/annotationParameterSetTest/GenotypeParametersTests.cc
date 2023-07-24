@@ -127,6 +127,11 @@ TEST_F(GenotypeParametersTests, GenotypeParameterWriteRandom) {  // NOLINT(cert-
     strwriter.flush();
     genotypeParametersCheck.read(strreader);
 
+    genie::core::Writer writeSize;
+    auto size = genotypeParameters.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
+
     EXPECT_EQ(genotypeParameters.getBinarizationID(), genotypeParametersCheck.getBinarizationID());
     EXPECT_EQ(genotypeParameters.getConcatAxis(), genotypeParametersCheck.getConcatAxis());
     EXPECT_EQ(genotypeParameters.getMaxPloidy(), genotypeParametersCheck.getMaxPloidy());

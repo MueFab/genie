@@ -88,7 +88,7 @@ void BlockPayload::read(util::BitReader& reader,
     read(reader);
 }
 
-void BlockPayload::write(core::Writer& writer) {
+void BlockPayload::write(core::Writer& writer) const {
     if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
         genotype_payload.write(writer);
     } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::LIKELIHOOD) {
@@ -101,6 +101,12 @@ void BlockPayload::write(core::Writer& writer) {
     }
     writer.flush();
 }
+
+size_t BlockPayload::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
+}
+
 
 }  // namespace annotation_access_unit
 }  // namespace record

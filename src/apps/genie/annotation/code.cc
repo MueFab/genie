@@ -322,7 +322,7 @@ void genieapp::annotation::TempEncoder::encode(const std::stringstream &input, s
     unsigned char *dest = NULL;
     size_t destLen = 0;
     size_t srcLen = input.str().size();
-    std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+ //   std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
     mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)input.str().c_str(), srcLen,
                        MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,

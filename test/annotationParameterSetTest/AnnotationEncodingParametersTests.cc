@@ -95,6 +95,7 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
     annotationEncodingParametersCheck.write(teststrwriter);
     teststrwriter.flush();
 
+
     EXPECT_EQ(annotationEncodingParameters.getNumberOfFilters(),
               annotationEncodingParametersCheck.getNumberOfFilters());
     EXPECT_EQ(annotationEncodingParameters.getFilterIDLengths(),
@@ -112,6 +113,10 @@ TEST_F(AnnotationEncodingParametersTests, annotationEncodingParametersRandom) { 
               annotationEncodingParametersCheck.getOntologyTermNameLengths());
 
     EXPECT_EQ(InOut.str(), TestOUt.str());
+    genie::core::Writer writeSize;
+    auto size = annotationEncodingParameters.getSize(writeSize);
+    if (size % 8 != 0) size += (8 - size % 8);
+    EXPECT_EQ(InOut.str().size(), size / 8);
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/AnnotationEncodingParameters_seed_";

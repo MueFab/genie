@@ -69,7 +69,8 @@ class BlockPayload {
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
               uint8_t numChrs);
-    void write(core::Writer& writer);
+    void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

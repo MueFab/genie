@@ -117,7 +117,6 @@ void AnnotationEncodingParameters::read(util::BitReader& reader) {
     reader.flush();
 }
 
-
 void AnnotationEncodingParameters::write(core::Writer& writer) const {
     writer.write(n_filter, 8);
     for (auto i = 0; i < n_filter; ++i) {
@@ -149,6 +148,11 @@ void AnnotationEncodingParameters::write(core::Writer& writer) const {
         attribute_parameter_set[i].write(writer);
     }
     writer.flush();
+}
+
+size_t AnnotationEncodingParameters::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

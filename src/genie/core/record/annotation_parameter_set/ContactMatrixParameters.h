@@ -67,9 +67,8 @@ class ContactMatrixParameters {
 
     void read(util::BitReader& reader);
 
-    void write(std::ostream& outputfile) const;
-
     void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfSamples() const { return num_samples; }
     std::vector<uint8_t> getSampleIDs() const { return sample_ID; }

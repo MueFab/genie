@@ -59,12 +59,7 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional)
       start_index{},
       end_index{},
       tile_size{0},
-      two_dimensional(two_dimensional) {
-    if (two_dimensional)
-        tile_size.resize(2);
-    else
-        tile_size.resize(1);
-}
+      two_dimensional(two_dimensional) {}
 
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
                              std::vector<std::vector<uint64_t>> start_index,
@@ -75,11 +70,17 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool var
       n_tiles(n_tiles),
       start_index(start_index),
       end_index(end_index),
-      tile_size(tile_size) {}
+      tile_size(tile_size) {
+    if (!variable_size_tiles) {
+        this->start_index.clear();
+        this->end_index.clear();
+    } else {
+        this->tile_size.clear();
+    }
+}
 
 void TileStructure::read(util::BitReader& reader, uint8_t AT_coordsize, bool twoDimensional) {
     this->ATCoordSize = AT_coordsize;
-    if (!two_dimensional && twoDimensional) tile_size.resize(2);
     this->two_dimensional = twoDimensional;
     read(reader);
 }
@@ -90,6 +91,7 @@ void TileStructure::read(util::BitReader& reader) {
     n_tiles = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
+        tile_size.clear();
         start_index.resize(n_tiles, std::vector<uint64_t>(dimensions));
         end_index.resize(n_tiles, std::vector<uint64_t>(dimensions));
         for (auto i = 0; i < n_tiles; ++i) {
@@ -99,49 +101,11 @@ void TileStructure::read(util::BitReader& reader) {
             }
         }
     } else {
+        end_index.clear();
+        start_index.clear();
         tile_size.resize(dimensions);
         for (auto& dimension : tile_size)
             dimension = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
-    }
-}
-
-void TileStructure::write(std::ostream& outputfile, bool skipEmbeddedRecord) const {
-    if (!skipEmbeddedRecord) write(outputfile);
-}
-
-void TileStructure::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(variable_size_tiles) << ",";
-    outputfile << std::to_string(n_tiles) << ",";
-    auto dimensions = two_dimensional ? 2 : 1;
-    if (variable_size_tiles) {
-        for (auto i = 0; i < n_tiles; ++i) {
-            for (auto j = 0; j < dimensions; ++j) {
-                outputfile << std::to_string(start_index[i][j]) << ",";
-                outputfile << std::to_string(end_index[i][j]) << ",";
-            }
-        }
-    } else {
-        for (auto j = 0; j < dimensions; ++j) outputfile << std::to_string(tile_size[j]) << ",";
-    }
-}
-
-void TileStructure::write(util::BitWriter& writer, bool skipEmbeddedRecord) const {
-    if (!skipEmbeddedRecord) write(writer);
-}
-
-void TileStructure::write(util::BitWriter& writer) const {
-    writer.write(0, 7);
-    writer.write(variable_size_tiles, 1);
-    writer.write(n_tiles, coordSizeInBits(ATCoordSize));
-    auto dimensions = two_dimensional ? 2 : 1;
-    if (variable_size_tiles) {
-        for (auto i = 0; i < n_tiles; ++i)
-            for (auto j = 0; j < dimensions; ++j) {
-                writer.write(start_index[i][j], coordSizeInBits(ATCoordSize));
-                writer.write(end_index[i][j], coordSizeInBits(ATCoordSize));
-            }
-    } else {
-        for (auto j = 0; j < dimensions; ++j) writer.write(tile_size[j], coordSizeInBits(ATCoordSize));
     }
 }
 
@@ -159,6 +123,11 @@ void TileStructure::write(core::Writer& writer) const {
     } else {
         for (auto j = 0; j < dimensions; ++j) writer.write(tile_size[j], coordSizeInBits(ATCoordSize));
     }
+}
+
+size_t TileStructure::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

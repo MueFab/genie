@@ -70,18 +70,16 @@ class TileConfiguration {
 
     void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
-    void write(util::BitWriter& writer) const;
-    void write(std::ostream& outputfile, bool skipEmbeddedRecord) const;
-    void write(util::BitWriter& writer, bool skipEmbeddedRecord) const;
     void write(core::Writer& writer) const;
+
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getAttributeGroupClass() const { return AG_class; }
     bool isAttributeContiguity() const { return attribute_contiguity; }
     bool isTwoDimensional() const { return two_dimensional; }
     bool isColumnMajorTileOrder() const { return column_major_tile_order; }
-    uint8_t getSymetryMode() const { return symmetry_mode; }
-    bool isSymetryMinorDiagonal() const { return symmetry_minor_diagonal; }
+    uint8_t getSymmetryMode() const { return symmetry_mode; }
+    bool isSymmetryMinorDiagonal() const { return symmetry_minor_diagonal; }
 
     bool isAttrributeDependentTiles() const { return attribute_dependent_tiles; }
     TileStructure getDefaultTileStructure() const { return default_tile_structure; }

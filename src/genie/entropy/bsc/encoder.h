@@ -55,7 +55,7 @@ class BSCEncoder {
         input.read(dest, srcLen);
         unsigned char* destination;
         size_t destLen = srcLen;
-        std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+      //  std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
          mpegg_bsc_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen, lzpHashSize,
          lzpMinLen,
@@ -63,7 +63,6 @@ class BSCEncoder {
 
         output.write((const char *)dest, destLen);
         if (destLen != srcLen) {
-            std::cerr << "foutje?\n";
         }
         delete[] dest;
     }
