@@ -9,6 +9,8 @@
 #include "genie/core/record/variant_site/record.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/util/bitreader.h"
+#include "codecs/include/mpegg-codecs.h"
+
 
 class VariantSiteRecordTests : public ::testing::Test {
  protected:
@@ -158,7 +160,7 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(output.str(), checkOut.str());
 }
 
-#define COMPRESSED false
+#define COMPRESSED true
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -193,12 +195,19 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::map<DescriptorID, std::stringstream> encodedDescriptors;
     genie::entropy::bsc::BSCEncoder encoder;
 
-    for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
+   for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
         encoder.encode(it->second, encodedDescriptors[it->first]);
+
+        std::stringstream check;
+        encoder.decode(encodedDescriptors[it->first], check);
+        EXPECT_EQ(check.str(), it->second.str());
     }
     std::map<std::string, std::stringstream> encodedAttributes;
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
         encoder.encode(it->second, encodedAttributes[it->first]);
+        std::stringstream check;
+        encoder.decode(encodedAttributes[it->first], check);
+        EXPECT_EQ(check.str(), it->second.str());
     }
 #endif
 
@@ -267,34 +276,13 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::vector<uint8_t> ontology_term_name_len;
     std::vector<std::string> ontology_term_name;
 
-    uint8_t n_pars = 4;
-    std::vector<uint8_t> par_ID{1, 2, 3, 4};
-    std::vector<uint8_t> par_type{4, 4, 4, 4};
-    std::vector<uint8_t> par_num_array_dims(4, 0);
-    std::vector<uint8_t> values{MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
-                                MPEGG_BSC_CODER_QLFC_STATIC};
+    genie::entropy::bsc::BSCParameters bscParameters(MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN,
+                                                     MPEGG_BSC_BLOCKSORTER_BWT, MPEGG_BSC_CODER_QLFC_STATIC);
 
-    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
-    //   genie::core::arrayType toar;
-    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
-    std::vector<std::vector<std::vector<uint8_t>>> temp2;
-    std::vector<std::vector<uint8_t>> temp3;
-    std::vector<uint8_t> temp4(1, 0);
-    temp3.resize(n_pars, temp4);
-    temp2.resize(1, temp3);
-    temp.resize(1, temp2);
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
 
-    for (auto l = 0; l < par_val.size(); ++l) {
-        for (auto k = 0; k < par_val[l].size(); ++k)
-            for (auto j = 0; j < par_val[l][k].size(); ++j)
-                for (auto i = 0; i < par_val[l][k][j].size(); ++i) {
-                    par_val[l][k][j][i][0] = values[i];
-                }
-    }
-
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
-        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters = bscParameters.convertToAlgorithmParameters();
+    //(
+      //  n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
     uint8_t n_compressors = 1;
     uint8_t compressor_ID = 1;
@@ -310,7 +298,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::vector<uint8_t> n_completed_out_vars{0};
     std::vector<std::vector<uint8_t>> completed_out_var_ID;
 
-        genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
         compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
@@ -395,12 +383,15 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 #else
         for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
 #endif
+         //   std::string tempdata = it->second.str();
             std::vector<uint8_t> data;
-            uint8_t readbyte;
-            while (it->second >> readbyte) data.push_back(readbyte);
+         for (auto readbyte : it->second.str()) data.push_back(readbyte);
+           // uint8_t readbyte;
+           // while (it->second >> readbyte) ;
             genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, 0, data);
             genie::core::record::annotation_access_unit::Block blockn;
             blockn.set(blockInfo);
+
             blocks.push_back(blockn);
         }
 
@@ -411,8 +402,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 #endif
             auto attributeID = info[it->first].getAttributeID();
             std::vector<uint8_t> data;
-            uint8_t readbyte;
-            while (it->second >> readbyte) data.push_back(readbyte);
+            for (auto readbyte : it->second.str()) data.push_back(readbyte);
             genie::core::record::annotation_access_unit::BlockVectorData blockInfo(DescriptorID::ATTRIBUTE, attributeID,
                                                                                    data);
             genie::core::record::annotation_access_unit::Block blockn;
@@ -456,7 +446,6 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
             aauBinFile.close();
             aauTxtFile.close();
         }
-#endif
         std::stringstream aps_size;
         std::stringstream aau_size;
         {
@@ -467,8 +456,9 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
             annotationAccessUnittot.write(aau);
             EXPECT_EQ(aau_size.str().size(), annotationAccessUnittot.getSize() / 8);
         }
-        auto apsByteSize = aps_size.str().size();
-        auto aauByteSize = aau_size.str().size();
+#endif
+        auto apsByteSize = annotationParameterSet.getSize() / 8;
+        auto aauByteSize = annotationAccessUnittot.getSize() / 8;
 
         std::ofstream testfile;
         testfile.open(name + ".bin", std::ios::binary | std::ios::out);
@@ -477,18 +467,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
             writer.write(3, 8);
             writer.write_reserved(10);
-            //    auto size = annotationParameterSet.getSize();
-            //    EXPECT_EQ(size % 8, 0);
-            //    if (size % 8 != 0) size += (8 - size % 8);
             writer.write(apsByteSize, 22);
             annotationParameterSet.write(writer);
 
             writer.write(4, 8);
             writer.write_reserved(3);
-            //      size = annotationAccessUnittot.getSize();
-            //       EXPECT_EQ(size % 8, 0);
-            //      if (size % 8 != 0) size += (8 - size % 8);
-            //      EXPECT_EQ(size % 8, 0);
             writer.write(aauByteSize, 29);
             annotationAccessUnittot.write(writer);
             testfile.close();
@@ -500,15 +483,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
             txtWriter.write(3, 8);
             txtWriter.write_reserved(10);
-            //         auto size = annotationParameterSet.getSize();
-            //          if (size % 8 != 0) size += (8 - size % 8);
             txtWriter.write(apsByteSize, 22);
             annotationParameterSet.write(txtWriter);
 
             txtWriter.write(4, 8);
             txtWriter.write_reserved(3);
-            //        size = annotationAccessUnittot.getSize();
-            //        if (size % 8 != 0) size += (8 - size % 8);
             txtWriter.write(aauByteSize, 29);
             annotationAccessUnittot.write(txtWriter);
             txtfile.close();

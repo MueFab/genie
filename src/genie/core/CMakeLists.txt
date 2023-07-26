@@ -30,6 +30,7 @@ set(source_files
 
         record/variant_site/record.cc
         record/variant_site/VariantSiteParser.cc
+        record/variant_site/JsonInfoFieldParser.cc
 
         record/variant_genotype/record.cc
 

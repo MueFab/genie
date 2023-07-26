@@ -54,11 +54,9 @@ void BlockHeader::write(core::Writer& writer) const {
     writer.write(block_payload_size, 29);
 }
 
-size_t BlockHeader::getSize() const {
-    core::Writer getSize;
-    write(getSize);
-    size_t writeSize = getSize.getBitsWritten();
-    return writeSize;
+size_t BlockHeader::getSize(core::Writer& writesize) const {
+    write(writesize);
+    return writesize.getBitsWritten();
 }
 }  // namespace annotation_access_unit
 }  // namespace record
