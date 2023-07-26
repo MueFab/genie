@@ -15,9 +15,9 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
+#include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +25,6 @@ namespace genie {
 namespace core {
 namespace record {
 namespace annotation_parameter_set {
-
-
-
-
-
 
 class AlgorithmParameters {
  private:

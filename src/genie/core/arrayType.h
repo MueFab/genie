@@ -11,18 +11,35 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/writer.h"
 
 namespace genie {
 namespace core {
 
+enum class Type {
+    STRING = 0,
+    CHAR,
+    BOOL,
+    INT8,
+    UINT8,
+    INT16,
+    UINT16,
+    INT32,
+    UINT32,
+    INT64,
+    UINT64,
+    FLOAT,
+    DOUBLE
+};
+
+
 class arrayType {
  private:
     uint8_t bitSize;
-    public:
 
+ public:
     std::vector<uint8_t> toArray(uint8_t type, util::BitReader& reader);
     void toFile(uint8_t type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
     std::string toString(uint8_t type, std::vector<uint8_t> value) const;

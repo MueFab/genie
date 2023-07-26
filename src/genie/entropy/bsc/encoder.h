@@ -24,8 +24,7 @@
 #include "genie/util/watch.h"
 
 #include "apps/genie/annotation/code.h"
-#include "codecs/api/mpegg_utils.h"
-#include "codecs/include/mpegg-codecs.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -39,33 +38,19 @@ class BSCParameters {
     uint8_t blockSorter;
     uint8_t coder;
     uint16_t features;
+    BSCParameters(uint8_t lzpHashSize, uint8_t lzpMinLen, uint8_t blockSorter, uint8_t coder, uint16_t features = 0)
+        : lzpHashSize(lzpHashSize), lzpMinLen(lzpMinLen), blockSorter(blockSorter), coder(coder), features(features) {}
+
+    genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
 };
 
 class BSCEncoder {
  public:
-    BSCEncoder()
-        : lzpHashSize(MPEGG_BSC_DEFAULT_LZPHASHSIZE),
-          lzpMinLen(MPEGG_BSC_DEFAULT_LZPMINLEN),
-          blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
-          coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
+    BSCEncoder();
 
-    void encode(std::stringstream &input, std::stringstream &output) {
-        const size_t srcLen = input.str().size();
-        char *dest = new char[srcLen];
-        input.read(dest, srcLen);
-        unsigned char* destination;
-        size_t destLen = srcLen;
-      //  std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+    void encode(std::stringstream &input, std::stringstream &output);
 
-         mpegg_bsc_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen, lzpHashSize,
-         lzpMinLen,
-                           blockSorter, coder);
-
-        output.write((const char *)dest, destLen);
-        if (destLen != srcLen) {
-        }
-        delete[] dest;
-    }
+    void decode(std::stringstream &input, std::stringstream &output);
 
     void configure(const BSCParameters bscParameters) {
         lzpHashSize = bscParameters.lzpHashSize;

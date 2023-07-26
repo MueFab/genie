@@ -15,7 +15,7 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#include "AlgorithmParameters.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

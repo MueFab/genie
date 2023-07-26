@@ -48,13 +48,14 @@ void VaritanSiteParser::init() {
                                               // addWriter(DescriptorID::ATTRIBUTE);       // 31
     uint16_t attributeID = 0;
     for (auto infoField : infoFields) {
-        Writer writer(&attributeStream[infoField]);
+        Writer writer(&attributeStream[infoField.ID]);
         attributeWriter.push_back(writer);
 
-        AttributeData attribute(static_cast<uint8_t>(infoField.length()), infoField, attributeID);
-        attributeData[infoField] = attribute;
+        AttributeData attribute(static_cast<uint8_t>(infoField.ID.length()), infoField.ID, attributeID);
+        attributeData[infoField.ID] = attribute;
         attributeID++;
     }
+    
     numberOfAttributes = attributeID;
 }
 
@@ -143,33 +144,6 @@ void VaritanSiteParser::ParseAttribute(std::string infoTagfield) {
     }
 }
 
-void VaritanSiteParser::ParseInfoFields() {
-    std::stringstream infoFieldsList;
-    infoFieldsList << infoFieldsJSON.substr(1, infoFieldsJSON.size() - 2);
-
-    std::string infoField;
-    while (std::getline(infoFieldsList, infoField, ',')) {
-        infoField.erase(std::remove(infoField.begin(), infoField.end(), '"'), infoField.end());
-        infoField.erase(std::remove(infoField.begin(), infoField.end(), ' '), infoField.end());
-        infoFields.push_back(infoField);
-    }
-}
-
-void VaritanSiteParser::ParseInfoField(std::string id) {
-    std::stringstream infoFieldsList;
-    infoFieldsList << infoFieldsJSON.substr(1, infoFieldsJSON.size() - 2);
-    // std::vector<std::string> read;
-    for (std::string read; infoFieldsList.getline(&read[0], 64);) {
-        if (read.size() < 3) continue;  // read = "{" or "}"
-        read.erase(std::remove(read.begin(), read.end(), '"'), read.end());
-        read.erase(std::remove(read.begin(), read.end(), ','), read.end());
-        auto posColumn = read.find(':');
-        std::string IDField = read.substr(0, posColumn - 1);
-        std::string value = read.substr(posColumn + 1);
-        if (IDField == "ID") {
-        }
-    }
-}
 
 void VaritanSiteParser::writeDanglingBits() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQUENCEID)].flush();
