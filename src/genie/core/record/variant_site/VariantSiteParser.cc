@@ -70,16 +70,15 @@ void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::STARTPOS)].write(startPos, 64);
     fieldWriter[static_cast<size_t>(DescriptorID::STRAND)].write(variantSite.getStrand(), 2);
     fieldWriter[static_cast<size_t>(DescriptorID::NAME)].write(variantSite.getID());
+    fieldWriter[static_cast<size_t>(DescriptorID::NAME)].write(0, 8);
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(variantSite.getDescription());
     fieldWriter[static_cast<size_t>(DescriptorID::DESCRIPTION)].write(0, 8);
 
     const auto& reference = variantSite.getRef();
     for (const auto& ref : reference) {
-        fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(ref, 3);
+        fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(AlternTranslate(ref), 3);
     }
     fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEnd, 3);
-
-    fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(0, 8);
 
     const auto& altArray = variantSite.getAlt();
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
@@ -119,7 +118,8 @@ void VaritanSiteParser::ParseAttribute(uint8_t index) {
     for (const auto& value : tag[index].infoValue) {
         arrayType toval;
         toval.toFile(attributeData[infoTag].getAttributeType(), value, attributeWriter[index]);
-        if (attributeData[infoTag].getAttributeType() == 0) attributeWriter[index].write(0, 8, true);
+        if (attributeData[infoTag].getAttributeType() == 0) 
+            attributeWriter[index].write(0, 8, true);
     }
 }
 
