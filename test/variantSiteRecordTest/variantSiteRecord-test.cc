@@ -201,6 +201,25 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         std::stringstream check;
         encoder.decode(encodedDescriptors[it->first], check);
         EXPECT_EQ(check.str(), it->second.str());
+
+        if (it->first == DescriptorID::REFERENCE) {
+            std::ofstream testfile;
+            std::ofstream testfile2;
+            testfile.open("Testfiles/RefBeforeCom.bin", std::ios::binary | std::ios::out);
+            testfile2.open("Testfiles/RefAfter.bin", std::ios::binary | std::ios::out);
+            if (testfile.is_open()) {
+            std::string writeString = it->second.str();
+                testfile << writeString;
+            testfile.close();
+            }
+            if (testfile2.is_open()) {
+                std::string writeString = encodedDescriptors[it->first].str();
+                testfile2 << writeString;
+                testfile2.close();
+            }
+ 
+        }
+
     }
     std::map<std::string, std::stringstream> encodedAttributes;
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
