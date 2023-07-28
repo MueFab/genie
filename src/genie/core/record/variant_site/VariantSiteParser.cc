@@ -49,13 +49,13 @@ void VaritanSiteParser::init() {
     uint16_t attributeID = 0;
     for (auto infoField : infoFields) {
         Writer writer(&attributeStream[infoField.ID]);
-        attributeWriter.push_back(writer);
-
-        AttributeData attribute(static_cast<uint8_t>(infoField.ID.length()), infoField.ID, attributeID);
+        attrWriter[infoField.ID] = writer;
+        AttributeData attribute(static_cast<uint8_t>(infoField.ID.length()), infoField.ID, infoField.Type,
+                                infoField.Number, attributeID);
         attributeData[infoField.ID] = attribute;
         attributeID++;
     }
-    
+
     numberOfAttributes = attributeID;
 }
 
@@ -78,7 +78,7 @@ void VaritanSiteParser::ParseOne() {
     for (const auto& ref : reference) {
         fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(AlternTranslate(ref), 3);
     }
-    fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEnd, 3);
+    fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(AlternEnd, 3);
 
     const auto& altArray = variantSite.getAlt();
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
@@ -94,8 +94,8 @@ void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQQUALITY)].write(variantSite.getSeqQual(), 32);
     fieldWriter[static_cast<size_t>(DescriptorID::MAPQUALITY)].write(variantSite.getMapQual(), 32);
     fieldWriter[static_cast<size_t>(DescriptorID::MAPNUMQUALITY0)].write(variantSite.getMapNumQual0(), 32);
-    fieldWriter[static_cast<size_t>(DescriptorID::FILTER)].write(variantSite.getFilters());
-    fieldWriter[static_cast<size_t>(DescriptorID::FILTER)].write(0, 8);
+    auto filters = FilterTranslate(variantSite.getFilters());
+    for (auto filter : filters) fieldWriter[static_cast<size_t>(DescriptorID::FILTER)].write(filter, 8);
     if (variantSite.isLinkedRecord()) {
         fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].write(variantSite.getLinkName());
         fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].write(0, 8);
@@ -103,23 +103,28 @@ void VaritanSiteParser::ParseOne() {
     } else {
         fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].write(255, 8);
     }
-    std::map<std::string, AttributeData>::iterator it;
-    for (it = attributeData.begin(); it != attributeData.end(); it++) {
+    for (auto it = attributeData.begin(); it != attributeData.end(); it++) {
+        if (it->first == "HOMSEQ") {
+            std::cout << it->first;
+        }
         ParseAttribute(it->first);
     }
 }
 
 void VaritanSiteParser::ParseAttribute(uint8_t index) {
     const auto infoTag = variantSite.getInfoTag()[index].info_tag;
-    attributeData[infoTag].setAttributeType(variantSite.getInfoTag()[index].info_type);
-    attributeData[infoTag].setArrayLength(variantSite.getInfoTag()[index].info_array_len);
+    if (attributeData[infoTag].getAttributeType() != variantSite.getInfoTag()[index].info_type) {
+        attributeData[infoTag].setAttributeType(variantSite.getInfoTag()[index].info_type);
+    }
+    if (attributeData[infoTag].getArrayLength() < variantSite.getInfoTag()[index].info_array_len) {
+        attributeData[infoTag].setArrayLength(variantSite.getInfoTag()[index].info_array_len);
+    }
 
     const auto& tag = variantSite.getInfoTag();
     for (const auto& value : tag[index].infoValue) {
         arrayType toval;
-        toval.toFile(attributeData[infoTag].getAttributeType(), value, attributeWriter[index]);
-        if (attributeData[infoTag].getAttributeType() == 0) 
-            attributeWriter[index].write(0, 8, true);
+        toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]); 
+        if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
     }
 }
 
@@ -139,11 +144,12 @@ void VaritanSiteParser::ParseAttribute(std::string infoTagfield) {
         auto defaultType = attributeData[infoTagfield].getAttributeType();
         auto defaultValue = def.getDefaultValue(defaultType);
         auto defaultSize = def.getDefaultBitsize(defaultType);
-        for (auto i = 0; i < attributeData[infoTagfield].getArrayLength(); ++i)
-            attributeWriter[attributeData[infoTagfield].getAttributeID()].write(defaultValue, defaultSize);
+        for (auto i = 0; i < attributeData[infoTagfield].getArrayLength(); ++i) {
+            attrWriter[infoTagfield].write(defaultValue, defaultSize);
+            if (defaultType == 0) attrWriter[infoTagfield].write(0, 8, true);
+        }
     }
 }
-
 
 void VaritanSiteParser::writeDanglingBits() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQUENCEID)].flush();
@@ -169,6 +175,19 @@ uint8_t VaritanSiteParser::AlternTranslate(char alt) const {
     if (alt == 'C') return 0b001;
     if (alt == 'N') return 0b100;
     return 0b111;
+}
+
+std::vector<uint8_t> VaritanSiteParser::FilterTranslate(std::string filter) const {
+    if (filter == "") return std::vector<uint8_t>{1};
+    if (filter == "PASS") return std::vector<uint8_t>{0};
+    std::vector<uint8_t> filters;
+    std::stringstream input(filter);
+    std::string item;
+    while (getline(input, item, ';')) {
+        filters.push_back(static_cast<uint8_t>(std::stoi(item)) + 2);
+    }
+    filters.push_back(0xFF);
+    return filters;
 }
 
 }  // namespace variant_site
