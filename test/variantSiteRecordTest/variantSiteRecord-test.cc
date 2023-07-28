@@ -190,6 +190,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
         inputfile.close();
     }
+
+    EXPECT_EQ(attributeStream.size(), 22);
+    for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)
+        EXPECT_GE(it->second.str().size(), 10000) << it->first;
+
     //----------------------------------------------------//
 #if COMPRESSED
     std::map<DescriptorID, std::stringstream> encodedDescriptors;
@@ -202,7 +207,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         encoder.decode(encodedDescriptors[it->first], check);
         EXPECT_EQ(check.str(), it->second.str());
 
-        if (it->first == DescriptorID::REFERENCE) {
+        if (false){//(it->first == DescriptorID::REFERENCE) {
             std::ofstream testfile;
             std::ofstream testfile2;
             testfile.open("Testfiles/RefBeforeCom.bin", std::ios::binary | std::ios::out);

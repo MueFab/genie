@@ -49,7 +49,7 @@ void JsonInfoFieldParser::ParseInfoFields() {
 
 uint8_t JsonInfoFieldParser::InterpretType(std::string type) const {
     if (type == "STRING") return static_cast<uint8_t>(genie::core::Type::STRING);
-    if (type == "INTEGER") return static_cast<uint8_t>(genie::core::Type::INT64);
+    if (type == "INTEGER") return static_cast<uint8_t>(genie::core::Type::INT32);
     if (type == "FLOAT")
         return static_cast<uint8_t>(genie::core::Type::FLOAT);
     else

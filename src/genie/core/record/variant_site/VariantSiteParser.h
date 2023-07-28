@@ -80,7 +80,7 @@ class VaritanSiteParser {
     std::vector<Writer> fieldWriter;
     std::map<DescriptorID, std::stringstream>& dataFields;
 
-    std::vector<Writer> attributeWriter;
+    std::map<std::string, Writer> attrWriter;
     std::map<std::string, std::stringstream>& attributeStream;
     std::map<std::string, AttributeData>& attributeData;
     uint16_t numberOfAttributes;
@@ -97,6 +97,7 @@ class VaritanSiteParser {
     void ParseAttribute(std::string infoTagfield);
     void writeDanglingBits();
     uint8_t AlternTranslate(char alt) const;
+    std::vector<uint8_t> FilterTranslate(std::string filter) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
