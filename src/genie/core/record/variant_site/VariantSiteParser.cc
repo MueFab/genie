@@ -124,7 +124,7 @@ void VaritanSiteParser::ParseAttribute(uint8_t index) {
     for (const auto& value : tag[index].infoValue) {
         arrayType toval;
         toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]); 
-        if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
+ //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
     }
 }
 
@@ -165,7 +165,6 @@ void VaritanSiteParser::writeDanglingBits() {
     fieldWriter[static_cast<size_t>(DescriptorID::FILTER)].flush();
     fieldWriter[static_cast<size_t>(DescriptorID::LINKNAME)].flush();
     fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].flush();
-    //   fieldWriter[static_cast<size_t>(DescriptorID::ATTRIBUTE)].flush();
 }
 
 uint8_t VaritanSiteParser::AlternTranslate(char alt) const {
