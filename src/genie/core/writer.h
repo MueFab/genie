@@ -53,7 +53,7 @@ class Writer {
             writeBitSize += bits;
         } else if (writingLog)
             *logwriter << std::to_string(value) << ",";
-        else
+        else if (bits > 0)
             binwriter.write(value, bits);
     }
 

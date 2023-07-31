@@ -160,7 +160,7 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(output.str(), checkOut.str());
 }
 
-#define COMPRESSED true
+#define COMPRESSED false
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
