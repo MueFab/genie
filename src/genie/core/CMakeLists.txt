@@ -64,6 +64,7 @@ set(source_files
         record/annotation_parameter_set/DescriptorConfiguration.cc
         record/annotation_parameter_set/CompressorParameterSet.cc
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
+        record/annotation_parameter_set/ParameterSetEncoder.cc
 
         arrayType.cc
         writer.cc
