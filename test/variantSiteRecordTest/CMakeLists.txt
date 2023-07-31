@@ -3,7 +3,6 @@ project("VariantSiteRecord-tests")
 set(source_files
         variantSiteRecord-test.cc
         main.cc
-        payloadStream-test.cc
         JsonInfoFieldParser-test.cc
 )
 

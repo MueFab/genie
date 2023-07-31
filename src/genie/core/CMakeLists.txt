@@ -42,7 +42,6 @@ set(source_files
         record/annotation_access_unit/block.cc
         record/annotation_access_unit/BlockHeader.cc
         record/annotation_access_unit/BlockPayload.cc
-        record/annotation_access_unit/BlockPayloadStream.cc
         record/annotation_access_unit/AnnotationAccessUnitHeader.cc
         record/annotation_access_unit/VariantsPayload.cc
         record/annotation_access_unit/RowColIDsPayload.cc
@@ -64,7 +63,6 @@ set(source_files
         record/annotation_parameter_set/DescriptorConfiguration.cc
         record/annotation_parameter_set/CompressorParameterSet.cc
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
-        record/annotation_parameter_set/ParameterSetEncoder.cc
 
         arrayType.cc
         writer.cc
