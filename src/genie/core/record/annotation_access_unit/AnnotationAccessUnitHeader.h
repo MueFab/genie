@@ -19,6 +19,7 @@
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

@@ -67,7 +67,9 @@ set(source_files
         encapsulator/encapsulated_dataset_group.cc
         encapsulator/encapsulated_file.cc
         encapsulator/decapsulated_file.cc
-        encapsulator/decapsulated_dataset_group.cc)
+        encapsulator/decapsulated_dataset_group.cc
+        annotation_table/annotation_table.cc
+)
 
 add_library(genie-mgg ${source_files})
 

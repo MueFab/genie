@@ -109,7 +109,8 @@ set(source_files
         meta/blockheader/disabled.cc
         api.cc
         c_api.cc
-        payload.cc)
+        payload.cc
+        ../format/mgg/annotation_table/annotation_table.cc)
 
 add_library(genie-core ${source_files})
 
