@@ -60,7 +60,7 @@ namespace annotation_parameter_set {
 class DescriptorConfiguration {
  private:
     AnnotDesc descriptor_ID;
-    uint8_t encoding_mode_ID;
+    AlgoID encoding_mode_ID;
     GenotypeParameters genotype_parameters;
     LikelihoodParameters likelihood_parameters;
     ContactMatrixParameters contact_matrix_parameters;
@@ -69,15 +69,17 @@ class DescriptorConfiguration {
  public:
     DescriptorConfiguration();
     explicit DescriptorConfiguration(util::BitReader& reader);
-    DescriptorConfiguration(AnnotDesc descriptor_ID, uint8_t encoding_mode_ID,
-                            GenotypeParameters genotype_parameters, LikelihoodParameters likelihood_parameters,
+    DescriptorConfiguration(AnnotDesc descriptor_ID,
+                            AlgoID encoding_mode_ID,
+                            GenotypeParameters genotype_parameters,
+                            LikelihoodParameters likelihood_parameters,
                             ContactMatrixParameters contact_matrix_parameters,
                             AlgorithmParameters algorithm_parameters);
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& write_size) const;
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
-    uint8_t getEncodingModeID() const { return encoding_mode_ID; }
+    AlgoID getEncodingModeID() const { return encoding_mode_ID; }
     GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }
     LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
     ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }

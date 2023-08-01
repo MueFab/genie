@@ -303,6 +303,21 @@ enum class AnnotDesc : uint8_t {
     ATTRIBUTE = 31
 };
 
+enum class AlgoID: uint8_t{
+    CABAC = 0,
+    LZMA = 1,
+    ZSTD = 2,
+    BSC = 3,
+    PROCRUSTES = 4,
+    JBIG = 5,
+    LZW = 16,
+    BIN = 17,
+    SPARSE = 18,
+    DEL = 19,
+    RLE = 20,
+    SER = 21
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

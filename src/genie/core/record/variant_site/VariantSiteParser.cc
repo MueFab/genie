@@ -23,22 +23,22 @@ namespace record {
 namespace variant_site {
 
 VariantSiteParser::VariantSiteParser(
-                std::istream& site_MGrecs,
-                std::map<AnnotDesc, std::stringstream>& output,
-                std::map<std::string, AttributeData>& info,
-                std::map<std::string, std::stringstream>& attributeStream,
-                std::stringstream& jsonInfoFields)
-    : siteMGrecs(site_MGrecs),
+                std::istream& _site_MGrecs,
+                std::map<AnnotDesc, std::stringstream>& _output,
+                std::map<std::string, AttributeData>& _info,
+                std::map<std::string, std::stringstream>& _attributeStream,
+                std::stringstream& _jsonInfoFields)
+    : siteMGrecs(_site_MGrecs),
       rowsPerTile(0),
       numberOfRows(0),
       fieldWriter{},
-      dataFields(output),
-      attributeStream(attributeStream),
-      attributeData(info),
+      dataFields(_output),
+      attributeStream(_attributeStream),
+      attributeData(_info),
       numberOfAttributes(0),
       startPos(0) {
 
-    JsonInfoFieldParser InfoFieldParser(jsonInfoFields);
+    JsonInfoFieldParser InfoFieldParser(_jsonInfoFields);
     infoFields = InfoFieldParser.getInfoFields();
     init();
     util::BitReader reader(siteMGrecs);

@@ -51,7 +51,7 @@ class AnnotationAccessUnit {
 class Record {
  private:
     uint8_t data_unit_type;
-    uint64_t data_unit_size;
+    uint64_t data_unit_size; // TODO: Compute on-the-fly (?)
     RawReference rawReference;
     ParameterSet parameterSet;
     AccessUnit accessUnit;

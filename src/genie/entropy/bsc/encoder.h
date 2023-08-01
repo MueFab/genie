@@ -38,8 +38,13 @@ class BSCParameters {
     uint8_t blockSorter;
     uint8_t coder;
     uint16_t features;
-    BSCParameters(uint8_t lzpHashSize, uint8_t lzpMinLen, uint8_t blockSorter, uint8_t coder, uint16_t features = 0)
-        : lzpHashSize(lzpHashSize), lzpMinLen(lzpMinLen), blockSorter(blockSorter), coder(coder), features(features) {}
+    BSCParameters(
+        uint8_t _lzpHashSize,
+        uint8_t _lzpMinLen,
+        uint8_t _blockSorter,
+        uint8_t _coder,
+        uint16_t _features = 0)
+        : lzpHashSize(_lzpHashSize), lzpMinLen(_lzpMinLen), blockSorter(_blockSorter), coder(_coder), features(_features) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
 };

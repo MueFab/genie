@@ -68,6 +68,7 @@ class Info_tag {
         info_type = other.info_type;
         info_array_len = other.info_array_len;
         infoValue = other.infoValue;
+        //TODO @Stefanie: the return is missing here (?)
     }
 };
 
@@ -107,7 +108,7 @@ class Record {
     uint8_t reference_box_ID;
 
     uint8_t determineSize(uint8_t selectType) const;
-    std::string infoToCorrectString(std::string value, uint8_t selectType) const;
+    std::string infoToCorrectString(std::string& value, uint8_t selectType) const;
 
  public:
     /**
