@@ -39,11 +39,11 @@ class VariantSiteParser {
     using AttributeData = genie::core::record::variant_site::AttributeData;
     using InfoField = genie::core::record::variant_site::InfoField;
 
-    VariantSiteParser(std::istream& site_MGrecs,
-                      std::map<AnnotDesc, std::stringstream>& output,
-                      std::map<std::string, AttributeData>& info,
-                      std::map<std::string, std::stringstream>& attributeStream,
-                      std::stringstream& jsonInfoFields);
+    VariantSiteParser(std::istream& _site_MGrecs,
+                      std::map<AnnotDesc, std::stringstream>& _output,
+                      std::map<std::string, AttributeData>& _info,
+                      std::map<std::string, std::stringstream>& _attributeStream,
+                      std::stringstream& _jsonInfoFields);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 

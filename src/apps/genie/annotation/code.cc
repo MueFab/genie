@@ -35,29 +35,29 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class codecs { BSC, ABC };
-codecs convertStringToCodec(std::string inputString) {
-    if (inputString == "BSC")
-        return codecs::BSC;
-    else
-        return codecs::ABC;
-}
+//enum class codecs { BSC, ABC };
+//codecs convertStringToCodec(std::string& inputString) {
+//    if (inputString == "BSC")
+//        return codecs::BSC;
+//    else
+//        return codecs::ABC;
+//}
 
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName)
-    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), false) {}
+    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, false) {} //TODO @Stefanie: change default AlgoID
 
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput)
-    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), testOutput) {}
+    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {} //TODO @Stefanie: change default AlgoID
 
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput)
-    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), testOutput) {}
+    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {} //TODO @Stefanie: encodeString is not yet assigned
 
-Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, uint8_t encodeMode, bool testOutput):
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode, bool testOutput):
     inputFileName(_inputFileName),
     outputFileName(_outputFileName),
     compressedData{} {
 
-    if (encodeMode != 3) UTILS_DIE("No Valid codec selected ");
+    if (encodeMode != genie::core::AlgoID::BSC) UTILS_DIE("No Valid codec selected ");
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
