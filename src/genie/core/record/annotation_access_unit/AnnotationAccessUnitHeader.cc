@@ -28,7 +28,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
       AT_coord_size(0),
       is_attribute(false),
       attribute_ID(0),
-      descriptor_ID(genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE),
+      descriptor_ID(AnnotDesc::ATTRIBUTE),
       n_tiles_per_col(0),
       n_tiles_per_row(0),
       n_blocks(0),
@@ -45,7 +45,7 @@ AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(util::BitReader& reader, 
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader(
     bool attributeContiguity, bool twoDimensional, bool columnMajorTileOrder, bool variable_size_tiles,
     uint8_t ATCoordSize, bool is_attribute, uint16_t attribute_ID,
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID, uint64_t n_tiles_per_col,
+    AnnotDesc, uint64_t n_tiles_per_col,
     uint64_t n_tiles_per_row, uint64_t nblocks, uint64_t tile_index_1, bool tile_index_2_exists, uint64_t tile_index_2)
     : attribute_contiguity(attributeContiguity),
       two_dimensional(twoDimensional),
@@ -108,7 +108,7 @@ void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
         if (is_attribute) {
             attribute_ID = static_cast<uint16_t>(reader.read_b(16));
         } else {
-            descriptor_ID = static_cast<genie::core::record::annotation_parameter_set::DescriptorID>(reader.read_b(7));
+            descriptor_ID = static_cast<AnnotDesc>(reader.read_b(7));
         }
         if (two_dimensional && !variable_size_tiles) {
             if (column_major_tile_order) {

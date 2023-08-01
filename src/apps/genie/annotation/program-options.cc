@@ -25,18 +25,23 @@ namespace annotation {
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G Annotations\n");
 
-    app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (MPEG-G Annotation records)")->mandatory(true);
     app.add_option("-o,--output-file", outputFile, "")->mandatory(true);
-    this->task = "encode";
-    app.add_option("-t,--task", this->task, "Task ('encode' or 'decode')");
-    this->codec = "bsc";
-    app.add_option("-c,--codec", this->codec, "codec ('bsc' or 'default')");
+
+    task = "encode";
+    app.add_option("-t, --task", task, "Task ('encode' or 'decode')\n");
+
+    codec = "bsc";
+    app.add_option("-c,--codec", codec, "codec ('bsc' or 'default')\n");
+
+    rec = "all";
+    app.add_option("-T, --type", rec, "Type of records to be processed')\n");
 
     testfileoutput = false;
-    app.add_flag("--csv", testfileoutput, "comma seperated file");
+    app.add_flag("--csv", testfileoutput, "comma seperated file\n");
 
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "overwrite outputfile");
+    app.add_flag("-f,--force", forceOverwrite, "Overwrite existing output files\n");
 
     try {
         app.parse(argc, argv);
@@ -118,8 +123,8 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() const {
     auto files = genie::util::tokenize(inputFile, ';');
-    if (this->task != "encode" && this->task != "decode") {
-        UTILS_DIE("Task '" + this->task + "' is invalid");
+    if (task != "encode" && task != "decode") {
+        UTILS_DIE("Task '" + task + "' is invalid");
     }
     for (const auto &f : files) {
         validateInputFile(f);

@@ -20,23 +20,23 @@ namespace core {
 namespace record {
 namespace data_unit {
 
-Record::Record() : data_unit_size(0), data_unit_type(0) {}
+Record::Record() : data_unit_type(0), data_unit_size(0) {}
 
-Record::Record(RawReference rawReference) : rawReference(rawReference), data_unit_size(0), data_unit_type(0) {}
+Record::Record(RawReference _rawReference) : data_unit_type(0), data_unit_size(0), rawReference(_rawReference) {}
 
-Record::Record(ParameterSet parameterSet) : parameterSet(parameterSet), data_unit_type(1) {
+Record::Record(ParameterSet _parameterSet) : data_unit_type(1), parameterSet(_parameterSet) {
     data_unit_size = this->parameterSet.getSize();
 }
 
 
 
-Record::Record(AccessUnit accessUnit) : accessUnit(accessUnit), data_unit_size(0), data_unit_type(2) {}
+Record::Record(AccessUnit _accessUnit) : data_unit_type(2), data_unit_size(0), accessUnit(_accessUnit) {}
 
-Record::Record(annotation_parameter_set::Record annotationParameterSet)
-    : annotationParameterSet(annotationParameterSet), data_unit_size(0), data_unit_type(3) {}
+Record::Record(annotation_parameter_set::Record _annotationParameterSet)
+    : data_unit_type(3), data_unit_size(0), annotationParameterSet(_annotationParameterSet) {}
 
-Record::Record(annotation_access_unit::Record annotationAccessUnit)
-    : annotationAccessUnit(annotationAccessUnit), data_unit_size(0), data_unit_type(4) {}
+Record::Record(annotation_access_unit::Record _annotationAccessUnit)
+    : data_unit_type(4), data_unit_size(0), annotationAccessUnit(_annotationAccessUnit) {}
 
 }  // namespace data_unit
 }  // namespace record
