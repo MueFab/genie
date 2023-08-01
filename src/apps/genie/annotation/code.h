@@ -43,7 +43,8 @@ class Code {
     Code(const std::string& _inputFileName, const std::string& _outputFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode, bool testOutput);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode, bool testOutput,
+         std::string& rec = (std::string&)"all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
@@ -52,7 +53,7 @@ class Code {
     using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
 
-    genie::core::AlgoID encodingMode = genie::core::AlgoID::BSC;  // BSC
+    genie::core::AlgoID encodingMode = genie::core::AlgoID::BSC;
     const genie::core::AnnotDesc descriptorID = genie::core::AnnotDesc::ATTRIBUTE;
     uint64_t fileSize = 197974; //TODO @Stefanie: What is the meaning of this number?
     const uint8_t AT_coord_size = 2;

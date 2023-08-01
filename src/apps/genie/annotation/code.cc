@@ -52,7 +52,13 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput)
     : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {} //TODO @Stefanie: encodeString is not yet assigned
 
-Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode, bool testOutput):
+Code::Code(
+    const std::string& _inputFileName,
+    const std::string& _outputFileName,
+    genie::core::AlgoID encodeMode,
+    bool testOutput,
+    std::string& rec
+    ):
     inputFileName(_inputFileName),
     outputFileName(_outputFileName),
     compressedData{} {
