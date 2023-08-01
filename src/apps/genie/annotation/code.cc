@@ -8,6 +8,7 @@
 #include <iostream>
 #include <istream>
 #include <sstream>
+#include <utility>
 
 #include "apps/genie/annotation/code.h"
 #include "codecs/api/mpegg_utils.h"
@@ -42,24 +43,26 @@ codecs convertStringToCodec(std::string inputString) {
         return codecs::ABC;
 }
 
-Code::Code(std::string inputFileName, std::string OutputFileName)
-    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), false) {}
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName)
+    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), false) {}
 
-Code::Code(std::string inputFileName, std::string OutputFileName, bool testOutput)
-    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), testOutput) {}
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput)
+    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), testOutput) {}
 
-Code::Code(std::string inputFileName, std::string OutputFileName, std::string encodeString, bool testOutput)
-    : Code(inputFileName, outputFileName, static_cast<uint8_t>(3), testOutput) {}
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput)
+    : Code(_inputFileName, _outputFileName, static_cast<uint8_t>(3), testOutput) {}
 
-genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode,
-                                 bool testOutput)
-    : inputFileName(inputFileName), outputFileName(outputFileName), compressedData{} {
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, uint8_t encodeMode, bool testOutput):
+    inputFileName(_inputFileName),
+    outputFileName(_outputFileName),
+    compressedData{} {
+
     if (encodeMode != 3) UTILS_DIE("No Valid codec selected ");
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
     }
-    std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream> output;
+    std::map<genie::core::AnnotDesc, std::stringstream> output;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     {
         std::stringstream infoFields(
@@ -69,7 +72,7 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
 
         std::ifstream site_MGrecs(inputFileName, std::ios::binary);
         std::map<std::string, std::stringstream> attributeStream;
-        genie::core::record::variant_site::VaritanSiteParser variantSiteParser(site_MGrecs, output, info,
+        genie::core::record::variant_site::VariantSiteParser variantSiteParser(site_MGrecs, output, info,
                                                                                attributeStream, infoFields);
     }
 
@@ -86,12 +89,12 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
 
     std::ofstream txtFile;
     if (testOutput) {
-        std::string txtName = OutputFileName + ".txt";
+        std::string txtName = outputFileName + ".txt";
         txtFile.open(txtName, std::ios::out);
     }
 
     std::ofstream outputFile;
-    outputFile.open(OutputFileName, std::ios::binary | std::ios::out);
+    outputFile.open(outputFileName, std::ios::binary | std::ios::out);
 
     if (outputFile.is_open()) {
         genie::core::Writer dataUnitWriter(&outputFile);
@@ -131,7 +134,7 @@ genieapp::annotation::Code::Code(std::string inputFileName, std::string OutputFi
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void genieapp::annotation::Code::fillAnnotationParameterSet() {
+void Code::fillAnnotationParameterSet() {
     uint64_t n_tiles = 1;
     std::vector<std::vector<uint64_t>> start_index;
     std::vector<std::vector<uint64_t>> end_index;
@@ -189,9 +192,9 @@ genie::core::record::annotation_parameter_set::DescriptorConfiguration Code::fil
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
-    return genie::core::record::annotation_parameter_set::DescriptorConfiguration(
+    return {
         descriptorID, encodingMode, genotypeParameters, likelihoodParameters, contactMatrixParameters,
-        algorithmParameters);
+        algorithmParameters};
 }
 
 genie::core::record::annotation_parameter_set::AnnotationEncodingParameters Code::fillAnnotationEncodingParameters() {
@@ -224,14 +227,14 @@ genie::core::record::annotation_parameter_set::AnnotationEncodingParameters Code
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set(
         n_attributes, genie::core::record::annotation_parameter_set::AttributeParameterSet());
 
-    return AnnotationEncodingParameters(n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names,
+    return {n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names,
                                         feature_name_len, feature_name, n_ontology_terms, ontology_term_name_len,
                                         ontology_term_name, n_descriptors, descriptor_configuration, n_compressors,
-                                        compressor_parameter_set, n_attributes, attribute_parameter_set);
+                                        compressor_parameter_set, n_attributes, attribute_parameter_set};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void genieapp::annotation::Code::fillAnnotationAccessUnit() {
+void Code::fillAnnotationAccessUnit() {
     bool is_attribute = false;
     uint16_t attribute_ID = false;
     uint64_t n_tiles_per_col = 0;
@@ -246,7 +249,7 @@ void genieapp::annotation::Code::fillAnnotationAccessUnit() {
         tile_index_2_exists, tile_index_2);
 
     bool indexed = false;
-    uint32_t block_payload_size = static_cast<uint32_t>(fileSize);
+    auto block_payload_size = static_cast<uint32_t>(fileSize);
 
     genie::core::record::annotation_access_unit::BlockHeader block_header(attribute_contiguity, descriptorID,
                                                                           attribute_ID, indexed, block_payload_size);
@@ -281,7 +284,7 @@ void genieapp::annotation::Code::fillAnnotationAccessUnit() {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void genieapp::annotation::Code::encodeData() {
+void Code::encodeData() {
     std::ifstream infile;
     infile.open(inputFileName, std::ios::binary);
 
@@ -313,7 +316,7 @@ void genieapp::annotation::Code::encodeData() {
     */
 }
 
-void genieapp::annotation::TempEncoder::encode(const std::stringstream &input, std::stringstream &output) {
+void TempEncoder::encode(const std::stringstream &input, std::stringstream &output) {
     // uint8_t lzpHashSize = MPEGG_BSC_DEFAULT_LZPHASHSIZE;
     //  uint8_t lzpMinLen = MPEGG_BSC_DEFAULT_LZPMINLEN;
     //  uint8_t blockSorter = MPEGG_BSC_BLOCKSORTER_BWT;

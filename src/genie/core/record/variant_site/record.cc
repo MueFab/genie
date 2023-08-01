@@ -10,13 +10,14 @@
 #include <string>
 #include <utility>
 
-#include "..\annotation_parameter_set\record.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/core/arrayType.h"
+#include "genie/core/record/variant_site/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

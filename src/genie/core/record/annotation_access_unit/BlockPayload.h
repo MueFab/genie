@@ -44,7 +44,7 @@ namespace annotation_access_unit {
 
 class BlockPayload {
  private:
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
+    AnnotDesc descriptor_ID;
     uint8_t num_chrs;
     GenotypePayload genotype_payload;
     LikelihoodPayload likelihood_payload;
@@ -55,19 +55,19 @@ class BlockPayload {
 
  public:
     BlockPayload();
-    BlockPayload(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+    BlockPayload(util::BitReader& reader, AnnotDesc descriptorID,
                  uint8_t numChrs);
 
-    BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint32_t block_payload_size,
+    BlockPayload(AnnotDesc descriptorID, uint32_t block_payload_size,
                  const std::vector<uint8_t>& generic_payload);
 
-    BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs,
+    BlockPayload(AnnotDesc descriptorID, uint8_t numChrs,
                  GenotypePayload genotype_payload, LikelihoodPayload likelihood_payload,
                  std::vector<ContactMatrixBinPayload> cm_bin_payload, ContactMatrixMatPayload cm_mat_payload,
                  uint32_t block_payload_size, const std::vector<uint8_t>& generic_payload);
 
     void read(util::BitReader& reader);
-    void read(util::BitReader& reader, genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+    void read(util::BitReader& reader, AnnotDesc descriptorID,
               uint8_t numChrs);
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& writesize) const;

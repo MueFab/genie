@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "genie/core/constants.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
@@ -39,21 +40,21 @@ class Code {
     /**
      * @brief
      */
-    Code(std::string inputFileName, std::string OutputFileName);
-    Code(std::string inputFileName, std::string OutputFileName, bool testOutput);
-    Code(std::string inputFileName, std::string OutputFileName, std::string encodeString, bool testOutput);
-    Code(std::string inputFileName, std::string OutputFileName, uint8_t encodeMode, bool testOutput);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, uint8_t encodeMode, bool testOutput);
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
     using AnnotationAccessUnit = genie::core::record::annotation_access_unit::Record;
-    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+//    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
     using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
 
     uint8_t encodingMode = 3;  // BSC
-    const DescriptorID descriptorID = DescriptorID::ATTRIBUTE;
-    uint64_t fileSize = 197974;
+    const genie::core::AnnotDesc descriptorID = genie::core::AnnotDesc::ATTRIBUTE;
+    uint64_t fileSize = 197974; //TODO @Stefanie: What is the meaning of this number?
     const uint8_t AT_coord_size = 2;
     const uint8_t AG_class = 1;
     const uint8_t AT_ID = 1;

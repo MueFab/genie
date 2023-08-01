@@ -277,6 +277,32 @@ uint8_t bits2bytes(uint8_t bits);
  */
 uint8_t range2bytes(std::pair<int64_t, int64_t> range);
 
+enum class AnnotDesc : uint8_t {
+    SEQUENCEID = 1,
+    STARTPOS = 2,
+    ENDPOS = 3,
+    STRAND = 4,
+    NAME = 5,
+    DESCRIPTION = 6,
+    LINKNAME = 7,
+    LINKID = 8,
+    DEPTH = 9,
+    SEQQUALITY = 10,
+    MAPQUALITY = 11,
+    MAPNUMQUALITY0 = 12,
+    REFERENCE = 13,
+    ALTERN = 14,
+    GENOTYPE = 15,
+    LIKELIHOOD = 16,
+    FILTER = 17,
+    FEATURENAME = 18,
+    FEATUREID = 19,
+    ONTOLOGYNAME = 20,
+    ONTOLOGYID = 21,
+    CONTACT = 22,
+    ATTRIBUTE = 31
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

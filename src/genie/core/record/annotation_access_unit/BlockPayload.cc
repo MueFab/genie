@@ -23,7 +23,7 @@ namespace record {
 namespace annotation_access_unit {
 
 BlockPayload::BlockPayload()
-    : descriptor_ID(genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE),
+    : descriptor_ID(AnnotDesc::GENOTYPE),
       num_chrs(0),
       genotype_payload{},
       likelihood_payload{},
@@ -32,7 +32,7 @@ BlockPayload::BlockPayload()
       block_payload_size(0),
       generic_payload{} {}
 
-BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID,
+BlockPayload::BlockPayload(AnnotDesc descriptorID,
                            uint32_t block_payload_size, const std::vector<uint8_t>& generic_payload)
     : descriptor_ID(descriptorID),
       num_chrs(0),
@@ -44,13 +44,13 @@ BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::Descri
       generic_payload(generic_payload) {}
 
 BlockPayload::BlockPayload(util::BitReader& reader,
-                           genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs) {
+                           AnnotDesc descriptorID, uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
     read(reader);
 }
 
-BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs,
+BlockPayload::BlockPayload(AnnotDesc descriptorID, uint8_t numChrs,
                            GenotypePayload genotype_payload, LikelihoodPayload likelihood_payload,
                            std::vector<ContactMatrixBinPayload> cm_bin_payload, ContactMatrixMatPayload cm_mat_payload,
                            uint32_t block_payload_size, const std::vector<uint8_t>& genericPayload)
@@ -64,11 +64,11 @@ BlockPayload::BlockPayload(genie::core::record::annotation_parameter_set::Descri
       generic_payload(genericPayload) {}
 
 void BlockPayload::read(util::BitReader& reader) {
-    if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
+    if (descriptor_ID == AnnotDesc::GENOTYPE) {
         genotype_payload.read(reader);
-    } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::LIKELIHOOD) {
+    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_payload.read(reader);
-    } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::CONTACT) {
+    } else if (descriptor_ID == AnnotDesc::CONTACT) {
         for (auto i = 0; i < num_chrs; ++i) {
             ContactMatrixBinPayload cmBinPayload;
             cmBinPayload.read(reader);
@@ -82,18 +82,18 @@ void BlockPayload::read(util::BitReader& reader) {
 }
 
 void BlockPayload::read(util::BitReader& reader,
-                        genie::core::record::annotation_parameter_set::DescriptorID descriptorID, uint8_t numChrs) {
+                        AnnotDesc descriptorID, uint8_t numChrs) {
     descriptor_ID = descriptorID;
     num_chrs = numChrs;
     read(reader);
 }
 
 void BlockPayload::write(core::Writer& writer) const {
-    if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::GENOTYPE) {
+    if (descriptor_ID == AnnotDesc::GENOTYPE) {
         genotype_payload.write(writer);
-    } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::LIKELIHOOD) {
+    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_payload.write(writer);
-    } else if (descriptor_ID == genie::core::record::annotation_parameter_set::DescriptorID::CONTACT) {
+    } else if (descriptor_ID == AnnotDesc::CONTACT) {
         for (auto binPayload : cm_bin_payload) binPayload.write(writer);
         cm_mat_payload.write(writer);
     } else {
