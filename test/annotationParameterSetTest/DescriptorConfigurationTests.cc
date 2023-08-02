@@ -72,7 +72,7 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
 
     genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration(
-        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE, 3, genotypeParameters,
+        genie::core::AnnotDesc::ATTRIBUTE, genie::core::AlgoID::BSC, genotypeParameters,
         likelihoodParameters, contactMatrixParameters, algorithmParameters);
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(),

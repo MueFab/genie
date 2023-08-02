@@ -93,7 +93,7 @@ bool VariantSiteParser::fillRecord(util::BitReader reader) {
 
 void VariantSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(AnnotDesc::SEQUENCEID)].write(variantSite.getSeqID(), 16);
-    startPos = variantSite.getPos() - startPos;
+    startPos = variantSite.getPos();
     fieldWriter[static_cast<size_t>(AnnotDesc::STARTPOS)].write(startPos, 64);
     fieldWriter[static_cast<size_t>(AnnotDesc::STRAND)].write(variantSite.getStrand(), 2);
     fieldWriter[static_cast<size_t>(AnnotDesc::NAME)].write(variantSite.getID());
@@ -160,7 +160,7 @@ void VariantSiteParser::ParseAttribute(const std::string& infoTagfield) {
     auto matchLocation = static_cast<uint8_t>(infoArray.size());
     for (size_t i = 0; i < infoArray.size(); ++i) {
         if (infoArray[i].info_tag == infoTagfield) {
-            matchLocation = i;
+            matchLocation = static_cast<uint8_t>(i);
             break;
         }
     }

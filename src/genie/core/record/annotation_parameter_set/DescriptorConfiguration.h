@@ -31,31 +31,6 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-//enum class DescriptorID {
-//    SEQUENCEID = 1,
-//    STARTPOS,
-//    ENDPOS,
-//    STRAND,
-//    NAME,
-//    DESCRIPTION,
-//    LINKNAME,
-//    LINKID,
-//    DEPTH,
-//    SEQQUALITY,
-//    MAPQUALITY,
-//    MAPNUMQUALITY0,
-//    REFERENCE,
-//    ALTERN,
-//    GENOTYPE,
-//    LIKELIHOOD,
-//    FILTER,
-//    FEATURENAME,
-//    FEATUREID,
-//    ONTOLOGYNAME,
-//    ONTOLOGYID,
-//    CONTACT,
-//    ATTRIBUTE = 31
-//};
 
 class DescriptorConfiguration {
  private:

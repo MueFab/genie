@@ -332,9 +332,8 @@ RandomAnnotationEncodingParameters::randomTileConfiguration() {
 
 genie::core::record::annotation_parameter_set::DescriptorConfiguration
 RandomAnnotationEncodingParameters::randomDescriptorConfiguration() {
-    genie::core::record::annotation_parameter_set::DescriptorID descriptorID =
-        static_cast<genie::core::record::annotation_parameter_set::DescriptorID>(randomU2());
-    uint8_t encoding_mode_ID = randomU8();
+    genie::core::AnnotDesc descriptorID = static_cast<genie::core::AnnotDesc>(randomU2());
+    genie::core::AlgoID encoding_mode_ID = static_cast < genie::core::AlgoID>(randomU8());
 
     return genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptorID, encoding_mode_ID, genie::core::record::annotation_parameter_set::GenotypeParameters(),
