@@ -20,13 +20,13 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
 
-    std::vector<genie::core::record::variant_genotype::Record> recs;
+    std::vector<genie::core::record::VariantGenotype> recs;
 
     while (bitreader.isGood()){
         recs.emplace_back(bitreader);
     }
 
-    // TODO (Yeremia): Temporary fix as the number of records exceed by 1
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);

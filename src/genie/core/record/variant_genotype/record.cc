@@ -21,7 +21,6 @@
 namespace genie {
 namespace core {
 namespace record {
-namespace variant_genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +40,7 @@ namespace variant_genotype {
 //    }
 //}
 
-//Record::Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
+//VariantGenotype::VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
 //               std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
 //               uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
 //               std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
@@ -64,16 +63,14 @@ namespace variant_genotype {
 //      link_name(link_name),
 //      reference_box_ID(reference_box_ID) {}
 
-Record::Record(util::BitReader& bitreader)
+VariantGenotype::VariantGenotype(util::BitReader& bitreader)
     : variant_index(bitreader.readBypassBE<uint64_t>()),
       sample_index_from(bitreader.readBypassBE<uint32_t>()),
       sample_count(bitreader.readBypassBE<uint32_t>()),
       format(),
       alleles(),
       phasings(),
-      linked_record(),
-      link_name(),
-      reference_box_ID()
+      linked_record()
     {
 
     auto format_count = bitreader.readBypassBE<uint8_t>();
@@ -121,58 +118,11 @@ Record::Record(util::BitReader& bitreader)
 
     linked_record = bitreader.read<bool>(8);
     if (linked_record) {
-        auto link_name_len = bitreader.readBypassBE<uint8_t>();
-        bitreader.readBypass(&link_name[0], link_name_len);
-        reference_box_ID = bitreader.readBypassBE<uint8_t>();
+        link_record = LinkRecord(bitreader);
     }
 }
 
-//void Record::read(util::BitReader& reader) {
-//    variant_index = (reader.readBypassBE<uint64_t>());
-//    sample_index_from = (reader.readBypassBE<uint32_t>());
-//    sample_count = (reader.readBypassBE<uint32_t>());
-//
-//    format_count = (reader.readBypassBE<uint8_t>());
-//    if (format_count > 0) {
-//        format.resize(format_count);
-//        for (auto& format_item : format) {
-//            format_item.write(reader, sample_count);
-//        }
-//    }
-//    genotype_present = (reader.readBypassBE<uint8_t>());
-//    likelihood_present = (reader.readBypassBE<uint8_t>());
-//
-//    n_alleles_per_sample = (reader.readBypassBE<uint8_t>());
-//    alleles.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample));
-//    phasings.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample - 1));
-//    for (uint32_t i = 0; i < sample_count; ++i) {
-//        for (auto& allele : alleles[i]) {
-//            allele = (reader.readBypassBE<uint8_t>());
-//        }
-//    }
-//    for (uint32_t i = 0; i < sample_count; ++i) {
-//        for (auto& phase : phasings[i]) {
-//            phase = (reader.readBypassBE<uint8_t>());
-//        }
-//    }
-//
-//    n_likelihoods = (reader.readBypassBE<uint8_t>());
-//    likelihoods.resize(sample_count, std::vector<uint32_t>(n_likelihoods));
-//    for (auto& likelihood_sample : likelihoods) {
-//        for (auto& likelihood : likelihood_sample) {
-//            likelihood = (reader.readBypassBE<uint32_t>());
-//        }
-//    }
-//
-//    linked_record = (reader.readBypassBE<uint8_t>());
-//    if (linked_record) {
-//        link_name_len = (reader.readBypassBE<uint8_t>());
-//        reader.readBypass(&link_name[0], link_name_len);
-//        reference_box_ID = (reader.readBypassBE<uint8_t>());
-//    }
-//}
-
-//void Record::write(std::ostream& outputfile) const {
+//void VariantGenotype::write(std::ostream& outputfile) const {
 //    outputfile << std::to_string(variant_index) << ",";
 //    outputfile << std::to_string(sample_index_from) << ",";
 //    outputfile << std::to_string(sample_count) << ",";
@@ -225,42 +175,42 @@ Record::Record(util::BitReader& bitreader)
 //    }
 //}
 
-uint64_t Record::getVariantIndex() const { return variant_index; }
+uint64_t VariantGenotype::getVariantIndex() const { return variant_index; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t Record::getStartSampleIndex() const { return sample_index_from; }
+uint32_t VariantGenotype::getStartSampleIndex() const { return sample_index_from; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t Record::getSampleCount() const { return sample_count; }
+uint32_t VariantGenotype::getSampleCount() const { return sample_count; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Record::getFormatCount() const { return format.size(); }
+uint8_t VariantGenotype::getFormatCount() const { return format.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 //
-//std::vector<FormatField> Record::getFormat() const { return format; }
+//std::vector<FormatField> VariantGenotype::getFormat() const { return format; }
 //
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-bool Record::isGenotypePresent() const {
+bool VariantGenotype::isGenotypePresent() const {
     return !alleles.empty();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Record::isLikelihoodPresent() const {
+bool VariantGenotype::isLikelihoodPresent() const {
     return !likelihoods.empty();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Record::getNumberOfAllelesPerSample() const {
+uint8_t VariantGenotype::getNumberOfAllelesPerSample() const {
     if (isGenotypePresent()){
         return alleles[0].size();
     } else {
@@ -270,15 +220,15 @@ uint8_t Record::getNumberOfAllelesPerSample() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<uint8_t>>& Record::getAlleles() const { return alleles; }
+const std::vector<std::vector<uint8_t>>& VariantGenotype::getAlleles() const { return alleles; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<uint8_t>>& Record::getPhasing() const { return phasings; }
+const std::vector<std::vector<uint8_t>>& VariantGenotype::getPhasing() const { return phasings; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Record::getNumberOfLikelihoods() const {
+uint8_t VariantGenotype::getNumberOfLikelihoods() const {
     if (isLikelihoodPresent()){
         return 0;
     } else {
@@ -288,33 +238,18 @@ uint8_t Record::getNumberOfLikelihoods() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<uint32_t>>& Record::getLikelihoods() const { return likelihoods; }
+const std::vector<std::vector<uint32_t>>& VariantGenotype::getLikelihoods() const { return likelihoods; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Record::isLinkRecordExist() const {
-    return linked_record;
-}
+bool VariantGenotype::isLinkRecordExist() const {return linked_record;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Record::getLinkNameLength() const {
-    return link_name.size();
-}
+const boost::optional<LinkRecord>& VariantGenotype::getLinkRecord() const {return link_record;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& Record::getLinkName() const {
-    return link_name;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t Record::getReferenceBoxID() const { return reference_box_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace variant_genotype
 }  // namespace record
 }  // namespace core
 }  // namespace genie

@@ -14,16 +14,17 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/constants.h"
+#include <boost/optional/optional.hpp>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/linked_record/linked_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
-namespace variant_genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,16 +38,6 @@ class info_field {
     uint8_t info_type;                //!< @brief
     uint8_t info_array_len;           //!< @brief
     std::vector<uint8_t> info_value;  //!< @brief type??
-};
-
-/**
- *  @brief
- */
-class linked_record {
- public:
-    uint8_t link_name_len;     //!< @brief
-    std::string link_name;     //!< @brief
-    uint8_t reference_box_ID;  //!< @brief
 };
 
 class FormatField {
@@ -69,35 +60,27 @@ class FormatField {
 /**
  *  @brief
  */
-class Record {
+class VariantGenotype {
  private:
     uint64_t variant_index;      //!< @brief
     uint32_t sample_index_from;  //!< @brief
     uint32_t sample_count;       //!< @brief
 
-    //    uint8_t format_count;             //!< @brief
     std::vector<FormatField> format;  //!< @brief
 
-    //    uint8_t genotype_present;    //!< @brief
-    //    uint8_t likelihood_present;  //!< @brief
-
-    //    uint8_t n_alleles_per_sample;               //!< @brief
     std::vector<std::vector<uint8_t>> alleles;  //!< @brief
     std::vector<std::vector<uint8_t>> phasings;  //!< @brief
 
-    //    uint8_t n_likelihoods;                           //!< @brief
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
     bool linked_record;        //!< @brief
-//    uint8_t link_name_len;     //!< @brief
-    std::string link_name;     //!< @brief
-    uint8_t reference_box_ID;  //!< @brief
+    boost::optional<LinkRecord> link_record;
 
  public:
     /**
      * @brief
      */
-    //    Record()
+    //    VariantGenotype()
     //        : variant_index(0),
     //          sample_index_from(0),
     //          sample_count(0),
@@ -115,16 +98,15 @@ class Record {
     //          link_name(),
     //          reference_box_ID(0) {}
 
-    //    Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
+    //    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
     //           std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
     //           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
     //           std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
     //           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
     //           std::string link_name = "", uint8_t reference_box_ID = 0);
 
-    explicit Record(util::BitReader& bitreader);
+    explicit VariantGenotype(util::BitReader& bitreader);
 
-    //    void read(util::BitReader& reader);
     //    void write(std::ostream& outputfile) const;
     //
     uint64_t getVariantIndex() const;
@@ -141,14 +123,14 @@ class Record {
     uint8_t getNumberOfLikelihoods() const;
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool isLinkRecordExist() const;
-    uint8_t getLinkNameLength() const;
-    const std::string& getLinkName() const;
-    uint8_t getReferenceBoxID() const;
+    const boost::optional<LinkRecord>& getLinkRecord() const;
+//    uint8_t getLinkNameLength() const;
+//    const std::string& getLinkName() const;
+//    uint8_t getReferenceBoxID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_genotype
 }  // namespace record
 }  // namespace core
 }  // namespace genie
