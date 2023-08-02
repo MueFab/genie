@@ -10,13 +10,14 @@
 #include <string>
 #include <utility>
 
-#include "..\annotation_parameter_set\record.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/core/arrayType.h"
+#include "genie/core/record/variant_site/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -28,18 +29,18 @@ AttributeData::AttributeData()
     : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), attributeID(0) {}
 
 AttributeData::AttributeData(uint8_t length, std::string name, uint16_t attributeID)
-    : attributeNameLength(length),
+    : attributeID(attributeID),
+      attributeNameLength(length),
       attributeName(name),
       attributeType(0),
-      attributeArrayDims(0),
-      attributeID(attributeID) {}
+      attributeArrayDims(0) {}
 
 AttributeData::AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength, uint16_t attributeID)
-    : attributeNameLength(length),
+    : attributeID(attributeID),
+      attributeNameLength(length),
       attributeName(name),
       attributeType(type),
-      attributeArrayDims(arrayLength),
-      attributeID(attributeID) {}
+      attributeArrayDims(arrayLength) {}
 
 AttributeData& AttributeData::operator=(const AttributeData& other) {
     attributeNameLength = other.attributeNameLength;
@@ -66,7 +67,7 @@ uint8_t Record::determineSize(uint8_t selectType) const {
     return 4;
 }
 
-std::string Record::infoToCorrectString(std::string value, uint8_t selectType) const {
+std::string Record::infoToCorrectString(std::string& value, uint8_t selectType) const {
     std::string outputstring;
     auto type_size = determineSize(selectType);
     if (selectType == 0) {

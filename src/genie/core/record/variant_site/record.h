@@ -108,7 +108,7 @@ class Record {
     uint8_t reference_box_ID;
 
     uint8_t determineSize(uint8_t selectType) const;
-    std::string infoToCorrectString(std::string value, uint8_t selectType) const;
+    std::string infoToCorrectString(std::string& value, uint8_t selectType) const;
     void clearData();
 
  public:
@@ -144,37 +144,56 @@ class Record {
     /**
      * @brief
      */
-    Record(uint64_t variant_index, uint16_t seq_ID, uint64_t pos, uint8_t strand, uint8_t ID_len, std::string ID,
-           uint8_t description_len, std::string description, uint32_t ref_len, std::string ref, uint8_t alt_count,
-           std::vector<uint32_t> alt_len, std::vector<std::string> altern, uint32_t depth, uint32_t seq_qual,
-           uint32_t map_qual, uint32_t map_num_qual_0, uint8_t filters_len, std::string filters, uint8_t info_count,
-           std::vector<Info_tag> info_tag, uint8_t linked_record, uint8_t link_name_len, std::string link_name,
-           uint8_t reference_box_ID)
-        : variant_index(variant_index),
-          seq_ID(seq_ID),
-          pos(pos),
-          strand(strand),
-          ID_len(ID_len),
-          ID(ID),
-          description_len(description_len),
-          description(description),
-          ref_len(ref_len),
-          ref(ref),
-          alt_count(alt_count),
-          alt_len(alt_len),
-          altern(altern),
-          depth(depth),
-          seq_qual(seq_qual),
-          map_qual(map_qual),
-          map_num_qual_0(map_num_qual_0),
-          filters_len(filters_len),
-          filters(filters),
-          info_count(info_count),
-          info_tag(info_tag),
-          linked_record(linked_record),
-          link_name_len(link_name_len),
-          link_name(link_name),
-          reference_box_ID(reference_box_ID) {}
+    Record(uint64_t _variant_index,
+           uint16_t _seq_ID,
+           uint64_t _pos,
+           uint8_t _strand,
+           uint8_t _ID_len,
+           std::string& _ID,
+           uint8_t _description_len,
+           std::string _description,
+           uint32_t _ref_len,
+           std::string _ref,
+           uint8_t _alt_count,
+           std::vector<uint32_t> _alt_len,
+           std::vector<std::string> _altern,
+           uint32_t _depth,
+           uint32_t _seq_qual,
+           uint32_t _map_qual,
+           uint32_t _map_num_qual_0,
+           uint8_t _filters_len,
+           std::string _filters,
+           uint8_t _info_count,
+           std::vector<Info_tag> _info_tag,
+           uint8_t _linked_record,
+           uint8_t _link_name_len,
+           std::string _link_name,
+           uint8_t _reference_box_ID)
+        : variant_index(_variant_index),
+          seq_ID(_seq_ID),
+          pos(_pos),
+          strand(_strand),
+          ID_len(_ID_len),
+          ID(_ID),
+          description_len(_description_len),
+          description(_description),
+          ref_len(_ref_len),
+          ref(_ref),
+          alt_count(_alt_count),
+          alt_len(_alt_len),
+          altern(_altern),
+          depth(_depth),
+          seq_qual(_seq_qual),
+          map_qual(_map_qual),
+          map_num_qual_0(_map_num_qual_0),
+          filters_len(_filters_len),
+          filters(_filters),
+          info_count(_info_count),
+          info_tag(_info_tag),
+          linked_record(_linked_record),
+          link_name_len(_link_name_len),
+          link_name(_link_name),
+          reference_box_ID(_reference_box_ID) {}
     /**
      * @brief
      */

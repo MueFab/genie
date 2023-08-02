@@ -16,7 +16,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 #include "segment.h"
-#include "..\data_unit\record.h"
+#include "genie/core/record/data_unit/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

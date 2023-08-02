@@ -31,57 +31,59 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-enum class DescriptorID {
-    SEQUENCEID = 1,
-    STARTPOS,
-    ENDPOS,
-    STRAND,
-    NAME,
-    DESCRIPTION,
-    LINKNAME,
-    LINKID,
-    DEPTH,
-    SEQQUALITY,
-    MAPQUALITY,
-    MAPNUMQUALITY0,
-    REFERENCE,
-    ALTERN,
-    GENOTYPE,
-    LIKELIHOOD,
-    FILTER,
-    FEATURENAME,
-    FEATUREID,
-    ONTOLOGYNAME,
-    ONTOLOGYID,
-    CONTACT,
-    ATTRIBUTE = 31
-};
+//enum class DescriptorID {
+//    SEQUENCEID = 1,
+//    STARTPOS,
+//    ENDPOS,
+//    STRAND,
+//    NAME,
+//    DESCRIPTION,
+//    LINKNAME,
+//    LINKID,
+//    DEPTH,
+//    SEQQUALITY,
+//    MAPQUALITY,
+//    MAPNUMQUALITY0,
+//    REFERENCE,
+//    ALTERN,
+//    GENOTYPE,
+//    LIKELIHOOD,
+//    FILTER,
+//    FEATURENAME,
+//    FEATUREID,
+//    ONTOLOGYNAME,
+//    ONTOLOGYID,
+//    CONTACT,
+//    ATTRIBUTE = 31
+//};
 
 class DescriptorConfiguration {
  private:
-    DescriptorID descriptor_ID;
-    uint8_t encoding_mode_ID;
+    AnnotDesc descriptor_ID;
+    AlgoID encoding_mode_ID;
     GenotypeParameters genotype_parameters;
     LikelihoodParameters likelihood_parameters;
     ContactMatrixParameters contact_matrix_parameters;
-    AlgorithmParameters algorithm_patarmeters;
+    AlgorithmParameters algorithm_parameters;
 
  public:
     DescriptorConfiguration();
     explicit DescriptorConfiguration(util::BitReader& reader);
-    DescriptorConfiguration(DescriptorID descriptor_ID, uint8_t encoding_mode_ID,
-                            GenotypeParameters genotype_parameters, LikelihoodParameters likelihood_parameters,
+    DescriptorConfiguration(AnnotDesc descriptor_ID,
+                            AlgoID encoding_mode_ID,
+                            GenotypeParameters genotype_parameters,
+                            LikelihoodParameters likelihood_parameters,
                             ContactMatrixParameters contact_matrix_parameters,
-                            AlgorithmParameters algorithm_patarmeters);
+                            AlgorithmParameters algorithm_parameters);
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& writesize) const;
-    DescriptorID getDescriptorID() const { return descriptor_ID; }
-    uint8_t getEncodingModeID() const { return encoding_mode_ID; }
+    size_t getSize(core::Writer& write_size) const;
+    AnnotDesc getDescriptorID() const { return descriptor_ID; }
+    AlgoID getEncodingModeID() const { return encoding_mode_ID; }
     GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }
     LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
     ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }
-    AlgorithmParameters getAlgorithmParameters() const { return algorithm_patarmeters; }
+    AlgorithmParameters getAlgorithmParameters() const { return algorithm_parameters; }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
