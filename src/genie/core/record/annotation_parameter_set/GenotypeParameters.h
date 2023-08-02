@@ -26,9 +26,16 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-enum class BinarizationID { BIT_PLANE = 0, ROW_SPLIT };
+enum class BinarizationID {
+    BIT_PLANE = 0,
+    ROW_SPLIT = 1
+};
 
-enum class ConcatAxis { CONCAT_ROW_DIR, CONCAT_COL_DIR, DO_NOT_CONCAT };
+enum class ConcatAxis {
+    CONCAT_ROW_DIR = 0,
+    CONCAT_COL_DIR = 1,
+    DO_NOT_CONCAT = 2
+};
 
 class GenotypeParameters {
  private:

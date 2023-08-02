@@ -51,7 +51,7 @@ class AnnotationAccessUnit {
 class Record {
  private:
     uint8_t data_unit_type;
-    uint64_t data_unit_size;
+    uint64_t data_unit_size; // TODO: Compute on-the-fly (?)
     RawReference rawReference;
     ParameterSet parameterSet;
     AccessUnit accessUnit;
@@ -65,12 +65,12 @@ class Record {
      */
     Record();
 
-    Record(RawReference rawReference);
-    Record(ParameterSet parameterSet);
-    Record(AccessUnit accessUnit);
+    explicit Record(RawReference rawReference);
+    explicit Record(ParameterSet parameterSet);
+    explicit Record(AccessUnit accessUnit);
 
-    Record(annotation_access_unit::Record annotationAccessUnit);
-    Record(annotation_parameter_set::Record annotationParameterSet);
+    explicit Record(annotation_access_unit::Record annotationAccessUnit);
+    explicit Record(annotation_parameter_set::Record annotationParameterSet);
 
 };
 

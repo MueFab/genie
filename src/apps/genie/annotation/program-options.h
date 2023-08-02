@@ -35,6 +35,7 @@ class ProgramOptions {
     bool forceOverwrite;  //!< @brief
     std::string task;     //!< @brief
     std::string codec;    //!< @brief
+    std::string rec; //!< @brief
     bool testfileoutput; //!< @brief
     bool help;            //!< @brief
 

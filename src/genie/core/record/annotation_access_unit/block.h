@@ -35,19 +35,19 @@ namespace annotation_access_unit {
 
 class BlockData {
  public:
-    BlockData(annotation_parameter_set::DescriptorID descriptorID, std::stringstream data)
-        : descriptorID(descriptorID), data(data), thisIsAttribute(false), attributeID(0) {}
+    BlockData(AnnotDesc _descriptorID, std::stringstream _data)
+        : descriptorID(_descriptorID), attributeID(0), thisIsAttribute(false), data(_data) {}
 
-    BlockData(annotation_parameter_set::DescriptorID descriptorID, uint16_t attributeID, std::stringstream& data)
-        : descriptorID(descriptorID), attributeID(attributeID), data(data), thisIsAttribute(true) {}
+    BlockData(AnnotDesc _descriptorID, uint16_t _attributeID, std::stringstream& _data)
+        : descriptorID(_descriptorID), attributeID(_attributeID), thisIsAttribute(true), data(_data) {}
 
-    annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptorID; }
+    AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
     std::stringstream& getData() { return data; }
 
  private:
-    annotation_parameter_set::DescriptorID descriptorID;
+    AnnotDesc descriptorID;
     uint16_t attributeID;
     bool thisIsAttribute;
     std::stringstream& data;
@@ -56,19 +56,19 @@ class BlockData {
 
 class BlockVectorData {
  public:
-    BlockVectorData(annotation_parameter_set::DescriptorID descriptorID, std::vector<uint8_t> data)
-        : descriptorID(descriptorID), data(data), thisIsAttribute(false), attributeID(0) {}
+    BlockVectorData(AnnotDesc _descriptorID, std::vector<uint8_t>& _data)
+        : descriptorID(_descriptorID), attributeID(0), thisIsAttribute(false), data(_data) {}
 
-    BlockVectorData(annotation_parameter_set::DescriptorID descriptorID, uint16_t attributeID, std::vector<uint8_t>& data)
-        : descriptorID(descriptorID), attributeID(attributeID), data(data), thisIsAttribute(true) {}
+    BlockVectorData(AnnotDesc _descriptorID, uint16_t _attributeID, std::vector<uint8_t>& _data)
+        : descriptorID(_descriptorID), attributeID(_attributeID), thisIsAttribute(true), data(_data) {}
 
-    annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptorID; }
+    AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
     std::vector<uint8_t>& getData() { return data; }
 
  private:
-    annotation_parameter_set::DescriptorID descriptorID;
+    AnnotDesc descriptorID;
     uint16_t attributeID;
     bool thisIsAttribute;
     std::vector<uint8_t>& data;
@@ -93,6 +93,7 @@ class Block {
         numChrs = b.numChrs;
     }
 
+    //TODO @Stefanie: is this "trivial" operator?
     Block& operator=(const Block& b) {
         block_header = b.block_header;
         block_payload = b.block_payload;

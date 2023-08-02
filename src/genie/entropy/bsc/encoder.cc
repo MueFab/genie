@@ -78,11 +78,11 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters BSCParameters
     temp.resize(1, temp2);
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
 
-    for (auto l = 0; l < par_val.size(); ++l) {
-        for (auto k = 0; k < par_val[l].size(); ++k)
-            for (auto j = 0; j < par_val[l][k].size(); ++j)
-                for (auto i = 0; i < par_val[l][k][j].size(); ++i) {
-                    par_val[l][k][j][i][0] = values[i];
+    for (auto & l : par_val) {
+        for (auto & k : l)
+            for (auto & j : k)
+                for (size_t i = 0; i < j.size(); ++i) {
+                    j[i][0] = values[i];
                 }
     }
 

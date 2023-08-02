@@ -34,20 +34,20 @@ namespace annotation_access_unit {
 class BlockHeader {
  private:
     bool attribute_contiguity;
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID;
+    AnnotDesc descriptor_ID;
     uint16_t attribute_ID;
     bool indexed;
     uint32_t block_payload_size;
 
  public:
     BlockHeader();
-    BlockHeader(bool attribute_contiguity, genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID,
+    BlockHeader(bool attribute_contiguity, AnnotDesc descriptor_ID,
                 uint16_t attribute_ID, bool indexed, uint32_t block_payload_size);
 
     void read(genie::util::BitReader& reader);
     void write(core::Writer& writer) const;
 
-    genie::core::record::annotation_parameter_set::DescriptorID getDescriptorID() const { return descriptor_ID; }
+    AnnotDesc getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }
     bool isIndexed() const { return indexed; }
     uint32_t getBlockPayloadSize() const { return block_payload_size; }
