@@ -75,8 +75,7 @@ TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
-        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE;
+    genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::ATTRIBUTE;
     uint8_t num_chrs = 1;
     genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
     genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
@@ -119,8 +118,7 @@ TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
-        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE;
+    genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::ATTRIBUTE;
     uint8_t num_chrs = 1;
     genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
     genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
@@ -201,11 +199,10 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     uint64_t fileSize = 197974;
     uint8_t AT_coord_size = 0;
-    genie::core::record::annotation_parameter_set::DescriptorID descriptorID =
-        genie::core::record::annotation_parameter_set::DescriptorID::ATTRIBUTE;
+    genie::core::AnnotDesc descriptorID = genie::core::AnnotDesc::ATTRIBUTE;
 
     //-----------------------descriiptor_configuration----------------------------//
-    uint8_t encodingMode = 3;  // BSC
+    genie::core::AlgoID encodingMode = genie::core::AlgoID::BSC;
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
     genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
     genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParameters;
