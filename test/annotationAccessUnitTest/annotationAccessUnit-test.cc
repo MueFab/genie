@@ -4,6 +4,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include "genie/core/constants.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/writer.h"
@@ -71,8 +72,9 @@ TEST_F(AnnotationAccessUnitTests, annotationAccessUnitHeader) {  // NOLINT(cert-
     uint8_t ATCoordSize = 3;
     bool is_attribute = false;
     uint16_t attribute_ID = 0;
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
-        genie::core::record::annotation_parameter_set::DescriptorID ::DESCRIPTION;
+  
+    genie::core::AnnotDesc descriptor_ID =
+        genie::core::AnnotDesc ::DESCRIPTION;
     uint64_t n_tiles_per_col = 0;
     uint64_t n_tiles_per_row = 0;
     uint64_t n_blocks = 1;

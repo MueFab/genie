@@ -68,7 +68,7 @@ class Info_tag {
         info_type = other.info_type;
         info_array_len = other.info_array_len;
         infoValue = other.infoValue;
-        //TODO @Stefanie: the return is missing here (?)
+        return *this;
     }
 };
 
@@ -109,6 +109,7 @@ class Record {
 
     uint8_t determineSize(uint8_t selectType) const;
     std::string infoToCorrectString(std::string& value, uint8_t selectType) const;
+    void clearData();
 
  public:
     /**

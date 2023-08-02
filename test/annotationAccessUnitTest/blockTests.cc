@@ -73,8 +73,7 @@ TEST_F(BlockTests, blockHeader) {  // NOLINT(cert-err58-cpp)
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
     bool attribute_contiguity = false;
-    genie::core::record::annotation_parameter_set::DescriptorID descriptor_ID =
-        genie::core::record::annotation_parameter_set::DescriptorID::DESCRIPTION;
+    genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::DESCRIPTION;
     uint16_t attribute_ID = 0;
     bool indexed = false;
     uint32_t block_payload_size = 1234;

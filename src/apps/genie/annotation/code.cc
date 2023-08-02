@@ -62,7 +62,7 @@ Code::Code(
     inputFileName(_inputFileName),
     outputFileName(_outputFileName),
     compressedData{} {
-
+    rec = rec;
     if (encodeMode != genie::core::AlgoID::BSC) UTILS_DIE("No Valid codec selected ");
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
