@@ -66,7 +66,7 @@ bool VaritanSiteParser::fillRecord(util::BitReader reader) {
 
 void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::SEQUENCEID)].write(variantSite.getSeqID(), 16);
-    startPos = variantSite.getPos() - startPos;
+    startPos = variantSite.getPos();
     fieldWriter[static_cast<size_t>(DescriptorID::STARTPOS)].write(startPos, 64);
     fieldWriter[static_cast<size_t>(DescriptorID::STRAND)].write(variantSite.getStrand(), 2);
     fieldWriter[static_cast<size_t>(DescriptorID::NAME)].write(variantSite.getID());
@@ -81,14 +81,19 @@ void VaritanSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(DescriptorID::REFERENCE)].write(AlternEnd, 3);
 
     const auto& altArray = variantSite.getAlt();
+    std::string temp;
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
         const auto& altern = altArray[i];
         for (const auto& alt : altern) {
             fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternTranslate(alt), 3);
+            temp += alt;
         }
         fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEndLine, 3);
+        temp += 'x';
     }
     fieldWriter[static_cast<size_t>(DescriptorID::ALTERN)].write(AlternEnd, 3);
+    temp += '*';
+    testAltern.push_back(temp);
 
     fieldWriter[static_cast<size_t>(DescriptorID::DEPTH)].write(variantSite.getDepth(), 32);
     fieldWriter[static_cast<size_t>(DescriptorID::SEQQUALITY)].write(variantSite.getSeqQual(), 32);
@@ -104,9 +109,6 @@ void VaritanSiteParser::ParseOne() {
         fieldWriter[static_cast<size_t>(DescriptorID::LINKID)].write(255, 8);
     }
     for (auto it = attributeData.begin(); it != attributeData.end(); it++) {
-        if (it->first == "HOMSEQ") {
-            std::cout << it->first;
-        }
         ParseAttribute(it->first);
     }
 }
@@ -123,8 +125,7 @@ void VaritanSiteParser::ParseAttribute(uint8_t index) {
     const auto& tag = variantSite.getInfoTag();
     for (const auto& value : tag[index].infoValue) {
         arrayType toval;
-        toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]); 
- //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
+        toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]);
     }
 }
 

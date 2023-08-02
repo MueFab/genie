@@ -73,7 +73,7 @@ class VaritanSiteParser {
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
-
+    std::vector<std::string> testAltern;
     std::vector<InfoField> infoFields;
     std::map<std::string, uint8_t> infoFieldType;
 

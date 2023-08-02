@@ -201,6 +201,7 @@ void Record::write(std::ostream& outputfile) const {
 }
 
 bool Record::read(genie::util::BitReader& reader) {
+    clearData();
     variant_index = reader.read_b(64);
     if (!reader.isGood()) return false;
     seq_ID = static_cast<uint16_t>(reader.read_b(16));
@@ -226,7 +227,8 @@ bool Record::read(genie::util::BitReader& reader) {
     for (auto i = 0; i < alt_count; ++i) {
         alt_len.push_back(static_cast<uint32_t>(reader.read_b(32)));
         std::string altlist(alt_len.back(), 0);
-        reader.readBypass(&altlist[0], alt_len.back());
+        for (auto& item : altlist) item = static_cast<char>(reader.read_b(8));
+        //   reader.readBypass(&altlist[0], alt_len.back());
         altern.push_back(altlist);
     }
 
@@ -250,7 +252,6 @@ bool Record::read(genie::util::BitReader& reader) {
             reader.readBypass(&infoTag.info_tag[0], infoTag.info_tag_len);
         }
         infoTag.info_type = static_cast<uint8_t>(reader.read_b(8));
-        //  auto inf_size = determineSize(infoTag.info_type);
 
         infoTag.info_array_len = static_cast<uint8_t>(reader.read_b(8));
 
@@ -261,19 +262,6 @@ bool Record::read(genie::util::BitReader& reader) {
                 value = infoArray.toArray(infoTag.info_type, reader);
             }
         }
-        /*
-        for (auto& inf : infoTag.info_value) {
-            if (inf_size == 0) {
-                uint8_t read = 0xF;
-                do {
-                    read = reader.readBypassBE<uint8_t>();
-                    if (read != 0) inf += read;
-                } while (read != 0);
-            } else {
-                inf.resize(inf_size);
-                reader.readBypass(&inf[0], inf_size);
-            }
-        }*/
     }
 
     linked_record = static_cast<uint8_t>(reader.read_b(8));
@@ -286,6 +274,34 @@ bool Record::read(genie::util::BitReader& reader) {
         reference_box_ID = static_cast<uint8_t>(reader.read_b(8));
     }
     return true;
+}
+
+void Record::clearData() {
+    variant_index = 0;
+    seq_ID = 0;
+    pos = 0;
+    strand = 0;
+    ID_len = 0;
+    ID = "";
+    description_len = 0;
+    description = "";
+    ref_len = 0;
+    ref = "";
+    alt_count = 0;
+    alt_len = {};
+    altern = {};
+    depth = 0;
+    seq_qual = 0;
+    map_qual = 0;
+    map_num_qual_0 = 0;
+    filters_len = 0;
+    filters = "";
+    info_count = 0;
+    info_tag = {};
+    linked_record = 0;
+    link_name_len = 0;
+    link_name = "";
+    reference_box_ID = 0;
 }
 
 }  // namespace variant_site
