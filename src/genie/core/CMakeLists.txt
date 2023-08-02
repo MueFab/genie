@@ -34,9 +34,12 @@ set(source_files
 
         record/variant_genotype/record.cc
 
-        record/data_unit/record.cc
+        record/linked_record/linked_record.h
+        record/linked_record/linked_record.cc
 
         record/contact/record.cc
+
+        record/data_unit/record.cc
 
         record/annotation_access_unit/record.cc
         record/annotation_access_unit/block.cc
@@ -110,7 +113,7 @@ set(source_files
         api.cc
         c_api.cc
         payload.cc
-        ../format/mgg/annotation_table/annotation_table.cc)
+        )
 
 add_library(genie-core ${source_files})
 
