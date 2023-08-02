@@ -201,7 +201,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     uint8_t n_attributes = 20;
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
 
-    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+    using DescriptorID = genie::core::AnnotDesc;
 
     // descriptor_configuration parameters
     std::vector<DescriptorID> descriptorIDlist{
@@ -211,7 +211,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         DescriptorID::LINKID,      DescriptorID::LINKNAME,   DescriptorID::ATTRIBUTE};
     for (auto item : descriptorIDlist) {
         DescriptorID descriptor_ID = item;
-        uint8_t encoding_mode_ID = 3;
+        genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
         genie::core::record::annotation_parameter_set::GenotypeParameters genotype_parameters;
         genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
         genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
@@ -221,8 +221,6 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         std::vector<uint8_t> par_type{4, 4, 4, 4};
         std::vector<uint8_t> par_num_array_dims{0, 0, 0, 0};
         std::vector<std::vector<uint8_t>> par_array_dims;
-        // std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val{
-        //    {{{{0}}}}, {{{{1}}}}, {{{{2}}}}, {{{{3}}}}};
         std::vector<uint8_t> val1{10};
         std::vector<uint8_t> val2{11};
         std::vector<uint8_t> val3{12};

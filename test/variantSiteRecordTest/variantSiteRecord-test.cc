@@ -162,7 +162,7 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
 class ParameterSetEncoder {
  public:
     genie::core::record::annotation_parameter_set::Record setParameterSet(
-                std::map<genie::core::record::annotation_parameter_set::DescriptorID, std::stringstream>& encodedDescriptors,
+                std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
         std::map<std::string, genie::core::record::variant_site::AttributeData>& info) {
         //----------------------------------------------------//
         // default values
@@ -181,7 +181,7 @@ class ParameterSetEncoder {
         uint16_t n_add_tile_structures = 0;
         bool symmetry_mode = false;
         bool symmetry_minor_diagonal = false;
-        uint8_t encoding_mode_ID = 3;
+        genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
         uint64_t n_tiles = 1;
         std::vector<std::vector<uint64_t>> start_index;
@@ -250,7 +250,7 @@ class ParameterSetEncoder {
         std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
         uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
         for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
-            genie::core::record::annotation_parameter_set::DescriptorID DescrID = it->first;
+            genie::core::AnnotDesc DescrID = it->first;
             genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
                 DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
                 algorithmParameters);
@@ -313,7 +313,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+    using DescriptorID = genie::core::AnnotDesc;
     std::string path = "./Testfiles/exampleMGrecs/";
     std::string filename = "ALL.chrX.10000";
     std::ifstream inputfile;
@@ -330,7 +330,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::map<DescriptorID, std::stringstream> outputstream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     std::map<std::string, std::stringstream> attributeStream;
-    genie::core::record::variant_site::VaritanSiteParser parser(inputfile, outputstream, info, attributeStream,
+    genie::core::record::variant_site::VariantSiteParser parser(inputfile, outputstream, info, attributeStream,
                                                                 infoFields);
     if (inputfile.is_open()) {
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
@@ -396,7 +396,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     uint64_t tile_index_2 = 0;
     bool is_attribute = false;
     uint16_t attribute_ID = 0;
-    auto descriptor_ID = genie::core::record::annotation_parameter_set::DescriptorID::STARTPOS;
+    auto descriptor_ID = genie::core::AnnotDesc::STARTPOS;
     uint8_t AT_ID = 0;
     genie::core::record::annotation_access_unit::AnnotationType AT_type =
         genie::core::record::annotation_access_unit::AnnotationType::VARIANTS;
