@@ -4,14 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_coder.h"
+#include "genotype_parameters.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t GenotypeParameters::getNumVariantsPayloads() const {return variants_payload_params.size();}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // namespace genotype
-} // namespace genie
+}  // namespace genotype
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
