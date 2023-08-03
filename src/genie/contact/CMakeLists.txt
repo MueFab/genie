@@ -2,6 +2,7 @@ project("cmc")
 
 set(source_files
         contact_coder.cc
+        contact_parameters.cc
 )
 
 add_library(genie-cmc ${source_files})
