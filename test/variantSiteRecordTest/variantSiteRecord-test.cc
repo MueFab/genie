@@ -4,11 +4,14 @@
 #include <iostream>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/variant_site/VariantSiteParser.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/entropy/bsc/encoder.h"
+#include "genie/entropy/lzma/encoder.h"
+#include "genie/entropy/zstd/encoder.h"
 #include "genie/util/bitreader.h"
 
 class VariantSiteRecordTests : public ::testing::Test {
@@ -162,7 +165,7 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
 class ParameterSetEncoder {
  public:
     genie::core::record::annotation_parameter_set::Record setParameterSet(
-                std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
+        std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
         std::map<std::string, genie::core::record::variant_site::AttributeData>& info) {
         //----------------------------------------------------//
         // default values
@@ -219,15 +222,20 @@ class ParameterSetEncoder {
 
         genie::entropy::bsc::BSCParameters bscParameters(MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN,
                                                          MPEGG_BSC_BLOCKSORTER_BWT, MPEGG_BSC_CODER_QLFC_STATIC);
+        genie::entropy::zstd::ZSTDParameters zstdParameters;
+        genie::entropy::lzma::LZMAParameters lzmaParameters;
 
-        genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters =
-            bscParameters.convertToAlgorithmParameters();
+        auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
+        auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
+        auto ZSTDalgorithmParameters = zstdParameters.convertToAlgorithmParameters();
 
-        uint8_t n_compressors = 1;
+        uint8_t n_compressors = 3;
         uint8_t compressor_ID = 1;
         uint8_t n_compressor_steps = 1;
         std::vector<uint8_t> compressor_step_ID{0};
-        std::vector<uint8_t> algorithm_ID{3};
+        std::vector<genie::core::AlgoID> BSCalgorithm_ID{genie::core::AlgoID::BSC};
+        std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
+        std::vector<genie::core::AlgoID> ZSTDalgorithm_ID{genie::core::AlgoID::ZSTD};
         std::vector<bool> use_default_pars{true};
         std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
         std::vector<uint8_t> n_in_vars{0};
@@ -237,11 +245,22 @@ class ParameterSetEncoder {
         std::vector<uint8_t> n_completed_out_vars{0};
         std::vector<std::vector<uint8_t>> completed_out_var_ID;
 
-        genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
-            compressor_ID, n_compressor_steps, compressor_step_ID, algorithm_ID, use_default_pars, algorithm_parameters,
-            n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
+        genie::core::record::annotation_parameter_set::CompressorParameterSet BSCcompressorParameterSet(
+            compressor_ID, n_compressor_steps, compressor_step_ID, BSCalgorithm_ID, use_default_pars,
+            algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
+            completed_out_var_ID);
+        compressor_ID++;
+        genie::core::record::annotation_parameter_set::CompressorParameterSet LZMAcompressorParameterSet(
+            compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars,
+            algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
+            completed_out_var_ID);
+        compressor_ID++;
+        genie::core::record::annotation_parameter_set::CompressorParameterSet ZSTDcompressorParameterSet(
+            compressor_ID, n_compressor_steps, compressor_step_ID, ZSTDalgorithm_ID, use_default_pars,
+            algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
+            completed_out_var_ID);
         std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
-            compressorParameterSet};
+            BSCcompressorParameterSet, LZMAcompressorParameterSet, ZSTDcompressorParameterSet};
 
         genie::core::record::annotation_parameter_set::GenotypeParameters genotype_parameters;
         genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
@@ -251,9 +270,18 @@ class ParameterSetEncoder {
         uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
         for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
             genie::core::AnnotDesc DescrID = it->first;
+            if (DescrID == genie::core::AnnotDesc::STRAND)
+                encoding_mode_ID = genie::core::AlgoID::LZMA;
+            else if (DescrID == genie::core::AnnotDesc::REFERENCE)
+                encoding_mode_ID = genie::core::AlgoID::ZSTD;
+            else
+                encoding_mode_ID = genie::core::AlgoID::BSC;
+
+        //    encoding_mode_ID = genie::core::AlgoID::BSC;
+
             genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
                 DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
-                algorithmParameters);
+                BSCalgorithmParameters);
 
             descriptor_configuration.push_back(descrConf);
         }
@@ -290,7 +318,7 @@ class ParameterSetEncoder {
             genie::core::record::annotation_parameter_set::AttributeParameterSet attributeParameterSet(
                 attrID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims,
                 attribute_array_dims, attribute_default_val, attribute_miss_val_flag, attribute_miss_default_flag,
-                attribute_miss_val, attribute_miss_str, compressor_ID, n_steps_with_dependencies, dependency_step_ID,
+                attribute_miss_val, attribute_miss_str, 1, n_steps_with_dependencies, dependency_step_ID,
                 n_dependencies, dependency_var_ID, dependency_is_attribute, dependency_ID);
             attribute_parameter_set.push_back(attributeParameterSet);
         }
@@ -342,40 +370,47 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)
         EXPECT_GE(it->second.str().size(), 10000) << it->first;
 
-        //----------------------------------------------------//
+    ParameterSetEncoder encodeParameters;
+
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        encodeParameters.setParameterSet(outputstream, info);
+
+    //----------------------------------------------------//
 #if COMPRESSED
+
     std::map<DescriptorID, std::stringstream> encodedDescriptors;
-    genie::entropy::bsc::BSCEncoder encoder;
+    genie::entropy::bsc::BSCEncoder bscEncoder;
+    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
+    genie::entropy::zstd::ZSTDEncoder zstdEncoder;
+    const auto& temp = annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
+    for (auto encodingpar : temp) {
+        switch (encodingpar.getEncodingModeID()) {
+            case genie::core::AlgoID::BSC:
+                bscEncoder.encode(outputstream[encodingpar.getDescriptorID()],
+                                  encodedDescriptors[encodingpar.getDescriptorID()]);
+                break;
+            case genie::core::AlgoID::LZMA:
+                lzmaEncoder.encode(outputstream[encodingpar.getDescriptorID()],
+                                   encodedDescriptors[encodingpar.getDescriptorID()]);
+                break;
+            case genie::core::AlgoID::ZSTD:
+                zstdEncoder.encode(outputstream[encodingpar.getDescriptorID()],
+                                   encodedDescriptors[encodingpar.getDescriptorID()]);
+                break;
 
-    for (auto it = outputstream.begin(); it != outputstream.end(); ++it) {
-        encoder.encode(it->second, encodedDescriptors[it->first]);
-
-        std::stringstream check;
-        encoder.decode(encodedDescriptors[it->first], check);
-        EXPECT_EQ(check.str(), it->second.str());
-
-        if (false) {  //(it->first == DescriptorID::REFERENCE) {
-            std::ofstream testfile;
-            std::ofstream testfile2;
-            testfile.open("Testfiles/RefBeforeCom.bin", std::ios::binary | std::ios::out);
-            testfile2.open("Testfiles/RefAfter.bin", std::ios::binary | std::ios::out);
-            if (testfile.is_open()) {
-                std::string writeString = it->second.str();
-                testfile << writeString;
-                testfile.close();
-            }
-            if (testfile2.is_open()) {
-                std::string writeString = encodedDescriptors[it->first].str();
-                testfile2 << writeString;
-                testfile2.close();
-            }
+            default:
+                break;
+        }
+        if (encodingpar.getDescriptorID() == genie::core::AnnotDesc::STRAND) {
+            std::cerr << "+";
         }
     }
+
     std::map<std::string, std::stringstream> encodedAttributes;
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
-        encoder.encode(it->second, encodedAttributes[it->first]);
+        bscEncoder.encode(it->second, encodedAttributes[it->first]);
         std::stringstream check;
-        encoder.decode(encodedAttributes[it->first], check);
+        bscEncoder.decode(encodedAttributes[it->first], check);
         EXPECT_EQ(check.str(), it->second.str());
     }
 #endif
@@ -401,21 +436,6 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     genie::core::record::annotation_access_unit::AnnotationType AT_type =
         genie::core::record::annotation_access_unit::AnnotationType::VARIANTS;
     uint8_t numChrs = 0;
-    genie::entropy::bsc::BSCParameters bscParameters(MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN,
-                                                     MPEGG_BSC_BLOCKSORTER_BWT, MPEGG_BSC_CODER_QLFC_STATIC);
-
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters =
-        bscParameters.convertToAlgorithmParameters();
-
-
-    ParameterSetEncoder encodeParameters;
-#if COMPRESSED
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(encodedDescriptors, info);
-#else
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(attributeStream, outputstream, info);
-#endif
 
     //----------------------------------------------------//
     {

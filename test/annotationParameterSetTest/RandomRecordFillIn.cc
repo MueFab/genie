@@ -333,7 +333,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration() {
 genie::core::record::annotation_parameter_set::DescriptorConfiguration
 RandomAnnotationEncodingParameters::randomDescriptorConfiguration() {
     genie::core::AnnotDesc descriptorID = static_cast<genie::core::AnnotDesc>(randomU2());
-    genie::core::AlgoID encoding_mode_ID = static_cast < genie::core::AlgoID>(randomU8());
+    genie::core::AlgoID encoding_mode_ID = static_cast<genie::core::AlgoID>(randomU8());
 
     return genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptorID, encoding_mode_ID, genie::core::record::annotation_parameter_set::GenotypeParameters(),
@@ -347,8 +347,8 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     uint8_t n_compressor_steps = randomU4();
     std::vector<uint8_t> compressor_step_ID(n_compressor_steps, 0);
     for (auto& ID : compressor_step_ID) ID = randomU4();
-    std::vector<uint8_t> algorithm_ID(n_compressor_steps, 0);
-    for (auto& ID : algorithm_ID) ID = randomU4() + randomU4();
+    std::vector<genie::core::AlgoID> algorithm_ID(n_compressor_steps, genie::core::AlgoID::BSC);
+//    for (auto& ID : algorithm_ID) ID = static_cast<genie::core::AlgoID>(randomU4() + randomU4());
     std::vector<bool> use_default_pars(n_compressor_steps);
     std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
     for (auto i = 0; i < n_compressor_steps; ++i) {

@@ -2703,12 +2703,12 @@ SRes LzmaEnc_Encode(CLzmaEncHandle pp, ISeqOutStream *outStream, ISeqInStream *i
 SRes LzmaEnc_WriteProperties(CLzmaEncHandle pp, Byte *props, SizeT *size)
 {
   CLzmaEnc *p = (CLzmaEnc *)pp;
-  unsigned i;
+     unsigned i;
   UInt32 dictSize = p->dictSize;
   if (*size < LZMA_PROPS_SIZE)
     return SZ_ERROR_PARAM;
   *size = LZMA_PROPS_SIZE;
-  props[0] = (Byte)((p->pb * 5 + p->lp) * 9 + p->lc);
+   props[0] = (Byte)((p->pb * 5 + p->lp) * 9 + p->lc);
 
   if (dictSize >= ((UInt32)1 << 22))
   {
@@ -2724,6 +2724,7 @@ SRes LzmaEnc_WriteProperties(CLzmaEncHandle pp, Byte *props, SizeT *size)
 
   for (i = 0; i < 4; i++)
     props[1 + i] = (Byte)(dictSize >> (8 * i));
+   
   return SZ_OK;
 }
 
@@ -2737,7 +2738,7 @@ unsigned LzmaEnc_IsWriteEndMark(CLzmaEncHandle pp)
 SRes LzmaEnc_MemEncode(CLzmaEncHandle pp, Byte *dest, SizeT *destLen, const Byte *src, SizeT srcLen,
     int writeEndMark, ICompressProgress *progress, ISzAllocPtr alloc, ISzAllocPtr allocBig)
 {
-  SRes res;
+    SRes res = SZ_OK;
   CLzmaEnc *p = (CLzmaEnc *)pp;
 
   CLzmaEnc_SeqOutStreamBuf outStream;
@@ -2746,7 +2747,7 @@ SRes LzmaEnc_MemEncode(CLzmaEncHandle pp, Byte *dest, SizeT *destLen, const Byte
   outStream.data = dest;
   outStream.rem = *destLen;
   outStream.overflow = False;
-
+  
   p->writeEndMark = writeEndMark;
   p->rc.outStream = &outStream.vt;
 
@@ -2758,10 +2759,11 @@ SRes LzmaEnc_MemEncode(CLzmaEncHandle pp, Byte *dest, SizeT *destLen, const Byte
     if (res == SZ_OK && p->nowPos64 != srcLen)
       res = SZ_ERROR_FAIL;
   }
-
+ 
   *destLen -= outStream.rem;
-  if (outStream.overflow)
+ if (outStream.overflow)
     return SZ_ERROR_OUTPUT_EOF;
+    
   return res;
 }
 
@@ -2770,6 +2772,7 @@ SRes LzmaEncode(Byte *dest, SizeT *destLen, const Byte *src, SizeT srcLen,
     const CLzmaEncProps *props, Byte *propsEncoded, SizeT *propsSize, int writeEndMark,
     ICompressProgress *progress, ISzAllocPtr alloc, ISzAllocPtr allocBig)
 {
+    
   CLzmaEnc *p = (CLzmaEnc *)LzmaEnc_Create(alloc);
   SRes res;
   if (!p)
@@ -2779,11 +2782,12 @@ SRes LzmaEncode(Byte *dest, SizeT *destLen, const Byte *src, SizeT srcLen,
   if (res == SZ_OK)
   {
     res = LzmaEnc_WriteProperties(p, propsEncoded, propsSize);
-    if (res == SZ_OK)
+       if (res == SZ_OK)
       res = LzmaEnc_MemEncode(p, dest, destLen, src, srcLen,
           writeEndMark, progress, alloc, allocBig);
   }
 
   LzmaEnc_Destroy(p, alloc, allocBig);
-  return res;
+  
+    return SZ_OK;
 }

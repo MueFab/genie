@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_BSC_ENCODER_H_
-#define SRC_GENIE_ENTROPY_BSC_ENCODER_H_
+#ifndef SRC_GENIE_ENTROPY_LZMA_ENCODER_H_
+#define SRC_GENIE_ENTROPY_LZMA_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -29,40 +29,40 @@
 
 namespace genie {
 namespace entropy {
-namespace bsc {
+namespace lzma {
 
-class BSCParameters {
+class LZMAParameters {
  public:
     uint8_t lzpHashSize;
     uint8_t lzpMinLen;
     uint8_t blockSorter;
     uint8_t coder;
     uint16_t features;
-    BSCParameters()
+    LZMAParameters()
         : lzpHashSize(MPEGG_BSC_DEFAULT_LZPHASHSIZE),
           lzpMinLen(MPEGG_BSC_DEFAULT_LZPMINLEN),
           blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
           coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
-    BSCParameters(
-        uint8_t _lzpHashSize,
-        uint8_t _lzpMinLen,
-        uint8_t _blockSorter,
-        uint8_t _coder,
-        uint16_t _features = 0)
-        : lzpHashSize(_lzpHashSize), lzpMinLen(_lzpMinLen), blockSorter(_blockSorter), coder(_coder), features(_features) {}
+    LZMAParameters(uint8_t _lzpHashSize, uint8_t _lzpMinLen, uint8_t _blockSorter, uint8_t _coder,
+                   uint16_t _features = 0)
+        : lzpHashSize(_lzpHashSize),
+          lzpMinLen(_lzpMinLen),
+          blockSorter(_blockSorter),
+          coder(_coder),
+          features(_features) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
 };
 
-class BSCEncoder {
+class LZMAEncoder {
  public:
-    BSCEncoder();
+    LZMAEncoder();
 
     void encode(std::stringstream &input, std::stringstream &output);
 
     void decode(std::stringstream &input, std::stringstream &output);
 
-    void configure(const BSCParameters bscParameters) {
+    void configure(const LZMAParameters bscParameters) {
         lzpHashSize = bscParameters.lzpHashSize;
         lzpMinLen = bscParameters.lzpMinLen;
         blockSorter = bscParameters.blockSorter;
@@ -78,13 +78,13 @@ class BSCEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace bsc
+}  // namespace lzma
 }  // namespace entropy
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_BSC_ENCODER_H_
+#endif  // SRC_GENIE_ENTROPY_LZMA_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

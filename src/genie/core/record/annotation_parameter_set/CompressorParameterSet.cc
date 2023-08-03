@@ -42,7 +42,7 @@ CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(r
 
 CompressorParameterSet::CompressorParameterSet(
     uint8_t compressor_ID, uint8_t n_compressor_steps, std::vector<uint8_t> compressor_step_ID,
-    std::vector<uint8_t> algorithm_ID, std::vector<bool> use_default_pars,
+    std::vector<genie::core::AlgoID> algorithm_ID, std::vector<bool> use_default_pars,
     std::vector<AlgorithmParameters> algorithm_parameters, std::vector<uint8_t> n_in_vars,
     std::vector<std::vector<uint8_t>> in_var_ID, std::vector<std::vector<uint8_t>> prev_step_ID,
     std::vector<std::vector<uint8_t>> prev_out_var_ID, std::vector<uint8_t> n_completed_out_vars,
@@ -76,7 +76,7 @@ void CompressorParameterSet::read(util::BitReader& reader) {
 
     for (auto i = 0; i < n_compressor_steps; ++i) {
         compressor_step_ID.push_back(static_cast<uint8_t>(reader.read_b(4)));
-        algorithm_ID.push_back(static_cast<uint8_t>(reader.read_b(5)));
+        algorithm_ID.push_back(static_cast<genie::core::AlgoID>(reader.read_b(5)));
         use_default_pars[i] = (static_cast<bool>(reader.read_b(1)));
         if (!use_default_pars[i]) {
             AlgorithmParameters algorithmParameters(reader);
@@ -101,7 +101,7 @@ void CompressorParameterSet::write(core::Writer& writer) const {
     uint8_t algorithm_index = 0;
     for (auto i = 0; i < n_compressor_steps; ++i) {
         writer.write(compressor_step_ID[i], 4);
-        writer.write(algorithm_ID[i], 5);
+        writer.write(static_cast<uint8_t>(algorithm_ID[i]), 5);
         writer.write(use_default_pars[i], 1);
         if (!use_default_pars[i]) {
             (algorithm_parameters[algorithm_index].write(writer));

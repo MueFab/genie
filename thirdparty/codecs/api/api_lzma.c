@@ -17,13 +17,14 @@ int mpegg_lzma_compress(
         int      fb,        /* 5 <= fb <= 273, default = 32 */
         int      numThreads /* 1 or 2, default = 2 */
 ){
-    unsigned long int propsSize = LZMA_PROPS_SIZE;
+    SizeT propsSize = LZMA_PROPS_SIZE;
     unsigned long int const headerSize = propsSize                         /* signal propsSize */
                                          + MPEGG_LZMA_DATA_SIZE_BYTES;     /* signal srcLen */
-    unsigned long int payloadSize = (srcLen + 20) / 20 * 21 + (1U << 16U); /* we allocate 105% of original size + 64KB for output buffer */
+    SizeT payloadSize =
+        (srcLen + 20) / 20 * 21 + (1U << 16U); /* we allocate 105% of original size + 64KB for output buffer */
     unsigned long int const dstLenTot = headerSize + payloadSize + 1;      /* +1 for null termination */
 
-    unsigned char *propsPtr = NULL;
+ unsigned char *propsPtr = NULL;
     unsigned char *dataSzPtr = NULL;
     unsigned char *payloadPtr = NULL;
     unsigned char *tmpBuffer = NULL;
@@ -62,7 +63,7 @@ int mpegg_lzma_compress(
         ec = 1; goto error;
     }
 
-    if ((ec = mpegg_write_long_to_Buffer(dataSzPtr,
+  if ((ec = mpegg_write_long_to_Buffer(dataSzPtr,
                                           srcLen,
                                           MPEGG_LZMA_DATA_SIZE_BYTES)
     ) != 0) goto error;
