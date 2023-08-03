@@ -105,7 +105,7 @@ TEST_F(CompressorParameterSetTests, FixedValues) {  // NOLINT(cert-err58-cpp)
     uint8_t compressor_ID = 1;
     uint8_t n_compressor_steps = 1;
     std::vector<uint8_t> compressor_step_ID{0};
-    std::vector<uint8_t> algorithm_ID{3};
+    std::vector<genie::core::AlgoID> algorithm_ID{genie::core::AlgoID::BSC};
     std::vector<bool> use_default_pars{true};
     std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters{
         algorithmParameters};

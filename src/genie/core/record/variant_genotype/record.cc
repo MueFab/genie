@@ -186,7 +186,7 @@ uint32_t VariantGenotype::getSampleCount() const { return sample_count; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t VariantGenotype::getFormatCount() const { return format.size(); }
+uint8_t VariantGenotype::getFormatCount() const { return static_cast<uint8_t>(format.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ bool VariantGenotype::isLikelihoodPresent() const {
 
 uint8_t VariantGenotype::getNumberOfAllelesPerSample() const {
     if (isGenotypePresent()){
-        return alleles[0].size();
+        return static_cast<uint8_t>(alleles[0].size());
     } else {
         return 0;
     }
@@ -231,7 +231,7 @@ uint8_t VariantGenotype::getNumberOfLikelihoods() const {
     if (isLikelihoodPresent()){
         return 0;
     } else {
-        return likelihoods[0].size();
+        return static_cast<uint8_t>(likelihoods[0].size());
     }
 }
 
