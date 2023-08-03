@@ -494,12 +494,12 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
             writer.write(3, 8);
             writer.write_reserved(10);
-            writer.write(apsByteSize, 22);
+            writer.write(apsByteSize+5, 22);
             annotationParameterSet.write(writer);
 
             writer.write(4, 8);
             writer.write_reserved(3);
-            writer.write(aauByteSize, 29);
+            writer.write(aauByteSize+5, 29);
             annotationAccessUnittot.write(writer);
             testfile.close();
         }
@@ -510,12 +510,12 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
             txtWriter.write(3, 8);
             txtWriter.write_reserved(10);
-            txtWriter.write(apsByteSize, 22);
+            txtWriter.write(apsByteSize+5, 22);
             annotationParameterSet.write(txtWriter);
 
             txtWriter.write(4, 8);
             txtWriter.write_reserved(3);
-            txtWriter.write(aauByteSize, 29);
+            txtWriter.write(aauByteSize+5, 29);
             annotationAccessUnittot.write(txtWriter);
             txtfile.close();
         }

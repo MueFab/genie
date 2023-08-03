@@ -22,7 +22,7 @@ LinkRecord::LinkRecord(genie::util::BitReader& bitreader){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t LinkRecord::getLinkNameLen() const { return link_name.size(); }
+uint8_t LinkRecord::getLinkNameLen() const { return static_cast<uint8_t>(link_name.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
