@@ -22,12 +22,10 @@ namespace core {
 namespace record {
 namespace variant_site {
 
-VariantSiteParser::VariantSiteParser(
-                std::istream& _site_MGrecs,
-                std::map<AnnotDesc, std::stringstream>& _output,
-                std::map<std::string, AttributeData>& _info,
-                std::map<std::string, std::stringstream>& _attributeStream,
-                std::stringstream& _jsonInfoFields)
+VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::map<AnnotDesc, std::stringstream>& _output,
+                                     std::map<std::string, AttributeData>& _info,
+                                     std::map<std::string, std::stringstream>& _attributeStream,
+                                     std::stringstream& _jsonInfoFields)
     : siteMGrecs(_site_MGrecs),
       rowsPerTile(0),
       numberOfRows(0),
@@ -37,7 +35,6 @@ VariantSiteParser::VariantSiteParser(
       attributeData(_info),
       numberOfAttributes(0),
       startPos(0) {
-
     JsonInfoFieldParser InfoFieldParser(_jsonInfoFields);
     infoFields = InfoFieldParser.getInfoFields();
     init();
@@ -72,7 +69,7 @@ void VariantSiteParser::init() {
     addWriter(AnnotDesc::REFERENCE);       // 13
     addWriter(AnnotDesc::ALTERN);          // 14
     addWriter(AnnotDesc::FILTER);          // 17
-                                              // addWriter(DescriptorID::ATTRIBUTE);       // 31
+                                           // addWriter(DescriptorID::ATTRIBUTE);       // 31
     uint16_t attributeID = 0;
     for (const auto& infoField : infoFields) {
         Writer writer(&attributeStream[infoField.ID]);
@@ -108,12 +105,22 @@ void VariantSiteParser::ParseOne() {
     fieldWriter[static_cast<size_t>(AnnotDesc::REFERENCE)].write(alternEnd, 3);
 
     const auto& altArray = variantSite.getAlt();
+    // look for <DEL>
+    bool foundDel = false;
     for (auto i = 0; i < variantSite.getAltCount(); ++i) {
         const auto& altern = altArray[i];
-        for (const auto& alt : altern) {
-            fieldWriter[static_cast<size_t>(AnnotDesc::ALTERN)].write(AlternTranslate(alt), 3);
+        if (!altern.find("<DEL>")) {
+            foundDel = true;
         }
-        fieldWriter[static_cast<size_t>(AnnotDesc::ALTERN)].write(alternEndLine, 3);
+    }
+    if (!foundDel) {
+        for (auto i = 0; i < variantSite.getAltCount(); ++i) {
+            const auto& altern = altArray[i];
+            for (const auto& alt : altern) {
+                fieldWriter[static_cast<size_t>(AnnotDesc::ALTERN)].write(AlternTranslate(alt), 3);
+            }
+            fieldWriter[static_cast<size_t>(AnnotDesc::ALTERN)].write(alternEndLine, 3);
+        }
     }
     fieldWriter[static_cast<size_t>(AnnotDesc::ALTERN)].write(alternEnd, 3);
 
@@ -130,7 +137,7 @@ void VariantSiteParser::ParseOne() {
     } else {
         fieldWriter[static_cast<size_t>(AnnotDesc::LINKID)].write(255, 8);
     }
-    for (auto & it : attributeData) {
+    for (auto& it : attributeData) {
         if (it.first == "HOMSEQ") {
             std::cout << it.first;
         }
@@ -150,8 +157,8 @@ void VariantSiteParser::ParseAttribute(uint8_t index) {
     const auto& tag = variantSite.getInfoTag();
     for (const auto& value : tag[index].infoValue) {
         arrayType toval{};
-        toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]); 
- //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
+        toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]);
+        //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
     }
 }
 
@@ -194,14 +201,14 @@ void VariantSiteParser::writeDanglingBits() {
     fieldWriter[static_cast<size_t>(AnnotDesc::LINKID)].flush();
 }
 
-//TODO @Yeremia: Check if by default Genie should compiled with C++14
+// TODO @Yeremia: Check if by default Genie should compiled with C++14
 uint8_t VariantSiteParser::AlternTranslate(char alt) const {
     if (alt == 'A') return 0b000;
     if (alt == 'T') return 0b011;
     if (alt == 'G') return 0b010;
     if (alt == 'C') return 0b001;
     if (alt == 'N') return 0b100;
-    return 0b111;
+    return 0b101;
 }
 
 std::vector<uint8_t> VariantSiteParser::FilterTranslate(const std::string& filter) {

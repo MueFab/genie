@@ -14,7 +14,7 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t FormatField::getFormatLen() const { return format_name.size(); }
+uint8_t FormatField::getFormatLen() const { return static_cast<uint8_t>(format_name.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,18 +26,17 @@ DataType FormatField::getFormatType() const { return format_type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t FormatField::getSampleCount() const { return format_value.size(); }
+uint32_t FormatField::getSampleCount() const { return static_cast<uint32_t>(format_value.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t FormatField::getFormatArrayLen() const { return format_value[0].size(); }
+uint8_t FormatField::getFormatArrayLen() const { return static_cast<uint8_t>(format_value[0].size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<std::vector<DynamicDataType>>& FormatField::getFormatValue() const { return format_value; }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
 
 }  // namespace record
 }  // namespace core
