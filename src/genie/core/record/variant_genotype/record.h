@@ -14,16 +14,19 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/constants.h"
+#include <boost/optional/optional.hpp>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/linked_record/linked_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
-namespace variant_genotype {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief
@@ -37,114 +40,93 @@ class info_field {
     std::vector<uint8_t> info_value;  //!< @brief type??
 };
 
-/**
- *  @brief
- */
-class linked_record {
+class format_field {
  public:
-    uint8_t link_name_len;     //!< @brief
-    std::string link_name;     //!< @brief
-    uint8_t reference_box_ID;  //!< @brief
-};
-
-class FormatField {
- public:
-    uint8_t len;
-    std::string format;
-    uint8_t type;
-    uint8_t array_len;
-    std::vector<std::vector<std::vector<uint8_t>>> value_array;
-
-    FormatField() : len(0), format(""), type(0), array_len(0), value_array(0) {}
-
-    FormatField(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
-                std::vector<std::vector<std::vector<uint8_t>>> value)
-        : len(len), format(format), type(type), array_len(array_len), value_array(value) {}
-
-    void write(util::BitReader& reader, uint32_t sample_count);
+    //    uint8_t len;
+    //    std::string format;
+    //    uint8_t type;
+    //    uint8_t array_len;
+    //    std::vector<std::vector<std::vector<uint8_t>>> value_array;
+    //
+    //    format_field() : len(0), format(""), type(0), array_len(0), value_array(0) {}
+    //
+    //    format_field(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
+    //                std::vector<std::vector<std::vector<uint8_t>>> value)
+    //        : len(len), format(format), type(type), array_len(array_len), value_array(value) {}
+    //
+    //    void write(util::BitReader& reader, uint32_t sample_count);
 };
 
 /**
  *  @brief
  */
-class Record {
+class VariantGenotype {
  private:
     uint64_t variant_index;      //!< @brief
     uint32_t sample_index_from;  //!< @brief
     uint32_t sample_count;       //!< @brief
 
-    uint8_t format_count;             //!< @brief
-    std::vector<FormatField> format;  //!< @brief
+    std::vector<format_field> format;  //!< @brief
 
-    uint8_t genotype_present;    //!< @brief
-    uint8_t likelihood_present;  //!< @brief
-
-    uint8_t n_alleles_per_sample;               //!< @brief
     std::vector<std::vector<uint8_t>> alleles;  //!< @brief
-    std::vector<std::vector<uint8_t>> phasing;  //!< @brief
+    std::vector<std::vector<uint8_t>> phasings;  //!< @brief
 
-    uint8_t n_likelihoods;                           //!< @brief
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
-    uint8_t linked_record;     //!< @brief
-    uint8_t link_name_len;     //!< @brief
-    std::string link_name;     //!< @brief
-    uint8_t reference_box_ID;  //!< @brief
+    boost::optional<LinkRecord> link_record;
 
  public:
     /**
      * @brief
      */
-    Record()
-        : variant_index(0),
-          sample_index_from(0),
-          sample_count(0),
-          format_count(0),
-          format(0),
-          genotype_present(0),
-          likelihood_present(0),
-          n_alleles_per_sample(1),
-          alleles(0),
-          phasing(0),
-          n_likelihoods(0),
-          likelihoods(0),
-          linked_record(0),
-          link_name_len(0),
-          link_name(""),
-          reference_box_ID(0) {}
+    //    VariantGenotype()
+    //        : variant_index(0),
+    //          sample_index_from(0),
+    //          sample_count(0),
+    ////          format_count(0),
+    //          format(0),
+    ////          genotype_present(0),
+    ////          likelihood_present(0),
+    ////          n_alleles_per_sample(1),
+    //          alleles(0),
+    //          phasings(0),
+    //          n_likelihoods(0),
+    //          likelihoods(0),
+    //          linked_record(0),
+    //          link_name_len(0),
+    //          link_name(),
+    //          reference_box_ID(0) {}
 
-    Record(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
-           std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
-           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
-           std::vector<std::vector<uint8_t>> phasing, uint8_t n_likelihoods,
-           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
-           std::string link_name = "", uint8_t reference_box_ID = 0);
+    //    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
+    //           std::vector<format_field> format, uint8_t genotype_present, uint8_t likelihood_present,
+    //           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
+    //           std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
+    //           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
+    //           std::string link_name = "", uint8_t reference_box_ID = 0);
 
-    explicit Record(util::BitReader& reader);
-    void read(util::BitReader& reader);
-    void write(std::ostream& outputfile) const;
+    explicit VariantGenotype(util::BitReader& bitreader);
 
+    //    void write(std::ostream& outputfile) const;
+    //
     uint64_t getVariantIndex() const;
     uint32_t getStartSampleIndex() const;
-
     uint32_t getSampleCount() const;
+
     uint8_t getFormatCount() const;
-    std::vector<FormatField> getFormat() const;
+    //    const std::vector<format_field>& getFormat() const;
     bool isGenotypePresent() const;
     bool isLikelihoodPresent() const;
     uint8_t getNumberOfAllelesPerSample() const;
-    std::vector<std::vector<uint8_t>> getAlleles() const;
-    std::vector<std::vector<uint8_t>> getPhasing() const;
+    const std::vector<std::vector<uint8_t>>& getAlleles() const;
+    const std::vector<std::vector<uint8_t>>& getPhasing() const;
     uint8_t getNumberOfLikelihoods() const;
-    std::vector<std::vector<uint32_t>> getLikelihoods() const;
-    bool isLinkedRecord() const;
-    std::string getLinkName() const;
-    uint8_t getReferenceBoxID() const;
+    const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
+    bool getLinkedRecord() const;
+    const boost::optional<LinkRecord>& getLinkRecord() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace variant_genotype
 }  // namespace record
 }  // namespace core
 }  // namespace genie
