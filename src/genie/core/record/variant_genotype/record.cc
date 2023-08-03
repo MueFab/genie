@@ -24,7 +24,7 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void FormatField::write(util::BitReader& reader, uint32_t sample_count) {
+//void format_field::write(util::BitReader& reader, uint32_t sample_count) {
 //    len = (reader.readBypassBE<uint8_t>());
 //    format.resize(len);
 //    reader.readBypass(&format[0], len);
@@ -41,7 +41,7 @@ namespace record {
 //}
 
 //VariantGenotype::VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
-//               std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
+//               std::vector<format_field> format, uint8_t genotype_present, uint8_t likelihood_present,
 //               uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
 //               std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
 //               std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len,
@@ -69,8 +69,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
       sample_count(bitreader.readBypassBE<uint32_t>()),
       format(),
       alleles(),
-      phasings(),
-      linked_record()
+      phasings()
     {
 
     auto format_count = bitreader.readBypassBE<uint8_t>();
@@ -116,7 +115,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
         }
     }
 
-    linked_record = bitreader.read<bool>(8);
+    auto linked_record = bitreader.read<bool>(8);
     if (linked_record) {
         link_record = LinkRecord(bitreader);
     }
@@ -192,7 +191,7 @@ uint8_t VariantGenotype::getFormatCount() const { return format.size(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 //
-//std::vector<FormatField> VariantGenotype::getFormat() const { return format; }
+//std::vector<format_field> VariantGenotype::getFormat() const { return format; }
 //
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -242,7 +241,7 @@ const std::vector<std::vector<uint32_t>>& VariantGenotype::getLikelihoods() cons
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool VariantGenotype::isLinkRecordExist() const {return linked_record;}
+bool VariantGenotype::getLinkedRecord() const {return link_record != boost::none;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

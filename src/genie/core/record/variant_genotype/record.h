@@ -40,7 +40,7 @@ class info_field {
     std::vector<uint8_t> info_value;  //!< @brief type??
 };
 
-class FormatField {
+class format_field {
  public:
     //    uint8_t len;
     //    std::string format;
@@ -48,9 +48,9 @@ class FormatField {
     //    uint8_t array_len;
     //    std::vector<std::vector<std::vector<uint8_t>>> value_array;
     //
-    //    FormatField() : len(0), format(""), type(0), array_len(0), value_array(0) {}
+    //    format_field() : len(0), format(""), type(0), array_len(0), value_array(0) {}
     //
-    //    FormatField(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
+    //    format_field(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
     //                std::vector<std::vector<std::vector<uint8_t>>> value)
     //        : len(len), format(format), type(type), array_len(array_len), value_array(value) {}
     //
@@ -66,14 +66,13 @@ class VariantGenotype {
     uint32_t sample_index_from;  //!< @brief
     uint32_t sample_count;       //!< @brief
 
-    std::vector<FormatField> format;  //!< @brief
+    std::vector<format_field> format;  //!< @brief
 
     std::vector<std::vector<uint8_t>> alleles;  //!< @brief
     std::vector<std::vector<uint8_t>> phasings;  //!< @brief
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
-    bool linked_record;        //!< @brief
     boost::optional<LinkRecord> link_record;
 
  public:
@@ -99,7 +98,7 @@ class VariantGenotype {
     //          reference_box_ID(0) {}
 
     //    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
-    //           std::vector<FormatField> format, uint8_t genotype_present, uint8_t likelihood_present,
+    //           std::vector<format_field> format, uint8_t genotype_present, uint8_t likelihood_present,
     //           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
     //           std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
     //           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
@@ -114,7 +113,7 @@ class VariantGenotype {
     uint32_t getSampleCount() const;
 
     uint8_t getFormatCount() const;
-    //    const std::vector<FormatField>& getFormat() const;
+    //    const std::vector<format_field>& getFormat() const;
     bool isGenotypePresent() const;
     bool isLikelihoodPresent() const;
     uint8_t getNumberOfAllelesPerSample() const;
@@ -122,11 +121,8 @@ class VariantGenotype {
     const std::vector<std::vector<uint8_t>>& getPhasing() const;
     uint8_t getNumberOfLikelihoods() const;
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
-    bool isLinkRecordExist() const;
+    bool getLinkedRecord() const;
     const boost::optional<LinkRecord>& getLinkRecord() const;
-//    uint8_t getLinkNameLength() const;
-//    const std::string& getLinkName() const;
-//    uint8_t getReferenceBoxID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

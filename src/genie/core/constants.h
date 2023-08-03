@@ -16,6 +16,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/variant/variant.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -317,6 +318,32 @@ enum class AlgoID: uint8_t{
     RLE = 20,
     SER = 21
 };
+
+enum class DataType: uint8_t {
+    STRING = 0,
+    CHAR = 1,
+    BOOL = 2,
+    INT8 = 3,
+    UINT8 = 4,
+    INT16 = 5,
+    UINT16 = 6,
+    INT32 = 7,
+    UINT32 = 8,
+    INT64 = 9,
+    UINT64 = 10,
+    FLOAT = 11,
+    DOUBLE =  12
+};
+
+typedef boost::variant<
+    std::string,
+    bool,
+    int8_t, uint8_t,
+    int16_t, uint16_t,
+    int32_t, uint32_t,
+    int64_t, uint64_t,
+    float, double
+> DynamicDataType;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

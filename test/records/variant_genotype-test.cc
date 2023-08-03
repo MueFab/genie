@@ -36,6 +36,7 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(rec.getVariantIndex(), i);
         ASSERT_EQ(rec.getSampleCount(), 1092);
         ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
+        ASSERT_EQ(rec.getLinkedRecord(), false);
     }
 
     {

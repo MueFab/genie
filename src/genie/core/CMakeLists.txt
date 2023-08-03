@@ -33,6 +33,8 @@ set(source_files
         record/variant_site/JsonInfoFieldParser.cc
 
         record/variant_genotype/record.cc
+        record/variant_genotype/format_field.cc
+        record/variant_genotype/format_field.h
 
         record/linked_record/linked_record.h
         record/linked_record/linked_record.cc
@@ -113,7 +115,7 @@ set(source_files
         api.cc
         c_api.cc
         payload.cc
-        )
+)
 
 add_library(genie-core ${source_files})
 
