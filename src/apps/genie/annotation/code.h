@@ -79,6 +79,8 @@ class Code {
     void encodeData();
 };
 
+void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath);
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace annotation

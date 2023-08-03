@@ -11,15 +11,13 @@
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+#include "record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
-namespace contact {
-
-}  // namespace contact
 }  // namespace record
 }  // namespace core
 }  // namespace genie
