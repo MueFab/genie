@@ -64,6 +64,7 @@ class GenotypeParameters {
     bool encode_phases_data_flag;
     std::vector<GenotypePayloadParameters> phases_payload_params;
     bool phases_value;
+
  public:
     uint8_t getNumVariantsPayloads() const;
 };
