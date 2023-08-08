@@ -21,7 +21,8 @@ class Encoder {
  private:
 
  public:
-    void encode(std::stringstream &input, std::stringstream &output);
+//    void encode(std::stringstream &input, std::stringstream &output);
+    explicit Encoder(bool _writeOutStreams);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

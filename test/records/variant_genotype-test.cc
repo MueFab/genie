@@ -6,11 +6,16 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
+#include <xtensor/xmath.hpp>
+#include <xtensor/xoperation.hpp>
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/util/bitwriter.h"
+#include "genie/genotype/genotype_coder.h"
 #include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 #include "genie/util/runtime-exception.h"
 #include "helpers.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -34,14 +39,14 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
     for (size_t i = 0; i< recs.size(); i++){
         auto& rec = recs[i];
         ASSERT_EQ(rec.getVariantIndex(), i);
-        ASSERT_EQ(rec.getSampleCount(), 1092);
+        ASSERT_EQ(rec.getNumSamples(), 1092);
         ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
         ASSERT_EQ(rec.getLinkedRecord(), false);
     }
 
     {
         auto& rec = recs[0];
-        auto num_samples = rec.getSampleCount();
+        auto num_samples = rec.getNumSamples();
         auto num_alleles = rec.getNumberOfAllelesPerSample();
 
         std::vector<uint32_t> num_counts_per_allele(3);
@@ -60,7 +65,7 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
 
     {
         auto& rec = recs[recs.size()-1];
-        auto num_samples = rec.getSampleCount();
+        auto num_samples = rec.getNumSamples();
         auto num_alleles = rec.getNumberOfAllelesPerSample();
 
         std::vector<uint32_t> num_counts_per_allele(3);
@@ -78,3 +83,5 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
     }
 
 }
+
+// ---------------------------------------------------------------------------------------------------------------------

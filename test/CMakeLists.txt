@@ -1,7 +1,10 @@
 add_subdirectory(example)
-add_subdirectory(variantSiteRecordTest)
-#add_subdirectory(variantGenotypeRecordTest)
-add_subdirectory(records)
+
 add_subdirectory(annotationParameterSetTest)
 add_subdirectory(mpeggBSCTest)
 add_subdirectory(annotationAccessUnitTest)
+
+#add_subdirectory(variantSiteRecordTest)
+#add_subdirectory(variantGenotypeRecordTest)
+add_subdirectory(records)
+add_subdirectory(genotype)

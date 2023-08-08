@@ -149,7 +149,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         std::vector<std::vector<uint64_t>> start_index;
         std::vector<std::vector<uint64_t>> end_index;
         std::vector<uint64_t> tile_size;
-        for (auto i = 0; i < n_tiles; ++i) tile_size.push_back(static_cast<uint64_t>(i) * 1111);
+        for (uint64_t i = 0; i < n_tiles; ++i) tile_size.push_back(static_cast<uint64_t>(i) * 1111);
         bool two_dimensional = false;
         genie::core::record::annotation_parameter_set::TileStructure default_tile_structure(
             AT_coord_size, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);

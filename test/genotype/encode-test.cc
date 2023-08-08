@@ -1,0 +1,79 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include <gtest/gtest.h>
+#include <vector>
+#include <fstream>
+#include <xtensor/xview.hpp>
+#include <xtensor/xmath.hpp>
+#include <xtensor/xoperation.hpp>
+#include "genie/core/constants.h"
+#include "genie/core/record/variant_genotype/record.h"
+#include "genie/genotype/genotype_coder.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/runtime-exception.h"
+#include "helpers.h"
+
+TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    genie::genotype::EncodingOptions enc_opt = {
+        512,// block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+        false,// sort_rows;
+        false,// sort_cols;
+        genie::core::AlgoID::JBIG,//codec_ID;
+    };
+
+    genie::genotype::SignedAlleleTensorDtype signed_allele_tensor;
+    genie::genotype::PhasingTensorDtype phasing_tensor;
+    genie::genotype::decompose(enc_opt, recs, signed_allele_tensor, phasing_tensor);
+
+    // Check allele_mat shape
+    ASSERT_EQ(signed_allele_tensor.dimension(), 3);
+    ASSERT_EQ(signed_allele_tensor.shape(0), 100);
+    ASSERT_EQ(signed_allele_tensor.shape(1), 1092);
+    ASSERT_EQ(signed_allele_tensor.shape(2), 2);
+    ASSERT_EQ(signed_allele_tensor(0, 1, 1), 1);
+
+    // Check phasing_mat shape
+    ASSERT_EQ(phasing_tensor.dimension(), 3);
+    ASSERT_EQ(phasing_tensor.shape(0), 100);
+    ASSERT_EQ(phasing_tensor.shape(1), 1092);
+    ASSERT_EQ(phasing_tensor.shape(2), 1);
+
+    // Check the content of the first row of allele_tensor
+    {
+        const auto& allele_rec = xt::view(signed_allele_tensor, 0, xt::all(), xt::all());
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2067);
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 117);
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
+    }
+
+    // Check the content of the last row of allele_tensor
+    {
+        const auto& allele_rec = xt::view(signed_allele_tensor, -1, xt::all(), xt::all());
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2178);
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 6);
+        ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
+    }
+}

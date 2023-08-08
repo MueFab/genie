@@ -56,17 +56,30 @@ class GenotypeParameters {
     BinarizationID binarization_ID;
 
     // if BinarizationID == BinarizationID::BIT_PLANE
-    uint8_t num_bit_plane;
+    uint8_t num_bit_planes;
     ConcatAxis concat_axis;
 
     std::vector<GenotypePayloadParameters> variants_payload_params;
 
     bool encode_phases_data_flag;
-    std::vector<GenotypePayloadParameters> phases_payload_params;
+    GenotypePayloadParameters phases_payload_params;
     bool phases_value;
 
  public:
+    uint8_t getMaxPloidy() const;
+    bool getNoRerefernceFlag() const;
+    bool getNotAvailableFlag() const;
+    BinarizationID getBinarizationID() const;
+    uint8_t getNumBitPlanes() const;
+    ConcatAxis isConcatenated() const;
+    const std::vector<GenotypePayloadParameters>& getVariantsPayloadParams() const;
+
+    bool isPhaseEncoded() const;
+    // IF encode_phases_data_flag
+    const GenotypePayloadParameters& getPhasesPayloadParams() const;
     uint8_t getNumVariantsPayloads() const;
+    // ELSE
+    bool getPhaseValue() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
