@@ -14,8 +14,8 @@
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+//#include "genie/util/bitwriter.h"
+//#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
 TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
@@ -35,7 +35,7 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
-    genie::genotype::EncodingOptions enc_opt = {
+    genie::genotype::EncodingOptions opt = {
         512,// block_size;
         genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
         genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
@@ -44,26 +44,34 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
         genie::core::AlgoID::JBIG,//codec_ID;
     };
 
-    genie::genotype::SignedAlleleTensorDtype signed_allele_tensor;
-    genie::genotype::PhasingTensorDtype phasing_tensor;
-    genie::genotype::decompose(enc_opt, recs, signed_allele_tensor, phasing_tensor);
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+
+    ASSERT_EQ(block.max_ploidy, 2);
+    ASSERT_EQ(block.dot_flag, false);
+    ASSERT_EQ(block.na_flag, false);
+
+    auto& allele_mat = block.allele_mat;
+    auto& phasing_mat = block.phasing_mat;
 
     // Check allele_mat shape
-    ASSERT_EQ(signed_allele_tensor.dimension(), 3);
-    ASSERT_EQ(signed_allele_tensor.shape(0), 100);
-    ASSERT_EQ(signed_allele_tensor.shape(1), 1092);
-    ASSERT_EQ(signed_allele_tensor.shape(2), 2);
-    ASSERT_EQ(signed_allele_tensor(0, 1, 1), 1);
+    ASSERT_EQ(allele_mat.dimension(), 2);
+    ASSERT_EQ(allele_mat.shape(0), 100);
+    ASSERT_EQ(allele_mat.shape(1), 1092*2);
+    ASSERT_EQ(allele_mat(0, 3), 1);
 
     // Check phasing_mat shape
-    ASSERT_EQ(phasing_tensor.dimension(), 3);
-    ASSERT_EQ(phasing_tensor.shape(0), 100);
-    ASSERT_EQ(phasing_tensor.shape(1), 1092);
-    ASSERT_EQ(phasing_tensor.shape(2), 1);
+    ASSERT_EQ(phasing_mat.dimension(), 2);
+    ASSERT_EQ(phasing_mat.shape(0), 100);
+    ASSERT_EQ(phasing_mat.shape(1), 1092);
+
+    // Check all values
+    ASSERT_EQ(xt::amin(allele_mat)(0), 0);
+    ASSERT_EQ(xt::amax(allele_mat)(0), 1);
 
     // Check the content of the first row of allele_tensor
     {
-        const auto& allele_rec = xt::view(signed_allele_tensor, 0, xt::all(), xt::all());
+        const auto& allele_rec = xt::view(allele_mat, 0, xt::all(), xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2067);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 117);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
@@ -71,9 +79,117 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
 
     // Check the content of the last row of allele_tensor
     {
-        const auto& allele_rec = xt::view(signed_allele_tensor, -1, xt::all(), xt::all());
+        const auto& allele_rec = xt::view(allele_mat, -1, xt::all(), xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2178);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 6);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
     }
+}
+
+TEST(Genotype, AdaptiveMaxValue) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    genie::genotype::EncodingOptions opt = {
+        512,// block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+        false,// sort_rows;
+        false,// sort_cols;
+        genie::core::AlgoID::JBIG//codec_ID;
+    };
+
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+    genie::genotype::transform_max_value(block);
+
+    ASSERT_EQ(block.dot_flag, false);
+    ASSERT_EQ(block.na_flag, false);
+    ASSERT_EQ(xt::amin(block.allele_mat)(0), 0);
+    ASSERT_EQ(xt::amax(block.allele_mat)(0), 1);
+}
+
+TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    genie::genotype::EncodingOptions opt = {
+        512,// block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+        false,// sort_rows;
+        false,// sort_cols;
+        genie::core::AlgoID::JBIG//codec_ID;
+    };
+
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+    genie::genotype::transform_max_value(block);
+    genie::genotype::binarize_allele_mat(opt, block);
+
+    ASSERT_EQ(block.bin_allele_mats.shape(0), 1);
+    ASSERT_EQ(block.bin_allele_mats.shape(1), block.allele_mat.shape(0));
+    ASSERT_EQ(block.bin_allele_mats.shape(2), block.allele_mat.shape(1));
+}
+
+TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    genie::genotype::EncodingOptions opt = {
+        512,// block_size;
+        genie::genotype::BinarizationID::ROW_BIN,// binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+        false,// sort_rows;
+        false,// sort_cols;
+        genie::core::AlgoID::JBIG//codec_ID;
+    };
+
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+    genie::genotype::transform_max_value(block);
+    genie::genotype::binarize_allele_mat(opt, block);
+
+    ASSERT_EQ(block.bin_allele_mats.shape(0), 1);
+    ASSERT_EQ(block.bin_allele_mats.shape(1), static_cast<size_t>(xt::sum(block.amax_vec)(0)));
+    ASSERT_EQ(block.bin_allele_mats.shape(2), block.allele_mat.shape(1));
 }
