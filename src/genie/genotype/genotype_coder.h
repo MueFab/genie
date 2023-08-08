@@ -24,13 +24,15 @@
 namespace genie {
 namespace genotype {
 
-using SignedAlleleTensorDtype = xt::xtensor<int8_t, 3, xt::layout_type::row_major>;
-using UnsignedAlleleTensorDtype = xt::xtensor<uint8_t, 3, xt::layout_type::row_major>;
-using PhasingTensorDtype = xt::xtensor<bool, 3, xt::layout_type::row_major>;
+//using AlleleTensorDtype = xt::xtensor<int8_t, 3, xt::layout_type::row_major>;
+using IntMatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
+using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
+using BinMatsDtype = xt::xtensor<bool, 3, xt::layout_type::row_major>;
+using UIntVecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
 
-//using SignedAlleleTensorDtype = xt::xarray<int8_t, xt::layout_type::row_major>;
+//using AlleleTensorDtype = xt::xarray<int8_t, xt::layout_type::row_major>;
 //using UnsignedAlleleTensorDtype = xt::xarray<uint8_t, xt::layout_type::row_major>;
-//using PhasingTensorDtype = xt::xarray<bool, xt::layout_type::row_major>;
+//using BinMatDtype = xt::xarray<bool, xt::layout_type::row_major>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,28 +48,58 @@ struct EncodingOptions {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingBlock {
-//    uint32_t num_samples;
-//    uint8_t max_ploidy;
+    uint8_t max_ploidy = 0;
+    bool dot_flag = false;
+    bool na_flag = false;
 
-    std::list<core::record::VariantGenotype> recs;
+    IntMatDtype allele_mat;
+    BinMatDtype phasing_mat;
+
+    UIntVecDtype amax_vec;
+    BinMatsDtype bin_allele_mats;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void decompose(
     const EncodingOptions& opt,
-   std::vector<core::record::VariantGenotype>& recs,
-   SignedAlleleTensorDtype& signed_allele_tensor,
-   PhasingTensorDtype& phasing_tensor);
-
-//std::tuple<SignedAlleleTensorDtype, PhasingTensorDtype>&& decompose(
-//    const EncodingOptions& opt,
-//    std::vector<core::record::VariantGenotype>& recs
-//);
+    EncodingBlock& block,
+    std::vector<core::record::VariantGenotype>& recs
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode(const EncodingOptions& opt, std::list<core::record::VariantGenotype>& recs);
+void transform_max_value(
+    EncodingBlock& block
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void binarize_bit_plane(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void binarize_row_bin(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void binarize_allele_mat(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode(
+    const EncodingOptions& opt,
+    std::list<core::record::VariantGenotype>& recs
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
