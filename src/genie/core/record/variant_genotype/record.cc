@@ -84,9 +84,11 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
 
     if (genotype_present){
         auto n_alleles_per_sample = bitreader.read<uint8_t>(8);
+        UTILS_DIE_IF(n_alleles_per_sample == 0,
+                     "Invalid n_alleles_per_sample!");
 
-        alleles.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample));
-        phasings.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample - 1));
+        alleles.resize(sample_count, std::vector<int8_t>(n_alleles_per_sample));
+        phasings.resize(sample_count, std::vector<int8_t>(n_alleles_per_sample - 1));
 
         for (auto& alleles_sample : alleles) {
             for (auto& allele : alleles_sample) {
@@ -105,6 +107,8 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
 
     if (likelihood_present){
         auto n_likelihoods = bitreader.readBypassBE<uint8_t>();
+        UTILS_DIE_IF(n_likelihoods == 0,
+                     "Invalid n_likelihoods!");
 
         likelihoods.resize(sample_count, std::vector<uint32_t>(n_likelihoods));
 
@@ -182,7 +186,7 @@ uint32_t VariantGenotype::getStartSampleIndex() const { return sample_index_from
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t VariantGenotype::getSampleCount() const { return sample_count; }
+uint32_t VariantGenotype::getNumSamples() const { return sample_count; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -211,19 +215,20 @@ bool VariantGenotype::isLikelihoodPresent() const {
 
 uint8_t VariantGenotype::getNumberOfAllelesPerSample() const {
     if (isGenotypePresent()){
-        return static_cast<uint8_t>(alleles[0].size());
+        return static_cast<uint8_t>(alleles.front().size());
     } else {
-        return 0;
+//        return 0;
+        UTILS_DIE("max_ploidy does not exist in the record!");
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<uint8_t>>& VariantGenotype::getAlleles() const { return alleles; }
+const std::vector<std::vector<int8_t>>& VariantGenotype::getAlleles() const { return alleles; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<uint8_t>>& VariantGenotype::getPhasing() const { return phasings; }
+const std::vector<std::vector<int8_t>>& VariantGenotype::getPhasing() const { return phasings; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -241,11 +246,21 @@ const std::vector<std::vector<uint32_t>>& VariantGenotype::getLikelihoods() cons
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool VariantGenotype::getLinkedRecord() const {return link_record != boost::none;}
+bool VariantGenotype::getLinkedRecord() const {return static_cast<bool>(link_record);}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const boost::optional<LinkRecord>& VariantGenotype::getLinkRecord() const {return link_record;}
+const LinkRecord& VariantGenotype::getLinkRecord() const {return link_record.value();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//uint8_t VariantGenotype::getMaxPloidy() const {
+//    if (isGenotypePresent()){
+//        return alleles.front().size();
+//    } else {
+//        UTILS_DIE("max_ploidy does not exist in the record!");
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

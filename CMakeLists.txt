@@ -35,7 +35,7 @@ endif()
 # Compiler
 #==============================================================================
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
     #
@@ -150,7 +150,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
-
+find_package(xtl REQUIRED)
+find_package(xtensor REQUIRED)
 
 #==============================================================================
 # Include paths
@@ -170,7 +171,6 @@ add_subdirectory(src)
 if(${BUILD_TESTS})
     add_subdirectory(test)
 endif()
-
 
 
 #==============================================================================

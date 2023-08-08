@@ -14,7 +14,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/optional/optional.hpp>
+//#include <boost/optional/optional.hpp>
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/core/constants.h"
@@ -68,14 +69,17 @@ class VariantGenotype {
 
     std::vector<format_field> format;  //!< @brief
 
-    std::vector<std::vector<uint8_t>> alleles;  //!< @brief
-    std::vector<std::vector<uint8_t>> phasings;  //!< @brief
+    std::vector<std::vector<int8_t>> alleles;  //!< @brief
+    std::vector<std::vector<int8_t>> phasings;  //!< @brief
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
-    boost::optional<LinkRecord> link_record;
+//    boost::optional<LinkRecord> link_record;
+    std::optional<LinkRecord> link_record;
 
  public:
+//    using GenotypeDescriptor =
+//        std::vector<std::vector<int8_t>>;
     /**
      * @brief
      */
@@ -106,23 +110,21 @@ class VariantGenotype {
 
     explicit VariantGenotype(util::BitReader& bitreader);
 
-    //    void write(std::ostream& outputfile) const;
-    //
     uint64_t getVariantIndex() const;
     uint32_t getStartSampleIndex() const;
-    uint32_t getSampleCount() const;
+    uint32_t getNumSamples() const;
 
     uint8_t getFormatCount() const;
     //    const std::vector<format_field>& getFormat() const;
     bool isGenotypePresent() const;
     bool isLikelihoodPresent() const;
     uint8_t getNumberOfAllelesPerSample() const;
-    const std::vector<std::vector<uint8_t>>& getAlleles() const;
-    const std::vector<std::vector<uint8_t>>& getPhasing() const;
+    const std::vector<std::vector<int8_t>>& getAlleles() const;
+    const std::vector<std::vector<int8_t>>& getPhasing() const;
     uint8_t getNumberOfLikelihoods() const;
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool getLinkedRecord() const;
-    const boost::optional<LinkRecord>& getLinkRecord() const;
+    const LinkRecord& getLinkRecord() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

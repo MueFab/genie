@@ -77,7 +77,7 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(),
               descriptorConfiguration.getAlgorithmParameters().getNumberOfPars());
-};
+}
 
 
 
