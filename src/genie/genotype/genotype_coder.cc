@@ -24,8 +24,6 @@ void decompose(
     const EncodingOptions& opt,
     EncodingBlock& block,
     std::vector<core::record::VariantGenotype>& recs
-//    AlleleTensorDtype& signed_allele_tensor,
-//    PhasingTensorDtype& phasing_tensor
 ){
 
     UTILS_DIE_IF(recs.empty(),
@@ -198,11 +196,12 @@ void sort_matrix(
     BinMatDtype& bin_mat,
     UIntVecDtype ids,
     uint8_t axis
-) {
+){
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0),
                  "bin_mat and ids have different dimension!");
 
+    //TODO @Yeremia: create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
