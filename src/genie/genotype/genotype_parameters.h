@@ -24,16 +24,19 @@ namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class BinarizationID {
-    BIT_PLANE = 0, ROW_BIN = 1
+enum class BinarizationID: uint8_t {
+    BIT_PLANE = 0,
+    ROW_BIN = 1,
+    UNDEFINED = 2,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class ConcatAxis {
+enum class ConcatAxis: uint8_t {
     CONCAT_ROW_DIR = 0,
     CONCAT_COL_DIR = 1,
-    DO_NOT_CONCAT = 2
+    DO_NOT_CONCAT = 2,
+    UNDEFINED = 3,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -65,6 +68,21 @@ class GenotypeParameters {
     bool phases_value;
 
  public:
+    GenotypeParameters();
+
+    GenotypeParameters(
+        uint8_t max_ploidy,
+        bool no_reference_flag,
+        bool not_available_flag,
+        BinarizationID binarization_ID,
+        uint8_t num_bit_planes,
+        ConcatAxis concat_axis,
+        std::vector<GenotypePayloadParameters>&& variants_payload_params,
+        bool encode_phases_data_flag,
+        GenotypePayloadParameters&& phases_payload_params,
+        bool phases_value
+    );
+
     uint8_t getMaxPloidy() const;
     bool getNoRerefernceFlag() const;
     bool getNotAvailableFlag() const;

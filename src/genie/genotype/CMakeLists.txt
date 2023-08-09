@@ -1,9 +1,10 @@
 project("genie-gvc")
 
+set(XTENSOR_USE_XSIMD 0)
+set(XTENSOR_USE_TBB 0)
+
 find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
-
-set(XTENSOR_USE_TBB 1)
 
 set(source_files
         genotype_coder.cc
@@ -16,8 +17,9 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
+target_include_directories(genie-gvc PUBLIC ${XTENSOR_INCLUDE_DIRS})
+#target_link_libraries(genie-gvc PUBLIC xtl)
 #target_link_libraries(genie-gvc PUBLIC xtensor)
-#target_include_directories(genie-gvc PUBLIC ${XTENSOR_INCLUDE_DIRS})
 target_link_libraries(genie-gvc PUBLIC xtensor xtensor::optimize)
 target_link_libraries(genie-gvc PUBLIC genie-core)
 
