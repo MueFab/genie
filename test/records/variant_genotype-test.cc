@@ -6,10 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
-#include <xtensor/xmath.hpp>
-#include <xtensor/xoperation.hpp>
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/genotype/genotype_coder.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/runtime-exception.h"

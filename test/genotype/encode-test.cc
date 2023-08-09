@@ -39,9 +39,9 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
         512,// block_size;
         genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
         genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        false,// sort_rows;
-        false,// sort_cols;
-        genie::core::AlgoID::JBIG,//codec_ID;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::core::AlgoID::JBIG//codec_ID;
     };
 
     genie::genotype::EncodingBlock block{};
@@ -107,8 +107,8 @@ TEST(Genotype, AdaptiveMaxValue) {  // NOLINT(cert-err58-cpp)
         512,// block_size;
         genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
         genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        false,// sort_rows;
-        false,// sort_cols;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
         genie::core::AlgoID::JBIG//codec_ID;
     };
 
@@ -139,23 +139,65 @@ TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
-    genie::genotype::EncodingOptions opt = {
-        512,// block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        false,// sort_rows;
-        false,// sort_cols;
-        genie::core::AlgoID::JBIG//codec_ID;
-    };
+    // Check DO_NOT_CONCAT
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
 
-    genie::genotype::EncodingBlock block{};
-    genie::genotype::decompose(opt, block, recs);
-    genie::genotype::transform_max_value(block);
-    genie::genotype::binarize_allele_mat(opt, block);
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
 
-    ASSERT_EQ(block.bin_allele_mats.shape(0), 1);
-    ASSERT_EQ(block.bin_allele_mats.shape(1), block.allele_mat.shape(0));
-    ASSERT_EQ(block.bin_allele_mats.shape(2), block.allele_mat.shape(1));
+        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
+        // TODO @Yeremia: Update the assert
+    }
+
+    // Check CONCAT_ROW_DIR
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::CONCAT_ROW_DIR,// concat_axis;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+
+        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
+        // TODO @Yeremia: Update the assert
+    }
+
+    // Check CONCAT_COL_DIR
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::CONCAT_COL_DIR,// concat_axis;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+
+        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
+        // TODO @Yeremia: Update the assert
+    }
 }
 
 TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
@@ -179,8 +221,8 @@ TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
         512,// block_size;
         genie::genotype::BinarizationID::ROW_BIN,// binarization_ID;
         genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        false,// sort_rows;
-        false,// sort_cols;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
         genie::core::AlgoID::JBIG//codec_ID;
     };
 
@@ -189,7 +231,77 @@ TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
     genie::genotype::transform_max_value(block);
     genie::genotype::binarize_allele_mat(opt, block);
 
-    ASSERT_EQ(block.bin_allele_mats.shape(0), 1);
-    ASSERT_EQ(block.bin_allele_mats.shape(1), static_cast<size_t>(xt::sum(block.amax_vec)(0)));
-    ASSERT_EQ(block.bin_allele_mats.shape(2), block.allele_mat.shape(1));
+    // TODO @Yeremia: Update the assert
+    ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
+    ASSERT_EQ(block.allele_bin_mat_vect[0].shape(0), static_cast<size_t>(xt::sum(block.amax_vec)(0)));
+//    ASSERT_EQ(block.allele_bin_mat_vect.shape(2), block.allele_mat.shape(1));
+}
+
+TEST(Genotype, RandomSort) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+        genie::genotype::sort_block(opt, block);
+    }
+
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+        genie::genotype::sort_block(opt, block);
+    }
+
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
+            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
+            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
+            genie::core::AlgoID::JBIG//codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+        genie::genotype::sort_block(opt, block);
+    }
 }

@@ -24,15 +24,20 @@
 namespace genie {
 namespace genotype {
 
-//using AlleleTensorDtype = xt::xtensor<int8_t, 3, xt::layout_type::row_major>;
 using IntMatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
-using BinMatsDtype = xt::xtensor<bool, 3, xt::layout_type::row_major>;
+using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
 
-//using AlleleTensorDtype = xt::xarray<int8_t, xt::layout_type::row_major>;
-//using UnsignedAlleleTensorDtype = xt::xarray<uint8_t, xt::layout_type::row_major>;
-//using BinMatDtype = xt::xarray<bool, xt::layout_type::row_major>;
+// ---------------------------------------------------------------------------------------------------------------------
+
+enum class SortingAlgoID: uint8_t {
+    NO_SORTING = 0,
+    RANDOM_SORT = 1,
+    NEAREST_NEIGHBOR = 2,
+    LIN_KERNIGHAN_HEURISTIC = 3,
+};
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,8 +45,8 @@ struct EncodingOptions {
     uint32_t block_size;
     BinarizationID binarization_ID;
     ConcatAxis concat_axis;
-    bool sort_rows;
-    bool sort_cols;
+    SortingAlgoID sort_row_method;
+    SortingAlgoID sort_col_method;
     genie::core::AlgoID codec_ID;
 };
 
@@ -56,7 +61,12 @@ struct EncodingBlock {
     BinMatDtype phasing_mat;
 
     UIntVecDtype amax_vec;
-    BinMatsDtype bin_allele_mats;
+    std::vector<BinMatDtype> allele_bin_mat_vect;
+    std::vector<UIntVecDtype> allele_row_ids_vect;
+    std::vector<UIntVecDtype> allele_col_ids_vect;
+
+    UIntVecDtype phasing_row_ids;
+    UIntVecDtype phasing_col_ids;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -76,20 +86,33 @@ void transform_max_value(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void binarize_bit_plane(
-    const EncodingOptions& opt,
     EncodingBlock& block
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void binarize_row_bin(
-    const EncodingOptions& opt,
     EncodingBlock& block
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void binarize_allele_mat(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void random_sort_bin_mat(
+////    EncodingBlock& block,
+//    const BinMatDtype& bin_mat,
+//    uint8_t axis
+//);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_block(
     const EncodingOptions& opt,
     EncodingBlock& block
 );

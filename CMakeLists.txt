@@ -149,9 +149,7 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
-find_package(xtl REQUIRED)
-find_package(xtensor REQUIRED)
+#set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
 #==============================================================================
 # Include paths
