@@ -46,6 +46,7 @@ struct EncodingOptions {
     uint32_t block_size;
     BinarizationID binarization_ID;
     ConcatAxis concat_axis;
+    bool transpose_mat = false;
     SortingAlgoID sort_row_method;
     SortingAlgoID sort_col_method;
     genie::core::AlgoID codec_ID;
@@ -69,6 +70,10 @@ struct EncodingBlock {
     UIntVecDtype phasing_row_ids;
     UIntVecDtype phasing_col_ids;
 };
+
+uint8_t getNumBinMats(
+    EncodingBlock& block
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

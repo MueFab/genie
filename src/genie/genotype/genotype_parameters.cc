@@ -18,12 +18,12 @@ GenotypeParameters::GenotypeParameters():
     no_reference_flag(false),
     not_available_flag(false),
     binarization_ID(BinarizationID::UNDEFINED),
-    num_bit_planes(0),
+//    num_bit_planes(0),
     concat_axis(ConcatAxis::UNDEFINED),
     variants_payload_params(),
     encode_phases_data_flag(false),
     phases_payload_params(),
-    phases_value(false)
+      phasing_value(false)
 {}
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,22 +32,22 @@ GenotypeParameters::GenotypeParameters(
     bool _no_reference_flag,
     bool _not_available_flag,
     BinarizationID _binarization_ID,
-    uint8_t _num_bit_planes,
+//    uint8_t _num_bit_planes,
     ConcatAxis _concat_axis,
     std::vector<GenotypePayloadParameters>&& _variants_payload_params,
     bool _encode_phases_data_flag,
-    GenotypePayloadParameters&& _phases_payload_params,
+    GenotypePayloadParameters _phases_payload_params,
     bool _phases_value):
       max_ploidy(_max_ploidy),
       no_reference_flag(_no_reference_flag),
       not_available_flag(_not_available_flag),
       binarization_ID(_binarization_ID),
-      num_bit_planes(_num_bit_planes),
+//      num_bit_planes(_num_bit_planes),
       concat_axis(_concat_axis),
       variants_payload_params(_variants_payload_params),
       encode_phases_data_flag(_encode_phases_data_flag),
       phases_payload_params(_phases_payload_params),
-      phases_value(_phases_value)
+      phasing_value(_phases_value)
 {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ BinarizationID GenotypeParameters::getBinarizationID() const { return binarizati
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getNumBitPlanes() const {return num_bit_planes;}
+uint8_t GenotypeParameters::getNumBitPlanes() const {return static_cast<uint8_t>(variants_payload_params.size());}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ const GenotypePayloadParameters& GenotypeParameters::getPhasesPayloadParams() co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getPhaseValue() const { return phases_value; }
+bool GenotypeParameters::getPhaseValue() const { return phasing_value; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

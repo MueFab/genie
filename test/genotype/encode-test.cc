@@ -18,7 +18,7 @@
 //#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
-TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
+TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
 
@@ -37,10 +37,11 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+        false, // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
         genie::core::AlgoID::JBIG//codec_ID;
     };
 
@@ -86,7 +87,7 @@ TEST(Genotype, Decompose) {  // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST(Genotype, AdaptiveMaxValue) {  // NOLINT(cert-err58-cpp)
+TEST(Genotype, AdaptiveMaxValue) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
 
@@ -105,10 +106,11 @@ TEST(Genotype, AdaptiveMaxValue) {  // NOLINT(cert-err58-cpp)
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+        false, // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
         genie::core::AlgoID::JBIG//codec_ID;
     };
 
@@ -122,7 +124,7 @@ TEST(Genotype, AdaptiveMaxValue) {  // NOLINT(cert-err58-cpp)
     ASSERT_EQ(xt::amax(block.allele_mat)(0), 1);
 }
 
-TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
+TEST(Genotype, BinarizeBitPlane) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
 
@@ -143,10 +145,11 @@ TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
             genie::core::AlgoID::JBIG//codec_ID;
         };
 
@@ -163,10 +166,11 @@ TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::CONCAT_ROW_DIR,// concat_axis;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::CONCAT_ROW_DIR, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
             genie::core::AlgoID::JBIG//codec_ID;
         };
 
@@ -183,10 +187,11 @@ TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::CONCAT_COL_DIR,// concat_axis;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::CONCAT_COL_DIR, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
             genie::core::AlgoID::JBIG//codec_ID;
         };
 
@@ -200,7 +205,7 @@ TEST(Genotype, BinarizeBitPlane) {  // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
+TEST(Genotype, BinarizeRowBin) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
 
@@ -219,10 +224,11 @@ TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
-        genie::genotype::BinarizationID::ROW_BIN,// binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
+        genie::genotype::BinarizationID::ROW_BIN, // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+        false, // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
         genie::core::AlgoID::JBIG//codec_ID;
     };
 
@@ -237,7 +243,7 @@ TEST(Genotype, BinarizeRowBin) {  // NOLINT(cert-err58-cpp)
 //    ASSERT_EQ(block.allele_bin_mat_vect.shape(2), block.allele_mat.shape(1));
 }
 
-TEST(Genotype, RandomSort) {  // NOLINT(cert-err58-cpp)
+TEST(Genotype, RandomSort) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
 
@@ -257,11 +263,12 @@ TEST(Genotype, RandomSort) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-            genie::core::AlgoID::JBIG//codec_ID;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::core::AlgoID::JBIG //codec_ID;
         };
 
         genie::genotype::EncodingBlock block{};
@@ -274,11 +281,12 @@ TEST(Genotype, RandomSort) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-            genie::genotype::SortingAlgoID::NO_SORTING,// sort_row_method;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
-            genie::core::AlgoID::JBIG//codec_ID;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
+            genie::core::AlgoID::JBIG //codec_ID;
         };
 
         genie::genotype::EncodingBlock block{};
@@ -291,11 +299,12 @@ TEST(Genotype, RandomSort) {  // NOLINT(cert-err58-cpp)
     {
         genie::genotype::EncodingOptions opt = {
             512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,// binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,// concat_axis;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,// sort_row_method;
-            genie::core::AlgoID::JBIG//codec_ID;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
+            genie::core::AlgoID::JBIG //codec_ID;
         };
 
         genie::genotype::EncodingBlock block{};
