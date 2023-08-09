@@ -36,6 +36,7 @@ enum class SortingAlgoID: uint8_t {
     RANDOM_SORT = 1,
     NEAREST_NEIGHBOR = 2,
     LIN_KERNIGHAN_HEURISTIC = 3,
+    UNDEFINED = 4
 };
 
 
@@ -86,7 +87,8 @@ void transform_max_value(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void binarize_bit_plane(
-    EncodingBlock& block
+    EncodingBlock& block,
+    ConcatAxis concat_axis
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -104,11 +106,29 @@ void binarize_allele_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void random_sort_bin_mat(
-////    EncodingBlock& block,
-//    const BinMatDtype& bin_mat,
-//    uint8_t axis
-//);
+void sort_matrix(
+    BinMatDtype& bin_mat,
+    UIntVecDtype ids,
+    uint8_t axis
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void random_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& ids,
+    uint8_t axis
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids,
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
