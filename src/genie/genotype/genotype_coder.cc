@@ -20,6 +20,14 @@ namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t getNumBinMats(
+    EncodingBlock& block
+){
+    return static_cast<uint8_t>(block.allele_bin_mat_vect.size());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void decompose(
     const EncodingOptions& opt,
     EncodingBlock& block,
@@ -120,8 +128,6 @@ void binarize_bit_plane(
     auto& bin_mats = block.allele_bin_mat_vect;
     bin_mats.resize(num_bit_planes);
 
-//    bin_mats = BinMatsDtype({num_bit_planes, nrows, ncols});
-
     for (uint8_t k = 0; k < num_bit_planes; k++){
         bin_mats[k] = allele_mat & (1 << k);
     }
@@ -186,7 +192,6 @@ void binarize_allele_mat(
     }
 
     //TODO @Yeremia: Free memory of allele_mat
-//    delete block.allele_mat;
     block.allele_mat.resize({0,0});
 }
 
@@ -279,9 +284,8 @@ void sort_block(
     const EncodingOptions& opt,
     EncodingBlock& block
 ){
-    auto num_bin_mats = static_cast<uint8_t>(block.allele_bin_mat_vect.size());
+    auto num_bin_mats = getNumBinMats(block);
 
-    // Sort (boolean) alelle matrices
     block.allele_row_ids_vect.resize(num_bin_mats);
     block.allele_col_ids_vect.resize(num_bin_mats);
     for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
@@ -306,12 +310,94 @@ void sort_block(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void encode(
-//    const EncodingOptions& opt,
-//    std::list<core::record::VariantGenotype>& recs
+// TODO @Yeremia: Does it makes sense to create sort_block which take GenotypeParameter?
+//void sort_block(
+//    const GenotypeParameters& params,
+//    EncodingBlock& block
 //){
+//    auto num_bin_mats = params.getNumBitPlanes();
+//
+//    block.allele_row_ids_vect.resize(num_bin_mats);
+//    block.allele_col_ids_vect.resize(num_bin_mats);
+//    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
+//        sort_bin_mat(
+//            block.allele_bin_mat_vect[i_mat],
+//            block.allele_row_ids_vect[i_mat],
+//            block.allele_col_ids_vect[i_mat],
+//            opt.sort_row_method,
+//            opt.sort_col_method
+//        );
+//    }
+//
+//    // Sort phasing matrix
+//    sort_bin_mat(
+//        block.phasing_mat,
+//        block.phasing_row_ids,
+//        block.phasing_col_ids,
+//        opt.sort_row_method,
+//        opt.sort_col_method
+//    );
 //
 //}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<GenotypeParameters, EncodingBlock>&& encode(
+    const EncodingOptions& opt,
+    std::vector<core::record::VariantGenotype>& recs
+){
+    UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG,
+                 "Invalid AlgoID or algorithm is not yet implemented");
+    UTILS_DIE_IF(opt.binarization_ID != BinarizationID::UNDEFINED,
+                 "Invalid BinarizationID");
+    UTILS_DIE_IF(opt.sort_row_method != SortingAlgoID::UNDEFINED,
+                 "Invalid SortingAlgoID");
+    UTILS_DIE_IF(opt.sort_col_method != SortingAlgoID::UNDEFINED,
+                 "Invalid SortingAlgoID");
+
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+    genie::genotype::transform_max_value(block);
+    genie::genotype::binarize_allele_mat(opt, block);
+
+    // TODO @Yeremia: create function to create GenotypeParameters
+    auto num_bin_mats = getNumBinMats(block);
+    std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
+    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
+        payload_params[i_mat].sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].transpose_variants_mat_flag = false;
+        payload_params[i_mat].variants_codec_ID = opt.codec_ID;
+    }
+
+    auto unique_phasing_vals = xt::unique(block.phasing_mat);
+    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
+    bool phases_value = unique_phasing_vals(0);
+
+    GenotypePayloadParameters phasing_payload_params{};
+    if (encode_phases_data_flag){
+        phasing_payload_params.sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.transpose_variants_mat_flag = false;
+        phasing_payload_params.variants_codec_ID = opt.codec_ID;
+    }
+
+    GenotypeParameters parameter(
+        block.max_ploidy,
+        block.dot_flag,
+        block.na_flag,
+        opt.binarization_ID,
+        opt.concat_axis,
+        std::move(payload_params),
+        encode_phases_data_flag,
+        phasing_payload_params,
+        phases_value
+    );
+
+    genie::genotype::sort_block(opt, block);
+
+    return {parameter, block};
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
