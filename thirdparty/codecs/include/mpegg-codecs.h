@@ -1,6 +1,9 @@
 #ifndef _MPEGG_CODECS_H
 #define _MPEGG_CODECS_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 /* ================================================================================================================  */
 /* BSC                                                                                                               */
 /* ================================================================================================================  */
@@ -81,6 +84,47 @@ int mpegg_zstd_compress(unsigned char **dest, size_t *destLen, const unsigned ch
                         int compressionLevel);
 
 int mpegg_zstd_decompress(unsigned char **dest, size_t *destLen, const unsigned char *src, size_t srcLen);
+
+/* ================================================================================================================  */
+/* JBIG                                                                                                              */
+/* ================================================================================================================  */
+
+int mpegg_jbig_compress(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char  *src,
+    size_t                scr_len,
+    unsigned long width,
+    unsigned long height,
+    unsigned long num_lines_per_stripe, // Valid range: 1 to 2^32-1
+    bool deterministic_pred,
+    bool typical_pred,
+    bool diff_layer_typical_pred,
+//    bool var_img_height,
+    bool two_line_template
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//int mpegg_jbig_decompress_default(
+//    unsigned char      **dest,
+//    size_t              *dest_len,
+//    const unsigned char *src,
+//    size_t               src_len
+//);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+int mpegg_jbig_decompress(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char *src,
+    size_t               src_len,
+    size_t               buf_len,
+    size_t               xmax
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }
