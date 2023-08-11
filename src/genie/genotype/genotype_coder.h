@@ -24,10 +24,13 @@
 namespace genie {
 namespace genotype {
 
-using IntMatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
+using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
+using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
+using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
+using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +62,7 @@ struct EncodingBlock {
     bool dot_flag = false;
     bool na_flag = false;
 
-    IntMatDtype allele_mat;
+    Int8MatDtype allele_mat;
     BinMatDtype phasing_mat;
 
     UIntVecDtype amax_vec;
@@ -144,7 +147,30 @@ void sort_block(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode(
+void bin_mat_to_bytes(
+    BinMatDtype& bin_mat,
+    uint8_t** payload,
+    size_t& payload_len
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void entropy_encode_bin_mat(
+    BinMatDtype& bin_mat,
+    genie::core::AlgoID codec_ID
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void bin_mat_from_bytes(
+    BinMatDtype& bin_mat,
+    uint8_t** payload,
+    size_t& payload_len
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode_block(
     const EncodingOptions& opt,
     std::list<core::record::VariantGenotype>& recs
 );

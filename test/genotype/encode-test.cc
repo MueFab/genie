@@ -21,16 +21,15 @@
 TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
-
-    std::vector<genie::core::record::VariantGenotype> recs;
-
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
     }
+    reader.close();
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
@@ -90,16 +89,15 @@ TEST(Genotype, Decompose) {
 TEST(Genotype, AdaptiveMaxValue) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
-
-    std::vector<genie::core::record::VariantGenotype> recs;
-
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
     }
+    reader.close();
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
@@ -127,16 +125,15 @@ TEST(Genotype, AdaptiveMaxValue) {
 TEST(Genotype, BinarizeBitPlane) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
-
-    std::vector<genie::core::record::VariantGenotype> recs;
-
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
     }
+    reader.close();
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
@@ -208,16 +205,15 @@ TEST(Genotype, BinarizeBitPlane) {
 TEST(Genotype, BinarizeRowBin) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
-
-    std::vector<genie::core::record::VariantGenotype> recs;
-
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
     }
+    reader.close();
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
@@ -312,5 +308,52 @@ TEST(Genotype, RandomSort) {
         genie::genotype::transform_max_value(block);
         genie::genotype::binarize_allele_mat(opt, block);
         genie::genotype::sort_block(opt, block);
+    }
+}
+
+TEST(Genotype, SerializeBinMat) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+
+    std::ifstream reader(filepath);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    {
+        genie::genotype::EncodingOptions opt = {
+            512,// block_size;
+            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
+            false, // transpose_mat;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
+            genie::core::AlgoID::JBIG //codec_ID;
+        };
+
+        genie::genotype::EncodingBlock block{};
+        genie::genotype::decompose(opt, block, recs);
+        genie::genotype::transform_max_value(block);
+        genie::genotype::binarize_allele_mat(opt, block);
+        genie::genotype::sort_block(opt, block);
+
+        genie::core::AlgoID codec_ID = opt.codec_ID;
+        for (uint8_t i_mat = 0; i_mat < genie::genotype::getNumBinMats(block); i_mat++){
+//        for (auto& bin_mat: block.allele_bin_mat_vect){
+//            auto payload = std::vector<uint8_t>();
+//            uint8_t* payload;
+//            size_t payload_len;
+            auto& bin_mat = block.allele_bin_mat_vect[i_mat];
+            genie::genotype::entropy_encode_bin_mat(bin_mat, codec_ID);
+            auto y = 0;
+        }
     }
 }

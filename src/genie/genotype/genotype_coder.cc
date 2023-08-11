@@ -11,6 +11,7 @@
 #include <xtensor/xsort.hpp>
 //#include <xtensor/xstrided_view.hpp>
 #include <xtensor/xview.hpp>
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,9 +55,10 @@ void decompose(
     }
 
     auto& allele_mat = block.allele_mat;
-    allele_mat = IntMatDtype({block_size, num_samples*max_ploidy});
-    // Initialize value with "not available"
-    xt::view(allele_mat, xt::all(), xt::all(), xt::all()) = -2;
+//    allele_mat = Int8MatDtype({block_size, num_samples*max_ploidy});
+    MatShapeDtype allele_mat_shape = {block_size, num_samples*max_ploidy};
+    allele_mat = xt::empty<bool, xt::layout_type::row_major>(allele_mat_shape);
+    xt::view(allele_mat, xt::all(), xt::all(), xt::all()) = -2; // Initialize value with "not available"
 
     auto& phasing_mat = block.phasing_mat;
     phasing_mat = BinMatDtype({block_size, num_samples * static_cast<uint8_t>(max_ploidy -1)});
@@ -140,6 +142,7 @@ void binarize_bit_plane(
                 bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1);
             }
         }
+        // Clean-up the remaining bin_mats
         bin_mats.resize(1);
     }
 }
@@ -154,14 +157,12 @@ void binarize_row_bin(
     auto& amax_vec = block.amax_vec;
     auto nrows = allele_mat.shape(0);
     auto ncols = allele_mat.shape(1);
-    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(
-                                    xt::amax(allele_mat, 1) + 1)));
+    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, 1) + 1)));
 
     auto& bin_mats = block.allele_bin_mat_vect;
     bin_mats.resize(1);
     auto new_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
 
-//    bin_mats = BinMatsDtype ({1, new_nrows, ncols});
     auto& bin_mat = bin_mats[0];
     bin_mat.resize({new_nrows, ncols});
 
@@ -310,39 +311,91 @@ void sort_block(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO @Yeremia: Does it makes sense to create sort_block which take GenotypeParameter?
-//void sort_block(
-//    const GenotypeParameters& params,
-//    EncodingBlock& block
-//){
-//    auto num_bin_mats = params.getNumBitPlanes();
-//
-//    block.allele_row_ids_vect.resize(num_bin_mats);
-//    block.allele_col_ids_vect.resize(num_bin_mats);
-//    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
-//        sort_bin_mat(
-//            block.allele_bin_mat_vect[i_mat],
-//            block.allele_row_ids_vect[i_mat],
-//            block.allele_col_ids_vect[i_mat],
-//            opt.sort_row_method,
-//            opt.sort_col_method
-//        );
+void bin_mat_to_bytes(
+    BinMatDtype& bin_mat,
+    uint8_t** payload,
+    size_t& payload_len
+){
+    auto nrows = static_cast<size_t>(bin_mat.shape(0));
+    auto ncols = static_cast<size_t>(bin_mat.shape(1));
+
+    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
+//    payload.resize(bpl * nrows);
+    payload_len = bpl * nrows;
+    *payload = (unsigned char*) malloc(payload_len * sizeof(unsigned char));
+    auto ncols_byte_aligned = static_cast<size_t>(floor(static_cast<double>(ncols) / 8));
+
+    // TODO @Yeremia: Create simpler version
+    size_t ibytes = 0;
+    size_t ibit = 0;
+    for (size_t i = 0; i<nrows; i++){
+        auto ibyte_offset = static_cast<size_t>(i * bpl);
+        for (size_t j = 0; j<ncols; j++) {
+            (*payload)[ibyte_offset + static_cast<size_t>(floor(static_cast<double>(j)/8))] |=
+                xt::cast<uint8_t>(xt::view(bin_mat, i, j))(0) << ibit;
+        }
+    }
+
+    // SIMD version of the for loop
+//    MatShapeDtype buffer_mat_shape {nrows, bpl};
+////    auto buffer_mat = UInt8MatDtype(buffer_mat_shape);
+//    UInt8MatDtype buffer_mat = xt::zeros<uint8_t>(buffer_mat_shape);
+////    auto ncols_byte_aligned = static_cast<size_t>(floor(static_cast<double>(ncols) / 8));
+//    // Handle byte-aligned columns
+//    for (uint8_t ibit = 0; ibit < 8; ibit++){
+//        auto ith_bit_bin_mat = xt::view(bin_mat, xt::all(), xt::range(ibit, ncols_byte_aligned *8, 8));
+//        xt::view(buffer_mat, xt::all(), xt::range(0, ncols_byte_aligned)) |= xt::cast<uint8_t>(ith_bit_bin_mat) << (7-ibit);
 //    }
-//
-//    // Sort phasing matrix
-//    sort_bin_mat(
-//        block.phasing_mat,
-//        block.phasing_row_ids,
-//        block.phasing_col_ids,
-//        opt.sort_row_method,
-//        opt.sort_col_method
-//    );
-//
-//}
+//    for (uint8_t ibit = 0; ibit < static_cast<uint8_t>(ncols % 8); ibit++){
+//        auto ith_bit_bin_mat = xt::view(bin_mat, xt::all(), xt::range(ncols_byte_aligned*8, ncols_byte_aligned*8+ibit));
+//        xt::view(buffer_mat, xt::all(), ncols_byte_aligned) |= xt::cast<uint8_t>(ith_bit_bin_mat) << (7-ibit);
+//    }
+
+//    std::vector<double> w(a1.begin(), a1.end());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<GenotypeParameters, EncodingBlock>&& encode(
+void entropy_encode_bin_mat(
+    BinMatDtype& bin_mat,
+    genie::core::AlgoID codec_ID
+){
+    uint8_t* raw_payload;
+    size_t raw_payload_len;
+    uint8_t* compressed_payload;
+    size_t compressed_payload_len;
+
+    bin_mat_to_bytes(bin_mat, &raw_payload, raw_payload_len);
+    mpegg_jbig_compress(
+        &compressed_payload,
+        &compressed_payload_len,
+        raw_payload,
+        raw_payload_len,
+        bin_mat.shape(0),
+        bin_mat.shape(1),
+        -1,     // num_lines_per_stripe
+        true,   // deterministic_pred
+        false,  // typical_pred
+        false,  // diff_layer_typical_pred
+//        false,  // var_img_height
+        false   // two_line_template
+    );
+
+    free(raw_payload);
+    free(compressed_payload);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void bin_mat_from_bytes(
+    BinMatDtype& bin_mat, // Must be initialized first with the correct size
+    uint8_t** payload,
+    size_t& payload_len
+){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<GenotypeParameters, EncodingBlock>&& encode_block(
     const EncodingOptions& opt,
     std::vector<core::record::VariantGenotype>& recs
 ){
@@ -372,7 +425,7 @@ std::tuple<GenotypeParameters, EncodingBlock>&& encode(
 
     auto unique_phasing_vals = xt::unique(block.phasing_mat);
     bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
-    bool phases_value = unique_phasing_vals(0);
+    bool phases_value = unique_phasing_vals(0); // unique_phasing_vals has (at least) 1 value
 
     GenotypePayloadParameters phasing_payload_params{};
     if (encode_phases_data_flag){
