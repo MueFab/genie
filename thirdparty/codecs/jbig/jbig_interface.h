@@ -22,12 +22,20 @@ void data_out(unsigned char *start, size_t len, void *file);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+int line_out(
+    const struct jbg85_dec_state *s,
+    unsigned char *start, size_t len,
+    unsigned long y,
+    void *file
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void jbg85_set_enc_options(
     struct jbg85_enc_state *s,
     bool deterministic_pred,
     bool typical_pred,
     bool diff_layer_typical_pred,
-//    bool var_img_height,
     bool two_line_template
 );
 

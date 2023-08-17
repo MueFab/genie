@@ -34,6 +34,29 @@ void data_out(
     void *file
 ){
     fwrite(start, 1, len, (FILE *) file);
+//    fwrite(start, len, 1, (FILE *) file);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+int line_out(
+    const struct jbg85_dec_state *s,
+    unsigned char *start, size_t len,
+    unsigned long y,
+    void *file
+){
+//    if (y == 0) {
+//        /* prefix first line with PBM header */
+//        fprintf((FILE *) file, "P4\n");
+//        fprintf((FILE *) file, "%10lu\n", jbg85_dec_getwidth(s));
+//        /* store file position of height, so we can update it after NEWLEN */
+//        y_0 = jbg85_dec_getheight(s);
+//        ypos_error = fgetpos((FILE *) file, &ypos);
+//        fprintf((FILE *) file, "%10lu\n", y_0); /* pad number to 10 bytes */
+//    }
+//    fwrite(start, len, 1, (FILE *) file);
+    fwrite(start, 1, len, (FILE *) file);
+    return y == -1;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +66,6 @@ void jbg85_set_enc_options(
     bool deterministic_pred,
     bool typical_pred,
     bool diff_layer_typical_pred,
-//    bool var_img_height,
     bool two_line_template
 ){
     s->options = 0;
@@ -53,8 +75,6 @@ void jbg85_set_enc_options(
         s->options |= JBG_TPBON;
     if (diff_layer_typical_pred)
         s->options |= JBG_TPDON;
-//    if (var_img_height)
-//        s->options |= JBG_VLENGTH;
     if (two_line_template)
         s->options |= JBG_LRLTWO;
 }
@@ -69,7 +89,6 @@ void jbg85_set_def_enc_options(
         true, // deterministic_pred
         false, // typical_pred: rarely similar line after each other
         false, // diff_layer_typical_pred: multiple layer is turned off
-//        false, // var_img_height: img_heigh is known
         false // two_line_template: template should be three lines
     );
 }

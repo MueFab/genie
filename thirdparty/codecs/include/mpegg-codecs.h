@@ -94,8 +94,8 @@ int mpegg_jbig_compress(
     size_t              *dest_len,
     const unsigned char  *src,
     size_t                scr_len,
-    unsigned long width,
-    unsigned long height,
+    unsigned long nrows,
+    unsigned long ncols,
     unsigned long num_lines_per_stripe, // Valid range: 1 to 2^32-1
     bool deterministic_pred,
     bool typical_pred,
@@ -106,12 +106,13 @@ int mpegg_jbig_compress(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//int mpegg_jbig_decompress_default(
-//    unsigned char      **dest,
-//    size_t              *dest_len,
-//    const unsigned char *src,
-//    size_t               src_len
-//);
+int mpegg_jbig_decompress_default(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char *src,
+    size_t               src_len,
+    unsigned long       *nrows,
+    unsigned long       *ncols);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -120,8 +121,10 @@ int mpegg_jbig_decompress(
     size_t              *dest_len,
     const unsigned char *src,
     size_t               src_len,
-    size_t               buf_len,
-    size_t               xmax
+    unsigned long *nrows,
+    unsigned long *ncols,
+    size_t buf_len,
+    size_t xmax
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
