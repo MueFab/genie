@@ -584,7 +584,7 @@ void jbg85_dec_init(struct jbg85_dec_state *s,
   s->p[1] = -1;
   s->p[2] = -1;
   arith_decode_init(&s->s, 0);
-  return;
+//  return;
 }
 
 
