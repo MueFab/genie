@@ -5,17 +5,18 @@
  */
 
 #include <gtest/gtest.h>
-#include <vector>
 #include <fstream>
-#include <xtensor/xview.hpp>
+#include <vector>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xoperation.hpp>
+#include <xtensor/xrandom.hpp>
+#include <xtensor/xview.hpp>
+#include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/runtime-exception.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
-#include "genie/util/bitreader.h"
-//#include "genie/util/bitwriter.h"
-//#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
 TEST(Genotype, Decompose) {
@@ -311,49 +312,53 @@ TEST(Genotype, RandomSort) {
     }
 }
 
-TEST(Genotype, SerializeBinMat) {
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+TEST(Genotype, Serializer) {
 
-    std::ifstream reader(filepath);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
+    genie::genotype::BinMatDtype bin_mat;
+    uint8_t* payload;
+    size_t payload_len;
+    size_t nrows;
+    size_t ncols;
 
-    std::vector<genie::core::record::VariantGenotype> recs;
-
-    while (bitreader.isGood()) {
-        recs.emplace_back(bitreader);
+    bin_mat = xt::eval(xt::random::randint<uint8_t>({10, 24})) > 127;
+    {
+        genie::genotype::BinMatDtype recon_bin_mat;
+        recon_bin_mat = bin_mat;
+        ASSERT_TRUE(bin_mat == recon_bin_mat);
     }
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
+    genie::genotype::bin_mat_to_bytes(
+        bin_mat,
+        &payload,
+        payload_len
+    );
 
-    {
-        genie::genotype::EncodingOptions opt = {
-            512,// block_size;
-            genie::genotype::BinarizationID::BIT_PLANE, // binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT, // concat_axis;
-            false, // transpose_mat;
-            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING, // sort_row_method;
-            genie::core::AlgoID::JBIG //codec_ID;
-        };
+    nrows = bin_mat.shape(0);
+    ncols = bin_mat.shape(1);
 
-        genie::genotype::EncodingBlock block{};
-        genie::genotype::decompose(opt, block, recs);
-        genie::genotype::transform_max_value(block);
-        genie::genotype::binarize_allele_mat(opt, block);
-        genie::genotype::sort_block(opt, block);
+    genie::genotype::BinMatDtype recon_bin_mat;
+    genie::genotype::bin_mat_from_bytes(
+        recon_bin_mat,
+        payload,
+        payload_len,
+        nrows,
+        ncols
+    );
 
-        genie::core::AlgoID codec_ID = opt.codec_ID;
-        for (uint8_t i_mat = 0; i_mat < genie::genotype::getNumBinMats(block); i_mat++){
-//        for (auto& bin_mat: block.allele_bin_mat_vect){
-//            auto payload = std::vector<uint8_t>();
-//            uint8_t* payload;
-//            size_t payload_len;
-            auto& bin_mat = block.allele_bin_mat_vect[i_mat];
-            genie::genotype::entropy_encode_bin_mat(bin_mat, codec_ID);
-            auto y = 0;
+    free(payload);
+//    ASSERT_TRUE(bin_mat == recon_bin_mat);
+
+    auto orig_shape = bin_mat.shape();
+    auto recon_shape = recon_bin_mat.shape();
+    UTILS_DIE_IF(bin_mat.shape(0) != recon_bin_mat.shape(0), "Wrong nrows!");
+    UTILS_DIE_IF(bin_mat.shape(1) != recon_bin_mat.shape(1), "Wrong ncols!");
+//    UTILS_DIE_IF(bin_mat != recon_bin_mat, "");
+    for (size_t i = 0; i < nrows; i++) {
+        for (size_t j = 0; j < ncols; j++) {
+            bool bin_mat_val = bin_mat(i,j);
+            bool recon_bin_mat_val = recon_bin_mat(i,j);
+            UTILS_DIE_IF(bin_mat_val != recon_bin_mat_val, "");
         }
     }
+    auto y = 0;
 }

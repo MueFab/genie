@@ -320,20 +320,30 @@ void bin_mat_to_bytes(
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
     auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
-//    payload.resize(bpl * nrows);
     payload_len = bpl * nrows;
     *payload = (unsigned char*) malloc(payload_len * sizeof(unsigned char));
-    auto ncols_byte_aligned = static_cast<size_t>(floor(static_cast<double>(ncols) / 8));
 
-    // TODO @Yeremia: Create simpler version
-    size_t ibytes = 0;
-    size_t ibit = 0;
+//    auto* payload_ptr = *payload;
     for (size_t i = 0; i<nrows; i++){
-        auto ibyte_offset = static_cast<size_t>(i * bpl);
+//        size_t byte_offset = 0;
         for (size_t j = 0; j<ncols; j++) {
-            (*payload)[ibyte_offset + static_cast<size_t>(floor(static_cast<double>(j)/8))] |=
-                xt::cast<uint8_t>(xt::view(bin_mat, i, j))(0) << ibit;
+//            auto byte_offset = static_cast<size_t>(floor(static_cast<double>(j)/8));
+//            auto rem_j = j % 8;
+//            auto bit_offset = (7 - (rem_j));
+//            auto mask = static_cast<uint8_t>(bin_mat(i, j));
+//            auto x = mask << bit_offset;
+//            *(payload_ptr + byte_offset) |= mask << bit_offset;
+//            byte_offset += (!rem_j && j > 0) ? 1 : 0;
+
+//            *(payload_ptr + byte_offset) |= bin_mat(i, j);
+//            *(payload_ptr + byte_offset) << 1;
+//            if (j % 8 && j > 0){
+//                byte_offset++;
+//            }
+            auto byte_offset = static_cast<size_t>((i*bpl) + floor(j/8));
+            *(*payload + byte_offset) |= static_cast<uint8_t>(static_cast<uint8_t>(bin_mat(i, j)) << (7-(j%8)));
         }
+//        payload_ptr += bpl;
     }
 
     // SIMD version of the for loop
@@ -356,42 +366,130 @@ void bin_mat_to_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void bin_mat_from_bytes(
+    BinMatDtype& bin_mat,
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols
+){
+    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
+    UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
+                 "Invalid payload_len / nrows / ncols!");
+
+    MatShapeDtype bin_mat_shape = {nrows, ncols};
+    bin_mat.resize(bin_mat_shape);
+    xt::view(bin_mat, xt::all(), xt::all(), xt::all()) = false; // Initialize value with 0
+
+//    auto* payload_ptr = payload;
+    for (size_t i = 0; i < nrows; i++){
+//        size_t byte_offset = 0;
+//        uint8_t val = 0;
+        for (size_t j = 0; j<ncols; j++) {
+//            *(payload_ptr + byte_offset) |= bin_mat(i, j);
+//            *(payload_ptr + byte_offset) << 1;
+//            if (j % 8 && j > 0){
+//                byte_offset++;
+//            }
+//            auto rem_j = j % 8;
+//            auto bit_offset = (7 - (rem_j));
+//            auto val =  (*(payload_ptr + byte_offset) >> bit_offset);
+//            val &= 1;
+//            bin_mat(i, j) = val;
+//            byte_offset += (!rem_j && j > 0) ? 1 : 0;
+//            if (j % 8 == 0)
+//                val = *(payload_ptr + byte_offset);
+//
+//            bin_mat(i, j) = val & 1;
+//            val >>= 1;
+//            if (j % 8 && j > 0){
+//                byte_offset++;
+//            }
+            auto byte_offset = static_cast<size_t>(i*bpl + j/8);
+//            *(payload + byte_offset) |= static_cast<uint8_t>(static_cast<uint8_t>(bin_mat(i, j)) << (7-(j%8)));
+            bin_mat(i, j) = (*(payload + byte_offset) >> (7-(j%8))) & 1;
+        }
+//        payload_ptr += bpl;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
-    genie::core::AlgoID codec_ID
+    genie::core::AlgoID codec_ID,
+    std::vector<uint8_t> payload
 ){
-    uint8_t* raw_payload;
-    size_t raw_payload_len;
-    uint8_t* compressed_payload;
-    size_t compressed_payload_len;
 
-    bin_mat_to_bytes(bin_mat, &raw_payload, raw_payload_len);
+    uint8_t* raw_data;
+    size_t raw_data_len;
+    uint8_t* compressed_data;
+    size_t compressed_data_len;
+
+    bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
     mpegg_jbig_compress(
-        &compressed_payload,
-        &compressed_payload_len,
-        raw_payload,
-        raw_payload_len,
+        &compressed_data,
+        &compressed_data_len,
+        raw_data,
+        raw_data_len,
         bin_mat.shape(0),
         bin_mat.shape(1),
         -1,     // num_lines_per_stripe
         true,   // deterministic_pred
         false,  // typical_pred
         false,  // diff_layer_typical_pred
-//        false,  // var_img_height
         false   // two_line_template
     );
 
-    free(raw_payload);
-    free(compressed_payload);
+    payload = std::vector<uint8_t>(
+        compressed_data,
+        compressed_data + compressed_data_len
+    );
+
+    free(raw_data);
+
+//#ifdef DEBUG
+
+    size_t nrows;
+    size_t ncols;
+
+    mpegg_jbig_decompress_default(
+        &raw_data,
+        &raw_data_len,
+        compressed_data,
+        compressed_data_len,
+        &nrows,
+        &ncols
+    );
+
+    BinMatDtype recon_bin_mat;
+
+    bin_mat_from_bytes(
+        recon_bin_mat, // Must be initialized first with the correct size
+        raw_data,
+        raw_data_len,
+        nrows,
+        ncols
+    );
+
+//#endif
+
+    free(compressed_data);
+
+    UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
+//    UTILS_DIE_IF(!xt::all(xt::equal(bin_mat, recon_bin_mat)));
+    auto equality_check = xt::equal(bin_mat, recon_bin_mat);
+    if (!xt::all(equality_check)){
+        for (size_t i = 0; i<nrows; i++) {
+            for (size_t j = 0; j < ncols; j++) {
+                auto val = equality_check(i, j);
+                std::cerr << val;
+            }
+        }
+    }
+
+    auto x = 0;
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void bin_mat_from_bytes(
-    BinMatDtype& bin_mat, // Must be initialized first with the correct size
-    uint8_t** payload,
-    size_t& payload_len
-){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
