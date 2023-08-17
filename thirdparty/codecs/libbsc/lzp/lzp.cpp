@@ -802,6 +802,8 @@ int bsc_lzp_compress(const unsigned char * input, unsigned char * output, int n,
         return bsc_lzp_compress_parallel(input, output, n, hashSize, minLen);
     }
 
+#else
+    (void)features;
 #endif
 
     return bsc_lzp_compress_serial(input, output, n, hashSize, minLen);
@@ -845,6 +847,8 @@ int bsc_lzp_decompress(const unsigned char * input, unsigned char * output, int 
     }
     else
 
+#else
+    (void)features;
 #endif
 
     {

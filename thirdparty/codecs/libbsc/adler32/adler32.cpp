@@ -84,10 +84,10 @@ See also the bsc and libbsc web site:
 
 unsigned int ADLER32_FUNCTION_NAME (const unsigned char * T, int n, int features)
 {
-            features;
     unsigned int sum1 = 1;
     unsigned int sum2 = 0;
 
+    (void)features;
 #if LIBBSC_CPU_FEATURE >= LIBBSC_CPU_FEATURE_SSSE3 || LIBBSC_CPU_FEATURE == LIBBSC_CPU_FEATURE_A64
 
     while ((((uintptr_t)T & 15) != 0) && n > 0)

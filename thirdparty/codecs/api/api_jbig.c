@@ -75,7 +75,7 @@ int mpegg_jbig_compress(
     *dest = (unsigned char *) malloc (*dest_len * sizeof(unsigned  char));
     fout = fmemopen(*dest, *dest_len * sizeof(unsigned  char), "wb");
     if (!fout){
-        fprintf(stderr, "Can't open input file '%s");
+        fprintf(stderr, "Can't open input file");
         exit(1);
     }
 
@@ -105,7 +105,7 @@ int mpegg_jbig_compress(
     }
 
     if (ferror(fout) || fclose(fout)) {
-        fprintf(stderr, "Problem while writing output file '%s");
+        fprintf(stderr, "Problem while writing output file");
         perror("'");
         exit(1);
     }

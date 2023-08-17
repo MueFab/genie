@@ -254,6 +254,8 @@ int bsc_platform_init(int features, void* (* malloc)(size_t size), void* (* zero
         }
     }
 
+#else
+    (void)features;
 #endif
 
     return LIBBSC_NO_ERROR;

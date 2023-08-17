@@ -5,7 +5,7 @@
 
 int mpegg_write_long_to_Buffer(
         unsigned char      *buffer,
-        unsigned long       value,
+        size_t              value,
         unsigned char       numBytes) {
 
     int ec = 0;
@@ -28,7 +28,7 @@ int mpegg_write_long_to_Buffer(
 
 int mpegg_read_long_from_buffer(
         unsigned char const *buffer,
-        unsigned long       *value,
+        size_t              *value,
         unsigned char        numBytes) {
 
     int ec = 0;

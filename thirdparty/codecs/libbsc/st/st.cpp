@@ -49,6 +49,7 @@ int bsc_st_init(int features)
 #ifdef LIBBSC_CUDA_SUPPORT
     return bsc_st_cuda_init(features);
 #else
+    (void)features;
     return LIBBSC_NO_ERROR;
 #endif
 }
@@ -883,6 +884,8 @@ int bsc_st3_encode(unsigned char * T, int n, int features)
             }
             else
 
+#else
+            (void)features;
 #endif
 
             {
@@ -913,6 +916,8 @@ int bsc_st4_encode(unsigned char * T, int n, int features)
             }
             else
 
+#else
+            (void)features;
 #endif
 
             {
@@ -943,6 +948,8 @@ int bsc_st5_encode(unsigned char * T, int n, int features)
             }
             else
 
+#else
+            (void)features;
 #endif
 
             {
@@ -973,6 +980,8 @@ int bsc_st6_encode(unsigned char * T, int n, int features)
             }
             else
 
+#else
+            (void)features;
 #endif
 
             {
@@ -1510,6 +1519,8 @@ int bsc_st_decode(unsigned char * T, int n, int k, int index, int features)
             }
             else
 
+#else
+            (void)features;
 #endif
 
             {

@@ -30,7 +30,9 @@
 #ifdef DEBUG
 #include <stdio.h>
 #else
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 #endif
 
 #include <stdlib.h>
