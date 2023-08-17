@@ -157,15 +157,18 @@ void bin_mat_to_bytes(
 
 void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
-    genie::core::AlgoID codec_ID
+    genie::core::AlgoID codec_ID,
+    std::vector<uint8_t> payload
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void bin_mat_from_bytes(
     BinMatDtype& bin_mat,
-    uint8_t** payload,
-    size_t& payload_len
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
