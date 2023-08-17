@@ -42,7 +42,6 @@ See also the bsc and libbsc web site:
 
 int bsc_bwt_encode(unsigned char * T, int n, unsigned char * num_indexes, int * indexes, int features)
 {
-    features;
     if (int * RESTRICT A = (int *)bsc_malloc(n * sizeof(int)))
     {
         int mod = n / 8;
@@ -56,6 +55,7 @@ int bsc_bwt_encode(unsigned char * T, int n, unsigned char * num_indexes, int * 
         int index = libsais_bwt_aux_omp(T, T, A, n, 0, NULL, mod + 1, indexes, (features & LIBBSC_FEATURE_MULTITHREADING) > 0 ? 0 : 1);
 #else
         int index = libsais_bwt_aux(T, T, A, n, 0, NULL, mod + 1, indexes);
+        (void)features;
 #endif
 
         bsc_free(A);
@@ -101,6 +101,7 @@ int bsc_bwt_decode(unsigned char * T, int n, int index, unsigned char num_indexe
             index = libsais_unbwt_aux_omp(T, T, P, n, NULL, mod + 1, I, (features & LIBBSC_FEATURE_MULTITHREADING) > 0 ? 0 : 1);
 #else
             index = libsais_unbwt_aux(T, T, P, n, NULL, mod + 1, I);
+            (void)features;
 #endif
         }
         else

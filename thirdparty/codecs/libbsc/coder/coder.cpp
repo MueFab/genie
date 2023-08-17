@@ -243,7 +243,6 @@ int bsc_coder_compress_parallel(const unsigned char * input, unsigned char * out
 
 int bsc_coder_compress(const unsigned char * input, unsigned char * output, int n, int coder, int features)
 {
-    features;
     if ((coder != LIBBSC_CODER_QLFC_STATIC) && (coder != LIBBSC_CODER_QLFC_ADAPTIVE) && (coder != LIBBSC_CODER_QLFC_FAST))
     {
         return LIBBSC_BAD_PARAMETER;
@@ -256,6 +255,8 @@ int bsc_coder_compress(const unsigned char * input, unsigned char * output, int 
         return bsc_coder_compress_parallel(input, output, n, coder);
     }
 
+#else
+    (void)features;
 #endif
 
     return bsc_coder_compress_serial(input, output, n, coder);
@@ -313,6 +314,8 @@ int bsc_coder_decompress(const unsigned char * input, unsigned char * output, in
     }
     else
 
+#else
+    (void)features;
 #endif
 
     {

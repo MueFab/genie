@@ -17,19 +17,18 @@ int mpegg_lzma_compress(
         int      fb,        /* 5 <= fb <= 273, default = 32 */
         int      numThreads /* 1 or 2, default = 2 */
 ){
-    SizeT propsSize = LZMA_PROPS_SIZE;
-    unsigned long int const headerSize = propsSize                         /* signal propsSize */
+    size_t propsSize = LZMA_PROPS_SIZE;
+    size_t const headerSize = propsSize                                    /* signal propsSize */
                                          + MPEGG_LZMA_DATA_SIZE_BYTES;     /* signal srcLen */
-    SizeT payloadSize =
-        (srcLen + 20) / 20 * 21 + (1U << 16U); /* we allocate 105% of original size + 64KB for output buffer */
-    unsigned long int const dstLenTot = headerSize + payloadSize + 1;      /* +1 for null termination */
+    size_t payloadSize = (srcLen + 20) / 20 * 21 + (1U << 16U); /* we allocate 105% of original size + 64KB for output buffer */
+    size_t const dstLenTot = headerSize + payloadSize + 1;      /* +1 for null termination */
 
- unsigned char *propsPtr = NULL;
+    unsigned char *propsPtr = NULL;
     unsigned char *dataSzPtr = NULL;
     unsigned char *payloadPtr = NULL;
     unsigned char *tmpBuffer = NULL;
     unsigned char *trmBuffer = NULL;
-    unsigned int trmSize = 0;
+    size_t trmSize = 0;
 
     int ec = 0;
 
@@ -63,7 +62,7 @@ int mpegg_lzma_compress(
         ec = 1; goto error;
     }
 
-  if ((ec = mpegg_write_long_to_Buffer(dataSzPtr,
+    if ((ec = mpegg_write_long_to_Buffer(dataSzPtr,
                                           srcLen,
                                           MPEGG_LZMA_DATA_SIZE_BYTES)
     ) != 0) goto error;
@@ -126,7 +125,7 @@ int mpegg_lzma_decompress(
         ec = 1; goto error;
     }
 
-    unsigned long int tmpInt = 0;
+    size_t tmpInt = 0;
 
     if((ec = mpegg_read_long_from_buffer(src + MPEGG_LZMA_PROPS_SIZE,
                                           &tmpInt,
@@ -137,9 +136,9 @@ int mpegg_lzma_decompress(
         ec = 1; goto error;
     }
 
-    unsigned long int dstLenTot = tmpInt + 1; /* +1 for null terminator */
-    unsigned long int recLen    = tmpInt;
-    unsigned long int srcSz     = 0;
+    size_t dstLenTot = tmpInt + 1; /* +1 for null terminator */
+    size_t recLen    = tmpInt;
+    size_t srcSz     = 0;
 
     dstPtr = (unsigned char *) malloc(dstLenTot * sizeof(unsigned char));
     if(dstPtr == NULL) {

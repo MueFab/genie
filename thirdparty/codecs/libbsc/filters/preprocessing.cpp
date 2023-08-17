@@ -53,6 +53,8 @@ int bsc_reverse_block(unsigned char * T, int n, int features)
     }
     else
 
+#else
+    (void)features;
 #endif
 
     {
@@ -101,6 +103,8 @@ int bsc_reorder_forward(unsigned char * T, int n, int recordSize, int features)
         }
         else
 
+#else
+        (void)features;
 #endif
 
         {
@@ -156,6 +160,8 @@ int bsc_reorder_reverse(unsigned char * T, int n, int recordSize, int features)
         }
         else
 
+#else
+        (void)features;
 #endif
 
         {

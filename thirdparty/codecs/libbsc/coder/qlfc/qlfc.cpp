@@ -2108,6 +2108,7 @@ int QLFC_FAST_DECODE_FUNCTION_NAME (const unsigned char * input, unsigned char *
 
 int bsc_qlfc_init(int features)
 {
+    (void)features;
     return bsc_qlfc_init_static_model();
 }
 

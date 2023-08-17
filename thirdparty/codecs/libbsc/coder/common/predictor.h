@@ -68,7 +68,7 @@ public:
     template <int R> static INLINE void UpdateBit(short & probability, const int threshold)
     {
         probability = probability - (short)((probability - threshold) >> R);
-    };
+    }
 };
 
 struct ProbabilityMixer
