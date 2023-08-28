@@ -24,6 +24,9 @@ We kindly ask to refrain from publishing analyses that were conducted using this
 * CMake 3.1 or greater
 * A compiler compliant to C++11
 * Doxygen in case you want to build the HTML-documentation
+* For Part 6:
+  * [xtl](https://www.github.com/xtensor-stack/xtl) 0.7.5 or later
+  * [xtensor](https://www.github.com/xtensor-stack/xtensor) 0.24.6 or later
 
 ## Building
 
