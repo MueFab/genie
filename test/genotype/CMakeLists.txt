@@ -25,6 +25,7 @@ target_link_libraries(genotype-tests PRIVATE xtensor xtensor::optimize)
 target_link_libraries(genotype-tests PRIVATE genie-core)
 target_link_libraries(genotype-tests PRIVATE genie-util)
 target_link_libraries(genotype-tests PRIVATE genie-gvc)
+target_link_libraries(genotype-tests PRIVATE mpeggCodecs-static)
 
 install(TARGETS genotype-tests
         RUNTIME DESTINATION "usr/bin")

@@ -72,7 +72,12 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters LZMAParameter
     const {
     uint8_t n_pars = 7;
     std::vector<uint8_t> par_ID{1, 2, 3, 4, 5, 6, 7};
-    std::vector<uint8_t> par_type{4, 4, 4, 4, 4, 4, 4};
+    std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
+                                  genie::core::DataType::UINT8,
+                                  genie::core::DataType::UINT8,
+                                  genie::core::DataType::UINT8,
+                                  genie::core::DataType::UINT8,
+                                  genie::core::DataType::UINT8};
     std::vector<uint8_t> par_num_array_dims(7, 0);
     std::vector<uint8_t> values{MPEGG_LZMA_DEFAULT_LEVEL,  static_cast<uint8_t>(MPEGG_LZMA_DEFAULT_DIC_SIZE),
                                 MPEGG_LZMA_DEFAULT_LC,     MPEGG_LZMA_DEFAULT_LP,

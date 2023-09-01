@@ -76,7 +76,7 @@ RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
     uint8_t attribute_name_len = randomU8();
     if (attribute_name_len < 3) attribute_name_len = 3;
     std::string attribute_name = randomString(attribute_name_len);
-    uint8_t attribute_type = 0;
+    genie::core::DataType attribute_type = genie::core::DataType::UINT8;
     // randomType();
     uint8_t attribute_num_array_dims = randomU2();
 
@@ -137,7 +137,7 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars, std::vector<uint8_t> parNumArrayDims) {
     uint8_t n_pars = nuMOfpars;
     std::vector<uint8_t> par_ID(n_pars, 0);
-    std::vector<uint8_t> par_type(n_pars, 0);
+    std::vector<genie::core::DataType> par_type(n_pars, genie::core::DataType::STRING);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
     par_num_array_dims = parNumArrayDims;
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));

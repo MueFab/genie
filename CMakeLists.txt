@@ -159,6 +159,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src/apps")
 include_directories("${CMAKE_SOURCE_DIR}/src/libs")
 include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/thirdparty")
 add_subdirectory("thirdparty/codecs")
+add_subdirectory("thirdparty/supportLibraries/fmemopen_windows")
 
 #==============================================================================
 # Subdirectories

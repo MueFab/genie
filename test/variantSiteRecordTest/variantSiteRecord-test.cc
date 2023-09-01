@@ -113,19 +113,19 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     infoTag.info_array_len = 1;
     infoTag.info_tag = "AA";
     infoTag.info_tag_len = 2;
-    infoTag.info_type = 1;  // char
+    infoTag.info_type = genie::core::DataType::CHAR;  // char
     infoTag.infoValue.resize(infoTag.info_array_len);
     infoTag.infoValue[0].push_back(63);
     info_tag.push_back(infoTag);
 
     infoTag.info_tag = "CD";
-    infoTag.info_type = 6;  // unsigned int
+    infoTag.info_type = genie::core::DataType::UINT16;  // unsigned int
     infoTag.infoValue[0][0] = 24;
     infoTag.infoValue[0].push_back(0);
     info_tag.push_back(infoTag);
 
     infoTag.info_tag = "EF";
-    infoTag.info_type = 0;  // string
+    infoTag.info_type = genie::core::DataType::STRING;  // string
     infoTag.infoValue[0][1] = 'A';
     infoTag.infoValue[0][1] = 'B';
     infoTag.infoValue[0].push_back('C');
@@ -293,7 +293,7 @@ class ParameterSetEncoder {
             uint16_t attrID = info[it->first].getAttributeID();
             std::string attribute_name = info[it->first].getAttributeName();
             uint8_t attribute_name_len = static_cast<uint8_t>(attribute_name.length());
-            uint8_t attribute_type = info[it->first].getAttributeType();
+            genie::core::DataType attribute_type = info[it->first].getAttributeType();
             uint8_t attribute_num_array_dims = info[it->first].getArrayLength();
             std::vector<uint8_t> attribute_array_dims;
             if (info[it->first].getArrayLength() == 1) {
