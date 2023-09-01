@@ -209,10 +209,10 @@ void jbg85_enc_lineout(struct jbg85_enc_state *s, unsigned char *line,
   /* things that need to be done before the first line is encoded */
   if (s->y == 0) {
     /* prepare BIH */
-    buf[0]  = 0;   /* DL = initial layer to be transmitted */
-    buf[1]  = 0;   /* D  = number of differential layers */
-    buf[2]  = 1;   /* P  = number of bit planes */
-    buf[3]  = 0;
+    buf[0]  =  0;   /* DL = initial layer to be transmitted */
+    buf[1]  =  0;   /* D  = number of differential layers */
+    buf[2]  =  1;   /* P  = number of bit planes */
+    buf[3]  =  0;
     buf[4]  =  s->x0 >> 24;
     buf[5]  = (s->x0 >> 16) & 0xff;
     buf[6]  = (s->x0 >>  8) & 0xff;
@@ -225,10 +225,10 @@ void jbg85_enc_lineout(struct jbg85_enc_state *s, unsigned char *line,
     buf[13] = (s->l0 >> 16) & 0xff;
     buf[14] = (s->l0 >>  8) & 0xff;
     buf[15] =  s->l0 & 0xff;
-    buf[16] = s->mx;
-    buf[17] = 0;   /* MY = maximum vertical offset allowed for AT pixel */
-    buf[18] = 0;   /* order: HITOLO = SEQ = ILEAVE = SMID = 0 */
-    buf[19] = s->options & (JBG_LRLTWO | JBG_VLENGTH | JBG_TPBON);
+    buf[16] =  s->mx;
+    buf[17] =  0;   /* MY = maximum vertical offset allowed for AT pixel */
+    buf[18] =  0;   /* order: HITOLO = SEQ = ILEAVE = SMID = 0 */
+    buf[19] =  s->options & (JBG_LRLTWO | JBG_VLENGTH | JBG_TPBON);
 
     /* output BIH */
     s->data_out(buf, 20, s->file);
@@ -318,9 +318,9 @@ void jbg85_enc_lineout(struct jbg85_enc_state *s, unsigned char *line,
      * Layout of the variables line_h1, line_h2, line_h3, which contain
      * as bits the neighbour pixels of the currently coded pixel X:
      *
-     *          76543210765432107654321076543210     line_h3
-     *          76543210765432107654321076543210     line_h2
-     *  76543210765432107654321X76543210             line_h1
+     *           76543210 76543210 76543210 76543210     line_h3
+     *           76543210 76543210 76543210 76543210     line_h2
+     *  76543210 76543210 7654321X 76543210              line_h1
      */
   
     /* pointer to first image byte of the three lines of interest */

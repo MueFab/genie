@@ -11,6 +11,7 @@
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/util/bitwriter.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/runtime-exception.h"
@@ -315,50 +316,91 @@ TEST(Genotype, RandomSort) {
 TEST(Genotype, Serializer) {
 
     genie::genotype::BinMatDtype bin_mat;
+    size_t orig_payload_len = 15;
+    uint8_t bitmap[15] = {
+        0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+        0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38
+    };
+    size_t ncols = 23;
+    size_t nrows = 5;
+
+//    size_t orig_payload_len = 4;
+//    uint8_t bitmap[4] = {0x7c, 0xe0, 0x38, 0x04};
+//    size_t nrows = 2;
+//    size_t ncols = 14;
+
+    genie::genotype::bin_mat_from_bytes(
+        bin_mat,
+        bitmap,
+        orig_payload_len,
+        nrows,
+        ncols
+    );
+
+//    ASSERT_EQ(bin_mat(0,0), false);
+//    ASSERT_EQ(bin_mat(0,1), true);
+//    ASSERT_EQ(bin_mat(0,2), true);
+//    ASSERT_EQ(bin_mat(0,3), true);
+//
+//    ASSERT_EQ(bin_mat(1,10), false);
+//    ASSERT_EQ(bin_mat(1,11), false);
+//    ASSERT_EQ(bin_mat(1,12), false);
+//    ASSERT_EQ(bin_mat(1,13), true);
+
     uint8_t* payload;
     size_t payload_len;
-    size_t nrows;
-    size_t ncols;
-
-    bin_mat = xt::eval(xt::random::randint<uint8_t>({10, 24})) > 127;
-    {
-        genie::genotype::BinMatDtype recon_bin_mat;
-        recon_bin_mat = bin_mat;
-        ASSERT_TRUE(bin_mat == recon_bin_mat);
-    }
-
     genie::genotype::bin_mat_to_bytes(
         bin_mat,
         &payload,
         payload_len
     );
 
-    nrows = bin_mat.shape(0);
-    ncols = bin_mat.shape(1);
+    ASSERT_EQ(orig_payload_len, payload_len);
+    for (size_t i = 0; i<payload_len; i++){
+        ASSERT_EQ(*(payload+i), *(bitmap+i));
+    }
+}
 
-    genie::genotype::BinMatDtype recon_bin_mat;
-    genie::genotype::bin_mat_from_bytes(
-        recon_bin_mat,
-        payload,
-        payload_len,
-        nrows,
-        ncols
+TEST(Genotype, JBIG) {
+    genie::genotype::BinMatDtype bin_mat;
+    size_t orig_payload_len = 15;
+    uint8_t orig_payload[15] = {
+        0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+        0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38
+    };
+    size_t orig_ncols = 23;
+    size_t orig_nrows = 5;
+
+    uint8_t* compressed_data;
+    size_t compressed_data_len;
+
+    mpegg_jbig_compress_default(
+        &compressed_data,
+        &compressed_data_len,
+        orig_payload,
+        orig_payload_len,
+        orig_nrows,
+        orig_ncols
     );
 
-    free(payload);
-//    ASSERT_TRUE(bin_mat == recon_bin_mat);
+    uint8_t* payload;
+    size_t payload_len;
 
-    auto orig_shape = bin_mat.shape();
-    auto recon_shape = recon_bin_mat.shape();
-    UTILS_DIE_IF(bin_mat.shape(0) != recon_bin_mat.shape(0), "Wrong nrows!");
-    UTILS_DIE_IF(bin_mat.shape(1) != recon_bin_mat.shape(1), "Wrong ncols!");
-//    UTILS_DIE_IF(bin_mat != recon_bin_mat, "");
-    for (size_t i = 0; i < nrows; i++) {
-        for (size_t j = 0; j < ncols; j++) {
-            bool bin_mat_val = bin_mat(i,j);
-            bool recon_bin_mat_val = recon_bin_mat(i,j);
-            UTILS_DIE_IF(bin_mat_val != recon_bin_mat_val, "");
-        }
+    size_t ncols;
+    size_t nrows;
+    mpegg_jbig_decompress_default(
+        &payload,
+        &payload_len,
+        compressed_data,
+        compressed_data_len,
+        &nrows,
+        &ncols);
+
+    ASSERT_EQ(nrows, orig_nrows);
+    ASSERT_EQ(ncols, orig_ncols);
+
+    ASSERT_EQ(orig_payload_len, payload_len);
+    for (size_t i = 0; i<payload_len; i++){
+        ASSERT_EQ(*(payload+i), *(orig_payload +i));
     }
-    auto y = 0;
 }
