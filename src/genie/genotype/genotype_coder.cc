@@ -319,14 +319,23 @@ void bin_mat_to_bytes(
     auto nrows = static_cast<size_t>(bin_mat.shape(0));
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
-    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
+    auto bpl = (ncols >> 3) + ((ncols & 7) > 0); // Ceil operation
     payload_len = bpl * nrows;
-    *payload = (unsigned char*) malloc(payload_len * sizeof(unsigned char));
+    *payload = (unsigned char*) calloc(payload_len, sizeof(unsigned char));
+
+    for (size_t i = 0; i<nrows; i++){
+        size_t row_offset = i*bpl;
+        for (size_t j = 0; j<ncols; j++) {
+            auto byte_offset = row_offset + (j >> 3);
+            uint8_t shift = (7-(j & 7));
+            auto val = static_cast<uint8_t>(bin_mat(i, j));
+            val <<= shift;
+            *(*payload + byte_offset) |= val;
+        }
+    }
 
 //    auto* payload_ptr = *payload;
-    for (size_t i = 0; i<nrows; i++){
 //        size_t byte_offset = 0;
-        for (size_t j = 0; j<ncols; j++) {
 //            auto byte_offset = static_cast<size_t>(floor(static_cast<double>(j)/8));
 //            auto rem_j = j % 8;
 //            auto bit_offset = (7 - (rem_j));
@@ -340,11 +349,7 @@ void bin_mat_to_bytes(
 //            if (j % 8 && j > 0){
 //                byte_offset++;
 //            }
-            auto byte_offset = static_cast<size_t>((i*bpl) + floor(j/8));
-            *(*payload + byte_offset) |= static_cast<uint8_t>(static_cast<uint8_t>(bin_mat(i, j)) << (7-(j%8)));
-        }
 //        payload_ptr += bpl;
-    }
 
     // SIMD version of the for loop
 //    MatShapeDtype buffer_mat_shape {nrows, bpl};
@@ -373,7 +378,8 @@ void bin_mat_from_bytes(
     size_t nrows,
     size_t ncols
 ){
-    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
+//    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
+    auto bpl = (ncols >> 3) + ((ncols & 7) > 0); // Ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
                  "Invalid payload_len / nrows / ncols!");
 
@@ -381,11 +387,15 @@ void bin_mat_from_bytes(
     bin_mat.resize(bin_mat_shape);
     xt::view(bin_mat, xt::all(), xt::all(), xt::all()) = false; // Initialize value with 0
 
+    for (size_t i = 0; i < nrows; i++) {
+        for (size_t j = 0; j < ncols; j++) {
+            auto byte_offset = static_cast<size_t>(i * bpl + j / 8);
+            bin_mat(i, j) = (*(payload + byte_offset) >> (7 - (j % 8))) & 1;
+        }
+    }
 //    auto* payload_ptr = payload;
-    for (size_t i = 0; i < nrows; i++){
 //        size_t byte_offset = 0;
 //        uint8_t val = 0;
-        for (size_t j = 0; j<ncols; j++) {
 //            *(payload_ptr + byte_offset) |= bin_mat(i, j);
 //            *(payload_ptr + byte_offset) << 1;
 //            if (j % 8 && j > 0){
@@ -405,12 +415,10 @@ void bin_mat_from_bytes(
 //            if (j % 8 && j > 0){
 //                byte_offset++;
 //            }
-            auto byte_offset = static_cast<size_t>(i*bpl + j/8);
 //            *(payload + byte_offset) |= static_cast<uint8_t>(static_cast<uint8_t>(bin_mat(i, j)) << (7-(j%8)));
-            bin_mat(i, j) = (*(payload + byte_offset) >> (7-(j%8))) & 1;
-        }
+//        }
 //        payload_ptr += bpl;
-    }
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
