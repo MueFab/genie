@@ -70,7 +70,7 @@ class RandomAnnotationEncodingParameters {
     uint8_t randomU3() { return static_cast<uint8_t>(rand() % 8); }
     uint8_t randomU2() { return static_cast<uint8_t>(rand() % 4); }
     bool randomBool() { return static_cast<bool>(rand() % 2); }
-
+    /*
     uint8_t randomType() {
         uint8_t Type = static_cast<uint8_t>(rand() % 13);
         // replace all signed types
@@ -79,6 +79,16 @@ class RandomAnnotationEncodingParameters {
         if (Type == 7) Type = 8;
         if (Type == 9) Type = 10;
         return Type;
+    }*/
+
+    genie::core::DataType randomType() {
+        uint8_t Type = static_cast<uint8_t>(rand() % 13);
+        // replace all signed types
+        if (Type == 3) Type = 4;
+        if (Type == 5) Type = 6;
+        if (Type == 7) Type = 8;
+        if (Type == 9) Type = 10;
+        return static_cast<genie::core::DataType>(Type);
     }
 
     std::string randomString(uint16_t len) {
@@ -90,33 +100,33 @@ class RandomAnnotationEncodingParameters {
         return random;
     }
 
-    uint8_t typeSize(uint8_t selectType) const {
+    uint8_t typeSize(genie::core::DataType selectType) const {
         switch (selectType) {
-            case 0:
+            case genie::core::DataType::STRING:
                 return 0;
-            case 1:
-            case 3:
-            case 4:
+            case genie::core::DataType::INT8:
+            case genie::core::DataType::CHAR:
+            case genie::core::DataType::UINT8:
                 return 8;
-            case 5:
-            case 6:
+            case genie::core::DataType::INT16:
+            case genie::core::DataType::UINT16:
                 return 16;
-            case 2:
+            case genie::core::DataType::BOOL:
                 return 1;
-            case 7:
-            case 8:
-            case 11:
+            case genie::core::DataType::FLOAT:
+            case genie::core::DataType::INT32:
+            case genie::core::DataType::UINT32:
                 return 32;
-            case 9:
-            case 10:
-            case 12:
+            case genie::core::DataType::DOUBLE:
+            case genie::core::DataType::INT64:
+            case genie::core::DataType::UINT64:
                 return 64;
             default:
                 return 0;
         }
     }
 
-    std::vector<uint8_t> randomValForType(uint8_t selectType) {
+    std::vector<uint8_t> randomValForType(genie::core::DataType selectType) {
         uint8_t size = typeSize(selectType);
         std::vector<uint8_t> randomVal{};
         if (size == 1)

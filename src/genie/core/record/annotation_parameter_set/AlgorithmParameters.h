@@ -30,7 +30,7 @@ class AlgorithmParameters {
  private:
     uint8_t n_pars;
     std::vector<uint8_t> par_ID;
-    std::vector<uint8_t> par_type;
+    std::vector<core::DataType> par_type;
     std::vector<uint8_t> par_num_array_dims;
     std::vector<std::vector<uint8_t>> par_array_dims;
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
@@ -38,7 +38,7 @@ class AlgorithmParameters {
  public:
     AlgorithmParameters();
     explicit AlgorithmParameters(util::BitReader& reader);
-    AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<uint8_t> par_type,
+    AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type,
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
@@ -48,7 +48,7 @@ class AlgorithmParameters {
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }
-    std::vector<uint8_t> getParTypes() const { return par_type; }
+    std::vector<core::DataType> getParTypes() const { return par_type; }
     std::vector<uint8_t> getParNumberOfArrayDims() const { return par_num_array_dims; }
     std::vector<std::vector<uint8_t>> getParArrayDims() const { return par_array_dims; }
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> getParValues() const { return par_val; }

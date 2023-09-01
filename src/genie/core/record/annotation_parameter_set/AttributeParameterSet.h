@@ -30,7 +30,7 @@ class AttributeParameterSet {
     uint16_t attribute_ID;
     uint8_t attribute_name_len;
     std::string attribute_name;
-    uint8_t attribute_type;
+    core::DataType attribute_type;
     uint8_t attribute_num_array_dims;
     std::vector<uint8_t> attribute_array_dims;
 
@@ -52,7 +52,7 @@ class AttributeParameterSet {
  public:
     AttributeParameterSet();
     AttributeParameterSet(uint16_t attribute_ID, uint8_t attribute_name_len, std::string attribute_name,
-                          uint8_t attribute_type, uint8_t attribute_num_array_dims,
+                          core::DataType attribute_type, uint8_t attribute_num_array_dims,
                           std::vector<uint8_t> attribute_array_dims, std::vector<uint8_t> attribute_default_val,
                           bool attribute_miss_val_flag, bool attribute_miss_default_flag,
                           std::vector<uint8_t> attribute_miss_val, std::string attribute_miss_str,
@@ -96,7 +96,7 @@ class AttributeParameterSet {
     uint16_t getAttriubuteID() const { return attribute_ID; }
     uint8_t getAttributeNameLength() const { return attribute_name_len; }
     std::string getAttributeName() const { return attribute_name; }
-    uint8_t getAttributeType() const { return attribute_type; }
+    core::DataType getAttributeType() const { return attribute_type; }
     uint8_t getAttributeNumberOFArrayDims() const { return attribute_num_array_dims; }
     std::vector<uint8_t> getAttributeArrayDims() const { return attribute_array_dims; }
 

@@ -33,7 +33,7 @@ AttributeParameterSet::AttributeParameterSet()
     : attribute_ID(2),
       attribute_name_len(0),
       attribute_name{},
-      attribute_type(0),
+      attribute_type(DataType::STRING),
       attribute_num_array_dims(0),
       attribute_array_dims{},
       attribute_default_val{},
@@ -50,7 +50,7 @@ AttributeParameterSet::AttributeParameterSet()
       dependency_ID{} {}
 
 AttributeParameterSet::AttributeParameterSet(
-    uint16_t attribute_ID, uint8_t attribute_name_len, std::string attribute_name, uint8_t attribute_type,
+    uint16_t attribute_ID, uint8_t attribute_name_len, std::string attribute_name, core::DataType attribute_type,
     uint8_t attribute_num_array_dims, std::vector<uint8_t> attribute_array_dims,
     std::vector<uint8_t> attribute_default_val, bool attribute_miss_val_flag, bool attribute_miss_default_flag,
     std::vector<uint8_t> attribute_miss_val, std::string attribute_miss_str, uint8_t compressor_ID,
@@ -116,7 +116,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     attribute_name.resize(attribute_name_len);
     for (auto& attribute_nameChar : attribute_name) attribute_nameChar = static_cast<char>(reader.read_b(8));
 
-    attribute_type = static_cast<uint8_t>(reader.read_b(8));
+    attribute_type = static_cast<DataType>(reader.read_b(8));
     attribute_num_array_dims = static_cast<uint8_t>(reader.read_b(2));
     attribute_array_dims.resize(attribute_num_array_dims);
     for (auto i = 0; i < attribute_num_array_dims; ++i)
@@ -170,7 +170,7 @@ void AttributeParameterSet::write(core::Writer& writer) const {
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
     writer.write(attribute_name);
-    writer.write(attribute_type, 8);
+    writer.write(static_cast<uint8_t>(attribute_type), 8);
     writer.write(attribute_num_array_dims, 2);
     for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
     curType.toFile(attribute_type, attribute_default_val, writer);

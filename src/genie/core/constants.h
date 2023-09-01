@@ -11,12 +11,12 @@
 
 #define NOMINMAX
 #include <algorithm>
+#include <boost/variant/variant.hpp>
 #include <cmath>
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/variant/variant.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -304,7 +304,7 @@ enum class AnnotDesc : uint8_t {
     ATTRIBUTE = 31
 };
 
-enum class AlgoID: uint8_t{
+enum class AlgoID : uint8_t {
     CABAC = 0,
     LZMA = 1,
     ZSTD = 2,
@@ -319,7 +319,7 @@ enum class AlgoID: uint8_t{
     SER = 21
 };
 
-enum class DataType: uint8_t {
+enum class DataType : uint8_t {
     STRING = 0,
     CHAR = 1,
     BOOL = 2,
@@ -332,18 +332,12 @@ enum class DataType: uint8_t {
     INT64 = 9,
     UINT64 = 10,
     FLOAT = 11,
-    DOUBLE =  12
+    DOUBLE = 12
 };
 
-typedef boost::variant<
-    std::string,
-    bool,
-    int8_t, uint8_t,
-    int16_t, uint16_t,
-    int32_t, uint32_t,
-    int64_t, uint64_t,
-    float, double
-> DynamicDataType;
+typedef boost::variant<std::string, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
+                       float, double>
+    DynamicDataType;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

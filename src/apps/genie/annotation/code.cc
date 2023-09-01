@@ -189,7 +189,7 @@ genie::core::record::annotation_parameter_set::DescriptorConfiguration Code::fil
 
     uint8_t n_pars = 1;
     std::vector<uint8_t> par_ID(n_pars, 0);
-    std::vector<uint8_t> par_type(n_pars, 4);
+    std::vector<genie::core::DataType> par_type(n_pars, genie::core::DataType::UINT8);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
     par_num_array_dims = {0};
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
@@ -350,7 +350,9 @@ void TempEncoder::encode(const std::stringstream &input, std::stringstream &outp
         }*/
 }
 
-void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath){
+void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath) {
+    if (_input_fpath == _output_fpath) {
+    }
 
 }
 

@@ -58,7 +58,8 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters ZSTDParameter
     const {
     uint8_t n_pars = 3;
     std::vector<uint8_t> par_ID{1, 2, 3};
-    std::vector<uint8_t> par_type{2, 6, 0};
+    std::vector<genie::core::DataType> par_type{genie::core::DataType::BOOL, genie::core::DataType::UINT16,
+                                                genie::core::DataType::STRING};
     std::vector<uint8_t> par_num_array_dims(3, 0);
     std::vector<uint8_t> values{use_dictionary_flag, 0, 0};
 

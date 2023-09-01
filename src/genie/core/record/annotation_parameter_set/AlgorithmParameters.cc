@@ -30,7 +30,7 @@ AlgorithmParameters::AlgorithmParameters()
 AlgorithmParameters::AlgorithmParameters(util::BitReader& reader) { read(reader); }
 
 AlgorithmParameters::AlgorithmParameters(
-    uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<uint8_t> par_type, std::vector<uint8_t> par_num_array_dims,
+    uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type, std::vector<uint8_t> par_num_array_dims,
     std::vector<std::vector<uint8_t>> par_array_dims,
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val)
     : n_pars(n_pars),
@@ -52,7 +52,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
 
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i] = (static_cast<uint8_t>(reader.read_b(4)));
-        par_type[i] = (static_cast<uint8_t>(reader.read_b(8)));
+        par_type[i] = (static_cast<core::DataType>(reader.read_b(8)));
         par_num_array_dims[i] = (static_cast<uint8_t>(reader.read_b(2)));
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
             par_array_dims[i].push_back(static_cast<uint8_t>(reader.read_b(8)));
@@ -81,7 +81,7 @@ void AlgorithmParameters::write(core::Writer& writer) const {
     writer.write(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
         writer.write(par_ID[i], 4);
-        writer.write(par_type[i], 8);
+        writer.write(static_cast<uint8_t>(par_type[i]), 8);
         writer.write(par_num_array_dims[i], 2);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
             writer.write(par_array_dims[i][j], 8);

@@ -67,6 +67,7 @@ TEST_F(JsonInfoFieldParserTests, readJsonFile) {  // NOLINT(cert-err58-cpp)
 
     genie::core::record::variant_site::JsonInfoFieldParser jsonInfoFields(infoFieldStream);
     EXPECT_GT(jsonInfoFields.getInfoFields().size(), 10);
-
-    EXPECT_EQ(0, 0);
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).ID, "AA");
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).Number, 1);
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).Type, genie::core::DataType::STRING);
 }

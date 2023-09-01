@@ -209,7 +209,7 @@ TEST_F(MpeggBSCTests, DISABLED_ExampleTest) {  // NOLINT(cert-err58-cpp)
 
     uint8_t n_pars = 1;
     std::vector<uint8_t> par_ID(n_pars, 0);
-    std::vector<uint8_t> par_type(n_pars, 4);
+    std::vector<genie::core::DataType> par_type(n_pars, genie::core::DataType::UINT8);
     std::vector<uint8_t> par_num_array_dims(n_pars, 0);
     par_num_array_dims = {0};
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
