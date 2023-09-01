@@ -378,7 +378,6 @@ void bin_mat_from_bytes(
     size_t nrows,
     size_t ncols
 ){
-//    auto bpl = static_cast<size_t>(ceil(static_cast<double>(ncols) / 8)); // Byte per row
     auto bpl = (ncols >> 3) + ((ncols & 7) > 0); // Ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
                  "Invalid payload_len / nrows / ncols!");
@@ -388,9 +387,11 @@ void bin_mat_from_bytes(
     xt::view(bin_mat, xt::all(), xt::all(), xt::all()) = false; // Initialize value with 0
 
     for (size_t i = 0; i < nrows; i++) {
+        size_t row_offset = i*bpl;
         for (size_t j = 0; j < ncols; j++) {
-            auto byte_offset = static_cast<size_t>(i * bpl + j / 8);
-            bin_mat(i, j) = (*(payload + byte_offset) >> (7 - (j % 8))) & 1;
+            auto byte_offset = row_offset + (j >> 3);
+            uint8_t shift = (7-(j & 7));
+            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
         }
     }
 //    auto* payload_ptr = payload;

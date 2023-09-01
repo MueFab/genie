@@ -324,11 +324,6 @@ TEST(Genotype, Serializer) {
     size_t ncols = 23;
     size_t nrows = 5;
 
-//    size_t orig_payload_len = 4;
-//    uint8_t bitmap[4] = {0x7c, 0xe0, 0x38, 0x04};
-//    size_t nrows = 2;
-//    size_t ncols = 14;
-
     genie::genotype::bin_mat_from_bytes(
         bin_mat,
         bitmap,
@@ -336,16 +331,6 @@ TEST(Genotype, Serializer) {
         nrows,
         ncols
     );
-
-//    ASSERT_EQ(bin_mat(0,0), false);
-//    ASSERT_EQ(bin_mat(0,1), true);
-//    ASSERT_EQ(bin_mat(0,2), true);
-//    ASSERT_EQ(bin_mat(0,3), true);
-//
-//    ASSERT_EQ(bin_mat(1,10), false);
-//    ASSERT_EQ(bin_mat(1,11), false);
-//    ASSERT_EQ(bin_mat(1,12), false);
-//    ASSERT_EQ(bin_mat(1,13), true);
 
     uint8_t* payload;
     size_t payload_len;

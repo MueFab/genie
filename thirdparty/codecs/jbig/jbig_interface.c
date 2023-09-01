@@ -44,16 +44,6 @@ int line_out(
     unsigned long y,
     void *file
 ){
-//    if (y == 0) {
-//        /* prefix first line with PBM header */
-//        fprintf((FILE *) file, "P4\n");
-//        fprintf((FILE *) file, "%10lu\n", jbg85_dec_getwidth(s));
-//        /* store file position of height, so we can update it after NEWLEN */
-//        y_0 = jbg85_dec_getheight(s);
-//        ypos_error = fgetpos((FILE *) file, &ypos);
-//        fprintf((FILE *) file, "%10lu\n", y_0); /* pad number to 10 bytes */
-//    }
-//    fwrite(start, len, 1, (FILE *) file);
     fwrite(start, 1, len, (FILE *) file);
     return y == -1;
 }

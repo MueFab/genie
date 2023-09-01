@@ -288,7 +288,7 @@ int mpegg_jbig_decompress(
         if (fout != stdout)
         {
             fclose(fout);
-            /*remove(fnout);*/
+            /* remove(fnout); */
         }
         exit(1);
     }
