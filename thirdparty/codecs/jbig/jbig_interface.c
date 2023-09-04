@@ -5,6 +5,7 @@
  */
 
 #include "jbig_interface.h"
+#include<stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
 
