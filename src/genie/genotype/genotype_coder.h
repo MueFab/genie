@@ -24,11 +24,12 @@
 namespace genie {
 namespace genotype {
 
-using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
-using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
-using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
-using UIntVecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
+using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
+using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
+using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
+using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
+
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
@@ -173,7 +174,7 @@ void bin_mat_from_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): Finalize this function, do not return local memory
+// TODO @Yeremia: Finalize this function, do not return local memory
 //void encode_block(
 //    const EncodingOptions& opt,
 //    std::list<core::record::VariantGenotype>& recs
