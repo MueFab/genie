@@ -173,10 +173,11 @@ void bin_mat_from_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode_block(
-    const EncodingOptions& opt,
-    std::list<core::record::VariantGenotype>& recs
-);
+// TODO (Yeremia): Finalize this function, do not return local memory
+//void encode_block(
+//    const EncodingOptions& opt,
+//    std::list<core::record::VariantGenotype>& recs
+//);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
