@@ -353,8 +353,8 @@ TEST(Genotype, JBIG) {
         0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
         0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38
     };
-    size_t orig_ncols = 23;
-    size_t orig_nrows = 5;
+    unsigned long orig_ncols = 23;
+    unsigned long orig_nrows = 5;
 
     uint8_t* compressed_data;
     size_t compressed_data_len;
@@ -371,8 +371,8 @@ TEST(Genotype, JBIG) {
     uint8_t* payload;
     size_t payload_len;
 
-    size_t ncols;
-    size_t nrows;
+    unsigned long ncols;
+    unsigned long nrows;
     mpegg_jbig_decompress_default(
         &payload,
         &payload_len,

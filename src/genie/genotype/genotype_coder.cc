@@ -463,8 +463,8 @@ void entropy_encode_bin_mat(
 
 //#ifdef DEBUG
 
-    size_t nrows;
-    size_t ncols;
+    unsigned long nrows;
+    unsigned long ncols;
 
     mpegg_jbig_decompress_default(
         &raw_data,
