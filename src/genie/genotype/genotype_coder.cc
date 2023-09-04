@@ -210,7 +210,7 @@ void sort_matrix(
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0),
                  "bin_mat and ids have different dimension!");
 
-    //TODO @Yeremia: create a boolean vector for the buffer instead of whole matrix;
+    //TODO @Yeremia: (optimization) Create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
@@ -235,7 +235,8 @@ void random_sort_bin_mat(
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
 
     auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
-    ids = xt::random::permutation(num_elem);
+    // TODO @Yeremia: requires explicit conversion
+    ids = xt::random::permutation<uint32_t>(num_elem);
     sort_matrix(bin_mat, ids, axis);
     ids = xt::argsort(ids);
 }
