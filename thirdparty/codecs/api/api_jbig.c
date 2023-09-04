@@ -220,7 +220,7 @@ int mpegg_jbig_decompress(
     }
 
     *dest_len = src_len * 30; // Expect worst case 3x source size
-    *dest = (u_int8_t *) malloc (*dest_len);
+    *dest = (unsigned char *) malloc (*dest_len);
 #if defined(_WIN32) || defined(_WIN64)
     fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
 #else

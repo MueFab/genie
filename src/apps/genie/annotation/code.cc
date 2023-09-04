@@ -350,8 +350,9 @@ void TempEncoder::encode(const std::stringstream &input, std::stringstream &outp
         }*/
 }
 
-void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath){
-
+void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath) {
+    if (_input_fpath == _output_fpath) {
+    }
 }
 
 }  // namespace annotation
