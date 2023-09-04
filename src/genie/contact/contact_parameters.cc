@@ -13,23 +13,26 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberSamples() const {return sample_infos.size();}
+uint8_t ContactParameters::getNumberSamples() const { return static_cast<uint8_t>(sample_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberChromosomes() const {return chr_infos.size();}
+uint8_t ContactParameters::getNumberChromosomes() const { return static_cast<uint8_t>(chr_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberIntervalMultipliers() const {return interval_multipliers.size();}
+uint8_t ContactParameters::getNumberIntervalMultipliers() const {
+    return static_cast<uint8_t>(interval_multipliers.size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMethods() const {return norm_method_infos.size();}
+uint8_t ContactParameters::getNumberNormMethods() const { return static_cast<uint8_t>(norm_method_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMats() const {return norm_mat_infos.size();}
+uint8_t ContactParameters::getNumberNormMats() const { return static_cast<uint8_t>(norm_mat_infos.size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

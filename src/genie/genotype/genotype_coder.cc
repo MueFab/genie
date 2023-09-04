@@ -435,15 +435,16 @@ void entropy_encode_bin_mat(
     uint8_t* compressed_data;
     size_t compressed_data_len;
 
+    codec_ID;
     bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
     mpegg_jbig_compress(
         &compressed_data,
         &compressed_data_len,
         raw_data,
         raw_data_len,
-        bin_mat.shape(0),
-        bin_mat.shape(1),
-        -1,     // num_lines_per_stripe
+        static_cast<unsigned long>(bin_mat.shape(0)),
+        static_cast<unsigned long>(bin_mat.shape(1)),
+        static_cast<unsigned long>(-1),     // num_lines_per_stripe
         true,   // deterministic_pred
         false,  // typical_pred
         false,  // diff_layer_typical_pred
@@ -459,8 +460,8 @@ void entropy_encode_bin_mat(
 
 //#ifdef DEBUG
 
-    size_t nrows;
-    size_t ncols;
+    unsigned long nrows;
+    unsigned long ncols;
 
     mpegg_jbig_decompress_default(
         &raw_data,
@@ -497,7 +498,7 @@ void entropy_encode_bin_mat(
         }
     }
 
-    auto x = 0;
+    //auto x = 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
