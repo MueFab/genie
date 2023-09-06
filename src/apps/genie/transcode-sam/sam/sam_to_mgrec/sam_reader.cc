@@ -12,6 +12,7 @@
 
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -77,15 +78,10 @@ bool SamReader::isReady() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SamReader::isValid() {
-    /// Find Tag HD with key "SO" to find out the ordering
-    if (sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0) {
-        return false;
-    }
-
     /// Find out if records are sorted by query name
-    if (std::strcmp(header_info.s, "queryname") != 0) {
-        return false;
-    }
+    UTILS_DIE_IF(sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0 ||
+                     std::strcmp(header_info.s, "queryname") != 0,
+                 "Sam file must be ordered by read name! That ordering must be documented in the SAM header.");
 
     return true;
 }
