@@ -85,6 +85,14 @@ stages:
       displayName: 'Build documentation (Ubuntu 22.04)'
       condition: eq( variables['artifactName'], 'ubuntu2204')
 
+    - bash: |
+        mkdir -p cmake-build-debug-manual
+        cd cmake-build-debug-manual
+        cmake ..-DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
+        make -j
+      displayName: 'Genie build (non-bash script)'
+
+
     - bash: ./ci/build.sh debug
       displayName: 'Genie build'
 
