@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genotype_coder.h"
 #include <cmath>
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
-//#include <xtensor/xstrided_view.hpp>
+// #include <xtensor/xstrided_view.hpp>
 #include <xtensor/xview.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/util/runtime-exception.h"
+#include "genotype_coder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace genotype {
 
 uint8_t getNumBinMats(
     EncodingBlock& block
-){
+) {
     return static_cast<uint8_t>(block.allele_bin_mat_vect.size());
 }
 
@@ -33,7 +33,7 @@ void decompose(
     const EncodingOptions& opt,
     EncodingBlock& block,
     std::vector<core::record::VariantGenotype>& recs
-){
+) {
 
     UTILS_DIE_IF(recs.empty(),
                  "No records found for the process!");
@@ -99,7 +99,7 @@ void decompose(
 
 void transform_max_value(
     EncodingBlock& block
-){
+) {
     auto& allele_mat = block.allele_mat;
 
     block.dot_flag = xt::any(xt::equal(allele_mat, -1));
@@ -125,7 +125,7 @@ void transform_max_value(
 void binarize_bit_plane(
     EncodingBlock& block,
     ConcatAxis concat_axis
-){
+) {
     auto& allele_mat = block.allele_mat;
     auto max_val = xt::amax(allele_mat)(0);
 
@@ -154,7 +154,7 @@ void binarize_bit_plane(
 
 void binarize_row_bin(
     EncodingBlock& block
-){
+) {
 
     auto& allele_mat = block.allele_mat;
     auto& amax_vec = block.amax_vec;
@@ -182,7 +182,7 @@ void binarize_row_bin(
 void binarize_allele_mat(
     const EncodingOptions& opt,
     EncodingBlock& block
-){
+) {
 
     switch(opt.binarization_ID){
         case genie::genotype::BinarizationID::BIT_PLANE:
@@ -195,7 +195,7 @@ void binarize_allele_mat(
             UTILS_DIE("Invalid binarization_ID!");
     }
 
-    //TODO @Yeremia: Free memory of allele_mat
+    // TODO(yeremia): Free memory of allele_mat
     block.allele_mat.resize({0,0});
 }
 
@@ -205,12 +205,12 @@ void sort_matrix(
     BinMatDtype& bin_mat,
     UIntVecDtype ids,
     uint8_t axis
-){
+) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0),
                  "bin_mat and ids have different dimension!");
 
-    //TODO @Yeremia: (optimization) Create a boolean vector for the buffer instead of whole matrix;
+    // TODO(yeremia): (optimization) Create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
@@ -231,11 +231,11 @@ void random_sort_bin_mat(
     BinMatDtype& bin_mat,
     UIntVecDtype& ids,
     uint8_t axis
-){
+) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
 
     auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
-    // TODO @Yeremia: requires explicit conversion
+    // TODO(yeremia): requires explicit conversion
     ids = xt::random::permutation<uint32_t>(num_elem);
     sort_matrix(bin_mat, ids, axis);
     ids = xt::argsort(ids);
@@ -249,7 +249,7 @@ void sort_bin_mat(
     UIntVecDtype& col_ids,
     SortingAlgoID sort_row_method,
     SortingAlgoID sort_col_method
-){
+) {
     switch(sort_row_method){
         case genie::genotype::SortingAlgoID::NO_SORTING:
             break;
@@ -288,7 +288,7 @@ void sort_bin_mat(
 void sort_block(
     const EncodingOptions& opt,
     EncodingBlock& block
-){
+) {
     auto num_bin_mats = getNumBinMats(block);
 
     block.allele_row_ids_vect.resize(num_bin_mats);
@@ -319,7 +319,7 @@ void bin_mat_to_bytes(
     BinMatDtype& bin_mat,
     uint8_t** payload,
     size_t& payload_len
-){
+) {
     auto nrows = static_cast<size_t>(bin_mat.shape(0));
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
@@ -382,7 +382,7 @@ void bin_mat_from_bytes(
     size_t payload_len,
     size_t nrows,
     size_t ncols
-){
+) {
     auto bpl = (ncols >> 3) + ((ncols & 7) > 0); // Ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl),
                  "Invalid payload_len / nrows / ncols!");
@@ -433,7 +433,7 @@ void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     std::vector<uint8_t> payload
-){
+) {
 
     uint8_t* raw_data;
     size_t raw_data_len;
@@ -472,16 +472,15 @@ void entropy_encode_bin_mat(
         &raw_data_len,
         compressed_data,
         compressed_data_len,
-//        static_cast<unsigned long*>(&nrows),
-//        static_cast<unsigned long*>(&ncols)
         &nrows,
         &ncols
     );
 
     BinMatDtype recon_bin_mat;
 
+    // recon_bin_mat must be initialized first with the correct size
     bin_mat_from_bytes(
-        recon_bin_mat, // Must be initialized first with the correct size
+        recon_bin_mat,
         raw_data,
         raw_data_len,
         nrows,
@@ -525,7 +524,7 @@ void entropy_encode_bin_mat(
 //    genie::genotype::transform_max_value(block);
 //    genie::genotype::binarize_allele_mat(opt, block);
 //
-//    // TODO @Yeremia: create function to create GenotypeParameters
+//    // TODO(yeremia): create function to create GenotypeParameters
 //    auto num_bin_mats = getNumBinMats(block);
 //    std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
 //    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
