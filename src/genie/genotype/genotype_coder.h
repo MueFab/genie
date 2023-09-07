@@ -13,8 +13,8 @@
 #include <optional>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
-//#include <xtensor/xmath.hpp>
-//#include <xtensor/xoperation.hpp>
+// #include <xtensor/xmath.hpp>
+// #include <xtensor/xoperation.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genotype_parameters.h"
@@ -174,7 +174,7 @@ void bin_mat_from_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO @Yeremia: Finalize this function, do not return local memory
+// TODO(yeremia): Finalize this function, do not return local memory
 //void encode_block(
 //    const EncodingOptions& opt,
 //    std::list<core::record::VariantGenotype>& recs

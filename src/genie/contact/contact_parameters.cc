@@ -19,10 +19,9 @@ ContactParameters::ContactParameters():
     tile_size(1),
     interval_multipliers(),
     norm_method_infos(),
-    norm_mat_infos()
-{
-    // TODO @Yeremia: Check if interval multipliers are valid
-    // TODO @Yeremia: Set default value so that interval_multipliers is valid
+    norm_mat_infos() {
+    // TODO(yeremia): Check if interval multipliers are valid
+    // TODO(yeremia): Set default value so that interval_multipliers is valid
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,9 +41,8 @@ ContactParameters::ContactParameters(
     tile_size(_tile_size),
     interval_multipliers(_interval_multipliers),
     norm_method_infos(_norm_method_infos),
-    norm_mat_infos(_norm_mat_infos)
-{
-    // TODO @Yeremia: check if interval multipliers are valid
+    norm_mat_infos(_norm_mat_infos) {
+    // TODO(yeremia): check if interval multipliers are valid
     for (uint32_t mult: _interval_multipliers){
         UTILS_DIE_IF(tile_size % mult != 0, "Invalid multiplier!");
     }
