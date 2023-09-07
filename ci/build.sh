@@ -43,7 +43,7 @@ cd $git_root_dir
 if [[ "$1" == "debug" ]]; then
     mkdir -p cmake-build-debug
     cd cmake-build-debug
-    cmake .. $architecture -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=OFF -DBUILD_DOCUMENTATION=ON -DGENIE_WERROR=ON "-DGENIE_SAM_SUPPORT=OFF" || { echo 'Cmake failed!' ; exit 1; }
+    cmake .. $architecture -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON -DGENIE_WERROR=ON $sam_support || { echo 'Cmake failed!' ; exit 1; }
 
     if [[ "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
         echo "Skipping automatic build for MSVC"
