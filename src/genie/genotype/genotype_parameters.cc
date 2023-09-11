@@ -18,13 +18,12 @@ GenotypeParameters::GenotypeParameters():
     no_reference_flag(false),
     not_available_flag(false),
     binarization_ID(BinarizationID::UNDEFINED),
-//    num_bit_planes(0),
     concat_axis(ConcatAxis::UNDEFINED),
     variants_payload_params(),
     encode_phases_data_flag(false),
     phases_payload_params(),
-      phasing_value(false)
-{}
+    phasing_value(false){}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters::GenotypeParameters(
@@ -32,7 +31,6 @@ GenotypeParameters::GenotypeParameters(
     bool _no_reference_flag,
     bool _not_available_flag,
     BinarizationID _binarization_ID,
-//    uint8_t _num_bit_planes,
     ConcatAxis _concat_axis,
     std::vector<GenotypePayloadParameters>&& _variants_payload_params,
     bool _encode_phases_data_flag,
@@ -42,13 +40,11 @@ GenotypeParameters::GenotypeParameters(
       no_reference_flag(_no_reference_flag),
       not_available_flag(_not_available_flag),
       binarization_ID(_binarization_ID),
-//      num_bit_planes(_num_bit_planes),
       concat_axis(_concat_axis),
       variants_payload_params(_variants_payload_params),
       encode_phases_data_flag(_encode_phases_data_flag),
       phases_payload_params(_phases_payload_params),
-      phasing_value(_phases_value)
-{}
+      phasing_value(_phases_value){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

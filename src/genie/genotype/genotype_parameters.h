@@ -57,8 +57,6 @@ class GenotypeParameters {
     bool not_available_flag;
     BinarizationID binarization_ID;
 
-    // if BinarizationID == BinarizationID::BIT_PLANE
-//    uint8_t num_bit_planes;
     ConcatAxis concat_axis;
 
     std::vector<GenotypePayloadParameters> variants_payload_params;
@@ -75,7 +73,6 @@ class GenotypeParameters {
         bool no_reference_flag,
         bool not_available_flag,
         BinarizationID binarization_ID,
-//        uint8_t num_bit_planes,
         ConcatAxis concat_axis,
         std::vector<GenotypePayloadParameters>&& variants_payload_params,
         bool encode_phases_data_flag,

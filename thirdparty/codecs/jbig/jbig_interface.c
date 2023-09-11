@@ -3,13 +3,20 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+<<<<<<< HEAD
 
 #if WIN32
 #include<stdio.h>
+=======
+#if WIN32
+#include <stdio.h>
+>>>>>>> c1fc0cf4346510de4db1eb202caac328f61fbbe1
 #endif
 #include "jbig_interface.h"
+#include<stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +44,6 @@ void data_out(
     void *file
 ){
     fwrite(start, 1, len, (FILE *) file);
-//    fwrite(start, len, 1, (FILE *) file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,16 +54,6 @@ int line_out(
     unsigned long y,
     void *file
 ){
-//    if (y == 0) {
-//        /* prefix first line with PBM header */
-//        fprintf((FILE *) file, "P4\n");
-//        fprintf((FILE *) file, "%10lu\n", jbg85_dec_getwidth(s));
-//        /* store file position of height, so we can update it after NEWLEN */
-//        y_0 = jbg85_dec_getheight(s);
-//        ypos_error = fgetpos((FILE *) file, &ypos);
-//        fprintf((FILE *) file, "%10lu\n", y_0); /* pad number to 10 bytes */
-//    }
-//    fwrite(start, len, 1, (FILE *) file);
     fwrite(start, 1, len, (FILE *) file);
     return y == -1;
 }

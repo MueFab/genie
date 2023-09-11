@@ -15,6 +15,46 @@
 #include "libjbig/jbig85.h"
 #include "libjbig/jbig.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+
+#include <windows.h>
+#include <share.h>
+#include <io.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <stdio.h>
+/* https://github.com/Arryboom/fmemopen_windows  */
+
+FILE *fmemopen_windows(void *buf, size_t len, const char *type)
+{
+    int fd;
+    FILE *fp;
+    char tp[MAX_PATH - 13];
+    char fn[MAX_PATH + 1];
+    int * pfd = &fd;
+    int retner = -1;
+    char tfname[] = "MemTF_";
+    if (!GetTempPathA(sizeof(tp), tp))
+        return NULL;
+    if (!GetTempFileNameA(tp, tfname, 0, fn))
+        return NULL;
+    retner = _sopen_s(pfd, fn, _O_CREAT | _O_SHORT_LIVED | _O_TEMPORARY | _O_RDWR | _O_BINARY | _O_NOINHERIT, _SH_DENYRW, _S_IREAD | _S_IWRITE);
+    if (retner != 0)
+        return NULL;
+    if (fd == -1)
+        return NULL;
+    fp = _fdopen(fd, "wb+");
+    if (!fp) {
+        _close(fd);
+        return NULL;
+    }
+    /*File descriptors passed into _fdopen are owned by the returned FILE * stream.If _fdopen is successful, do not call _close on the file descriptor.Calling fclose on the returned FILE * also closes the file descriptor.*/
+    fwrite(buf, len, 1, fp);
+    rewind(fp);
+    return fp;
+}
+#endif
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 unsigned long y_0;
@@ -27,26 +67,29 @@ int ypos_error = 1;
 #define JBIG_MAX_BUF_SIZE = 1<<25;
 
 // ---------------------------------------------------------------------------------------------------------------------
-//
-//int line_out(const struct jbg85_dec_state *s,
-//             unsigned char *start,
-//             size_t len,
-//             unsigned long y,
-//             void *file
-//){
-//    if (y == 0)
-//    {
-//        /* prefix first line with PBM header */
-//        fprintf((FILE *)file, "P4\n");
-//        fprintf((FILE *)file, "%10lu\n", jbg85_dec_getwidth(s));
-//        /* store file position of height, so we can update it after NEWLEN */
-//        y_0 = jbg85_dec_getheight(s);
-//        ypos_error = fgetpos((FILE *)file, &ypos);
-//        fprintf((FILE *)file, "%10lu\n", y_0); /* pad number to 10 bytes */
-//    }
-//    fwrite(start, len, 1, (FILE *)file);
-//    return y == JBIG_YMAX - 1;
-//}
+
+int mpegg_jbig_compress_default(
+    unsigned char      **dest,
+    size_t              *dest_len,
+    const unsigned char  *src,
+    size_t                scr_len,
+    unsigned long nrows,
+    unsigned long ncols
+){
+    return mpegg_jbig_compress(
+        dest,
+        dest_len,
+        src,
+        scr_len,
+        nrows,
+        ncols,
+        -1,     // num_lines_per_stripe
+        true,   // deterministic_pred
+        false,  // typical_pred
+        false,  // diff_layer_typical_pred
+        false   // two_line_template
+    );
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +116,11 @@ int mpegg_jbig_compress(
 
     *dest_len = scr_len * 3; // Expect worst case 3x source size
     *dest = (unsigned char *) malloc (*dest_len * sizeof(unsigned  char));
+#if defined(_WIN32) || defined(_WIN64)
+    fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
+#else
     fout = fmemopen(*dest, *dest_len * sizeof(unsigned  char), "wb");
+#endif
     if (!fout){
         fprintf(stderr, "Can't open input file");
         exit(1);
@@ -162,8 +209,12 @@ int mpegg_jbig_decompress(
         printf("Sorry, not enough memory available!\n");
         exit(1);
     }
-
+#if defined(_WIN32) || defined(_WIN64)
+    fin = fmemopen_windows(src_ptr, src_len * sizeof(unsigned  char), "rb");
+#else
     fin = fmemopen(src_ptr, src_len * sizeof(unsigned  char), "rb");
+#endif
+
     if (!fin)
     {
         fprintf(stderr, "Can't open input file '%s", fnin);
@@ -171,8 +222,16 @@ int mpegg_jbig_decompress(
     }
 
     *dest_len = src_len * 30; // Expect worst case 3x source size
+<<<<<<< HEAD
     *dest = (unsigned char *)malloc(*dest_len);
+=======
+    *dest = (unsigned char *) malloc (*dest_len);
+#if defined(_WIN32) || defined(_WIN64)
+    fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
+#else
+>>>>>>> c1fc0cf4346510de4db1eb202caac328f61fbbe1
     fout = fmemopen(*dest, *dest_len * sizeof(unsigned  char), "wb");
+#endif
 
     if (!fout)
     {
@@ -235,7 +294,7 @@ int mpegg_jbig_decompress(
         if (fout != stdout)
         {
             fclose(fout);
-            /*remove(fnout);*/
+            /* remove(fnout); */
         }
         exit(1);
     }
