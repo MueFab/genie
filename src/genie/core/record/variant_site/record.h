@@ -20,6 +20,7 @@
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/core/arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,18 +33,18 @@ class AttributeData {
  public:
     AttributeData();
     AttributeData(uint8_t length, std::string name, uint16_t attributeID);
-    AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength, uint16_t attributeID);
+    AttributeData(uint8_t length, std::string name, genie::core::DataType type, uint8_t arrayLength, uint16_t attributeID);
 
     AttributeData& operator=(const AttributeData& other);
 
     AttributeData(const AttributeData& other);
 
-    void setAttributeType(uint8_t value) { attributeType = value; }
+    void setAttributeType(genie::core::DataType value) { attributeType = value; }
     void setArrayLength(uint8_t value) { attributeArrayDims = value; }
 
     uint8_t getAttributeNameLength() const { return attributeNameLength; }
     std::string getAttributeName() const { return attributeName; }
-    uint8_t getAttributeType() const { return attributeType; }
+    genie::core::DataType getAttributeType() const { return attributeType; }
     uint8_t getArrayLength() const { return attributeArrayDims; }
     uint16_t getAttributeID() const { return attributeID; }
 
@@ -51,7 +52,7 @@ class AttributeData {
     uint16_t attributeID;
     uint8_t attributeNameLength;
     std::string attributeName;
-    uint8_t attributeType;
+    genie::core::DataType attributeType;
     uint8_t attributeArrayDims;
 };
 
@@ -59,7 +60,7 @@ class Info_tag {
  public:
     uint8_t info_tag_len{};
     std::string info_tag{};
-    uint8_t info_type{};
+    genie::core::DataType info_type{};
     uint8_t info_array_len{};
     std::vector<std::vector<uint8_t>> infoValue;
     Info_tag& operator=(const Info_tag& other) {

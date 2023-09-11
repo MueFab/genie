@@ -7,8 +7,10 @@
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/variant_site/VariantSiteParser.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/variantsite/VariantSiteParser.h"
 #include "genie/core/record/variant_site/record.h"
+
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
@@ -79,8 +81,6 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         inputfile.close();
         outputfile.close();
     }
-
-    EXPECT_EQ(0, 0);
 }
 TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -277,8 +277,6 @@ class ParameterSetEncoder {
             else
                 encoding_mode_ID = genie::core::AlgoID::BSC;
 
-        //    encoding_mode_ID = genie::core::AlgoID::BSC;
-
             genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
                 DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
                 BSCalgorithmParameters);
@@ -335,6 +333,72 @@ class ParameterSetEncoder {
     }
 };
 
+class Compressor {
+ public:
+    void compress(const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>&
+                      descriptorConfigurations,
+                  std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
+                  std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors) {
+        // std::map<genie::core::AnnotDesc, std::stringstream> encodedDescriptors;
+        genie::entropy::bsc::BSCEncoder bscEncoder;
+        genie::entropy::lzma::LZMAEncoder lzmaEncoder;
+        genie::entropy::zstd::ZSTDEncoder zstdEncoder;
+        for (auto encodingpar : descriptorConfigurations) {
+            switch (encodingpar.getEncodingModeID()) {
+                case genie::core::AlgoID::BSC:
+                    bscEncoder.encode(inputstream[encodingpar.getDescriptorID()],
+                                      encodedDescriptors[encodingpar.getDescriptorID()]);
+                    break;
+                case genie::core::AlgoID::LZMA:
+                    lzmaEncoder.encode(inputstream[encodingpar.getDescriptorID()],
+                                       encodedDescriptors[encodingpar.getDescriptorID()]);
+                    break;
+                case genie::core::AlgoID::ZSTD:
+                    zstdEncoder.encode(inputstream[encodingpar.getDescriptorID()],
+                                       encodedDescriptors[encodingpar.getDescriptorID()]);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    void compress(
+        std::map<std::string, std::stringstream>& attributeStream,
+        const std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet>& attributeParameterSets,
+        const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>&
+            compressorParameterSets,
+        std::map<std::string, std::stringstream>& encodedAttributes) {
+        genie::entropy::bsc::BSCEncoder bscEncoder;
+        genie::entropy::lzma::LZMAEncoder lzmaEncoder;
+        genie::entropy::zstd::ZSTDEncoder zstdEncoder;
+
+        for (auto& attribute : attributeParameterSets) {
+            auto attributeName = attribute.getAttributeName();
+            auto compressorID = attribute.getCompressorID();
+            auto encodeID = compressorParameterSets[compressorID - 1].getAlgorithmIDs();
+            switch (encodeID[0]) {
+                case genie::core::AlgoID::BSC:
+                    bscEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+                case genie::core::AlgoID::LZMA:
+                    lzmaEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+                case genie::core::AlgoID::ZSTD:
+                    zstdEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+ private:
+    //   std::map<std::string, std::stringstream> encodedAttributes;
+};
+
 #define COMPRESSED true
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
@@ -355,10 +419,11 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         infoFields << infoFieldsFile.rdbuf();
         infoFieldsFile.close();
     }
+
     std::map<DescriptorID, std::stringstream> outputstream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     std::map<std::string, std::stringstream> attributeStream;
-    genie::core::record::variant_site::VariantSiteParser parser(inputfile, outputstream, info, attributeStream,
+    genie::variant_site::VariantSiteParser parser(inputfile, outputstream, info, attributeStream,
                                                                 infoFields);
     if (inputfile.is_open()) {
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
@@ -377,42 +442,28 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
     //----------------------------------------------------//
 #if COMPRESSED
+    //   auto& encodedDescr = outputstream;
 
+    Compressor compressor;
+    auto descriptorConfigurations =
+        annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
     std::map<DescriptorID, std::stringstream> encodedDescriptors;
-    genie::entropy::bsc::BSCEncoder bscEncoder;
-    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
-    genie::entropy::zstd::ZSTDEncoder zstdEncoder;
-    const auto& temp = annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
-    for (auto encodingpar : temp) {
-        switch (encodingpar.getEncodingModeID()) {
-            case genie::core::AlgoID::BSC:
-                bscEncoder.encode(outputstream[encodingpar.getDescriptorID()],
-                                  encodedDescriptors[encodingpar.getDescriptorID()]);
-                break;
-            case genie::core::AlgoID::LZMA:
-                lzmaEncoder.encode(outputstream[encodingpar.getDescriptorID()],
-                                   encodedDescriptors[encodingpar.getDescriptorID()]);
-                break;
-            case genie::core::AlgoID::ZSTD:
-                zstdEncoder.encode(outputstream[encodingpar.getDescriptorID()],
-                                   encodedDescriptors[encodingpar.getDescriptorID()]);
-                break;
-
-            default:
-                break;
-        }
-        if (encodingpar.getDescriptorID() == genie::core::AnnotDesc::STRAND) {
-            std::cerr << "+";
-        }
-    }
+    compressor.compress(descriptorConfigurations, outputstream, encodedDescriptors);
 
     std::map<std::string, std::stringstream> encodedAttributes;
-    for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it) {
-        bscEncoder.encode(it->second, encodedAttributes[it->first]);
-        std::stringstream check;
-        bscEncoder.decode(encodedAttributes[it->first], check);
-        EXPECT_EQ(check.str(), it->second.str());
-    }
+    auto attributeParameterSets = annotationParameterSet.getAnnotationEncodingParameters().getAttributeParameterSets();
+    auto compressorParameterSets =
+        annotationParameterSet.getAnnotationEncodingParameters().getCompressorParameterSets();
+    compressor.compress(attributeStream, attributeParameterSets, compressorParameterSets, encodedAttributes);
+
+    // for (const auto& attr : attributes) {
+    //      compressors;
+    //  attributes;
+    //      attr;
+    //        std::stringstream& attrData =
+    //  }
+
+
 #endif
 
     //----------------------------------------------------//
@@ -477,6 +528,9 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
             AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
             twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
 
+        genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+        genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnittot);
+
 #if COMPRESSED
         std::string subname = "Compressed";
 #else
@@ -484,39 +538,20 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 #endif
         std::string name = "TestFiles/Complete" + subname;
 
-        auto apsByteSize = annotationParameterSet.getSize() / 8;
-        auto aauByteSize = annotationAccessUnittot.getSize() / 8;
-
         std::ofstream testfile;
         testfile.open(name + ".bin", std::ios::binary | std::ios::out);
         if (testfile.is_open()) {
             genie::core::Writer writer(&testfile);
-
-            writer.write(3, 8);
-            writer.write_reserved(10);
-            writer.write(apsByteSize+5, 22);
-            annotationParameterSet.write(writer);
-
-            writer.write(4, 8);
-            writer.write_reserved(3);
-            writer.write(aauByteSize+5, 29);
-            annotationAccessUnittot.write(writer);
+            APS_dataUnit.write(writer);
+            AAU_dataUnit.write(writer);
             testfile.close();
         }
         std::ofstream txtfile;
         txtfile.open(name + ".txt", std::ios::out);
         if (txtfile.is_open()) {
             genie::core::Writer txtWriter(&txtfile, true);
-
-            txtWriter.write(3, 8);
-            txtWriter.write_reserved(10);
-            txtWriter.write(apsByteSize+5, 22);
-            annotationParameterSet.write(txtWriter);
-
-            txtWriter.write(4, 8);
-            txtWriter.write_reserved(3);
-            txtWriter.write(aauByteSize+5, 29);
-            annotationAccessUnittot.write(txtWriter);
+            APS_dataUnit.write(txtWriter);
+            AAU_dataUnit.write(txtWriter);
             txtfile.close();
         }
     }

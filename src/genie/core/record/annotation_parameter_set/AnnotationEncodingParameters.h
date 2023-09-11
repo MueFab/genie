@@ -29,6 +29,14 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
+class TypedData {
+ public:
+    uint8_t data_type_ID;
+    uint8_t num_array_dims;
+    uint32_t n_elements = 1;
+    std::vector<uint32_t> array_dims;
+    std::vector<uint64_t> data_block;
+};
 class AnnotationEncodingParameters {
  private:
     uint8_t n_filter;

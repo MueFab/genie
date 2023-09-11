@@ -4,6 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#if WIN32
+#include<stdio.h>
+#endif
 #include "jbig_interface.h"
 #include <malloc.h>
 #include <stdlib.h>
