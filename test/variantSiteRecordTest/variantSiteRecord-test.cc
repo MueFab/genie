@@ -420,16 +420,19 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         infoFieldsFile.close();
     }
 
+
     std::map<DescriptorID, std::stringstream> outputstream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
     std::map<std::string, std::stringstream> attributeStream;
     genie::variant_site::VariantSiteParser parser(inputfile, outputstream, info, attributeStream,
                                                                 infoFields);
+    ASSERT_TRUE(inputfile.is_open());
     if (inputfile.is_open()) {
         EXPECT_GE(outputstream[DescriptorID::ALTERN].str().size(), 52);
         EXPECT_EQ(parser.getNumberOfRows(), 10000);
         inputfile.close();
     }
+
 
     EXPECT_EQ(attributeStream.size(), 22);
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)

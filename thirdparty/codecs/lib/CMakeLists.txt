@@ -33,7 +33,6 @@ foreach(mpeggCodecs_lib_target ${MPEGG_CODECS_LIB_TARGETS})
       target_link_libraries(${mpeggCodecs_lib_target} m)
     else()
       target_link_libraries(${mpeggCodecs_lib_target})
-      target_link_libraries(${mpeggCodecs_lib_target} PRIVATE fmemopen_windows)
 
     endif()
 endforeach(mpeggCodecs_lib_target)
