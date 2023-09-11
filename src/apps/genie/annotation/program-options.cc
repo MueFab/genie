@@ -43,6 +43,12 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Overwrite existing output files\n");
 
+    infoFields = "";
+    app.add_option("-if,--infofields", infoFields, "json file with infoField information\n");
+
+    configFile = "";  //!< @brief
+    app.add_option("-cf,--config-file", configFile, "configuration file\n");
+
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {

@@ -18,7 +18,8 @@
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
 
-#include "genie/core/record/variant_site/VariantSiteParser.h"
+#include "genie/core/record/data_unit/record.h"
+#include "genie/variantsite/VariantSiteParser.h"
 //#include "genie/entropy/bsc/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,63 +36,56 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//enum class codecs { BSC, ABC };
-//codecs convertStringToCodec(std::string& inputString) {
-//    if (inputString == "BSC")
-//        return codecs::BSC;
-//    else
-//        return codecs::ABC;
-//}
-
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName)
-    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, false) {} //TODO @Stefanie: change default AlgoID
+    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, false) {
+}  // TODO @Stefanie: change default AlgoID
 
 Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput)
-    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {} //TODO @Stefanie: change default AlgoID
+    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {
+}  // TODO @Stefanie: change default AlgoID
 
-Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput)
-    : Code(_inputFileName, _outputFileName, genie::core::AlgoID::BSC, testOutput) {} //TODO @Stefanie: encodeString is not yet assigned
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString,
+           bool testOutput)
+    : Code(_inputFileName, _outputFileName, convertStringToALgoID(encodeString), testOutput) {}
 
-Code::Code(
-    const std::string& _inputFileName,
-    const std::string& _outputFileName,
-    genie::core::AlgoID encodeMode,
-    bool testOutput,
-    std::string& rec
-    ):
-    inputFileName(_inputFileName),
-    outputFileName(_outputFileName),
-    compressedData{} {
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
+           bool testOutput, std::string& rec)
+    : Code(_inputFileName, _outputFileName, encodeMode, testOutput, "", "", rec) {}
+
+Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
+           bool testOutput, const std::string& _infoFieldsFileName, const std::string& _configFileName,
+           std::string& rec)
+    : inputFileName(_inputFileName),
+      outputFileName(_outputFileName),
+      infoFieldsFileName(_infoFieldsFileName),
+      configFileName(_configFileName),
+      compressedData{} {
     rec = rec;
     if (encodeMode != genie::core::AlgoID::BSC) UTILS_DIE("No Valid codec selected ");
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
     }
+
     std::map<genie::core::AnnotDesc, std::stringstream> output;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
-    {
-        std::stringstream infoFields(
-            "[\"LDAF\", \"AVGPOST\", \"RSQ\", \"ERATE\", \"THETA\", \"CIEND\", \"CIPOS\", \"END\", \"HOMLEN\", "
-            "\"HOMSEQ\", \"SVLEN\", \"SVTYPE\", \"AC\", \"AN\", \"AA\", \"AF\", \"AMR_AF\", \"ASN_AF\", \"AFR_AF\", "
-            "\"EUR_AF\", \"VT\", \"SNPSOURCE\"]");
-
-        std::ifstream site_MGrecs(inputFileName, std::ios::binary);
-        std::map<std::string, std::stringstream> attributeStream;
-        genie::core::record::variant_site::VariantSiteParser variantSiteParser(site_MGrecs, output, info,
-                                                                               attributeStream, infoFields);
+    std::stringstream infoFields;
+    if (!infoFieldsFileName.empty()) {
+        std::ifstream infoFieldsFile;
+        infoFieldsFile.open(infoFieldsFileName, std::ios::in);
+        if (infoFieldsFile.is_open()) {
+            infoFields << infoFieldsFile.rdbuf();
+            infoFieldsFile.close();
+        }
     }
+    std::ifstream site_MGrecs(inputFileName, std::ios::binary);
+    std::map<std::string, std::stringstream> attributeStream;
+    genie::variant_site::VariantSiteParser variantSiteParser(site_MGrecs, output, info, attributeStream,
+                                                                           infoFields);
 
     fillAnnotationParameterSet();
     encodeData();
     fillAnnotationAccessUnit();
-
-    std::stringstream parameterSetStream;
-    genie::core::Writer parameterSetWriter(&parameterSetStream);
-    std::stringstream accessStream;
-    genie::core::Writer accessWriter(&accessStream);
-    annotationParameterSet.write(parameterSetWriter);
-    annotationAccessUnit.write(accessWriter);
 
     std::ofstream txtFile;
     if (testOutput) {
@@ -102,41 +96,43 @@ Code::Code(
     std::ofstream outputFile;
     outputFile.open(outputFileName, std::ios::binary | std::ios::out);
 
+    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+    genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
+
     if (outputFile.is_open()) {
         genie::core::Writer dataUnitWriter(&outputFile);
-        uint8_t data_unit_type = 3;
-        uint64_t ParameterSet_size = (parameterSetWriter.getBitsWritten() + 10 + 8 + 22) / 8;
-        dataUnitWriter.write(data_unit_type, 8);
-        dataUnitWriter.write(0, 10);
-        dataUnitWriter.write(ParameterSet_size, 22);
-        dataUnitWriter.write(&parameterSetStream);
+        APS_dataUnit.write(dataUnitWriter);
+        AAU_dataUnit.write(dataUnitWriter);
 
-        data_unit_type = 4;
-        uint64_t Accessunit_size = (accessWriter.getBitsWritten() + 8 + 29 + 3) / 8;
-        dataUnitWriter.write(data_unit_type, 8);
-        dataUnitWriter.write(0, 3);
-        dataUnitWriter.write(Accessunit_size, 29);
-        dataUnitWriter.write(&accessStream);
-        dataUnitWriter.flush();
         std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
         outputFile.close();
         if (testOutput) {
             genie::core::Writer txtWriter(&txtFile, true);
-            txtWriter.write(3, 8);
-            txtWriter.write(0, 10);
-            txtWriter.write(ParameterSet_size, 22);
-            annotationParameterSet.write(txtWriter);
-
-            txtWriter.write(4, 8);
-            txtWriter.write(0, 3);
-            txtWriter.write(Accessunit_size, 29);
-            annotationAccessUnit.write(txtWriter);
+            APS_dataUnit.write(txtWriter);
+            AAU_dataUnit.write(txtWriter);
             txtWriter.flush();
             txtFile.close();
         }
     } else {
         std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
     }
+}
+
+genie::core::AlgoID Code::convertStringToALgoID(std::string algoString) const {
+    const std::map<std::string, genie::core::AlgoID> algoIds = {{"GABAC", genie::core::AlgoID::CABAC},
+                                                                {"LZMA", genie::core::AlgoID::LZMA},
+                                                                {"ZSTD", genie::core::AlgoID::ZSTD},
+                                                                {"BSC", genie::core::AlgoID::BSC},
+                                                                {"PROCRUSTES", genie::core::AlgoID::PROCRUSTES},
+                                                                {"JBIG", genie::core::AlgoID::JBIG},
+                                                                {"LZW", genie::core::AlgoID::LZW},
+                                                                {"BIN", genie::core::AlgoID::BIN},
+                                                                {"SPARSE", genie::core::AlgoID::SPARSE},
+                                                                {"DEL", genie::core::AlgoID::DEL},
+                                                                {"RLE", genie::core::AlgoID::RLE},
+                                                                {"SER", genie::core::AlgoID::SER}};
+
+    return algoIds.at(algoString);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -198,9 +194,8 @@ genie::core::record::annotation_parameter_set::DescriptorConfiguration Code::fil
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
-    return {
-        descriptorID, encodingMode, genotypeParameters, likelihoodParameters, contactMatrixParameters,
-        algorithmParameters};
+    return {descriptorID,       encodingMode, genotypeParameters, likelihoodParameters, contactMatrixParameters,
+            algorithmParameters};
 }
 
 genie::core::record::annotation_parameter_set::AnnotationEncodingParameters Code::fillAnnotationEncodingParameters() {
@@ -233,10 +228,23 @@ genie::core::record::annotation_parameter_set::AnnotationEncodingParameters Code
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set(
         n_attributes, genie::core::record::annotation_parameter_set::AttributeParameterSet());
 
-    return {n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names,
-                                        feature_name_len, feature_name, n_ontology_terms, ontology_term_name_len,
-                                        ontology_term_name, n_descriptors, descriptor_configuration, n_compressors,
-                                        compressor_parameter_set, n_attributes, attribute_parameter_set};
+    return {n_filter,
+            filter_ID_len,
+            filter_ID,
+            desc_len,
+            description,
+            n_features_names,
+            feature_name_len,
+            feature_name,
+            n_ontology_terms,
+            ontology_term_name_len,
+            ontology_term_name,
+            n_descriptors,
+            descriptor_configuration,
+            n_compressors,
+            compressor_parameter_set,
+            n_attributes,
+            attribute_parameter_set};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -268,7 +276,7 @@ void Code::fillAnnotationAccessUnit() {
     uint8_t readByte;
     std::vector<uint8_t> payloadVector;
     while (compressedData >> readByte) payloadVector.push_back(readByte);
-  //  std::string generic_payload = compressedData.str();
+    //  std::string generic_payload = compressedData.str();
     uint8_t num_chrs = 0;
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
@@ -322,21 +330,21 @@ void Code::encodeData() {
     */
 }
 
-void TempEncoder::encode(const std::stringstream &input, std::stringstream &output) {
+void TempEncoder::encode(const std::stringstream& input, std::stringstream& output) {
     // uint8_t lzpHashSize = MPEGG_BSC_DEFAULT_LZPHASHSIZE;
     //  uint8_t lzpMinLen = MPEGG_BSC_DEFAULT_LZPMINLEN;
     //  uint8_t blockSorter = MPEGG_BSC_BLOCKSORTER_BWT;
     //  uint16_t coder = MPEGG_BSC_CODER_QLFC_STATIC;
 
-    unsigned char *dest = NULL;
+    unsigned char* dest = NULL;
     size_t destLen = 0;
     size_t srcLen = input.str().size();
- //   std::cout << "source length: " << std::to_string(srcLen) << std::endl;
+    //   std::cout << "source length: " << std::to_string(srcLen) << std::endl;
 
-    mpegg_bsc_compress(&dest, &destLen, (const unsigned char *)input.str().c_str(), srcLen,
+    mpegg_bsc_compress(&dest, &destLen, (const unsigned char*)input.str().c_str(), srcLen,
                        MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
                        MPEGG_BSC_CODER_QLFC_STATIC);
-    output.write((const char *)dest, destLen);
+    output.write((const char*)dest, destLen);
     //   std::cout << "compressedData length: " << std::to_string(output.str().size()) << std::endl;
 
     /*
@@ -353,7 +361,6 @@ void TempEncoder::encode(const std::stringstream &input, std::stringstream &outp
 void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath) {
     if (_input_fpath == _output_fpath) {
     }
-
 }
 
 }  // namespace annotation

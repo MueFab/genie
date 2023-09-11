@@ -26,16 +26,21 @@ namespace record {
 namespace variant_site {
 
 AttributeData::AttributeData()
-    : attributeNameLength(0), attributeName(""), attributeType(0), attributeArrayDims(0), attributeID(0) {}
+    : attributeNameLength(0),
+      attributeName(""),
+      attributeType(genie::core::DataType::STRING),
+      attributeArrayDims(0),
+      attributeID(0) {}
 
 AttributeData::AttributeData(uint8_t length, std::string name, uint16_t attributeID)
     : attributeID(attributeID),
       attributeNameLength(length),
       attributeName(name),
-      attributeType(0),
+      attributeType(genie::core::DataType::STRING),
       attributeArrayDims(0) {}
 
-AttributeData::AttributeData(uint8_t length, std::string name, uint8_t type, uint8_t arrayLength, uint16_t attributeID)
+AttributeData::AttributeData(uint8_t length, std::string name, genie::core::DataType type, uint8_t arrayLength,
+                             uint16_t attributeID)
     : attributeID(attributeID),
       attributeNameLength(length),
       attributeName(name),
@@ -141,12 +146,12 @@ void Record::write(core::Writer& writer) {
     for (auto i = 0; i < info_count; ++i) {
         writer.write(info_tag[i].info_tag_len, 8);
         writer.write(info_tag[i].info_tag);
-        writer.write(info_tag[i].info_type, 8);
+        writer.write(static_cast<uint8_t>(info_tag[i].info_type), 8);
         writer.write(info_tag[i].info_array_len, 8);
         arrayType writeType;
         for (auto j = 0; j < info_tag[i].info_array_len; ++j) {
             writeType.toFile(info_tag[i].info_type, info_tag[i].infoValue[j], writer);
-            if (info_tag[i].info_type == 0) writer.write_reserved(8);
+            if (info_tag[i].info_type == DataType::STRING) writer.write_reserved(8);
         }
     }
     writer.write_reserved(7);
@@ -187,7 +192,7 @@ void Record::write(std::ostream& outputfile) const {
     for (const auto& tag : info_tag) {
         outputfile << std::to_string(tag.info_tag_len) << ",";
         outputfile << '"' << tag.info_tag << '"' << ",";
-        outputfile << std::to_string(tag.info_type) << ",";
+        outputfile << std::to_string(static_cast<uint8_t>(tag.info_type)) << ",";
         outputfile << std::to_string(tag.info_array_len) << ",";
         for (auto value : tag.infoValue) {
         }
@@ -252,7 +257,7 @@ bool Record::read(genie::util::BitReader& reader) {
             infoTag.info_tag.resize(infoTag.info_tag_len);
             reader.readBypass(&infoTag.info_tag[0], infoTag.info_tag_len);
         }
-        infoTag.info_type = static_cast<uint8_t>(reader.read_b(8));
+        infoTag.info_type = static_cast<core::DataType>(reader.read_b(8));
 
         infoTag.info_array_len = static_cast<uint8_t>(reader.read_b(8));
 

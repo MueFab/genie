@@ -32,11 +32,11 @@ int main(int argc, char* argv[]) {
     ProgramOptions programOptions(argc, argv);
     if (programOptions.task == "encode") {
         std::cerr << "calling Code...\n";
-        genie::core::AlgoID encodeMode = genie::core::AlgoID::BSC;
+
         Code code(programOptions.inputFile,
-                  programOptions.outputFile,
-                  encodeMode,
+                  programOptions.outputFile, programOptions.codec,
                   programOptions.testfileoutput);
+
     } else if (programOptions.task == "decode") {
         UTILS_DIE("not yet implemented: " + std::string(programOptions.task));
     } else {

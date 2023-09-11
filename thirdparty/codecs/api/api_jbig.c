@@ -5,6 +5,8 @@
  */
 
 #include "mpegg-codecs.h"
+#include "/Data/MPEGG/supportLibraries/fmemopen_windows/libfmemopen.h"
+#include "../supportLibraries/fmemopen_windows/libfmemopen.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -169,7 +171,7 @@ int mpegg_jbig_decompress(
     }
 
     *dest_len = src_len * 30; // Expect worst case 3x source size
-    *dest = (u_int8_t *) malloc (*dest_len);
+    *dest = (unsigned char *)malloc(*dest_len);
     fout = fmemopen(*dest, *dest_len * sizeof(unsigned  char), "wb");
 
     if (!fout)

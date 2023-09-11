@@ -72,6 +72,8 @@ class Record {
     explicit Record(annotation_access_unit::Record annotationAccessUnit);
     explicit Record(annotation_parameter_set::Record annotationParameterSet);
 
+    void write(core::Writer& writer) const;
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
