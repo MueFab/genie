@@ -53,6 +53,30 @@ stages:
       displayName: 'Install HTSLib (Unix)'
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
+    - bash: |
+        git clone https://github.com/xtensor-stack/xtl.git
+        cd xtl
+        git checkout tags/0.7.5
+        mkdir build
+        cd build
+        cmake ..
+        make -j
+        sudo make install
+      displayName: 'Install xtl (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+    - bash: |
+        git clone https://github.com/xtensor-stack/xtensor.git
+        cd xtensor
+        git checkout tags/0.24.6
+        mkdir build
+        cd build
+        cmake ..
+        make -j
+        sudo make install
+      displayName: 'Install xtensor (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
     - bash: ./ci/src_test.sh
       displayName: 'Check source code (Ubuntu 22.04)'
       condition: eq( variables['artifactName'], 'ubuntu2204')
@@ -60,6 +84,14 @@ stages:
     - bash: ./ci/build.sh doc
       displayName: 'Build documentation (Ubuntu 22.04)'
       condition: eq( variables['artifactName'], 'ubuntu2204')
+
+    - bash: |
+        mkdir -p cmake-build-debug-manual
+        cd cmake-build-debug-manual
+        cmake ..-DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
+        make -j
+      displayName: 'Genie build (non-bash script)'
+
 
     - bash: ./ci/build.sh debug
       displayName: 'Genie build'

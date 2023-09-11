@@ -62,8 +62,21 @@ class ContactParameters {
     std::vector<NormalizedMatrixInformations> norm_mat_infos;
  public:
 
+    ContactParameters();
+
+    ContactParameters(
+        std::vector<SampleInformation>&& _sample_infos,
+        std::vector<ChromosomeInformation>&& _chr_infos,
+        uint32_t _interval,
+        uint32_t _tile_size,
+        std::vector<uint32_t>&& _interval_multipliers,
+        std::vector<NormalizationMethodInformation>&& _norm_method_infos,
+        std::vector<NormalizedMatrixInformations>&& _norm_mat_infos
+    );
+
     uint8_t getNumberSamples() const;
     uint8_t getNumberChromosomes() const;
+    uint32_t getInterval() const;
     uint8_t getNumberIntervalMultipliers() const;
     uint8_t getNumberNormMethods() const;
     uint8_t getNumberNormMats() const;
