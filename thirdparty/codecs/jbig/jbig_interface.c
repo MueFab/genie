@@ -3,14 +3,8 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-<<<<<<< HEAD
-
-#if WIN32
-#include<stdio.h>
-=======
 #if WIN32
 #include <stdio.h>
->>>>>>> c1fc0cf4346510de4db1eb202caac328f61fbbe1
 #endif
 #include "jbig_interface.h"
 #include<stdio.h>

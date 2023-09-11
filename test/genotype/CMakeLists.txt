@@ -19,15 +19,6 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
-<<<<<<< HEAD
-target_link_libraries(genotype-tests PRIVATE gtest_main)
-#target_link_libraries(genotype-tests PRIVATE xtensor)
-target_link_libraries(genotype-tests PRIVATE xtensor xtensor::optimize)
-target_link_libraries(genotype-tests PRIVATE genie-core)
-target_link_libraries(genotype-tests PRIVATE genie-util)
-target_link_libraries(genotype-tests PRIVATE genie-gvc)
-target_link_libraries(genotype-tests PRIVATE mpeggCodecs-static)
-=======
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
     target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
     target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
@@ -44,7 +35,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
->>>>>>> c1fc0cf4346510de4db1eb202caac328f61fbbe1
 
 install(TARGETS genotype-tests
         RUNTIME DESTINATION "usr/bin")
