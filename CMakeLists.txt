@@ -40,8 +40,8 @@ set(CMAKE_CXX_STANDARD 17)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
     #
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <cctype>
 
 #include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/util/bitreader.h"

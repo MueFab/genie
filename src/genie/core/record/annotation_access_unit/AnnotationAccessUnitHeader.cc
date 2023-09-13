@@ -23,8 +23,8 @@ namespace annotation_access_unit {
 AnnotationAccessUnitHeader::AnnotationAccessUnitHeader()
     : attribute_contiguity(false),
       two_dimensional(false),
-      column_major_tile_order(false),
       variable_size_tiles(false),
+      column_major_tile_order(false),
       AT_coord_size(0),
       is_attribute(false),
       attribute_ID(0),

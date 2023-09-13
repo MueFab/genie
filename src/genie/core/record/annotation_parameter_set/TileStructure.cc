@@ -45,32 +45,32 @@ TileStructure::TileStructure()
       start_index{},
       end_index{},
       tile_size{0},
-      two_dimensional(false),
-      ATCoordSize(0) {}
+      ATCoordSize(0),
+      two_dimensional(false) {}
 
 TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool two_dimensional)
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
     read(reader);
 }
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional)
-    : ATCoordSize(ATCoordSize),
-      variable_size_tiles(false),
+    : variable_size_tiles(false),
       n_tiles(0),
       start_index{},
       end_index{},
       tile_size{0},
+      ATCoordSize(ATCoordSize),
       two_dimensional(two_dimensional) {}
 
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
                              std::vector<std::vector<uint64_t>> start_index,
                              std::vector<std::vector<uint64_t>> end_index, std::vector<uint64_t> tile_size)
-    : ATCoordSize(ATCoordSize),
-      two_dimensional(two_dimensional),
-      variable_size_tiles(variable_size_tiles),
+    : variable_size_tiles(variable_size_tiles),
       n_tiles(n_tiles),
       start_index(start_index),
       end_index(end_index),
-      tile_size(tile_size) {
+      tile_size(tile_size),
+      ATCoordSize(ATCoordSize),
+      two_dimensional(two_dimensional) {
     if (!variable_size_tiles) {
         this->start_index.clear();
         this->end_index.clear();
@@ -94,7 +94,7 @@ void TileStructure::read(util::BitReader& reader) {
         tile_size.clear();
         start_index.resize(n_tiles, std::vector<uint64_t>(dimensions));
         end_index.resize(n_tiles, std::vector<uint64_t>(dimensions));
-        for (auto i = 0; i < n_tiles; ++i) {
+        for (uint64_t i = 0; i < n_tiles; ++i) {
             for (auto j = 0; j < dimensions; ++j) {
                 start_index[i][j] = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
                 end_index[i][j] = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
@@ -115,7 +115,7 @@ void TileStructure::write(core::Writer& writer) const {
     writer.write(n_tiles, coordSizeInBits(ATCoordSize));
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
-        for (auto i = 0; i < n_tiles; ++i)
+        for (uint64_t i = 0; i < n_tiles; ++i)
             for (auto j = 0; j < dimensions; ++j) {
                 writer.write(start_index[i][j], coordSizeInBits(ATCoordSize));
                 writer.write(end_index[i][j], coordSizeInBits(ATCoordSize));

@@ -57,11 +57,11 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
       two_dimensional(twoDimensional),
       column_major_tile_order(columnMajorTileOrder),
       variable_size_tiles(variable_size_tiles),
+      AT_coord_size(ATCoordSize),
       n_blocks(n_blocks),
-      numChrs(numChrs),
-      AT_coord_size(ATCoordSize) {
+      numChrs(numChrs) {
     this->block.resize(n_blocks);
-    for (auto i = 0; i < blocks.size(); ++i) this->block[i] = blocks[i];
+    for (size_t i = 0; i < blocks.size(); ++i) this->block[i] = blocks[i];
 }
 
 void Record::read(util::BitReader& reader) {
