@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
         rc = 1; goto error;
     }
 
-    fprintf(stdout, "raw       : %lu\n", inputSize);
-    fprintf(stdout, "compressed: %lu\n", compSize);
+    fprintf(stdout, "raw       : %zu\n", inputSize);
+    fprintf(stdout, "compressed: %zu\n", compSize);
 
 
     ret = mpegg_lzma_decompress(&decompressedBuffer, &tmpBuffSize, compressedBuffer, compSize);

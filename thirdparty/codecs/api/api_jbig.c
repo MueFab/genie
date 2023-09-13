@@ -215,7 +215,7 @@ int mpegg_jbig_decompress(
 
     if (!fin)
     {
-        fprintf(stderr, "Can't open input file '%s", fnin);
+        fprintf(stderr, "Can't open input file '%s'", (fnin)?fnin:"NULL");
         exit(1);
     }
 
@@ -229,7 +229,7 @@ int mpegg_jbig_decompress(
 
     if (!fout)
     {
-        fprintf(stderr, "Can't open input file '%s", fnout);
+        fprintf(stderr, "Can't open input file '%s'", (fnout)?fnout:"NULL");
         exit(1);
     }
 
@@ -256,7 +256,7 @@ int mpegg_jbig_decompress(
     }
     if (ferror(fin))
     {
-        fprintf(stderr, "Problem while reading input file '%s", fnin);
+        fprintf(stderr, "Problem while reading input file '%s'", (fnin)?fnin:"NULL");
         perror("'");
         if (fout != stdout)
         {
@@ -283,7 +283,7 @@ int mpegg_jbig_decompress(
         fprintf(stderr, "Problem with input file '%s': %s\n"
                 "(error code 0x%02x, %lu = 0x%04lx BIE bytes "
                 "and %lu pixel rows processed)\n",
-                fnin, jbg85_strerror(result), result,
+                (fnin)?fnin:"NULL", jbg85_strerror(result), result,
                 (unsigned long)bytes_read, (unsigned long)bytes_read, s.y);
         if (fout != stdout)
         {
@@ -302,8 +302,8 @@ int mpegg_jbig_decompress(
         }
         else
         {
-            fprintf(stderr, "Problem while updating nrows in output file '%s",
-                    fnout);
+            fprintf(stderr, "Problem while updating nrows in output file '%s'",
+                    (fnout)?fnout:"NULL");
             perror("'");
             exit(1);
         }
@@ -316,7 +316,7 @@ int mpegg_jbig_decompress(
     /* check for file errors and close fout */
     if (ferror(fout) || fclose(fout))
     {
-        fprintf(stderr, "Problem while writing output file '%s", fnout);
+        fprintf(stderr, "Problem while writing output file '%s'", (fnout)?fnout:"NULL");
         perror("'");
         exit(1);
     }

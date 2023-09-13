@@ -49,10 +49,12 @@ void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
             writer.write_reserved(10);
             writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
             annotationParameterSet.write(writer);
+            break;
         case 4:
             writer.write_reserved(3);
             writer.write((annotationAccessUnit.getSize() + 40) / 8, 29);
             annotationAccessUnit.write(writer);
+            break;
         default:
             break;
     }
