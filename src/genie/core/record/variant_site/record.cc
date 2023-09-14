@@ -26,11 +26,11 @@ namespace record {
 namespace variant_site {
 
 AttributeData::AttributeData()
-    : attributeNameLength(0),
+    : attributeID(0),
+      attributeNameLength(0),
       attributeName(""),
       attributeType(genie::core::DataType::STRING),
-      attributeArrayDims(0),
-      attributeID(0) {}
+      attributeArrayDims(0) {}
 
 AttributeData::AttributeData(uint8_t length, std::string name, uint16_t attributeID)
     : attributeID(attributeID),

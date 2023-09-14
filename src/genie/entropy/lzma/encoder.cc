@@ -37,7 +37,7 @@ void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
     unsigned char *inputBuffer = NULL;
 
     inputBuffer = (unsigned char *)malloc(sizeof(*inputBuffer) * srcLen);
-    memcpy_s(inputBuffer, srcLen, input.str().c_str(), srcLen);
+    memcpy(inputBuffer, input.str().c_str(), srcLen);
 
     unsigned char *compressedBuffer = NULL;
     size_t inputSize = srcLen;
@@ -50,7 +50,7 @@ void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
      if (ret != 0) {
         std::cerr << "error with compression\n";
     }
-     for (auto i = 0; i < compSize; ++i) output << compressedBuffer[i];
+     for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
    // output.write((const char *)compressedBuffer, compSize);
     if (compressedBuffer) free(compressedBuffer);
     if (inputBuffer) free(inputBuffer);
