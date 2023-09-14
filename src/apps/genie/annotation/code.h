@@ -26,11 +26,6 @@
 namespace genieapp {
 namespace annotation {
 
-class TempEncoder {
- public:
-    void encode(const std::stringstream& input, std::stringstream& output);
-};
-
 /**
  * @brief
  */
@@ -41,14 +36,16 @@ class Code {
      * @brief
      */
     Code(const std::string& _inputFileName, const std::string& _outputFileName);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString,
          bool testOutput);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
-         bool testOutput, std::string& rec = (std::string&)"all");
+         bool testOutput, const std::string& rec = (std::string&)"all");
+
     Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
-         bool testOutput, const std::string& _infoFieldsFileName, const std::string& _configFileName,
-         std::string& rec = (std::string&)"all");
+         bool testOutput, const std::string& _infoFieldsFileName,
+         const std::string& rec = (std::string&)"all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
@@ -67,23 +64,12 @@ class Code {
     bool two_dimensional = false;
     bool column_major_tile_order = false;
 
-    AnnotationParameterSet annotationParameterSet;
-    AnnotationAccessUnit annotationAccessUnit;
-
     std::string inputFileName = "in.mgrecs";
     std::string outputFileName = "out.mgb";
     std::string infoFieldsFileName = "";
-    std::string configFileName = "";
     std::stringstream compressedData{};
 
     genie::core::AlgoID convertStringToALgoID(std::string algoString) const;
-
-    void fillAnnotationParameterSet();
-    DescriptorConfiguration fillDescriptorConfiguration();
-    AnnotationEncodingParameters fillAnnotationEncodingParameters();
-
-    void fillAnnotationAccessUnit();
-    void encodeData();
 };
 
 void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath);
