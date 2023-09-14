@@ -69,11 +69,11 @@ std::string arrayType::toString(core::DataType type, std::vector<uint8_t> bytear
             temp = std::to_string(value);
             break;
         }
-        default:  // csae 0
+        default:  // case 0
 
             temp += '"';
             if (bytearray.size() > 0)
-                for (auto i = 0; i < bytearray.size(); ++i) temp += bytearray[i];
+                for (size_t i = 0; i < bytearray.size(); ++i) temp += bytearray[i];
             temp += '"';
             break;
     }

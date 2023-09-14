@@ -49,9 +49,9 @@ int main(int argc, char **argv) {
         rc = 1; goto error;
     }
 
-    fprintf(stdout, "raw         : %lu\n", inputSize);
-    fprintf(stdout, "compressed  : %lu\n", compBuffSize);
-    fprintf(stdout, "decompressed: %lu\n", decBuffSize);
+    fprintf(stdout, "raw         : %zu\n", inputSize);
+    fprintf(stdout, "compressed  : %zu\n", compBuffSize);
+    fprintf(stdout, "decompressed: %zu\n", decBuffSize);
 
     if(inputSize != decBuffSize){
         fprintf(stderr, "decompression error: different size...\n");
