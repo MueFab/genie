@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -68,6 +69,7 @@ void DescriptorConfiguration::write(core::Writer& writer) const {
         likelihood_parameters.write(writer);
     else if (descriptor_ID == AnnotDesc::CONTACT)
         contact_matrix_parameters.write(writer);
+    std::cerr << "write algorithm_parameters " << std::endl;
     algorithm_parameters.write(writer);
 }
 
