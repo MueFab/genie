@@ -5,6 +5,8 @@ project("genie-vsite")
 set(source_files
         VariantSiteParser.cc
         JsonInfoFieldParser.cc
+        ParameterSetComposer.cc
+        AccessUnitComposer.cc
 )
 
 add_library(genie-vsite ${source_files})

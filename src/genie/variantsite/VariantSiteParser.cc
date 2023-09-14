@@ -137,9 +137,6 @@ void VariantSiteParser::ParseOne() {
         fieldWriter[static_cast<size_t>(genie::core::AnnotDesc::LINKID)].write(255, 8);
     }
     for (auto& it : attributeData) {
-        if (it.first == "HOMSEQ") {
-            std::cout << it.first;
-        }
         ParseAttribute(it.first);
     }
 }

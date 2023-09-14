@@ -47,7 +47,9 @@ void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
             break;
         case 3:
             writer.write_reserved(10);
+            std::cerr << "write getsize" << std::endl;
             writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
+
             annotationParameterSet.write(writer);
         case 4:
             writer.write_reserved(3);

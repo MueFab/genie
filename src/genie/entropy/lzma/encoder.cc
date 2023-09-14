@@ -85,7 +85,6 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters LZMAParameter
                                 MPEGG_LZMA_DEFAULT_THREADS};
 
     std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
-    //   genie::core::arrayType toar;
     std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
     std::vector<std::vector<std::vector<uint8_t>>> temp2;
     std::vector<std::vector<uint8_t>> temp3;
