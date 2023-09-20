@@ -152,7 +152,7 @@ void VariantSiteParser::ParseAttribute(uint8_t index) {
 
     const auto& tag = variantSite.getInfoTag();
     for (const auto& value : tag[index].infoValue) {
-        genie::core::arrayType toval{};
+        genie::core::ArrayType toval{};
         toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]);
         //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
     }
@@ -170,7 +170,7 @@ void VariantSiteParser::ParseAttribute(const std::string& infoTagfield) {
     if (matchLocation < infoArray.size()) {
         ParseAttribute(matchLocation);
     } else {  // insert default values
-        genie::core::arrayType def{};
+        genie::core::ArrayType def{};
         auto defaultType = attributeData[infoTagfield].getAttributeType();
         auto defaultValue = def.getDefaultValue(defaultType);
         auto defaultSize = def.getDefaultBitsize(defaultType);

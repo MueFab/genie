@@ -6,7 +6,7 @@
 namespace genie {
 namespace core {
 
-std::string arrayType::toString(core::DataType type, std::vector<uint8_t> bytearray) const {
+std::string ArrayType::toString(core::DataType type, std::vector<uint8_t> bytearray) const {
     std::string temp;
 
     switch (type) {
@@ -154,7 +154,7 @@ std::string arrayType::toString(uint8_t type, std::vector<uint8_t> bytearray) co
     return temp;
 }
 */
-uint8_t arrayType::getDefaultBitsize(core::DataType type) const {
+uint8_t ArrayType::getDefaultBitsize(core::DataType type) const {
     if (type == DataType::STRING) return 0;
     if (type == DataType::CHAR || type == DataType::INT8 || type == DataType::UINT8) return 8;
     if (type == DataType::BOOL) return 1;
@@ -174,7 +174,7 @@ uint8_t arrayType::getDefaultBitsize(uint8_t type) const {
     return 0;
 }
 */
-uint64_t arrayType::getDefaultValue(core::DataType type) const {
+uint64_t ArrayType::getDefaultValue(core::DataType type) const {
     switch (type) {
         case core::DataType::STRING:
         case core::DataType::CHAR:
@@ -238,7 +238,7 @@ uint64_t arrayType::getDefaultValue(uint8_t type) const {
     return 0;
 }
 */
-std::vector<uint8_t> arrayType::toArray(DataType type, util::BitReader& reader) {
+std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) {
     std::vector<uint8_t> byteArray;
     switch (type) {
         case DataType::BOOL:
@@ -390,7 +390,7 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, util::BitReader& reader) {
     return byteArray;
 }
 */
-void arrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const {
+void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const {
     if (type == core::DataType::BOOL) {
         writer.write(bytearray[0], 1);
     } else if (type == core::DataType::STRING) {
@@ -449,7 +449,7 @@ std::vector<uint8_t> arrayType::toArray(uint8_t type, uint64_t value) {
     return returnValue;
 }
 */
-std::vector<uint8_t> arrayType::toArray(DataType type, uint64_t value) {
+std::vector<uint8_t> ArrayType::toArray(DataType type, uint64_t value) {
     std::vector<uint8_t> returnValue;
     auto NrOfBytes = (getDefaultBitsize(type) + 7) / 8;
     returnValue.resize(NrOfBytes);

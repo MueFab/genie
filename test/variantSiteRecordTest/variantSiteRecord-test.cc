@@ -204,7 +204,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descriptorStream, attributesInfo);
+        encodeParameters.setParameterSet(descriptorStream, attributesInfo, parser.getNumberOfRows());
 
     //----------------------------------------------------//
 

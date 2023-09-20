@@ -33,23 +33,37 @@ namespace lzma {
 
 class LZMAParameters {
  public:
-    uint8_t lzpHashSize;
-    uint8_t lzpMinLen;
-    uint8_t blockSorter;
-    uint8_t coder;
-    uint16_t features;
+    uint8_t level;      /* 0 <= level <= 9, default = 5 */
+    uint32_t dictSize;  /* default = (1 << 24) */
+    uint8_t lc;         /* 0 <= lc <= 8, default = 3  */
+    uint8_t lp;         /* 0 <= lp <= 4, default = 0  */
+    uint8_t pb;         /* 0 <= pb <= 4, default = 2  */
+    uint16_t fb;        /* 5 <= fb <= 273, default = 32 */
+    uint8_t numThreads; /* 1 or 2, default = 2 */
+
     LZMAParameters()
-        : lzpHashSize(MPEGG_BSC_DEFAULT_LZPHASHSIZE),
-          lzpMinLen(MPEGG_BSC_DEFAULT_LZPMINLEN),
-          blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
-          coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
-    LZMAParameters(uint8_t _lzpHashSize, uint8_t _lzpMinLen, uint8_t _blockSorter, uint8_t _coder,
-                   uint16_t _features = 0)
-        : lzpHashSize(_lzpHashSize),
-          lzpMinLen(_lzpMinLen),
-          blockSorter(_blockSorter),
-          coder(_coder),
-          features(_features) {}
+        : level(MPEGG_LZMA_DEFAULT_LEVEL),
+          dictSize(MPEGG_LZMA_DEFAULT_DIC_SIZE),
+          lc(MPEGG_LZMA_DEFAULT_LC),
+          lp(MPEGG_LZMA_DEFAULT_LP),
+          pb(MPEGG_LZMA_DEFAULT_PB),
+          fb(MPEGG_LZMA_DEFAULT_FB),
+          numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
+
+    LZMAParameters(uint8_t level,
+                   uint32_t dictSize,
+                   uint8_t lc,
+                   uint8_t lp,
+                   uint8_t pb,
+                   uint16_t fb,
+                   uint8_t numThreads)
+        : level(level),
+          dictSize(dictSize),
+          lc(lc),
+          lp(lp),
+          pb(pb),
+          fb(fb),
+          numThreads(numThreads) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
 };
@@ -62,18 +76,24 @@ class LZMAEncoder {
 
     void decode(std::stringstream &input, std::stringstream &output);
 
-    void configure(const LZMAParameters bscParameters) {
-        lzpHashSize = bscParameters.lzpHashSize;
-        lzpMinLen = bscParameters.lzpMinLen;
-        blockSorter = bscParameters.blockSorter;
-        coder = bscParameters.coder;
+    void configure(const LZMAParameters lzmaParameters) {
+        level = lzmaParameters.level;
+        dictSize = lzmaParameters.dictSize;
+        lc = lzmaParameters.lc;
+        lp = lzmaParameters.lp;
+        pb = lzmaParameters.pb;
+        fb = lzmaParameters.fb;
+        numThreads = lzmaParameters.numThreads;
     }
 
  private:
-    uint8_t lzpHashSize;
-    uint8_t lzpMinLen;
-    uint8_t blockSorter;
-    uint8_t coder;
+    uint8_t level;      /* 0 <= level <= 9, default = 5 */
+    uint32_t dictSize;  /* default = (1 << 24) */
+    uint8_t lc;         /* 0 <= lc <= 8, default = 3  */
+    uint8_t lp;         /* 0 <= lp <= 4, default = 0  */
+    uint8_t pb;         /* 0 <= pb <= 4, default = 2  */
+    uint16_t fb;        /* 5 <= fb <= 273, default = 32 */
+    uint8_t numThreads; /* 1 or 2, default = 2 */
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

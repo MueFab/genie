@@ -14,6 +14,7 @@
 
 //#include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"
+#include "genie/core/constants.h"
 #include "genie/entropy/bsc/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -56,38 +57,28 @@ void BSCEncoder::decode(std::stringstream &input, std::stringstream &output) {
     if (destination) free(destination);
 }
 
-genie::core::record::annotation_parameter_set::AlgorithmParameters BSCParameters::convertToAlgorithmParameters()
-    const {
+#include <type_traits>
+
+genie::core::record::annotation_parameter_set::AlgorithmParameters BSCParameters::convertToAlgorithmParameters() const {
     uint8_t n_pars = 4;
     std::vector<uint8_t> par_ID{1, 2, 3, 4};
-    std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
-                                                genie::core::DataType::UINT8,
-                                                genie::core::DataType::UINT8};
-    std::vector<uint8_t> par_num_array_dims(4, 0);
+    const std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
+                                                      genie::core::DataType::UINT8, genie::core::DataType::UINT8};
+    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
     std::vector<uint8_t> values{MPEGG_BSC_DEFAULT_LZPHASHSIZE, MPEGG_BSC_DEFAULT_LZPMINLEN, MPEGG_BSC_BLOCKSORTER_BWT,
                                 MPEGG_BSC_CODER_QLFC_STATIC};
 
-    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
-    //   genie::core::arrayType toar;
-    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
-    std::vector<std::vector<std::vector<uint8_t>>> temp2;
-    std::vector<std::vector<uint8_t>> temp3;
-    std::vector<uint8_t> temp4(1, 0);
-    temp3.resize(n_pars, temp4);
-    temp2.resize(1, temp3);
-    temp.resize(1, temp2);
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
+    std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(1, 0));
 
-    for (auto & l : par_val) {
-        for (auto & k : l)
-            for (auto & j : k)
-                for (size_t i = 0; i < j.size(); ++i) {
-                    j[i][0] = values[i];
-                }
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
+
+    for (auto i = 0; i < n_pars; ++i) {
+        if (par_type.at(i) == core::DataType::UINT8) {
+            par_val.push_back( core::record::annotation_parameter_set::parameterToVector<uint8_t>(
+                {values.at(i)}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        }
     }
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
-        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
     return genie::core::record::annotation_parameter_set::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }

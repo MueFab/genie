@@ -35,12 +35,16 @@ class AlgorithmParameters {
     std::vector<std::vector<uint8_t>> par_array_dims;
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
 
+
  public:
     AlgorithmParameters();
+
     explicit AlgorithmParameters(util::BitReader& reader);
     AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type,
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
+
+    void setParameters(std::vector<genie::core::DataType> par_types, std::vector<uint8_t> par_values);
 
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
@@ -52,7 +56,27 @@ class AlgorithmParameters {
     std::vector<uint8_t> getParNumberOfArrayDims() const { return par_num_array_dims; }
     std::vector<std::vector<uint8_t>> getParArrayDims() const { return par_array_dims; }
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> getParValues() const { return par_val; }
+    static std::vector<std::vector<std::vector<std::vector<uint8_t>>>> resizeVector(uint8_t num_array_dims,
+                                                                             std::vector<uint8_t> array_dims);
 };
+template <typename T>
+std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(std::vector<T> value, core::DataType type,
+                                                                              uint8_t num_array_dims,
+                                                                              std::vector<uint8_t> array_dims) {
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterVector =
+        AlgorithmParameters::resizeVector(num_array_dims, array_dims);
+    core::ArrayType arrayType;
+    auto index = 0;
+    for (auto j = 0; j < parameterVector.size(); ++j) {
+        for (auto k = 0; k < parameterVector.at(j).size(); ++k) {
+            for (auto l = 0; l < parameterVector.at(j).at(k).size(); ++l) {
+                parameterVector.at(j).at(k).at(l) = arrayType.toArray(type, value.at(index));
+                index++;
+            }
+        }
+    }
+    return parameterVector;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

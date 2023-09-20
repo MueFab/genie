@@ -23,14 +23,14 @@ namespace variant_site {
 
     genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
-    std::map<std::string, genie::core::record::variant_site::AttributeData>& info) {
-    return setParameterSet(encodedDescriptors, info, genie::core::AlgoID::BSC);
+    std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize) {
+    return setParameterSet(encodedDescriptors, info, genie::core::AlgoID::BSC, defaultTileSize);
 }
 
     genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
           std::map<std::string, genie::core::record::variant_site::AttributeData> & info,
-          genie::core::AlgoID encodeMode) {
+          genie::core::AlgoID encodeMode, uint64_t defaultTileSize) {
     //----------------------------------------------------//
     // default values
     bool attributeContiguity = false;
@@ -53,7 +53,7 @@ namespace variant_site {
     uint64_t n_tiles = 1;
     std::vector<std::vector<uint64_t>> start_index;
     std::vector<std::vector<uint64_t>> end_index;
-    std::vector<uint64_t> tile_size(1, 10000);
+    std::vector<uint64_t> tile_size(1, defaultTileSize);
 
     std::vector<uint16_t> nAttributes;
     std::vector<std::vector<uint16_t>> attribute_IDs;
@@ -147,7 +147,7 @@ namespace variant_site {
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
     uint8_t n_attributes = static_cast<uint8_t>(info.size());
     for (auto it = info.begin(); it != info.end(); ++it) {
-        genie::core::arrayType deftype;
+        genie::core::ArrayType deftype;
         uint16_t attrID = info[it->first].getAttributeID();
         std::string attribute_name = info[it->first].getAttributeName();
         uint8_t attribute_name_len = static_cast<uint8_t>(attribute_name.length());

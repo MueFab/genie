@@ -148,7 +148,7 @@ void Record::write(core::Writer& writer) {
         writer.write(info_tag[i].info_tag);
         writer.write(static_cast<uint8_t>(info_tag[i].info_type), 8);
         writer.write(info_tag[i].info_array_len, 8);
-        arrayType writeType;
+        ArrayType writeType;
         for (auto j = 0; j < info_tag[i].info_array_len; ++j) {
             writeType.toFile(info_tag[i].info_type, info_tag[i].infoValue[j], writer);
             if (info_tag[i].info_type == DataType::STRING) writer.write_reserved(8);
@@ -263,7 +263,7 @@ bool Record::read(genie::util::BitReader& reader) {
 
         if (infoTag.info_array_len > 0) {
             infoTag.infoValue.resize(infoTag.info_array_len);
-            arrayType infoArray;
+            ArrayType infoArray;
             for (auto& value : infoTag.infoValue) {
                 value = infoArray.toArray(infoTag.info_type, reader);
             }

@@ -122,7 +122,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     for (auto i = 0; i < attribute_num_array_dims; ++i)
         attribute_array_dims[i] = static_cast<uint8_t>(reader.read_b(8));
 
-    arrayType curType;
+    ArrayType curType;
     attribute_default_val = curType.toArray(attribute_type, reader);
     attribute_miss_val_flag = static_cast<bool>(reader.read_b(1));
     if (attribute_miss_val_flag) {
@@ -166,7 +166,7 @@ void AttributeParameterSet::read(util::BitReader& reader) {
 }
 
 void AttributeParameterSet::write(core::Writer& writer) const {
-    arrayType curType;
+    ArrayType curType;
     writer.write(attribute_ID, 16);
     writer.write(attribute_name_len, 8);
     writer.write(attribute_name);
