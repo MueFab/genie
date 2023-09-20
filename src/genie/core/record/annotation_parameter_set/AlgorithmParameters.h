@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
@@ -67,9 +68,9 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(st
         AlgorithmParameters::resizeVector(num_array_dims, array_dims);
     core::ArrayType arrayType;
     auto index = 0;
-    for (auto j = 0; j < parameterVector.size(); ++j) {
-        for (auto k = 0; k < parameterVector.at(j).size(); ++k) {
-            for (auto l = 0; l < parameterVector.at(j).at(k).size(); ++l) {
+    for (size_t j = 0; j < parameterVector.size(); ++j) {
+        for (size_t k = 0; k < parameterVector.at(j).size(); ++k) {
+            for (size_t l = 0; l < parameterVector.at(j).at(k).size(); ++l) {
                 parameterVector.at(j).at(k).at(l) = arrayType.toArray(type, value.at(index));
                 index++;
             }
