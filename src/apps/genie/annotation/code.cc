@@ -98,7 +98,7 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descriptorStream, attributesInfo);
+        encodeParameters.setParameterSet(descriptorStream, attributesInfo, parser.getNumberOfRows());
 
 
     genie::variant_site::AccessUnitComposer accessUnit;

@@ -258,7 +258,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         uint8_t attribute_num_array_dims = 0;
         std::vector<uint8_t> attribute_array_dims;
 
-        genie::core::arrayType typeval;
+        genie::core::ArrayType typeval;
 
         std::vector<uint8_t> attribute_default_val;
         if (attribute_type != genie::core::DataType::STRING)
@@ -266,7 +266,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
 
         bool attribute_miss_val_flag = true;
         bool attribute_miss_default_flag = false;
-        genie::core::arrayType def;
+        genie::core::ArrayType def;
         uint64_t defaultValue = def.getDefaultValue(static_cast<genie::core::DataType>(itemName.second));
         std::vector<uint8_t> attribute_miss_val;
         auto size = def.getDefaultBitsize(static_cast<genie::core::DataType>(itemName.second));

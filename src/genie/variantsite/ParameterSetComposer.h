@@ -37,10 +37,10 @@ namespace variant_site {
      public:
         genie::core::record::annotation_parameter_set::Record setParameterSet(
             std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
-            std::map<std::string, genie::core::record::variant_site::AttributeData>& info);
+            std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize);
         genie::core::record::annotation_parameter_set::Record setParameterSet(
             std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
-            std::map<std::string, genie::core::record::variant_site::AttributeData>& info, genie::core::AlgoID encodeMode);
+            std::map<std::string, genie::core::record::variant_site::AttributeData>& info, genie::core::AlgoID encodeMode, uint64_t defaultTileSize);
 
     };
 

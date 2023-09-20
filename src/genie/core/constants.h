@@ -337,7 +337,7 @@ enum class DataType : uint8_t {
     DOUBLE = 12
 };
 
-typedef boost::variant<std::string, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
+typedef boost::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
                        float, double>
     DynamicDataType;
 
