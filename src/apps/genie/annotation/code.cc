@@ -64,8 +64,8 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
       outputFileName(_outputFileName),
       infoFieldsFileName(_infoFieldsFileName),
       compressedData{} {
-    rec;
-    encodeMode;
+    (void)rec;
+    (void)encodeMode;
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
