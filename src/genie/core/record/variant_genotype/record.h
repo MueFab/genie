@@ -14,7 +14,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-//#include <boost/optional/optional.hpp>
 #include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -74,7 +73,6 @@ class VariantGenotype {
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
-//    boost::optional<LinkRecord> link_record;
     std::optional<LinkRecord> link_record;
 
  public:
