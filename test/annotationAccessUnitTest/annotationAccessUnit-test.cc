@@ -10,7 +10,7 @@
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/record/variant_site/VariantSiteParser.h"
+#include "genie/variantsite/VariantSiteParser.h"
 
 #define GENERATE_TEST_FILES false
 

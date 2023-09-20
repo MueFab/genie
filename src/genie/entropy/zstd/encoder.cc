@@ -14,8 +14,8 @@
 
 #include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"
-#include "genie/entropy/zstd/encoder.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/entropy/zstd/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,30 +58,29 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters ZSTDParameter
     const {
     uint8_t n_pars = 3;
     std::vector<uint8_t> par_ID{1, 2, 3};
-    std::vector<uint8_t> par_type{2, 6, 0};
-    std::vector<uint8_t> par_num_array_dims(3, 0);
-    std::vector<uint8_t> values{use_dictionary_flag, 0, 0};
+    std::vector<genie::core::DataType> par_type{genie::core::DataType::BOOL, genie::core::DataType::UINT16,
+                                                genie::core::DataType::STRING};
+    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
+    std::vector<uint16_t> values{use_dictionary_flag, 0, 0};
 
-    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
-    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
-    std::vector<std::vector<std::vector<uint8_t>>> temp2;
-    std::vector<std::vector<uint8_t>> temp3;
-    std::vector<uint8_t> temp4(1, 0);
-    temp3.resize(n_pars, temp4);
-    temp2.resize(1, temp3);
-    temp.resize(1, temp2);
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
+    std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(1, 0));
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
 
-    for (auto &l : par_val) {
-        for (auto &k : l)
-            for (auto &j : k)
-                for (size_t i = 0; i < j.size(); ++i) {
-                    j[i][0] = values[i];
-                }
+    for (auto i = 0; i < n_pars; ++i) {
+        if (par_type.at(i) == core::DataType::BOOL) {
+            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<bool>(
+                {static_cast<bool>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        }
+        if (par_type.at(i) == core::DataType::UINT16) {
+            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint16_t>(
+                {static_cast<uint16_t>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        }
+        if (par_type.at(i) == core::DataType::STRING) {
+            par_val.push_back(core::record::annotation_parameter_set::parameterToVector<uint8_t>(
+                {0}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));
+        }
     }
 
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
-        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
     return genie::core::record::annotation_parameter_set::AlgorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }

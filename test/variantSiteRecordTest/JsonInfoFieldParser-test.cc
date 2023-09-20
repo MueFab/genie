@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <iostream>
-#include "genie/core/record/variant_site/JsonInfoFieldParser.h"
+#include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/util/bitreader.h"
 
 class JsonInfoFieldParserTests : public ::testing::Test {
@@ -63,10 +63,11 @@ TEST_F(JsonInfoFieldParserTests, readJsonFile) {  // NOLINT(cert-err58-cpp)
     if (inputfile.is_open()) {
         infoFieldStream << inputfile.rdbuf();
         inputfile.close();
-    }
 
-    genie::core::record::variant_site::JsonInfoFieldParser jsonInfoFields(infoFieldStream);
+    genie::variant_site::JsonInfoFieldParser jsonInfoFields(infoFieldStream);
     EXPECT_GT(jsonInfoFields.getInfoFields().size(), 10);
-
-    EXPECT_EQ(0, 0);
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).ID, "AA");
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).Number, 1);
+    EXPECT_EQ(jsonInfoFields.getInfoField(0).Type, genie::core::DataType::STRING);
+    }
 }

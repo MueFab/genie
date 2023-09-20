@@ -14,11 +14,16 @@ set(source_files
 
 add_executable(genie ${source_files})
 
+target_link_libraries(genie PRIVATE genie-core)
 target_link_libraries(genie PRIVATE genie-util)
+target_link_libraries(genie PRIVATE genie-bsc)
+target_link_libraries(genie PRIVATE genie-lzma)
+target_link_libraries(genie PRIVATE genie-zstd)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-gabac)
-target_link_libraries(genie PRIVATE genie-bsc)
+target_link_libraries(genie PRIVATE genie-vsite)
 target_link_libraries(genie PRIVATE mpeggCodecs-static)
+
 #target_link_libraries(genie PRIVATE libbsc)
 #target_link_libraries(genie PRIVATE Api)
 # TODO: To be implemented later

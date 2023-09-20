@@ -60,26 +60,23 @@ class DescriptorConfigurationTests : public ::testing::Test {
     // }
 };
 
-
 TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(1, {2}, {1}, {0}, {{0}},
-                                                                                           {{{{{0}}}}});
+    genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
+        1, {2}, {genie::core::DataType::BOOL}, {0}, {{0}}, {{{{{0}}}}});
     genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParameters;
     genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
 
     genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration(
-        genie::core::AnnotDesc::ATTRIBUTE, genie::core::AlgoID::BSC, genotypeParameters,
-        likelihoodParameters, contactMatrixParameters, algorithmParameters);
+        genie::core::AnnotDesc::ATTRIBUTE, genie::core::AlgoID::BSC, genotypeParameters, likelihoodParameters,
+        contactMatrixParameters, algorithmParameters);
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(),
               descriptorConfiguration.getAlgorithmParameters().getNumberOfPars());
 }
-
-
 
 TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue

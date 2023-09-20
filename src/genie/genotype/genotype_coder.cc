@@ -439,6 +439,8 @@ void entropy_encode_bin_mat(
     size_t raw_data_len;
     uint8_t* compressed_data;
     size_t compressed_data_len;
+    if (codec_ID == genie::core::AlgoID::BSC) {
+    }
 
     bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
 
