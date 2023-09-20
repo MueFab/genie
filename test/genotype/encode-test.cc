@@ -22,7 +22,7 @@
 
 TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
@@ -35,6 +35,8 @@ TEST(Genotype, Decompose) {
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
@@ -92,7 +94,7 @@ TEST(Genotype, Decompose) {
 
 TEST(Genotype, AdaptiveMaxValue) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
@@ -105,6 +107,8 @@ TEST(Genotype, AdaptiveMaxValue) {
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
@@ -128,7 +132,7 @@ TEST(Genotype, AdaptiveMaxValue) {
 
 TEST(Genotype, BinarizeBitPlane) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
@@ -141,6 +145,8 @@ TEST(Genotype, BinarizeBitPlane) {
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     // Check DO_NOT_CONCAT
     {
@@ -208,7 +214,7 @@ TEST(Genotype, BinarizeBitPlane) {
 
 TEST(Genotype, BinarizeRowBin) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
     std::ifstream reader(filepath);
@@ -221,6 +227,8 @@ TEST(Genotype, BinarizeRowBin) {
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     genie::genotype::EncodingOptions opt = {
         512,// block_size;
@@ -245,7 +253,7 @@ TEST(Genotype, BinarizeRowBin) {
 
 TEST(Genotype, RandomSort) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.no_fmt.vcf.geno";
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
 
     std::ifstream reader(filepath);
     ASSERT_EQ(reader.fail(), false);
@@ -259,6 +267,8 @@ TEST(Genotype, RandomSort) {
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     {
         genie::genotype::EncodingOptions opt = {

@@ -9,6 +9,7 @@ find_package(xtensor REQUIRED)
 set(source_files
         genotype_coder.cc
         genotype_parameters.cc
+        genotype_payload.cc
 )
 
 add_library(genie-gvc ${source_files})
