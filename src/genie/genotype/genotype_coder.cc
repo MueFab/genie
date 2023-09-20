@@ -506,62 +506,68 @@ void entropy_encode_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::tuple<GenotypeParameters, EncodingBlock>&& encode_block(
-//    const EncodingOptions& opt,
-//    std::vector<core::record::VariantGenotype>& recs
-//){
-//    UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG,
-//                 "Invalid AlgoID or algorithm is not yet implemented");
-//    UTILS_DIE_IF(opt.binarization_ID != BinarizationID::UNDEFINED,
-//                 "Invalid BinarizationID");
-//    UTILS_DIE_IF(opt.sort_row_method != SortingAlgoID::UNDEFINED,
-//                 "Invalid SortingAlgoID");
-//    UTILS_DIE_IF(opt.sort_col_method != SortingAlgoID::UNDEFINED,
-//                 "Invalid SortingAlgoID");
+std::tuple<GenotypeParameters, EncodingBlock> encode_block(
+    const EncodingOptions& opt,
+    std::vector<core::record::VariantGenotype>& recs
+){
+    UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG,
+                 "Invalid AlgoID or algorithm is not yet implemented");
+    UTILS_DIE_IF(opt.binarization_ID != BinarizationID::UNDEFINED,
+                 "Invalid BinarizationID");
+    UTILS_DIE_IF(opt.sort_row_method != SortingAlgoID::UNDEFINED,
+                 "Invalid SortingAlgoID");
+    UTILS_DIE_IF(opt.sort_col_method != SortingAlgoID::UNDEFINED,
+                 "Invalid SortingAlgoID");
+
+    genie::genotype::EncodingBlock block{};
+    genie::genotype::decompose(opt, block, recs);
+    genie::genotype::transform_max_value(block);
+    genie::genotype::binarize_allele_mat(opt, block);
+
+    // TODO(yeremia): create function to create GenotypeParameters
+    auto num_bin_mats = getNumBinMats(block);
+    std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
+    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
+        payload_params[i_mat].sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].transpose_variants_mat_flag = false;
+        payload_params[i_mat].variants_codec_ID = opt.codec_ID;
+    }
+
+    auto unique_phasing_vals = xt::unique(block.phasing_mat);
+    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
+    bool phases_value = unique_phasing_vals(0); // unique_phasing_vals has (at least) 1 value
+
+    GenotypePayloadParameters phasing_payload_params{};
+    if (encode_phases_data_flag){
+        phasing_payload_params.sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.transpose_variants_mat_flag = false;
+        phasing_payload_params.variants_codec_ID = opt.codec_ID;
+    }
+
+    GenotypeParameters parameter(
+        block.max_ploidy,
+        block.dot_flag,
+        block.na_flag,
+        opt.binarization_ID,
+        opt.concat_axis,
+        std::move(payload_params),
+        encode_phases_data_flag,
+        phasing_payload_params,
+        phases_value
+    );
+
+    genie::genotype::sort_block(opt, block);
+
+//    std::tuple<GenotypeParameters, EncodingBlock> ret = {
+//        std::move(parameter), std::move(block)
+//    };
 //
-//    genie::genotype::EncodingBlock block{};
-//    genie::genotype::decompose(opt, block, recs);
-//    genie::genotype::transform_max_value(block);
-//    genie::genotype::binarize_allele_mat(opt, block);
-//
-//    // TODO(yeremia): create function to create GenotypeParameters
-//    auto num_bin_mats = getNumBinMats(block);
-//    std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
-//    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++){
-//        payload_params[i_mat].sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-//        payload_params[i_mat].sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-//        payload_params[i_mat].transpose_variants_mat_flag = false;
-//        payload_params[i_mat].variants_codec_ID = opt.codec_ID;
-//    }
-//
-//    auto unique_phasing_vals = xt::unique(block.phasing_mat);
-//    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
-//    bool phases_value = unique_phasing_vals(0); // unique_phasing_vals has (at least) 1 value
-//
-//    GenotypePayloadParameters phasing_payload_params{};
-//    if (encode_phases_data_flag){
-//        phasing_payload_params.sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-//        phasing_payload_params.sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-//        phasing_payload_params.transpose_variants_mat_flag = false;
-//        phasing_payload_params.variants_codec_ID = opt.codec_ID;
-//    }
-//
-//    GenotypeParameters parameter(
-//        block.max_ploidy,
-//        block.dot_flag,
-//        block.na_flag,
-//        opt.binarization_ID,
-//        opt.concat_axis,
-//        std::move(payload_params),
-//        encode_phases_data_flag,
-//        phasing_payload_params,
-//        phases_value
-//    );
-//
-//    genie::genotype::sort_block(opt, block);
-//
-//    return {parameter, block};
-//}
+//    return std::move(ret);
+
+    return {parameter, block};
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
