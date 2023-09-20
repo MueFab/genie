@@ -55,10 +55,10 @@ void decompose(
     }
 
     auto& allele_mat = block.allele_mat;
-//    allele_mat = Int8MatDtype({block_size, num_samples*max_ploidy});
+
     MatShapeDtype allele_mat_shape = {block_size, num_samples*max_ploidy};
     allele_mat = xt::empty<bool, xt::layout_type::row_major>(allele_mat_shape);
-    xt::view(allele_mat, xt::all(), xt::all(), xt::all()) = -2; // Initialize value with "not available"
+    xt::view(allele_mat, xt::all(), xt::all()) = -2; // Initialize value with "not available"
 
     auto& phasing_mat = block.phasing_mat;
     phasing_mat = BinMatDtype({block_size, num_samples * static_cast<uint8_t>(max_ploidy -1)});
@@ -83,7 +83,7 @@ void decompose(
         }
 
         if (max_ploidy-1 > 0) {
-            auto phasing_ploidy = max_ploidy-1;
+            unsigned int phasing_ploidy = max_ploidy-1;
             auto& rec_phasings = rec.getPhasing();
             for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++){
                 // Iterate only until given number of allele of the current record

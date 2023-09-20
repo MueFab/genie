@@ -25,7 +25,7 @@ TEST(Genotype, Decompose) {
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
-    std::ifstream reader(filepath);
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
     while (bitreader.isGood()) {
@@ -76,7 +76,7 @@ TEST(Genotype, Decompose) {
     // Check the content of the first row of allele_tensor
     {
 //        const auto& allele_rec = xt::view(allele_mat, 0, xt::all(), xt::all());
-        auto allele_rec = xt::view(allele_mat, 0, xt::all(), xt::all());
+        auto allele_rec = xt::view(allele_mat, 0, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2067);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 117);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
@@ -85,7 +85,7 @@ TEST(Genotype, Decompose) {
     // Check the content of the last row of allele_tensor
     {
 //        const auto& allele_rec = xt::view(allele_mat, -1, xt::all(), xt::all());
-        auto allele_rec = xt::view(allele_mat, -1, xt::all(), xt::all());
+        auto allele_rec = xt::view(allele_mat, -1, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2178);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 6);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
@@ -97,7 +97,7 @@ TEST(Genotype, AdaptiveMaxValue) {
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
-    std::ifstream reader(filepath);
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
     while (bitreader.isGood()) {
@@ -135,7 +135,7 @@ TEST(Genotype, BinarizeBitPlane) {
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
-    std::ifstream reader(filepath);
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
     while (bitreader.isGood()) {
@@ -217,7 +217,7 @@ TEST(Genotype, BinarizeRowBin) {
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
-    std::ifstream reader(filepath);
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
     while (bitreader.isGood()) {
@@ -255,7 +255,7 @@ TEST(Genotype, RandomSort) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
 
-    std::ifstream reader(filepath);
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
 
