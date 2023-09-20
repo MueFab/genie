@@ -15,6 +15,7 @@ file(GLOB_RECURSE Api_sources "*.c")
 
 add_library(Api OBJECT ${Api_sources})
 
+
 #target_link_libraries(${PROJECT_NAME} PUBLIC jbigkit)
 #target_link_libraries(${PROJECT_NAME} PUBLIC jbig-interface)
 

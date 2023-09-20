@@ -23,6 +23,7 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
+    std::cerr << "programm options\n";
     CLI::App app("Genie MPEG-G Annotations\n");
 
     app.add_option("-i,--input-file", inputFile, "Input file (MPEG-G Annotation records)")->mandatory(true);
@@ -42,6 +43,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
 
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Overwrite existing output files\n");
+    infoFields = "";
+    app.add_option("-j, --info", infoFields, "json file with infoField information\n");
+    configFile = "";  //!< @brief
+ //   app.add_option("-cf,--config-file", configFile, "configuration file\n");
 
     try {
         app.parse(argc, argv);
@@ -122,6 +127,8 @@ void validateOutputFile(const std::string &file, bool forced) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ProgramOptions::validate() const {
+    std::cerr << "validate\n";
+
     auto files = genie::util::tokenize(inputFile, ';');
     if (task != "encode" && task != "decode") {
         UTILS_DIE("Task '" + task + "' is invalid");

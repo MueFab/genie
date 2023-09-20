@@ -82,7 +82,8 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(ce
 
     uint8_t n_pars = 4;
     std::vector<uint8_t> par_ID{1, 2, 3, 4};
-    std::vector<uint8_t> par_type{4, 4, 4, 4};
+    std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
+                                                genie::core::DataType::UINT8, genie::core::DataType::UINT8};
     std::vector<uint8_t> par_num_array_dims(4, 0);
     std::vector<uint8_t> values{16, 128, 1, 1};
 

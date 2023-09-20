@@ -22,8 +22,8 @@ GenotypeParameters::GenotypeParameters():
     variants_payload_params(),
     encode_phases_data_flag(false),
     phases_payload_params(),
-    phasing_value(false){}
-
+    phasing_value(false)
+{}
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters::GenotypeParameters(
@@ -44,7 +44,8 @@ GenotypeParameters::GenotypeParameters(
       variants_payload_params(_variants_payload_params),
       encode_phases_data_flag(_encode_phases_data_flag),
       phases_payload_params(_phases_payload_params),
-      phasing_value(_phases_value){}
+      phasing_value(_phases_value)
+{}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

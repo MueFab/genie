@@ -36,7 +36,7 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
     for (size_t i = 0; i< recs.size(); i++){
         auto& rec = recs[i];
         ASSERT_EQ(rec.getVariantIndex(), i);
-        ASSERT_EQ(rec.getNumSamples(), 1092);
+        ASSERT_EQ(rec.getNumSamples(), 1092u);
         ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
         ASSERT_EQ(rec.getLinkedRecord(), false);
     }
@@ -55,9 +55,9 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
             }
         }
 
-        ASSERT_EQ(num_counts_per_allele[0], 2067);
-        ASSERT_EQ(num_counts_per_allele[1], 117);
-        ASSERT_EQ(num_counts_per_allele[2], 0);
+        ASSERT_EQ(num_counts_per_allele[0], 2067u);
+        ASSERT_EQ(num_counts_per_allele[1], 117u);
+        ASSERT_EQ(num_counts_per_allele[2], 0u);
     }
 
     {
@@ -74,9 +74,9 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
             }
         }
 
-        ASSERT_EQ(num_counts_per_allele[0], 2178);
-        ASSERT_EQ(num_counts_per_allele[1], 6);
-        ASSERT_EQ(num_counts_per_allele[2], 0);
+        ASSERT_EQ(num_counts_per_allele[0], 2178u);
+        ASSERT_EQ(num_counts_per_allele[1], 6u);
+        ASSERT_EQ(num_counts_per_allele[2], 0u);
     }
 
 }

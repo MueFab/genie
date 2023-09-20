@@ -67,7 +67,7 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetValues) {  // NOLINT(cer
     uint16_t attribute_ID = 1;
     uint8_t attribute_name_len = 5;
     std::string attribute_name = "12345";
-    uint8_t attribute_type = 1;
+    genie::core::DataType attribute_type = genie::core::DataType::CHAR;
     uint8_t attribute_num_array_dims = 5;
     std::vector<uint8_t> attribute_array_dims = {1, 2, 3, 4, 5};
 

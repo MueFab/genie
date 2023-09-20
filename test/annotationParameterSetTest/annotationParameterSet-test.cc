@@ -218,7 +218,9 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
 
         uint8_t n_pars = 4;
         std::vector<uint8_t> par_ID{1, 2, 3, 4};
-        std::vector<uint8_t> par_type{4, 4, 4, 4};
+        std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
+                                      genie::core::DataType::UINT8,
+                                      genie::core::DataType::UINT8};
         std::vector<uint8_t> par_num_array_dims{0, 0, 0, 0};
         std::vector<std::vector<uint8_t>> par_array_dims;
         std::vector<uint8_t> val1{10};
@@ -252,22 +254,22 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         ID++;
         uint8_t attribute_name_len = static_cast<uint8_t>(itemName.first.length());
         std::string attribute_name = itemName.first;
-        uint8_t attribute_type = static_cast<uint8_t>(itemName.second);
+        genie::core::DataType attribute_type = static_cast<genie::core::DataType>(itemName.second);
         uint8_t attribute_num_array_dims = 0;
         std::vector<uint8_t> attribute_array_dims;
 
-        genie::core::arrayType typeval;
+        genie::core::ArrayType typeval;
 
         std::vector<uint8_t> attribute_default_val;
-        if (attribute_type != 0)
+        if (attribute_type != genie::core::DataType::STRING)
             attribute_default_val.resize((static_cast<size_t>(typeval.getDefaultBitsize(attribute_type)) + 7) / 8);
 
         bool attribute_miss_val_flag = true;
         bool attribute_miss_default_flag = false;
-        genie::core::arrayType def;
-        uint64_t defaultValue = def.getDefaultValue(static_cast<uint8_t>(itemName.second));
+        genie::core::ArrayType def;
+        uint64_t defaultValue = def.getDefaultValue(static_cast<genie::core::DataType>(itemName.second));
         std::vector<uint8_t> attribute_miss_val;
-        auto size = def.getDefaultBitsize(static_cast<uint8_t>(itemName.second));
+        auto size = def.getDefaultBitsize(static_cast<genie::core::DataType>(itemName.second));
         while (size > 0) {
             uint8_t value = static_cast<uint8_t>(defaultValue & 0xFF);
             attribute_miss_val.push_back(value);

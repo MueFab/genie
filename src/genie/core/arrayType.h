@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -18,35 +19,23 @@
 namespace genie {
 namespace core {
 
-enum class Type {
-    STRING = 0,
-    CHAR,
-    BOOL,
-    INT8,
-    UINT8,
-    INT16,
-    UINT16,
-    INT32,
-    UINT32,
-    INT64,
-    UINT64,
-    FLOAT,
-    DOUBLE
-};
 
 
-class arrayType {
+
+class ArrayType {
  private:
     uint8_t bitSize;
 
  public:
-    std::vector<uint8_t> toArray(uint8_t type, util::BitReader& reader);
-    void toFile(uint8_t type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
-    std::string toString(uint8_t type, std::vector<uint8_t> value) const;
+    std::vector<uint8_t> toArray(DataType type, util::BitReader& reader);
 
-    uint8_t getDefaultBitsize(uint8_t type) const;
-    uint64_t getDefaultValue(uint8_t type) const;
-    std::vector<uint8_t> toArray(uint8_t type, uint64_t value);
+    void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
+ 
+    std::string toString(core::DataType type, std::vector<uint8_t> value) const;
+
+    uint8_t getDefaultBitsize(core::DataType type) const;
+    uint64_t getDefaultValue(core::DataType type) const;
+    std::vector<uint8_t> toArray(core::DataType type, uint64_t value);
 };
 
 }  // namespace core

@@ -26,11 +26,6 @@
 namespace genieapp {
 namespace annotation {
 
-class TempEncoder {
- public:
-    void encode(const std::stringstream &input, std::stringstream &output);
-};
-
 /**
  * @brief
  */
@@ -41,21 +36,26 @@ class Code {
      * @brief
      */
     Code(const std::string& _inputFileName, const std::string& _outputFileName);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString, bool testOutput);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode, bool testOutput,
-         std::string& rec = (std::string&)"all");
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString,
+         bool testOutput);
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
+         bool testOutput, const std::string& rec = (std::string&)"all");
+
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
+         bool testOutput, const std::string& _infoFieldsFileName,
+         const std::string& rec = (std::string&)"all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
     using AnnotationAccessUnit = genie::core::record::annotation_access_unit::Record;
-//    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
     using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
 
     genie::core::AlgoID encodingMode = genie::core::AlgoID::BSC;
     const genie::core::AnnotDesc descriptorID = genie::core::AnnotDesc::ATTRIBUTE;
-    uint64_t fileSize = 197974; //TODO @Stefanie: What is the meaning of this number?
+    uint64_t fileSize = 197974;  // TODO @Stefanie: What is the meaning of this number?
     const uint8_t AT_coord_size = 2;
     const uint8_t AG_class = 1;
     const uint8_t AT_ID = 1;
@@ -64,19 +64,12 @@ class Code {
     bool two_dimensional = false;
     bool column_major_tile_order = false;
 
-    AnnotationParameterSet annotationParameterSet;
-    AnnotationAccessUnit annotationAccessUnit;
-
     std::string inputFileName = "in.mgrecs";
     std::string outputFileName = "out.mgb";
+    std::string infoFieldsFileName = "";
     std::stringstream compressedData{};
 
-    void fillAnnotationParameterSet();
-    DescriptorConfiguration fillDescriptorConfiguration();
-    AnnotationEncodingParameters fillAnnotationEncodingParameters();
-
-    void fillAnnotationAccessUnit();
-    void encodeData();
+    genie::core::AlgoID convertStringToALgoID(std::string algoString) const;
 };
 
 void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath);

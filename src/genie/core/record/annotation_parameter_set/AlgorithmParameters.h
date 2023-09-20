@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
@@ -30,17 +31,21 @@ class AlgorithmParameters {
  private:
     uint8_t n_pars;
     std::vector<uint8_t> par_ID;
-    std::vector<uint8_t> par_type;
+    std::vector<core::DataType> par_type;
     std::vector<uint8_t> par_num_array_dims;
     std::vector<std::vector<uint8_t>> par_array_dims;
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
 
+
  public:
     AlgorithmParameters();
+
     explicit AlgorithmParameters(util::BitReader& reader);
-    AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<uint8_t> par_type,
+    AlgorithmParameters(uint8_t n_pars, std::vector<uint8_t> par_ID, std::vector<core::DataType> par_type,
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
+
+    void setParameters(std::vector<genie::core::DataType> par_types, std::vector<uint8_t> par_values);
 
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
@@ -48,11 +53,31 @@ class AlgorithmParameters {
 
     uint8_t getNumberOfPars() const { return n_pars; }
     std::vector<uint8_t> getParIDs() const { return par_ID; }
-    std::vector<uint8_t> getParTypes() const { return par_type; }
+    std::vector<core::DataType> getParTypes() const { return par_type; }
     std::vector<uint8_t> getParNumberOfArrayDims() const { return par_num_array_dims; }
     std::vector<std::vector<uint8_t>> getParArrayDims() const { return par_array_dims; }
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> getParValues() const { return par_val; }
+    static std::vector<std::vector<std::vector<std::vector<uint8_t>>>> resizeVector(uint8_t num_array_dims,
+                                                                             std::vector<uint8_t> array_dims);
 };
+template <typename T>
+std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(std::vector<T> value, core::DataType type,
+                                                                              uint8_t num_array_dims,
+                                                                              std::vector<uint8_t> array_dims) {
+    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterVector =
+        AlgorithmParameters::resizeVector(num_array_dims, array_dims);
+    core::ArrayType arrayType;
+    auto index = 0;
+    for (size_t j = 0; j < parameterVector.size(); ++j) {
+        for (size_t k = 0; k < parameterVector.at(j).size(); ++k) {
+            for (size_t l = 0; l < parameterVector.at(j).at(k).size(); ++l) {
+                parameterVector.at(j).at(k).at(l) = arrayType.toArray(type, value.at(index));
+                index++;
+            }
+        }
+    }
+    return parameterVector;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

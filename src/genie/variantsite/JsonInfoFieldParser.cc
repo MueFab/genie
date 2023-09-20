@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <cctype>
 
-#include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/JsonInfoFieldParser.h"
+#include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -18,8 +18,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
-namespace record {
 namespace variant_site {
 
 void JsonInfoFieldParser::ParseInfoFields() {
@@ -47,13 +45,13 @@ void JsonInfoFieldParser::ParseInfoFields() {
     }
 }
 
-uint8_t JsonInfoFieldParser::InterpretType(std::string type) const {
-    if (type == "STRING") return static_cast<uint8_t>(genie::core::Type::STRING);
-    if (type == "INTEGER") return static_cast<uint8_t>(genie::core::Type::INT32);
+genie::core::DataType JsonInfoFieldParser::InterpretType(std::string type) const {
+    if (type == "STRING") return genie::core::DataType::STRING;
+    if (type == "INTEGER") return genie::core::DataType::INT32;
     if (type == "FLOAT")
-        return static_cast<uint8_t>(genie::core::Type::FLOAT);
+        return genie::core::DataType::FLOAT;
     else
-        return static_cast<uint8_t>(genie::core::Type::UINT64);
+        return genie::core::DataType::UINT64;
 }
 
 uint8_t JsonInfoFieldParser::InterpretSize(std::string size) const {
@@ -64,8 +62,6 @@ uint8_t JsonInfoFieldParser::InterpretSize(std::string size) const {
 }
 
 }  // namespace variant_site
-}  // namespace record
-}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
