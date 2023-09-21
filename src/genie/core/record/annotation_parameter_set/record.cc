@@ -65,9 +65,7 @@ void Record::write(Writer& writer) const {
     writer.write(AT_coord_size, 2);
     writer.write(AT_pos_40_bits_flag, 1);
     writer.write(n_aux_attribute_groups, 3);
-    std::cerr << "written until tile configuration...\n";
     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
-    std::cerr << "written until annotation_encoding_parameters...\n";
     annotation_encoding_parameters.write(writer);
 }
 

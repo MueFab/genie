@@ -71,6 +71,8 @@ class Record {
     void write(core::Writer& writer) const;
     size_t getSize() const;
     size_t getSize(core::Writer& writesize) const;
+
+    Record& operator=(const Record& rec);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

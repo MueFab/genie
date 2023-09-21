@@ -126,39 +126,33 @@ void AnnotationEncodingParameters::write(core::Writer& writer) const {
         writer.write(desc_len[i], 10);
         for (auto byte : description[i]) writer.write(byte, 8);
     }
-    std::cerr << "filter parameters written" << std::endl;
     writer.write(n_features_names, 8);
     for (auto i = 0; i < n_features_names; ++i) {
         writer.write(feature_name_len[i], 6);
         for (auto byte : feature_name[i]) writer.write(byte, 8);
     }
-    std::cerr << "features parameters written" << std::endl;
 
     writer.write(n_ontology_terms, 8);
     for (auto i = 0; i < n_ontology_terms; ++i) {
         writer.write(ontology_term_name_len[i], 6);
         for (auto byte : ontology_term_name[i]) writer.write(byte, 8);
     }
-    std::cerr << "ontology parameters written" << std::endl;
 
    
     writer.write(n_descriptors, 8);
     for (auto i = 0; i < n_descriptors; ++i) {
         descriptor_configuration[i].write(writer);
     }
-    std::cerr << "filter descriptor written" << std::endl;
 
     writer.write(n_compressors, 8);
     for (auto i = 0; i < n_compressors; ++i) {
         compressor_parameter_set[i].write(writer);
     }
-    std::cerr << "filter compressor written" << std::endl;
 
     writer.write(n_attributes, 8);
     for (auto i = 0; i < n_attributes; ++i) {
         attribute_parameter_set[i].write(writer);
     }
-    std::cerr << "filter atttribute parameters written" << std::endl;
 
     writer.flush();
 }

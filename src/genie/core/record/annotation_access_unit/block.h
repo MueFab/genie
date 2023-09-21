@@ -61,11 +61,12 @@ class BlockVectorData {
         : descriptorID(_descriptorID), attributeID(0), thisIsAttribute(false), data(_data) {}
 
     BlockVectorData(AnnotDesc _descriptorID, uint16_t _attributeID, std::vector<uint8_t>& _data)
-        : descriptorID(_descriptorID), attributeID(_attributeID), thisIsAttribute(true), data(_data) {}
+        : descriptorID(_descriptorID), attributeID(_attributeID), thisIsAttribute(true), data(_data),dataSize(_data.size()) {}
 
     AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
+    size_t getDataSize() const { return dataSize; }
     std::vector<uint8_t>& getData() { return data; }
 
  private:
@@ -73,6 +74,8 @@ class BlockVectorData {
     uint16_t attributeID;
     bool thisIsAttribute;
     std::vector<uint8_t>& data;
+    size_t dataSize;
+ 
 };
 
 
