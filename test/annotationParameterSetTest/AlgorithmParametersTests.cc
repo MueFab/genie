@@ -79,31 +79,24 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(ce
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-
     uint8_t n_pars = 4;
     std::vector<uint8_t> par_ID{1, 2, 3, 4};
     std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
                                                 genie::core::DataType::UINT8, genie::core::DataType::UINT8};
     std::vector<uint8_t> par_num_array_dims(4, 0);
     std::vector<uint8_t> values{16, 128, 1, 1};
+    std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(1, 0));
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
+    for (auto i = 0; i < n_pars; ++i) {
+        par_val.emplace_back(genie::core::record::annotation_parameter_set::AlgorithmParameters::resizeVector(
+            par_num_array_dims[i], par_array_dims[i]));
 
-    std::vector<std::vector<uint8_t>> par_array_dims(0, std::vector<uint8_t>(1, 0));
-    //   genie::core::arrayType toar;
-    std::vector<std::vector<std::vector<std::vector<uint8_t>>>> temp;
-    std::vector<std::vector<std::vector<uint8_t>>> temp2;
-    std::vector<std::vector<uint8_t>> temp3;
-    std::vector<uint8_t> temp4(1, 0);
-    temp3.resize(n_pars, temp4);
-    temp2.resize(1, temp3);
-    temp.resize(1, temp2);
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(1, temp);
-    // par_val.resize(n_pars, temp);
-    for (size_t l = 0; l < par_val.size(); ++l) {
-        for (size_t k = 0; k < par_val[l].size(); ++k)
-            for (size_t j = 0; j < par_val[l][k].size(); ++j)
-                for (size_t i = 0; i < par_val[l][k][j].size(); ++i) {
-                    par_val[l][k][j][i][0] = values[i];
-                }
+        genie::core::ArrayType arrayType;
+
+        for (auto& j : par_val[i]) {
+            for (auto& k : j)
+                for (auto& l : k) l = arrayType.toArray(par_type[i], values[i]);
+        }
     }
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
@@ -127,8 +120,7 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     RandomAnnotationEncodingParameters randomAlgorithmParameters;
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters;
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParametersCheck;
-    uint8_t nPars = 1;
-    // static_cast<uint8_t>(rand() % 16);
+    uint8_t nPars = 3;
     uint8_t numArray = 0;
     std::vector<uint8_t> parNumArrayDims(nPars, numArray);
     algorithmParameters = randomAlgorithmParameters.randomAlgorithmParameters(nPars, parNumArrayDims);

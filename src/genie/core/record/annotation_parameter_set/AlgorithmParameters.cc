@@ -42,9 +42,10 @@ AlgorithmParameters::AlgorithmParameters(
       par_val(par_val) {}
 
 void AlgorithmParameters::read(util::BitReader& reader) {
+    par_val.resize(0);
+
     n_pars = static_cast<uint8_t>(reader.read_b(4));
     par_array_dims.resize(n_pars);
-    par_val.resize(n_pars);
     par_ID.resize(n_pars);
     par_type.resize(n_pars);
     par_num_array_dims.resize(n_pars);
@@ -58,7 +59,7 @@ void AlgorithmParameters::read(util::BitReader& reader) {
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
             par_array_dims[i].push_back(static_cast<uint8_t>(reader.read_b(8)));
         }
-        par_val[i] = resizeVector(par_num_array_dims[i], par_array_dims[i]);
+        par_val.emplace_back(resizeVector(par_num_array_dims[i], par_array_dims[i]));
         for (auto& d1 : par_val[i])
             for (auto& d2 : d1)
                 for (auto& d3 : d2) d3 = types.toArray(par_type[i], reader);
@@ -80,6 +81,7 @@ void AlgorithmParameters::write(core::Writer& writer) const {
                 for (auto l : k) types.toFile(par_type[i], l, writer);
     }
 }
+
 size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.getBitsWritten();
@@ -91,7 +93,7 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters:
     uint8_t j = 1;
     uint8_t k = 1;
     uint8_t l = 1;
-    j = array_dims.at(0) + 1;
+    if (array_dims.size() != 0) j = array_dims.at(0) + 1;
     if (num_array_dims > 0) k = array_dims.at(1) + 1;
     if (num_array_dims == 2) l = array_dims.at(2) + 1;
 

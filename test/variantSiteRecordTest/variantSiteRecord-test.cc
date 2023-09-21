@@ -202,15 +202,14 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::string filepath = gitRootDir + "/data/records/";
     filepath.erase(std::remove(filepath.begin(), filepath.end(), '\n'), filepath.end());
     using DescriptorID = genie::core::AnnotDesc;
-    //std::string path = "./Testfiles/exampleMGrecs/";
 
-   // std::string filename = "ALL.chrX.10000.site";
-    std::string filename = "1.3.05_cut.site";
+    std::string filename = "ALL.chrX.10000.site";
+   // std::string filename = "1.3.05_cut.site";
     constexpr size_t ExpectedNumberOfrows = 10;
     std::ifstream inputfile;
     inputfile.open(filepath + filename, std::ios::in | std::ios::binary);
 
-    std::string infofilename = "1.3.5.header100.no_fmt.vcf.infotags.json";
+    std::string infofilename = "1.3.5.header100.gt_only.vcf.infotags.json";
     std::ifstream infoFieldsFile;
     infoFieldsFile.open(filepath + infofilename, std::ios::in);
     std::stringstream infoFields;
