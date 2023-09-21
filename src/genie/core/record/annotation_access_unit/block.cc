@@ -47,7 +47,7 @@ void Block::set(BlockVectorData blockData) {
     numChrs = 0;
     const bool attribute_contiguity = false;
     const bool indexed = false;
-    uint32_t blockSize = static_cast<uint32_t>(blockData.getData().size());
+    uint32_t blockSize = static_cast<uint32_t>(blockData.getDataSize());
     BlockHeader header(attribute_contiguity, blockData.getDescriptorID(), blockData.getAttributeID(), indexed,
                        blockSize);
     GenotypePayload genotype_payload;
