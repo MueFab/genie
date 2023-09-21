@@ -135,38 +135,26 @@ RandomAnnotationEncodingParameters::randomAlgorithmParameters() {
 
 genie::core::record::annotation_parameter_set::AlgorithmParameters
 RandomAnnotationEncodingParameters::randomAlgorithmParameters(uint8_t nuMOfpars, std::vector<uint8_t> parNumArrayDims) {
+    std::vector<uint8_t> par_num_array_dims(parNumArrayDims);
     uint8_t n_pars = nuMOfpars;
     std::vector<uint8_t> par_ID(n_pars, 0);
-    std::vector<genie::core::DataType> par_type(n_pars, genie::core::DataType::STRING);
-    std::vector<uint8_t> par_num_array_dims(n_pars, 0);
-    par_num_array_dims = parNumArrayDims;
+    std::vector<genie::core::DataType> par_type(n_pars, genie::core::DataType::UINT16);
     std::vector<std::vector<uint8_t>> par_array_dims(n_pars, std::vector<uint8_t>(0));
-    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val(
-        n_pars, std::vector<std::vector<std::vector<std::vector<uint8_t>>>>(0));
+    std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
+
     for (auto i = 0; i < n_pars; ++i) {
         par_ID[i] = randomU4();
         par_type[i] = randomType();
-        par_array_dims[i].resize(par_num_array_dims[i]);
+        if (par_type[i] == genie::core::DataType::STRING) par_type[i] = genie::core::DataType::UINT8;
+        //par_array_dims[i].resize(par_num_array_dims[i]+1);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) par_array_dims[i][j] = randomU4();  // randomU8();
-        if (par_num_array_dims[i] == 0)
-            par_val[i].resize(1,
-                              std::vector<std::vector<std::vector<uint8_t>>>(1, std::vector<std::vector<uint8_t>>(1)));
-        if (par_num_array_dims[i] == 1)
-            par_val[i].resize(1, std::vector<std::vector<std::vector<uint8_t>>>(
-                                     1, std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
-        if (par_num_array_dims[i] == 2)
-            par_val[i].resize(1, std::vector<std::vector<std::vector<uint8_t>>>(
-                                     par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
-        if (par_num_array_dims[i] == 3)
-            par_val[i].resize(par_array_dims[i][2],
-                              std::vector<std::vector<std::vector<uint8_t>>>(
-                                  par_array_dims[i][1], std::vector<std::vector<uint8_t>>(par_array_dims[i][0])));
-
-        for (size_t j = 0; j < par_val[i].size(); ++j)
-            for (size_t k = 0; k < par_val[j][i].size(); ++k)
-                for (size_t l = 0; l < par_val[k][j][i].size(); ++l) {
-                    par_val[l][k][j][i] = randomValForType(par_type[i]);
-                }
+        std::vector<std::vector<std::vector<std::vector<uint8_t>>>> tempvec=
+            genie::core::record::annotation_parameter_set::AlgorithmParameters::resizeVector(par_num_array_dims[i],
+                                                                                             par_array_dims[i]);
+        par_val.emplace_back(tempvec);
+        for (auto& j : par_val[i])
+            for (auto& k : j)
+                for (auto& l : k) l = randomValForType(par_type[i]);
     }
 
     return genie::core::record::annotation_parameter_set::AlgorithmParameters(
@@ -348,7 +336,7 @@ RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
     std::vector<uint8_t> compressor_step_ID(n_compressor_steps, 0);
     for (auto& ID : compressor_step_ID) ID = randomU4();
     std::vector<genie::core::AlgoID> algorithm_ID(n_compressor_steps, genie::core::AlgoID::BSC);
-//    for (auto& ID : algorithm_ID) ID = static_cast<genie::core::AlgoID>(randomU4() + randomU4());
+    //    for (auto& ID : algorithm_ID) ID = static_cast<genie::core::AlgoID>(randomU4() + randomU4());
     std::vector<bool> use_default_pars(n_compressor_steps);
     std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
     for (auto i = 0; i < n_compressor_steps; ++i) {
