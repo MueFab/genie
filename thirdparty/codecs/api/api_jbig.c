@@ -113,7 +113,7 @@ int mpegg_jbig_compress(
     size_t bpl = (ncols >> 3) + ((ncols & 7) != 0);     /* bytes per line */
 
     *dest_len = scr_len * 3; // Expect worst case 3x source size
-    *dest = (unsigned char *) malloc (*dest_len * sizeof(unsigned  char));
+    *dest = (unsigned char *) calloc(*dest_len,  sizeof(unsigned  char));
 #if defined(_WIN32) || defined(_WIN64)
     fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
 #else
@@ -199,9 +199,9 @@ int mpegg_jbig_decompress(
 
     unsigned char* src_ptr = (unsigned char*)src;
 
-    inbuf = (unsigned char *)malloc(buf_len * sizeof(unsigned char));
+    inbuf = (unsigned char *)calloc(buf_len, sizeof(unsigned char));
     outbuflen = ((xmax >> 3) + ((xmax & 7) != 0)) * 3;
-    outbuf = (unsigned char *)malloc(outbuflen * sizeof(unsigned char));
+    outbuf = (unsigned char *)calloc(outbuflen, sizeof(unsigned char));
     if (!inbuf || !outbuf)
     {
         printf("Sorry, not enough memory available!\n");
@@ -220,7 +220,7 @@ int mpegg_jbig_decompress(
     }
 
     *dest_len = src_len * 30; // Expect worst case 3x source size
-    *dest = (unsigned char *) malloc (*dest_len);
+    *dest = (unsigned char *) calloc (*dest_len, sizeof(unsigned  char));
 #if defined(_WIN32) || defined(_WIN64)
     fout = fmemopen_windows(*dest, *dest_len * sizeof(unsigned  char), "wb");
 #else
