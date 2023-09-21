@@ -4,6 +4,8 @@
 #include <iostream>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
+
+
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
@@ -165,21 +167,52 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(output.str(), checkOut.str());
 }
 
-#define COMPRESSED true
+std::string exec(const std::string &cmd) {
+#ifdef WIN32
+    FILE *pipe = _popen(cmd.c_str(), "r");
+#else
+    FILE *pipe = popen(cmd.c_str(), "r");
+#endif
+    if (!pipe) {
+        return "<exec(" + cmd + ") failed>";
+    }
+
+    const int bufferSize = 256;
+    char buffer[bufferSize];
+    std::string result;
+
+    while (!feof(pipe)) {
+        if (fgets(buffer, bufferSize, pipe) != nullptr) {
+            result += buffer;
+        }
+    }
+#ifdef WIN32
+    _pclose(pipe);
+#else
+    pclose(pipe);
+#endif
+
+    return result;
+}
 
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-    using DescriptorID = genie::core::AnnotDesc;
-    std::string path = "./Testfiles/exampleMGrecs/";
-    std::string filename = "ALL.chrX.10000";
-    std::ifstream inputfile;
-    inputfile.open(path + filename + ".site", std::ios::in | std::ios::binary);
 
-    filename = "ALL.chrX.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.infotags.json";
+    std::string gitRootDir = exec("git rev-parse --show-toplevel");
+
+    std::string filepath = gitRootDir + "/data/records/";
+    filepath.erase(std::remove(filepath.begin(), filepath.end(), '\n'), filepath.end());
+    using DescriptorID = genie::core::AnnotDesc;
+    //std::string path = "./Testfiles/exampleMGrecs/";
+
+   // std::string filename = "ALL.chrX.10000.site";
+    std::string filename = "1.3.05_cut.site";
+    constexpr size_t ExpectedNumberOfrows = 10;
+    std::ifstream inputfile;
+    inputfile.open(filepath + filename, std::ios::in | std::ios::binary);
+
+    std::string infofilename = "1.3.5.header100.no_fmt.vcf.infotags.json";
     std::ifstream infoFieldsFile;
-    infoFieldsFile.open(path + filename, std::ios::in);
+    infoFieldsFile.open(filepath + infofilename, std::ios::in);
     std::stringstream infoFields;
     if (infoFieldsFile.is_open()) {
         infoFields << infoFieldsFile.rdbuf();
@@ -192,14 +225,14 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream, infoFields);
     ASSERT_TRUE(inputfile.is_open());
     if (inputfile.is_open()) {
-        EXPECT_GE(descriptorStream[DescriptorID::ALTERN].str().size(), 52);
-        EXPECT_EQ(parser.getNumberOfRows(), 10000);
+        EXPECT_GE(descriptorStream[DescriptorID::ALTERN].str().size(), 12);
+        EXPECT_GE(parser.getNumberOfRows(), ExpectedNumberOfrows);
         inputfile.close();
     }
 
     EXPECT_EQ(attributeStream.size(), 22);
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)
-        EXPECT_GE(it->second.str().size(), 10000) << it->first;
+        EXPECT_GE(it->second.str().size(), ExpectedNumberOfrows) << it->first;
 
     genie::variant_site::ParameterSetComposer encodeParameters;
 
@@ -216,8 +249,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
-    std::string subname = "Compressed";
-    std::string name = "TestFiles/Complete" + subname;
+    std::string name = "TestFiles/Complete" + filename;
 
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);

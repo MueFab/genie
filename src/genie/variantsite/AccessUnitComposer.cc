@@ -29,7 +29,7 @@ void AccessUnitComposer::setAccessUnit(
     std::map<std::string, std::stringstream>& _attributeStream,
     std::map<std::string, core::record::variant_site::AttributeData> _attributeInfo,
     const genie::core::record::annotation_parameter_set::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record _annotationAccessUnit) {
+    core::record::annotation_access_unit::Record& _annotationAccessUnit) {
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
 
     // -------- descriptors ---------- //

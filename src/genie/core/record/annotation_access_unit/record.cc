@@ -107,6 +107,23 @@ size_t Record::getSize(core::Writer& writesize) const {
     return writesize.getBitsWritten();
 }
 
+Record& Record::operator = (const Record& rec) {
+    AT_ID = rec.AT_ID;
+    AT_type = rec.AT_type;
+    AT_subtype = rec.AT_subtype;
+    AG_class = rec.AG_class;
+    annotation_access_unit_header = rec.annotation_access_unit_header;
+    attribute_contiguity = rec.attribute_contiguity;
+    two_dimensional = rec.two_dimensional;
+    column_major_tile_order = rec.column_major_tile_order;
+    variable_size_tiles = rec.variable_size_tiles;
+    AT_coord_size = rec.AT_coord_size;
+    n_blocks = rec.n_blocks;
+    numChrs = rec.numChrs;
+    for (const auto& blockin : rec.block) block.push_back(blockin);
+    return *this;
+}
+
 }  // namespace annotation_access_unit
 }  // namespace record
 }  // namespace core
