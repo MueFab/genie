@@ -22,19 +22,20 @@ namespace data_unit {
 
 Record::Record() : data_unit_type(0), data_unit_size(0) {}
 
-Record::Record(RawReference _rawReference) : data_unit_type(0), data_unit_size(0), rawReference(_rawReference) {}
+Record::Record(RawReference& _rawReference) : data_unit_type(0), data_unit_size(0), rawReference(_rawReference) {}
 
-Record::Record(ParameterSet _parameterSet) : data_unit_type(1), parameterSet(_parameterSet) {
+Record::Record(ParameterSet& _parameterSet) : data_unit_type(1), parameterSet(_parameterSet) {
     data_unit_size = this->parameterSet.getSize();
 }
 
-Record::Record(AccessUnit _accessUnit) : data_unit_type(2), data_unit_size(0), accessUnit(_accessUnit) {}
+Record::Record(AccessUnit& _accessUnit) : data_unit_type(2), data_unit_size(0), accessUnit(_accessUnit) {}
 
-Record::Record(annotation_parameter_set::Record _annotationParameterSet)
+Record::Record(annotation_parameter_set::Record& _annotationParameterSet)
     : data_unit_type(3), data_unit_size(0), annotationParameterSet(_annotationParameterSet) {}
 
-Record::Record(annotation_access_unit::Record _annotationAccessUnit)
-    : data_unit_type(4), data_unit_size(0), annotationAccessUnit(_annotationAccessUnit) {}
+Record::Record(annotation_access_unit::Record& _annotationAccessUnit) : data_unit_type(4), data_unit_size(0) {
+    annotationAccessUnit = _annotationAccessUnit;
+}
 
 void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
     writer.write(data_unit_type, 8);

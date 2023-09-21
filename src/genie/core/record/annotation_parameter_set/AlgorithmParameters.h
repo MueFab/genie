@@ -45,8 +45,6 @@ class AlgorithmParameters {
                         std::vector<uint8_t> par_num_array_dims, std::vector<std::vector<uint8_t>> par_array_dims,
                         std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val);
 
-    void setParameters(std::vector<genie::core::DataType> par_types, std::vector<uint8_t> par_values);
-
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& writesize) const;
