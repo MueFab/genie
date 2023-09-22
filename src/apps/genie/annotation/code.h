@@ -38,14 +38,11 @@ class Code {
     Code(const std::string& _inputFileName, const std::string& _outputFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, const std::string& _jsonInfoFileName);
     Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, std::string encodeString,
-         bool testOutput);
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
-         bool testOutput, const std::string& rec = (std::string&)"all");
-
-    Code(const std::string& _inputFileName, const std::string& _outputFileName, genie::core::AlgoID encodeMode,
-         bool testOutput, const std::string& _infoFieldsFileName,
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
          const std::string& rec = (std::string&)"all");
+
+    Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
+         const std::string& _infoFieldsFileName, const std::string& rec = (std::string&)"all");
 
  private:
     using AnnotationParameterSet = genie::core::record::annotation_parameter_set::Record;
@@ -67,12 +64,15 @@ class Code {
     std::string inputFileName = "in.mgrecs";
     std::string outputFileName = "out.mgb";
     std::string infoFieldsFileName = "";
+    std::string rec = "all";
     std::stringstream compressedData{};
 
     genie::core::AlgoID convertStringToALgoID(std::string algoString) const;
 };
 
-void encodeVariantGenotype(std::string& _input_fpath, std::string& _output_fpath);
+void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
+                       const std::string& _infoFieldsFileName);
+void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _output_fpath);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
