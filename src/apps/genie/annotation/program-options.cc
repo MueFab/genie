@@ -23,7 +23,6 @@ namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
-    std::cerr << "programm options\n";
     CLI::App app("Genie MPEG-G Annotations\n");
 
     app.add_option("-i,--input-file", inputFile, "Input file (MPEG-G Annotation records)")->mandatory(true);
@@ -46,7 +45,6 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     infoFields = "";
     app.add_option("-j, --info", infoFields, "json file with infoField information\n");
     configFile = "";  //!< @brief
- //   app.add_option("-cf,--config-file", configFile, "configuration file\n");
 
     try {
         app.parse(argc, argv);

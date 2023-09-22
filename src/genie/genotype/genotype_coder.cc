@@ -389,7 +389,7 @@ void bin_mat_from_bytes(
 
     MatShapeDtype bin_mat_shape = {nrows, ncols};
     bin_mat.resize(bin_mat_shape);
-    xt::view(bin_mat, xt::all(), xt::all(), xt::all()) = false; // Initialize value with 0
+    xt::view(bin_mat, xt::all(), xt::all()) = false; // Initialize value with 0
 
     for (size_t i = 0; i < nrows; i++) {
         size_t row_offset = i*bpl;
