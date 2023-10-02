@@ -32,7 +32,6 @@ int main(int argc, char* argv[]) {
     std::cerr << "Starting main annotation..\n";
     ProgramOptions programOptions(argc, argv);
     if (programOptions.task == "encode") {
-        std::cerr << "calling Code...\n";
 
         Code code(programOptions.inputFile, programOptions.outputFile, programOptions.testfileoutput,
                   programOptions.infoFields, programOptions.rec);

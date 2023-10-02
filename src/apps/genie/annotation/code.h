@@ -65,7 +65,7 @@ class Code {
     std::string outputFileName = "out.mgb";
     std::string infoFieldsFileName = "";
     std::string rec = "all";
-    std::stringstream compressedData{};
+    //std::stringstream compressedData{};
 
     genie::core::AlgoID convertStringToALgoID(std::string algoString) const;
 };

@@ -28,6 +28,7 @@
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
+#include "genie/core/record/variant_site/record.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

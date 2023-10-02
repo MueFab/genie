@@ -7,11 +7,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -24,16 +24,23 @@ namespace genie {
 namespace core {
 namespace record {
 namespace annotation_parameter_set {
-DescriptorConfiguration::DescriptorConfiguration() : descriptor_ID(AnnotDesc::GENOTYPE), encoding_mode_ID(AlgoID::CABAC) {}
+
+DescriptorConfiguration::DescriptorConfiguration()
+    : descriptor_ID(AnnotDesc::GENOTYPE), encoding_mode_ID(AlgoID::CABAC) {}
+
 DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
 
-DescriptorConfiguration::DescriptorConfiguration(
-    AnnotDesc _descriptor_ID,
-    AlgoID _encoding_mode_ID,
-    GenotypeParameters _genotype_parameters,
-    LikelihoodParameters _likelihood_parameters,
-    ContactMatrixParameters _contact_matrix_parameters,
-    AlgorithmParameters _algorithm_parameters)
+DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
+                                                 genie::genotype::GenotypeParameters _genotype_parameters,
+                                                 AlgorithmParameters _algorithm_parameters)
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters, LikelihoodParameters{},
+                              ContactMatrixParameters{}, _algorithm_parameters) {}
+
+DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
+                                                 genie::genotype::GenotypeParameters _genotype_parameters,
+                                                 LikelihoodParameters _likelihood_parameters,
+                                                 ContactMatrixParameters _contact_matrix_parameters,
+                                                 AlgorithmParameters _algorithm_parameters)
     : descriptor_ID(_descriptor_ID),
       encoding_mode_ID(_encoding_mode_ID),
       genotype_parameters(_genotype_parameters),

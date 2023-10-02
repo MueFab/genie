@@ -7,16 +7,16 @@
 #ifndef GENIE_GENOTYPE_PARAMETERS_H
 #define GENIE_GENOTYPE_PARAMETERS_H
 
+#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/optional/optional.hpp>
+#include "genie/core/constants.h"
+#include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/constants.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -24,15 +24,15 @@ namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class BinarizationID: uint8_t {
+enum class BinarizationID : uint8_t {
     BIT_PLANE = 0,
-    ROW_BIN = 1,
+    ROW_BIN = 1, // should be ROW_SPLIT?
     UNDEFINED = 2,
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class ConcatAxis: uint8_t {
+enum class ConcatAxis : uint8_t {
     CONCAT_ROW_DIR = 0,
     CONCAT_COL_DIR = 1,
     DO_NOT_CONCAT = 2,
@@ -68,17 +68,10 @@ class GenotypeParameters {
  public:
     GenotypeParameters();
 
-    GenotypeParameters(
-        uint8_t max_ploidy,
-        bool no_reference_flag,
-        bool not_available_flag,
-        BinarizationID binarization_ID,
-        ConcatAxis concat_axis,
-        std::vector<GenotypePayloadParameters>&& variants_payload_params,
-        bool encode_phases_data_flag,
-        GenotypePayloadParameters phases_payload_params,
-        bool phases_value
-    );
+    GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
+                       BinarizationID binarization_ID, ConcatAxis concat_axis,
+                       std::vector<GenotypePayloadParameters>&& variants_payload_params, bool encode_phases_data_flag,
+                       GenotypePayloadParameters phases_payload_params, bool phases_value);
 
     uint8_t getMaxPloidy() const;
     bool getNoRerefernceFlag() const;
@@ -94,6 +87,10 @@ class GenotypeParameters {
     uint8_t getNumVariantsPayloads() const;
     // ELSE
     bool getPhaseValue() const;
+
+    void write(core::Writer& writer) const;
+    size_t getSize(core::Writer& writesize) const;
+    void read(util::BitReader& reader) { (void)reader; }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

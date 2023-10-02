@@ -61,8 +61,7 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
     : inputFileName(_inputFileName),
       outputFileName(_outputFileName),
       infoFieldsFileName(_infoFieldsFileName),
-      rec(_rec),
-      compressedData{} {
+      rec(_rec) {
     (void)rec;
 
     if (inputFileName.empty()) {
@@ -122,10 +121,10 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     genie::variant_site::VariantSiteParser parser(site_MGrecs, descriptorStream, attributesInfo, attributeStream,
                                                   infoFields);
 
-    genie::variant_site::ParameterSetComposer encodeParameters;
+    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descriptorStream, attributesInfo, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
 
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
@@ -167,7 +166,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
 }
 
 void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _output_fpath) {
-    _output_fpath;
+    (void)_output_fpath;
 
     std::ifstream reader(_input_fpath, std::ios::binary);
     genie::util::BitReader bitreader(reader);
@@ -193,6 +192,19 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::genotype::EncodingBlock block{};
     genie::genotype::decompose(opt, block, recs);
 
+    //--------------------------------------------------
+    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
+    std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
+    std::map<std::string, std::stringstream> attributeStream;
+    descriptorStream[genie::core::AnnotDesc::GENOTYPE];
+    for (auto j : block.allele_mat) {
+        descriptorStream[genie::core::AnnotDesc::GENOTYPE].write((const char*)j,1);
+    }
+    //block.phasing_mat;
+    genie::variant_site::AccessUnitComposer accessUnit;
+    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        encodeParameters.setParameterSet( attributesInfo, recs.size());
     // auto& allele_mat = block.allele_mat;
     // auto& phasing_mat = block.phasing_mat;
 }

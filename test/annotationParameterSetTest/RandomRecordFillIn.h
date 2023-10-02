@@ -22,8 +22,6 @@ class RandomAnnotationEncodingParameters {
  public:
     genie::core::record::annotation_parameter_set::LikelihoodParameters randomLikelihood();
 
-    genie::core::record::annotation_parameter_set::GenotypeParameters randomGenotypeParameters();
-
     genie::core::record::annotation_parameter_set::AttributeParameterSet randomAttributeParameterSet();
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters randomAlgorithmParameters();
@@ -42,7 +40,6 @@ class RandomAnnotationEncodingParameters {
     genie::core::record::annotation_parameter_set::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
     genie::core::record::annotation_parameter_set::ContactMatrixParameters randomContactMatrixParameters();
     genie::core::record::annotation_parameter_set::ContactMatrixParameters simpleContactMatrixParameters();
-    genie::core::record::annotation_parameter_set::DescriptorConfiguration randomDescriptorConfiguration();
     genie::core::record::annotation_parameter_set::CompressorParameterSet randomCompressorParameterSet();
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters randomAnnotationEncodingParameters();
     genie::core::record::annotation_parameter_set::Record randomAnnotationParameterSet();

@@ -35,6 +35,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+
 
 install(TARGETS genotype-tests
         RUNTIME DESTINATION "usr/bin")

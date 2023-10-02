@@ -17,8 +17,8 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/core/arrayType.h"
+#include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 
@@ -32,19 +32,27 @@
 namespace genie {
 namespace variant_site {
 
-    class ParameterSetComposer {
+class ParameterSetComposer {
+ public:
+    genie::core::record::annotation_parameter_set::Record setParameterSet(
+        std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize);
 
-     public:
-        genie::core::record::annotation_parameter_set::Record setParameterSet(
-            std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
-            std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize);
-        genie::core::record::annotation_parameter_set::Record setParameterSet(
-            std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors,
-            std::map<std::string, genie::core::record::variant_site::AttributeData>& info, genie::core::AlgoID encodeMode, uint64_t defaultTileSize);
+    ParameterSetComposer(std::map<genie::core::AnnotDesc, std::stringstream>& _encodedDescriptors)
+        : encodedDescriptors(_encodedDescriptors){};
 
-    };
+    genie::core::record::annotation_parameter_set::Record setParameterSet(
+        std::map<std::string, genie::core::record::variant_site::AttributeData>& info,
+        genie::genotype::GenotypeParameters genotype_parameters, genie::core::AlgoID encodeMode,
+        uint64_t defaultTileSize);
 
-    // ---------------------------------------------------------------------------------------------------------------------
+ private:
+    std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet composeBSCParameters(uint8_t compressor_ID);
+    genie::core::record::annotation_parameter_set::CompressorParameterSet composeZSTDParameters(uint8_t compressor_ID);
+    genie::core::record::annotation_parameter_set::CompressorParameterSet composeLZMAParameters(uint8_t compressor_ID);
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace variant_site
 }  // namespace genie

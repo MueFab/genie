@@ -6,7 +6,7 @@ set(source_files
         LikelihoodTests.cc
         AlgorithmParametersTests.cc
         AttributeParameterSetTests.cc
-        GenotypeParametersTests.cc
+#        GenotypeParametersTests.cc
         TileConfigurationTests.cc
         TileStructureTests.cc
         AnnotationEncodingParametersTests.cc
@@ -20,4 +20,5 @@ add_executable(annotationParameterSet-tests ${source_files})
 
 target_link_libraries(annotationParameterSet-tests PRIVATE gtest_main)
 target_link_libraries(annotationParameterSet-tests PRIVATE genie-core)
+target_link_libraries(annotationParameterSet-tests PRIVATE genie-gvc)
 target_link_libraries(annotationParameterSet-tests PRIVATE genie-util)

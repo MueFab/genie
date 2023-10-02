@@ -179,6 +179,8 @@ void bin_mat_from_bytes(
 //    const EncodingOptions& opt,
 //    std::list<core::record::VariantGenotype>& recs
 //);
+std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
+                                                           std::vector<core::record::VariantGenotype>& recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
