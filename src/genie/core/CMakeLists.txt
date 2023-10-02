@@ -57,7 +57,7 @@ set(source_files
 
         record/annotation_parameter_set/record.cc
         record/annotation_parameter_set/LikelihoodParameters.cc
-        record/annotation_parameter_set/GenotypeParameters.cc
+       # record/annotation_parameter_set/GenotypeParameters.cc
         record/annotation_parameter_set/AttributeParameterSet.cc
         record/annotation_parameter_set/AlgorithmParameters.cc
         record/annotation_parameter_set/ContactMatrixParameters.cc

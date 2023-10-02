@@ -218,7 +218,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         infoFieldsFile.close();
     }
 
-    std::map<DescriptorID, std::stringstream> descriptorStream;
+    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
     genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream, infoFields);
@@ -233,10 +233,10 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)
         EXPECT_GE(it->second.str().size(), ExpectedNumberOfrows) << it->first;
 
-    genie::variant_site::ParameterSetComposer encodeParameters;
+    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descriptorStream, attributesInfo, parser.getNumberOfRows());
+        encodeParameters.setParameterSet( attributesInfo, parser.getNumberOfRows());
 
     //----------------------------------------------------//
 

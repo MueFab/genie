@@ -18,57 +18,6 @@ RandomAnnotationEncodingParameters::randomLikelihood() {
                                                                                dtype_id);
 }
 
-genie::core::record::annotation_parameter_set::GenotypeParameters
-RandomAnnotationEncodingParameters::randomGenotypeParameters() {
-    uint8_t max_ploidy = randomU8();
-    bool no_reference_flag = randomBool();
-    bool not_available_flag = randomBool();
-    genie::core::record::annotation_parameter_set::BinarizationID binarization_ID =
-        static_cast<genie::core::record::annotation_parameter_set::BinarizationID>(randomBool());
-    uint8_t num_bit_plane = 0;
-    genie::core::record::annotation_parameter_set::ConcatAxis concat_axis =
-        genie::core::record::annotation_parameter_set::ConcatAxis::DO_NOT_CONCAT;
-    if (binarization_ID == genie::core::record::annotation_parameter_set::BinarizationID::BIT_PLANE) {
-        num_bit_plane = randomU8();
-        concat_axis = static_cast<genie::core::record::annotation_parameter_set::ConcatAxis>(rand() % 3);
-    }
-
-    uint8_t num_variants_payloads = 1;
-    if (concat_axis == genie::core::record::annotation_parameter_set::ConcatAxis::DO_NOT_CONCAT &&
-        binarization_ID == genie::core::record::annotation_parameter_set::BinarizationID::BIT_PLANE)
-        num_variants_payloads = num_bit_plane;
-
-    std::vector<bool> sort_variants_rows_flag{};
-    std::vector<bool> sort_variants_cols_flag{};
-    std::vector<bool> transpose_variants_mat_flag{};
-    std::vector<uint8_t> variants_codec_ID{};
-    for (auto i = 0; i < num_variants_payloads; ++i) {
-        sort_variants_rows_flag.push_back(randomBool());
-        sort_variants_cols_flag.push_back(randomBool());
-        transpose_variants_mat_flag.push_back(randomBool());
-        variants_codec_ID.push_back(static_cast<uint8_t>(rand() % 16) + 16);
-    }
-
-    bool sort_phases_rows_flag = false;
-    bool sort_phases_cols_flag = false;
-    bool transpose_phases_mat_flag = false;
-    bool phases_codec_ID = false;
-    bool phases_value = false;
-    bool encode_phases_data_flag = false;
-    if (encode_phases_data_flag) {
-        sort_phases_rows_flag = randomBool();
-        sort_phases_cols_flag = randomBool();
-        transpose_phases_mat_flag = randomBool();
-        phases_codec_ID = randomBool();
-        phases_value = randomBool();
-    }
-
-    return genie::core::record::annotation_parameter_set::GenotypeParameters(
-        max_ploidy, no_reference_flag, not_available_flag, binarization_ID, num_bit_plane, concat_axis,
-        sort_variants_rows_flag, sort_variants_cols_flag, transpose_variants_mat_flag, variants_codec_ID,
-        encode_phases_data_flag, sort_phases_rows_flag, sort_phases_cols_flag, transpose_phases_mat_flag,
-        phases_codec_ID, phases_value);
-}
 
 genie::core::record::annotation_parameter_set::AttributeParameterSet
 RandomAnnotationEncodingParameters::randomAttributeParameterSet() {
@@ -223,33 +172,34 @@ genie::core::record::annotation_parameter_set::TileStructure RandomAnnotationEnc
 
 genie::core::record::annotation_parameter_set::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_size) {
+    genie::core::record::annotation_parameter_set::TileParameterSettings tileParameterSettings;
     uint8_t AG_class = randomU3();
-    bool attribute_contiguity = randomBool();
+    tileParameterSettings.attributeContiguity = randomBool();
 
-    bool two_dimensional = randomBool();
+    tileParameterSettings.twoDimensional = randomBool();
 
-    bool column_major_tile_order = randomBool();
-    uint8_t symmetry_mode = randomU3();
-    bool symmetry_minor_diagonal = randomBool();
+    tileParameterSettings.columnMajorTileOrder = randomBool();
+    tileParameterSettings.symmetry_mode = randomU3();
+    tileParameterSettings.symmetry_minor_diagonal = randomBool();
 
-    bool attribute_dependent_tiles = randomBool();
+    tileParameterSettings.attribute_dependent_tiles = randomBool();
 
     genie::core::record::annotation_parameter_set::TileStructure default_tile_structure =
-        simpleTileStructure(AT_coord_size, two_dimensional);
+        simpleTileStructure(AT_coord_size, tileParameterSettings.twoDimensional);
 
-    uint16_t n_add_tile_structures = randomU16();
+    tileParameterSettings.n_add_tile_structures = randomU16();
     std::vector<uint16_t> n_attributes;
     std::vector<std::vector<uint16_t>> attribute_ID;
     std::vector<uint8_t> n_descriptors;
     std::vector<std::vector<uint8_t>> descriptor_ID;
     std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
 
-    if (attribute_dependent_tiles) {
-        n_add_tile_structures = randomU8();  // randomU16
-        n_attributes.resize(n_add_tile_structures);
-        descriptor_ID.resize(n_add_tile_structures, std::vector<uint8_t>(0));
-        attribute_ID.resize(n_add_tile_structures, std::vector<uint16_t>(0));
-        for (auto i = 0; i < n_add_tile_structures; ++i) {
+    if (tileParameterSettings.attribute_dependent_tiles) {
+        tileParameterSettings.n_add_tile_structures = randomU8();  // randomU16
+        n_attributes.resize(tileParameterSettings.n_add_tile_structures);
+        descriptor_ID.resize(tileParameterSettings.n_add_tile_structures, std::vector<uint8_t>(0));
+        attribute_ID.resize(tileParameterSettings.n_add_tile_structures, std::vector<uint16_t>(0));
+        for (auto i = 0; i < tileParameterSettings.n_add_tile_structures; ++i) {
             n_attributes[i] = randomU8();  // randomU16
             for (auto j = 0; j < n_attributes[i]; ++j) {
                 attribute_ID[i].push_back(randomU16());
@@ -258,12 +208,16 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
             for (auto j = 0; j < n_descriptors[i]; ++j) {
                 descriptor_ID[i].push_back(randomU8() / 2);
             }
-            additional_tile_structure.push_back(simpleTileStructure(AT_coord_size, two_dimensional));
+            additional_tile_structure.push_back(
+                simpleTileStructure(AT_coord_size, tileParameterSettings.twoDimensional));
         }
     }
     return genie::core::record::annotation_parameter_set::TileConfiguration(
-        AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
-        symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures, n_attributes,
+        AT_coord_size, AG_class, tileParameterSettings.attributeContiguity, tileParameterSettings.twoDimensional,
+        tileParameterSettings.columnMajorTileOrder, tileParameterSettings.symmetry_mode,
+        tileParameterSettings.symmetry_minor_diagonal,
+        tileParameterSettings.attribute_dependent_tiles, default_tile_structure,
+        tileParameterSettings.n_add_tile_structures, n_attributes,
         attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 }
 
@@ -318,16 +272,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration() {
     return randomTileConfiguration(AT_coord_size);
 }
 
-genie::core::record::annotation_parameter_set::DescriptorConfiguration
-RandomAnnotationEncodingParameters::randomDescriptorConfiguration() {
-    genie::core::AnnotDesc descriptorID = static_cast<genie::core::AnnotDesc>(randomU2());
-    genie::core::AlgoID encoding_mode_ID = static_cast<genie::core::AlgoID>(randomU8());
 
-    return genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-        descriptorID, encoding_mode_ID, genie::core::record::annotation_parameter_set::GenotypeParameters(),
-        genie::core::record::annotation_parameter_set::LikelihoodParameters(), simpleContactMatrixParameters(),
-        genie::core::record::annotation_parameter_set::AlgorithmParameters());
-}
 
 genie::core::record::annotation_parameter_set::CompressorParameterSet
 RandomAnnotationEncodingParameters::randomCompressorParameterSet() {
@@ -414,7 +359,7 @@ genie::core::record::annotation_parameter_set::Record
 RandomAnnotationEncodingParameters::randomAnnotationParameterSet() {
     uint8_t parameter_set_ID = randomU8();
     uint8_t AT_ID = randomU8();
-    uint8_t AT_alphabet_ID = randomU8();
+    genie::core::AlphabetID AT_alphabet_ID = static_cast <genie::core::AlphabetID>(randomU8());
     uint8_t AT_coord_size = randomU2();
     bool AT_pos_40_bits_flag = randomBool();
     uint8_t n_aux_attribute_groups = randomU3();

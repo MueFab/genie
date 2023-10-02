@@ -66,7 +66,7 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
     // when continuing after failure doesn't make sense.
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         1, {2}, {genie::core::DataType::BOOL}, {0}, {{0}}, {{{{{0}}}}});
-    genie::core::record::annotation_parameter_set::GenotypeParameters genotypeParameters;
+    genie::genotype::GenotypeParameters genotypeParameters;
     genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
 
@@ -78,54 +78,4 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
               descriptorConfiguration.getAlgorithmParameters().getNumberOfPars());
 }
 
-TEST_F(DescriptorConfigurationTests, DescriptorConfigurationRandom) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
 
-    RandomAnnotationEncodingParameters RandomContactMatrixParameters;
-    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration;
-    genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfigurationCheck;
-
-    descriptorConfiguration = RandomContactMatrixParameters.randomDescriptorConfiguration();
-
-    std::stringstream InOut;
-    genie::core::Writer strwriter(&InOut);
-    genie::util::BitReader strreader(InOut);
-    descriptorConfiguration.write(strwriter);
-    strwriter.flush();
-    descriptorConfigurationCheck.read(strreader);
-
-    std::stringstream TestOut;
-    genie::core::Writer teststrwriter(&TestOut);
-    descriptorConfigurationCheck.write(teststrwriter);
-    teststrwriter.flush();
-    EXPECT_EQ(InOut.str(), TestOut.str());
-    genie::core::Writer writeSize;
-    auto size = descriptorConfiguration.getSize(writeSize);
-    if (size % 8 != 0) size += (8 - size % 8);
-    EXPECT_EQ(TestOut.str().size(), size / 8);
-    EXPECT_EQ(descriptorConfiguration.getDescriptorID(), descriptorConfigurationCheck.getDescriptorID());
-    EXPECT_EQ(descriptorConfiguration.getEncodingModeID(), descriptorConfigurationCheck.getEncodingModeID());
-
-#if GENERATE_TEST_FILES
-    std::string name = "TestFiles/DescriptorConfiguration_seed_";
-    name += std::to_string(rand() % 10);
-
-    std::ofstream outputfile;
-    outputfile.open(name + ".bin", std::ios::binary | std::ios::out);
-    if (outputfile.is_open()) {
-        genie::core::Writer writer(&outputfile);
-        descriptorConfiguration.write(writer);
-        writer.flush();
-        outputfile.close();
-    }
-    std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
-    if (txtfile.is_open()) {
-        genie::core::Writer txtWriter(&txtfile);
-        descriptorConfiguration.write(txtWriter);
-        txtfile.close();
-    }
-#endif
-}
