@@ -29,111 +29,8 @@
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/variantsite/AccessUnitComposer.h"
-#include "genie/variantsite/ParameterSetComposer.h"
+#include "genie/genotype/ParameterSetComposer.h"
 
-class ParameterSetComposer {
- public:
-    genie::core::record::annotation_parameter_set::Record Build(
-        genie::genotype::GenotypeParameters& genotypeParameters, genie::genotype::EncodingOptions opt,
-        uint64_t defaultTileSize = 100) {
-        uint8_t parameter_set_ID = 1;
-        uint8_t AT_ID = 1;
-        genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
-        genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
-        uint8_t AT_coord_size = 3;
-        bool AT_pos_40_bits_flag = false;
-        uint8_t n_aux_attribute_groups = 0;
-        bool two_dimensional = false;
-        bool variable_size_tiles = false;
-        uint64_t n_tiles = 1;
-        std::vector<std::vector<uint64_t>> start_index{0};
-        std::vector<std::vector<uint64_t>> end_index{0};
-        std::vector<uint64_t> tile_size{defaultTileSize};
-       uint8_t AG_class = 0;
-        bool attribute_contiguity = false;
-        bool column_major_tile_order = false;
-        uint8_t symmetry_mode = 0;
-        bool symmetry_minor_diagonal = false;
-        bool attribute_dependent_tiles = false;
-        uint16_t n_add_tile_structures = 0;
-        std::vector<uint16_t> n_attributes = {0};
-        std::vector<std::vector<uint16_t>> attributeIDs{};
-        std::vector<uint8_t> n_descriptors{1};
-        std::vector<std::vector<uint8_t>> descriptorIDs{};
-
-        genie::core::record::annotation_parameter_set::TileStructure defaultTileStructure(
-            AT_coord_size, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
- 
-
-        std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure{
-            defaultTileStructure};
-
-        std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration{
-            genie::core::record::annotation_parameter_set::TileConfiguration(
-                AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
-                symmetry_minor_diagonal, attribute_dependent_tiles, defaultTileStructure, n_add_tile_structures,
-                n_attributes, attributeIDs, n_descriptors, descriptorIDs, additional_tile_structure)};
-
-        //-------------------
-        genie::entropy::lzma::LZMAParameters lzmaParameters;
-        auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
-
-        uint8_t compressor_ID = 1;
-        std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
-        uint8_t n_compressor_steps = 1;
-        std::vector<uint8_t> compressor_step_ID{0};
-        std::vector<bool> use_default_pars{true};
-        std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-        std::vector<uint8_t> n_in_vars{0};
-        std::vector<std::vector<uint8_t>> in_var_ID{{0}};
-        std::vector<std::vector<uint8_t>> prev_step_ID;
-        std::vector<std::vector<uint8_t>> prev_out_var_ID;
-        std::vector<uint8_t> n_completed_out_vars{0};
-        std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
-        genie::core::record::annotation_parameter_set::CompressorParameterSet LZMACompressorParameterSet(
-            compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars,
-            algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
-            completed_out_var_ID);
-        std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
-            LZMACompressorParameterSet};
-
-        uint8_t n_filter = 0;
-        std::vector<uint8_t> filter_ID_len;
-        std::vector<std::string> filter_ID;
-        std::vector<uint16_t> desc_len;
-        std::vector<std::string> description;
-
-        uint8_t n_features_names = 0;
-        std::vector<uint8_t> feature_name_len;
-        std::vector<std::string> feature_name;
-
-        uint8_t n_ontology_terms = 0;
-        std::vector<uint8_t> ontology_term_name_len;
-        std::vector<std::string> ontology_term_name;
-
-        uint8_t ndescriptors = 1;
-        std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
-            genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-                descriptor_ID, opt.codec_ID, genotypeParameters, LZMAalgorithmParameters)};
-
-        uint8_t n_compressors = compressor_parameter_set.size();
-
-        uint8_t nattributes = 0;
-        std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
-
-        genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
-            n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
-            n_ontology_terms, ontology_term_name_len, ontology_term_name, ndescriptors, descriptor_configuration,
-            n_compressors, compressor_parameter_set, nattributes, attribute_parameter_set);
-        // ------------------------------------
-        genie::core::record::annotation_parameter_set::Record annotationParameterSet(
-            parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size, AT_pos_40_bits_flag, n_aux_attribute_groups,
-            tile_configuration, annotation_encoding_parameters);
-        // ----------------------
-        return annotationParameterSet;
-    }
-};
 TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
@@ -243,109 +140,12 @@ TEST(Genotype, parameters) {
         EXPECT_GE(genotypeParameters.getSize(writer), 15);
     }
 
-    ParameterSetComposer genotypeParameterSet;
+    genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         genotypeParameterSet.Build(genotypeParameters, opt, recs.size());
 
-    //// -----------------
-    // uint8_t parameter_set_ID = 1;
-    // uint8_t AT_ID = 1;
-    // genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
-    // genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
-    // uint8_t AT_coord_size = 3;
-    // bool AT_pos_40_bits_flag = false;
-    // uint8_t n_aux_attribute_groups = 0;
-    //// -------------
-    // bool two_dimensional = false;
-    // bool variable_size_tiles = false;
-    // uint64_t n_tiles = 1;
-    // std::vector<std::vector<uint64_t>> start_index{0};
-    // std::vector<std::vector<uint64_t>> end_index{0};
-    // std::vector<uint64_t> tile_size{recs.size()};
-
-    // genie::core::record::annotation_parameter_set::TileStructure defaultTileStructure(
-    //    AT_coord_size, two_dimensional, variable_size_tiles, n_tiles, start_index, end_index, tile_size);
-    //// ---------------
-    // uint8_t AG_class = 0;
-    // bool attribute_contiguity = false;
-    // bool column_major_tile_order = false;
-    // uint8_t symmetry_mode = 0;
-    // bool symmetry_minor_diagonal = false;
-    // bool attribute_dependent_tiles = false;
-
-    // uint16_t n_add_tile_structures = 0;
-    // std::vector<uint16_t> n_attributes = {0};
-    // std::vector<std::vector<uint16_t>> attributeIDs{};
-    // std::vector<uint8_t> n_descriptors{1};
-    // std::vector<std::vector<uint8_t>> descriptorIDs{};
-
-    // std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure{
-    //    defaultTileStructure};
-
-    // std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configuration{
-    //    genie::core::record::annotation_parameter_set::TileConfiguration(
-    //        AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
-    //        symmetry_minor_diagonal, attribute_dependent_tiles, defaultTileStructure, n_add_tile_structures,
-    //        n_attributes, attributeIDs, n_descriptors, descriptorIDs, additional_tile_structure)};
-
-    ////-------------------
-    // genie::entropy::lzma::LZMAParameters lzmaParameters;
-    // auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
-
-    // uint8_t compressor_ID = 1;
-
-    // std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
-    // uint8_t n_compressor_steps = 1;
-    // std::vector<uint8_t> compressor_step_ID{0};
-    // std::vector<bool> use_default_pars{true};
-    // std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-    // std::vector<uint8_t> n_in_vars{0};
-    // std::vector<std::vector<uint8_t>> in_var_ID{{0}};
-    // std::vector<std::vector<uint8_t>> prev_step_ID;
-    // std::vector<std::vector<uint8_t>> prev_out_var_ID;
-    // std::vector<uint8_t> n_completed_out_vars{0};
-    // std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
-    // genie::core::record::annotation_parameter_set::CompressorParameterSet LZMACompressorParameterSet(
-    //    compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars,
-    //    algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
-    //    completed_out_var_ID);
-    // std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
-    //    LZMACompressorParameterSet};
-    //// -----------------
-    // uint8_t n_filter = 0;
-    // std::vector<uint8_t> filter_ID_len;
-    // std::vector<std::string> filter_ID;
-    // std::vector<uint16_t> desc_len;
-    // std::vector<std::string> description;
-
-    // uint8_t n_features_names = 0;
-    // std::vector<uint8_t> feature_name_len;
-    // std::vector<std::string> feature_name;
-
-    // uint8_t n_ontology_terms = 0;
-    // std::vector<uint8_t> ontology_term_name_len;
-    // std::vector<std::string> ontology_term_name;
-
-    // uint8_t ndescriptors = 1;
-    // std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
-    //    genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-    //        descriptor_ID, opt.codec_ID, genotypeParameters, LZMAalgorithmParameters)};
-
-    // uint8_t n_compressors = compressor_parameter_set.size();
-
-    // uint8_t nattributes = 0;
-    // std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
-
-    // genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
-    //    n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
-    //    n_ontology_terms, ontology_term_name_len, ontology_term_name, ndescriptors, descriptor_configuration,
-    //    n_compressors, compressor_parameter_set, nattributes, attribute_parameter_set);
-    //// ------------------------------------
-    // genie::core::record::annotation_parameter_set::Record annotationParameterSet(
-    //    parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size, AT_pos_40_bits_flag, n_aux_attribute_groups,
-    //    tile_configuration, annotation_encoding_parameters);
-    //// ----------------------
+ 
+    // ----------------------
     std::map<genie::core::AnnotDesc, std::stringstream> encodedDescriptors;
     std::map<std::string, genie::core::record::variant_site::AttributeData> info;
 
@@ -755,6 +555,8 @@ TEST(Genotype, Serializer) {
     }
 }
 
+#include "genie/entropy/jbig/encoder.h"
+
 TEST(Genotype, JBIG) {
     genie::genotype::BinMatDtype bin_mat;
     size_t orig_payload_len = 15;
@@ -770,10 +572,22 @@ TEST(Genotype, JBIG) {
 
     mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, orig_payload, orig_payload_len, orig_nrows,
                                 orig_ncols);
+    std::stringstream uncomressed_input;
+    std::stringstream compressed_output;
+    for (uint8_t byte : orig_payload) uncomressed_input.write((char*)&byte, 1);
+    genie::entropy::jbig::JBIGEncoder encoder;
+    encoder.encode(uncomressed_input, compressed_output, orig_ncols, orig_nrows);
 
+    ASSERT_EQ(compressed_data_len, compressed_output.str().size());
+    for (auto i = 0; i < compressed_data_len; ++i) EXPECT_EQ(compressed_output.str()[i], compressed_data[i]);
+    
+    std::stringstream uncompressed_output;
+    uint32_t output_ncols = 0;
+    uint32_t output_nrows = 0;
+    encoder.decode(compressed_output, uncompressed_output, output_ncols, output_nrows);
+    
     std::vector<uint8_t> mem_data_source(3 * orig_payload_len);
     uint8_t* payload = &mem_data_source[0];
-    ;
     size_t payload_len;
 
     unsigned long ncols;

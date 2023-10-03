@@ -36,6 +36,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 
 install(TARGETS genotype-tests

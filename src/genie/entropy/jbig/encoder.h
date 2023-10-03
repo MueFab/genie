@@ -7,22 +7,75 @@
 #ifndef GENIE_ENTROPY_JBIG_ENCODER_H
 #define GENIE_ENTROPY_JBIG_ENCODER_H
 
+#ifdef _WIN32
+#include <windows.h>
+#define SYSERROR() GetLastError()
+#else
+#include <errno.h>
+#define SYSERROR() errno
+#endif
 #include <sstream>
+#include <codecs/include/mpegg-codecs.h>
+#include "genie/core/record/annotation_parameter_set/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace entropy {
 namespace jbig {
+// ---------------------------------------------------------------------------------------------------------------------
+class JBIGparameters {
+ public:
+    int32_t num_lines_per_stripe;
+    bool deterministic_pred;
+    bool typical_pred;
+    bool diff_layer_typical_pred;
+    bool two_line_template;
 
+    JBIGparameters()
+        : num_lines_per_stripe(-1),
+          deterministic_pred(true),
+          typical_pred(false),
+          diff_layer_typical_pred(false),
+          two_line_template(false) {}
+
+    JBIGparameters(int32_t num_lines_per_stripe, bool deterministic_pred, bool typical_pred,
+                   bool diff_layer_typical_pred, bool two_line_template)
+        : num_lines_per_stripe(num_lines_per_stripe),
+          deterministic_pred(deterministic_pred),
+          typical_pred(typical_pred),
+          diff_layer_typical_pred(diff_layer_typical_pred),
+          two_line_template(two_line_template) {}
+
+
+    genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
+};
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Encoder {
- private:
-
+class JBIGEncoder {
  public:
-//    void encode(std::stringstream &input, std::stringstream &output);
-    explicit Encoder(bool _writeOutStreams);
+    JBIGEncoder();
+
+    void configure(const JBIGparameters jbigParameters) {
+        num_lines_per_stripe = jbigParameters.num_lines_per_stripe;
+        deterministic_pred = jbigParameters.deterministic_pred;
+        typical_pred = jbigParameters.typical_pred;
+        diff_layer_typical_pred = jbigParameters.diff_layer_typical_pred;
+        two_line_template = jbigParameters.two_line_template;
+    }
+
+    void encode(std::stringstream& input, std::stringstream& output, uint32_t ncols,
+                uint32_t nrows);
+
+    void decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows);
+
+
+ private:
+    int32_t num_lines_per_stripe;
+    bool deterministic_pred;
+    bool typical_pred;
+    bool diff_layer_typical_pred;
+    bool two_line_template;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
