@@ -13,11 +13,14 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/entropy/jbig/encoder.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +51,7 @@ class BinMatPayload {
     std::vector<uint8_t> payload;  // JBIG or CABAC: ISO/IEC 11544 or ISO/IEC 23092-2
     uint32_t nrows;
     uint32_t ncols;
-
+    std::vector<uint8_t> CompressedPayload;
  public:
     BinMatPayload(core::AlgoID codecID, std::vector<uint8_t> payload, uint32_t nrows = 0, uint32_t ncols = 0)
         : codecID(codecID), payload(payload), nrows(nrows), ncols(ncols) {}
@@ -62,6 +65,22 @@ class BinMatPayload {
             writer.write(ncols, 32);
             for (auto byte : payload) writer.write(byte, 8);  //??
         }
+    }
+    void writeCompressed(core::Writer writer) {
+        std::stringstream compressedStream;
+        std::stringstream payloadStream;
+        core::Writer writeCompressed(&compressedStream);
+            for (auto byte : payload) payloadStream.write((char*)&byte, 1);
+        if (codecID == core::AlgoID::JBIG) {
+            genie::entropy::jbig::JBIGEncoder encoder;
+            encoder.encode(payloadStream, compressedStream,ncols,nrows);
+        } else {
+            payloadStream.write((char*)&nrows, 4);
+            payloadStream.write((char*)&ncols, 4);
+            //genie::entropy::cabac::CABACEncoder encoder;
+            //encoder.encode(payloadStream, compressedStream, ncols, nrows);
+        }
+        write(writeCompressed);
     }
 };
 
@@ -78,7 +97,7 @@ class RowColIdsPayload {
 
     void write(core::Writer writer) {
         for (auto i = 0; i < nelements; ++i) {
-            writer.write(row_col_ids_elements[i], nbits_per_elem);
+            writer.write(row_col_ids_elements[i], static_cast<uint8_t>(nbits_per_elem));
         }
     }
 };
@@ -101,7 +120,7 @@ class AmexPayload {
     void write(core::Writer writer) {
         writer.write(nelems, 32);
         writer.write(nbits_per_elem, 8);
-        for (auto i = 0; i < nelements; ++i) {
+        for (uint32_t i = 0; i < nelements; ++i) {
             writer.write(is_one_flag[i], 1);
             if (is_one_flag[i]) writer.write(amax_elements[i], nbits_per_elem);
         }
@@ -111,23 +130,13 @@ class AmexPayload {
 
 class GenotypePayload {
  private:
-    // inputs
-    // uint8_t num_variants_payloads;              // genotype_parameters 6.3.4.2
-    // std::vector<bool> sort_variants_row_flag;   // genotype_parameters 6.3.4.2
-    // std::vector<bool> sort_variants_col_flags;  // genotype_parameters  6.3.4.2
-    // bool encode_phase_data;                     // genotype_parameters 6.3.4.2
-    // BinarizationID binarization_id;             // genotype_parameters 6.3.4.2
     GenotypeParameters genotypeParameters;
 
-    //  std::vector<uint32_t> variants_payload_size;
     std::vector<BinMatPayload> variants_payload;  // bin_mat_payload 6.4.4.3.2.2
 
-    uint32_t phases_payload_size;
     BinMatPayload phases_payload;  // bin_mat_payload 6.4.4.3.2.2
 
-    std::vector<uint32_t> sort_variants_row_ids_payload_size;
     std::vector<RowColIdsPayload> sort_variants_row_ids_payload;  // row_col_ids_payload 6.4.4.3.2.3
-    std::vector<uint32_t> sort_variants_col_ids_payload_size;
     std::vector<RowColIdsPayload> sort_variants_col_ids_payload;  // row_col_ids_payload 6.4.4.3.2.3
 
     uint32_t variants_amax_payload_size;
@@ -151,7 +160,7 @@ class GenotypePayload {
                                             : 1;
         for (auto i = 0; i < num_variants_payloads; ++i) {
             writer.write(variants_payload[i].payloadSize(), 32);
-            variants_payload[i].write(writer);
+            variants_payload[i].writeCompressed(writer);
 
             auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
 

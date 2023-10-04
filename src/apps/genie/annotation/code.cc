@@ -23,10 +23,10 @@
 #include "genie/variantsite/ParameterSetComposer.h"
 #include "genie/variantsite/VariantSiteParser.h"
 
-//#include "genie/entropy/bsc/encoder.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/ParameterSetComposer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -190,23 +190,86 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     };
 
     genie::genotype::EncodingBlock block{};
-    genie::genotype::decompose(opt, block, recs);
-
+    auto tupleoutput = genie::genotype::encode_block(opt, recs);
     //--------------------------------------------------
+    genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
+    genie::genotype::ParameterSetComposer genotypeParameterSet;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        genotypeParameterSet.Build(genotypeParameters, opt, recs.size());
+
+    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+    //--------------------------------------------------
+    auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
+    std::vector<genie::genotype::BinMatPayload> variantsPayload;
+    datablock.allele_bin_mat_vect;
+    for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
+        size_t payloadSize = 0;
+        uint8_t* payloadArray;
+        genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
+        std::vector<uint8_t> payload;
+        for (auto i = 0; i < payloadSize; ++i) {
+            payload.push_back(payloadArray[i]);
+        }
+        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload));
+    }
+    std::vector<uint8_t> payload;
+    if (datablock.phasing_mat.size() > 0) {
+        size_t payloadSize = 0;
+        uint8_t* payloadArray;
+        genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
+        for (auto i = 0; i < payloadSize; ++i) {
+            payload.push_back(payloadArray[i]);
+        }
+    }
+    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload);
+    std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
+    std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
+
+    for (auto alleleRowIDs : datablock.allele_row_ids_vect) {
+        std::vector<uint64_t> payloadVec;
+        for (auto elem : alleleRowIDs) payloadVec.push_back(elem);
+        sortRowIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
+    }
+
+    for (auto alleleColIDs : datablock.allele_col_ids_vect) {
+        std::vector<uint64_t> payloadVec;
+        for (auto elem : alleleColIDs) payloadVec.push_back(elem);
+        sortColIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
+    }
+    genie::genotype::AmexPayload amexPayload(0, 0, 0, {}, {});
+         
+    //-----------------------------------------------------
+    genie::genotype::GenotypePayload genotypePayload(genotypeParameters, variantsPayload, PhasesPayload,
+                                                     sortRowIdsPayload, sortColIdsPayload, amexPayload);
+    //--------------------------------------------------
+    genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
-    for (auto j : block.allele_mat) {
-        descriptorStream[genie::core::AnnotDesc::GENOTYPE].write((const char*)j,1);
+    {
+        genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
+        genotypePayload.write(writer);
     }
-    //block.phasing_mat;
-    genie::variant_site::AccessUnitComposer accessUnit;
-    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet( attributesInfo, recs.size());
-    // auto& allele_mat = block.allele_mat;
-    // auto& phasing_mat = block.phasing_mat;
+    genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+    accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
+                             annotationAccessUnit);
+
+        std::ofstream outputFile;
+    outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
+
+    if (outputFile.is_open()) {
+        genie::core::Writer dataUnitWriter(&outputFile);
+        APS_dataUnit.write(dataUnitWriter);
+        annotationAccessUnit.write(dataUnitWriter);
+
+        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
+        outputFile.close();
+    } else {
+        std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
+    }
+
+
 }
 
 }  // namespace annotation

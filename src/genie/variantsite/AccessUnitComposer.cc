@@ -81,7 +81,7 @@ void AccessUnitComposer::compress(
     const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>& descriptorConfigurations,
     std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors) {
-    // std::map<genie::core::AnnotDesc, std::stringstream> encodedDescriptors;
+
     genie::entropy::bsc::BSCEncoder bscEncoder;
     genie::entropy::lzma::LZMAEncoder lzmaEncoder;
     genie::entropy::zstd::ZSTDEncoder zstdEncoder;
