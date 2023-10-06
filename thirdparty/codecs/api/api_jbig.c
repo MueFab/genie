@@ -148,6 +148,10 @@ int mpegg_jbig_compress(
             exit(1);
     }
 
+#if defined(_WIN32) || defined(_WIN64)
+    rewind(fout);
+    fread(*dest,1, *dest_len, fout);
+#endif
     if (ferror(fout) || fclose(fout)) {
         fprintf(stderr, "Problem while writing output file");
         perror("'");
