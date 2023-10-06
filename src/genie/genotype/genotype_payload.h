@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #include <sstream>
+#include <iostream>
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
@@ -176,6 +177,8 @@ class GenotypePayload {
                 writer.write(variants_amax_payload.sizeInBytes(), 32);
             }
         }
+        auto written = writer.getBitsWritten();
+        std::cerr << "genetype payload: " << written << std::endl;
     }
 };
 
