@@ -41,6 +41,7 @@ class ParameterSetComposer {
     genie::core::record::annotation_parameter_set::Record Build(genie::genotype::GenotypeParameters& genotypeParameters,
                                                                 genie::genotype::EncodingOptions opt,
                                                                 uint64_t defaultTileSize = 100) {
+        (void)opt;
         uint8_t parameter_set_ID = 1;
         uint8_t AT_ID = 1;
         genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
@@ -106,7 +107,7 @@ class ParameterSetComposer {
         uint8_t ndescriptors = 1;
         std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
             genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-                descriptor_ID, opt.codec_ID, genotypeParameters, LZMAalgorithmParameters)};
+                descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, LZMAalgorithmParameters)};
 
         uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 

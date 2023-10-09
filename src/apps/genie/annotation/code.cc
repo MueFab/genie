@@ -24,9 +24,9 @@
 #include "genie/variantsite/VariantSiteParser.h"
 
 #include "genie/core/record/variant_genotype/record.h"
+#include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/ParameterSetComposer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 #ifdef _WIN32
@@ -210,7 +210,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         for (auto i = 0; i < payloadSize; ++i) {
             payload.push_back(payloadArray[i]);
         }
-        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload));
+        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload,
+                                                                    static_cast<uint32_t>(alleleBinMat.shape().at(0)),
+                                                                    static_cast<uint32_t>(alleleBinMat.shape().at(1))));
     }
     std::vector<uint8_t> payload;
     if (datablock.phasing_mat.size() > 0) {
@@ -221,7 +223,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
             payload.push_back(payloadArray[i]);
         }
     }
-    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload);
+    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload,
+                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(0)),
+                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(1)));
     std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
     std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
 
@@ -237,7 +241,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         sortColIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
     }
     genie::genotype::AmexPayload amexPayload(0, 0, 0, {}, {});
-         
+
     //-----------------------------------------------------
     genie::genotype::GenotypePayload genotypePayload(genotypeParameters, variantsPayload, PhasesPayload,
                                                      sortRowIdsPayload, sortColIdsPayload, amexPayload);
@@ -253,9 +257,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     }
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                             annotationAccessUnit);
+                                     annotationAccessUnit);
 
-        std::ofstream outputFile;
+    std::ofstream outputFile;
     outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
 
     if (outputFile.is_open()) {
@@ -268,8 +272,6 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     } else {
         std::cerr << "Failed to open file : " << SYSERROR() << std::endl;
     }
-
-
 }
 
 }  // namespace annotation

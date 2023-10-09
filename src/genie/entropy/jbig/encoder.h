@@ -39,13 +39,13 @@ class JBIGparameters {
           diff_layer_typical_pred(false),
           two_line_template(false) {}
 
-    JBIGparameters(int32_t num_lines_per_stripe, bool deterministic_pred, bool typical_pred,
-                   bool diff_layer_typical_pred, bool two_line_template)
-        : num_lines_per_stripe(num_lines_per_stripe),
-          deterministic_pred(deterministic_pred),
-          typical_pred(typical_pred),
-          diff_layer_typical_pred(diff_layer_typical_pred),
-          two_line_template(two_line_template) {}
+    JBIGparameters(int32_t _num_lines_per_stripe, bool _deterministic_pred, bool _typical_pred,
+                   bool _diff_layer_typical_pred, bool _two_line_template)
+        : num_lines_per_stripe(_num_lines_per_stripe),
+          deterministic_pred(_deterministic_pred),
+          typical_pred(_typical_pred),
+          diff_layer_typical_pred(_diff_layer_typical_pred),
+          two_line_template(_two_line_template) {}
 
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
@@ -66,6 +66,7 @@ class JBIGEncoder {
 
     void encode(std::stringstream& input, std::stringstream& output, uint32_t ncols,
                 uint32_t nrows);
+    void encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows);
 
     void decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows);
 
