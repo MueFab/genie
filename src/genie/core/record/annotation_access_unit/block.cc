@@ -50,13 +50,7 @@ void Block::set(BlockVectorData blockData) {
     uint32_t blockSize = static_cast<uint32_t>(blockData.getDataSize());
     BlockHeader header(attribute_contiguity, blockData.getDescriptorID(), blockData.getAttributeID(), indexed,
                        blockSize);
-    GenotypePayload genotype_payload;
-    LikelihoodPayload likelihood_payload;
-    std::vector<ContactMatrixBinPayload> cm_bin_payload;
-    ContactMatrixMatPayload cm_mat_payload;
-    BlockPayload payload(blockData.getDescriptorID(), numChrs, genotype_payload, likelihood_payload,
-                               cm_bin_payload,
-                         cm_mat_payload, blockSize, blockData.getData());
+    BlockPayload payload(blockData.getDescriptorID(), numChrs,  blockSize, blockData.getData());
     block_header = header;
     block_payload = payload;
 }

@@ -133,8 +133,8 @@ TEST(Genotype, parameters) {
     // ------------------------------
     auto tupleoutput = genie::genotype::encode_block(opt, recs);
     genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
-    std::stringstream dataout;
     {
+        std::stringstream dataout;
         genie::core::Writer writer(&dataout);
         genotypeParameters.write(writer);
         EXPECT_GE(genotypeParameters.getSize(writer), 15);
@@ -145,12 +145,10 @@ TEST(Genotype, parameters) {
         genotypeParameterSet.Build(genotypeParameters, opt, recs.size());
 
     // ----------------------
-    std::map<genie::core::AnnotDesc, std::stringstream> encodedDescriptors;
-    std::map<std::string, genie::core::record::variant_site::AttributeData> info;
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     {
-        std::string name = gitRootDir + "/data/records/genotype_APS_DataUnit";
+        std::string name = gitRootDir + "/data/records/enotype_1.3.5.header100.gt_only_APS";
 
         std::ofstream testfile;
         testfile.open(name + ".bin", std::ios::binary | std::ios::out);
@@ -169,18 +167,22 @@ TEST(Genotype, parameters) {
         }
     }
     //-----------------------------------------------------
+
     auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
     std::vector<genie::genotype::BinMatPayload> variantsPayload;
-    datablock.allele_bin_mat_vect;
+
     for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
         size_t payloadSize = 0;
         uint8_t* payloadArray;
+        auto shape = alleleBinMat.shape();
+        auto nrows = shape.at(0);
+        auto ncols = shape.at(1);
         genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
         std::vector<uint8_t> payload;
         for (auto i = 0; i < payloadSize; ++i) {
             payload.push_back(payloadArray[i]);
         }
-        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload));
+        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload, nrows, ncols));
     }
     std::vector<uint8_t> payload;
     if (datablock.phasing_mat.size() > 0) {
@@ -191,7 +193,8 @@ TEST(Genotype, parameters) {
             payload.push_back(payloadArray[i]);
         }
     }
-    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload);
+
+    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload, datablock.phasing_mat.shape().at(0), datablock.phasing_mat.shape().at(1));
     std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
     std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
 
@@ -211,6 +214,13 @@ TEST(Genotype, parameters) {
     //-----------------------------------------------------
     genie::genotype::GenotypePayload genotypePayload(genotypeParameters, variantsPayload, PhasesPayload,
                                                      sortRowIdsPayload, sortColIdsPayload, amexPayload);
+
+    std::stringstream sizeGenotypePayload;
+    genie::core::Writer writesizeGenotypePayload(&sizeGenotypePayload);
+    genotypePayload.write(writesizeGenotypePayload);
+    auto tempsize = writesizeGenotypePayload.getBitsWritten();
+    if (tempsize < 3) {
+    }
     //--------------------------------------------------
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
@@ -226,7 +236,7 @@ TEST(Genotype, parameters) {
                                      AAU_dataUnit);
 
     {
-        std::string name = gitRootDir + "/data/records/genotype_AAU_DataUnit";
+        std::string name = gitRootDir + "/data/records/enotype_1.3.5.header100.gt_only_AAU";
 
         std::ofstream testfile;
         testfile.open(name + ".bin", std::ios::binary | std::ios::out);
@@ -244,6 +254,28 @@ TEST(Genotype, parameters) {
             txtfile.close();
         }
     }
+    {
+        std::string name = gitRootDir + "/data/records/genotype_1.3.5.header100.gt_only";
+
+        std::ofstream testfile;
+        testfile.open(name + ".bin", std::ios::binary | std::ios::out);
+        if (testfile.is_open()) {
+            genie::core::Writer writer(&testfile);
+            APS_dataUnit.write(writer);
+            AAU_dataUnit.write(writer);
+            testfile.close();
+        }
+
+        std::ofstream txtfile;
+        txtfile.open(name + ".txt", std::ios::out);
+        if (txtfile.is_open()) {
+            genie::core::Writer txtWriter(&txtfile, true);
+            APS_dataUnit.write(txtWriter);
+            AAU_dataUnit.write(txtWriter);
+            txtfile.close();
+        }
+    }
+
 }
 
 TEST(Genotype, AdaptiveMaxValue) {
@@ -525,7 +557,6 @@ TEST(Genotype, JBIG) {
         EXPECT_EQ(orig_compressed[i], compressed_data[i]);
     }
 
-
     std::stringstream uncomressed_input;
     std::stringstream compressed_output;
     for (uint8_t byte : orig_payload) uncomressed_input.write((char*)&byte, 1);
@@ -539,8 +570,6 @@ TEST(Genotype, JBIG) {
     for (auto i = 0; i < compressed_data_len; ++i) {
         EXPECT_EQ(orig_compressed[i], mem_data[i]);
     }
-    //   ASSERT_EQ(compressed_data_len, compressed_output.str().size());
-  //  for (auto i = 0; i < compressed_data_len-1; ++i) EXPECT_EQ(compressed_output.str()[i], compressed_data[i]);
 
     std::stringstream uncompressed_output;
     uint32_t output_ncols = 0;

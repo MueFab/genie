@@ -65,7 +65,7 @@ std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterToVector(st
     std::vector<std::vector<std::vector<std::vector<uint8_t>>>> parameterVector =
         AlgorithmParameters::resizeVector(num_array_dims, array_dims);
     core::ArrayType arrayType;
-    auto index = 0;
+    size_t index = 0;
     for (size_t j = 0; j < parameterVector.size(); ++j) {
         for (size_t k = 0; k < parameterVector.at(j).size(); ++k) {
             for (size_t l = 0; l < parameterVector.at(j).at(k).size(); ++l) {

@@ -44,6 +44,23 @@ void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, ui
 
 }
 
+void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows) {
+    const size_t srcLen = input.size();
+    unsigned char* inputBuffer = NULL;
+    inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
+    memcpy(inputBuffer, &input[0], srcLen);
+
+    unsigned char* decompressedBuffer = NULL;
+    size_t dest_data_len;
+
+    int ret = mpegg_jbig_decompress_default(&decompressedBuffer, &dest_data_len, inputBuffer, srcLen,
+                                            (unsigned long*)&nrows, (unsigned long*)&ncols);
+    if (ret != 0) {
+        std::cerr << "error with decompression\n";
+    }
+    for (size_t i = 0; i < dest_data_len; ++i) output.push_back(decompressedBuffer[i]);
+}
+
 void JBIGEncoder::decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows) {
     const size_t srcLen = input.str().size();
     unsigned char* inputBuffer = NULL;
@@ -73,7 +90,7 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameter
     std::vector<std::vector<std::vector<std::vector<std::vector<uint8_t>>>>> par_val;
     std::vector<int32_t> values{num_lines_per_stripe, deterministic_pred, typical_pred, diff_layer_typical_pred,
                                 two_line_template};
-    for (auto i = 0; i < n_pars; ++i) {
+    for (uint8_t i = 0; i < n_pars; ++i) {
         if (par_type.at(i) == core::DataType::BOOL) {
             par_val.push_back(core::record::annotation_parameter_set::parameterToVector<bool>(
                 {static_cast<bool>(values.at(i))}, par_type.at(i), par_num_array_dims.at(i), par_array_dims.at(i)));

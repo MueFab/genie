@@ -46,14 +46,14 @@ set(source_files
         record/annotation_access_unit/BlockHeader.cc
         record/annotation_access_unit/BlockPayload.cc
         record/annotation_access_unit/AnnotationAccessUnitHeader.cc
-        record/annotation_access_unit/VariantsPayload.cc
-        record/annotation_access_unit/RowColIDsPayload.cc
-        record/annotation_access_unit/AmaxPayload.cc
-        record/annotation_access_unit/BinaryMatrixPayload.cc
-        record/annotation_access_unit/GenotypePayload.cc
-        record/annotation_access_unit/LikelihoodPayload.cc
-        record/annotation_access_unit/ContactMatrixBinPayload.cc
-        record/annotation_access_unit/ContactMatrixMatPayload.cc
+        #record/annotation_access_unit/VariantsPayload.cc
+        #record/annotation_access_unit/RowColIDsPayload.cc
+        #record/annotation_access_unit/AmaxPayload.cc
+        #record/annotation_access_unit/BinaryMatrixPayload.cc
+        #record/annotation_access_unit/GenotypePayload.cc
+        #record/annotation_access_unit/LikelihoodPayload.cc
+        #record/annotation_access_unit/ContactMatrixBinPayload.cc
+        #record/annotation_access_unit/ContactMatrixMatPayload.cc
 
         record/annotation_parameter_set/record.cc
         record/annotation_parameter_set/LikelihoodParameters.cc

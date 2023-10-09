@@ -77,10 +77,6 @@ TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::ATTRIBUTE;
     uint8_t num_chrs = 1;
-    genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
-    genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
-    std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
-    genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
 
     std::string FileName = "TestFiles/exampleMGrecs/ALL.chrX.10000.site";
     std::ifstream infile(FileName, std::ios::binary | std::ios::in);
@@ -105,7 +101,7 @@ TEST_F(MpeggBSCTests, testPayload) {  // NOLINT(cert-err58-cpp)
     uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
-        descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
+        descriptor_ID, num_chrs, 
         block_payload_size, payloadVector);
 
     std::stringstream outputData;
@@ -120,10 +116,6 @@ TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
     // when continuing after failure doesn't make sense.
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::ATTRIBUTE;
     uint8_t num_chrs = 1;
-    genie::core::record::annotation_access_unit::GenotypePayload genotype_payload;
-    genie::core::record::annotation_access_unit::LikelihoodPayload likelihood_payload;
-    std::vector<genie::core::record::annotation_access_unit::ContactMatrixBinPayload> cm_bin_payload;
-    genie::core::record::annotation_access_unit::ContactMatrixMatPayload cm_mat_payload;
 
     std::string FileName = "TestFiles/exampleMGrecs/ALL.chrX.10000.site";
     std::ifstream infile(FileName, std::ios::binary | std::ios::in);
@@ -147,7 +139,7 @@ TEST_F(MpeggBSCTests, testBlock) {  // NOLINT(cert-err58-cpp)
     uint16_t block_payload_size = static_cast<uint16_t>(generic_payload.str().size());
 
     genie::core::record::annotation_access_unit::BlockPayload block_payload(
-        descriptor_ID, num_chrs, genotype_payload, likelihood_payload, cm_bin_payload, cm_mat_payload,
+        descriptor_ID, num_chrs, 
         block_payload_size, payloadvector);
     genie::core::record::annotation_access_unit::BlockHeader blockHeader(false, descriptor_ID, 1, false,
                                                                          block_payload_size);
