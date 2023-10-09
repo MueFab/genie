@@ -40,7 +40,7 @@ class AccessUnitComposer {
                        std::map<std::string, std::stringstream>& attributeStream,
                        std::map<std::string, core::record::variant_site::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
-                       core::record::annotation_access_unit::Record& annotationAccessUnit);
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AT_ID = 1);
 
  private:
     // default values
@@ -59,7 +59,7 @@ class AccessUnitComposer {
     bool is_attribute = false;
     uint16_t attribute_ID = 0;
     core::AnnotDesc descriptor_ID = core::AnnotDesc::STARTPOS;
-    uint8_t AT_ID = 0;
+    uint8_t AT_ID = 1;
     core::record::annotation_access_unit::AnnotationType AT_type =
         core::record::annotation_access_unit::AnnotationType::VARIANTS;
     uint8_t numChrs = 0;

@@ -192,10 +192,12 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::genotype::EncodingBlock block{};
     auto tupleoutput = genie::genotype::encode_block(opt, recs);
     //--------------------------------------------------
+    uint8_t AT_ID = 1;
+
     genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(genotypeParameters, opt, recs.size());
+        genotypeParameterSet.Build(genotypeParameters, opt, AT_ID, recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     //--------------------------------------------------
@@ -257,7 +259,8 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     }
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     annotationAccessUnit);
+                                     annotationAccessUnit, AT_ID);
+    genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
     std::ofstream outputFile;
     outputFile.open(_output_fpath, std::ios::binary | std::ios::out);
@@ -265,7 +268,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     if (outputFile.is_open()) {
         genie::core::Writer dataUnitWriter(&outputFile);
         APS_dataUnit.write(dataUnitWriter);
-        annotationAccessUnit.write(dataUnitWriter);
+        AAU_dataUnit.write(dataUnitWriter);
 
         std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
         outputFile.close();

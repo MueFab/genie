@@ -29,9 +29,9 @@ void AccessUnitComposer::setAccessUnit(
     std::map<std::string, std::stringstream>& _attributeStream,
     std::map<std::string, core::record::variant_site::AttributeData> _attributeInfo,
     const genie::core::record::annotation_parameter_set::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit) {
+    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AT_ID) {
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
-
+    AT_ID = _AT_ID;
     // -------- descriptors ---------- //
     auto descriptorConfigurations =
         _annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
