@@ -40,10 +40,11 @@ class ParameterSetComposer {
  public:
     genie::core::record::annotation_parameter_set::Record Build(genie::genotype::GenotypeParameters& genotypeParameters,
                                                                 genie::genotype::EncodingOptions opt,
+                                                                uint8_t _AT_ID,
                                                                 uint64_t defaultTileSize = 100) {
         (void)opt;
         uint8_t parameter_set_ID = 1;
-        uint8_t AT_ID = 1;
+        uint8_t AT_ID = _AT_ID;
         genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
         genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
         uint8_t AT_coord_size = 3;

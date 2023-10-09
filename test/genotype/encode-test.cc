@@ -139,10 +139,10 @@ TEST(Genotype, parameters) {
         genotypeParameters.write(writer);
         EXPECT_GE(genotypeParameters.getSize(writer), 15);
     }
-
+    uint8_t AT_ID = 1;
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(genotypeParameters, opt, recs.size());
+        genotypeParameterSet.Build(genotypeParameters, opt, AT_ID, recs.size());
 
     // ----------------------
 
@@ -231,9 +231,10 @@ TEST(Genotype, parameters) {
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
         genotypePayload.write(writer);
     }
-    genie::core::record::annotation_access_unit::Record AAU_dataUnit;
+    genie::core::record::annotation_access_unit::Record AAU_Unit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     AAU_dataUnit);
+                                     AAU_Unit, AT_ID);
+    genie::core::record::data_unit::Record AAU_dataUnit(AAU_Unit);
 
     {
         std::string name = gitRootDir + "/data/records/enotype_1.3.5.header100.gt_only_AAU";
