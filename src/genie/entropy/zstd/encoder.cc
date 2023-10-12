@@ -85,6 +85,24 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters ZSTDParameter
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
+genie::core::record::annotation_parameter_set::CompressorParameterSet ZSTDParameters::compressorParameterSet(
+    uint8_t compressor_ID) const {
+    std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
+    uint8_t n_compressor_steps = 1;
+    std::vector<uint8_t> compressor_step_ID{0};
+    std::vector<bool> use_default_pars{true};
+    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
+    std::vector<uint8_t> n_in_vars{0};
+    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
+    std::vector<std::vector<uint8_t>> prev_step_ID;
+    std::vector<std::vector<uint8_t>> prev_out_var_ID;
+    std::vector<uint8_t> n_completed_out_vars{0};
+    std::vector<std::vector<uint8_t>> completed_out_var_ID;
+
+    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
+        compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars, algorithm_parameters,
+        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
+}
 }  // namespace zstd
 }  // namespace entropy
 }  // namespace genie

@@ -333,7 +333,6 @@ void bin_mat_to_bytes(
             auto byte_offset = row_offset + (j >> 3);
             uint8_t shift = (7-(j & 7));
             auto val = static_cast<uint8_t>(bin_mat(i, j));
-//            val <<= shift;
             val = static_cast<uint8_t>(val << shift);
             *(*payload + byte_offset) |= val;
         }

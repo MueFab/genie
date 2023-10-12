@@ -55,6 +55,8 @@ class BSCParameters {
         : lzpHashSize(_lzpHashSize), lzpMinLen(_lzpMinLen), blockSorter(_blockSorter), coder(_coder), features(_features) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+        uint8_t compressor_ID) const;
 };
 
 class BSCEncoder {

@@ -24,45 +24,6 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void format_field::write(util::BitReader& reader, uint32_t sample_count) {
-//    len = (reader.readBypassBE<uint8_t>());
-//    format.resize(len);
-//    reader.readBypass(&format[0], len);
-//    type = (reader.readBypassBE<uint8_t>());
-//    arrayType curType;
-//    array_len = (reader.readBypassBE<uint8_t>());
-//    value_array.resize(sample_count);
-//    for (auto& values : value_array) {
-//        values.resize(array_len);
-//        for (auto& value : values) {
-//            value = curType.toArray(type, reader);
-//        }
-//    }
-//}
-
-//VariantGenotype::VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
-//               std::vector<format_field> format, uint8_t genotype_present, uint8_t likelihood_present,
-//               uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
-//               std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
-//               std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len,
-//               std::string link_name, uint8_t reference_box_ID)
-//    : variant_index(variant_index),
-//      sample_index_from(sample_index_from),
-//      sample_count(sample_count),
-//      format_count(format_count),
-//      format(format),
-//      genotype_present(genotype_present),
-//      likelihood_present(likelihood_present),
-//      n_alleles_per_sample(n_alleles_per_sample),
-//      alleles(alleles),
-//      phasings(phasings),
-//      n_likelihoods(n_likelihoods),
-//      likelihoods(likelihoods),
-//      linked_record(linked_record),
-//      link_name_len(link_name_len),
-//      link_name(link_name),
-//      reference_box_ID(reference_box_ID) {}
-
 VariantGenotype::VariantGenotype(util::BitReader& bitreader)
     : variant_index(bitreader.readBypassBE<uint64_t>()),
       sample_index_from(bitreader.readBypassBE<uint32_t>()),
