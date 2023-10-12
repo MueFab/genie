@@ -47,7 +47,7 @@ void BinMatPayload::writeCompressed(core::Writer& writer) const {
 }
 
 void RowColIdsPayload::write(core::Writer& writer) const {
-    for (auto i = 0; i < nelements; ++i) {
+    for (uint64_t i = 0; i < nelements; ++i) {
         writer.write(row_col_ids_elements[i], static_cast<uint8_t>(nbits_per_elem));
     }
 }
