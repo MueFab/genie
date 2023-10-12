@@ -53,7 +53,6 @@ void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
         std::cerr << "error with compression\n";
     }
     for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
-    // output.write((const char *)compressedBuffer, compSize);
     if (compressedBuffer) free(compressedBuffer);
     if (inputBuffer) free(inputBuffer);
 }

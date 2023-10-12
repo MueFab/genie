@@ -71,8 +71,8 @@ class RowColIdsPayload {
     std::vector<uint64_t> row_col_ids_elements;
 
  public:
-    RowColIdsPayload(uint64_t nelements, uint64_t nbits_per_elem, std::vector<uint64_t> row_col_ids_elements)
-        : nelements(nelements), nbits_per_elem(nbits_per_elem), row_col_ids_elements(row_col_ids_elements) {}
+    RowColIdsPayload(uint64_t _nelements, uint64_t _nbits_per_elem, std::vector<uint64_t> _row_col_ids_elements)
+        : nelements(_nelements), nbits_per_elem(_nbits_per_elem), row_col_ids_elements(_row_col_ids_elements) {}
     size_t payloadSize() const { return row_col_ids_elements.size(); }
 
     void write(core::Writer& writer) const;
@@ -87,9 +87,9 @@ class AmexPayload {
     std::vector<uint64_t> amax_elements;
 
  public:
-    AmexPayload(uint32_t nelems, uint8_t nbits_per_elem, uint32_t nelements, std::vector<bool> is_one_flag,
-                std::vector<uint64_t> amax_elements)
-        : nelems(nelems), nbits_per_elem(nbits_per_elem), nelements(nelements), amax_elements(amax_elements) {}
+    AmexPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<bool> _is_one_flag,
+                std::vector<uint64_t> _amax_elements)
+        : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {}
 
     size_t sizeInBytes() const { return (nelems * nbits_per_elem + 7) / 8; }
 

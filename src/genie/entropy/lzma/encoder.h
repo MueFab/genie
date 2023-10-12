@@ -52,20 +52,20 @@ class LZMAParameters {
           fb(MPEGG_LZMA_DEFAULT_FB),
           numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
 
-    LZMAParameters(uint8_t level,
-                   uint32_t dictSize,
-                   uint8_t lc,
-                   uint8_t lp,
-                   uint8_t pb,
-                   uint16_t fb,
-                   uint8_t numThreads)
-        : level(level),
-          dictSize(dictSize),
-          lc(lc),
-          lp(lp),
-          pb(pb),
-          fb(fb),
-          numThreads(numThreads) {}
+    LZMAParameters(uint8_t _level,
+                   uint32_t _dictSize,
+                   uint8_t _lc,
+                   uint8_t _lp,
+                   uint8_t _pb,
+                   uint16_t _fb,
+                   uint8_t _numThreads)
+        : level(_level),
+          dictSize(_dictSize),
+          lc(_lc),
+          lp(_lp),
+          pb(_pb),
+          fb(_fb),
+          numThreads(_numThreads) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
 };
