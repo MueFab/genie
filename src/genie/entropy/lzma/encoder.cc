@@ -62,7 +62,7 @@ void LZMAEncoder::decode(std::stringstream &input, std::stringstream &output) {
     const size_t srcLen = input.str().size();
     unsigned char *destination;
     size_t destLen = srcLen;
-    int ret = mpegg_bsc_decompress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen);
+    int ret = mpegg_lzma_decompress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen);
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }

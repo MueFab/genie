@@ -56,24 +56,21 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
            const std::string& rec)
     : Code(_inputFileName, _outputFileName, testOutput, "", rec) {}
 
-Code::Code(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
-           const std::string& _infoFieldsFileName, const std::string& _rec)
-    : inputFileName(_inputFileName),
-      outputFileName(_outputFileName),
-      infoFieldsFileName(_infoFieldsFileName),
-      rec(_rec) {
-    (void)rec;
+Code::Code(const std::string& inputFileName, const std::string& outputFileName, bool testOutput,
+           const std::string& infoFieldsFileName, const std::string& _rec)
+     {
 
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
     }
+    auto rec = _rec;
     std::transform(rec.begin(), rec.end(), rec.begin(), [](unsigned char c) { return std::tolower(c); });
-    std::cerr << _rec << ": ";
+    std::cerr << rec << ": ";
     if (rec == "geno") {
         std::cerr << "encoding variant genotype... \n";
         std::string input_fpath = "datain";
-        encodeVariantGenotype(_inputFileName, _outputFileName);
+        encodeVariantGenotype(inputFileName, outputFileName);
     } else {
         std::cerr << "encoding varaint site... \n";
         encodeVariantSite(inputFileName, outputFileName, testOutput, infoFieldsFileName);
@@ -102,13 +99,15 @@ genie::core::AlgoID Code::convertStringToALgoID(std::string algoString) const {
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
                        const std::string& _infoFieldsFileName) {
     std::ifstream site_MGrecs;
-    site_MGrecs.open(_inputFileName, std::ios::in | std::ios::binary);
+    auto inputFileName = _inputFileName;
+    site_MGrecs.open(inputFileName, std::ios::in | std::ios::binary);
 
     std::stringstream infoFields;
-    if (!_infoFieldsFileName.empty()) {
-        std::cerr << "reading infofields from " << _infoFieldsFileName << std::endl;
+    auto infoFieldsFileName = _infoFieldsFileName;
+    if (!infoFieldsFileName.empty()) {
+        std::cerr << "reading infofields from " << infoFieldsFileName << std::endl;
         std::ifstream infoFieldsFile;
-        infoFieldsFile.open(_infoFieldsFileName, std::ios::in);
+        infoFieldsFile.open(infoFieldsFileName, std::ios::in);
         if (infoFieldsFile.is_open()) {
             infoFields << infoFieldsFile.rdbuf();
             infoFieldsFile.close();
@@ -127,9 +126,10 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
         encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
 
     genie::variant_site::AccessUnitComposer accessUnit;
+    uint8_t AG_class = 1;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                             annotationAccessUnit);
+                             annotationAccessUnit, AG_class);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
@@ -193,7 +193,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     auto tupleoutput = genie::genotype::encode_block(opt, recs);
     //--------------------------------------------------
     uint8_t AT_ID = 1;
-
+    uint8_t AG_class = 0;
     genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
@@ -208,9 +208,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         size_t payloadSize = 0;
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
-        std::vector<uint8_t> payload;
+        std::vector<uint8_t> payload(payloadSize);
         for (auto i = 0; i < payloadSize; ++i) {
-            payload.push_back(payloadArray[i]);
+            payload.at(i) = payloadArray[i];
         }
         variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload,
                                                                     static_cast<uint32_t>(alleleBinMat.shape().at(0)),
@@ -221,8 +221,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         size_t payloadSize = 0;
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
+        payload.resize(payloadSize);
         for (auto i = 0; i < payloadSize; ++i) {
-            payload.push_back(payloadArray[i]);
+            payload.at(i) = payloadArray[i];
         }
     }
     genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload,
@@ -259,7 +260,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     }
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     annotationAccessUnit, AT_ID);
+                                     annotationAccessUnit, AG_class, AT_ID);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
     std::ofstream outputFile;

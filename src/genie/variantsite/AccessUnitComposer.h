@@ -40,7 +40,7 @@ class AccessUnitComposer {
                        std::map<std::string, std::stringstream>& attributeStream,
                        std::map<std::string, core::record::variant_site::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
-                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AT_ID = 1);
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID = 1);
 
  private:
     // default values
@@ -50,7 +50,7 @@ class AccessUnitComposer {
     uint8_t ATCoordSize = 3;
     bool variable_size_tiles = false;
     uint8_t AT_subtype = 1;
-    uint8_t AG_class = 1;
+   // uint8_t AG_class = 1;
     uint64_t n_tiles_per_col = 1;
     uint64_t n_tiles_per_row = 1;
     uint64_t tile_index_1 = 0;

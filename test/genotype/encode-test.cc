@@ -140,6 +140,7 @@ TEST(Genotype, parameters) {
         EXPECT_GE(genotypeParameters.getSize(writer), 15);
     }
     uint8_t AT_ID = 1;
+    uint8_t AG_class = 0;
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         genotypeParameterSet.Build(genotypeParameters, opt, AT_ID, recs.size());
@@ -175,12 +176,12 @@ TEST(Genotype, parameters) {
         size_t payloadSize = 0;
         uint8_t* payloadArray;
         auto shape = alleleBinMat.shape();
-        auto nrows = shape.at(0);
-        auto ncols = shape.at(1);
+        uint32_t nrows = static_cast<uint32_t>(shape.at(0));
+        uint32_t ncols = static_cast<uint32_t>(shape.at(1));
         genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
-        std::vector<uint8_t> payload;
+        std::vector<uint8_t> payload(payloadSize);
         for (auto i = 0; i < payloadSize; ++i) {
-            payload.push_back(payloadArray[i]);
+            payload.at(i) = payloadArray[i];
         }
         variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload, nrows, ncols));
     }
@@ -189,12 +190,14 @@ TEST(Genotype, parameters) {
         size_t payloadSize = 0;
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
+        payload.resize(payloadSize);
         for (auto i = 0; i < payloadSize; ++i) {
-            payload.push_back(payloadArray[i]);
+            payload.at(i) = payloadArray[i];
         }
     }
 
-    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload, datablock.phasing_mat.shape().at(0), datablock.phasing_mat.shape().at(1));
+    genie::genotype::BinMatPayload PhasesPayload(
+        genie::core::AlgoID::JBIG, payload, static_cast<uint32_t>(datablock.phasing_mat.shape().at(0)), static_cast<uint32_t>(datablock.phasing_mat.shape().at(1)));
     std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
     std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
 
@@ -231,9 +234,16 @@ TEST(Genotype, parameters) {
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
         genotypePayload.write(writer);
     }
+    descriptorStream[genie::core::AnnotDesc::LINKID];
+    for (auto i = 0; i < recs.size(); ++i) {
+        char byte = 0xff;
+        descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte,1);
+    }
+    EXPECT_EQ(descriptorStream[genie::core::AnnotDesc::LINKID].str().size(), recs.size());
+
     genie::core::record::annotation_access_unit::Record AAU_Unit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     AAU_Unit, AT_ID);
+                                     AAU_Unit,AG_class, AT_ID);
     genie::core::record::data_unit::Record AAU_dataUnit(AAU_Unit);
 
     {
@@ -276,7 +286,6 @@ TEST(Genotype, parameters) {
             txtfile.close();
         }
     }
-
 }
 
 TEST(Genotype, AdaptiveMaxValue) {

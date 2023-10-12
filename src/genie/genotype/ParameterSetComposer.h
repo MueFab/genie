@@ -39,14 +39,12 @@ namespace genotype {
 class ParameterSetComposer {
  public:
     genie::core::record::annotation_parameter_set::Record Build(genie::genotype::GenotypeParameters& genotypeParameters,
-                                                                genie::genotype::EncodingOptions opt,
-                                                                uint8_t _AT_ID,
+                                                                genie::genotype::EncodingOptions opt, uint8_t _AT_ID,
                                                                 uint64_t defaultTileSize = 100) {
         (void)opt;
         uint8_t parameter_set_ID = 1;
         uint8_t AT_ID = _AT_ID;
         genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
-        genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
         uint8_t AT_coord_size = 3;
         bool AT_pos_40_bits_flag = false;
         uint8_t n_aux_attribute_groups = 0;
@@ -85,11 +83,13 @@ class ParameterSetComposer {
         auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
         genie::entropy::jbig::JBIGparameters jbigParameters;
         auto JBIGalgorithmParameters = jbigParameters.convertToAlgorithmParameters();
+        genie::entropy::bsc::BSCParameters bscParameters;
+        auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
 
         //-------------------
- 
+
         std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
-            addLZMACompressorParameterSet(1), addLZMACompressorParameterSet(2)};
+            addLZMACompressorParameterSet(1), addJBIGCompressorParameterSet(2), addBSCCompressorParameterSet(3)};
 
         uint8_t n_filter = 0;
         std::vector<uint8_t> filter_ID_len;
@@ -105,10 +105,14 @@ class ParameterSetComposer {
         std::vector<uint8_t> ontology_term_name_len;
         std::vector<std::string> ontology_term_name;
 
-        uint8_t ndescriptors = 1;
+        uint8_t ndescriptors = 2;
+        genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
         std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
             genie::core::record::annotation_parameter_set::DescriptorConfiguration(
                 descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, LZMAalgorithmParameters)};
+        descriptor_ID = genie::core::AnnotDesc::LINKID;
+        descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
+            descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, BSCalgorithmParameters));
 
         uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
@@ -129,10 +133,6 @@ class ParameterSetComposer {
 
     genie::core::record::annotation_parameter_set::CompressorParameterSet addLZMACompressorParameterSet(
         uint8_t compressor_ID) {
-        genie::entropy::lzma::LZMAParameters lzmaParameters;
-        auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
-
-        //-------------------
         std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
         uint8_t n_compressor_steps = 1;
         std::vector<uint8_t> compressor_step_ID{0};
@@ -152,10 +152,6 @@ class ParameterSetComposer {
     }
     genie::core::record::annotation_parameter_set::CompressorParameterSet addJBIGCompressorParameterSet(
         uint8_t compressor_ID) {
-        genie::entropy::jbig::JBIGparameters jbigParameters;
-        auto LZMAalgorithmParameters = jbigParameters.convertToAlgorithmParameters();
-
-        //-------------------
         std::vector<genie::core::AlgoID> JBIGalgorithm_ID{genie::core::AlgoID::JBIG};
         uint8_t n_compressor_steps = 1;
         std::vector<uint8_t> compressor_step_ID{0};
@@ -170,6 +166,26 @@ class ParameterSetComposer {
 
         return genie::core::record::annotation_parameter_set::CompressorParameterSet(
             compressor_ID, n_compressor_steps, compressor_step_ID, JBIGalgorithm_ID, use_default_pars,
+            algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
+            completed_out_var_ID);
+    }
+
+    genie::core::record::annotation_parameter_set::CompressorParameterSet addBSCCompressorParameterSet(
+        uint8_t compressor_ID) {
+        std::vector<genie::core::AlgoID> BSCalgorithm_ID{genie::core::AlgoID::BSC};
+        uint8_t n_compressor_steps = 1;
+        std::vector<uint8_t> compressor_step_ID{0};
+        std::vector<bool> use_default_pars{true};
+        std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
+        std::vector<uint8_t> n_in_vars{0};
+        std::vector<std::vector<uint8_t>> in_var_ID{{0}};
+        std::vector<std::vector<uint8_t>> prev_step_ID;
+        std::vector<std::vector<uint8_t>> prev_out_var_ID;
+        std::vector<uint8_t> n_completed_out_vars{0};
+        std::vector<std::vector<uint8_t>> completed_out_var_ID;
+
+        return genie::core::record::annotation_parameter_set::CompressorParameterSet(
+            compressor_ID, n_compressor_steps, compressor_step_ID, BSCalgorithm_ID, use_default_pars,
             algorithm_parameters, n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars,
             completed_out_var_ID);
     }
