@@ -41,6 +41,8 @@ class ZSTDParameters {
         : use_dictionary_flag(_use_dictionary_flag), dictionary_size(_dictionary_size), dictionary(_dictionary) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+        uint8_t compressor_ID) const;
 };
 
 class ZSTDEncoder {

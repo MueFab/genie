@@ -68,6 +68,7 @@ class LZMAParameters {
           numThreads(_numThreads) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(uint8_t compressor_ID) const;
 };
 
 class LZMAEncoder {
@@ -97,6 +98,8 @@ class LZMAEncoder {
     uint16_t fb;        /* 5 <= fb <= 273, default = 32 */
     uint8_t numThreads; /* 1 or 2, default = 2 */
 };
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

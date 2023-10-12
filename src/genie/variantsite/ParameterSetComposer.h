@@ -47,9 +47,6 @@ class ParameterSetComposer {
 
  private:
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors;
-    genie::core::record::annotation_parameter_set::CompressorParameterSet composeBSCParameters(uint8_t compressor_ID);
-    genie::core::record::annotation_parameter_set::CompressorParameterSet composeZSTDParameters(uint8_t compressor_ID);
-    genie::core::record::annotation_parameter_set::CompressorParameterSet composeLZMAParameters(uint8_t compressor_ID);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

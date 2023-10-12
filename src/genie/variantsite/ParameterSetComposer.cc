@@ -53,10 +53,9 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
-        defaultset.ATCoordSize, AG_class,
-        defaultset.tileParameterSettings.attributeContiguity, defaultset.tileParameterSettings.twoDimensional,
-        defaultset.tileParameterSettings.columnMajorTileOrder, defaultset.tileParameterSettings.symmetry_mode,
-        defaultset.tileParameterSettings.symmetry_minor_diagonal,
+        defaultset.ATCoordSize, AG_class, defaultset.tileParameterSettings.attributeContiguity,
+        defaultset.tileParameterSettings.twoDimensional, defaultset.tileParameterSettings.columnMajorTileOrder,
+        defaultset.tileParameterSettings.symmetry_mode, defaultset.tileParameterSettings.symmetry_minor_diagonal,
         defaultset.tileParameterSettings.attribute_dependent_tiles, default_tile_structure,
         defaultset.tileParameterSettings.n_add_tile_structures, nAttributes, attribute_IDs, nDescriptors,
         descriptor_IDs, additional_tile_structure);
@@ -83,23 +82,18 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     uint8_t compressor_ID = 1;
     genie::entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
-    genie::core::record::annotation_parameter_set::CompressorParameterSet BSCCompressorParameterSet =
-        composeBSCParameters(compressor_ID);
 
     compressor_ID++;
     genie::entropy::lzma::LZMAParameters lzmaParameters;
     auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
-    genie::core::record::annotation_parameter_set::CompressorParameterSet LZMACompressorParameterSet =
-        composeLZMAParameters(compressor_ID);
 
     compressor_ID++;
     genie::entropy::zstd::ZSTDParameters zstdParameters;
     auto ZSTDalgorithmParameters = zstdParameters.convertToAlgorithmParameters();
-    genie::core::record::annotation_parameter_set::CompressorParameterSet ZSTDCompressorParameterSet =
-        composeZSTDParameters(compressor_ID);
 
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set{
-        BSCCompressorParameterSet, ZSTDCompressorParameterSet, LZMACompressorParameterSet};
+        bscParameters.compressorParameterSet(1), lzmaParameters.compressorParameterSet(2),
+        zstdParameters.compressorParameterSet(3)};
 
     // -----------------------------------------------------------------------------------------
 
@@ -167,62 +161,6 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         defaultset.AT_pos_40_bits_flag, defaultset.n_aux_attribute_groups, tile_configurations,
         annotation_encoding_parameters);
     return annotationParameterSet;
-}
-
-genie::core::record::annotation_parameter_set::CompressorParameterSet ParameterSetComposer::composeBSCParameters(
-    uint8_t compressor_ID) {
-    std::vector<genie::core::AlgoID> BSCalgorithm_ID{genie::core::AlgoID::BSC};
-    uint8_t n_compressor_steps = 1;
-    std::vector<uint8_t> compressor_step_ID{0};
-    std::vector<bool> use_default_pars{true};
-    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-    std::vector<uint8_t> n_in_vars{0};
-    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
-    std::vector<std::vector<uint8_t>> prev_step_ID;
-    std::vector<std::vector<uint8_t>> prev_out_var_ID;
-    std::vector<uint8_t> n_completed_out_vars{0};
-    std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
-    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
-        compressor_ID, n_compressor_steps, compressor_step_ID, BSCalgorithm_ID, use_default_pars, algorithm_parameters,
-        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
-}
-
-genie::core::record::annotation_parameter_set::CompressorParameterSet ParameterSetComposer::composeZSTDParameters(
-    uint8_t compressor_ID) {
-    std::vector<genie::core::AlgoID> ZSTDalgorithm_ID{genie::core::AlgoID::ZSTD};
-    uint8_t n_compressor_steps = 1;
-    std::vector<uint8_t> compressor_step_ID{0};
-    std::vector<bool> use_default_pars{true};
-    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-    std::vector<uint8_t> n_in_vars{0};
-    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
-    std::vector<std::vector<uint8_t>> prev_step_ID;
-    std::vector<std::vector<uint8_t>> prev_out_var_ID;
-    std::vector<uint8_t> n_completed_out_vars{0};
-    std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
-    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
-        compressor_ID, n_compressor_steps, compressor_step_ID, ZSTDalgorithm_ID, use_default_pars, algorithm_parameters,
-        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
-}
-genie::core::record::annotation_parameter_set::CompressorParameterSet ParameterSetComposer::composeLZMAParameters(
-    uint8_t compressor_ID) {
-    std::vector<genie::core::AlgoID> LZMAalgorithm_ID{genie::core::AlgoID::LZMA};
-    uint8_t n_compressor_steps = 1;
-    std::vector<uint8_t> compressor_step_ID{0};
-    std::vector<bool> use_default_pars{true};
-    std::vector<genie::core::record::annotation_parameter_set::AlgorithmParameters> algorithm_parameters;
-    std::vector<uint8_t> n_in_vars{0};
-    std::vector<std::vector<uint8_t>> in_var_ID{{0}};
-    std::vector<std::vector<uint8_t>> prev_step_ID;
-    std::vector<std::vector<uint8_t>> prev_out_var_ID;
-    std::vector<uint8_t> n_completed_out_vars{0};
-    std::vector<std::vector<uint8_t>> completed_out_var_ID;
-
-    return genie::core::record::annotation_parameter_set::CompressorParameterSet(
-        compressor_ID, n_compressor_steps, compressor_step_ID, LZMAalgorithm_ID, use_default_pars, algorithm_parameters,
-        n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }
 
 }  // namespace variant_site

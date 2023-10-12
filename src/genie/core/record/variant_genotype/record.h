@@ -76,35 +76,6 @@ class VariantGenotype {
     std::optional<LinkRecord> link_record;
 
  public:
-//    using GenotypeDescriptor =
-//        std::vector<std::vector<int8_t>>;
-    /**
-     * @brief
-     */
-    //    VariantGenotype()
-    //        : variant_index(0),
-    //          sample_index_from(0),
-    //          sample_count(0),
-    ////          format_count(0),
-    //          format(0),
-    ////          genotype_present(0),
-    ////          likelihood_present(0),
-    ////          n_alleles_per_sample(1),
-    //          alleles(0),
-    //          phasings(0),
-    //          n_likelihoods(0),
-    //          likelihoods(0),
-    //          linked_record(0),
-    //          link_name_len(0),
-    //          link_name(),
-    //          reference_box_ID(0) {}
-
-    //    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from, uint32_t sample_count, uint8_t format_count,
-    //           std::vector<format_field> format, uint8_t genotype_present, uint8_t likelihood_present,
-    //           uint8_t n_alleles_per_sample, std::vector<std::vector<uint8_t>> alleles,
-    //           std::vector<std::vector<uint8_t>> phasings, uint8_t n_likelihoods,
-    //           std::vector<std::vector<uint32_t>> likelihoods, uint8_t linked_record, uint8_t link_name_len = 0,
-    //           std::string link_name = "", uint8_t reference_box_ID = 0);
 
     explicit VariantGenotype(util::BitReader& bitreader);
 
