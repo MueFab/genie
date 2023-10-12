@@ -101,7 +101,8 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameter
         }
     }
 
-    return genie::core::record::annotation_parameter_set::AlgorithmParameters();
+    return genie::core::record::annotation_parameter_set::AlgorithmParameters(
+        n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
 }  // namespace jbig

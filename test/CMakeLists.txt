@@ -5,6 +5,6 @@ add_subdirectory(mpeggBSCTest)
 add_subdirectory(annotationAccessUnitTest)
 
 add_subdirectory(variantSiteRecordTest)
-# add_subdirectory(variantGenotypeRecordTest)
 add_subdirectory(records)
 add_subdirectory(genotype)
+add_subdirectory(entropy)

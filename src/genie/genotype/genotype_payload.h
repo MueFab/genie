@@ -130,7 +130,10 @@ class GenotypePayload {
                                             ? genotypeParameters.getNumBitPlanes()
                                             : 1;
         for (auto i = 0; i < num_variants_payloads; ++i) {
-            writer.write(variants_payload[i].payloadSize(), 32);
+            std::stringstream tempstream;
+            core::Writer writesize(&tempstream);
+            variants_payload[i].writeCompressed(writesize);
+            writer.write(tempstream.str().size(), 32);
             variants_payload[i].writeCompressed(writer);
             auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
             auto indecRowIds = 0;

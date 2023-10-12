@@ -23,8 +23,10 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/watch.h"
 
+#include "codecs/include/mpegg-codecs.h"
 #include "apps/genie/annotation/code.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

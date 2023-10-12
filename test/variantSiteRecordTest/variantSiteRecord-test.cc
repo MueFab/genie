@@ -239,10 +239,10 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         encodeParameters.setParameterSet( attributesInfo, parser.getNumberOfRows());
 
     //----------------------------------------------------//
-
+    uint8_t AG_class = 1;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
-    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet, annotationAccessUnit);
+    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet, annotationAccessUnit, AG_class);
     
         
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
