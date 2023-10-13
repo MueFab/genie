@@ -14,7 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
+TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
 
@@ -78,6 +78,36 @@ TEST(VariantGenotypeRecord, Genotype) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(num_counts_per_allele[1], 6u);
         ASSERT_EQ(num_counts_per_allele[2], 0u);
     }
+
+}
+
+TEST(VariantGenotypeRecord, Genotype_fmt_only) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.geno";
+
+    std::ifstream reader(filepath, std::ios::binary);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 10000);
+
+    for (size_t i = 0; i < recs.size(); i++) {
+        auto& rec = recs[i];
+        ASSERT_EQ(rec.getVariantIndex(), i);
+        ASSERT_EQ(rec.getNumSamples(), 1092u);
+        ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
+        ASSERT_EQ(rec.getLinkedRecord(), false);
+    }
+
 
 }
 

@@ -77,23 +77,6 @@ Code::Code(const std::string& inputFileName, const std::string& outputFileName, 
     }
 }
 
-genie::core::AlgoID Code::convertStringToALgoID(std::string algoString) const {
-    const std::map<std::string, genie::core::AlgoID> algoIds = {{"GABAC", genie::core::AlgoID::CABAC},
-                                                                {"LZMA", genie::core::AlgoID::LZMA},
-                                                                {"ZSTD", genie::core::AlgoID::ZSTD},
-                                                                {"BSC", genie::core::AlgoID::BSC},
-                                                                {"PROCRUSTES", genie::core::AlgoID::PROCRUSTES},
-                                                                {"JBIG", genie::core::AlgoID::JBIG},
-                                                                {"LZW", genie::core::AlgoID::LZW},
-                                                                {"BIN", genie::core::AlgoID::BIN},
-                                                                {"SPARSE", genie::core::AlgoID::SPARSE},
-                                                                {"DEL", genie::core::AlgoID::DEL},
-                                                                {"RLE", genie::core::AlgoID::RLE},
-                                                                {"SER", genie::core::AlgoID::SER}};
-    if (algoIds.find(algoString) == algoIds.end()) return genie::core::AlgoID::BSC;
-    return algoIds.at(algoString);
-}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
@@ -203,13 +186,12 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     //--------------------------------------------------
     auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
     std::vector<genie::genotype::BinMatPayload> variantsPayload;
-    datablock.allele_bin_mat_vect;
     for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
         size_t payloadSize = 0;
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
         std::vector<uint8_t> payload(payloadSize);
-        for (auto i = 0; i < payloadSize; ++i) {
+        for (size_t i = 0; i < payloadSize; ++i) {
             payload.at(i) = payloadArray[i];
         }
         variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload,
@@ -222,7 +204,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
         payload.resize(payloadSize);
-        for (auto i = 0; i < payloadSize; ++i) {
+        for (size_t i = 0; i < payloadSize; ++i) {
             payload.at(i) = payloadArray[i];
         }
     }

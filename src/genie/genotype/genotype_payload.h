@@ -89,7 +89,10 @@ class AmexPayload {
  public:
     AmexPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<bool> _is_one_flag,
                 std::vector<uint64_t> _amax_elements)
-        : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {}
+        : nelems(_nelems),
+          nbits_per_elem(_nbits_per_elem),
+          nelements(_nelements),
+          is_one_flag(_is_one_flag), amax_elements(_amax_elements) {}
 
     size_t sizeInBytes() const { return (nelems * nbits_per_elem + 7) / 8; }
 
