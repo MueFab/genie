@@ -11,14 +11,15 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/linked_record/linked_record.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,20 +42,19 @@ class info_field {
 };
 
 class format_field {
+ private:
+    uint32_t sample_count;
+
+    std::string format;
+    core::DataType type;
+    std::vector<std::vector<std::vector<uint8_t>>> value;
+
  public:
-    //    uint8_t len;
-    //    std::string format;
-    //    uint8_t type;
-    //    uint8_t array_len;
-    //    std::vector<std::vector<std::vector<uint8_t>>> value_array;
-    //
-    //    format_field() : len(0), format(""), type(0), array_len(0), value_array(0) {}
-    //
-    //    format_field(uint8_t len, std::string format, uint8_t type, uint8_t array_len,
-    //                std::vector<std::vector<std::vector<uint8_t>>> value)
-    //        : len(len), format(format), type(type), array_len(array_len), value_array(value) {}
-    //
-    //    void write(util::BitReader& reader, uint32_t sample_count);
+    format_field(util::BitReader& bitreader, uint32_t _sample_count);
+
+    std::string getFormat() const { return format; }
+    core::DataType getType() const { return type; }
+    const std::vector<std::vector<std::vector<uint8_t>>>& getValue() const { return value; }
 };
 
 /**
@@ -68,7 +68,7 @@ class VariantGenotype {
 
     std::vector<format_field> format;  //!< @brief
 
-    std::vector<std::vector<int8_t>> alleles;  //!< @brief
+    std::vector<std::vector<int8_t>> alleles;   //!< @brief
     std::vector<std::vector<int8_t>> phasings;  //!< @brief
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
@@ -76,7 +76,6 @@ class VariantGenotype {
     std::optional<LinkRecord> link_record;
 
  public:
-
     explicit VariantGenotype(util::BitReader& bitreader);
 
     uint64_t getVariantIndex() const;
@@ -94,9 +93,8 @@ class VariantGenotype {
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool getLinkedRecord() const;
     const LinkRecord& getLinkRecord() const;
+    const std::vector<format_field>& getFormats() const;
 };
-
-// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace record
 }  // namespace core

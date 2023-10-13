@@ -180,7 +180,7 @@ TEST(Genotype, parameters) {
         uint32_t ncols = static_cast<uint32_t>(shape.at(1));
         genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
         std::vector<uint8_t> payload(payloadSize);
-        for (auto i = 0; i < payloadSize; ++i) {
+        for (size_t i = 0; i < payloadSize; ++i) {
             payload.at(i) = payloadArray[i];
         }
         variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload, nrows, ncols));
@@ -191,7 +191,7 @@ TEST(Genotype, parameters) {
         uint8_t* payloadArray;
         genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
         payload.resize(payloadSize);
-        for (auto i = 0; i < payloadSize; ++i) {
+        for (size_t i = 0; i < payloadSize; ++i) {
             payload.at(i) = payloadArray[i];
         }
     }
@@ -235,8 +235,8 @@ TEST(Genotype, parameters) {
         genotypePayload.write(writer);
     }
     descriptorStream[genie::core::AnnotDesc::LINKID];
-    for (auto i = 0; i < recs.size(); ++i) {
-        char byte = 0xff;
+    for (size_t i = 0; i < recs.size(); ++i) {
+        char byte = static_cast<char>(0xff);
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte,1);
     }
     EXPECT_EQ(descriptorStream[genie::core::AnnotDesc::LINKID].str().size(), recs.size());
@@ -563,7 +563,7 @@ TEST(Genotype, JBIG) {
     mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, orig_payload, orig_payload_len, orig_nrows,
                                 orig_ncols);
 
-    for (auto i = 0; i < compressed_data_len; ++i) {
+    for (size_t i = 0; i < compressed_data_len; ++i) {
         EXPECT_EQ(orig_compressed[i], compressed_data[i]);
     }
 
@@ -571,13 +571,13 @@ TEST(Genotype, JBIG) {
     std::stringstream compressed_output;
     for (uint8_t byte : orig_payload) uncomressed_input.write((char*)&byte, 1);
     genie::entropy::jbig::JBIGEncoder encoder;
-    encoder.encode(uncomressed_input, compressed_output, orig_ncols, orig_nrows);
+    encoder.encode(uncomressed_input, compressed_output, (uint32_t)orig_ncols, (uint32_t)orig_nrows);
 
     std::vector<uint8_t> mem_data;
     for (auto byte : compressed_output.str()) {
         mem_data.push_back(byte);
     }
-    for (auto i = 0; i < compressed_data_len; ++i) {
+    for (size_t i = 0; i < compressed_data_len; ++i) {
         EXPECT_EQ(orig_compressed[i], mem_data[i]);
     }
 

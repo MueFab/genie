@@ -50,8 +50,6 @@ class Code {
     using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
 
-
-    genie::core::AlgoID convertStringToALgoID(std::string algoString) const;
 };
 
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,

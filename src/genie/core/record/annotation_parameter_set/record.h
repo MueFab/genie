@@ -70,19 +70,20 @@ class Record {
     AnnotationEncodingParameters getAnnotationEncodingParameters() const { return annotation_encoding_parameters; }
 };
 
-
 struct ParameterSettings {
     uint8_t parameter_set_ID;
     uint8_t AT_ID;
+    uint8_t AT_class;
     core::AlphabetID AT_alphabet_ID;
     uint8_t ATCoordSize;
     bool AT_pos_40_bits_flag;
     uint8_t n_aux_attribute_groups;
-
     TileParameterSettings tileParameterSettings;
+
     ParameterSettings()
         : parameter_set_ID(1),
           AT_ID(0),
+          AT_class(0),
           AT_alphabet_ID(core::AlphabetID::ACGTN),
           ATCoordSize(3),
           AT_pos_40_bits_flag(false),
