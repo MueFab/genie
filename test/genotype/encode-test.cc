@@ -236,7 +236,7 @@ TEST(Genotype, parameters) {
     }
     descriptorStream[genie::core::AnnotDesc::LINKID];
     for (auto i = 0; i < recs.size(); ++i) {
-        char byte = 0xff;
+        char byte = static_cast<char>(0xff);
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte,1);
     }
     EXPECT_EQ(descriptorStream[genie::core::AnnotDesc::LINKID].str().size(), recs.size());
