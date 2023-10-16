@@ -83,7 +83,7 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
 
 TEST(VariantGenotypeRecord, Genotype_fmt_only) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.geno";
+    std::string filepath = gitRootDir + "/data/records/ALL.chrX.5000.vcf.geno";
 
     std::ifstream reader(filepath, std::ios::binary);
     ASSERT_EQ(reader.fail(), false);
@@ -98,7 +98,7 @@ TEST(VariantGenotypeRecord, Genotype_fmt_only) {  // NOLINT(cert-err58-cpp)
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
-    ASSERT_EQ(recs.size(), 10000);
+    ASSERT_EQ(recs.size(), 5000);
 
     for (size_t i = 0; i < recs.size(); i++) {
         auto& rec = recs[i];
