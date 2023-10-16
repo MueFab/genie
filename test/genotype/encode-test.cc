@@ -87,7 +87,7 @@ TEST(Genotype, Decompose) {
     // Check the content of the first row of allele_tensor
     {
         //        const auto& allele_rec = xt::view(allele_mat, 0, xt::all(), xt::all());
-        auto allele_rec = xt::view(allele_mat, 0, xt::all());
+        auto allele_rec = xt::view(allele_mat, 0LL, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2067);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 117);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
@@ -96,7 +96,7 @@ TEST(Genotype, Decompose) {
     // Check the content of the last row of allele_tensor
     {
         //        const auto& allele_rec = xt::view(allele_mat, -1, xt::all(), xt::all());
-        auto allele_rec = xt::view(allele_mat, -1, xt::all());
+        auto allele_rec = xt::view(allele_mat, -1LL, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2178);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 6);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
@@ -196,8 +196,9 @@ TEST(Genotype, parameters) {
         }
     }
 
-    genie::genotype::BinMatPayload PhasesPayload(
-        genie::core::AlgoID::JBIG, payload, static_cast<uint32_t>(datablock.phasing_mat.shape().at(0)), static_cast<uint32_t>(datablock.phasing_mat.shape().at(1)));
+    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload,
+                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(0)),
+                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(1)));
     std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
     std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
 
@@ -237,13 +238,13 @@ TEST(Genotype, parameters) {
     descriptorStream[genie::core::AnnotDesc::LINKID];
     for (size_t i = 0; i < recs.size(); ++i) {
         char byte = static_cast<char>(0xff);
-        descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte,1);
+        descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte, 1);
     }
     EXPECT_EQ(descriptorStream[genie::core::AnnotDesc::LINKID].str().size(), recs.size());
 
     genie::core::record::annotation_access_unit::Record AAU_Unit;
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     AAU_Unit,AG_class, AT_ID);
+                                     AAU_Unit, AG_class, AT_ID);
     genie::core::record::data_unit::Record AAU_dataUnit(AAU_Unit);
 
     {
