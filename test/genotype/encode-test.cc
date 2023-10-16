@@ -235,7 +235,11 @@ TEST(Genotype, parameters) {
         genotypePayload.write(writer);
     }
     descriptorStream[genie::core::AnnotDesc::LINKID];
+<<<<<<< HEAD
     for (size_t i = 0; i < recs.size(); ++i) {
+=======
+    for (auto i = 0; i < recs.size(); ++i) {
+>>>>>>> ea73c8e06d933d51be14893db73f5ae30b55ae03
         char byte = static_cast<char>(0xff);
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&byte,1);
     }
