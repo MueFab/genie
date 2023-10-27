@@ -21,13 +21,11 @@ namespace genie {
 namespace variant_site {
 
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
-
     std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize) {
     return setParameterSet(info, genie::genotype::GenotypeParameters{}, genie::core::AlgoID::BSC, defaultTileSize);
 }
 
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
-
     std::map<std::string, genie::core::record::variant_site::AttributeData>& info,
     genie::genotype::GenotypeParameters genotype_parameters, genie::core::AlgoID encodeMode, uint64_t defaultTileSize) {
     //----------------------------------------------------//

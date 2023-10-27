@@ -5,7 +5,7 @@
  */
 
 #include "genotype_payload.h"
-
+#include "genotype_coder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -14,6 +14,22 @@ namespace genotype {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+BinMatPayload::BinMatPayload(BinMatDtype alleleBinMat) {
+    std::vector<genie::genotype::BinMatPayload> variantsPayload;
+    codecID = genie::core::AlgoID::JBIG;
+    size_t payloadSize = 0;
+    uint8_t* payloadArray;
+    auto shape = alleleBinMat.shape();
+    nrows = (uint32_t)(shape.at(0));
+    ncols = static_cast<uint32_t>(shape.at(1));
+
+    genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
+    payload.resize(payloadSize);
+    for (size_t i = 0; i < payloadSize; ++i) {
+        payload.at(i) = payloadArray[i];
+    }
+}
 
 void BinMatPayload::write(core::Writer& writer) const {
     if (codecID == core::AlgoID::JBIG) {
@@ -61,6 +77,37 @@ void AmexPayload::write(core::Writer& writer) const {
     }
 }
 
+void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
+    uint8_t num_variants_payloads = genotypeParameters.getBinarizationID() == BinarizationID::BIT_PLANE &&
+                                            genotypeParameters.isConcatenated() == ConcatAxis::DO_NOT_CONCAT
+                                        ? genotypeParameters.getNumBitPlanes()
+                                        : 1;
+    for (auto i = 0; i < num_variants_payloads; ++i) {
+        std::stringstream tempstream;
+        core::Writer writesize(&tempstream);
+        variants_payload[i].writeCompressed(writesize);
+        writer.write(tempstream.str().size(), 32);
+        variants_payload[i].writeCompressed(writer);
+        auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
+        auto indecRowIds = 0;
+        if (variantsPayloadsParams[i].sort_variants_rows_flag) {
+            writer.write(sort_variants_row_ids_payload[indecRowIds].payloadSize(), 32);
+            sort_variants_row_ids_payload[indecRowIds].write(writer);
+            ++indecRowIds;
+        }
+        auto indecColIds = 0;
+        if (variantsPayloadsParams[i].sort_variants_cols_flag) {
+            writer.write(sort_variants_col_ids_payload[indecColIds].payloadSize(), 32);
+            sort_variants_col_ids_payload[indecColIds].write(writer);
+            ++indecColIds;
+        }
+        if (genotypeParameters.getBinarizationID() == BinarizationID::ROW_BIN) {
+            writer.write(variants_amax_payload.sizeInBytes(), 32);
+        }
+    }
+    auto written = writer.getBitsWritten();
+    std::cerr << "genotype payload: " << written << std::endl;
+}
 }  // namespace genotype
 }  // namespace genie
 

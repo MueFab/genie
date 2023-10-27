@@ -29,6 +29,7 @@ set(source_files
         record/alignment/alignment.cc
 
         record/variant_site/record.cc
+        record/variant_site/AttributeData.cc
 
         record/variant_genotype/record.cc
         record/variant_genotype/format_field.cc

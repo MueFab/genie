@@ -97,6 +97,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
         }
     }
 
+  //  uint8_t AT_ID = 1;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
@@ -178,13 +179,13 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
     genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
+    auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(genotypeParameters, opt, AT_ID, recs.size());
+        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters, recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     //--------------------------------------------------
-    auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
     std::vector<genie::genotype::BinMatPayload> variantsPayload;
     for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
         size_t payloadSize = 0;
