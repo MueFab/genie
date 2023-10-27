@@ -48,12 +48,14 @@ class format_field {
     std::string format;
     core::DataType type;
     std::vector<std::vector<std::vector<uint8_t>>> value;
+    uint8_t arrayLength;
 
  public:
     format_field(util::BitReader& bitreader, uint32_t _sample_count);
 
     std::string getFormat() const { return format; }
     core::DataType getType() const { return type; }
+    uint32_t getSampleCount() const { return sample_count; }
     const std::vector<std::vector<std::vector<uint8_t>>>& getValue() const { return value; }
 };
 

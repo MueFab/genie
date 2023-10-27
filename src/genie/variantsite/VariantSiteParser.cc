@@ -154,7 +154,6 @@ void VariantSiteParser::ParseAttribute(uint8_t index) {
     for (const auto& value : tag[index].infoValue) {
         genie::core::ArrayType toval{};
         toval.toFile(attributeData[infoTag].getAttributeType(), value, attrWriter[infoTag]);
-        //       if (attributeData[infoTag].getAttributeType() == 0) attrWriter[infoTag].write(0, 8, true);
     }
 }
 

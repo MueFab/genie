@@ -107,8 +107,7 @@ TEST(VariantGenotypeRecord, Genotype_fmt_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(rec.getNumberOfAllelesPerSample(), 2);
         ASSERT_EQ(rec.getLinkedRecord(), false);
     }
-
-
+    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

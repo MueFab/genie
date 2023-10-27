@@ -19,6 +19,7 @@
 #include "genie/core/writer.h"
 #include "genie/entropy/jbig/encoder.h"
 #include "genie/genotype/genotype_parameters.h"
+#include "genie/genotype/genotype_coder.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -56,12 +57,35 @@ class BinMatPayload {
  public:
     BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
         : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols) {}
-    size_t payloadSize() const { return payload.size(); 
-}
+    size_t payloadSize() const { return payload.size(); }
+
+
+    BinMatPayload(BinMatDtype binmat);
 
     void write(core::Writer& writer) const;
 
     void writeCompressed(core::Writer& writer) const;
+};
+
+class LikelihoodPayload {
+ private:
+    uint32_t nrows;
+    uint32_t ncols;
+    std::vector<uint32_t> payload;
+    bool transformFlag;
+    uint32_t additionalPayloadSize;
+    std::vector<uint8_t> additionalPayload;
+
+ public:
+    LikelihoodPayload(uint32_t nrows, uint32_t ncols, std::vector<uint32_t> payload, bool transformFlag,
+                      uint32_t additionalPayloadSize, std::vector<uint8_t> additionalPayload)
+        :  nrows(nrows),
+           ncols(ncols),
+           payload(payload),
+           transformFlag(transformFlag),
+           additionalPayloadSize(additionalPayloadSize),
+          additionalPayload(additionalPayload)
+    {};
 };
 
 class RowColIdsPayload {
@@ -92,7 +116,8 @@ class AmexPayload {
         : nelems(_nelems),
           nbits_per_elem(_nbits_per_elem),
           nelements(_nelements),
-          is_one_flag(_is_one_flag), amax_elements(_amax_elements) {}
+          is_one_flag(_is_one_flag),
+          amax_elements(_amax_elements) {}
 
     size_t sizeInBytes() const { return (nelems * nbits_per_elem + 7) / 8; }
 
@@ -125,39 +150,7 @@ class GenotypePayload {
           sort_variants_col_ids_payload(_sort_variants_col_ids_payload),
           variants_amax_payload(_variants_amax_payload) {}
 
-    void write(core::Writer& writer) const
-
-    {
-        uint8_t num_variants_payloads = genotypeParameters.getBinarizationID() == BinarizationID::BIT_PLANE &&
-                                                genotypeParameters.isConcatenated() == ConcatAxis::DO_NOT_CONCAT
-                                            ? genotypeParameters.getNumBitPlanes()
-                                            : 1;
-        for (auto i = 0; i < num_variants_payloads; ++i) {
-            std::stringstream tempstream;
-            core::Writer writesize(&tempstream);
-            variants_payload[i].writeCompressed(writesize);
-            writer.write(tempstream.str().size(), 32);
-            variants_payload[i].writeCompressed(writer);
-            auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
-            auto indecRowIds = 0;
-            if (variantsPayloadsParams[i].sort_variants_rows_flag) {
-                writer.write(sort_variants_row_ids_payload[indecRowIds].payloadSize(), 32);
-                sort_variants_row_ids_payload[indecRowIds].write(writer);
-                ++indecRowIds;
-            }
-            auto indecColIds = 0;
-            if (variantsPayloadsParams[i].sort_variants_cols_flag) {
-                writer.write(sort_variants_col_ids_payload[indecColIds].payloadSize(), 32);
-                sort_variants_col_ids_payload[indecColIds].write(writer);
-                ++indecColIds;
-            }
-            if (genotypeParameters.getBinarizationID() == BinarizationID::ROW_BIN) {
-                writer.write(variants_amax_payload.sizeInBytes(), 32);
-            }
-        }
-        auto written = writer.getBitsWritten();
-        std::cerr << "genotype payload: " << written << std::endl;
-    }
+    void write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

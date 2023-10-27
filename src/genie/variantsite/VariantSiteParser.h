@@ -23,6 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/core/record/variant_site/record.h"
+#include "genie/core/record/variant_site/AttributeData.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 // ---------------------------------------------------------------------------------------------------------------------

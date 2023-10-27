@@ -31,8 +31,8 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
       format(),
       alleles(),
       phasings() {
+
     auto format_count = bitreader.readBypassBE<uint8_t>();
-  //  if (format_count > 0) UTILS_DIE("FORMAT parser is not yet implement!");
     for (uint8_t i = 0; i < format_count; i++) {
         format.emplace_back(bitreader, sample_count);
     }
@@ -171,10 +171,15 @@ format_field::format_field(util::BitReader& bitreader, uint32_t _sample_count) :
     type = static_cast<core::DataType>(bitreader.read_b(8));
     core::ArrayType arrayType;
 
-    uint8_t arrayLength = static_cast<uint8_t>(bitreader.read_b(8));
+    arrayLength = static_cast<uint8_t>(bitreader.read_b(8));
     value.resize(sample_count, std::vector<std::vector<uint8_t>>(arrayLength, std::vector<uint8_t>(0)));
-    for (auto& formatArray : value)
-        for (auto& oneValue : formatArray) oneValue = arrayType.toArray(type, bitreader);
+    for (auto& formatArray : value) {
+        for (auto& oneValue : formatArray) {
+            auto temp = arrayType.toArray(type, bitreader);
+            oneValue = temp;
+            for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
+        }
+    }
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

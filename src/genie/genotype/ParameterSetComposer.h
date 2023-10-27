@@ -38,9 +38,8 @@ namespace genotype {
 
 class ParameterSetComposer {
  public:
-    genie::core::record::annotation_parameter_set::Record Build(genie::genotype::GenotypeParameters& genotypeParameters,
-                                                                genie::genotype::EncodingOptions opt, uint8_t _AT_ID,
-                                                                uint64_t defaultTileSize = 100);
+    genie::core::record::annotation_parameter_set::Record Build(
+        uint8_t _AT_ID, std::map<std::string, genie::core::record::variant_site::AttributeData>& info, genie::genotype::GenotypeParameters& genotypeParameters, uint64_t defaultTileSize = 100);
 
 
 };
