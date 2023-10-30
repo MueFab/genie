@@ -77,6 +77,30 @@ void AmexPayload::write(core::Writer& writer) const {
     }
 }
 
+GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
+                                 genie::genotype::GenotypeParameters& _genotypeParameters)
+    : genotypeParameters(_genotypeParameters),
+      phases_payload(datablock.phasing_mat),
+      variants_amax_payload(0, 0, 0, {}, {}) {
+    for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
+        variants_payload.emplace_back(genie::genotype::BinMatPayload(alleleBinMat));
+    }
+
+    for (auto alleleRowIDs : datablock.allele_row_ids_vect) {
+        std::vector<uint64_t> payloadVec;
+        for (auto elem : alleleRowIDs) payloadVec.push_back(elem);
+        sort_variants_row_ids_payload.emplace_back(
+            genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
+    }
+
+    for (auto alleleColIDs : datablock.allele_col_ids_vect) {
+        std::vector<uint64_t> payloadVec;
+        for (auto elem : alleleColIDs) payloadVec.push_back(elem);
+        sort_variants_col_ids_payload.emplace_back(
+            genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
+    }
+}
+
 void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
     uint8_t num_variants_payloads = genotypeParameters.getBinarizationID() == BinarizationID::BIT_PLANE &&
                                             genotypeParameters.isConcatenated() == ConcatAxis::DO_NOT_CONCAT

@@ -185,52 +185,10 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters, recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+
     //--------------------------------------------------
-    std::vector<genie::genotype::BinMatPayload> variantsPayload;
-    for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
-        size_t payloadSize = 0;
-        uint8_t* payloadArray;
-        genie::genotype::bin_mat_to_bytes(alleleBinMat, &payloadArray, payloadSize);
-        std::vector<uint8_t> payload(payloadSize);
-        for (size_t i = 0; i < payloadSize; ++i) {
-            payload.at(i) = payloadArray[i];
-        }
-        variantsPayload.emplace_back(genie::genotype::BinMatPayload(genie::core::AlgoID::JBIG, payload,
-                                                                    static_cast<uint32_t>(alleleBinMat.shape().at(0)),
-                                                                    static_cast<uint32_t>(alleleBinMat.shape().at(1))));
-    }
-    std::vector<uint8_t> payload;
-    if (datablock.phasing_mat.size() > 0) {
-        size_t payloadSize = 0;
-        uint8_t* payloadArray;
-        genie::genotype::bin_mat_to_bytes(datablock.phasing_mat, &payloadArray, payloadSize);
-        payload.resize(payloadSize);
-        for (size_t i = 0; i < payloadSize; ++i) {
-            payload.at(i) = payloadArray[i];
-        }
-    }
-    genie::genotype::BinMatPayload PhasesPayload(genie::core::AlgoID::JBIG, payload,
-                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(0)),
-                                                 static_cast<uint32_t>(datablock.phasing_mat.shape().at(1)));
-    std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
-    std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
+    genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
 
-    for (auto alleleRowIDs : datablock.allele_row_ids_vect) {
-        std::vector<uint64_t> payloadVec;
-        for (auto elem : alleleRowIDs) payloadVec.push_back(elem);
-        sortRowIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
-    }
-
-    for (auto alleleColIDs : datablock.allele_col_ids_vect) {
-        std::vector<uint64_t> payloadVec;
-        for (auto elem : alleleColIDs) payloadVec.push_back(elem);
-        sortColIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
-    }
-    genie::genotype::AmexPayload amexPayload(0, 0, 0, {}, {});
-
-    //-----------------------------------------------------
-    genie::genotype::GenotypePayload genotypePayload(genotypeParameters, variantsPayload, PhasesPayload,
-                                                     sortRowIdsPayload, sortColIdsPayload, amexPayload);
     //--------------------------------------------------
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
