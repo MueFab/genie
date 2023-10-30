@@ -150,6 +150,9 @@ class GenotypePayload {
           sort_variants_col_ids_payload(_sort_variants_col_ids_payload),
           variants_amax_payload(_variants_amax_payload) {}
 
+    GenotypePayload(genie::genotype::EncodingBlock& dataBlock,
+                    genie::genotype::GenotypeParameters& genotpyParameters);  // build from datablock
+
     void write(core::Writer& writer) const;
 };
 

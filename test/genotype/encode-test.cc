@@ -119,8 +119,8 @@ TEST(Genotype, formattest) {
     reader.close();
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    std::vector<std::string> formatList;
     recs.pop_back();
+    std::vector<std::string> formatList;
     {
         std::string jsonfilepath =
             gitRootDir +
@@ -128,8 +128,6 @@ TEST(Genotype, formattest) {
         std::ifstream jsonReader(jsonfilepath, std::ios::in);
         ASSERT_TRUE(jsonReader.is_open());
         std::string stringFields((std::istreambuf_iterator<char>(jsonReader)), std::istreambuf_iterator<char>());
-        //  std::stringstream jsonFieldsFile << jsonReader.rdbuf();
-        //  auto stringFields = jsonFieldsFile.str();
         stringFields.erase(std::remove(stringFields.begin(), stringFields.end(), ' '), stringFields.end());
         stringFields.erase(std::remove(stringFields.begin(), stringFields.end(), '\t'), stringFields.end());
         stringFields.erase(std::remove(stringFields.begin(), stringFields.end(), '"'), stringFields.end());
@@ -144,20 +142,6 @@ TEST(Genotype, formattest) {
     }
 
     EXPECT_EQ(formatList.size(), 3);
-
-    EXPECT_EQ(recs.size(), 5000);
-    genie::genotype::EncodingOptions opt = {
-        512,                                         // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
-    // ------------------------------
-    auto tupleoutput = genie::genotype::encode_block(opt, recs);
 }
 
 #define WRITETESTFILES
@@ -209,32 +193,7 @@ TEST(Genotype, conformanceTests) {
 
     auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
 
-    std::vector<genie::genotype::BinMatPayload> variantsPayload;
-    for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
-        variantsPayload.emplace_back(genie::genotype::BinMatPayload(alleleBinMat));
-    }
-
-    genie::genotype::BinMatPayload PhasesPayload(datablock.phasing_mat);
-
-    std::vector<genie::genotype::RowColIdsPayload> sortRowIdsPayload;
-    std::vector<genie::genotype::RowColIdsPayload> sortColIdsPayload;
-
-    for (auto alleleRowIDs : datablock.allele_row_ids_vect) {
-        std::vector<uint64_t> payloadVec;
-        for (auto elem : alleleRowIDs) payloadVec.push_back(elem);
-        sortRowIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
-    }
-
-    for (auto alleleColIDs : datablock.allele_col_ids_vect) {
-        std::vector<uint64_t> payloadVec;
-        for (auto elem : alleleColIDs) payloadVec.push_back(elem);
-        sortColIdsPayload.emplace_back(genie::genotype::RowColIdsPayload(payloadVec.size(), 64, payloadVec));
-    }
-    genie::genotype::AmexPayload amexPayload(0, 0, 0, {}, {});
-
-    //-----------------------------------------------------
-    genie::genotype::GenotypePayload genotypePayload(genotypeParameters, variantsPayload, PhasesPayload,
-                                                     sortRowIdsPayload, sortColIdsPayload, amexPayload);
+    genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
 
     std::stringstream sizeGenotypePayload;
     genie::core::Writer writesizeGenotypePayload(&sizeGenotypePayload);
