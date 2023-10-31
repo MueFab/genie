@@ -29,7 +29,6 @@ set(source_files
         record/alignment/alignment.cc
 
         record/variant_site/record.cc
-        record/variant_site/AttributeData.cc
 
         record/variant_genotype/record.cc
         record/variant_genotype/format_field.cc
@@ -58,7 +57,6 @@ set(source_files
 
         record/annotation_parameter_set/record.cc
         record/annotation_parameter_set/LikelihoodParameters.cc
-       # record/annotation_parameter_set/GenotypeParameters.cc
         record/annotation_parameter_set/AttributeParameterSet.cc
         record/annotation_parameter_set/AlgorithmParameters.cc
         record/annotation_parameter_set/ContactMatrixParameters.cc
@@ -67,6 +65,7 @@ set(source_files
         record/annotation_parameter_set/DescriptorConfiguration.cc
         record/annotation_parameter_set/CompressorParameterSet.cc
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
+        record/annotation_parameter_set/AttributeData.cc
 
         arrayType.cc
         writer.cc

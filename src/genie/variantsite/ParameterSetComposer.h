@@ -35,13 +35,14 @@ namespace variant_site {
 class ParameterSetComposer {
  public:
     genie::core::record::annotation_parameter_set::Record setParameterSet(
-        std::map<std::string, genie::core::record::variant_site::AttributeData>& info, uint64_t defaultTileSize);
+        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+        uint64_t defaultTileSize);
 
     ParameterSetComposer(std::map<genie::core::AnnotDesc, std::stringstream>& _encodedDescriptors)
         : encodedDescriptors(_encodedDescriptors){};
 
     genie::core::record::annotation_parameter_set::Record setParameterSet(
-        std::map<std::string, genie::core::record::variant_site::AttributeData>& info,
+        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
         genie::genotype::GenotypeParameters genotype_parameters, genie::core::AlgoID encodeMode,
         uint64_t defaultTileSize);
 

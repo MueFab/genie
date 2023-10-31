@@ -57,9 +57,7 @@ Code::Code(const std::string& _inputFileName, const std::string& _outputFileName
     : Code(_inputFileName, _outputFileName, testOutput, "", rec) {}
 
 Code::Code(const std::string& inputFileName, const std::string& outputFileName, bool testOutput,
-           const std::string& infoFieldsFileName, const std::string& _rec)
-     {
-
+           const std::string& infoFieldsFileName, const std::string& _rec) {
     if (inputFileName.empty()) {
         std::cerr << ("No Valid Inputs ") << std::endl;
         return;
@@ -81,10 +79,6 @@ Code::Code(const std::string& inputFileName, const std::string& outputFileName, 
 
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,
                        const std::string& _infoFieldsFileName) {
-    std::ifstream site_MGrecs;
-    auto inputFileName = _inputFileName;
-    site_MGrecs.open(inputFileName, std::ios::in | std::ios::binary);
-
     std::stringstream infoFields;
     auto infoFieldsFileName = _infoFieldsFileName;
     if (!infoFieldsFileName.empty()) {
@@ -97,9 +91,13 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
         }
     }
 
-  //  uint8_t AT_ID = 1;
+    std::ifstream site_MGrecs;
+    auto inputFileName = _inputFileName;
+    site_MGrecs.open(inputFileName, std::ios::in | std::ios::binary);
+
+    uint8_t AT_ID = 1;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
     genie::variant_site::VariantSiteParser parser(site_MGrecs, descriptorStream, attributesInfo, attributeStream,
                                                   infoFields);
@@ -109,13 +107,14 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
 
+    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+
     genie::variant_site::AccessUnitComposer accessUnit;
     uint8_t AG_class = 1;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                             annotationAccessUnit, AG_class);
+                             annotationAccessUnit, AG_class, AT_ID);
 
-    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
     std::ofstream txtFile;
@@ -150,8 +149,6 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
 }
 
 void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _output_fpath) {
-    (void)_output_fpath;
-
     std::ifstream reader(_input_fpath, std::ios::binary);
     genie::util::BitReader bitreader(reader);
     std::vector<genie::core::record::VariantGenotype> recs;
@@ -190,16 +187,22 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
 
     //--------------------------------------------------
-    genie::variant_site::AccessUnitComposer accessUnitcomposer;
-    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo =
+        datablock.attributeInfo;
     std::map<std::string, std::stringstream> attributeStream;
+    for (auto formatdata : datablock.attributeData)
+        for (auto i = 0; i < formatdata.second.size(); ++i)
+            attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);
+
+    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
     {
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
         genotypePayload.write(writer);
     }
+    genie::variant_site::AccessUnitComposer accessUnitcomposer;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
                                      annotationAccessUnit, AG_class, AT_ID);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);

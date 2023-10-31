@@ -19,7 +19,8 @@
 namespace genie {
 namespace genotype {
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Build(
-    uint8_t _AT_ID, std::map<std::string, genie::core::record::variant_site::AttributeData>& info, genie::genotype::GenotypeParameters& genotypeParameters,  uint64_t defaultTileSize) {
+    uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+    genie::genotype::GenotypeParameters& genotypeParameters, uint64_t defaultTileSize) {
     uint8_t parameter_set_ID = 1;
     uint8_t AT_ID = _AT_ID;
     genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;

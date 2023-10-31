@@ -19,7 +19,7 @@
 // #include <xtensor/xoperation.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/core/record/variant_site/AttributeData.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/LikelihoodParameters.h"
 #include "genotype_parameters.h"
 // -----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ struct EncodingBlock {
     UIntVecDtype phasing_row_ids;
     UIntVecDtype phasing_col_ids;
 
-    std::map<std::string, core::record::variant_site::AttributeData> attributeInfo;
+    std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
     std::map<std::string, std::vector<uint8_t>> attributeData;
 
     core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
@@ -137,7 +137,7 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
-                 std::map<std::string, core::record::variant_site::AttributeData>& info,
+                 std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<uint8_t>>& values);
 // ---------------------------------------------------------------------------------------------------------------------
 

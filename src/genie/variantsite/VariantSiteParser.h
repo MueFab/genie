@@ -23,7 +23,7 @@
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/core/record/variant_site/AttributeData.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ namespace variant_site {
 
 class VariantSiteParser {
  public:
-    using AttributeData = genie::core::record::variant_site::AttributeData;
+    using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
     using InfoField = genie::variant_site::InfoField;
 
     VariantSiteParser(std::istream& _site_MGrecs,

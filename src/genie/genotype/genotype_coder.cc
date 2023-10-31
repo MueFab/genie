@@ -11,7 +11,7 @@
 // #include <xtensor/xstrided_view.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include <xtensor/xview.hpp>
-#include "genie/core/record/variant_site/AttributeData.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -374,7 +374,7 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 }
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
-                 std::map<std::string, core::record::variant_site::AttributeData>& info,
+                 std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<uint8_t>>& values) {
     for (auto i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
@@ -382,7 +382,8 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
         for (auto format : rec.getFormats()) {
             uint8_t prevArray_len = info[format.getFormat()].getArrayLength();
             uint8_t array_len = static_cast<uint8_t>(format.getValue().at(0).size());
-            core::record::variant_site::AttributeData thisAttr(static_cast<uint8_t>(format.getFormat().size()),
+            core::record::annotation_parameter_set::AttributeData thisAttr(
+                static_cast<uint8_t>(format.getFormat().size()),
                                                                format.getFormat(), format.getType(), array_len,
                                                                AttributeID);
             AttributeID++;
