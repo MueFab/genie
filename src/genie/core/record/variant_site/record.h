@@ -21,7 +21,7 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/AttributeData.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

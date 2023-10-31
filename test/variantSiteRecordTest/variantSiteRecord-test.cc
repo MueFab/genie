@@ -219,7 +219,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
 
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo;
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
     genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream, infoFields);
     ASSERT_TRUE(inputfile.is_open());

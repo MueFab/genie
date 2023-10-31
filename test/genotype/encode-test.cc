@@ -203,7 +203,8 @@ TEST(Genotype, conformanceTests) {
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
 
-    std::map<std::string, genie::core::record::variant_site::AttributeData> attributesInfo = datablock.attributeInfo;
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo =
+        datablock.attributeInfo;
     std::map<std::string, std::stringstream> attributeStream;
     for (auto formatdata : datablock.attributeData)
         for (auto i = 0; i < formatdata.second.size(); ++i)
