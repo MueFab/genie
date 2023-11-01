@@ -207,7 +207,7 @@ TEST(Genotype, conformanceTests) {
         datablock.attributeInfo;
     std::map<std::string, std::stringstream> attributeStream;
     for (auto formatdata : datablock.attributeData)
-        for (auto i = 0; i < formatdata.second.size(); ++i)
+        for (size_t i = 0; i < formatdata.second.size(); ++i)
             attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);
     //--------------------------------------------------
 
