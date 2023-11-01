@@ -60,6 +60,7 @@ CompressorParameterSet::CompressorParameterSet(
       n_completed_out_vars(n_completed_out_vars),
       completed_out_var_ID(completed_out_var_ID) {}
 
+
 void CompressorParameterSet::read(util::BitReader& reader) {
     compressor_ID = static_cast<uint8_t>(reader.read_b(8));
     n_compressor_steps = static_cast<uint8_t>(reader.read_b(4));

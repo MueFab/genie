@@ -78,15 +78,12 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     // -----------------------------------------------------------------------------------------
     uint8_t n_compressors = 3;
 
-    uint8_t compressor_ID = 1;
     genie::entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
 
-    compressor_ID++;
     genie::entropy::lzma::LZMAParameters lzmaParameters;
     auto LZMAalgorithmParameters = lzmaParameters.convertToAlgorithmParameters();
 
-    compressor_ID++;
     genie::entropy::zstd::ZSTDParameters zstdParameters;
     auto ZSTDalgorithmParameters = zstdParameters.convertToAlgorithmParameters();
 

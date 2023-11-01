@@ -376,7 +376,7 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<uint8_t>>& values) {
-    for (auto i_rec = 0; i_rec < block_size; i_rec++) {
+    for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
         uint8_t AttributeID = 0;
         for (auto format : rec.getFormats()) {
@@ -392,7 +392,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
         }
     }
 
-    for (auto i_rec = 0; i_rec < block_size; i_rec++) {
+    for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
 
         std::stringstream attr;
@@ -400,9 +400,9 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
             auto formatName = format.getFormat();
             for (uint32_t j = 0; j < format.getSampleCount(); ++j) {
                 auto CurrentAttr = info[formatName];
-                for (auto i = 0; i < CurrentAttr.getArrayLength(); ++i) {
+                for (size_t i = 0; i < CurrentAttr.getArrayLength(); ++i) {
                     if (i < format.getValue().at(j).size()) {
-                        for (auto k = 0; k < format.getValue().at(j).at(i).size(); k++) {
+                        for (size_t k = 0; k < format.getValue().at(j).at(i).size(); k++) {
                             values[CurrentAttr.getAttributeName()].push_back(format.getValue().at(j).at(i).at(k));
                         }
                     } else {
@@ -413,7 +413,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
                         auto typeSize = defaultValueVector.size();
                         if (typeSize == 0) typeSize = 1;
 
-                        for (auto k = 0; k < defaultValueVector.size(); k++) {
+                        for (size_t k = 0; k < defaultValueVector.size(); k++) {
                             values[CurrentAttr.getAttributeName()].push_back(defaultValueVector.at(k));
                         }
                     }
