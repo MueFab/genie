@@ -50,7 +50,7 @@ class BSCTestCase : public ::testing::Test {
 TEST_F(BSCTestCase, BSCEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
     const size_t NrOfInputBytes = 100;
     std::vector<uint8_t> testDataUncompressed(NrOfInputBytes);
-    for (auto i = 0; i < NrOfInputBytes; ++i) {
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
         uint8_t byte = static_cast<uint8_t>(rand() % 256);
         testDataUncompressed[i] = byte;
     }
