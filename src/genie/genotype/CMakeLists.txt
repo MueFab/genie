@@ -33,6 +33,7 @@ endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
