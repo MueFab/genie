@@ -100,7 +100,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
     genie::variant_site::VariantSiteParser parser(site_MGrecs, descriptorStream, attributesInfo, attributeStream,
-                                                  infoFields);
+                                                  infoFields,0);
 
     genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
 
