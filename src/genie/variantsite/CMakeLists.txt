@@ -7,6 +7,9 @@ set(source_files
         JsonInfoFieldParser.cc
         ParameterSetComposer.cc
         AccessUnitComposer.cc
+        Attributes.cc
+        Descriptors.cc
+        Tiles.cc
 )
 
 add_library(genie-vsite ${source_files})

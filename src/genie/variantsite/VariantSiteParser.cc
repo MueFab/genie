@@ -20,13 +20,15 @@
 namespace genie {
 namespace variant_site {
 
+
+
 VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs,
                                      std::map<genie::core::AnnotDesc, std::stringstream>& _output,
                                      std::map<std::string, AttributeData>& _info,
                                      std::map<std::string, std::stringstream>& _attributeStream,
-                                     std::stringstream& _jsonInfoFields)
+                                     std::stringstream& _jsonInfoFields, uint64_t _rowsPerTile)
     : siteMGrecs(_site_MGrecs),
-      rowsPerTile(0),
+      rowsPerTile(_rowsPerTile),
       numberOfRows(0),
       fieldWriter{},
       dataFields(_output),
@@ -37,11 +39,15 @@ VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs,
     JsonInfoFieldParser InfoFieldParser(_jsonInfoFields);
     infoFields = InfoFieldParser.getInfoFields();
     init();
+     descriptors.setTileSize(rowsPerTile);
+    
     util::BitReader reader(siteMGrecs);
     while (fillRecord(reader)) {
         ParseOne();
         numberOfRows++;
+        descriptors.write(variantSite);
     }
+    descriptors.writeDanglingBits();
     writeDanglingBits();
 }
 
@@ -77,7 +83,11 @@ void VariantSiteParser::init() {
                                 infoField.Number, attributeID);
         attributeData[infoField.ID] = attribute;
         attributeID++;
+
     }
+    
+    Attributes attr(rowsPerTile, attributeData);
+    attributes = attr;
 
     numberOfAttributes = attributeID;
 }
@@ -136,6 +146,7 @@ void VariantSiteParser::ParseOne() {
     } else {
         fieldWriter[static_cast<size_t>(genie::core::AnnotDesc::LINKID)].write(255, 8);
     }
+    attributes.add(variantSite.getInfoTag());
     for (auto& it : attributeData) {
         ParseAttribute(it.first);
     }

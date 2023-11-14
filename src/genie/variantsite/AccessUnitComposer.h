@@ -36,11 +36,19 @@ namespace variant_site {
 
 class AccessUnitComposer {
  public:
-    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+
+     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, std::stringstream>& attributeStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
-                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID = 1);
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
+                       uint8_t AT_ID, uint64_t rowIndex);
+
+     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+                       std::map<std::string, std::stringstream>& attributeStream,
+                       std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
+                       const core::record::annotation_parameter_set::Record& annotationParameterSet,
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID);
 
  private:
     // default values
@@ -59,6 +67,7 @@ class AccessUnitComposer {
     uint16_t attribute_ID = 0;
     core::AnnotDesc descriptor_ID = core::AnnotDesc::STARTPOS;
     uint8_t AT_ID = 1;
+    uint8_t AG_class = 0;
     core::record::annotation_access_unit::AnnotationType AT_type =
         core::record::annotation_access_unit::AnnotationType::VARIANTS;
     uint8_t numChrs = 0;

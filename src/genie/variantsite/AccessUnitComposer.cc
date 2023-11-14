@@ -29,9 +29,23 @@ void AccessUnitComposer::setAccessUnit(
     std::map<std::string, std::stringstream>& _attributeStream,
     std::map<std::string, core::record::annotation_parameter_set::AttributeData> _attributeInfo,
     const genie::core::record::annotation_parameter_set::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit,uint8_t AG_class, uint8_t _AT_ID) {
+    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID) {
+    setAccessUnit(_descriptorStream, _attributeStream, _attributeInfo, _annotationParameterSet, _annotationAccessUnit,
+                  _AG_class, _AT_ID, 0);
+}
+void AccessUnitComposer::setAccessUnit(
+    std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
+    std::map<std::string, std::stringstream>& _attributeStream,
+    std::map<std::string, core::record::annotation_parameter_set::AttributeData> _attributeInfo,
+    const core::record::annotation_parameter_set::Record& _annotationParameterSet,
+    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
+    uint64_t _rowIndex)
+
+{
+    tile_index_1 = _rowIndex;
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     AT_ID = _AT_ID;
+    AG_class = _AG_class;
     // -------- descriptors ---------- //
     auto descriptorConfigurations =
         _annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
@@ -81,7 +95,6 @@ void AccessUnitComposer::compress(
     const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>& descriptorConfigurations,
     std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors) {
-
     genie::entropy::bsc::BSCEncoder bscEncoder;
     genie::entropy::lzma::LZMAEncoder lzmaEncoder;
     genie::entropy::zstd::ZSTDEncoder zstdEncoder;

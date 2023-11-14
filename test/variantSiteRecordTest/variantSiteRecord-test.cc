@@ -4,7 +4,7 @@
 #include <iostream>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
-
+#include "genie/util/string-helpers.h"
 
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
@@ -167,11 +167,13 @@ TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
     EXPECT_EQ(output.str(), checkOut.str());
 }
 
-std::string exec(const std::string &cmd) {
+namespace util_tests {
+
+std::string exec(const std::string& cmd) {
 #ifdef WIN32
-    FILE *pipe = _popen(cmd.c_str(), "r");
+    FILE* pipe = _popen(cmd.c_str(), "r");
 #else
-    FILE *pipe = popen(cmd.c_str(), "r");
+    FILE* pipe = popen(cmd.c_str(), "r");
 #endif
     if (!pipe) {
         return "<exec(" + cmd + ") failed>";
@@ -191,20 +193,22 @@ std::string exec(const std::string &cmd) {
 #else
     pclose(pipe);
 #endif
+    genie::util::rtrim(result);
 
     return result;
 }
 
+}  // namespace util_tests
+
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     std::string filepath = gitRootDir + "/data/records/";
-    filepath.erase(std::remove(filepath.begin(), filepath.end(), '\n'), filepath.end());
     using DescriptorID = genie::core::AnnotDesc;
 
     std::string filename = "ALL.chrX.10000.site";
-   // std::string filename = "1.3.05_cut.site";
+    // std::string filename = "1.3.05_cut.site";
     constexpr size_t ExpectedNumberOfrows = 10;
     std::ifstream inputfile;
     inputfile.open(filepath + filename, std::ios::in | std::ios::binary);
@@ -221,7 +225,8 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
     std::map<std::string, std::stringstream> attributeStream;
-    genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream, infoFields);
+    genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream,
+                                                  infoFields, 0);
     ASSERT_TRUE(inputfile.is_open());
     if (inputfile.is_open()) {
         EXPECT_GE(descriptorStream[DescriptorID::ALTERN].str().size(), 12);
@@ -236,19 +241,20 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet( attributesInfo, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
+    uint8_t AT_ID = 1;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
-    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet, annotationAccessUnit, AG_class);
-    
-        
+    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
+                             annotationAccessUnit, AG_class, AT_ID);
+
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
-    std::string name = "TestFiles/Complete" + filename;
+    std::string name = filepath + filename;
 
     std::ofstream testfile;
     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
@@ -266,4 +272,74 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         AAU_dataUnit.write(txtWriter);
         txtfile.close();
     }
+}
+
+TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.site";
+    std::string infofilename = "/data/records/1.3.5.header100.gt_only.vcf.infotags.json";
+    std::ifstream infoFieldsFile;
+    infoFieldsFile.open(gitRootDir + infofilename, std::ios::in);
+    std::stringstream infoFields;
+    if (infoFieldsFile.is_open()) {
+        infoFields << infoFieldsFile.rdbuf();
+        infoFieldsFile.close();
+    }
+    std::ifstream inputfile;
+    inputfile.open(filepath, std::ios::in | std::ios::binary);
+    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
+    std::map<std::string, std::stringstream> attributeStream;
+    uint64_t defaultTileSize = 5000;
+    genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream,
+                                                  infoFields, defaultTileSize);
+    if (inputfile.is_open()) inputfile.close();
+    EXPECT_EQ(parser.getNrOfTiles(), 2);
+
+    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
+
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        encodeParameters.setParameterSet(attributesInfo, defaultTileSize);
+
+    uint8_t AG_class = 1;
+    uint8_t AT_ID = 1;
+
+    genie::variant_site::AccessUnitComposer accessUnit;
+    std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
+    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
+    auto& tile_attributeStream = parser.getAttributes().getTiles();
+    auto info = parser.getAttributes().getInfo();
+    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+        std::map<genie::core::AnnotDesc, std::stringstream> desc;
+        for (auto& desctile : tile_descriptorStream) {
+            ASSERT_EQ(desctile.second.getNrOfTiles(), 2);
+            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+        }
+
+        std::map<std::string, std::stringstream> attr;
+        for (auto& attrtile : tile_attributeStream) {
+            ASSERT_EQ(attrtile.second.getNrOfTiles(), 2);
+            attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
+        }
+        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID);
+    }
+
+    std::ofstream testfile;
+    testfile.open(filepath + "2tiles.bin", std::ios::binary | std::ios::out);
+    genie::core::Writer testwriter(&testfile);
+    std::ofstream txtfile;
+    txtfile.open(filepath + "2tiles.txt", std::ios::out);
+    genie::core::Writer txtwriter(&txtfile, true);
+
+    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+    APS_dataUnit.write(testwriter);
+    APS_dataUnit.write(txtwriter);
+
+    for (auto aau : annotationAccessUnit) {
+        genie::core::record::data_unit::Record AAU_dataUnit(aau);
+        AAU_dataUnit.write(testwriter);
+        AAU_dataUnit.write(txtwriter);
+    }
+    testfile.close();
+    txtfile.close();
 }

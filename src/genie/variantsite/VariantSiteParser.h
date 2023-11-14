@@ -18,36 +18,44 @@
 #include <vector>
 
 #include "genie/core/constants.h"
+#include "genie/variantsite/Attributes.h"
+#include "genie/variantsite/Descriptors.h"
 
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/variantsite/JsonInfoFieldParser.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
+#include "genie/variantsite/JsonInfoFieldParser.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace variant_site {
 
+//-------------------------------------------------------------------------------//
 
 class VariantSiteParser {
  public:
     using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
     using InfoField = genie::variant_site::InfoField;
 
-    VariantSiteParser(std::istream& _site_MGrecs,
-                      std::map<genie::core::AnnotDesc, std::stringstream>& _output,
+    // VariantSiteParser(std::istream& _site_MGrecs, uint64_t rowsPerTile, std::stringstream& _jsonInfoFields);
+
+    VariantSiteParser(std::istream& _site_MGrecs, std::map<genie::core::AnnotDesc, std::stringstream>& _output,
                       std::map<std::string, AttributeData>& _info,
-                      std::map<std::string, std::stringstream>& _attributeStream,
-                      std::stringstream& _jsonInfoFields);
+                      std::map<std::string, std::stringstream>& _attributeStream, std::stringstream& _jsonInfoFields,
+                      uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
- private:
-//    using DescriptorID = genie::core::record::annotation_parameter_set::DescriptorID;
+    Attributes& getAttributes() { return attributes; }
+    Descriptors& getDescriptors() { return descriptors; }
 
+    uint64_t getNrOfTiles() { return descriptors.getTiles()[genie::core::AnnotDesc::STARTPOS].getTiles().size(); }
+
+ private:
     genie::core::record::variant_site::Record variantSite;
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
@@ -60,8 +68,12 @@ class VariantSiteParser {
     std::map<genie::core::AnnotDesc, std::stringstream>& dataFields;
 
     std::map<std::string, genie::core::Writer> attrWriter;
+
     std::map<std::string, std::stringstream>& attributeStream;
     std::map<std::string, AttributeData>& attributeData;
+    Attributes attributes;
+    Descriptors descriptors;
+
     uint16_t numberOfAttributes;
 
     const uint8_t alternEndLine = 0x06;
@@ -76,7 +88,7 @@ class VariantSiteParser {
     void ParseAttribute(const std::string& infoTagfield);
     void writeDanglingBits();
     uint8_t AlternTranslate(char alt) const;
-    static std::vector<uint8_t> FilterTranslate(const std::string& filter) ;
+    static std::vector<uint8_t> FilterTranslate(const std::string& filter);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
