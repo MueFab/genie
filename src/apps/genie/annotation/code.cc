@@ -96,24 +96,38 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     site_MGrecs.open(inputFileName, std::ios::in | std::ios::binary);
 
     uint8_t AT_ID = 1;
-    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
-    std::map<std::string, std::stringstream> attributeStream;
-    genie::variant_site::VariantSiteParser parser(site_MGrecs, descriptorStream, attributesInfo, attributeStream,
-                                                  infoFields,0);
+    genie::variant_site::VariantSiteParser parser(site_MGrecs, infoFields, 0);
 
-    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
+    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
+    auto& tile_attributeStream = parser.getAttributes().getTiles();
+    auto info = parser.getAttributes().getInfo();
+    std::map<genie::core::AnnotDesc, std::stringstream> desc;
+    std::map<std::string, std::stringstream> attr;
+
+    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+        for (auto& desctile : tile_descriptorStream) {
+            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+        }
+
+        for (auto& attrtile : tile_attributeStream) {
+            attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
+        }
+    }
+
+    genie::variant_site::ParameterSetComposer encodeParameters;
+
+    std::vector<genie::core::AnnotDesc> descrList;
+    for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(descrList, info, parser.getNumberOfRows());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
     genie::variant_site::AccessUnitComposer accessUnit;
     uint8_t AG_class = 1;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
-    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                             annotationAccessUnit, AG_class, AT_ID);
+    accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit, AG_class, AT_ID);
 
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 

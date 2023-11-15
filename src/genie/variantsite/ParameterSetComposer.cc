@@ -21,18 +21,13 @@ namespace genie {
 namespace variant_site {
 
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
+    std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
     uint64_t defaultTileSize) {
-    return setParameterSet(info, genie::genotype::GenotypeParameters{}, genie::core::AlgoID::BSC, defaultTileSize);
-}
-
-genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-    genie::genotype::GenotypeParameters genotype_parameters, genie::core::AlgoID encodeMode, uint64_t defaultTileSize) {
-    //----------------------------------------------------//
+     //----------------------------------------------------//
     // default values
     core::record::annotation_parameter_set::ParameterSettings defaultset;
-    genie::core::AlgoID encoding_mode_ID = encodeMode;
+    genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
     uint8_t AG_class = 1;
     uint64_t n_tiles = 1;
@@ -96,11 +91,12 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     // genie::genotype::GenotypeParameters genotype_parameters;
     genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
+    genie::genotype::GenotypeParameters genotype_parameters;
 
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
-    uint8_t n_descriptors = static_cast<uint8_t>(encodedDescriptors.size());
-    for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
-        genie::core::AnnotDesc DescrID = it->first;
+    uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());
+    for (auto descr: descrList) {
+        genie::core::AnnotDesc DescrID = descr;
         if (DescrID == genie::core::AnnotDesc::GENOTYPE) encoding_mode_ID = genie::core::AlgoID::LZMA;
 
         genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
