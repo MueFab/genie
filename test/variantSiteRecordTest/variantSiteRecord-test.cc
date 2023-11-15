@@ -208,8 +208,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     using DescriptorID = genie::core::AnnotDesc;
 
     std::string filename = "ALL.chrX.10000.site";
-    // std::string filename = "1.3.05_cut.site";
-    constexpr size_t ExpectedNumberOfrows = 10;
+    constexpr size_t ExpectedNumberOfrows = 1000;
     std::ifstream inputfile;
     inputfile.open(filepath + filename, std::ios::in | std::ios::binary);
 
@@ -222,34 +221,43 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         infoFieldsFile.close();
     }
 
-    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
-    std::map<std::string, std::stringstream> attributeStream;
-    genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream,
-                                                  infoFields, 0);
+    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, 0);
     ASSERT_TRUE(inputfile.is_open());
     if (inputfile.is_open()) {
-        EXPECT_GE(descriptorStream[DescriptorID::ALTERN].str().size(), 12);
         EXPECT_GE(parser.getNumberOfRows(), ExpectedNumberOfrows);
         inputfile.close();
     }
 
-    EXPECT_EQ(attributeStream.size(), 22);
-    for (auto it = attributeStream.begin(); it != attributeStream.end(); ++it)
-        EXPECT_GE(it->second.str().size(), ExpectedNumberOfrows) << it->first;
+    genie::variant_site::ParameterSetComposer encodeParameters;
 
-    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
+    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
+    auto& tile_attributeStream = parser.getAttributes().getTiles();
+    std::vector<genie::core::AnnotDesc> descrList;
+    for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
+    ASSERT_EQ(parser.getNrOfTiles(), 1);
+    auto info = parser.getAttributes().getInfo();
+    std::map<genie::core::AnnotDesc, std::stringstream> desc;
+    std::map<std::string, std::stringstream> attr;
+
+    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+        for (auto& desctile : tile_descriptorStream) {
+            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+        }
+
+        for (auto& attrtile : tile_attributeStream) {
+            attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
+        }
+    }
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(attributesInfo, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(descrList, info, parser.getNumberOfRows());
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
-    accessUnit.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                             annotationAccessUnit, AG_class, AT_ID);
+    accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit, AG_class, AT_ID);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
@@ -287,28 +295,27 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
     }
     std::ifstream inputfile;
     inputfile.open(filepath, std::ios::in | std::ios::binary);
-    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo;
-    std::map<std::string, std::stringstream> attributeStream;
     uint64_t defaultTileSize = 5000;
-    genie::variant_site::VariantSiteParser parser(inputfile, descriptorStream, attributesInfo, attributeStream,
-                                                  infoFields, defaultTileSize);
+    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     if (inputfile.is_open()) inputfile.close();
     EXPECT_EQ(parser.getNrOfTiles(), 2);
 
-    genie::variant_site::ParameterSetComposer encodeParameters(descriptorStream);
 
+    auto info = parser.getAttributes().getInfo();
+    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
+    auto& tile_attributeStream = parser.getAttributes().getTiles();
+    std::vector<genie::core::AnnotDesc> descrList;
+    for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
+
+    genie::variant_site::ParameterSetComposer encodeParameters;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(attributesInfo, defaultTileSize);
+        encodeParameters.setParameterSet(descrList, info, defaultTileSize);
 
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
 
     genie::variant_site::AccessUnitComposer accessUnit;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
-    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
-    auto& tile_attributeStream = parser.getAttributes().getTiles();
-    auto info = parser.getAttributes().getInfo();
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : tile_descriptorStream) {

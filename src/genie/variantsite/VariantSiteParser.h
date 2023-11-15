@@ -41,12 +41,7 @@ class VariantSiteParser {
     using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
     using InfoField = genie::variant_site::InfoField;
 
-    // VariantSiteParser(std::istream& _site_MGrecs, uint64_t rowsPerTile, std::stringstream& _jsonInfoFields);
-
-    VariantSiteParser(std::istream& _site_MGrecs, std::map<genie::core::AnnotDesc, std::stringstream>& _output,
-                      std::map<std::string, AttributeData>& _info,
-                      std::map<std::string, std::stringstream>& _attributeStream, std::stringstream& _jsonInfoFields,
-                      uint64_t _rowsPerTile);
+     VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
@@ -65,12 +60,10 @@ class VariantSiteParser {
     std::map<std::string, uint8_t> infoFieldType;
 
     std::vector<genie::core::Writer> fieldWriter;
-    std::map<genie::core::AnnotDesc, std::stringstream>& dataFields;
 
     std::map<std::string, genie::core::Writer> attrWriter;
 
-    std::map<std::string, std::stringstream>& attributeStream;
-    std::map<std::string, AttributeData>& attributeData;
+    std::map<std::string, AttributeData> attributeData;
     Attributes attributes;
     Descriptors descriptors;
 
@@ -80,15 +73,8 @@ class VariantSiteParser {
     const uint8_t alternEnd = 0x07;
     uint64_t startPos = 0;
 
-    void addWriter(genie::core::AnnotDesc id);
     void init();
     bool fillRecord(util::BitReader reader);
-    void ParseOne();
-    void ParseAttribute(uint8_t index);
-    void ParseAttribute(const std::string& infoTagfield);
-    void writeDanglingBits();
-    uint8_t AlternTranslate(char alt) const;
-    static std::vector<uint8_t> FilterTranslate(const std::string& filter);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
