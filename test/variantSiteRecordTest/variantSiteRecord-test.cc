@@ -342,7 +342,7 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
     APS_dataUnit.write(testwriter);
     APS_dataUnit.write(txtwriter);
 
-    for (auto aau : annotationAccessUnit) {
+    for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter);

@@ -55,76 +55,9 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
         tiles[genie::core::AnnotDesc::LINKNAME].emptyForRow();
         tiles[genie::core::AnnotDesc::LINKID].write((uint8_t)255, 8);
     }
-
-    //---------------------------------------------
-
-    fieldWriter[genie::core::AnnotDesc::SEQUENCEID].write(variantSite.getSeqID(), 16);
-    fieldWriter[genie::core::AnnotDesc::STARTPOS].write(variantSite.getPos(), 64);
-
-    fieldWriter[genie::core::AnnotDesc::STRAND].write(variantSite.getStrand(), 2);
-    fieldWriter[genie::core::AnnotDesc::NAME].write(variantSite.getID());
-    fieldWriter[genie::core::AnnotDesc::NAME].write(0, 8);
-    fieldWriter[genie::core::AnnotDesc::DESCRIPTION].write(variantSite.getDescription());
-    fieldWriter[genie::core::AnnotDesc::DESCRIPTION].write(0, 8);
-
-    const auto& reference1 = variantSite.getRef();
-    for (const auto& ref : reference1) {
-        fieldWriter[genie::core::AnnotDesc::REFERENCE].write(AlternTranslate(ref), 3);
-    }
-    fieldWriter[genie::core::AnnotDesc::REFERENCE].write(alternEnd, 3);
-
-    const auto& altArray = variantSite.getAlt();
-    // look for <DEL>
-    bool foundDel = false;
-    for (auto i = 0; i < variantSite.getAltCount(); ++i) {
-        const auto& altern1 = altArray[i];
-        if (!altern1.find("<DEL>")) {
-            foundDel = true;
-        }
-    }
-
-    if (!foundDel) {
-        for (auto i = 0; i < variantSite.getAltCount(); ++i) {
-            const auto& altern1 = altArray[i];
-            for (const auto& alt : altern1) {
-                fieldWriter[genie::core::AnnotDesc::ALTERN].write(AlternTranslate(alt), 3);
-            }
-            fieldWriter[genie::core::AnnotDesc::ALTERN].write(alternEndLine, 3);
-        }
-    }
-    fieldWriter[genie::core::AnnotDesc::ALTERN].write(alternEnd, 3);
-
-    fieldWriter[genie::core::AnnotDesc::DEPTH].write(variantSite.getDepth(), 32);
-    fieldWriter[genie::core::AnnotDesc::SEQQUALITY].write(variantSite.getSeqQual(), 32);
-    fieldWriter[genie::core::AnnotDesc::MAPQUALITY].write(variantSite.getMapQual(), 32);
-    fieldWriter[genie::core::AnnotDesc::MAPNUMQUALITY0].write(variantSite.getMapNumQual0(), 32);
-    auto filters1 = FilterTranslate(variantSite.getFilters());
-    for (auto filter : filters1) fieldWriter[genie::core::AnnotDesc::FILTER].write(filter, 8);
-    if (variantSite.isLinkedRecord()) {
-        fieldWriter[genie::core::AnnotDesc::LINKNAME].write(variantSite.getLinkName());
-        fieldWriter[genie::core::AnnotDesc::LINKNAME].write(0, 8);
-        fieldWriter[genie::core::AnnotDesc::LINKID].write(variantSite.getReferenceBoxID(), 8);
-    } else {
-        fieldWriter[genie::core::AnnotDesc::LINKID].write(255, 8);
-    }
 }
 
 void Descriptors::writeDanglingBits() {
-    fieldWriter[genie::core::AnnotDesc::SEQUENCEID].flush();
-    fieldWriter[genie::core::AnnotDesc::STARTPOS].flush();
-    fieldWriter[genie::core::AnnotDesc::STRAND].flush();
-    fieldWriter[genie::core::AnnotDesc::NAME].flush();
-    fieldWriter[genie::core::AnnotDesc::DESCRIPTION].flush();
-    fieldWriter[genie::core::AnnotDesc::REFERENCE].flush();
-    fieldWriter[genie::core::AnnotDesc::ALTERN].flush();
-    fieldWriter[genie::core::AnnotDesc::DEPTH].flush();
-    fieldWriter[genie::core::AnnotDesc::SEQQUALITY].flush();
-    fieldWriter[genie::core::AnnotDesc::MAPNUMQUALITY0].flush();
-    fieldWriter[genie::core::AnnotDesc::FILTER].flush();
-    fieldWriter[genie::core::AnnotDesc::LINKNAME].flush();
-    fieldWriter[genie::core::AnnotDesc::LINKID].flush();
-
-
     tiles[genie::core::AnnotDesc::SEQUENCEID].wrapUp();      // 1
     tiles[genie::core::AnnotDesc::STARTPOS].wrapUp();                         // 2
     tiles[genie::core::AnnotDesc::STRAND].wrapUp();          // 4
@@ -139,11 +72,6 @@ void Descriptors::writeDanglingBits() {
     tiles[genie::core::AnnotDesc::REFERENCE].wrapUp();                        // 13
     tiles[genie::core::AnnotDesc::ALTERN].wrapUp();          // 14
     tiles[genie::core::AnnotDesc::FILTER].wrapUp();                           // 17
-}
-
-void Descriptors::addWriter(genie::core::AnnotDesc id) {
-    dataFields[id];
-    fieldWriter[id] = genie::core::Writer(&dataFields[id]);
 }
 
 void Descriptors::init() {
@@ -162,20 +90,6 @@ void Descriptors::init() {
     tiles[genie::core::AnnotDesc::ALTERN].setRowsPerTile(rowsPerTile);          // 14
     tiles[genie::core::AnnotDesc::FILTER].setRowsPerTile(rowsPerTile);          // 17
 
-    addWriter(genie::core::AnnotDesc::SEQUENCEID);      // 1
-    addWriter(genie::core::AnnotDesc::STARTPOS);        // 2
-    addWriter(genie::core::AnnotDesc::STRAND);          // 4
-    addWriter(genie::core::AnnotDesc::NAME);            // 5
-    addWriter(genie::core::AnnotDesc::DESCRIPTION);     // 6
-    addWriter(genie::core::AnnotDesc::LINKNAME);        // 7
-    addWriter(genie::core::AnnotDesc::LINKID);          // 8
-    addWriter(genie::core::AnnotDesc::DEPTH);           // 9
-    addWriter(genie::core::AnnotDesc::SEQQUALITY);      // 10
-    addWriter(genie::core::AnnotDesc::MAPQUALITY);      // 11
-    addWriter(genie::core::AnnotDesc::MAPNUMQUALITY0);  // 12
-    addWriter(genie::core::AnnotDesc::REFERENCE);       // 13
-    addWriter(genie::core::AnnotDesc::ALTERN);          // 14
-    addWriter(genie::core::AnnotDesc::FILTER);          // 17
 }
 
 uint8_t Descriptors::AlternTranslate(char alt) const {
