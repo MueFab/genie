@@ -68,7 +68,7 @@ AttributeTile::AttributeTile(const AttributeTile& other) {
 }
 
 void Attributes::add(std::vector<genie::core::record::variant_site::Info_tag> tags) {
-    for (auto tag : tags) {
+    for (auto& tag : tags) {
         attributeTiles[tag.info_tag].write(tag.infoValue);
         attrWritten[tag.info_tag] = true;
     }
