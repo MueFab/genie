@@ -203,11 +203,9 @@ std::string exec(const std::string& cmd) {
 TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-
     std::string filepath = gitRootDir + "/data/records/";
-    using DescriptorID = genie::core::AnnotDesc;
-
     std::string filename = "ALL.chrX.10000.site";
+
     constexpr size_t ExpectedNumberOfrows = 1000;
     std::ifstream inputfile;
     inputfile.open(filepath + filename, std::ios::in | std::ios::binary);
