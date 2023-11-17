@@ -43,6 +43,8 @@ class TypedData {
         num_array_dims = numArrayDims;
         array_dims = arrayDims;
     }
+    void convertToTypedData(util::BitReader& reader);
+
     void convertToTypedData(CustomType value);
     void convertToTypedData(std::vector<CustomType> matrix);
     void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
