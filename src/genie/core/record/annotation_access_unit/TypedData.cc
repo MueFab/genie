@@ -19,6 +19,17 @@ namespace genie {
 namespace core {
 namespace record {
 namespace annotation_access_unit {
+
+void TypedData::convertToTypedData(util::BitReader& reader) {
+    ArrayType arrayType;
+    uint64_t n_elements = 1;
+    for (uint8_t i = 0; i < num_array_dims; ++i) {
+        n_elements *= array_dims[i];
+    }
+    data_block.resize(n_elements);
+    for (uint32_t i = 0; i < n_elements; ++i) data_block.at(i) = arrayType.toArray(data_type_ID, reader);
+}
+
 void TypedData::convertToTypedData(CustomType value) {
     uint64_t n_elements = 1;
     data_block.resize(n_elements);
