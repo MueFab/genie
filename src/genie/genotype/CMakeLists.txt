@@ -1,4 +1,4 @@
-project("genie-gvc")
+project("genie-genotype")
 
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)
@@ -13,7 +13,7 @@ set(source_files
         ParameterSetComposer.cc
 )
 
-add_library(genie-gvc ${source_files})
+add_library(${PROJECT_NAME} ${source_files})
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)

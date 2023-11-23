@@ -23,7 +23,7 @@ target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-gabac)
 target_link_libraries(genie PRIVATE genie-jbig)
 target_link_libraries(genie PRIVATE genie-vsite)
-target_link_libraries(genie PRIVATE genie-gvc)
+target_link_libraries(genie PRIVATE genie-genotype)
 target_link_libraries(genie PRIVATE mpeggCodecs-static)
 
 #target_link_libraries(genie PRIVATE libbsc)

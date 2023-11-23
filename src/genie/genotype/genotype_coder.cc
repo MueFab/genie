@@ -8,9 +8,9 @@
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
+#include <xtensor/xview.hpp>
 // #include <xtensor/xstrided_view.hpp>
 #include <codecs/include/mpegg-codecs.h>
-#include <xtensor/xview.hpp>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
