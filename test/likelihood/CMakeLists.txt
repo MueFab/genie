@@ -1,4 +1,4 @@
-project("genotype-tests")
+project("genie-test-likelihood")
 
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)
@@ -13,7 +13,7 @@ set(source_files
         encode-test.cc
 )
 
-add_executable(genotype-tests ${source_files})
+add_executable(${PROJECT_NAME} ${source_files})
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -34,10 +34,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
 
 
-install(TARGETS genotype-tests
+install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "usr/bin")
