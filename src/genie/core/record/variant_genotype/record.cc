@@ -70,7 +70,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
 
         for (auto& likelihood_sample : likelihoods) {
             for (auto& likelihood : likelihood_sample) {
-                likelihood = bitreader.readBypassBE<uint32_t>();
+                likelihood = bitreader.readBypassBE<float>();
             }
         }
     }
@@ -131,7 +131,7 @@ const std::vector<std::vector<int8_t>>& VariantGenotype::getPhasing() const { re
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t VariantGenotype::getNumberOfLikelihoods() const {
-    if (isLikelihoodPresent()) {
+    if (!isLikelihoodPresent()) {
         return 0;
     } else {
         return static_cast<uint8_t>(likelihoods[0].size());

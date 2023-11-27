@@ -1,4 +1,4 @@
-project("genie-genotype")
+project("genie-test-likelihood")
 
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)
@@ -6,14 +6,14 @@ set(XTENSOR_USE_TBB 0)
 find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
 
+message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
+
 set(source_files
-        genotype_coder.cc
-        genotype_parameters.cc
-        genotype_payload.cc
-        ParameterSetComposer.cc
+        helpers.cc
+        encode-test.cc
 )
 
-add_library(${PROJECT_NAME} ${source_files})
+add_executable(${PROJECT_NAME} ${source_files})
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -30,13 +30,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
-#target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
-target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
 
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-    message(STATUS "dir='${dir}'")
-endforeach()
+
+install(TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION "usr/bin")

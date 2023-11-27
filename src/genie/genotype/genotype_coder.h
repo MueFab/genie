@@ -22,10 +22,13 @@
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/LikelihoodParameters.h"
 #include "genotype_parameters.h"
+
 // -----------------------------------------------------------------------------
 
 namespace genie {
 namespace genotype {
+
+// -----------------------------------------------------------------------------
 
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
