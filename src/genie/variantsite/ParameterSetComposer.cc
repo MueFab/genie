@@ -97,7 +97,12 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());
     for (auto descr: descrList) {
         genie::core::AnnotDesc DescrID = descr;
-        if (DescrID == genie::core::AnnotDesc::GENOTYPE) encoding_mode_ID = genie::core::AlgoID::LZMA;
+        if (DescrID == genie::core::AnnotDesc::STRAND)
+            encoding_mode_ID = genie::core::AlgoID::LZMA;
+        else if (DescrID == genie::core::AnnotDesc::REFERENCE)
+            encoding_mode_ID = genie::core::AlgoID::ZSTD;
+        else
+            encoding_mode_ID = genie::core::AlgoID::BSC;
 
         genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
             DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,

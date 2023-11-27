@@ -43,7 +43,7 @@ class AttributeTile {
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
             writers.back().flush();
-            convertToTypedData();
+       //     convertToTypedData();
         }
         return tiles.at(tilenr);
     }

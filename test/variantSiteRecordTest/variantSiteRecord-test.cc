@@ -226,6 +226,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         inputfile.close();
     }
 
+
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
@@ -233,10 +234,12 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::vector<genie::core::AnnotDesc> descrList;
     for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
+
     ASSERT_EQ(parser.getNrOfTiles(), 1);
     auto info = parser.getAttributes().getInfo();
     std::map<genie::core::AnnotDesc, std::stringstream> desc;
     std::map<std::string, std::stringstream> attr;
+
 
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         for (auto& desctile : tile_descriptorStream) {
@@ -252,7 +255,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
-    uint8_t AT_ID = 1;
+    uint8_t AT_ID =0;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit, AG_class, AT_ID);
@@ -263,7 +266,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::string name = filepath + filename;
 
     std::ofstream testfile;
-    testfile.open(name + ".bin", std::ios::binary | std::ios::out);
+    testfile.open(name + "_1tile_typed_data.bin", std::ios::binary | std::ios::out);
     if (testfile.is_open()) {
         genie::core::Writer writer(&testfile);
         APS_dataUnit.write(writer);
@@ -271,7 +274,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         testfile.close();
     }
     std::ofstream txtfile;
-    txtfile.open(name + ".txt", std::ios::out);
+    txtfile.open(name + "_1tile_typed_data.txt", std::ios::out);
     if (txtfile.is_open()) {
         genie::core::Writer txtWriter(&txtfile, true);
         APS_dataUnit.write(txtWriter);
@@ -298,7 +301,6 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
     if (inputfile.is_open()) inputfile.close();
     EXPECT_EQ(parser.getNrOfTiles(), 2);
 
-
     auto info = parser.getAttributes().getInfo();
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
     auto& tile_attributeStream = parser.getAttributes().getTiles();
@@ -310,7 +312,7 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
         encodeParameters.setParameterSet(descrList, info, defaultTileSize);
 
     uint8_t AG_class = 1;
-    uint8_t AT_ID = 1;
+    uint8_t AT_ID = 0;
 
     genie::variant_site::AccessUnitComposer accessUnit;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
@@ -325,6 +327,13 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
         for (auto& attrtile : tile_attributeStream) {
             ASSERT_EQ(attrtile.second.getNrOfTiles(), 2);
             attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
+            genie::core::ArrayType arrayType;
+            auto temp = arrayType.getDefaultBitsize(info[attrtile.first].getAttributeType());
+            if (temp > 0) {
+                auto totaltileInBits = attr[attrtile.first].str().size() * 8;
+                auto tileSize = totaltileInBits / (info[attrtile.first].getArrayLength() * temp);
+                EXPECT_EQ(defaultTileSize, tileSize);
+            }
         }
         accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID);
     }

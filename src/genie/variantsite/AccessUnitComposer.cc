@@ -76,6 +76,7 @@ void AccessUnitComposer::setAccessUnit(
                                                                                data);
         genie::core::record::annotation_access_unit::Block block;
         block.set(blockInfo);
+
         blocks.push_back(block);
     }
     // ------------------------------- //
@@ -131,20 +132,26 @@ void AccessUnitComposer::compress(
     for (auto& attribute : attributeParameterSets) {
         auto attributeName = attribute.getAttributeName();
         auto compressorID = attribute.getCompressorID();
-        auto encodeID = compressorParameterSets[compressorID - 1].getAlgorithmIDs();
-        switch (encodeID[0]) {
-            case genie::core::AlgoID::BSC:
-                bscEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                break;
-            case genie::core::AlgoID::LZMA:
-                lzmaEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                break;
-            case genie::core::AlgoID::ZSTD:
-                zstdEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
-                break;
+        if (compressorID == 0) {
+            encodedAttributes[attributeName] << attributeStream[attributeName].rdbuf();
+        } else {
+            auto encodeID = compressorParameterSets[compressorID - 1].getAlgorithmIDs();
 
-            default:
-                break;
+            switch (encodeID[0]) {
+                case genie::core::AlgoID::BSC:
+                    bscEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+                case genie::core::AlgoID::LZMA:
+                    lzmaEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+                case genie::core::AlgoID::ZSTD:
+                    zstdEncoder.encode(attributeStream[attributeName], encodedAttributes[attributeName]);
+                    break;
+
+                default:
+                    encodedAttributes[attributeName] << attributeStream[attributeName].rdbuf();
+                    break;
+            }
         }
     }
 }
