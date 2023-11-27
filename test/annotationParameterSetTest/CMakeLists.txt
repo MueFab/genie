@@ -20,5 +20,5 @@ add_executable(annotationParameterSet-tests ${source_files})
 
 target_link_libraries(annotationParameterSet-tests PRIVATE gtest_main)
 target_link_libraries(annotationParameterSet-tests PRIVATE genie-core)
-target_link_libraries(annotationParameterSet-tests PRIVATE genie-gvc)
+target_link_libraries(annotationParameterSet-tests PRIVATE genie-genotype)
 target_link_libraries(annotationParameterSet-tests PRIVATE genie-util)
