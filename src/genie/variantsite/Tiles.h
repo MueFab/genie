@@ -67,6 +67,7 @@ template <class T>
     size_t getNrOfTiles() { return tiles.tileData.size(); }
     std::stringstream& getTile(uint64_t tilenr) { return tiles.tileData.at(tilenr); }
 
+    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).getBitsWritten(); }
  private:
     uint64_t rowsPerTile;
     uint64_t rowInTile;

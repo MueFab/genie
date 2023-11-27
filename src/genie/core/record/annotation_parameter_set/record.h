@@ -82,7 +82,7 @@ struct ParameterSettings {
 
     ParameterSettings()
         : parameter_set_ID(1),
-          AT_ID(1),
+          AT_ID(0),
           AT_class(0),
           AT_alphabet_ID(core::AlphabetID::ACGTN),
           ATCoordSize(3),

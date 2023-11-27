@@ -25,7 +25,7 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         rowInTile++;
     } else {
         writers.back().flush();
-        convertToTypedData();
+        //convertToTypedData();
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
         rowInTile = 0;
@@ -97,14 +97,14 @@ Attributes::Attributes(Attributes& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
     attributeTiles = other.attributeTiles;
-    attrWritten.clear();
+    attrWritten = other.attrWritten;
 }
 
 Attributes& Attributes::operator=(const Attributes& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
     attributeTiles = other.attributeTiles;
-    attrWritten.clear();
+    attrWritten = other.attrWritten;
     return *this;
 }
 
