@@ -30,21 +30,23 @@ namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct VariantsPayload {
-    uint32_t variants_payload_size;
-    std::vector<uint8_t> variants_payload;
-    uint32_t sort_variants_row_ids_payload_size;
-    size_t payloadSize() const { return variants_payload.size(); }
-};
+//struct VariantsPayload {
+//    uint32_t variants_payload_size;
+//    std::vector<uint8_t> variants_payload;
+//    uint32_t sort_variants_row_ids_payload_size;
+//    size_t payloadSize() const { return variants_payload.size(); }
+//};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct PhasesPayload {
-    bool sort_variants_rows_flag;
-    bool sort_variants_cols_flag;
-    bool transpose_variants_mat_flag;
-    genie::core::AlgoID variants_codec_ID;
-};
+//struct PhasesPayload {
+//    bool sort_variants_rows_flag;
+//    bool sort_variants_cols_flag;
+//    bool transpose_variants_mat_flag;
+//    genie::core::AlgoID variants_codec_ID;
+//};
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 class BinMatPayload {
  private:
@@ -67,26 +69,26 @@ class BinMatPayload {
     void writeCompressed(core::Writer& writer) const;
 };
 
-class LikelihoodPayload {
- private:
-    uint32_t nrows;
-    uint32_t ncols;
-    std::vector<uint32_t> payload;
-    bool transformFlag;
-    uint32_t additionalPayloadSize;
-    std::vector<uint8_t> additionalPayload;
-
- public:
-    LikelihoodPayload(uint32_t _nrows, uint32_t _ncols, std::vector<uint32_t> _payload, bool _transformFlag,
-                      uint32_t _additionalPayloadSize, std::vector<uint8_t> _additionalPayload)
-        :  nrows(_nrows),
-           ncols(_ncols),
-           payload(_payload),
-           transformFlag(_transformFlag),
-           additionalPayloadSize(_additionalPayloadSize),
-          additionalPayload(_additionalPayload)
-    {};
-};
+//class LikelihoodPayload {
+// private:
+//    uint32_t nrows;
+//    uint32_t ncols;
+//    std::vector<uint32_t> payload;
+//    bool transformFlag;
+//    uint32_t additionalPayloadSize;
+//    std::vector<uint8_t> additionalPayload;
+//
+// public:
+//    LikelihoodPayload(uint32_t _nrows, uint32_t _ncols, std::vector<uint32_t> _payload, bool _transformFlag,
+//                      uint32_t _additionalPayloadSize, std::vector<uint8_t> _additionalPayload)
+//        :  nrows(_nrows),
+//           ncols(_ncols),
+//           payload(_payload),
+//           transformFlag(_transformFlag),
+//           additionalPayloadSize(_additionalPayloadSize),
+//          additionalPayload(_additionalPayload)
+//    {};
+//};
 
 class RowColIdsPayload {
  private:
@@ -102,7 +104,7 @@ class RowColIdsPayload {
     void write(core::Writer& writer) const;
 };
 
-class AmexPayload {
+class AmaxPayload {
  private:
     uint32_t nelems;
     uint8_t nbits_per_elem;
@@ -111,7 +113,7 @@ class AmexPayload {
     std::vector<uint64_t> amax_elements;
 
  public:
-    AmexPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<bool> _is_one_flag,
+    AmaxPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<bool> _is_one_flag,
                 std::vector<uint64_t> _amax_elements)
         : nelems(_nelems),
           nbits_per_elem(_nbits_per_elem),
@@ -137,12 +139,12 @@ class GenotypePayload {
     std::vector<RowColIdsPayload> sort_variants_col_ids_payload;  // row_col_ids_payload 6.4.4.3.2.3
 
     uint32_t variants_amax_payload_size;
-    AmexPayload variants_amax_payload;  // amax_payload 6.4.4.3.2.4
+    AmaxPayload variants_amax_payload;  // amax_payload 6.4.4.3.2.4
 
  public:
     GenotypePayload(GenotypeParameters _genotypeParameters, std::vector<BinMatPayload> _variants_payload,
                     BinMatPayload _phases_payload, std::vector<RowColIdsPayload> _sort_variants_row_ids_payload,
-                    std::vector<RowColIdsPayload> _sort_variants_col_ids_payload, AmexPayload _variants_amax_payload)
+                    std::vector<RowColIdsPayload> _sort_variants_col_ids_payload, AmaxPayload _variants_amax_payload)
         : genotypeParameters(_genotypeParameters),
           variants_payload(_variants_payload),
           phases_payload(_phases_payload),

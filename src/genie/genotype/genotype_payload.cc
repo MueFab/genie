@@ -69,7 +69,7 @@ void RowColIdsPayload::write(core::Writer& writer) const {
     }
 }
 
-void AmexPayload::write(core::Writer& writer) const {
+void AmaxPayload::write(core::Writer& writer) const {
     writer.write(nelems, 32);
     writer.write(nbits_per_elem, 8);
     for (uint32_t i = 0; i < nelements; ++i) {

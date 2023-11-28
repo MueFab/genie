@@ -8,7 +8,7 @@
 #include "genie/util/runtime-exception.h"
 #include "likelihood_coder.h"
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace likelihood {
@@ -42,17 +42,79 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
     }
 }
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
-void create_lut(const EncodingOptions& opt, EncodingBlock& block){
-//    auto out = xt::unique(block);
+void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
+    if (opt.transform_mode){
+        transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
+    }
+}
 
-    auto x = 10;
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
+    if (opt.transform_mode){
+        inverse_transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void transform_lut(
+    UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut,
+    UInt32MatDtype& idx_mat
+){
+    auto m = likelihood_mat.shape(0);
+    auto n = likelihood_mat.shape(1);
+
+    idx_mat = xt::xtensor<uint32_t, 2>({m, n});
+    lut = xt::unique(likelihood_mat);
+
+    for (size_t i=0; i<m; i++){
+        for (size_t j=0; j<n; j++){
+            auto& likelihood_val = likelihood_mat(i, j);
+
+            // Binary Search Algorithm
+            uint32_t low = 0;
+            uint32_t high = static_cast<uint32_t>(lut.shape(0)) - 1;
+
+            while (low <= high) {
+                uint32_t idx = (low + high) / 2;
+                if (lut[idx] > likelihood_val)
+                    high = idx - 1;
+                else if (lut[idx] < likelihood_val)
+                    low = idx + 1;
+                else{
+                    idx_mat(i, j) = idx;
+                    break;
+                }
+            }
+        }
+    }
 
 }
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_lut(
+    UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat
+){
+
+    likelihood_mat = xt::empty_like(idx_mat);
+    auto m = likelihood_mat.shape(0);
+    auto n = likelihood_mat.shape(1);
+
+    for (size_t i=0; i<m; i++){
+        for (size_t j=0; j<n; j++){
+            likelihood_mat(i, j) = lut(idx_mat(i, j));
+        }
+    }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }
 }
-// -----------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
