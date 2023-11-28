@@ -465,7 +465,6 @@ void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, 
     free(compressed_data);
 
     UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
-    //    UTILS_DIE_IF(!xt::all(xt::equal(bin_mat, recon_bin_mat)));
     auto equality_check = xt::equal(bin_mat, recon_bin_mat);
     if (!xt::all(equality_check)) {
         for (size_t i = 0; i < nrows; i++) {
@@ -518,12 +517,6 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
                                  phases_value);
 
     genie::genotype::sort_block(opt, block);
-
-    //    std::tuple<GenotypeParameters, EncodingBlock> ret = {
-    //        std::move(parameter), std::move(block)
-    //    };
-    //
-    //    return std::move(ret);
 
     return {parameter, block};
 }

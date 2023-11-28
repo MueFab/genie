@@ -211,9 +211,9 @@ TEST(Genotype, conformanceTests) {
             attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);
     //--------------------------------------------------
 
-    genie::genotype::LikelihoodPayload likelihood_Payload((uint32_t)1, (uint32_t)datablock.likelihoodData.size(),
-                                                          datablock.likelihoodData, false, (uint32_t)0,
-                                                          std::vector<uint8_t>{});
+//    genie::genotype::LikelihoodPayload likelihood_Payload((uint32_t)1, (uint32_t)datablock.likelihoodData.size(),
+//                                                          datablock.likelihoodData, false, (uint32_t)0,
+//                                                          std::vector<uint8_t>{});
 
     //--------------------------------------------------
 
