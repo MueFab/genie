@@ -197,7 +197,6 @@ bool Record::read(genie::util::BitReader& reader) {
         alt_len.push_back(static_cast<uint32_t>(reader.read_b(32)));
         std::string altlist(alt_len.back(), 0);
         for (auto& item : altlist) item = static_cast<char>(reader.read_b(8));
-        //   reader.readBypass(&altlist[0], alt_len.back());
         altern.push_back(altlist);
     }
 
