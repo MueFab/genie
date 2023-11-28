@@ -49,7 +49,7 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
 
 void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
     if (opt.transform_flag == 1){
-        transform_lut(block.likelihood_mat, block.lut, block.idx_mat, block.dtype_id);
+        transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
     }
 }
 
@@ -64,8 +64,11 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
 // ---------------------------------------------------------------------------------------------------------------------
 
 void transform_lut(
-    UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut,
-    UInt32MatDtype& idx_mat, core::DataType& dtype_id
+    UInt32MatDtype& likelihood_mat,
+    UInt32ArrDtype& lut,
+    uint32_t& nelems,
+    UInt32MatDtype& idx_mat,
+    core::DataType& dtype_id
 ){
     auto m = likelihood_mat.shape(0);
     auto n = likelihood_mat.shape(1);
@@ -95,13 +98,15 @@ void transform_lut(
         }
     }
 
-    auto lut_nelems = lut.size();
-    if (lut_nelems < (1<<8)-1 ){
+    nelems = (uint32_t) lut.size();
+    if (nelems < (1<<8) ){
         dtype_id = core::DataType::UINT8;
-    } else if (lut_nelems < (1<<16)-1 ){
+    } else if (nelems < (1<<16) ){
         dtype_id = core::DataType::UINT16;
-    } else if (lut_nelems < (1<<32)-1 ){
+    } else if (nelems < ((size_t) 1<<32) ){
         dtype_id = core::DataType::UINT32;
+    } else {
+        UTILS_DIE("Invalid DataType");
     }
 
 }
@@ -158,34 +163,24 @@ void serialize_mat(
         }
     } else
         UTILS_DIE("Invalid DataType");
+
+//    payload.seekp(0, std::ios::end);
+//    std::stringstream::pos_type offset = payload.tellp();
+//    auto x = 10;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void serialize_arr(
     UInt32ArrDtype arr,
-    const core::DataType dtype_id,
-    uint32_t& nelems,
+    const uint32_t nelems,
     std::stringstream& payload
 ){
-    nelems = (uint32_t) arr.size();
     util::BitWriter writer(&payload);
 
-    if (dtype_id == core::DataType::UINT8){
-        for (size_t i=0; i<nelems; i++) {
-            writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(arr(i)));
-        }
-    } else if (dtype_id == core::DataType::UINT16){
-        for (size_t i=0; i<nelems; i++) {
-            writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(arr(i)));
-        }
-    } else if (dtype_id == core::DataType::UINT32){
-        for (size_t i=0; i<nelems; i++) {
-            writer.writeBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
-        }
-    } else
-        UTILS_DIE("Invalid DataType");
-
+    for (size_t i=0; i<nelems; i++) {
+        writer.writeBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

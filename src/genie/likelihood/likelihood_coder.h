@@ -44,6 +44,7 @@ struct EncodingBlock {
     uint32_t ncols;
     UInt32MatDtype likelihood_mat;
     UInt32ArrDtype lut;
+    uint32_t nelems;
     UInt32MatDtype idx_mat;
     core::DataType dtype_id;
     std::stringstream serialized_mat;
@@ -64,7 +65,13 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut,UInt32MatDtype& idx_mat, core::DataType& dtype_id);
+void transform_lut(
+    UInt32MatDtype& likelihood_mat,
+    UInt32ArrDtype& lut,
+    uint32_t& nelems,
+    UInt32MatDtype& idx_mat,
+    core::DataType& dtype_id
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,12 +79,21 @@ void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void serialize_mat(UInt32MatDtype mat, const core::DataType dtype_id, uint32_t& nrows, uint32_t& ncols,
-                   std::stringstream& payload);
+void serialize_mat(
+    UInt32MatDtype mat,
+    core::DataType dtype_id,
+    uint32_t& nrows,
+    uint32_t& ncols,
+    std::stringstream& payload
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void serialize_arr(UInt32ArrDtype arr, const core::DataType dtype_id, uint32_t& nelems, std::stringstream& payload);
+void serialize_arr(
+    UInt32ArrDtype arr,
+    uint32_t nelems,
+    std::stringstream& payload
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
