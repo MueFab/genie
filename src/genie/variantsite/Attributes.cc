@@ -24,6 +24,8 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     } else if (rowInTile < rowsPerTile) {
         rowInTile++;
     } else {
+        writers.back().flush();
+        //convertToTypedData();
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
         rowInTile = 0;
@@ -41,6 +43,17 @@ void AttributeTile::writeMissing() {
     std::vector<std::vector<uint8_t>> value;
     for (uint8_t i = 0; i < info.getArrayLength(); ++i) value.emplace_back(def.toArray(defaultType, defaultValue));
     write(value);
+}
+
+void AttributeTile::convertToTypedData() {
+    core::DataType TypeId = info.getAttributeType();
+    uint8_t numArrayDims = 1;
+    std ::vector<uint32_t> arrayDims{static_cast<uint32_t>(rowInTile) * info.getArrayLength()};
+    genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
+    util::BitReader reader(tiles.back());
+    typedData.convertToTypedData(reader);
+    typedData.write(writers.back());
+    writers.back().flush();
 }
 
 void AttributeTile::AddFirst() {
@@ -84,14 +97,14 @@ Attributes::Attributes(Attributes& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
     attributeTiles = other.attributeTiles;
-    attrWritten.clear();
+    attrWritten = other.attrWritten;
 }
 
 Attributes& Attributes::operator=(const Attributes& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
     attributeTiles = other.attributeTiles;
-    attrWritten.clear();
+    attrWritten = other.attrWritten;
     return *this;
 }
 

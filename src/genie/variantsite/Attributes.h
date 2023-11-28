@@ -18,9 +18,11 @@
 #include <vector>
 
 #include "genie/core/constants.h"
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -37,10 +39,20 @@ class AttributeTile {
     AttributeTile(const AttributeTile& other);
 
     size_t getNrOfTiles() { return tiles.size(); }
-    std::stringstream& getTile(uint64_t tilenr) { return tiles.at(tilenr); }
+
+    std::stringstream& getTile(uint64_t tilenr) {
+        if (tilenr == tiles.size() - 1) {
+            writers.back().flush();
+       //     convertToTypedData();
+        }
+        return tiles.at(tilenr);
+    }
+
     void write(std::vector<std::vector<uint8_t>> value);
 
     void writeMissing();
+
+    void convertToTypedData();
 
  private:
     uint64_t rowsPerTile;
