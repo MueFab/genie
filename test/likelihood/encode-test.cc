@@ -53,7 +53,7 @@ TEST(Likelihood, ParseLikelihood) {
 
     genie::likelihood::EncodingOptions opt = {
         BLOCK_SIZE,    // block_size
-        1,      // transform_mode;
+        1,      // transform_flag;
     };
 
     genie::likelihood::EncodingBlock block{};
@@ -78,7 +78,7 @@ TEST(Likelihood, RoundTripTransform) {
     std::vector<genie::core::record::VariantGenotype> recs;
 
     uint32_t BLOCK_SIZE = 100;
-    uint8_t TRANSFORM_MODE = 1;
+    bool TRANSFORM_MODE = true;
 
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
@@ -95,7 +95,7 @@ TEST(Likelihood, RoundTripTransform) {
 
     genie::likelihood::EncodingOptions opt = {
         BLOCK_SIZE,     // block_size
-        TRANSFORM_MODE, // transform_mode;
+        TRANSFORM_MODE, // transform_flag;
     };
 
     genie::likelihood::EncodingBlock block{};
@@ -107,5 +107,53 @@ TEST(Likelihood, RoundTripTransform) {
 
     genie::likelihood::inverse_transform_lut(recon_likelihood_mat, block.lut, block.idx_mat);
 
+
+    ASSERT_TRUE(block.dtype_id == genie::core::DataType::UINT16);
     ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));
+}
+
+TEST(Likelihood, RoundTripEncode) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    uint32_t BLOCK_SIZE = 100;
+    bool TRANSFORM_MODE = true;
+
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+    reader.close();
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
+
+    genie::likelihood::EncodingOptions opt = {
+        BLOCK_SIZE,     // block_size
+        TRANSFORM_MODE, // transform_flag;
+    };
+
+    genie::likelihood::EncodingBlock block{};
+//    auto& likelihood_mat = block.likelihood_mat;
+    genie::likelihood::extract_likelihoods(opt, block, recs);
+
+    transform_likelihood_mat(opt, block);
+    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
+
+//    genie::likelihood::inverse_transform_lut(recon_likelihood_mat, block.lut, block.idx_mat);
+    std::stringstream serialized_mat;
+    std::stringstream serialized_arr;
+
+    genie::likelihood::serialize_mat(
+        block.idx_mat,
+        block.dtype_id,
+        block.nrows,
+        block.ncols,
+        block.serialized_mat
+    );
 }
