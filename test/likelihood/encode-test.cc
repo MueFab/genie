@@ -112,7 +112,7 @@ TEST(Likelihood, RoundTripTransform) {
     ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));
 }
 
-TEST(Likelihood, RoundTripEncode) {
+TEST(Likelihood, RoundTripTransformEncode) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gl_only.vcf.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
@@ -139,15 +139,10 @@ TEST(Likelihood, RoundTripEncode) {
     };
 
     genie::likelihood::EncodingBlock block{};
-//    auto& likelihood_mat = block.likelihood_mat;
     genie::likelihood::extract_likelihoods(opt, block, recs);
 
     transform_likelihood_mat(opt, block);
     genie::likelihood::UInt32MatDtype recon_likelihood_mat;
-
-//    genie::likelihood::inverse_transform_lut(recon_likelihood_mat, block.lut, block.idx_mat);
-    std::stringstream serialized_mat;
-    std::stringstream serialized_arr;
 
     genie::likelihood::serialize_mat(
         block.idx_mat,
@@ -155,5 +150,23 @@ TEST(Likelihood, RoundTripEncode) {
         block.nrows,
         block.ncols,
         block.serialized_mat
+    );
+
+    genie::likelihood::serialize_arr(
+        block.lut,
+        block.nelems,
+        block.serialized_arr
+    );
+
+    block.serialized_mat.seekp(0, std::ios::end);
+    ASSERT_EQ(
+        (size_t) block.serialized_mat.tellp(),
+        block.nrows * block.ncols * 2
+    );
+
+    block.serialized_arr.seekp(0, std::ios::end);
+    ASSERT_EQ(
+        (size_t) block.serialized_arr.tellp(),
+        block.lut.size() * 4
     );
 }
