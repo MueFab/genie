@@ -70,7 +70,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
 
         for (auto& likelihood_sample : likelihoods) {
             for (auto& likelihood : likelihood_sample) {
-                likelihood = bitreader.readBypassBE<float>();
+                likelihood = bitreader.readBypassBE<uint32_t>();
             }
         }
     }

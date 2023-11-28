@@ -32,14 +32,11 @@ class LikelihoodPayload {
     uint32_t nrows;
     uint32_t ncols;
     std::vector<uint8_t> payload;
-    //    bool transformFlag;
-    uint32_t additionalPayloadSize;
     std::vector<uint8_t> additionalPayload;
 
  public:
     LikelihoodPayload(LikelihoodParameters _parameters, uint32_t _nrows, uint32_t _ncols,
-                      std::vector<uint8_t> _payload, uint32_t _additionalPayloadSize,
-                      std::vector<uint8_t> _additionalPayload);
+                      std::vector<uint8_t> _payload, std::vector<uint8_t> _additionalPayload);
 
     void write(core::Writer& writer) const;
 };

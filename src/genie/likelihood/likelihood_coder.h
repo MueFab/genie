@@ -23,8 +23,11 @@ namespace likelihood {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-using FP32MatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
-using UInt16MatDtype = xt::xtensor<uint16_t, 2, xt::layout_type::row_major>;
+using UInt32ArrDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
+//using FP32MatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
+//using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
+//using UInt16MatDtype = xt::xtensor<uint16_t, 2, xt::layout_type::row_major>;
+using UInt32MatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,8 +40,9 @@ struct EncodingOptions {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingBlock {
-    FP32MatDtype likelihood_mat;
-    UInt16MatDtype index_mat;
+    UInt32MatDtype likelihood_mat;
+    UInt32ArrDtype lut;
+    UInt32MatDtype idx_mat;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -47,7 +51,19 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void create_lut(const EncodingOptions& opt, EncodingBlock& block);
+void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut,UInt32MatDtype& idx_mat);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_lut(UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
