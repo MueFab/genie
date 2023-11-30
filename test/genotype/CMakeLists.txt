@@ -1,4 +1,4 @@
-project("genotype-tests")
+project("genie-test-genotype")
 
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)

@@ -174,7 +174,7 @@ void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
             UTILS_DIE("Invalid binarization_ID!");
     }
 
-    // TODO(yeremia): Free memory of allele_mat
+    // TODO(Yeremia): Free memory of allele_mat
     block.allele_mat.resize({0, 0});
 }
 
@@ -184,7 +184,7 @@ void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0), "bin_mat and ids have different dimension!");
 
-    // TODO(yeremia): (optimization) Create a boolean vector for the buffer instead of whole matrix;
+    // TODO(Yeremia): (optimization) Create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
@@ -205,7 +205,7 @@ void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis) 
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
 
     auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
-    // TODO(yeremia): requires explicit conversion
+    // TODO(Yeremia): requires explicit conversion
     ids = xt::random::permutation<uint32_t>(num_elem);
     sort_matrix(bin_mat, ids, axis);
     ids = xt::argsort(ids);
@@ -333,8 +333,8 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     bin_mat.resize(bin_mat_shape);
     auto temp = bin_mat.size();
     auto temp2 = bin_mat.shape();
-    (void)temp;
-    (void)temp2;
+    (void)temp; // TODO(Yeremia): Whats the purpose of this code?
+    (void)temp2; // TODO(Yeremia): Whats the purpose of this code?
     xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
 
     for (size_t i = 0; i < nrows; i++) {
@@ -373,15 +373,18 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     //    }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+//TODO (Yeremia,Stefanie): Move and refactor this function to the parsing funciton
+
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<uint8_t>>& values) {
     for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
         uint8_t AttributeID = 0;
-        for (auto format : rec.getFormats()) {
+        for (const auto& format : rec.getFormats()) {
             uint8_t prevArray_len = info[format.getFormat()].getArrayLength();
-            uint8_t array_len = static_cast<uint8_t>(format.getValue().at(0).size());
+            auto array_len = static_cast<uint8_t>(format.getValue().at(0).size());
             core::record::annotation_parameter_set::AttributeData thisAttr(
                 static_cast<uint8_t>(format.getFormat().size()),
                                                                format.getFormat(), format.getType(), array_len,
@@ -396,7 +399,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
         auto& rec = recs[i_rec];
 
         std::stringstream attr;
-        for (auto format : rec.getFormats()) {
+        for (const auto& format : rec.getFormats()) {
             auto formatName = format.getFormat();
             for (uint32_t j = 0; j < format.getSampleCount(); ++j) {
                 auto CurrentAttr = info[formatName];
@@ -406,7 +409,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
                             values[CurrentAttr.getAttributeName()].push_back(format.getValue().at(j).at(i).at(k));
                         }
                     } else {
-                        genie::core::ArrayType arrayType;
+                        genie::core::ArrayType arrayType{};
                         auto defaultValue = arrayType.getDefaultValue(CurrentAttr.getAttributeType());
                         std::vector<uint8_t> defaultValueVector =
                             arrayType.toArray(CurrentAttr.getAttributeType(), defaultValue);
@@ -490,7 +493,7 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     genie::genotype::transform_max_value(block);
     genie::genotype::binarize_allele_mat(opt, block);
 
-    // TODO(yeremia): create function to create GenotypeParameters
+    // TODO(Yeremia): create function to create GenotypeParameters
     auto num_bin_mats = getNumBinMats(block);
     std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
     for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
@@ -512,16 +515,22 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
         phasing_payload_params.variants_codec_ID = opt.codec_ID;
     }
 
-    GenotypeParameters parameter(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID, opt.concat_axis,
-                                 std::move(payload_params), encode_phases_data_flag, phasing_payload_params,
-                                 phases_value);
+    GenotypeParameters parameter(
+        block.max_ploidy,
+        block.dot_flag,
+        block.na_flag,
+        opt.binarization_ID,
+        opt.concat_axis,
+        std::move(payload_params),
+        encode_phases_data_flag,
+        phasing_payload_params,
+        phases_value
+    );
 
     genie::genotype::sort_block(opt, block);
 
     return {parameter, block};
 }
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,6 +4,31 @@
 #include "mpegg_utils.h"
 #include "mpegg-codecs.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+int mpegg_lzma_compress_default(
+    unsigned char      **dest,
+    size_t              *destLen,
+    const unsigned char *src,
+    size_t               srcLen
+){
+    return mpegg_lzma_compress(
+        dest,
+        destLen,
+        src,
+        srcLen,
+        MPEGG_LZMA_DEFAULT_LEVEL,
+        MPEGG_LZMA_DEFAULT_DIC_SIZE,
+        MPEGG_LZMA_DEFAULT_LC,
+        MPEGG_LZMA_DEFAULT_LP,
+        MPEGG_LZMA_DEFAULT_PB,
+        MPEGG_LZMA_DEFAULT_FB,
+        MPEGG_LZMA_DEFAULT_THREADS
+    );
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 int mpegg_lzma_compress(
         unsigned char      **dest,
         size_t              *destLen,
@@ -103,6 +128,7 @@ int mpegg_lzma_compress(
     return ec;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 int mpegg_lzma_decompress(
         unsigned char      **dest,

@@ -4,7 +4,6 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#include <codecs/include/mpegg-codecs.h>
 #include <gtest/gtest.h>
 #include <fstream>
 #include <vector>
@@ -12,6 +11,7 @@
 //#include <xtensor/xoperation.hpp>
 //#include <xtensor/xrandom.hpp>
 //#include <xtensor/xview.hpp>
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/util/bitreader.h"
@@ -19,17 +19,10 @@
 #include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
-//#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
-//#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-//#include "genie/genotype/genotype_parameters.h"
-//#include "genie/genotype/genotype_payload.h"
-
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/likelihood/likelihood_coder.h"
-// #include "genie/genotype/ParameterSetComposer.h"
-//#include "genie/variantsite/AccessUnitComposer.h"
 
 TEST(Likelihood, ParseLikelihood) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -169,4 +162,39 @@ TEST(Likelihood, RoundTripTransformEncode) {
         (size_t) block.serialized_arr.tellp(),
         block.lut.size() * 4
     );
+
+    const std::string& serialized_arr_str = block.serialized_arr.str();
+    size_t serialized_arr_len = (size_t) block.serialized_mat.tellp();
+    auto* serialized_arr_payload = (unsigned char*)calloc(serialized_arr_len, sizeof(unsigned char));
+    auto* serialized_arr_ptr = serialized_arr_str.c_str();
+    std::memcpy(serialized_arr_payload, serialized_arr_ptr, serialized_arr_len);
+
+    uint8_t* compressed_data;
+    size_t compressed_data_len;
+
+    mpegg_lzma_compress_default(
+        &compressed_data,
+        &compressed_data_len,
+        serialized_arr_payload,
+        serialized_arr_len
+    );
+
+    uint8_t* recon_data;
+    size_t recon_data_len;
+
+    mpegg_lzma_decompress(
+        &recon_data,
+        &recon_data_len,
+        compressed_data,
+        compressed_data_len
+    );
+
+    ASSERT_EQ(serialized_arr_len, recon_data_len);
+    for (size_t i = 0; i < recon_data_len; i++) {
+        ASSERT_EQ(
+            (uint8_t) *(serialized_arr_payload + i),
+            (uint8_t) *(recon_data + i)
+        ) << "Index " << i;
+    }
+
 }
