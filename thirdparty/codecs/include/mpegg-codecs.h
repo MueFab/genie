@@ -64,7 +64,17 @@ int mpegg_bsc_decompress(unsigned char **dest, size_t *destLen, const unsigned c
 #define MPEGG_LZMA_DEFAULT_FB 32
 #define MPEGG_LZMA_DEFAULT_THREADS 2
 
-int mpegg_lzma_compress(unsigned char **dest, size_t *destLen, const unsigned char *src, size_t srcLen,
+int mpegg_lzma_compress_default(
+    unsigned char      **dest,
+    size_t              *destLen,
+    const unsigned char *src,
+    size_t               srcLen
+);
+
+int mpegg_lzma_compress(unsigned char **dest,
+                        size_t *destLen,
+                        const unsigned char *src,
+                        size_t srcLen,
                         int level,         /* 0 <= level <= 9, default = 5 */
                         unsigned dictSize, /* default = (1 << 24) */
                         int lc,            /* 0 <= lc <= 8, default = 3  */

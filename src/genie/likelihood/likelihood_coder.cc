@@ -163,10 +163,6 @@ void serialize_mat(
         }
     } else
         UTILS_DIE("Invalid DataType");
-
-//    payload.seekp(0, std::ios::end);
-//    std::stringstream::pos_type offset = payload.tellp();
-//    auto x = 10;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

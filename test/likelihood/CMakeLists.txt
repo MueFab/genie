@@ -38,6 +38,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 #target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
 #target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-likelihood)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
+#target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
 
 
 install(TARGETS ${PROJECT_NAME}

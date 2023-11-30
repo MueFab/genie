@@ -44,7 +44,7 @@ TEST(Genotype, Decompose) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     ASSERT_EQ(recs.size(), 100);
@@ -122,6 +122,7 @@ TEST(Genotype, formattest) {
     recs.pop_back();
     std::vector<std::string> formatList;
     {
+        // TODO(Stefanie): File does not exist in the repository
         std::string jsonfilepath =
             gitRootDir +
             "/data/records/ALL.chrX.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.formattags.json";
@@ -160,7 +161,7 @@ TEST(Genotype, conformanceTests) {
     }
     reader.close();
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
     genie::genotype::EncodingOptions opt = {
         static_cast<uint32_t>(recs.size()),          // block_size;
@@ -607,6 +608,6 @@ TEST(Genotype, JBIG) {
 
     ASSERT_EQ(orig_payload_len, payload_len);
     for (size_t i = 0; i < payload_len; i++) {
-        ASSERT_EQ(*(payload + i), *(orig_payload + i)) << "index: " << i;
+        ASSERT_EQ(*(payload + i), *(orig_payload + i));
     }
 }
