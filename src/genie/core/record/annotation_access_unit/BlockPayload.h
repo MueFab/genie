@@ -37,6 +37,7 @@ class BlockPayload {
     uint8_t num_chrs;
     uint32_t block_payload_size;
     std::vector<uint8_t> generic_payload;
+    std::stringstream generic_payload_stream;
 
  public:
     BlockPayload();
@@ -47,10 +48,31 @@ class BlockPayload {
     BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t block_payload_size,
                  const std::vector<uint8_t>& generic_payload);
 
+    BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t block_payload_size,
+        std::stringstream& generic_payload);
+
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs);
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& writesize) const;
+
+
+    BlockPayload& operator=(const BlockPayload& other) {
+        descriptor_ID = other.descriptor_ID;
+        num_chrs = other.num_chrs;
+        block_payload_size = other.block_payload_size;
+        generic_payload = other.generic_payload;
+        generic_payload_stream << other.generic_payload_stream.rdbuf();
+        return *this;
+    }
+
+    BlockPayload(BlockPayload& other) {
+        descriptor_ID = other.descriptor_ID;
+        num_chrs = other.num_chrs;
+        block_payload_size = other.block_payload_size;
+        generic_payload = other.generic_payload;
+        generic_payload_stream << other.generic_payload_stream.rdbuf();
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

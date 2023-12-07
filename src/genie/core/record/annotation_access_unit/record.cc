@@ -26,7 +26,7 @@ namespace annotation_access_unit {
 Record::Record()
     : AT_ID(0),
       AT_type(AnnotationType::VARIANTS),
-      AT_subtype(0),
+      AT_subtype(1),
       AG_class(0),
       annotation_access_unit_header{},
       block{},

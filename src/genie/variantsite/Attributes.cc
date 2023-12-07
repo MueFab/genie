@@ -8,7 +8,6 @@
 #include <string>
 #include <utility>
 
-#include "genie/variantsite/Attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/variantsite/Attributes.h"
@@ -20,18 +19,26 @@ namespace variant_site {
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
     genie::core::ArrayType arraytype;
+    for (auto onearray : value) {
+        arraytype.toFile(info.getAttributeType(), onearray, writers.back());
+    }
+    auto temp = (info.getAttributeName()=="AA");
+   
+    typedTiles.back().writeElement(value);
+    (void)temp;
     if (rowsPerTile == 0) {
-    } else if (rowInTile < rowsPerTile) {
+    } else if (rowInTile < rowsPerTile-1) {
         rowInTile++;
     } else {
         writers.back().flush();
-        //convertToTypedData();
+     //   convertToTypedData();
+        std::vector<uint32_t> arrayDims;
+        arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
         rowInTile = 0;
-    }
-    for (auto onearray : value) {
-        arraytype.toFile(info.getAttributeType(), onearray, writers.back());
     }
 }
 
@@ -45,14 +52,43 @@ void AttributeTile::writeMissing() {
     write(value);
 }
 
+std::vector<std::stringstream> AttributeTile::convertTilesToTypedData()
+{
+    std::vector<std::stringstream> TypedTiles;
+
+    core::DataType TypeId = info.getAttributeType();
+    uint8_t numArrayDims = info.getArrayLength();
+    std::vector<uint32_t> arrayDims;
+    arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+    for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+
+
+    for (auto& tile : tiles) {
+    genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
+        util::BitReader reader(tile);
+        typedData.convertToTypedData(reader);
+        TypedTiles.emplace_back("");
+        core::Writer writer(&TypedTiles.back());
+        typedData.write(writer);
+    }
+
+    return std::vector<std::stringstream>();
+}
+
 void AttributeTile::convertToTypedData() {
     core::DataType TypeId = info.getAttributeType();
-    uint8_t numArrayDims = 1;
-    std ::vector<uint32_t> arrayDims{static_cast<uint32_t>(rowInTile) * info.getArrayLength()};
+    uint8_t numArrayDims = info.getArrayLength();
+    std::vector<uint32_t> arrayDims;
+    arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+    for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
     genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
-    util::BitReader reader(tiles.back());
-    typedData.convertToTypedData(reader);
-    typedData.write(writers.back());
+    util::BitReader typedReader(tiles.back());
+    typedData.convertToTypedData(typedReader);
+    tiles.back().str("");
+    tiles.back().clear();
+    core::Writer typedWriter(&tiles.back());
+    typedData.write(typedWriter);
+    writers.back() = typedWriter;
     writers.back().flush();
 }
 
@@ -60,6 +96,12 @@ void AttributeTile::AddFirst() {
     if (tiles.empty()) {
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
+    }
+    if (typedTiles.empty()) {
+        std::vector<uint32_t> arrayDims;
+        arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+        for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
+        typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
     }
 }
 
@@ -78,6 +120,12 @@ AttributeTile::AttributeTile(const AttributeTile& other) {
     rowInTile = 0;
     tiles.clear();
     writers.clear();
+}
+
+void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compressedData)
+{
+    (void)tilenr;
+    (void)compressedData;
 }
 
 void Attributes::add(std::vector<genie::core::record::variant_site::Info_tag> tags) {

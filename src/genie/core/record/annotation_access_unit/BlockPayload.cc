@@ -45,6 +45,12 @@ BlockPayload::BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t blo
       block_payload_size(block_payload_size),
       generic_payload(genericPayload) {}
 
+BlockPayload::BlockPayload(AnnotDesc descriptorID, uint8_t numChrs, uint32_t block_payload_size,
+                           std::stringstream& _generic_payload_stream)
+    : descriptor_ID(descriptorID), num_chrs(numChrs), block_payload_size(block_payload_size) {
+    generic_payload_stream << _generic_payload_stream.rdbuf();
+}
+
 void BlockPayload::read(util::BitReader& reader) {
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
@@ -62,6 +68,9 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
 }
 
 void BlockPayload::write(core::Writer& writer) const {
+    if (generic_payload_stream.str().size() > 0)
+        writer.write(const_cast<std::stringstream*>(&generic_payload_stream));
+    else
     for (const auto& byte : generic_payload) writer.write(byte, 8, true);
     writer.flush();
 }
