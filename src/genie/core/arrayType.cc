@@ -80,7 +80,6 @@ std::string ArrayType::toString(core::DataType type, std::vector<uint8_t> bytear
     return temp;
 }
 
-
 uint8_t ArrayType::getDefaultBitsize(core::DataType type) const {
     if (type == DataType::STRING) return 0;
     if (type == DataType::CHAR || type == DataType::INT8 || type == DataType::UINT8) return 8;
@@ -90,7 +89,6 @@ uint8_t ArrayType::getDefaultBitsize(core::DataType type) const {
     if (type == DataType::UINT64 || type == DataType::INT64 || type == DataType::DOUBLE) return 64;
     return 0;
 }
-
 
 uint64_t ArrayType::getDefaultValue(core::DataType type) const {
     switch (type) {
@@ -185,7 +183,7 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
             temp = static_cast<uint32_t>(reader.read_b(32));
             byteArray.resize(4);
             memcpy(&byteArray[0], &temp, 4);
-             break;
+            break;
         }
         default:  // case STRING
             uint8_t read = static_cast<uint8_t>(reader.read_b(8));
@@ -199,7 +197,6 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
 
     return byteArray;
 }
-
 
 void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const {
     if (type == core::DataType::BOOL) {
@@ -221,6 +218,24 @@ void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core
 
             for (auto i = 0; (i < byteSize); ++i) writeValue += static_cast<uint64_t>(bytearray[i]) << (i * 8);
             writer.write(writeValue, static_cast<uint8_t>(byteSize) * 8);
+        }
+    }
+}
+
+void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number = 1) const {
+    if (type == core::DataType::STRING) {
+        for (uint64_t i = 0; i < number; ++i) {
+            std::string temp;
+            reader.readBypass_null_terminated(temp);
+            writer.write(temp);
+            writer.write(0, 8, true);
+        }
+    } else {
+        if (number > 0) {
+            //        uint64_t writeValue = 0;
+            uint8_t byteSize = getDefaultBitsize(type);
+            if (byteSize == 0) byteSize = 1;
+            for (uint64_t n = 0; n < number; ++n) writer.write(reader.read_b(byteSize), byteSize);
         }
     }
 }

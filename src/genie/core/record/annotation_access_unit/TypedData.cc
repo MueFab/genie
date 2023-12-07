@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -20,60 +21,92 @@ namespace core {
 namespace record {
 namespace annotation_access_unit {
 
+void TypedData::writeElement(std::vector<CustomType> matrixRow) {
+    ArrayType arrayType;
+    for (auto elem : matrixRow) arrayType.toFile(data_type_ID, elem, writer);
+}
+
 void TypedData::convertToTypedData(util::BitReader& reader) {
     ArrayType arrayType;
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
         n_elements *= array_dims[i];
     }
-    data_block.resize(n_elements);
-    for (uint32_t i = 0; i < n_elements; ++i) data_block.at(i) = arrayType.toArray(data_type_ID, reader);
+    arrayType.toFile(data_type_ID, reader, writer, n_elements);
 }
 
 void TypedData::convertToTypedData(CustomType value) {
-    uint64_t n_elements = 1;
-    data_block.resize(n_elements);
-    data_block.at(0) = value;
+    ArrayType arrayType;
+    arrayType.toFile(data_type_ID, value, writer);
 }
 
 void TypedData::convertToTypedData(std::vector<CustomType> matrix) {
+    UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements!");
+
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
         n_elements *= array_dims[i];
     }
-    data_block.resize(n_elements);
-    uint64_t index = 0;
-    for (uint32_t k = 0; k < array_dims[2]; ++k) {
-        data_block[index] = matrix.at(k);
-    }
+    ArrayType arrayType;
+    for (uint64_t i = 0; i < matrix.size(); ++i) arrayType.toFile(data_type_ID, matrix.at(i), writer);
 }
 
 void TypedData::convertToTypedData(std::vector<std::vector<CustomType>> matrix) {
+    UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements!");
+    UTILS_DIE_IF(array_dims[1] != matrix.at(0).size(), "matrix size does not match n_elements!");
+
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
         n_elements *= array_dims[i];
     }
-    data_block.resize(n_elements);
-    uint64_t index = 0;
-    for (uint32_t j = 0; j < array_dims[1]; ++j)
-        for (uint32_t k = 0; k < array_dims[2]; ++k) {
-            data_block[index] = matrix.at(j).at(k);
+    ArrayType arrayType;
+
+    for (uint32_t j = 0; j < matrix.size(); ++j)
+        for (uint32_t k = 0; k < matrix.at(0).size(); ++k) {
+            arrayType.toFile(data_type_ID, matrix.at(j).at(k), writer);
         }
 }
 
 void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix) {
+    UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements!");
+    UTILS_DIE_IF(array_dims[1] != matrix.at(0).size(), "matrix size does not match n_elements!");
+    UTILS_DIE_IF(array_dims[2] != matrix.at(1).size(), "matrix size does not match n_elements!");
+
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
         n_elements *= array_dims[i];
     }
-    data_block.resize(n_elements);
-    uint64_t index = 0;
-    for (uint32_t i = 0; i < array_dims[0]; ++i)
-        for (uint32_t j = 0; j < array_dims[1]; ++j)
-            for (uint32_t k = 0; k < array_dims[2]; ++k) {
-                data_block[index] = matrix.at(i).at(j).at(k);
+
+    ArrayType arrayType;
+
+    for (uint32_t i = 0; i < matrix.size(); ++i)
+        for (uint32_t j = 0; j < matrix.at(0).size(); ++j)
+            for (uint32_t k = 0; k < matrix.at(0).at(0).size(); ++k) {
+                arrayType.toFile(data_type_ID, matrix.at(i).at(j).at(k), writer);
             }
 }
+
+void TypedData::write(core::Writer& outputWriter) const {
+    outputWriter.write(static_cast<uint8_t>(data_type_ID), 8);
+    outputWriter.write(num_array_dims, 2);
+    uint64_t n_elements = 1;
+    for (uint64_t i = 0; i < num_array_dims; ++i) {
+        outputWriter.write(array_dims[i], 32);
+        n_elements = n_elements * array_dims[i];
+    }
+
+    if (compressedDataStream.str().size() > 0) {
+        outputWriter.write(compressedDataStream.str().size(), 32);
+        outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
+    } else {
+        auto temp = dataStream.str().size();
+        if (temp > 1000) {
+            // bla
+        }
+        outputWriter.write(const_cast<std::stringstream*>(&dataStream));
+    }
+};
+
 }  // namespace annotation_access_unit
 }  // namespace record
 }  // namespace core

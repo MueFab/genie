@@ -29,6 +29,7 @@
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/variant_site/record.h"
+#include "genie/core/record/annotation_access_unit/typeddata.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -36,6 +37,7 @@ namespace variant_site {
 
 class AccessUnitComposer {
  public:
+
 
      void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, std::stringstream>& attributeStream,
@@ -49,6 +51,13 @@ class AccessUnitComposer {
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
                        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID);
+
+     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+         std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
+         std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
+         const core::record::annotation_parameter_set::Record& annotationParameterSet,
+         core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID,
+         uint64_t _rowIndex);
 
  private:
     // default values
@@ -82,6 +91,9 @@ class AccessUnitComposer {
         const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>&
             compressorParameterSets,
         std::map<std::string, std::stringstream>& encodedAttributes);
+
+    void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock, genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

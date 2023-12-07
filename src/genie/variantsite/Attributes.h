@@ -38,12 +38,22 @@ class AttributeTile {
 
     AttributeTile(const AttributeTile& other);
 
-    size_t getNrOfTiles() { return tiles.size(); }
+    size_t getNrOfTiles() {
+        if (rowsPerTile == 0) {
+            tiles.pop_back();
+        }
+        return tiles.size();
+    }
+
+    void setCompressedData(uint64_t tilenr, std::stringstream& compressedData);
+    core::record::annotation_access_unit::TypedData& getTypedTile(uint64_t tilenr) {
+        return typedTiles.at(tilenr);
+    }
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
             writers.back().flush();
-       //     convertToTypedData();
+        //    convertToTypedData();
         }
         return tiles.at(tilenr);
     }
@@ -52,11 +62,13 @@ class AttributeTile {
 
     void writeMissing();
 
-    void convertToTypedData();
+    std::vector<std::stringstream> convertTilesToTypedData();
 
  private:
+    void convertToTypedData();
     uint64_t rowsPerTile;
     genie::core::record::annotation_parameter_set::AttributeData info;
+    std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;
     std::vector<std::stringstream> tiles;
     std::vector<genie::core::Writer> writers;
     uint64_t rowInTile;

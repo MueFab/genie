@@ -45,6 +45,9 @@ class BlockData {
     AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
+    size_t getDataSize() const {
+        return data.str().size();
+    }
     std::stringstream& getData() { return data; }
 
  private:
@@ -110,6 +113,7 @@ class Block {
     void read(util::BitReader& reader, uint8_t numChrs);
     void write(core::Writer& writer) const;
     void set(BlockVectorData blockData);
+    void set(BlockData& blockData);
     size_t getSize(core::Writer& writesize) const;
 };
 
