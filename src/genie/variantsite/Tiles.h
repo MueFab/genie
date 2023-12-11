@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_TILES_H_
-#define SRC_GENIE_VARIANT_SITE_TILES_H_
+#ifndef SRC_GENIE_VARIANTSITE_TILES_H_
+#define SRC_GENIE_VARIANTSITE_TILES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -39,12 +39,12 @@ class Tiles {
 
 class TiledStream {
  public:
-    TiledStream(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0), tiles{} {}
+    explicit TiledStream(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0), tiles{} {}
     TiledStream() : rowsPerTile(0), rowInTile(0), tiles{} {}
 
     void setRowsPerTile(uint64_t _rowsPerTile) { rowsPerTile = _rowsPerTile; }
 
-template <class T>
+    template <class T>
     void write(T value, uint8_t bits) {
         setTile();
         if (bits == 0) bits = sizeof(T);
@@ -68,6 +68,7 @@ template <class T>
     std::stringstream& getTile(uint64_t tilenr) { return tiles.tileData.at(tilenr); }
 
     size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).getBitsWritten(); }
+
  private:
     uint64_t rowsPerTile;
     uint64_t rowInTile;
@@ -83,7 +84,7 @@ template <class T>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_TILES_H_
+#endif  // SRC_GENIE_VARIANTSITE_TILES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

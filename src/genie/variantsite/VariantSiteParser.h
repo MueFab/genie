@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_VARIANTSITEPARSER_H_
-#define SRC_GENIE_VARIANT_SITE_VARIANTSITEPARSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
+#define SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -41,7 +41,7 @@ class VariantSiteParser {
     using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
     using InfoField = genie::variant_site::InfoField;
 
-     VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
+    VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
@@ -84,7 +84,7 @@ class VariantSiteParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_VARIANTSITEPARSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

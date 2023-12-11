@@ -24,7 +24,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
     uint64_t defaultTileSize) {
-     //----------------------------------------------------//
+    //----------------------------------------------------//
     // default values
     core::record::annotation_parameter_set::ParameterSettings defaultset;
     genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
@@ -95,7 +95,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
 
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
     uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());
-    for (auto descr: descrList) {
+    for (auto descr : descrList) {
         genie::core::AnnotDesc DescrID = descr;
         if (DescrID == genie::core::AnnotDesc::STRAND)
             encoding_mode_ID = genie::core::AlgoID::LZMA;

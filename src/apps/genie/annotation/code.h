@@ -29,7 +29,6 @@ namespace annotation {
 /**
  * @brief
  */
-
 class Code {
  public:
     /**
@@ -49,7 +48,6 @@ class Code {
     using AnnotationAccessUnit = genie::core::record::annotation_access_unit::Record;
     using DescriptorConfiguration = genie::core::record::annotation_parameter_set::DescriptorConfiguration;
     using AnnotationEncodingParameters = genie::core::record::annotation_parameter_set::AnnotationEncodingParameters;
-
 };
 
 void encodeVariantSite(const std::string& _inputFileName, const std::string& _outputFileName, bool testOutput,

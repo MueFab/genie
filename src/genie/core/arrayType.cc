@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "arrayType.h"
 #include <cstring>
 #include <iostream>
@@ -69,13 +75,14 @@ std::string ArrayType::toString(core::DataType type, std::vector<uint8_t> bytear
             temp = std::to_string(value);
             break;
         }
-        default:  // case 0
-
+        default: {  // case 0
             temp += '"';
-            if (bytearray.size() > 0)
+            if (bytearray.size() > 0) {
                 for (size_t i = 0; i < bytearray.size(); ++i) temp += bytearray[i];
+            }
             temp += '"';
             break;
+        }
     }
     return temp;
 }
@@ -122,7 +129,7 @@ uint64_t ArrayType::getDefaultValue(core::DataType type) const {
     return 0;
 }
 
-std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) {
+std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) const {
     std::vector<uint8_t> byteArray;
     switch (type) {
         case DataType::BOOL:
@@ -191,7 +198,7 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
             while (read != 0) {
                 byteArray.push_back(read);
                 read = static_cast<uint8_t>(reader.read_b(8));
-            };
+            }
             break;
     }
 
@@ -240,7 +247,7 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Write
     }
 }
 
-std::vector<uint8_t> ArrayType::toArray(DataType type, uint64_t value) {
+std::vector<uint8_t> ArrayType::toArray(DataType type, uint64_t value) const {
     std::vector<uint8_t> returnValue;
     auto NrOfBytes = (getDefaultBitsize(type) + 7) / 8;
     returnValue.resize(NrOfBytes);

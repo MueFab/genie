@@ -283,7 +283,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
+TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.site";
     std::string infofilename = "/data/records/1.3.5.header100.gt_only.vcf.infotags.json";
@@ -296,10 +296,10 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
     }
     std::ifstream inputfile;
     inputfile.open(filepath, std::ios::in | std::ios::binary);
-    uint64_t defaultTileSize = 5000;
+    uint64_t defaultTileSize = 1000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     if (inputfile.is_open()) inputfile.close();
-    EXPECT_EQ(parser.getNrOfTiles(), 2);
+    EXPECT_EQ(parser.getNrOfTiles(), 10);
 
     auto info = parser.getAttributes().getInfo();
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
@@ -316,33 +316,29 @@ TEST_F(VariantSiteRecordTests, twotile) {  // NOLINT(cert-err58-cpp)
 
     genie::variant_site::AccessUnitComposer accessUnit;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
+    uint64_t rowIndex = 0;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : tile_descriptorStream) {
-            ASSERT_EQ(desctile.second.getNrOfTiles(), 2);
+            ASSERT_GE(desctile.second.getNrOfTiles(), 10);
             desc[desctile.first] << desctile.second.getTile(i).rdbuf();
         }
 
-        std::map<std::string, std::stringstream> attr;
+        std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
         for (auto& attrtile : tile_attributeStream) {
-            ASSERT_EQ(attrtile.second.getNrOfTiles(), 2);
-            attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
-            genie::core::ArrayType arrayType;
-            auto temp = arrayType.getDefaultBitsize(info[attrtile.first].getAttributeType());
-            if (temp > 0) {
-                auto totaltileInBits = attr[attrtile.first].str().size() * 8;
-                auto tileSize = totaltileInBits / (info[attrtile.first].getArrayLength() * temp);
-                EXPECT_EQ(defaultTileSize, tileSize);
-            }
+            ASSERT_GE(attrtile.second.getNrOfTiles(), 10);
+            attr[attrtile.first] = attrtile.second.getTypedTile(i);
         }
-        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID);
+
+        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
+        rowIndex += defaultTileSize;
     }
 
     std::ofstream testfile;
-    testfile.open(filepath + "2tiles.bin", std::ios::binary | std::ios::out);
+    testfile.open(filepath + "_moretiles.bin", std::ios::binary | std::ios::out);
     genie::core::Writer testwriter(&testfile);
     std::ofstream txtfile;
-    txtfile.open(filepath + "2tiles.txt", std::ios::out);
+    txtfile.open(filepath + "_moretiles.txt", std::ios::out);
     genie::core::Writer txtwriter(&txtfile, true);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);

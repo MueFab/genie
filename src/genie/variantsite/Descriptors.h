@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_DESCRIPTORS_H_
-#define SRC_GENIE_VARIANT_SITE_DESCRIPTORS_H_
+#ifndef SRC_GENIE_VARIANTSITE_DESCRIPTORS_H_
+#define SRC_GENIE_VARIANTSITE_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -31,7 +31,7 @@ namespace variant_site {
 class Descriptors {
  public:
     Descriptors() : rowsPerTile(0), rowInTile(0) { init(); }
-    Descriptors(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0) { init(); }
+    explicit Descriptors(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0) { init(); }
 
     void setTileSize(uint64_t _rowsPerTile) {
         rowsPerTile = _rowsPerTile;
@@ -67,7 +67,7 @@ class Descriptors {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_DESCRIPTORS_H_
+#endif  // SRC_GENIE_VARIANTSITE_DESCRIPTORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

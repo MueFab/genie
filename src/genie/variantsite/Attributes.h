@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_ATTRIBUTES_H_
-#define SRC_GENIE_VARIANT_SITE_ATTRIBUTES_H_
+#ifndef SRC_GENIE_VARIANTSITE_ATTRIBUTES_H_
+#define SRC_GENIE_VARIANTSITE_ATTRIBUTES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -113,7 +113,7 @@ class Attributes {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_ATTRIBUTES_H_
+#endif  // SRC_GENIE_VARIANTSITE_ATTRIBUTES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

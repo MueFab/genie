@@ -164,7 +164,7 @@ TEST(Likelihood, RoundTripTransformEncode) {
     );
 
     const std::string& serialized_arr_str = block.serialized_arr.str();
-    size_t serialized_arr_len = (size_t) block.serialized_mat.tellp();
+    size_t serialized_arr_len = (size_t) block.serialized_arr.tellp();
     auto* serialized_arr_payload = (unsigned char*)calloc(serialized_arr_len, sizeof(unsigned char));
     auto* serialized_arr_ptr = serialized_arr_str.c_str();
     std::memcpy(serialized_arr_payload, serialized_arr_ptr, serialized_arr_len);

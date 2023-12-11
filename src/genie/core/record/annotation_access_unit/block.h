@@ -20,8 +20,8 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/core/writer.h"
+#include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bitreader.h"
 
 #include "BlockHeader.h"
@@ -45,9 +45,7 @@ class BlockData {
     AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
-    size_t getDataSize() const {
-        return data.str().size();
-    }
+    size_t getDataSize() const { return data.str().size(); }
     std::stringstream& getData() { return data; }
 
  private:
@@ -56,7 +54,6 @@ class BlockData {
     bool thisIsAttribute;
     std::stringstream& data;
 };
-
 
 class BlockVectorData {
  public:
@@ -69,9 +66,7 @@ class BlockVectorData {
     AnnotDesc getDescriptorID() const { return descriptorID; }
     uint16_t getAttributeID() const { return attributeID; }
     bool isAttribute() const { return thisIsAttribute; }
-    size_t getDataSize() const {
-        return data.size();
-    }
+    size_t getDataSize() const { return data.size(); }
     std::vector<uint8_t>& getData() { return data; }
 
  private:
@@ -79,10 +74,7 @@ class BlockVectorData {
     uint16_t attributeID;
     bool thisIsAttribute;
     std::vector<uint8_t>& data;
- 
 };
-
-
 
 class Block {
  private:
@@ -101,7 +93,6 @@ class Block {
         numChrs = b.numChrs;
     }
 
-    //TODO @Stefanie: is this "trivial" operator?
     Block& operator=(const Block& b) {
         block_header = b.block_header;
         block_payload = b.block_payload;

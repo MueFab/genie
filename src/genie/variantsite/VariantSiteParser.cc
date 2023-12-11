@@ -20,19 +20,14 @@
 namespace genie {
 namespace variant_site {
 
-
-VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs,
-                                     //std::map<genie::core::AnnotDesc, std::stringstream>& _output,
-                                     //std::map<std::string, AttributeData>& _info,
-                                     //std::map<std::string, std::stringstream>& _attributeStream,
-                                     std::stringstream& _jsonInfoFields, uint64_t _rowsPerTile)
+VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields,
+                                     uint64_t _rowsPerTile)
     : siteMGrecs(_site_MGrecs),
       rowsPerTile(_rowsPerTile),
       numberOfRows(0),
       fieldWriter{},
       numberOfAttributes(0),
       startPos(0) {
- 
     JsonInfoFieldParser InfoFieldParser(_jsonInfoFields);
     infoFields = InfoFieldParser.getInfoFields();
     init();

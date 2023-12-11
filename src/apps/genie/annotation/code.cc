@@ -11,8 +11,6 @@
 #include <utility>
 
 #include "apps/genie/annotation/code.h"
-//#include "codecs/api/mpegg_utils.h"
-//#include "codecs/include/mpegg-codecs.h"
 #include "filesystem/filesystem.hpp"
 #include "genie/core/writer.h"
 #include "genie/util/runtime-exception.h"
@@ -171,7 +169,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         recs.emplace_back(bitreader);
     }
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    // TODO(Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
     genie::genotype::EncodingOptions opt = {

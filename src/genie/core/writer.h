@@ -26,8 +26,8 @@ class Writer {
  public:
     Writer() : logwriter(nullptr), writingLog(false), getWriteSize(true), writeBitSize(0) {}
 
-    Writer(std::ostream* writer, bool log = false)
-        : logwriter(writer), binwriter{writer}, writingLog(log), getWriteSize(false), writeBitSize(0){};
+    explicit Writer(std::ostream* writer, bool log = false)
+        : logwriter(writer), binwriter{writer}, writingLog(log), getWriteSize(false), writeBitSize(0) {}
     /**
      * @brief Write a specified number of bits, reserved are not written to log
      * @param value Data to write. The LSBs will be written.
@@ -51,10 +51,11 @@ class Writer {
     void write(uint64_t value, uint8_t bits) {
         if (getWriteSize) {
             writeBitSize += bits;
-        } else if (writingLog)
+        } else if (writingLog) {
             *logwriter << std::to_string(value) << ",";
-        else if (bits > 0)
+        } else if (bits > 0) {
             binwriter.write(value, bits);
+        }
     }
 
     /**
@@ -83,11 +84,12 @@ class Writer {
             in->seekg(0, in->end);
             writeBitSize += in->tellg() * 8;
             in->seekg(0, in->beg);
-        } else if (!writingLog)
-            while (in->read((char*)&byte, sizeof(byte))) {
+        } else if (!writingLog) {
+            while (in->read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
                 binwriter.write(byte, 8);
             }
-    };
+        }
+    }
 
     /**
      * @brief Writes all buffered bits to the output stream. If there is no full byte available, the missing bits for
@@ -96,9 +98,10 @@ class Writer {
     void flush() {
         if (getWriteSize) {
             if (writeBitSize % 8 != 0) writeBitSize += (8 - writeBitSize % 8);
-        } else if (!writingLog)
+        } else if (!writingLog) {
             binwriter.flush();
-    };
+        }
+    }
 
     /**
      * @brief Reveals the already written number of bits.
@@ -107,10 +110,11 @@ class Writer {
     uint64_t getBitsWritten() const {
         if (getWriteSize) {
             return writeBitSize;
-        } else if (!writingLog)
+        } else if (!writingLog) {
             return binwriter.getBitsWritten();
-        else
+        } else {
             return 0;
+        }
     }
 };
 

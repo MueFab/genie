@@ -45,11 +45,11 @@ class TypedData {
 
     TypedData()
         : data_type_ID(core::DataType::UINT8),
-        num_array_dims(0),
-        array_dims{},
-        dataStream{},
-        writer{ &dataStream },
-        compressedDataStream{} {}
+          num_array_dims(0),
+          array_dims{},
+          dataStream{},
+          writer{&dataStream},
+          compressedDataStream{} {}
 
     void set(core::DataType TypeId, uint8_t numArrayDims, std ::vector<uint32_t> arrayDims) {
         data_type_ID = TypeId;
@@ -66,9 +66,7 @@ class TypedData {
     void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
     void convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix);
 
-    std::vector<CustomType>& getDataBlock() {
-        return data_block;
-    }
+    std::vector<CustomType>& getDataBlock() { return data_block; }
 
     std::stringstream& getdata() {
         writer.flush();
@@ -79,7 +77,7 @@ class TypedData {
         compressedDataStream.str("");
         compressedDataStream.clear();
         genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
-        compressedWriter.write(&_compressed_data_block);            
+        compressedWriter.write(&_compressed_data_block);
     }
 
     void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
@@ -112,8 +110,8 @@ class TypedData {
     std::vector<uint32_t> array_dims;
     std::vector<CustomType> data_block;
     std::stringstream dataStream;
+    genie::core::Writer writer{&dataStream};
     std::stringstream compressedDataStream;
-    genie::core::Writer writer;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

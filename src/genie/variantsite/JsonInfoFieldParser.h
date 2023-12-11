@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_JSONINFOFIELDPARSER_H_
-#define SRC_GENIE_VARIANT_SITE_JSONINFOFIELDPARSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_JSONINFOFIELDPARSER_H_
+#define SRC_GENIE_VARIANTSITE_JSONINFOFIELDPARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -17,8 +17,8 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/core/arrayType.h"
+#include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class InfoField {
 
 class JsonInfoFieldParser {
  public:
-    JsonInfoFieldParser(std::stringstream& jsonInfoFields) {
+    explicit JsonInfoFieldParser(std::stringstream& jsonInfoFields) {
         infoFieldsJSON = jsonInfoFields.str();
         if (!infoFieldsJSON.empty()) ParseInfoFields();
     }
@@ -73,7 +73,7 @@ class JsonInfoFieldParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_JSONINFOFIELDPARSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_JSONINFOFIELDPARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
