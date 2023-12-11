@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_PARAMETERSETCOMPOSER_H_
-#define SRC_GENIE_VARIANT_SITE_PARAMETERSETCOMPOSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
+#define SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -34,7 +34,7 @@ namespace variant_site {
 
 class ParameterSetComposer {
  public:
-    ParameterSetComposer(){};
+    ParameterSetComposer() {}
 
     genie::core::record::annotation_parameter_set::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
@@ -51,7 +51,7 @@ class ParameterSetComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_PARAMETERSETCOMPOSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

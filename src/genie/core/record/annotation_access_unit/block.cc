@@ -50,23 +50,21 @@ void Block::set(BlockVectorData blockData) {
     uint32_t blockSize = static_cast<uint32_t>(blockData.getDataSize());
     BlockHeader header(attribute_contiguity, blockData.getDescriptorID(), blockData.getAttributeID(), indexed,
                        blockSize);
-    BlockPayload payload(blockData.getDescriptorID(), numChrs,  blockSize, blockData.getData());
+    BlockPayload payload(blockData.getDescriptorID(), numChrs, blockSize, blockData.getData());
     block_header = header;
     block_payload = payload;
 }
 
-void Block::set(BlockData& blockData)
-{
+void Block::set(BlockData& blockData) {
     numChrs = 0;
     const bool attribute_contiguity = false;
     const bool indexed = false;
     uint32_t blockSize = static_cast<uint32_t>(blockData.getDataSize());
     BlockHeader header(attribute_contiguity, blockData.getDescriptorID(), blockData.getAttributeID(), indexed,
-        blockSize);
+                       blockSize);
     BlockPayload payload(blockData.getDescriptorID(), numChrs, blockSize, blockData.getData());
     block_header = header;
     block_payload = payload;
-
 }
 
 size_t Block::getSize(core::Writer& writesize) const {

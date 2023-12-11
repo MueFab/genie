@@ -19,9 +19,6 @@
 namespace genie {
 namespace variant_site {
 
-
-
-
 void TiledStream::write(std::string value) {
     setTile();
     tiles.tileWriter.back().write(value);

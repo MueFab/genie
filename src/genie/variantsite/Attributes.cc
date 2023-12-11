@@ -22,16 +22,16 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     for (auto onearray : value) {
         arraytype.toFile(info.getAttributeType(), onearray, writers.back());
     }
-    auto temp = (info.getAttributeName()=="AA");
-   
+    auto temp = (info.getAttributeName() == "AA");
+
     typedTiles.back().writeElement(value);
     (void)temp;
     if (rowsPerTile == 0) {
-    } else if (rowInTile < rowsPerTile-1) {
+    } else if (rowInTile < rowsPerTile - 1) {
         rowInTile++;
     } else {
         writers.back().flush();
-     //   convertToTypedData();
+        //   convertToTypedData();
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
@@ -52,8 +52,7 @@ void AttributeTile::writeMissing() {
     write(value);
 }
 
-std::vector<std::stringstream> AttributeTile::convertTilesToTypedData()
-{
+std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
     std::vector<std::stringstream> TypedTiles;
 
     core::DataType TypeId = info.getAttributeType();
@@ -62,9 +61,8 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData()
     arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
     for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
 
-
     for (auto& tile : tiles) {
-    genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
+        genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
         util::BitReader reader(tile);
         typedData.convertToTypedData(reader);
         TypedTiles.emplace_back("");
@@ -122,8 +120,7 @@ AttributeTile::AttributeTile(const AttributeTile& other) {
     writers.clear();
 }
 
-void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compressedData)
-{
+void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compressedData) {
     (void)tilenr;
     (void)compressedData;
 }

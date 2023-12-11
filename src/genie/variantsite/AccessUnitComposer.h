@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANT_SITE_ACCESSUNITCOMPOSER_H_
-#define SRC_GENIE_VARIANT_SITE_ACCESSUNITCOMPOSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
+#define SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -17,19 +17,19 @@
 #include <utility>
 #include <vector>
 
-#include "genie/core/constants.h"
 #include "genie/core/arrayType.h"
+#include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 
-#include "genie/core/record/variant_genotype/record.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/record/annotation_access_unit/typeddata.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/core/record/annotation_access_unit/typeddata.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -37,27 +37,26 @@ namespace variant_site {
 
 class AccessUnitComposer {
  public:
-
-
-     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, std::stringstream>& attributeStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
                        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
                        uint8_t AT_ID, uint64_t rowIndex);
 
-     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, std::stringstream>& attributeStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
-                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID);
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
+                       uint8_t AT_ID);
 
-     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
-         std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
-         std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
-         const core::record::annotation_parameter_set::Record& annotationParameterSet,
-         core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class, uint8_t AT_ID,
-         uint64_t _rowIndex);
+    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+                       std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
+                       std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
+                       const core::record::annotation_parameter_set::Record& annotationParameterSet,
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
+                       uint8_t AT_ID, uint64_t _rowIndex);
 
  private:
     // default values
@@ -92,8 +91,8 @@ class AccessUnitComposer {
             compressorParameterSets,
         std::map<std::string, std::stringstream>& encodedAttributes);
 
-    void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock, genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
-
+    void compress(genie::core::record::annotation_access_unit::TypedData& oneBlock,
+                  genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -103,7 +102,7 @@ class AccessUnitComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANT_SITE_ACCESSUNITCOMPOSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

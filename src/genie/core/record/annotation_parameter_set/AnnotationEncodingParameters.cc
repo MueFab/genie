@@ -138,7 +138,6 @@ void AnnotationEncodingParameters::write(core::Writer& writer) const {
         for (auto byte : ontology_term_name[i]) writer.write(byte, 8);
     }
 
-   
     writer.write(n_descriptors, 8);
     for (auto i = 0; i < n_descriptors; ++i) {
         descriptor_configuration[i].write(writer);

@@ -19,15 +19,12 @@
 namespace genie {
 namespace core {
 
-
-
-
 class ArrayType {
  private:
-    uint8_t bitSize;
+    uint8_t bitSize = 0;
 
  public:
-    std::vector<uint8_t> toArray(DataType type, util::BitReader& reader);
+    std::vector<uint8_t> toArray(DataType type, util::BitReader& reader) const;
 
     void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
     void toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number) const;
@@ -36,7 +33,7 @@ class ArrayType {
 
     uint8_t getDefaultBitsize(core::DataType type) const;
     uint64_t getDefaultValue(core::DataType type) const;
-    std::vector<uint8_t> toArray(core::DataType type, uint64_t value);
+    std::vector<uint8_t> toArray(core::DataType type, uint64_t value) const;
 };
 
 }  // namespace core
