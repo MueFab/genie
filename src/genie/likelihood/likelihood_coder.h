@@ -46,7 +46,7 @@ struct EncodingBlock {
     UInt32ArrDtype lut;
     uint32_t nelems;
     UInt32MatDtype idx_mat;
-    core::DataType dtype_id;
+    core::DataType dtype_id = core::DataType::UINT32;
     std::stringstream serialized_mat;
     std::stringstream serialized_arr;
 };
