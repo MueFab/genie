@@ -66,7 +66,7 @@ class TypedData {
     void convertToTypedData(std::vector<std::vector<CustomType>> matrix);
     void convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix);
 
-    std::vector<CustomType>& getDataBlock() { return data_block; }
+    std::stringstream& getDataStream() { return dataStream; }
 
     std::stringstream& getdata() {
         writer.flush();

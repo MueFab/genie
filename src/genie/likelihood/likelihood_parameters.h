@@ -7,15 +7,16 @@
 #ifndef GENIE_LIKELIHOOD_PARAMETERS_H
 #define GENIE_LIKELIHOOD_PARAMETERS_H
 
+#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/optional/optional.hpp>
+#include "genie/core/constants.h"
+#include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/constants.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +34,10 @@ class LikelihoodParameters {
  public:
     LikelihoodParameters();
     LikelihoodParameters(uint8_t _num_gl_per_sample, bool _transform_flag, core::DataType _dtype_id);
+
+    void write(core::Writer& writer) const;
+    void read(util::BitReader& reader);
+    size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumGlPerSample() const;
     bool getTransformFlag() const;

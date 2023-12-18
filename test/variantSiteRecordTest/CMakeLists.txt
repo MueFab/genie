@@ -16,5 +16,6 @@ target_link_libraries(VariantSiteRecord-tests PRIVATE genie-lzma)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-zstd)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-vsite)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-genotype)
+target_link_libraries(VariantSiteRecord-tests PRIVATE genie-likelihood)
 target_link_libraries(VariantSiteRecord-tests PRIVATE mpeggCodecs-static)
 

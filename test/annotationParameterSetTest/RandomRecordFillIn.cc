@@ -6,15 +6,15 @@
  */
 
 #include "RandomRecordFillIn.h"
-
+#include "genie/core/constants.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::annotation_parameter_set::LikelihoodParameters
+genie::likelihood::LikelihoodParameters
 RandomAnnotationEncodingParameters::randomLikelihood() {
     uint8_t num_gl_per_sample = randomU8();
     bool transform_flag = randomBool();
-    uint8_t dtype_id = randomU8();
-    return genie::core::record::annotation_parameter_set::LikelihoodParameters(num_gl_per_sample, transform_flag,
+    auto dtype_id = static_cast<genie::core::DataType>(randomU8());
+    return genie::likelihood::LikelihoodParameters(num_gl_per_sample, transform_flag,
                                                                                dtype_id);
 }
 

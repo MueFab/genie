@@ -22,14 +22,14 @@
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_access_unit/record.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/annotation_access_unit/typeddata.h"
+#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/variant_genotype/record.h"
-#include "genie/core/record/variant_site/record.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

@@ -62,8 +62,8 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParametersCheck;
+    genie::likelihood::LikelihoodParameters likelihoodParameters;
+    genie::likelihood::LikelihoodParameters likelihoodParametersCheck;
     RandomAnnotationEncodingParameters randomLikelihood;
     likelihoodParameters = randomLikelihood.randomLikelihood();
 
@@ -74,9 +74,9 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     strwriter.flush();
     likelihoodParametersCheck.read(strreader);
 
- //   EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
-    EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), likelihoodParametersCheck.getNumGLPerSample());
-    EXPECT_EQ(likelihoodParameters.isTransformFlag(), likelihoodParametersCheck.isTransformFlag());
+//    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());
+    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), likelihoodParametersCheck.getNumGlPerSample());
+    EXPECT_EQ(likelihoodParameters.getTransformFlag(), likelihoodParametersCheck.getTransformFlag());
     genie::core::Writer writeSize;
     auto size = likelihoodParameters.getSize(writeSize);
     if (size % 8 != 0) size += (8 - size % 8);
@@ -109,20 +109,22 @@ TEST_F(LikelihoodTests, LikelihoodConstructZeros) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
+    genie::likelihood::LikelihoodParameters likelihoodParameters;
 
-    EXPECT_FALSE(likelihoodParameters.isTransformFlag());
-    EXPECT_EQ(likelihoodParameters.getDtypeID(), 0);
-    EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), 0);
+    EXPECT_FALSE(likelihoodParameters.getTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+              static_cast<uint8_t>(genie::core::DataType::STRING));
+    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 0);
 }
 
 TEST_F(LikelihoodTests, LikelihoodConstructValues) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters(128, true, 45);
+    genie::likelihood::LikelihoodParameters likelihoodParameters(128, true, genie::core::DataType::DOUBLE);
 
-    EXPECT_TRUE(likelihoodParameters.isTransformFlag());
-    EXPECT_EQ(likelihoodParameters.getDtypeID(), 45);
-    EXPECT_EQ(likelihoodParameters.getNumGLPerSample(), 128);
+    EXPECT_TRUE(likelihoodParameters.getTransformFlag());
+    EXPECT_EQ(static_cast<uint8_t>(likelihoodParameters.getDtypeID()),
+              static_cast<uint8_t>(genie::core::DataType::DOUBLE));
+    EXPECT_EQ(likelihoodParameters.getNumGlPerSample(), 128);
 }

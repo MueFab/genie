@@ -96,7 +96,7 @@ void TypedData::write(core::Writer& outputWriter) const {
     }
 
     if (compressedDataStream.str().size() > 0) {
-        outputWriter.write(compressedDataStream.str().size(), 32);
+   //     outputWriter.write(compressedDataStream.str().size(), 32);
         outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
     } else {
         auto temp = dataStream.str().size();

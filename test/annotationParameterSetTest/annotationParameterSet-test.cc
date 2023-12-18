@@ -7,6 +7,7 @@
 #include "RandomRecordFillIn.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/likelihood/likelihood_parameters.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -58,19 +59,6 @@ class AnnotationParameterSetTests : public ::testing::Test {
     // }
 };
 
-TEST_F(AnnotationParameterSetTests, annotationParameterSetZeros) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-    //genie::core::record::annotation_parameter_set::Record record;
-
-    //EXPECT_EQ(record.getParameterSetID(), (uint8_t)0);
-    //EXPECT_EQ(record.getATID(), 0);
-    //EXPECT_EQ(record.getATAlphbetID(), 0);
-    //EXPECT_EQ(record.getATCoordSize(), 0);
-    //EXPECT_FALSE(record.isATPos$0Bits());
-    //EXPECT_EQ(record.getNumberOfAuxAttributeGroups(), 0);
-}
 
 TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -97,7 +85,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     EXPECT_EQ(annotationParameterSet.getATID(), annotationParameterSetCheck.getATID());
     EXPECT_EQ(annotationParameterSet.getATAlphbetID(), annotationParameterSetCheck.getATAlphbetID());
     EXPECT_EQ(annotationParameterSet.getATCoordSize(), annotationParameterSetCheck.getATCoordSize());
-    EXPECT_EQ(annotationParameterSet.isATPos$0Bits(), annotationParameterSetCheck.isATPos$0Bits());
+    EXPECT_EQ(annotationParameterSet.isATPos40Bits(), annotationParameterSetCheck.isATPos40Bits());
 
     EXPECT_EQ(annotationParameterSet.getTileConfigurations().size(),
               annotationParameterSetCheck.getTileConfigurations().size());
@@ -128,6 +116,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     }
 #endif
 }
+
 
 TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -213,7 +202,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         DescriptorID descriptor_ID = item;
         genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
         genie::genotype::GenotypeParameters genotype_parameters;
-        genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
+        genie::likelihood::LikelihoodParameters likelihood_parameters;
         genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
 
         uint8_t n_pars = 4;

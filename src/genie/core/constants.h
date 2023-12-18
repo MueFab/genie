@@ -304,6 +304,8 @@ enum class AnnotDesc : uint8_t {
     ATTRIBUTE = 31
 };
 
+std::string AnnotDescToString(AnnotDesc desc);
+
 enum class AlgoID : uint8_t {
     CABAC = 0,
     LZMA = 1,

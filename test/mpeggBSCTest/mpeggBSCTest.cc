@@ -16,7 +16,7 @@
 #include "genie//core/record/annotation_parameter_set/ContactMatrixParameters.h"
 #include "genie//core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie//core/record/annotation_parameter_set/LikelihoodParameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 
 #include "genie//core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
 #include "genie//core/record/annotation_access_unit/block.h"

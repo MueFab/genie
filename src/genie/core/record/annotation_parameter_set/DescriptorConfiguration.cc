@@ -17,6 +17,7 @@
 #include "genie/util/bitwriter.h"
 
 #include "DescriptorConfiguration.h"
+#include "genie/likelihood/likelihood_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,12 +34,20 @@ DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
                                                  genie::genotype::GenotypeParameters _genotype_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
-    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters, LikelihoodParameters{},
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters,
+                              genie::likelihood::LikelihoodParameters{}, ContactMatrixParameters{},
+                              _algorithm_parameters) {}
+
+DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
+                                                 genie::genotype::GenotypeParameters _genotype_parameters,
+                                                 genie::likelihood::LikelihoodParameters _likelihood_parameters,
+                                                 AlgorithmParameters _algorithm_parameters)
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters, _likelihood_parameters,
                               ContactMatrixParameters{}, _algorithm_parameters) {}
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
                                                  genie::genotype::GenotypeParameters _genotype_parameters,
-                                                 LikelihoodParameters _likelihood_parameters,
+                                                 genie::likelihood::LikelihoodParameters _likelihood_parameters,
                                                  ContactMatrixParameters _contact_matrix_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
     : descriptor_ID(_descriptor_ID),
@@ -56,7 +65,7 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
             genotype_parameters.read(reader);
             break;
         case AnnotDesc::LIKELIHOOD:
-            likelihood_parameters.read(reader);
+          //  likelihood_parameters.read(reader);
             break;
         case AnnotDesc::CONTACT:
             contact_matrix_parameters.read(reader);

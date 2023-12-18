@@ -20,7 +20,8 @@ namespace genie {
 namespace genotype {
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Build(
     uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-    genie::genotype::GenotypeParameters& genotypeParameters, uint64_t defaultTileSize) {
+    genie::genotype::GenotypeParameters& genotypeParameters,
+    genie::likelihood::LikelihoodParameters likelihoodParameters, uint64_t defaultTileSize) {
     uint8_t parameter_set_ID = 1;
     uint8_t AT_ID = _AT_ID;
     genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
@@ -88,9 +89,11 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     uint8_t ndescriptors = 2;
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
-        genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-            descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, LZMAalgorithmParameters)};
-    descriptor_ID = genie::core::AnnotDesc::LINKID;
+        genie::core::record::annotation_parameter_set::DescriptorConfiguration(descriptor_ID, genie::core::AlgoID::LZMA,
+                                                                               genotypeParameters, likelihoodParameters,
+                                                                               LZMAalgorithmParameters)};
+
+    descriptor_ID = genie::core::AnnotDesc::LIKELIHOOD;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, BSCalgorithmParameters));
 
@@ -143,9 +146,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
         tile_configuration, annotation_encoding_parameters);
     // ----------------------
     return annotationParameterSet;
-}  
-
-
+}
 
 }  // namespace genotype
 }  // namespace genie

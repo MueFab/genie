@@ -18,11 +18,13 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 
+#include "genie/core/record/variant_site/record.h"
+
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -53,7 +55,6 @@ class AttributeTile {
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
             writers.back().flush();
-        //    convertToTypedData();
         }
         return tiles.at(tilenr);
     }
@@ -65,7 +66,6 @@ class AttributeTile {
     std::vector<std::stringstream> convertTilesToTypedData();
 
  private:
-    void convertToTypedData();
     uint64_t rowsPerTile;
     genie::core::record::annotation_parameter_set::AttributeData info;
     std::vector< genie::core::record::annotation_access_unit::TypedData> typedTiles;

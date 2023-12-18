@@ -20,7 +20,7 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/core/record/annotation_parameter_set/LikelihoodParameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 #include "genotype_parameters.h"
 
 // -----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ struct EncodingBlock {
     std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
     std::map<std::string, std::vector<uint8_t>> attributeData;
 
-    core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
+    likelihood::LikelihoodParameters likelihoodParameters;
     std::vector<uint32_t> likelihoodData;
 };
 

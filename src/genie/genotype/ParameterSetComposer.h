@@ -31,6 +31,7 @@
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
+#include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -40,9 +41,8 @@ class ParameterSetComposer {
  public:
     genie::core::record::annotation_parameter_set::Record Build(
         uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-        genie::genotype::GenotypeParameters& genotypeParameters, uint64_t defaultTileSize = 100);
-
-
+        genie::genotype::GenotypeParameters& genotypeParameters,
+        genie::likelihood::LikelihoodParameters likelihoodParameters, uint64_t defaultTileSize = 100);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
