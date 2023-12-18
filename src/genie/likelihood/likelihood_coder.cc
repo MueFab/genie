@@ -48,16 +48,26 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
-    if (opt.transform_flag == 1){
+    if (opt.transform_flag){
         transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
+    } else {
+        block.idx_mat = xt::empty_like(block.likelihood_mat);
+        xt::view(block.idx_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all());
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
-    if (opt.transform_flag == 1){
+    if (opt.transform_flag){
         inverse_transform_lut(block.likelihood_mat, block.lut, block.idx_mat);
+    } else {
+        block.likelihood_mat = xt::empty_like(block.idx_mat);
+        auto ndim = block.likelihood_mat.dimension();
+        auto dim0 = block.likelihood_mat.shape(0);
+        auto dim1 = block.likelihood_mat.shape(1);
+        xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all(), xt::all());
+
     }
 }
 
@@ -114,16 +124,31 @@ void transform_lut(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void inverse_transform_lut(
-    UInt32MatDtype& likelihood_mat, UInt32ArrDtype& lut, UInt32MatDtype& idx_mat
+    UInt32MatDtype& likelihood_mat,
+    UInt32ArrDtype& lut,
+    UInt32MatDtype& idx_mat
 ){
+
+    auto num_dim = lut.dimension();
+
+    UTILS_DIE_IF(num_dim != 1, "LUT dimension must be 1!");
+    auto num_unique_vals = lut.shape(0);
 
     likelihood_mat = xt::empty_like(idx_mat);
     auto m = likelihood_mat.shape(0);
     auto n = likelihood_mat.shape(1);
 
-    for (size_t i=0; i<m; i++){
-        for (size_t j=0; j<n; j++){
-            likelihood_mat(i, j) = lut(idx_mat(i, j));
+    if (num_unique_vals > 1){
+        for (size_t i=0; i<m; i++){
+            for (size_t j=0; j<n; j++){
+                likelihood_mat(i, j) = lut(idx_mat(i, j));
+            }
+        }
+    } else {
+        for (size_t i=0; i<m; i++){
+            for (size_t j=0; j<n; j++){
+                likelihood_mat(i, j) = lut(i, j);
+            }
         }
     }
 
