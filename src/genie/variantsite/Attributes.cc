@@ -31,7 +31,6 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         rowInTile++;
     } else {
         writers.back().flush();
-        //   convertToTypedData();
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
@@ -71,23 +70,6 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
     }
 
     return std::vector<std::stringstream>();
-}
-
-void AttributeTile::convertToTypedData() {
-    core::DataType TypeId = info.getAttributeType();
-    uint8_t numArrayDims = info.getArrayLength();
-    std::vector<uint32_t> arrayDims;
-    arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
-    for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
-    genie::core::record::annotation_access_unit::TypedData typedData(TypeId, numArrayDims, arrayDims);
-    util::BitReader typedReader(tiles.back());
-    typedData.convertToTypedData(typedReader);
-    tiles.back().str("");
-    tiles.back().clear();
-    core::Writer typedWriter(&tiles.back());
-    typedData.write(typedWriter);
-    writers.back() = typedWriter;
-    writers.back().flush();
 }
 
 void AttributeTile::AddFirst() {

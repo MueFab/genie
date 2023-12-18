@@ -15,12 +15,12 @@
 #include <utility>
 #include <vector>
 #include "genie/core/record/annotation_parameter_set/record.h"
-
+#include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 class RandomAnnotationEncodingParameters {
  public:
-    genie::core::record::annotation_parameter_set::LikelihoodParameters randomLikelihood();
+    genie::likelihood::LikelihoodParameters randomLikelihood();
 
     genie::core::record::annotation_parameter_set::AttributeParameterSet randomAttributeParameterSet();
 
@@ -67,16 +67,6 @@ class RandomAnnotationEncodingParameters {
     uint8_t randomU3() { return static_cast<uint8_t>(rand() % 8); }
     uint8_t randomU2() { return static_cast<uint8_t>(rand() % 4); }
     bool randomBool() { return static_cast<bool>(rand() % 2); }
-    /*
-    uint8_t randomType() {
-        uint8_t Type = static_cast<uint8_t>(rand() % 13);
-        // replace all signed types
-        if (Type == 3) Type = 4;
-        if (Type == 5) Type = 6;
-        if (Type == 7) Type = 8;
-        if (Type == 9) Type = 10;
-        return Type;
-    }*/
 
     genie::core::DataType randomType() {
         uint8_t Type = static_cast<uint8_t>(rand() % 13);

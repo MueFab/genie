@@ -14,7 +14,17 @@
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
+
 #include "genie/variantsite/ParameterSetComposer.h"
+#include "genie/core/record/annotation_parameter_set/TileStructure.h"
+#include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
+#include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
+#include "genie/entropy/bsc/encoder.h"
+#include "genie/entropy/lzma/encoder.h"
+#include "genie/entropy/zstd/encoder.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -88,10 +98,9 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
 
     // -----------------------------------------------------------------------------------------
 
-    // genie::genotype::GenotypeParameters genotype_parameters;
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihood_parameters;
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
     genie::genotype::GenotypeParameters genotype_parameters;
+    genie::likelihood::LikelihoodParameters likelihood_parameters;
+    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
 
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
     uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());

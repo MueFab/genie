@@ -84,6 +84,7 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
             }
         }
     }
+    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -107,6 +108,7 @@ void transform_max_value(EncodingBlock& block) {
         max_val = static_cast<signed char>(max_val + 1);
         xt::filter(allele_mat, xt::equal(allele_mat, -2)) = max_val;
     }
+    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -134,6 +136,7 @@ void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis) {
         // Clean-up the remaining bin_mats
         bin_mats.resize(1);
     }
+    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -203,7 +206,9 @@ void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis) {
 
 void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
-
+    (void)bin_mat;
+    (void)ids;
+    (void)axis;
     auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
     // TODO(Yeremia): requires explicit conversion
     ids = xt::random::permutation<uint32_t>(num_elem);

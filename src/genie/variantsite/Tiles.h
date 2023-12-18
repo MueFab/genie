@@ -42,7 +42,10 @@ class TiledStream {
     explicit TiledStream(uint64_t _rowsPerTile) : rowsPerTile(_rowsPerTile), rowInTile(0), tiles{} {}
     TiledStream() : rowsPerTile(0), rowInTile(0), tiles{} {}
 
-    void setRowsPerTile(uint64_t _rowsPerTile) { rowsPerTile = _rowsPerTile; }
+    void setRowsPerTile(uint64_t _rowsPerTile) {
+        rowsPerTile = _rowsPerTile;
+        rowInTile = 0;
+    }
 
     template <class T>
     void write(T value, uint8_t bits) {

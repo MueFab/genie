@@ -30,24 +30,6 @@ namespace genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//struct VariantsPayload {
-//    uint32_t variants_payload_size;
-//    std::vector<uint8_t> variants_payload;
-//    uint32_t sort_variants_row_ids_payload_size;
-//    size_t payloadSize() const { return variants_payload.size(); }
-//};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//struct PhasesPayload {
-//    bool sort_variants_rows_flag;
-//    bool sort_variants_cols_flag;
-//    bool transpose_variants_mat_flag;
-//    genie::core::AlgoID variants_codec_ID;
-//};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 class BinMatPayload {
  private:
     core::AlgoID codecID;
@@ -69,26 +51,6 @@ class BinMatPayload {
     void writeCompressed(core::Writer& writer) const;
 };
 
-//class LikelihoodPayload {
-// private:
-//    uint32_t nrows;
-//    uint32_t ncols;
-//    std::vector<uint32_t> payload;
-//    bool transformFlag;
-//    uint32_t additionalPayloadSize;
-//    std::vector<uint8_t> additionalPayload;
-//
-// public:
-//    LikelihoodPayload(uint32_t _nrows, uint32_t _ncols, std::vector<uint32_t> _payload, bool _transformFlag,
-//                      uint32_t _additionalPayloadSize, std::vector<uint8_t> _additionalPayload)
-//        :  nrows(_nrows),
-//           ncols(_ncols),
-//           payload(_payload),
-//           transformFlag(_transformFlag),
-//           additionalPayloadSize(_additionalPayloadSize),
-//          additionalPayload(_additionalPayload)
-//    {};
-//};
 
 class RowColIdsPayload {
  private:

@@ -11,6 +11,7 @@
 
 #include "RandomRecordFillIn.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
+#include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define GENERATE_TEST_FILES false
@@ -67,7 +68,7 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         1, {2}, {genie::core::DataType::BOOL}, {0}, {{0}}, {{{{{0}}}}});
     genie::genotype::GenotypeParameters genotypeParameters;
-    genie::core::record::annotation_parameter_set::LikelihoodParameters likelihoodParameters;
+    genie::likelihood::LikelihoodParameters likelihoodParameters;
     genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
 
     genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration(

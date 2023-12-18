@@ -20,9 +20,9 @@
 
 #include "AlgorithmParameters.h"
 #include "ContactMatrixParameters.h"
-#include "genie/genotype/genotype_parameters.h"
-#include "LikelihoodParameters.h"
 #include "genie/core/writer.h"
+#include "genie/genotype/genotype_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,24 +31,27 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-
 class DescriptorConfiguration {
  private:
     AnnotDesc descriptor_ID;
     AlgoID encoding_mode_ID;
     genie::genotype::GenotypeParameters genotype_parameters;
-    LikelihoodParameters likelihood_parameters;
+    genie::likelihood::LikelihoodParameters likelihood_parameters;
     ContactMatrixParameters contact_matrix_parameters;
     AlgorithmParameters algorithm_parameters;
 
  public:
     DescriptorConfiguration();
     explicit DescriptorConfiguration(util::BitReader& reader);
-    DescriptorConfiguration(AnnotDesc descriptor_ID,
-                            AlgoID encoding_mode_ID,
+    DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
                             genie::genotype::GenotypeParameters genotype_parameters,
-                            LikelihoodParameters likelihood_parameters,
+                            genie::likelihood::LikelihoodParameters likelihood_parameters,
                             ContactMatrixParameters contact_matrix_parameters,
+                            AlgorithmParameters algorithm_parameters);
+
+    DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
+                            genie::genotype::GenotypeParameters genotype_parameters,
+                            genie::likelihood::LikelihoodParameters likelihood_parameters,
                             AlgorithmParameters algorithm_parameters);
 
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
@@ -61,7 +64,7 @@ class DescriptorConfiguration {
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     AlgoID getEncodingModeID() const { return encoding_mode_ID; }
     genie::genotype::GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }
-    LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
+    genie::likelihood::LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
     ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }
     AlgorithmParameters getAlgorithmParameters() const { return algorithm_parameters; }
 };

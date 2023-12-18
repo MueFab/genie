@@ -49,6 +49,18 @@ struct EncodingBlock {
     core::DataType dtype_id;
     std::stringstream serialized_mat;
     std::stringstream serialized_arr;
+    EncodingBlock() {}
+    EncodingBlock(const EncodingBlock& other) {
+        nrows = other.nrows;
+        ncols = other.ncols;
+        likelihood_mat = other.likelihood_mat;
+        lut = other.lut;
+        nelems = other.nelems;
+        idx_mat = other.idx_mat;
+        dtype_id = other.dtype_id;
+        serialized_mat << other.serialized_mat.rdbuf();
+        serialized_arr << other.serialized_arr.rdbuf();
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

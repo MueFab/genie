@@ -49,7 +49,6 @@ set(source_files
         record/annotation_access_unit/TypedData.cc
 
         record/annotation_parameter_set/record.cc
-        record/annotation_parameter_set/LikelihoodParameters.cc
         record/annotation_parameter_set/AttributeParameterSet.cc
         record/annotation_parameter_set/AlgorithmParameters.cc
         record/annotation_parameter_set/ContactMatrixParameters.cc
@@ -112,6 +111,7 @@ add_library(genie-core ${source_files})
 
 
 target_link_libraries(genie-core PUBLIC genie-util)
+target_link_libraries(genie-core PUBLIC genie-likelihood)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)

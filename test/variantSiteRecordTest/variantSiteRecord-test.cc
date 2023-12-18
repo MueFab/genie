@@ -283,6 +283,8 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
 }
 
+
+
 TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.site";
@@ -320,14 +322,33 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : tile_descriptorStream) {
-            ASSERT_GE(desctile.second.getNrOfTiles(), 10);
-            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+            if (desctile.first == genie::core::AnnotDesc::SEQUENCEID)
+            {
+                ASSERT_GE(desctile.second.getNrOfTiles(), 10);
+                desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+
+                auto temp = desc[desctile.first].str().size();
+                EXPECT_EQ(temp, defaultTileSize*2) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            }
         }
 
         std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
         for (auto& attrtile : tile_attributeStream) {
             ASSERT_GE(attrtile.second.getNrOfTiles(), 10);
             attr[attrtile.first] = attrtile.second.getTypedTile(i);
+       
+            if (info[attrtile.first].getAttributeType() != genie::core::DataType::STRING) {
+                auto datastreamSize = attr[attrtile.first].getDataStream().str().size();
+                genie::core::ArrayType arraytpe;
+                auto elemSize = arraytpe.getDefaultBitsize(info[attrtile.first].getAttributeType());
+                elemSize;
+                datastreamSize;
+                auto nrOfArrays = info[attrtile.first].getArrayLength();
+                nrOfArrays;
+
+                auto expTileSize = datastreamSize * 8 / (nrOfArrays * elemSize);
+               EXPECT_EQ(defaultTileSize, expTileSize);
+            }
         }
 
         accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);

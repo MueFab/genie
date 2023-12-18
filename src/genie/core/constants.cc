@@ -500,6 +500,59 @@ uint8_t range2bytes(std::pair<int64_t, int64_t> range) {
     return bits2bytes(bits);
 }
 
+std::string AnnotDescToString(AnnotDesc desc) {
+    switch (desc) {
+        case genie::core::AnnotDesc::SEQUENCEID:
+            return "SEQUENCEID";
+        case genie::core::AnnotDesc::STARTPOS:
+            return "STARTPOS";
+        case genie::core::AnnotDesc::ENDPOS:
+            return "ENDPOS";
+        case genie::core::AnnotDesc::STRAND:
+            return "STRAND";
+        case genie::core::AnnotDesc::NAME:
+            return "NAME";
+        case genie::core::AnnotDesc::DESCRIPTION:
+            return "DESCRIPTION";
+        case genie::core::AnnotDesc::LINKNAME:
+            return "LINKNAME";
+        case genie::core::AnnotDesc::LINKID:
+            return "LINKID";
+        case genie::core::AnnotDesc::DEPTH:
+            return "DEPTH";
+        case genie::core::AnnotDesc::SEQQUALITY:
+            return "SEQQUALITY";
+        case genie::core::AnnotDesc::MAPQUALITY:
+            return "MAPQUALITY";
+        case genie::core::AnnotDesc::MAPNUMQUALITY0:
+            return "MAPNUMQUALITY0";
+        case genie::core::AnnotDesc::REFERENCE:
+            return "REFERENCE";
+        case genie::core::AnnotDesc::ALTERN:
+            return "ALTERN";
+        case genie::core::AnnotDesc::GENOTYPE:
+            return "GENOTYPE";
+        case genie::core::AnnotDesc::LIKELIHOOD:
+            return "LIKELIHOOD";
+        case genie::core::AnnotDesc::FILTER:
+            return "FILTER";
+        case genie::core::AnnotDesc::FEATURENAME:
+            return "FEATURENAME";
+        case genie::core::AnnotDesc::FEATUREID:
+            return "FEATUREID";
+        case genie::core::AnnotDesc::ONTOLOGYNAME:
+            return "ONTOLOGYNAME";
+        case genie::core::AnnotDesc::ONTOLOGYID:
+            return "ONTOLOGYID";
+        case genie::core::AnnotDesc::CONTACT:
+            return "CONTACT";
+        case genie::core::AnnotDesc::ATTRIBUTE:
+            return "ATTRIBUTE";
+        default:
+            return "";
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

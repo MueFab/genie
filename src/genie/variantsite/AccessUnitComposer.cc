@@ -14,6 +14,11 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/variantsite/AccessUnitComposer.h"
+#include "genie/core/record/annotation_access_unit/block.h"
+#include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
+
+#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/record/variant_site/record.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -49,7 +54,6 @@ void AccessUnitComposer::setAccessUnit(
         block.set(blockInfo);
         blocks.push_back(block);
     }
-    // -------- descriptors ---------- //
 
     // -------- attributes ----------- //
     auto attributeParameterSets = _annotationParameterSet.getAnnotationEncodingParameters().getAttributeParameterSets();

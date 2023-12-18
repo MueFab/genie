@@ -64,7 +64,7 @@ class Record {
     uint8_t getATID() const { return AT_ID; }
     core::AlphabetID getATAlphbetID() const { return AT_alphabet_ID; }
     uint8_t getATCoordSize() const { return AT_coord_size; }
-    bool isATPos$0Bits() const { return AT_pos_40_bits_flag; }
+    bool isATPos40Bits() const { return AT_pos_40_bits_flag; }
     uint8_t getNumberOfAuxAttributeGroups() const { return n_aux_attribute_groups; }
     std::vector<TileConfiguration> getTileConfigurations() const { return tile_configuration; }
     AnnotationEncodingParameters getAnnotationEncodingParameters() const { return annotation_encoding_parameters; }
