@@ -226,7 +226,6 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         inputfile.close();
     }
 
-
     genie::variant_site::ParameterSetComposer encodeParameters;
 
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
@@ -234,12 +233,10 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     std::vector<genie::core::AnnotDesc> descrList;
     for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
-
     ASSERT_EQ(parser.getNrOfTiles(), 1);
     auto info = parser.getAttributes().getInfo();
     std::map<genie::core::AnnotDesc, std::stringstream> desc;
     std::map<std::string, std::stringstream> attr;
-
 
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         for (auto& desctile : tile_descriptorStream) {
@@ -255,7 +252,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
-    uint8_t AT_ID =0;
+    uint8_t AT_ID = 0;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit, AG_class, AT_ID);
@@ -282,8 +279,6 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         txtfile.close();
     }
 }
-
-
 
 TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -322,13 +317,25 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : tile_descriptorStream) {
-            if (desctile.first == genie::core::AnnotDesc::SEQUENCEID)
-            {
-                ASSERT_GE(desctile.second.getNrOfTiles(), 10);
-                desc[desctile.first] << desctile.second.getTile(i).rdbuf();
+            ASSERT_GE(desctile.second.getNrOfTiles(), 10);
+            desc[desctile.first] << desctile.second.getTile(i).rdbuf();
 
-                auto temp = desc[desctile.first].str().size();
-                EXPECT_EQ(temp, defaultTileSize*2) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            auto temp = desc[desctile.first].str().size();
+            if (desctile.first == genie::core::AnnotDesc::SEQUENCEID) {
+                EXPECT_EQ(temp, defaultTileSize * 2) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            }
+            if (desctile.first == genie::core::AnnotDesc::STARTPOS) {
+                EXPECT_EQ(temp, defaultTileSize * 8) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            }
+            if (desctile.first == genie::core::AnnotDesc::DEPTH ||
+                desctile.first == genie::core::AnnotDesc::MAPQUALITY) {
+                EXPECT_EQ(temp, defaultTileSize * 4) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            }
+            if (desctile.first == genie::core::AnnotDesc::STRAND) {
+                EXPECT_EQ(temp, defaultTileSize / 4) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
+            }
+            if (desctile.first == genie::core::AnnotDesc::LINKID || desctile.first == genie::core::AnnotDesc::FILTER) {
+                EXPECT_EQ(temp, defaultTileSize) << "descr: " << AnnotDescToString(desctile.first) << "," << i;
             }
         }
 
@@ -336,7 +343,7 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
         for (auto& attrtile : tile_attributeStream) {
             ASSERT_GE(attrtile.second.getNrOfTiles(), 10);
             attr[attrtile.first] = attrtile.second.getTypedTile(i);
-       
+
             if (info[attrtile.first].getAttributeType() != genie::core::DataType::STRING) {
                 auto datastreamSize = attr[attrtile.first].getDataStream().str().size();
                 genie::core::ArrayType arraytpe;
@@ -347,11 +354,12 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
                 nrOfArrays;
 
                 auto expTileSize = datastreamSize * 8 / (nrOfArrays * elemSize);
-               EXPECT_EQ(defaultTileSize, expTileSize);
+                EXPECT_EQ(defaultTileSize, expTileSize);
             }
         }
 
-        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
+        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID,
+                                 rowIndex);
         rowIndex += defaultTileSize;
     }
 

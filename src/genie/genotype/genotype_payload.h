@@ -39,8 +39,8 @@ class BinMatPayload {
     std::vector<uint8_t> CompressedPayload;
 
  public:
-    BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
-        : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols) {}
+     BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
+         : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols), CompressedPayload {} {}
     size_t payloadSize() const { return payload.size(); }
 
 

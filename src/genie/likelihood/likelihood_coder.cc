@@ -66,6 +66,9 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
         auto ndim = block.likelihood_mat.dimension();
         auto dim0 = block.likelihood_mat.shape(0);
         auto dim1 = block.likelihood_mat.shape(1);
+        (void)ndim;
+        (void)dim0;
+        (void)dim1;
         xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all(), xt::all());
 
     }
