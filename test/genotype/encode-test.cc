@@ -7,6 +7,7 @@
 #include <codecs/include/mpegg-codecs.h>
 #include <gtest/gtest.h>
 #include <fstream>
+#include <tuple>
 #include <vector>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xoperation.hpp>
@@ -186,8 +187,9 @@ TEST(Genotype, conformanceTests) {
     uint8_t AG_class = 0;
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     auto& attributeInfo = std::get<genie::genotype::EncodingBlock>(tupleoutput).attributeInfo;
+    genie::likelihood::LikelihoodParameters likelihoodParameters;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(AT_ID, attributeInfo, genotypeParameters, opt.block_size);
+        genotypeParameterSet.Build(AT_ID, attributeInfo, genotypeParameters, likelihoodParameters, opt.block_size);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     //-----------------------------------------------------
@@ -610,4 +612,118 @@ TEST(Genotype, JBIG) {
     for (size_t i = 0; i < payload_len; i++) {
         ASSERT_EQ(*(payload + i), *(orig_payload + i));
     }
+}
+
+std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeEncoding(
+    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
+    genie::genotype::EncodingOptions opt = {
+        blockSize,                                   // block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+        false,                                       // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::core::AlgoID::JBIG                    // codec_ID;
+    };
+
+    return genie::genotype::encode_block(opt, recs);
+}
+#include "genie/likelihood/likelihood_coder.h"
+#include "genie/likelihood/likelihood_payload.h"
+
+std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodEncoding(
+    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
+    bool TRANSFORM_MODE = true;
+    genie::likelihood::EncodingOptions opt = {
+        blockSize,       // block_size
+        TRANSFORM_MODE,  // transform_flag;
+    };
+    genie::likelihood::EncodingBlock block;
+    genie::likelihood::extract_likelihoods(opt, block, recs);
+    transform_likelihood_mat(opt, block);
+    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
+    genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
+    genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
+    block.serialized_mat.seekp(0, std::ios::end);
+    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
+                                                       TRANSFORM_MODE, block.dtype_id);
+    return std::make_tuple(parameters, block);
+}
+TEST(Genotype, genoAndLikelihood) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/ALL.chrX.5000.vcf.geno";
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+    reader.close();
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 5000);
+
+    uint32_t BLOCK_SIZE = 200;
+
+    auto genotypeData = genotypeEncoding(BLOCK_SIZE, recs);
+    auto likelihoodData = likelihoodEncoding(BLOCK_SIZE, recs);
+    //--------------------------------------------------
+    uint8_t AT_ID = 1;
+    uint8_t AG_class = 0;
+    genie::genotype::GenotypeParameters genotypeParameters =
+        std::get<genie::genotype::GenotypeParameters>(genotypeData);
+    auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);
+    genie::genotype::ParameterSetComposer genotypeParameterSet;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
+                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
+
+    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
+
+    //--------------------------------------------------
+    std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo =
+        datablock.attributeInfo;
+    std::map<std::string, std::stringstream> attributeStream;
+    for (auto formatdata : datablock.attributeData)
+        for (size_t i = 0; i < formatdata.second.size(); ++i)
+            attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);
+
+    std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
+    descriptorStream[genie::core::AnnotDesc::GENOTYPE];
+    {
+        genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
+        genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
+        genotypePayload.write(writer);
+    }
+    descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
+    {
+        genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
+                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
+        genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
+        payload.write(writer);
+    }
+    genie::variant_site::AccessUnitComposer accessUnitcomposer;
+    genie::core::record::annotation_access_unit::Record annotationAccessUnit;
+
+    accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
+                                     annotationAccessUnit, AG_class, AT_ID);
+    genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
+
+    std::ofstream testfile;
+    testfile.open(filepath + ".bin", std::ios::binary | std::ios::out);
+    genie::core::Writer testwriter(&testfile);
+    std::ofstream txtfile;
+    txtfile.open(filepath + ".txt", std::ios::out);
+    genie::core::Writer txtwriter(&txtfile, true);
+
+    APS_dataUnit.write(testwriter);
+    APS_dataUnit.write(txtwriter);
+
+    AAU_dataUnit.write(testwriter);
+    AAU_dataUnit.write(txtwriter);
+    testfile.close();
+    txtfile.close();
 }
