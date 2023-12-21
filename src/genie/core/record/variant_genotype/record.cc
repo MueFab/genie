@@ -150,7 +150,7 @@ bool VariantGenotype::getLinkedRecord() const { return static_cast<bool>(link_re
 
 const LinkRecord& VariantGenotype::getLinkRecord() const { return link_record.value(); }
 
-const std::vector<format_field>& VariantGenotype::getFormats() const { 
+ const std::vector<format_field>& VariantGenotype::getFormats() const { 
     return format; }
 
 // ---------------------------------------------------------------------------------------------------------------------

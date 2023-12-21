@@ -364,20 +364,48 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     }
 
     std::ofstream testfile;
-    testfile.open(filepath + "_moretiles.bin", std::ios::binary | std::ios::out);
+    std::string difName = "_moretiles_without";
+    testfile.open(filepath + difName + ".bin", std::ios::binary | std::ios::out);
     genie::core::Writer testwriter(&testfile);
     std::ofstream txtfile;
-    txtfile.open(filepath + "_moretiles.txt", std::ios::out);
+    txtfile.open(filepath + difName + ".txt", std::ios::out);
     genie::core::Writer txtwriter(&txtfile, true);
+
+    std::ofstream apsbin;
+    std::ofstream apstxt;
+    apsbin.open(filepath + difName + "_aps.bin");
+    apstxt.open(filepath + difName + "_aps.txt");
+    genie::core::Writer apsbinwriter(&apsbin);
+    genie::core::Writer apstxtwriter(&apstxt, true);
+
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     APS_dataUnit.write(testwriter);
+    APS_dataUnit.write(apstxtwriter);
+    apsbin.close();
+    apstxt.close();
+    
+    APS_dataUnit.write(apsbinwriter);
     APS_dataUnit.write(txtwriter);
 
+
+    uint8_t tile = 0;
     for (auto& aau : annotationAccessUnit) {
+        std::ofstream aaubin;
+        std::ofstream aautxt;
+        aaubin.open(filepath + difName + "_aau" + std::to_string(tile)+ ".bin");
+        aautxt.open(filepath + difName + "_aau" + std::to_string(tile) + ".txt");
+        genie::core::Writer aaubinwriter(&aaubin);
+        genie::core::Writer aautxtwriter(&aautxt, true);
+
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter);
+        AAU_dataUnit.write(aaubinwriter);
+        AAU_dataUnit.write(aautxtwriter);
+        aaubin.close();
+        aautxt.close();
+        tile++;
     }
     testfile.close();
     txtfile.close();
