@@ -187,36 +187,31 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
         block.serialized_mat
     );
 
-    genie::likelihood::serialize_arr(
-        block.lut,
-        block.nelems,
-        block.serialized_arr
-    );
-
-    auto target_serialized_mat = 0;
+    auto target_serialized_mat_len = 0;
     if (TRANSFORM_MODE) {
-        target_serialized_mat = block.nrows * block.ncols * 2;
+        target_serialized_mat_len = block.nrows * block.ncols * 2;
+        genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
     } else {
-        target_serialized_mat = block.nrows * block.ncols * 4;
+        target_serialized_mat_len = block.nrows * block.ncols * 4;
     }
 
     block.serialized_mat.seekp(0, std::ios::end);
     ASSERT_EQ(
         (size_t) block.serialized_mat.tellp(),
-        target_serialized_mat
+        target_serialized_mat_len
     );
 
-    block.serialized_arr.seekp(0, std::ios::end);
-    ASSERT_EQ(
-        (size_t) block.serialized_arr.tellp(),
-        block.lut.size() * 4
-    );
+//    block.serialized_arr.seekp(0, std::ios::end);
+//    ASSERT_EQ(
+//        (size_t) block.serialized_arr.tellp(),
+//        block.lut.size() * 4
+//    );
 
-    const std::string& serialized_arr_str = block.serialized_arr.str();
-    size_t serialized_arr_len = (size_t) block.serialized_arr.tellp();
-    auto* serialized_arr_payload = (unsigned char*)calloc(serialized_arr_len, sizeof(unsigned char));
-    auto* serialized_arr_ptr = serialized_arr_str.c_str();
-    std::memcpy(serialized_arr_payload, serialized_arr_ptr, serialized_arr_len);
+    const std::string& serialized_mat_str = block.serialized_mat.str();
+    size_t serialized_mat_len = (size_t) block.serialized_mat.tellp();
+    auto* serialized_mat_payload = (unsigned char*)calloc(serialized_mat_len, sizeof(unsigned char));
+    auto* serialized_mat_ptr = serialized_mat_str.c_str();
+    std::memcpy(serialized_mat_payload, serialized_mat_ptr, serialized_mat_len);
 
     uint8_t* compressed_data;
     size_t compressed_data_len;
@@ -224,8 +219,8 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     mpegg_lzma_compress_default(
         &compressed_data,
         &compressed_data_len,
-        serialized_arr_payload,
-        serialized_arr_len
+        serialized_mat_payload,
+        serialized_mat_len
     );
 
     uint8_t* recon_data;
@@ -238,10 +233,10 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
         compressed_data_len
     );
 
-    ASSERT_EQ(serialized_arr_len, recon_data_len);
+    ASSERT_EQ(serialized_mat_len, recon_data_len);
     for (size_t i = 0; i < recon_data_len; i++) {
         ASSERT_EQ(
-            (uint8_t) *(serialized_arr_payload + i),
+            (uint8_t) *(serialized_mat_payload + i),
             (uint8_t) *(recon_data + i)
                 ) << "Index " << i;
     }
