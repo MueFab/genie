@@ -57,6 +57,7 @@ class format_field {
     core::DataType getType() const { return type; }
     uint32_t getSampleCount() const { return sample_count; }
     const std::vector<std::vector<std::vector<uint8_t>>>& getValue() const { return value; }
+    uint8_t getArrayLength() const { return arrayLength; }
 };
 
 /**
@@ -95,7 +96,7 @@ class VariantGenotype {
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool getLinkedRecord() const;
     const LinkRecord& getLinkRecord() const;
-    const std::vector<format_field>& getFormats() const;
+    const std::vector<format_field>& getFormats() const ;
 };
 
 }  // namespace record

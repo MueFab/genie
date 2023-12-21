@@ -235,10 +235,20 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     //--------------------------------------------------
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo =
         datablock.attributeInfo;
-    std::map<std::string, std::stringstream> attributeStream;
+   /* std::map<std::string, std::stringstream> attributeStream;
     for (auto formatdata : datablock.attributeData)
         for (size_t i = 0; i < formatdata.second.size(); ++i)
-            attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);
+            attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);*/
+
+    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
+    for (auto formatdata : datablock.attributeData) {
+        auto& info = attributesInfo[formatdata.first];
+        auto arraylength = info.getArrayLength();
+        std::vector<uint32_t> arrayDims; arrayDims.push_back(BLOCK_SIZE);
+        for (auto i = 1; i < arraylength; ++i) arrayDims.push_back(2);
+        attributeTDStream[formatdata.first].set(info.getAttributeType(), info.getArrayLength(), arrayDims);
+    }
+
 
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
@@ -257,8 +267,8 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
 
-    accessUnitcomposer.setAccessUnit(descriptorStream, attributeStream, attributesInfo, annotationParameterSet,
-                                     annotationAccessUnit, AG_class, AT_ID);
+    accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributesInfo, annotationParameterSet,
+                                     annotationAccessUnit, AG_class, AT_ID,0);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
     std::ofstream outputFile;

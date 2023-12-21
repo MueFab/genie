@@ -18,8 +18,8 @@
 // #include <xtensor/xmath.hpp>
 // #include <xtensor/xoperation.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/record/variant_genotype/record.h"
 #include "genie/likelihood/likelihood_parameters.h"
 #include "genotype_parameters.h"
 
@@ -38,6 +38,7 @@ using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
+using AttrType = std::vector<uint8_t>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +81,9 @@ struct EncodingBlock {
     UIntVecDtype phasing_col_ids;
 
     std::map<std::string, core::record::annotation_parameter_set::AttributeData> attributeInfo;
-    std::map<std::string, std::vector<uint8_t>> attributeData;
+
+    // <block_size, num_samples, format_count/array_length, type>
+    std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>> attributeData;
 
     likelihood::LikelihoodParameters likelihoodParameters;
     std::vector<uint32_t> likelihoodData;
@@ -141,9 +144,8 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
-                 std::map<std::string, std::vector<uint8_t>>& values);
+                 std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values);
 // ---------------------------------------------------------------------------------------------------------------------
-
 
 /*
 {

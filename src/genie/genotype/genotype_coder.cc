@@ -84,7 +84,6 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
             }
         }
     }
-    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -108,7 +107,6 @@ void transform_max_value(EncodingBlock& block) {
         max_val = static_cast<signed char>(max_val + 1);
         xt::filter(allele_mat, xt::equal(allele_mat, -2)) = max_val;
     }
-    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,7 +134,6 @@ void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis) {
         // Clean-up the remaining bin_mats
         bin_mats.resize(1);
     }
-    
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -338,8 +335,8 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     bin_mat.resize(bin_mat_shape);
     auto temp = bin_mat.size();
     auto temp2 = bin_mat.shape();
-    (void)temp; // TODO(Yeremia): Whats the purpose of this code?
-    (void)temp2; // TODO(Yeremia): Whats the purpose of this code?
+    (void)temp;                                       // TODO(Yeremia): Whats the purpose of this code?
+    (void)temp2;                                      // TODO(Yeremia): Whats the purpose of this code?
     xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
 
     for (size_t i = 0; i < nrows; i++) {
@@ -379,57 +376,34 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-//TODO (Yeremia,Stefanie): Move and refactor this function to the parsing funciton
+// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing funciton
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
-                 std::map<std::string, std::vector<uint8_t>>& values) {
+                 std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values) {
+    uint8_t AttributeID = 0;
+    for (auto& attrInfo : info) {
+        values[attrInfo.first].resize(block_size);
+    }
     for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
-        uint8_t AttributeID = 0;
+        
         for (const auto& format : rec.getFormats()) {
-            uint8_t prevArray_len = info[format.getFormat()].getArrayLength();
-            auto array_len = static_cast<uint8_t>(format.getValue().at(0).size());
-            core::record::annotation_parameter_set::AttributeData thisAttr(
-                static_cast<uint8_t>(format.getFormat().size()),
-                                                               format.getFormat(), format.getType(), array_len,
-                                                               AttributeID);
-            AttributeID++;
-            info[format.getFormat()] = thisAttr;
-            info[format.getFormat()].setArrayLength(std::max(prevArray_len, array_len));
+            values[format.getFormat()];
+            if (values[format.getFormat()].size() == 0)values[format.getFormat()].resize(block_size);
+
+            std::vector<std::vector<AttrType>> formatValue = format.getValue();
+            values[format.getFormat()].at(i_rec);
+            if (values[format.getFormat()].at(i_rec).size() == 0)
+                values[format.getFormat()].at(i_rec) = formatValue;
+            else
+                values[format.getFormat()].at(i_rec).insert(values[format.getFormat()].at(i_rec).end(), formatValue.begin(), formatValue.end());
+            // values[format.getFormat()].at(i_rec).push_back(formatValue);
+            info[format.getFormat()] = core::record::annotation_parameter_set::AttributeData(
+                static_cast<uint8_t>(format.getFormat().size()), format.getFormat(), format.getType(),
+                format.getArrayLength(), AttributeID);
         }
     }
-
-    for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
-        auto& rec = recs[i_rec];
-
-        std::stringstream attr;
-        for (const auto& format : rec.getFormats()) {
-            auto formatName = format.getFormat();
-            for (uint32_t j = 0; j < format.getSampleCount(); ++j) {
-                auto CurrentAttr = info[formatName];
-                for (size_t i = 0; i < CurrentAttr.getArrayLength(); ++i) {
-                    if (i < format.getValue().at(j).size()) {
-                        for (size_t k = 0; k < format.getValue().at(j).at(i).size(); k++) {
-                            values[CurrentAttr.getAttributeName()].push_back(format.getValue().at(j).at(i).at(k));
-                        }
-                    } else {
-                        genie::core::ArrayType arrayType{};
-                        auto defaultValue = arrayType.getDefaultValue(CurrentAttr.getAttributeType());
-                        std::vector<uint8_t> defaultValueVector =
-                            arrayType.toArray(CurrentAttr.getAttributeType(), defaultValue);
-                        auto typeSize = defaultValueVector.size();
-                        if (typeSize == 0) typeSize = 1;
-
-                        for (size_t k = 0; k < defaultValueVector.size(); k++) {
-                            values[CurrentAttr.getAttributeName()].push_back(defaultValueVector.at(k));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -520,17 +494,9 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
         phasing_payload_params.variants_codec_ID = opt.codec_ID;
     }
 
-    GenotypeParameters parameter(
-        block.max_ploidy,
-        block.dot_flag,
-        block.na_flag,
-        opt.binarization_ID,
-        opt.concat_axis,
-        std::move(payload_params),
-        encode_phases_data_flag,
-        phasing_payload_params,
-        phases_value
-    );
+    GenotypeParameters parameter(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID, opt.concat_axis,
+                                 std::move(payload_params), encode_phases_data_flag, phasing_payload_params,
+                                 phases_value);
 
     genie::genotype::sort_block(opt, block);
 

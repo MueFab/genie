@@ -70,7 +70,7 @@ void TypedData::convertToTypedData(std::vector<std::vector<CustomType>> matrix) 
 void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix) {
     UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements!");
     UTILS_DIE_IF(array_dims[1] != matrix.at(0).size(), "matrix size does not match n_elements!");
-    UTILS_DIE_IF(array_dims[2] != matrix.at(1).size(), "matrix size does not match n_elements!");
+    UTILS_DIE_IF(array_dims[2] != matrix.at(0).at(0).size(), "matrix size does not match n_elements!");
 
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
@@ -96,7 +96,7 @@ void TypedData::write(core::Writer& outputWriter) const {
     }
 
     if (compressedDataStream.str().size() > 0) {
-   //     outputWriter.write(compressedDataStream.str().size(), 32);
+    //    outputWriter.write(compressedDataStream.str().size(), 32);
         outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
     } else {
         outputWriter.write(const_cast<std::stringstream*>(&dataStream));
