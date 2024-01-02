@@ -98,7 +98,7 @@ TEST(Likelihood, RoundTripNoTransform) {
 
     genie::likelihood::inverse_transform_likelihood_mat(opt, block);
     recon_likelihood_mat = xt::empty_like(block.likelihood_mat);
-    xt::view(recon_likelihood_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all());
+    xt::view(recon_likelihood_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
 
     ASSERT_TRUE(block.dtype_id == genie::core::DataType::UINT32);
     ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));
@@ -141,7 +141,7 @@ TEST(Likelihood, RoundTripTransform) {
 
     genie::likelihood::inverse_transform_likelihood_mat(opt, block);
     recon_likelihood_mat = xt::empty_like(block.likelihood_mat);
-    xt::view(recon_likelihood_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all());
+    xt::view(recon_likelihood_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
 
     ASSERT_TRUE(block.dtype_id == genie::core::DataType::UINT16);
     ASSERT_TRUE(xt::all(xt::equal(likelihood_mat, recon_likelihood_mat)));

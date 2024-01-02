@@ -95,7 +95,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
 
     descriptor_ID = genie::core::AnnotDesc::LIKELIHOOD;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-        descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, BSCalgorithmParameters));
+        descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, likelihoodParameters, BSCalgorithmParameters));
 
     uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
