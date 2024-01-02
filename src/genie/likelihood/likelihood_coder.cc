@@ -52,7 +52,7 @@ void transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock& block){
         transform_lut(block.likelihood_mat, block.lut, block.nelems, block.idx_mat, block.dtype_id);
     } else {
         block.idx_mat = xt::empty_like(block.likelihood_mat);
-        xt::view(block.idx_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all());
+        xt::view(block.idx_mat, xt::all(), xt::all()) = xt::view(block.likelihood_mat, xt::all(), xt::all());
     }
 }
 
@@ -69,7 +69,7 @@ void inverse_transform_likelihood_mat(const EncodingOptions& opt, EncodingBlock&
         (void)ndim;
         (void)dim0;
         (void)dim1;
-        xt::view(block.likelihood_mat, xt::all(), xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all(), xt::all());
+        xt::view(block.likelihood_mat, xt::all(), xt::all()) = xt::view(block.idx_mat, xt::all(), xt::all());
 
     }
 }
