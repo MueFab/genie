@@ -6,10 +6,10 @@
 
 #include <codecs/include/mpegg-codecs.h>
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <fstream>
 #include <tuple>
 #include <vector>
-#include <algorithm>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
@@ -33,6 +33,21 @@
 #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/variantsite/AccessUnitComposer.h"
 
+class GenotypeTest : public ::testing::TestWithParam<std::string> {
+ protected:
+    // Do any necessary setup for your tests here
+    GenotypeTest() = default;
+
+    ~GenotypeTest() override = default;
+
+    void SetUp() override {
+        // Code here will be called immediately before each test
+    }
+
+    void TearDown() override {
+        // Code here will be called immediately after each test
+    }
+};
 TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
@@ -193,13 +208,17 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
     block.serialized_mat << compressedData.rdbuf();
 
     genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
-        TRANSFORM_MODE, block.dtype_id);
+                                                       TRANSFORM_MODE, block.dtype_id);
     return std::make_tuple(parameters, block);
 }
-TEST(Genotype, conformanceTests) {
+
+
+TEST_P(GenotypeTest, conformanceTests) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/conformance/1.3.5.bgz.CASE01.geno";
-    //std::string filepath = gitRootDir + "/data/records/conformance/1.3.11.bgz.CASE03.geno";
+    std::string filename = GetParam();
+    std::string filepath = gitRootDir + filename;
+    // std::string filepath = gitRootDir + "/data/records/conformance/1.3.5.bgz.CASE01.geno";
+    // std::string filepath = gitRootDir + "/data/records/conformance/1.3.11.bgz.CASE03.geno";
     // std::string filepath = gitRootDir + "/data/records/conformance/1.3.11.bgz.CASE04.geno";
     std::vector<genie::core::record::VariantGenotype> recs;
 
@@ -228,7 +247,7 @@ TEST(Genotype, conformanceTests) {
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
-            std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
+                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
@@ -240,10 +259,11 @@ TEST(Genotype, conformanceTests) {
     for (auto formatdata : datablock.attributeData) {
         auto& info = attributesInfo[formatdata.first];
         std::vector<uint32_t> arrayDims;
-        arrayDims.push_back(std::min(BLOCK_SIZE,static_cast<uint32_t>(recs.size())));
+        arrayDims.push_back(std::min(BLOCK_SIZE, static_cast<uint32_t>(recs.size())));
         arrayDims.push_back(recs.at(0).getNumSamples());
         arrayDims.push_back(recs.at(0).getFormatCount());
-        attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()), arrayDims);
+        attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
+                                                arrayDims);
         attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
     }
 
@@ -258,20 +278,25 @@ TEST(Genotype, conformanceTests) {
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
     {
         genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
-            std::get<genie::likelihood::EncodingBlock>(likelihoodData));
+                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
         payload.write(writer);
+    }
+
+    // add LINK_ID default values
+    for (auto i = 0; i < BLOCK_SIZE && i < recs.size(); ++i) {
+        char val = 0xFF;
+        descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
 
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributesInfo, annotationParameterSet,
-        annotationAccessUnit, AG_class, AT_ID, 0);
+                                     annotationAccessUnit, AG_class, AT_ID, 0);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
 #ifdef WRITETESTFILES
-    if (false)
-    {
+    if (false) {
         std::string name = filepath + "_AAU";
 
         std::ofstream testfile;
@@ -290,8 +315,7 @@ TEST(Genotype, conformanceTests) {
             txtfile.close();
         }
     }
-    if(false)
-    {
+    if (false) {
         std::string name = filepath + "_APS";
 
         std::ofstream testfile;
@@ -333,6 +357,10 @@ TEST(Genotype, conformanceTests) {
     }
 #endif
 }
+INSTANTIATE_TEST_CASE_P(testallConformance, GenotypeTest,
+                         ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.geno",
+                                           "/data/records/conformance/1.3.11.bgz.CASE03.geno",
+                                           "/data/records/conformance/1.3.11.bgz.CASE04.geno"));
 
 TEST(Genotype, AdaptiveMaxValue) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -648,7 +676,6 @@ TEST(Genotype, JBIG) {
         ASSERT_EQ(*(payload + i), *(orig_payload + i));
     }
 }
-
 
 TEST(Genotype, genoAndLikelihood) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
