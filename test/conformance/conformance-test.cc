@@ -26,6 +26,10 @@
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 
+
+#include "genie/variantsite/VariantSiteParser.h"
+#include "genie/variantsite/ParameterSetComposer.h"
+
 #include "genie/util/string-helpers.h"
 
 namespace util_tests {
@@ -77,7 +81,10 @@ class GenotypeConformanceTest : public ::testing::TestWithParam<std::string> {
     }
 };
 
+
 #define WRITETESTFILES
+
+
 std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeEncoding(
     uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
     genie::genotype::EncodingOptions opt = {
@@ -138,7 +145,7 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
     return std::make_tuple(parameters, block);
 }
 
-TEST_P(GenotypeConformanceTest, conformanceTests) {
+TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = GetParam();
     std::string filepath = gitRootDir + filename;
@@ -280,7 +287,97 @@ TEST_P(GenotypeConformanceTest, conformanceTests) {
     }
 #endif
 }
-INSTANTIATE_TEST_CASE_P(testallConformance, GenotypeConformanceTest,
+INSTANTIATE_TEST_CASE_P(testallGenoConformance, GenotypeConformanceTest,
                         ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.geno",
                                           "/data/records/conformance/1.3.11.bgz.CASE03.geno",
                                           "/data/records/conformance/1.3.11.bgz.CASE04.geno"));
+
+
+
+class SiteConformanceTest : public ::testing::TestWithParam<std::string> {
+protected:
+    // Do any necessary setup for your tests here
+    SiteConformanceTest() = default;
+
+    ~SiteConformanceTest() override = default;
+
+    void SetUp() override {
+        // Code here will be called immediately before each test
+    }
+
+    void TearDown() override {
+        // Code here will be called immediately after each test
+    }
+};
+
+TEST_P(SiteConformanceTest,SiteConformancetests) {  // NOLINT(cert-err58-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = GetParam();
+    std::string filepath = gitRootDir + filename ;
+    std::string infofilename = "/data/records/1.3.5.header100.gt_only.vcf.infotags.json";
+    std::ifstream infoFieldsFile;
+    infoFieldsFile.open(gitRootDir + infofilename, std::ios::in);
+    std::stringstream infoFields;
+    if (infoFieldsFile.is_open()) {
+        infoFields << infoFieldsFile.rdbuf();
+        infoFieldsFile.close();
+    }
+    std::ifstream inputfile;
+    inputfile.open(filepath, std::ios::in | std::ios::binary);
+    uint64_t defaultTileSize = 0;
+    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
+    if (inputfile.is_open()) inputfile.close();
+
+    auto info = parser.getAttributes().getInfo();
+    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
+    auto& tile_attributeStream = parser.getAttributes().getTiles();
+    std::vector<genie::core::AnnotDesc> descrList;
+    for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
+
+    genie::variant_site::ParameterSetComposer encodeParameters;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
+        encodeParameters.setParameterSet(descrList, info, defaultTileSize);
+
+    uint8_t AG_class = 1;
+    uint8_t AT_ID = 0;
+
+    genie::variant_site::AccessUnitComposer accessUnit;
+    std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
+    uint64_t rowIndex = 0;
+    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
+        std::map<genie::core::AnnotDesc, std::stringstream> desc;
+
+        std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
+        for (auto& attrtile : tile_attributeStream) {
+            attr[attrtile.first] = attrtile.second.getTypedTile(i);
+        }
+
+        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID,
+            rowIndex);
+        rowIndex += defaultTileSize;
+    }
+
+    std::ofstream testfile;
+    testfile.open(filepath + "_output.bin", std::ios::binary | std::ios::out);
+    genie::core::Writer testwriter(&testfile);
+    std::ofstream txtfile;
+    txtfile.open(filepath + "_output.txt", std::ios::out);
+    genie::core::Writer txtwriter(&txtfile, true);
+
+    uint8_t tile = 0;
+    for (auto& aau : annotationAccessUnit) {
+        std::ofstream aaubin;
+        std::ofstream aautxt;
+        genie::core::record::data_unit::Record AAU_dataUnit(aau);
+        AAU_dataUnit.write(testwriter);
+        AAU_dataUnit.write(txtwriter);
+         tile++;
+    }
+    testfile.close();
+    txtfile.close();
+}
+
+INSTANTIATE_TEST_CASE_P(testallsiteConformance, SiteConformanceTest,
+    ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
+        "/data/records/conformance/1.3.11.bgz.CASE03.site",
+        "/data/records/conformance/1.3.11.bgz.CASE04.site"));
