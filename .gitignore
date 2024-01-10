@@ -24,3 +24,4 @@ page-output/
 .vscode/
 
 __pycache__/
+*.bak

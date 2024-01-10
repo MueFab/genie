@@ -86,7 +86,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     std::vector<uint8_t> ontology_term_name_len;
     std::vector<std::string> ontology_term_name;
 
-    uint8_t ndescriptors = 2;
+    uint8_t ndescriptors = 3;
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
         genie::core::record::annotation_parameter_set::DescriptorConfiguration(descriptor_ID, genie::core::AlgoID::LZMA,
@@ -96,6 +96,10 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     descriptor_ID = genie::core::AnnotDesc::LIKELIHOOD;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, likelihoodParameters, BSCalgorithmParameters));
+
+    descriptor_ID = genie::core::AnnotDesc::LINKID;
+    descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
+        descriptor_ID, genie::core::AlgoID::BSC, genotypeParameters, likelihoodParameters, BSCalgorithmParameters));
 
     uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
