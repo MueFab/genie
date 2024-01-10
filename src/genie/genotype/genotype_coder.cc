@@ -393,12 +393,10 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
             if (values[format.getFormat()].size() == 0)values[format.getFormat()].resize(block_size);
 
             std::vector<std::vector<AttrType>> formatValue = format.getValue();
-            values[format.getFormat()].at(i_rec);
             if (values[format.getFormat()].at(i_rec).size() == 0)
                 values[format.getFormat()].at(i_rec) = formatValue;
             else
                 values[format.getFormat()].at(i_rec).insert(values[format.getFormat()].at(i_rec).end(), formatValue.begin(), formatValue.end());
-            // values[format.getFormat()].at(i_rec).push_back(formatValue);
             info[format.getFormat()] = core::record::annotation_parameter_set::AttributeData(
                 static_cast<uint8_t>(format.getFormat().size()), format.getFormat(), format.getType(),
                 format.getArrayLength(), AttributeID);
