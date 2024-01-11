@@ -503,5 +503,7 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+
+
 }  // namespace genotype
 }  // namespace genie

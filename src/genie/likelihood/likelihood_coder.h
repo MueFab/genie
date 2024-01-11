@@ -14,6 +14,8 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 #include "genie/core/record/variant_genotype/record.h"
+#include "likelihood_parameters.h"
+
 // #include <xtensor/xstrided_view.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -106,6 +108,11 @@ void serialize_arr(
     uint32_t nelems,
     std::stringstream& payload
 );
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> encode_block(
+    genie::likelihood::EncodingOptions opt, std::vector<genie::core::record::VariantGenotype> recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
