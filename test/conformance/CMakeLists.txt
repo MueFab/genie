@@ -9,7 +9,9 @@ find_package(xtensor REQUIRED)
 message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 
 set(source_files
-        conformance-test.cc
+        site-conformance-test.cc
+        geno-conformance-test.cc
+        helpers.cc
         main.cc
 )
 

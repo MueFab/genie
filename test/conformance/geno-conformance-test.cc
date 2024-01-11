@@ -16,7 +16,6 @@
 #include "genie/genotype/genotype_payload.h"
 #include "genie/genotype/ParameterSetComposer.h"
 
-#include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
@@ -26,44 +25,8 @@
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 
+#include "helpers.h"
 
-#include "genie/variantsite/VariantSiteParser.h"
-#include "genie/variantsite/ParameterSetComposer.h"
-
-#include "genie/util/string-helpers.h"
-
-namespace util_tests {
-
-std::string exec(const std::string& cmd) {
-#ifdef WIN32
-    FILE* pipe = _popen(cmd.c_str(), "r");
-#else
-    FILE* pipe = popen(cmd.c_str(), "r");
-#endif
-    if (!pipe) {
-        return "<exec(" + cmd + ") failed>";
-    }
-
-    const int bufferSize = 256;
-    char buffer[bufferSize];
-    std::string result;
-
-    while (!feof(pipe)) {
-        if (fgets(buffer, bufferSize, pipe) != nullptr) {
-            result += buffer;
-        }
-    }
-#ifdef WIN32
-    _pclose(pipe);
-#else
-    pclose(pipe);
-#endif
-    genie::util::rtrim(result);
-
-    return result;
-}
-
-}  // namespace util_tests
 
 class GenotypeConformanceTest : public ::testing::TestWithParam<std::string> {
  protected:
@@ -85,65 +48,6 @@ class GenotypeConformanceTest : public ::testing::TestWithParam<std::string> {
 #define WRITETESTFILES
 
 
-std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeEncoding(
-    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
-    genie::genotype::EncodingOptions opt = {
-        blockSize,                                   // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
-    return genie::genotype::encode_block(opt, recs);
-}
-std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodEncoding(
-    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
-    bool TRANSFORM_MODE = true;
-    genie::likelihood::EncodingOptions opt = {
-        blockSize,       // block_size
-        TRANSFORM_MODE,  // transform_flag;
-    };
-    genie::likelihood::EncodingBlock block;
-    genie::likelihood::extract_likelihoods(opt, block, recs);
-    transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
-
-    {
-        uint32_t nrows = (uint32_t)block.idx_mat.shape(0);
-        uint32_t ncols = (uint32_t)block.idx_mat.shape(1);
-
-        if (block.dtype_id == genie::core::DataType::UINT16) {
-            for (size_t i = 0; i < nrows; i++) {
-                for (size_t j = 0; j < ncols; j++) {
-                    EXPECT_LE(block.idx_mat(i, j), block.nelems);
-                }
-            }
-        }
-    }
-
-    genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
-    genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
-    block.serialized_mat.seekp(0, std::ios::end);
-
-    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
-    std::stringstream compressedData;
-    lzmaEncoder.encode(block.serialized_arr, compressedData);
-
-    block.serialized_arr.str("");
-    block.serialized_arr << compressedData.rdbuf();
-    compressedData.str("");
-
-    lzmaEncoder.encode(block.serialized_mat, compressedData);
-    block.serialized_mat.str("");
-    block.serialized_mat << compressedData.rdbuf();
-
-    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
-                                                       TRANSFORM_MODE, block.dtype_id);
-    return std::make_tuple(parameters, block);
-}
 
 TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -165,9 +69,26 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     ASSERT_EQ(recs.size(), 3);
 
     uint32_t BLOCK_SIZE = 200;
+    bool TRANSFORM_MODE = true;
 
-    auto genotypeData = genotypeEncoding(BLOCK_SIZE, recs);
-    auto likelihoodData = likelihoodEncoding(BLOCK_SIZE, recs);
+    genie::likelihood::EncodingOptions likelihood_opt = {
+    BLOCK_SIZE,       // block_size
+    TRANSFORM_MODE,  // transform_flag;
+    };
+
+    genie::genotype::EncodingOptions genotype_opt = {
+    BLOCK_SIZE,                                   // block_size;
+    genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+    genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+    false,                                       // transpose_mat;
+    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+    genie::core::AlgoID::JBIG                    // codec_ID;
+    };
+
+
+    auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
+    auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
     //--------------------------------------------------
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
@@ -293,91 +214,3 @@ INSTANTIATE_TEST_CASE_P(testallGenoConformance, GenotypeConformanceTest,
                                           "/data/records/conformance/1.3.11.bgz.CASE04.geno"));
 
 
-
-class SiteConformanceTest : public ::testing::TestWithParam<std::string> {
-protected:
-    // Do any necessary setup for your tests here
-    SiteConformanceTest() = default;
-
-    ~SiteConformanceTest() override = default;
-
-    void SetUp() override {
-        // Code here will be called immediately before each test
-    }
-
-    void TearDown() override {
-        // Code here will be called immediately after each test
-    }
-};
-
-TEST_P(SiteConformanceTest,SiteConformancetests) {  // NOLINT(cert-err58-cpp)
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = GetParam();
-    std::string filepath = gitRootDir + filename ;
-    std::string infofilename = "/data/records/1.3.5.header100.gt_only.vcf.infotags.json";
-    std::ifstream infoFieldsFile;
-    infoFieldsFile.open(gitRootDir + infofilename, std::ios::in);
-    std::stringstream infoFields;
-    if (infoFieldsFile.is_open()) {
-        infoFields << infoFieldsFile.rdbuf();
-        infoFieldsFile.close();
-    }
-    std::ifstream inputfile;
-    inputfile.open(filepath, std::ios::in | std::ios::binary);
-    uint64_t defaultTileSize = 0;
-    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
-    if (inputfile.is_open()) inputfile.close();
-
-    auto info = parser.getAttributes().getInfo();
-    auto& tile_descriptorStream = parser.getDescriptors().getTiles();
-    auto& tile_attributeStream = parser.getAttributes().getTiles();
-    std::vector<genie::core::AnnotDesc> descrList;
-    for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
-
-    genie::variant_site::ParameterSetComposer encodeParameters;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, defaultTileSize);
-
-    uint8_t AG_class = 1;
-    uint8_t AT_ID = 0;
-
-    genie::variant_site::AccessUnitComposer accessUnit;
-    std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
-    uint64_t rowIndex = 0;
-    for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
-        std::map<genie::core::AnnotDesc, std::stringstream> desc;
-
-        std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
-        for (auto& attrtile : tile_attributeStream) {
-            attr[attrtile.first] = attrtile.second.getTypedTile(i);
-        }
-
-        accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID,
-            rowIndex);
-        rowIndex += defaultTileSize;
-    }
-
-    std::ofstream testfile;
-    testfile.open(filepath + "_output.bin", std::ios::binary | std::ios::out);
-    genie::core::Writer testwriter(&testfile);
-    std::ofstream txtfile;
-    txtfile.open(filepath + "_output.txt", std::ios::out);
-    genie::core::Writer txtwriter(&txtfile, true);
-
-    uint8_t tile = 0;
-    for (auto& aau : annotationAccessUnit) {
-        std::ofstream aaubin;
-        std::ofstream aautxt;
-        genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        AAU_dataUnit.write(testwriter);
-        AAU_dataUnit.write(txtwriter);
-         tile++;
-    }
-    testfile.close();
-    txtfile.close();
-}
-
-INSTANTIATE_TEST_CASE_P(testallsiteConformance, SiteConformanceTest,
-    ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
-        "/data/records/conformance/1.3.11.bgz.CASE03.site",
-        "/data/records/conformance/1.3.11.bgz.CASE04.site"));

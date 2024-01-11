@@ -5,9 +5,11 @@
  */
 
 #include <xtensor/xsort.hpp>
+#include <codecs/include/mpegg-codecs.h>
+
 #include "genie/util/runtime-exception.h"
 #include "likelihood_coder.h"
-
+#include "genie/entropy/lzma/encoder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -208,6 +210,38 @@ void serialize_arr(
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> encode_block(
+    genie::likelihood::EncodingOptions opt, std::vector<genie::core::record::VariantGenotype> recs) {
+    bool TRANSFORM_MODE = true;
+    
+    genie::likelihood::EncodingBlock block;
+    genie::likelihood::extract_likelihoods(opt, block, recs);
+    transform_likelihood_mat(opt, block);
+    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
+    genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
+    genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
+    block.serialized_mat.seekp(0, std::ios::end);
+
+    genie::entropy::lzma::LZMAEncoder lzmaEncoder;
+    std::stringstream compressedData;
+    lzmaEncoder.encode(block.serialized_arr, compressedData);
+
+    block.serialized_arr.str("");
+    block.serialized_arr << compressedData.rdbuf();
+    compressedData.str("");
+
+    lzmaEncoder.encode(block.serialized_mat, compressedData);
+    block.serialized_mat.str("");
+    block.serialized_mat << compressedData.rdbuf();
+
+    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
+        TRANSFORM_MODE, block.dtype_id);
+    return std::make_tuple(parameters, block);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+
 
 }
 }

@@ -166,41 +166,6 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     }
 }
 
-std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeEncoding(
-    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
-    genie::genotype::EncodingOptions opt = {
-        blockSize,                                   // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
-    return genie::genotype::encode_block(opt, recs);
-}
-
-std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodEncoding(
-    uint32_t blockSize, std::vector<genie::core::record::VariantGenotype> recs) {
-    bool TRANSFORM_MODE = true;
-    genie::likelihood::EncodingOptions opt = {
-        blockSize,       // block_size
-        TRANSFORM_MODE,  // transform_flag;
-    };
-
-    genie::likelihood::EncodingBlock block;
-    genie::likelihood::extract_likelihoods(opt, block, recs);
-    transform_likelihood_mat(opt, block);
-    genie::likelihood::UInt32MatDtype recon_likelihood_mat;
-    genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
-    genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
-    block.serialized_mat.seekp(0, std::ios::end);
-    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
-                                                       TRANSFORM_MODE, block.dtype_id);
-    return std::make_tuple(parameters, block);
-}
-
 void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _output_fpath) {
     std::ifstream reader(_input_fpath, std::ios::binary);
     genie::util::BitReader bitreader(reader);
@@ -214,19 +179,36 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     recs.pop_back();
 
     uint32_t BLOCK_SIZE = 100;
+    bool TRANSFORM_MODE = true;
 
-    auto tupleoutput = genotypeEncoding(BLOCK_SIZE, recs);
-    auto likelihoodblock = likelihoodEncoding(BLOCK_SIZE, recs);
+    genie::likelihood::EncodingOptions likelihood_opt = {
+    BLOCK_SIZE,       // block_size
+    TRANSFORM_MODE,  // transform_flag;
+    };
+
+    genie::genotype::EncodingOptions genotype_opt = {
+    BLOCK_SIZE,                                   // block_size;
+    genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+    genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+    false,                                       // transpose_mat;
+    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+    genie::core::AlgoID::JBIG                    // codec_ID;
+    };
+
+
+    auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
+    auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
 
     //--------------------------------------------------
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
-    genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(tupleoutput);
-    auto datablock = std::get<genie::genotype::EncodingBlock>(tupleoutput);
+    genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
+    auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
-                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodblock), recs.size());
+                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
@@ -259,8 +241,8 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     }
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
     {
-        genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodblock),
-                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodblock));
+        genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
+                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
         payload.write(writer);
     }
