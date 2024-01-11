@@ -58,7 +58,7 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
     }
     std::ifstream inputfile;
     inputfile.open(filepath, std::ios::in | std::ios::binary);
-    uint64_t defaultTileSize = 100;
+    uint64_t defaultTileSize = 3;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     if (inputfile.is_open()) inputfile.close();
 

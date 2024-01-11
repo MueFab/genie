@@ -52,7 +52,6 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
       AT_subtype(AT_subtype),
       AG_class(AG_class),
       annotation_access_unit_header(annotation_access_unit_header),
-      // block(block),
       attribute_contiguity(attributeContiguity),
       two_dimensional(twoDimensional),
       column_major_tile_order(columnMajorTileOrder),

@@ -79,9 +79,10 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
     if (inputfile.is_open()) {
         genie::util::BitReader reader(inputfile);
         std::ofstream outputfile(path + filename + "_site.txt");
+        genie::core::Writer txtwriter(&outputfile, true);
         do {
             genie::core::record::variant_site::Record variant_site_record(reader);
-            variant_site_record.write(outputfile);
+            variant_site_record.write(txtwriter);
         } while (inputfile.peek() != EOF);
         inputfile.close();
         outputfile.close();
