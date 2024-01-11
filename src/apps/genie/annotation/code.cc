@@ -203,34 +203,31 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     //--------------------------------------------------
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
-    genie::genotype::GenotypeParameters genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
+    genie::genotype::GenotypeParameters genotypeParameters =
+        std::get<genie::genotype::GenotypeParameters>(genotypeData);
     auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
         genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
-                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
+            std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
     //--------------------------------------------------
-
-    //--------------------------------------------------
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData> attributesInfo =
         datablock.attributeInfo;
-   /* std::map<std::string, std::stringstream> attributeStream;
-    for (auto formatdata : datablock.attributeData)
-        for (size_t i = 0; i < formatdata.second.size(); ++i)
-            attributeStream[formatdata.first].write((char*)&formatdata.second.at(i), 1);*/
 
     std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
     for (auto formatdata : datablock.attributeData) {
         auto& info = attributesInfo[formatdata.first];
-        auto arraylength = info.getArrayLength();
-        std::vector<uint32_t> arrayDims; arrayDims.push_back(BLOCK_SIZE);
-        for (auto i = 1; i < arraylength; ++i) arrayDims.push_back(2);
-        attributeTDStream[formatdata.first].set(info.getAttributeType(), info.getArrayLength(), arrayDims);
+        std::vector<uint32_t> arrayDims;
+        arrayDims.push_back(std::min(BLOCK_SIZE, static_cast<uint32_t>(recs.size())));
+        arrayDims.push_back(recs.at(0).getNumSamples());
+        arrayDims.push_back(recs.at(0).getFormatCount());
+        attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
+            arrayDims);
+        attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
     }
-
 
     std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
     descriptorStream[genie::core::AnnotDesc::GENOTYPE];
@@ -239,19 +236,28 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
         genotypePayload.write(writer);
     }
+
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
     {
         genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
-                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
+            std::get<genie::likelihood::EncodingBlock>(likelihoodData));
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
         payload.write(writer);
+    }
+
+    // add LINK_ID default values
+    for (auto i = 0u; i < BLOCK_SIZE && i < recs.size(); ++i) {
+        char val = static_cast<char>(0xFF);
+        descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
 
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributesInfo, annotationParameterSet,
-                                     annotationAccessUnit, AG_class, AT_ID,0);
+        annotationAccessUnit, AG_class, AT_ID, 0);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
+    
+    // ---------------------------------------- //
 
     std::ofstream outputFile;
     outputFile.open(_output_fpath, std::ios::binary | std::ios::out);

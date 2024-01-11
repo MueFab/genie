@@ -126,49 +126,6 @@ void Record::write(core::Writer& writer) {
     }
 }
 
-void Record::write(std::ostream& outputfile) const {
-    outputfile << std::to_string(variant_index) << ",";
-    outputfile << std::to_string(seq_ID) << ",";
-    outputfile << std::to_string(pos) << ",";
-    outputfile << std::to_string(strand) << ",";
-    outputfile << std::to_string(ID_len) << ",";
-    outputfile << '"' << ID << '"' << ",";
-    outputfile << std::to_string(description_len) << ",";
-    outputfile << '"' << description << '"' << ",";
-    outputfile << std::to_string(ref_len) << ",";
-    outputfile << '"' << ref << '"' << ",";
-    outputfile << std::to_string(alt_count) << ",";
-
-    for (auto i = 0; i < alt_count; ++i) {
-        outputfile << std::to_string(alt_len[i]) << ",";
-        outputfile << '"' << altern[i] << '"' << ",";
-    }
-
-    outputfile << std::to_string(depth) << ",";
-
-    outputfile << std::to_string(seq_qual) << ",";
-    outputfile << std::to_string(map_qual) << ",";
-    outputfile << std::to_string(map_num_qual_0) << ",";
-    outputfile << std::to_string(filters_len) << ",";
-    outputfile << '"' << filters << '"' << ",";
-    outputfile << std::to_string(info_count) << ",";
-    for (const auto& tag : info_tag) {
-        outputfile << std::to_string(tag.info_tag_len) << ",";
-        outputfile << '"' << tag.info_tag << '"' << ",";
-        outputfile << std::to_string(static_cast<uint8_t>(tag.info_type)) << ",";
-        outputfile << std::to_string(tag.info_array_len) << ",";
-        for (auto value : tag.infoValue) {
-        }
-    }
-
-    outputfile << std::to_string(linked_record) << ",";
-    if (linked_record == 1) {
-        outputfile << std::to_string(link_name_len) << ",";
-        outputfile << '"' << link_name << '"' << ",";
-        outputfile << std::to_string(reference_box_ID);
-    }
-}
-
 bool Record::read(genie::util::BitReader& reader) {
     clearData();
     variant_index = reader.read_b(64);
@@ -187,7 +144,7 @@ bool Record::read(genie::util::BitReader& reader) {
         description.resize(description_len);
         reader.readBypass(&description[0], description_len);
     }
-    ref_len = reader.readBypassBE<uint32_t>();
+    ref_len = static_cast<uint32_t>(reader.read_b(32));
     if (ref_len > 0) {
         ref.resize(ref_len);
         reader.readBypass(&ref[0], ref_len);

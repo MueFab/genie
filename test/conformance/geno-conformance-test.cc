@@ -147,44 +147,6 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
 
 #ifdef WRITETESTFILES
-    if (false) {
-        std::string name = filepath + "_AAU";
-
-        std::ofstream testfile;
-        testfile.open(name + ".bin", std::ios::binary | std::ios::out);
-        if (testfile.is_open()) {
-            genie::core::Writer writer(&testfile);
-            AAU_dataUnit.write(writer);
-            testfile.close();
-        }
-
-        std::ofstream txtfile;
-        txtfile.open(name + ".txt", std::ios::out);
-        if (txtfile.is_open()) {
-            genie::core::Writer txtWriter(&txtfile, true);
-            AAU_dataUnit.write(txtWriter);
-            txtfile.close();
-        }
-    }
-    if (false) {
-        std::string name = filepath + "_APS";
-
-        std::ofstream testfile;
-        testfile.open(name + ".bin", std::ios::binary | std::ios::out);
-        if (testfile.is_open()) {
-            genie::core::Writer writer(&testfile);
-            APS_dataUnit.write(writer);
-            testfile.close();
-        }
-
-        std::ofstream txtfile;
-        txtfile.open(name + ".txt", std::ios::out);
-        if (txtfile.is_open()) {
-            genie::core::Writer txtWriter(&txtfile, true);
-            APS_dataUnit.write(txtWriter);
-            txtfile.close();
-        }
-    }
     {
         std::string name = filepath + "_output";
 

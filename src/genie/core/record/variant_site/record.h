@@ -16,12 +16,12 @@
 #include <utility>
 #include <vector>
 
+#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -119,31 +119,12 @@ class Record {
     /**
      * @brief
      */
-    Record(uint64_t _variant_index,
-           uint16_t _seq_ID,
-           uint64_t _pos,
-           uint8_t _strand,
-           uint8_t _ID_len,
-           std::string& _ID,
-           uint8_t _description_len,
-           std::string _description,
-           uint32_t _ref_len,
-           std::string _ref,
-           uint8_t _alt_count,
-           std::vector<uint32_t> _alt_len,
-           std::vector<std::string> _altern,
-           uint32_t _depth,
-           uint32_t _seq_qual,
-           uint32_t _map_qual,
-           uint32_t _map_num_qual_0,
-           uint8_t _filters_len,
-           std::string _filters,
-           uint8_t _info_count,
-           std::vector<Info_tag> _info_tag,
-           uint8_t _linked_record,
-           uint8_t _link_name_len,
-           std::string _link_name,
-           uint8_t _reference_box_ID)
+    Record(uint64_t _variant_index, uint16_t _seq_ID, uint64_t _pos, uint8_t _strand, uint8_t _ID_len, std::string& _ID,
+           uint8_t _description_len, std::string _description, uint32_t _ref_len, std::string _ref, uint8_t _alt_count,
+           std::vector<uint32_t> _alt_len, std::vector<std::string> _altern, uint32_t _depth, uint32_t _seq_qual,
+           uint32_t _map_qual, uint32_t _map_num_qual_0, uint8_t _filters_len, std::string _filters,
+           uint8_t _info_count, std::vector<Info_tag> _info_tag, uint8_t _linked_record, uint8_t _link_name_len,
+           std::string _link_name, uint8_t _reference_box_ID)
         : variant_index(_variant_index),
           seq_ID(_seq_ID),
           pos(_pos),
@@ -184,7 +165,6 @@ class Record {
     /**
      * @brief
      */
-    void write(std::ostream& outputfile) const;
 
     uint64_t getVariantIndex() const { return variant_index; }
     uint16_t getSeqID() const { return seq_ID; }
