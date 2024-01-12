@@ -25,7 +25,7 @@
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/annotation_access_unit/typeddata.h"
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
