@@ -166,18 +166,18 @@ const LinkRecord& VariantGenotype::getLinkRecord() const { return link_record.va
 // ---------------------------------------------------------------------------------------------------------------------
 
 format_field::format_field(util::BitReader& bitreader, uint32_t _sample_count) : sample_count(_sample_count) {
-    format.resize(static_cast<uint8_t>(bitreader.read_b(8)));
+    format.resize(bitreader.read<uint8_t>());// static_cast<uint8_t>(bitreader.read_b(8)));
     for (char& c : format) c = static_cast<char>(bitreader.read_b(8));
     type = static_cast<core::DataType>(bitreader.read_b(8));
     core::ArrayType arrayType;
 
-    arrayLength = static_cast<uint8_t>(bitreader.read_b(8));
+    arrayLength = bitreader.read<uint8_t>();// static_cast<uint8_t>(bitreader.read_b(8));
     value.resize(sample_count, std::vector<std::vector<uint8_t>>(arrayLength, std::vector<uint8_t>(0)));
     for (auto& formatArray : value) {
         for (auto& oneValue : formatArray) {
-            auto temp = arrayType.toArray(type, bitreader);
-            oneValue = temp;
-            for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
+             oneValue = arrayType.toArray(type, bitreader);
+         //   oneValue = temp;
+         //   for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
         }
     }
 }

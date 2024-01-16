@@ -333,10 +333,6 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
     MatShapeDtype bin_mat_shape = {nrows, ncols};
     bin_mat.resize(bin_mat_shape);
-    auto temp = bin_mat.size();
-    auto temp2 = bin_mat.shape();
-    (void)temp;                                       // TODO(Yeremia): Whats the purpose of this code?
-    (void)temp2;                                      // TODO(Yeremia): Whats the purpose of this code?
     xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
 
     for (size_t i = 0; i < nrows; i++) {
@@ -460,7 +456,7 @@ void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, 
 
 std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
                                                            std::vector<core::record::VariantGenotype>& recs) {
-    UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG, "Invalid AlgoID or algorithm is not yet implemented");
+  //  UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG, "Invalid AlgoID or algorithm is not yet implemented");
     UTILS_DIE_IF(opt.binarization_ID == BinarizationID::UNDEFINED, "Invalid BinarizationID");
     UTILS_DIE_IF(opt.sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(opt.sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
