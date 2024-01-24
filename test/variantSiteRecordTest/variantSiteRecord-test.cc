@@ -312,7 +312,6 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     uint8_t AG_class = 1;
     uint8_t AT_ID = 0;
 
-    genie::variant_site::AccessUnitComposer accessUnit;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
@@ -359,6 +358,7 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
             }
         }
 
+        genie::variant_site::AccessUnitComposer accessUnit;
         accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID,
                                  rowIndex);
         rowIndex += defaultTileSize;
@@ -372,41 +372,14 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     txtfile.open(filepath + difName + ".txt", std::ios::out);
     genie::core::Writer txtwriter(&txtfile, true);
 
-    std::ofstream apsbin;
-    std::ofstream apstxt;
-    apsbin.open(filepath + difName + "_aps.bin");
-    apstxt.open(filepath + difName + "_aps.txt");
-    genie::core::Writer apsbinwriter(&apsbin);
-    genie::core::Writer apstxtwriter(&apstxt, true);
-
-
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     APS_dataUnit.write(testwriter);
-    APS_dataUnit.write(apstxtwriter);
-    apsbin.close();
-    apstxt.close();
-    
-    APS_dataUnit.write(apsbinwriter);
     APS_dataUnit.write(txtwriter);
 
-
-    uint8_t tile = 0;
     for (auto& aau : annotationAccessUnit) {
-        std::ofstream aaubin;
-        std::ofstream aautxt;
-        aaubin.open(filepath + difName + "_aau" + std::to_string(tile)+ ".bin");
-        aautxt.open(filepath + difName + "_aau" + std::to_string(tile) + ".txt");
-        genie::core::Writer aaubinwriter(&aaubin);
-        genie::core::Writer aautxtwriter(&aautxt, true);
-
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter);
-        AAU_dataUnit.write(aaubinwriter);
-        AAU_dataUnit.write(aautxtwriter);
-        aaubin.close();
-        aautxt.close();
-        tile++;
     }
     testfile.close();
     txtfile.close();

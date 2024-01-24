@@ -106,7 +106,7 @@ size_t Record::getSize(core::Writer& writesize) const {
     return writesize.getBitsWritten();
 }
 
-Record& Record::operator = (const Record& rec) {
+Record& Record::operator=(const Record& rec) {
     AT_ID = rec.AT_ID;
     AT_type = rec.AT_type;
     AT_subtype = rec.AT_subtype;

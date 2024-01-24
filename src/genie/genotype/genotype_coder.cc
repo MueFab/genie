@@ -9,15 +9,17 @@
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
+#include <fstream>
 // #include <xtensor/xstrided_view.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
 // ---------------------------------------------------------------------------------------------------------------------
-
 namespace genie {
 namespace genotype {
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -203,9 +205,6 @@ void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis) {
 
 void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
-    (void)bin_mat;
-    (void)ids;
-    (void)axis;
     auto num_elem = static_cast<uint32_t>(bin_mat.shape(axis));
     // TODO(Yeremia): requires explicit conversion
     ids = xt::random::permutation<uint32_t>(num_elem);
@@ -249,7 +248,6 @@ void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col
             UTILS_DIE("Invalid sort method!");
     }
 }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
@@ -465,7 +463,7 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     genie::genotype::decompose(opt, block, recs);
     genie::genotype::transform_max_value(block);
     genie::genotype::binarize_allele_mat(opt, block);
-
+ 
     // TODO(Yeremia): create function to create GenotypeParameters
     auto num_bin_mats = getNumBinMats(block);
     std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);

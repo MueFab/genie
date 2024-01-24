@@ -1,3 +1,4 @@
+#include "helpers.h"
 #include "genie/util/string-helpers.h"
 
 namespace util_tests {
@@ -29,6 +30,30 @@ std::string exec(const std::string &cmd) {
     genie::util::rtrim(result);
 
     return result;
+}
+
+FileOut::FileOut(std::string filename, std::string extension) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    if (extension == "json" || extension == "txt")
+        output.open(gitRootDir + filename + "." + extension);
+    else
+        output.open(gitRootDir + filename + "." + extension, std::ios::binary);
+}
+
+FileOut::~FileOut() {
+    if (output.is_open()) output.close();
+}
+
+FileIn::FileIn(std::string filename, std::string extension) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    if (extension == "json" || extension == "txt")
+        input.open(gitRootDir + filename + "." + extension);
+    else
+        input.open(gitRootDir + filename + "." + extension, std::ios::binary);
+}
+
+FileIn::~FileIn() {
+    if (input.is_open()) input.close();
 }
 
 }  // namespace util_tests
