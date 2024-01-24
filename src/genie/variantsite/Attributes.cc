@@ -22,10 +22,8 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     for (auto onearray : value) {
         arraytype.toFile(info.getAttributeType(), onearray, writers.back());
     }
-    auto temp = (info.getAttributeName() == "AA");
 
     typedTiles.back().writeElement(value);
-    (void)temp;
     if (rowsPerTile == 0) {
     } else if (rowInTile < rowsPerTile - 1) {
         rowInTile++;

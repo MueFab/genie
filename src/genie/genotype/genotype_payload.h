@@ -17,9 +17,8 @@
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
-#include "genie/entropy/jbig/encoder.h"
-#include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_coder.h"
+#include "genie/genotype/genotype_parameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -39,8 +38,8 @@ class BinMatPayload {
     std::vector<uint8_t> CompressedPayload;
 
  public:
-     BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
-         : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols), CompressedPayload {} {}
+    BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
+        : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols), CompressedPayload{} {}
     size_t payloadSize() const { return payload.size(); }
 
 
@@ -51,18 +50,18 @@ class BinMatPayload {
     void writeCompressed(core::Writer& writer) const;
 };
 
-
 class RowColIdsPayload {
  private:
     uint64_t nelements;
-    uint64_t nbits_per_elem;
+    uint32_t nbits_per_elem;
     std::vector<uint64_t> row_col_ids_elements;
-
+    uint32_t sizeInBytes;
  public:
-    RowColIdsPayload(uint64_t _nelements, uint64_t _nbits_per_elem, std::vector<uint64_t> _row_col_ids_elements)
-        : nelements(_nelements), nbits_per_elem(_nbits_per_elem), row_col_ids_elements(_row_col_ids_elements) {}
+    RowColIdsPayload(uint64_t _nelements, uint32_t _nbits_per_elem, std::vector<uint64_t> _row_col_ids_elements)
+        : nelements(_nelements), nbits_per_elem(_nbits_per_elem), row_col_ids_elements(_row_col_ids_elements), sizeInBytes(static_cast<uint32_t>(_nbits_per_elem* _nelements + 7) / 8) {}
     size_t payloadSize() const { return row_col_ids_elements.size(); }
 
+    uint32_t getWriteSizeInBytes() const { return sizeInBytes; }
     void write(core::Writer& writer) const;
 };
 
