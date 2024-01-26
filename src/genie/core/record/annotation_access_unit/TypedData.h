@@ -51,6 +51,23 @@ class TypedData {
           writer{&dataStream},
           compressedDataStream{} {}
 
+    TypedData& operator=(const TypedData& other) {
+        data_type_ID = other.data_type_ID;
+        num_array_dims = other.num_array_dims;
+        array_dims = other.array_dims;
+        dataStream << other.dataStream.rdbuf();
+        compressedDataStream << other.compressedDataStream.rdbuf();
+        return *this;
+    }
+
+    TypedData(TypedData& other) {
+        data_type_ID = other.data_type_ID;
+        num_array_dims = other.num_array_dims;
+        array_dims = other.array_dims;
+        dataStream << other.dataStream.rdbuf();
+        compressedDataStream << other.compressedDataStream.rdbuf();
+    }
+
     void set(core::DataType TypeId, uint8_t numArrayDims, std ::vector<uint32_t> arrayDims) {
         data_type_ID = TypeId;
         num_array_dims = numArrayDims;
@@ -87,22 +104,6 @@ class TypedData {
 
     void write(core::Writer& writer) const;
 
-    TypedData& operator=(const TypedData& other) {
-        data_type_ID = other.data_type_ID;
-        num_array_dims = other.num_array_dims;
-        array_dims = other.array_dims;
-        dataStream << other.dataStream.rdbuf();
-        compressedDataStream << other.compressedDataStream.rdbuf();
-        return *this;
-    }
-
-    TypedData(TypedData& other) {
-        data_type_ID = other.data_type_ID;
-        num_array_dims = other.num_array_dims;
-        array_dims = other.array_dims;
-        dataStream << other.dataStream.rdbuf();
-        compressedDataStream << other.compressedDataStream.rdbuf();
-    }
 
  private:
     core::DataType data_type_ID;

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <filesystem>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -48,7 +49,6 @@ void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
             break;
         case 3:
             writer.write_reserved(10);
-            std::cerr << "write getsize" << std::endl;
             writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
 
             annotationParameterSet.write(writer);
