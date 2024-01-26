@@ -32,9 +32,9 @@ struct genoTestValues {
     genie::genotype::BinarizationID binID;
     genie::core::AlgoID algID;
     std::string filepath;
-    genoTestValues( genie::genotype::SortingAlgoID _SortingID,
-                   genie::genotype::BinarizationID _binID, genie::core::AlgoID _algID,std::string _filepath)
-        :  SortingID(_SortingID), binID(_binID), algID(_algID),filepath(_filepath){}
+    genoTestValues(genie::genotype::SortingAlgoID _SortingID, genie::genotype::BinarizationID _binID,
+                   genie::core::AlgoID _algID, std::string _filepath)
+        : SortingID(_SortingID), binID(_binID), algID(_algID), filepath(_filepath) {}
 };
 
 class GenotypeConformanceTest : public ::testing::TestWithParam<genoTestValues> {
@@ -53,26 +53,19 @@ class GenotypeConformanceTest : public ::testing::TestWithParam<genoTestValues> 
     }
 };
 
-
 #define WRITETESTFILES
 
-
 TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
-  //  std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     genoTestValues testparams = GetParam();
-  
-    util_tests::FileIn filein(testparams.filepath,"geno");
- //   std::string filepath = gitRootDir + testparams.filepath;
+
+    util_tests::FileIn filein(testparams.filepath, "geno");
 
     std::vector<genie::core::record::VariantGenotype> recs;
 
- //   std::ifstream reader(filepath, std::ios::binary | std::ios::in);
- //   ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(filein.getStream());
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
     }
-  //  reader.close();
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
@@ -182,25 +175,15 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
         if (testparams.SortingID == genie::genotype::SortingAlgoID::NO_SORTING) name += "_NOSORT";
         if (testparams.SortingID == genie::genotype::SortingAlgoID::RANDOM_SORT) name += "_RANDOMSORT";
 
-     //   std::ofstream testfile;
-        util_tests::FileOut testfile(name , "bin");
-   //     testfile.open(name + ".bin", std::ios::binary | std::ios::out);
-   //     if (testfile.is_open()) {
-            genie::core::Writer writer(&testfile.getStream());
-            APS_dataUnit.write(writer);
-            AAU_dataUnit.write(writer);
-     //       testfile.close();
-     //   }
+        util_tests::FileOut testfile(name, "bin");
+        genie::core::Writer writer(&testfile.getStream());
+        APS_dataUnit.write(writer);
+        AAU_dataUnit.write(writer);
 
-            util_tests::FileOut txtfile(name , "txt");
-        //    std::ofstream txtfile;
-    //    txtfile.open(name + ".txt", std::ios::out);
-       // if (txtfile.is_open()) {
-            genie::core::Writer txtWriter(&txtfile.getStream(), true);
-            APS_dataUnit.write(txtWriter);
-            AAU_dataUnit.write(txtWriter);
-       //     txtfile.close();
-      //  }
+        util_tests::FileOut txtfile(name, "txt");
+        genie::core::Writer txtWriter(&txtfile.getStream(), true);
+        APS_dataUnit.write(txtWriter);
+        AAU_dataUnit.write(txtWriter);
     }
 #endif
 }
@@ -208,15 +191,15 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
 INSTANTIATE_TEST_CASE_P(
     testallGenoConformance, GenotypeConformanceTest,
     ::testing::Values(
-        genoTestValues( genie::genotype::SortingAlgoID::NO_SORTING,
-                       genie::genotype::BinarizationID::BIT_PLANE, genie::core::AlgoID::JBIG,"/data/records/conformance/1.3.5.bgz.CASE01"),
-        genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING,
-                       genie::genotype::BinarizationID::BIT_PLANE, genie::core::AlgoID::JBIG,"/data/records/conformance/1.3.11.bgz.CASE03"},
-        genoTestValues{ genie::genotype::SortingAlgoID::NO_SORTING,
-                       genie::genotype::BinarizationID::BIT_PLANE, genie::core::AlgoID::JBIG,"/data/records/conformance/1.3.11.bgz.CASE04"},
-        genoTestValues{ genie::genotype::SortingAlgoID::NO_SORTING,
-                       genie::genotype::BinarizationID::ROW_BIN, genie::core::AlgoID::JBIG,"/data/records/conformance/1.3.11.bgz.CASE03"},
-        genoTestValues{ genie::genotype::SortingAlgoID::RANDOM_SORT,
-                       genie::genotype::BinarizationID::BIT_PLANE, genie::core::AlgoID::JBIG,"/data/records/conformance/1.3.11.bgz.CASE03"},
-        genoTestValues{ genie::genotype::SortingAlgoID::NO_SORTING,
-                       genie::genotype::BinarizationID::BIT_PLANE, genie::core::AlgoID::BSC,"/data/records/conformance/1.3.11.bgz.CASE03"}));
+        genoTestValues(genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.5.bgz.CASE01"),
+        genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+        genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE04"},
+        genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::ROW_BIN,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+        genoTestValues{genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+        genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::BSC, "/data/records/conformance/1.3.11.bgz.CASE03"}));
