@@ -71,16 +71,22 @@ void AmaxPayload::write(core::Writer& writer) const {
     writer.write(nelems, 32);
     writer.write(nbits_per_elem, 8);
     for (uint32_t i = 0; i < nelements; ++i) {
-        writer.write(is_one_flag[i], 1);
-        if (is_one_flag[i]) writer.write(amax_elements[i], nbits_per_elem);
+        if (amax_elements[i] == 0) {
+            writer.write(1, 1);
+        } else {
+            writer.write(0, 1);
+            writer.write(amax_elements[i], nbits_per_elem);
+        }
     }
+    uint8_t remain = sizeInBits % 8;
+    if (remain != 0)    writer.write_reserved(8 - remain);
 }
 
 GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
                                  genie::genotype::GenotypeParameters& _genotypeParameters)
     : genotypeParameters(_genotypeParameters),
       phases_payload(datablock.phasing_mat),
-      variants_amax_payload(0, 0, 0, {}, {}) {
+      variants_amax_payload(0, 0, 0, {}) {
     for (auto alleleBinMat : datablock.allele_bin_mat_vect) {
         variants_payload.emplace_back(genie::genotype::BinMatPayload(alleleBinMat));
     }
@@ -90,7 +96,7 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
         auto shape = datablock.allele_bin_mat_vect.at(i).shape();
 
         uint32_t nrows = (uint32_t)(shape.at(0));
-        uint32_t nBitsPerElem =static_cast<uint32_t>( std::ceil(std::log2(nrows)));
+        uint32_t nBitsPerElem = static_cast<uint32_t>(std::ceil(std::log2(nrows)));
 
         std::vector<uint64_t> payloadVec;
         for (auto elem : alleleRowIDs) payloadVec.push_back(elem);
@@ -109,6 +115,16 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
         for (auto elem : alleleColIDs) payloadVec.push_back(elem);
         sort_variants_col_ids_payload.emplace_back(
             genie::genotype::RowColIdsPayload(payloadVec.size(), nBitsPerElem, payloadVec));
+    }
+    if (genotypeParameters.getBinarizationID() == genie::genotype::BinarizationID::ROW_BIN) {
+        std::vector<uint64_t> amax_elements;
+        for (auto amax : datablock.amax_vec) {
+            amax_elements.push_back(amax);
+        }
+        uint32_t elems = amax_elements.size();
+        uint8_t nbits_per_elem = 32;
+        AmaxPayload amax_payload(elems, nbits_per_elem, elems, amax_elements);
+        variants_amax_payload = amax_payload;
     }
 }
 
@@ -141,6 +157,7 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
         }
         if (genotypeParameters.getBinarizationID() == BinarizationID::ROW_BIN) {
             writer.write(variants_amax_payload.sizeInBytes(), 32);
+            variants_amax_payload.write(writer);
         }
     }
     auto written = writer.getBitsWritten();
