@@ -91,7 +91,7 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
         variants_payload.emplace_back(genie::genotype::BinMatPayload(alleleBinMat));
     }
 
-    for (auto i = 0; i < datablock.allele_row_ids_vect.size(); ++i) {
+    for (size_t i = 0; i < datablock.allele_row_ids_vect.size(); ++i) {
         auto alleleRowIDs = datablock.allele_row_ids_vect.at(i);
         auto shape = datablock.allele_bin_mat_vect.at(i).shape();
 
@@ -105,7 +105,7 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
             genie::genotype::RowColIdsPayload(payloadVec.size(), nBitsPerElem, payloadVec));
     }
 
-    for (auto i = 0; i < datablock.allele_col_ids_vect.size(); ++i) {
+    for (size_t i = 0; i < datablock.allele_col_ids_vect.size(); ++i) {
         auto alleleColIDs = datablock.allele_col_ids_vect.at(i);
         auto shape = datablock.allele_bin_mat_vect.at(i).shape();
         uint32_t ncols = static_cast<uint32_t>(shape.at(1));
@@ -121,7 +121,7 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
         for (auto amax : datablock.amax_vec) {
             amax_elements.push_back(amax);
         }
-        uint32_t elems = amax_elements.size();
+        uint32_t elems = static_cast<uint32_t>(amax_elements.size());
         uint8_t nbits_per_elem = 32;
         AmaxPayload amax_payload(elems, nbits_per_elem, elems, amax_elements);
         variants_amax_payload = amax_payload;
