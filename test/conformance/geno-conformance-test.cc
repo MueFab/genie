@@ -17,7 +17,7 @@
 #include "genie/genotype/genotype_payload.h"
 
 #include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_access_unit/typeddata.h"
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/variantsite/AccessUnitComposer.h"

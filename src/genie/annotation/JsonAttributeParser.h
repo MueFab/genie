@@ -50,11 +50,12 @@ class JsonAttributeParser {
  public:
     explicit JsonAttributeParser(std::stringstream& jsonInfoFields) {
         infoFieldsJSON = jsonInfoFields.str();
-        if (!infoFieldsJSON.empty())
+        if (!infoFieldsJSON.empty()) {
             if (infoFieldsJSON.at(1) == '{')
                 ParseInfoFields();
             else
                 ParseFormatFields();
+        }
     }
 
     std::vector<InfoField> getInfoFields() const { return infoFields; }
