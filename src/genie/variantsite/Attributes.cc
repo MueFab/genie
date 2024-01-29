@@ -33,10 +33,7 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
-        typedTiles.resize(typedTiles.size() + 1);
-        genie::core::record::annotation_access_unit::TypedData typedTile(info.getAttributeType(), info.getArrayLength(),
-                                                                         arrayDims);
-        typedTiles.back() = typedTile;
+        typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
         writers.emplace_back(&tiles.back());
         rowInTile = 0;
