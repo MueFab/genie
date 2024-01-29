@@ -10,3 +10,5 @@ add_subdirectory(genotype)
 add_subdirectory(likelihood)
 add_subdirectory(entropy)
 add_subdirectory(conformance)
+add_subdirectory(annotation)
+

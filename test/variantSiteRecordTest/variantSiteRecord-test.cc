@@ -348,10 +348,7 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
                 auto datastreamSize = attr[attrtile.first].getDataStream().str().size();
                 genie::core::ArrayType arraytpe;
                 auto elemSize = arraytpe.getDefaultBitsize(info[attrtile.first].getAttributeType());
-                elemSize;
-                datastreamSize;
                 auto nrOfArrays = info[attrtile.first].getArrayLength();
-                nrOfArrays;
 
                 auto expTileSize = datastreamSize * 8 / (nrOfArrays * elemSize);
                 EXPECT_EQ(defaultTileSize, expTileSize);

@@ -68,6 +68,8 @@ class TypedData {
         compressedDataStream << other.compressedDataStream.rdbuf();
     }
 
+    TypedData(TypedData&&) = default;
+
     void set(core::DataType TypeId, uint8_t numArrayDims, std ::vector<uint32_t> arrayDims) {
         data_type_ID = TypeId;
         num_array_dims = numArrayDims;
