@@ -89,7 +89,13 @@ struct EncodingBlock {
     std::vector<uint32_t> likelihoodData;
 };
 
-uint8_t getNumBinMats(EncodingBlock& block);
+// ---------------------------------------------------------------------------------------------------------------------
+
+GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t getNumBinMats(const EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -126,7 +132,16 @@ void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void invert_sorted_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids,
+                           GenotypeBinMatParameters params);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void sort_block(const EncodingOptions& opt, EncodingBlock& block);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void invert_sorted_block(const GenotypeParameters& params, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

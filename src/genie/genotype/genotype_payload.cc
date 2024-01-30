@@ -143,13 +143,13 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
         writer.write(variantssize, 32);
         variants_payload[i].writeCompressed(writer);
         auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
-        if (variantsPayloadsParams[i].sort_variants_rows_flag) {
+        if (variantsPayloadsParams[i].sort_rows_flag) {
             uint32_t size = sort_variants_row_ids_payload[indecRowIds].getWriteSizeInBytes();
             writer.write(size, 32);
             sort_variants_row_ids_payload[indecRowIds].write(writer);
             ++indecRowIds;
         }
-        if (variantsPayloadsParams[i].sort_variants_cols_flag) {
+        if (variantsPayloadsParams[i].sort_cols_flag) {
             auto size = sort_variants_col_ids_payload[indecColIds].getWriteSizeInBytes();
             writer.write(size, 32);
             sort_variants_col_ids_payload[indecColIds].write(writer);

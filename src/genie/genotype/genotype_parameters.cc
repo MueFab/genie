@@ -23,12 +23,13 @@ GenotypeParameters::GenotypeParameters()
       encode_phases_data_flag(false),
       phases_payload_params(),
       phasing_value(false) {}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters::GenotypeParameters(uint8_t _max_ploidy, bool _no_reference_flag, bool _not_available_flag,
                                        BinarizationID _binarization_ID, ConcatAxis _concat_axis,
-                                       std::vector<GenotypePayloadParameters>&& _variants_payload_params,
-                                       bool _encode_phases_data_flag, GenotypePayloadParameters _phases_payload_params,
+                                       std::vector<GenotypeBinMatParameters>&& _variants_payload_params,
+                                       bool _encode_phases_data_flag, GenotypeBinMatParameters _phases_payload_params,
                                        bool _phases_value)
     : max_ploidy(_max_ploidy),
       no_reference_flag(_no_reference_flag),
@@ -39,6 +40,19 @@ GenotypeParameters::GenotypeParameters(uint8_t _max_ploidy, bool _no_reference_f
       encode_phases_data_flag(_encode_phases_data_flag),
       phases_payload_params(_phases_payload_params),
       phasing_value(_phases_value) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//GenotypeParameters::GenotypeParameters(GenotypeParameters&& other)
+//    : max_ploidy(other.max_ploidy),
+//      no_reference_flag(other.no_reference_flag),
+//      not_available_flag(other.not_available_flag),
+//      binarization_ID(other.binarization_ID),
+//      concat_axis(other.concat_axis),
+//      variants_payload_params(std::move(other.variants_payload_params)),
+//      encode_phases_data_flag(other.encode_phases_data_flag),
+//      phases_payload_params(other.phases_payload_params),
+//      phasing_value(other.phasing_value) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +80,7 @@ ConcatAxis GenotypeParameters::isConcatenated() const { return concat_axis; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<GenotypePayloadParameters>& GenotypeParameters::getVariantsPayloadParams() const {
+const std::vector<GenotypeBinMatParameters>& GenotypeParameters::getVariantsPayloadParams() const {
     return variants_payload_params;
 }
 
@@ -82,7 +96,7 @@ uint8_t GenotypeParameters::getNumVariantsPayloads() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenotypePayloadParameters& GenotypeParameters::getPhasesPayloadParams() const { return phases_payload_params; }
+const GenotypeBinMatParameters& GenotypeParameters::getPhasesPayloadParams() const { return phases_payload_params; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -101,16 +115,16 @@ void GenotypeParameters::write(core::Writer& writer) const {
     }
 
     for (auto i = 0; i < static_cast<uint8_t>(variants_payload_params.size()); ++i) {
-        writer.write(variants_payload_params[i].sort_variants_rows_flag, 1);
-        writer.write(variants_payload_params[i].sort_variants_cols_flag, 1);
-        writer.write(variants_payload_params[i].transpose_variants_mat_flag, 1);
+        writer.write(variants_payload_params[i].sort_rows_flag, 1);
+        writer.write(variants_payload_params[i].sort_cols_flag, 1);
+        writer.write(variants_payload_params[i].transpose_mat_flag, 1);
         writer.write(static_cast<uint8_t>(variants_payload_params[i].variants_codec_ID), 8);
     }
     writer.write(encode_phases_data_flag, 1);
     if (encode_phases_data_flag) {
-        writer.write(phases_payload_params.sort_variants_rows_flag, 1);                  // sort_phases_rows_flag
-        writer.write(phases_payload_params.sort_variants_cols_flag, 1);                  // sort_phases_cols_flag
-        writer.write(phases_payload_params.transpose_variants_mat_flag, 1);              // transpose_phases_mat_flag
+        writer.write(phases_payload_params.sort_rows_flag, 1);                  // sort_phases_rows_flag
+        writer.write(phases_payload_params.sort_cols_flag, 1);                  // sort_phases_cols_flag
+        writer.write(phases_payload_params.transpose_mat_flag, 1);              // transpose_phases_mat_flag
         writer.write(static_cast<uint8_t>(phases_payload_params.variants_codec_ID), 1);  // phases_codec_ID
     } else {
         writer.write(phasing_value, 1);
