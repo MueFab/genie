@@ -14,6 +14,10 @@
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
+#include <xtensor/xnpy.hpp>
+//#include <xtensor-io/xnpz.hpp>
+//#include <xtensor-io/ximage.hpp>
+//#include <xtensor-io/xaudio.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
@@ -268,7 +272,70 @@ TEST(Genotype, BinarizeRowBin) {
     //    ASSERT_EQ(block.allele_bin_mat_vect.shape(2), block.allele_mat.shape(1));
 }
 
-TEST(Genotype, RandomSort) {
+//TEST(Genotype, test_sort_matrix){
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//    std::string python_data_path = gitRootDir + "/python/data";
+//
+//    auto NROWS = 50;
+//    auto NCOLS = 100;
+//
+//    auto orig_bin_mat = xt::load_npy<bool>(python_data_path + "/orig_bin_mat.npy");
+//    ASSERT_EQ(orig_bin_mat.dimension(), 2);
+//    ASSERT_EQ(orig_bin_mat.shape(0), NROWS);
+//    ASSERT_EQ(orig_bin_mat.shape(1), NCOLS);
+//
+//    {
+//        genie::genotype::BinMatDtype row_sorted_bin_mat = xt::load_npy<bool>(python_data_path + "/row_sorted_bin_mat.npy");
+//
+//        ASSERT_EQ(row_sorted_bin_mat.dimension(), 2);
+//        ASSERT_EQ(row_sorted_bin_mat.shape(0), NROWS);
+//        ASSERT_EQ(row_sorted_bin_mat.shape(1), NCOLS);
+//
+//        auto row_ids = xt::load_npy<int64_t >(python_data_path + "/row_sorted_bin_mat.row_ids.npy");
+//
+//        ASSERT_EQ(row_ids.dimension(), 1);
+//        ASSERT_EQ(row_ids.shape(0), NROWS);
+//
+//        for (auto k=0; k < NROWS; k++){
+//            ASSERT_TRUE(
+//                xt::view(orig_bin_mat, k, xt::all()) == xt::view(row_sorted_bin_mat, row_ids[k], xt::all())
+//            ) << k;
+//        }
+//
+//        genie::genotype::sort_matrix(row_sorted_bin_mat, row_ids, 0);
+//
+//        ASSERT_TRUE(
+//            orig_bin_mat == row_sorted_bin_mat
+//        );
+//    }
+//
+//    {
+//        genie::genotype::BinMatDtype col_sorted_bin_mat = xt::load_npy<bool>(python_data_path + "/col_sorted_bin_mat.npy");
+//
+//        ASSERT_EQ(col_sorted_bin_mat.dimension(), 2);
+//        ASSERT_EQ(col_sorted_bin_mat.shape(0), NROWS);
+//        ASSERT_EQ(col_sorted_bin_mat.shape(1), NCOLS);
+//
+//        auto col_ids = xt::load_npy<int64_t >(python_data_path + "/col_sorted_bin_mat.col_ids.npy");
+//
+//        ASSERT_EQ(col_ids.dimension(), 1);
+//        ASSERT_EQ(col_ids.shape(0), NCOLS);
+//
+//        for (auto k=0; k < NCOLS; k++){
+//            ASSERT_TRUE(
+//                xt::view(orig_bin_mat, xt::all(), k) == xt::view(col_sorted_bin_mat, xt::all(), col_ids[k])
+//                    ) << k;
+//        }
+//
+//        genie::genotype::sort_matrix(col_sorted_bin_mat, col_ids, 1);
+//
+//        ASSERT_TRUE(
+//            orig_bin_mat == col_sorted_bin_mat
+//        );
+//    }
+//}
+
+TEST(Genotype, RandomSort_Row) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
 
@@ -294,7 +361,7 @@ TEST(Genotype, RandomSort) {
             genie::genotype::ConcatAxis::DO_NOT_CONCAT,   // concat_axis;
             false,                                        // transpose_mat;
             genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
+            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_col_method;
             genie::core::AlgoID::JBIG                     // codec_ID;
         };
 
@@ -302,43 +369,143 @@ TEST(Genotype, RandomSort) {
         genie::genotype::decompose(opt, block, recs);
         genie::genotype::transform_max_value(block);
         genie::genotype::binarize_allele_mat(opt, block);
+
+        auto params = generate_genotype_parameters(opt, block);
+
+        auto& allele_bin_mat_vect = block.allele_bin_mat_vect;
+        std::vector<genie::genotype::BinMatDtype> orig_allele_bin_mat_vect;
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++) {
+            orig_allele_bin_mat_vect.emplace_back(allele_bin_mat_vect[k]);
+
+//            ASSERT_EQ(orig_allele_bin_mat_vect.back().dimension(), 2);
+//            ASSERT_EQ(orig_allele_bin_mat_vect.back().shape(0), 100);
+        }
+
         genie::genotype::sort_block(opt, block);
+
+        ASSERT_EQ(orig_allele_bin_mat_vect[0].dimension(), 2);
+        ASSERT_EQ(orig_allele_bin_mat_vect[0].shape(0), 100);
+
+//        xt::dump_npy(gitRootDir + "/orig_bin_mat.npy", orig_allele_bin_mat_vect[0]);
+//        xt::dump_npy(gitRootDir + "/sorted_bin_mat.npy", allele_bin_mat_vect[0]);
+//        xt::dump_npy(gitRootDir + "/sort_ids.npy", block.allele_row_ids_vect[0]);
+
+        // Make sure that the result after sorting differs from the original
+        for (size_t k = 0; k < allele_bin_mat_vect.size(); k++){
+            ASSERT_FALSE(
+                orig_allele_bin_mat_vect[k] == allele_bin_mat_vect[k]
+            );
+        }
+
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++) {
+            auto& orig_bin_mat = orig_allele_bin_mat_vect[k];
+            auto& sorted_bin_mat = block.allele_bin_mat_vect[k];
+            auto& sort_ids = block.allele_row_ids_vect[k];
+
+            auto nrows = orig_bin_mat.shape(0);
+
+            for (auto i = 0; k < nrows; k++) {
+                ASSERT_TRUE(
+                    xt::view(orig_bin_mat, i, xt::all()) ==
+                    xt::view(sorted_bin_mat, sort_ids[i], xt::all())
+                ) << k;
+            }
+        }
+
+        genie::genotype::invert_sorted_block(params, block);
+
+        // Make sure that the result after inverse transformation (un-sort) equals from the original
+        allele_bin_mat_vect = block.allele_bin_mat_vect;
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++){
+            auto& orig_bin_mat = orig_allele_bin_mat_vect[k];
+            auto& sorted_bin_mat = block.allele_bin_mat_vect[k];
+            ASSERT_TRUE(
+                orig_bin_mat == sorted_bin_mat
+            ) << k;
+        }
     }
+}
+
+TEST(Genotype, RandomSort_Col) {
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
+
+    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::VariantGenotype> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    ASSERT_EQ(recs.size(), 100);
 
     {
         genie::genotype::EncodingOptions opt = {
-            512,                                          // block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,   // concat_axis;
-            false,                                        // transpose_mat;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-            genie::core::AlgoID::JBIG                     // codec_ID;
+            512,                                         // block_size;
+            genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+            genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+            false,                                       // transpose_mat;
+            genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+            genie::genotype::SortingAlgoID::RANDOM_SORT, // sort_col_method;
+            genie::core::AlgoID::JBIG                    // codec_ID;
         };
 
         genie::genotype::EncodingBlock block{};
         genie::genotype::decompose(opt, block, recs);
         genie::genotype::transform_max_value(block);
         genie::genotype::binarize_allele_mat(opt, block);
-        genie::genotype::sort_block(opt, block);
-    }
 
-    {
-        genie::genotype::EncodingOptions opt = {
-            512,                                          // block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,   // concat_axis;
-            false,                                        // transpose_mat;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-            genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-            genie::core::AlgoID::JBIG                     // codec_ID;
-        };
+        auto params = generate_genotype_parameters(opt, block);
 
-        genie::genotype::EncodingBlock block{};
-        genie::genotype::decompose(opt, block, recs);
-        genie::genotype::transform_max_value(block);
-        genie::genotype::binarize_allele_mat(opt, block);
+        auto& allele_bin_mat_vect = block.allele_bin_mat_vect;
+        std::vector<genie::genotype::BinMatDtype> orig_allele_bin_mat_vect;
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++) {
+            orig_allele_bin_mat_vect.emplace_back(allele_bin_mat_vect[k]);
+        }
+
         genie::genotype::sort_block(opt, block);
+
+        ASSERT_EQ(orig_allele_bin_mat_vect[0].dimension(), 2);
+        ASSERT_EQ(orig_allele_bin_mat_vect[0].shape(0), 100);
+
+        // Make sure that the result after sorting differs from the original
+        for (size_t k = 0; k < allele_bin_mat_vect.size(); k++){
+            ASSERT_FALSE(
+                orig_allele_bin_mat_vect[k] == allele_bin_mat_vect[k]
+            );
+        }
+
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++) {
+            auto& orig_bin_mat = orig_allele_bin_mat_vect[k];
+            auto& sorted_bin_mat = block.allele_bin_mat_vect[k];
+            auto& sort_ids = block.allele_col_ids_vect[k];
+
+            auto ncols = orig_bin_mat.shape(1);
+
+            for (auto i = 0; k < ncols; k++) {
+                ASSERT_TRUE(
+                    xt::view(orig_bin_mat, xt::all(), i) ==
+                    xt::view(sorted_bin_mat, xt::all(), sort_ids[i])
+                        ) << k;
+            }
+        }
+
+        genie::genotype::invert_sorted_block(params, block);
+
+        // Make sure that the result after inverse transformation (un-sort) equals from the original
+        for (size_t k = 0; k < genie::genotype::getNumBinMats(block); k++){
+            auto& orig_bin_mat = orig_allele_bin_mat_vect[k];
+            auto& sorted_bin_mat = block.allele_bin_mat_vect[k];
+            ASSERT_TRUE(
+                orig_bin_mat == sorted_bin_mat
+                ) << k;
+        }
     }
 }
 

@@ -5,8 +5,10 @@ set(XTENSOR_USE_TBB 0)
 
 find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
+#find_package(xtensor-io REQUIRED)
 
 message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
+#message(STATUS "xio: ${xio_INCLUDE_DIRS}")
 
 set(source_files
         helpers.cc
@@ -32,6 +34,7 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
+#target_link_libraries(${PROJECT_NAME} PRIVATE xtensor-io)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)

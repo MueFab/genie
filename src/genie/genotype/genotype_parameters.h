@@ -41,10 +41,10 @@ enum class ConcatAxis : uint8_t {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct GenotypePayloadParameters {
-    bool sort_variants_rows_flag;
-    bool sort_variants_cols_flag;
-    bool transpose_variants_mat_flag;
+struct GenotypeBinMatParameters {
+    bool sort_rows_flag;
+    bool sort_cols_flag;
+    bool transpose_mat_flag;
     genie::core::AlgoID variants_codec_ID;
 };
 
@@ -59,10 +59,10 @@ class GenotypeParameters {
 
     ConcatAxis concat_axis;
 
-    std::vector<GenotypePayloadParameters> variants_payload_params;
+    std::vector<GenotypeBinMatParameters> variants_payload_params;
 
     bool encode_phases_data_flag;
-    GenotypePayloadParameters phases_payload_params;
+    GenotypeBinMatParameters phases_payload_params;
     bool phasing_value;
 
  public:
@@ -70,8 +70,10 @@ class GenotypeParameters {
 
     GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
                        BinarizationID binarization_ID, ConcatAxis concat_axis,
-                       std::vector<GenotypePayloadParameters>&& variants_payload_params, bool encode_phases_data_flag,
-                       GenotypePayloadParameters phases_payload_params, bool phases_value);
+                       std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
+                       GenotypeBinMatParameters phases_payload_params, bool phases_value);
+
+//    GenotypeParameters(GenotypeParameters&& other);
 
     uint8_t getMaxPloidy() const;
     bool getNoRerefernceFlag() const;
@@ -79,11 +81,11 @@ class GenotypeParameters {
     BinarizationID getBinarizationID() const;
     uint8_t getNumBitPlanes() const;
     ConcatAxis isConcatenated() const;
-    const std::vector<GenotypePayloadParameters>& getVariantsPayloadParams() const;
+    const std::vector<GenotypeBinMatParameters>& getVariantsPayloadParams() const;
 
     bool isPhaseEncoded() const;
     // IF encode_phases_data_flag
-    const GenotypePayloadParameters& getPhasesPayloadParams() const;
+    const GenotypeBinMatParameters& getPhasesPayloadParams() const;
     uint8_t getNumVariantsPayloads() const;
     // ELSE
     bool getPhaseValue() const;

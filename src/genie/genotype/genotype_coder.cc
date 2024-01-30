@@ -16,14 +16,50 @@
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
 // ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace genotype {
 
+// ---------------------------------------------------------------------------------------------------------------------
 
+GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block){
+    auto num_bin_mat = getNumBinMats(block);
+    std::vector<GenotypeBinMatParameters> variants_payload_params(num_bin_mat);
+    for (size_t i = 0; i < num_bin_mat; i++){
+        variants_payload_params[i].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        variants_payload_params[i].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        variants_payload_params[i].transpose_mat_flag = opt.transpose_mat;
+        variants_payload_params[i].variants_codec_ID = opt.codec_ID;
+    }
+
+    bool encode_phases_data_flag = (block.max_ploidy - 1) > 0;
+    GenotypeBinMatParameters phases_payload_param;
+    if (encode_phases_data_flag){
+        phases_payload_param.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        phases_payload_param.sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        phases_payload_param.transpose_mat_flag = opt.transpose_mat;
+        phases_payload_param.variants_codec_ID = opt.codec_ID;
+    }
+
+    auto params = GenotypeParameters(
+        block.max_ploidy,
+        block.dot_flag,
+        block.na_flag,
+        opt.binarization_ID,
+        opt.concat_axis,
+        std::move(variants_payload_params),
+        encode_phases_data_flag,
+        phases_payload_param,
+        false
+    );
+
+//    return std::move(params);
+    return params;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t getNumBinMats(EncodingBlock& block) { return static_cast<uint8_t>(block.allele_bin_mat_vect.size()); }
+uint8_t getNumBinMats(const EncodingBlock& block) { return static_cast<uint8_t>(block.allele_bin_mat_vect.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -182,7 +218,11 @@ void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis) {
+void sort_matrix(
+    BinMatDtype& bin_mat,
+    const UIntVecDtype ids,
+    uint8_t axis
+) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0), "bin_mat and ids have different dimension!");
 
@@ -190,15 +230,19 @@ void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis) {
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
-            xt::view(tmp_bin_mat, i, xt::all()) = xt::view(tmp_bin_mat, ids[i], xt::all());
+            xt::view(tmp_bin_mat, i, xt::all()) = xt::view(bin_mat, ids[i], xt::all());
+        }
+        for (uint32_t i = 0; i < ids.shape(0); i++) {
+            xt::view(bin_mat, i, xt::all()) = xt::view(tmp_bin_mat, i, xt::all());
         }
     } else if (axis == 1) {
         for (uint32_t i = 0; i < ids.shape(0); i++) {
-            xt::view(tmp_bin_mat, xt::all(), i) = xt::view(tmp_bin_mat, xt::all(), ids[i]);
+            xt::view(tmp_bin_mat, xt::all(), i) = xt::view(bin_mat, xt::all(), ids[i]);
+        }
+        for (uint32_t i = 0; i < ids.shape(0); i++) {
+            xt::view(bin_mat, xt::all(), i) = xt::view(tmp_bin_mat, xt::all(), i);
         }
     }
-
-    bin_mat = tmp_bin_mat;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -214,8 +258,13 @@ void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis) 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids, SortingAlgoID sort_row_method,
-                  SortingAlgoID sort_col_method) {
+void sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids,
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method)
+{
     switch (sort_row_method) {
         case genie::genotype::SortingAlgoID::NO_SORTING:
             break;
@@ -248,6 +297,20 @@ void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col
             UTILS_DIE("Invalid sort method!");
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void invert_sorted_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids,
+    const GenotypeBinMatParameters params
+) {
+
+
+
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
@@ -256,13 +319,60 @@ void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
     block.allele_row_ids_vect.resize(num_bin_mats);
     block.allele_col_ids_vect.resize(num_bin_mats);
     for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
-        sort_bin_mat(block.allele_bin_mat_vect[i_mat], block.allele_row_ids_vect[i_mat],
-                     block.allele_col_ids_vect[i_mat], opt.sort_row_method, opt.sort_col_method);
+        sort_bin_mat(
+            block.allele_bin_mat_vect[i_mat],
+            block.allele_row_ids_vect[i_mat],
+            block.allele_col_ids_vect[i_mat],
+            opt.sort_row_method,
+            opt.sort_col_method
+        );
     }
 
     // Sort phasing matrix
-    sort_bin_mat(block.phasing_mat, block.phasing_row_ids, block.phasing_col_ids, opt.sort_row_method,
-                 opt.sort_col_method);
+    sort_bin_mat(
+        block.phasing_mat,
+        block.phasing_row_ids,
+        block.phasing_col_ids,
+        opt.sort_row_method,
+        opt.sort_col_method
+    );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void invert_sorted_block(
+    const GenotypeParameters& params,
+    EncodingBlock& block
+) {
+    auto num_bin_mats = getNumBinMats(block);
+
+    auto& genotype_params = params.getVariantsPayloadParams();
+    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
+        auto& curr_params = genotype_params[i_mat];
+        auto& curr_bin_mat = block.allele_bin_mat_vect[i_mat];
+        auto& curr_row_ids = block.allele_row_ids_vect[i_mat];
+        auto& curr_col_ids = block.allele_col_ids_vect[i_mat];
+
+        if (curr_params.sort_rows_flag){
+            sort_matrix(curr_bin_mat, curr_row_ids, 0);
+        }
+        if (curr_params.sort_cols_flag){
+            sort_matrix(curr_bin_mat, curr_col_ids, 1);
+        }
+    }
+
+    // Sort phasing matrix
+    auto& curr_params = params.getPhasesPayloadParams();
+    auto& curr_bin_mat = block.phasing_mat;
+    auto& curr_row_ids = block.phasing_row_ids;
+    auto& curr_col_ids = block.phasing_col_ids;
+
+    if (curr_params.sort_rows_flag){
+        sort_matrix(curr_bin_mat, curr_row_ids, 0);
+    }
+    if (curr_params.sort_cols_flag){
+        sort_matrix(curr_bin_mat, curr_col_ids, 1);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -466,11 +576,11 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
  
     // TODO(Yeremia): create function to create GenotypeParameters
     auto num_bin_mats = getNumBinMats(block);
-    std::vector<GenotypePayloadParameters> payload_params(num_bin_mats);
+    std::vector<GenotypeBinMatParameters> payload_params(num_bin_mats);
     for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
-        payload_params[i_mat].sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        payload_params[i_mat].sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        payload_params[i_mat].transpose_variants_mat_flag = false;
+        payload_params[i_mat].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        payload_params[i_mat].transpose_mat_flag = false;
         payload_params[i_mat].variants_codec_ID = opt.codec_ID;
     }
 
@@ -478,11 +588,11 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
     bool phases_value = unique_phasing_vals(0);  // unique_phasing_vals has (at least) 1 value
 
-    GenotypePayloadParameters phasing_payload_params{};
+    GenotypeBinMatParameters phasing_payload_params{};
     if (encode_phases_data_flag) {
-        phasing_payload_params.sort_variants_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        phasing_payload_params.sort_variants_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        phasing_payload_params.transpose_variants_mat_flag = false;
+        phasing_payload_params.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
+        phasing_payload_params.transpose_mat_flag = false;
         phasing_payload_params.variants_codec_ID = opt.codec_ID;
     }
 
