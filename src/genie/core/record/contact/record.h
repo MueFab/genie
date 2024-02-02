@@ -102,7 +102,7 @@ class ContactRecord {
      /**
      *
      */
-     uint8_t getNormCounts() const;
+     uint8_t getNumNormCounts() const;
 
      /**
       *
