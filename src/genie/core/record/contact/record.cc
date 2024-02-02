@@ -71,7 +71,7 @@ ContactRecord::ContactRecord(util::BitReader &reader){
         counts[i] = reader.readBypassBE<uint32_t>();
     }
 
-    auto link_record_flag = reader.readBypassBE<bool>();
+    auto link_record_flag = reader.readBypassBE<uint8_t>();
     UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
 }
 
