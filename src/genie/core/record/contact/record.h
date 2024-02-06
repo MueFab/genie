@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 #include <boost/optional/optional.hpp>
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
@@ -37,22 +38,124 @@ class ContactRecord {
     std::string chr1_name;
     uint8_t chr2_ID;
     std::string chr2_name;
-    uint64_t num_counts;
-//    uint8_t num_norm_counts;
     std::vector<std::string> norm_count_names;
     std::vector<uint64_t> start_pos1;
     std::vector<uint64_t> end_pos1;
     std::vector<uint64_t> start_pos2;
     std::vector<uint64_t> end_pos2;
     std::vector<uint32_t> counts;
-//    norm_count
-    boost::optional<LinkRecord> link_record;
+    std::optional<LinkRecord> link_record;
 
  public:
     /**
      * @brief
      */
-//    Record();
+    ContactRecord();
+
+    /**
+     *
+     * @param reader
+     */
+    explicit ContactRecord(util::BitReader& reader);
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getSampleID() const;
+
+    /**
+     *
+     * @return
+     */
+    const std::string& getSampleName() const;
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getChr1ID() const;
+
+    /**
+     *
+     * @return
+     */
+    const std::string& getChr1Name() const;
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getChr2ID() const;
+
+    /**
+     *
+     * @return
+     */
+    const std::string& getChr2Name() const;
+
+    /**
+     *
+     * @return
+     */
+    uint64_t getNumCounts() const;
+
+     /**
+     *
+     */
+     uint8_t getNumNormCounts() const;
+
+     /**
+      *
+      * @return
+      */
+     const std::vector<uint64_t>& getStartPos1() const;
+
+     /**
+      *
+      * @return
+      */
+     const std::vector<uint64_t>& getEndPos1() const;
+
+     /**
+      *
+      * @return
+      */
+     const std::vector<uint64_t>& getStartPos2() const;
+
+     /**
+      *
+      * @return
+      */
+     const std::vector<uint64_t>& getEndPos2() const;
+
+     /**
+      *
+      * @return
+      */
+     const std::vector<uint32_t>& getCounts() const;
+
+     /**
+      *
+      */
+     void write(util::BitWriter &writer) const;
+
+     /**
+      *
+      * @return
+      */
+     uint64_t inferChr1Length();
+
+     /**
+      *
+      * @return
+      */
+     uint64_t inferChr2Length();
+
+     /**
+      *
+      */
+     uint32_t inferInterval();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

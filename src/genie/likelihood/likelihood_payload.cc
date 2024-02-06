@@ -19,13 +19,15 @@ LikelihoodPayload::LikelihoodPayload(LikelihoodParameters _parameters, uint32_t 
                                      std::vector<uint8_t> _payload, std::vector<uint8_t> _additionalPayload)
     : nrows(_nrows),
       ncols(_ncols),
-    transform_flag(false),
+      transform_flag(false),
       payload(std::move(_payload)),
       additionalPayload(std::move(_additionalPayload)),
       payloadStream{},
       additionalPayloadStream{} {
     (void)_parameters;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 LikelihoodPayload::LikelihoodPayload(genie::likelihood::EncodingBlock& block) {
     nrows = block.nrows;
@@ -49,10 +51,10 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters par
 void LikelihoodPayload::write(core::Writer& writer) const { 
     writer.write(nrows, 32);
     writer.write(ncols, 32);
-    if (payload.size() > 0) {
+    if (!payload.empty()) {
         writer.write(payload.size(), 32);
-        for(size_t i = 0; i < payload.size();++i)
-        writer.write(payload.at(i),8);
+        for(unsigned char i : payload)
+            writer.write(i,8);
         if (transform_flag) {
             writer.write(additionalPayload.size(), 32);
             for (size_t i = 0; i < additionalPayload.size(); ++i)

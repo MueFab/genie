@@ -17,6 +17,7 @@
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
