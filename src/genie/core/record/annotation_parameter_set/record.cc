@@ -25,7 +25,7 @@ Record::Record()
     : parameter_set_ID(0),
       AT_ID(0),
       AT_alphabet_ID(core::AlphabetID::ACGTN),
-      AT_coord_size(0),
+      AT_coord_size(3),
       AT_pos_40_bits_flag(false),
       n_aux_attribute_groups(0),
       tile_configuration{},

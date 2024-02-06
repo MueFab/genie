@@ -1,4 +1,3 @@
-#include "VariantSiteParser.h"
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
@@ -8,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include "VariantSiteParser.h"
 
 #include "genie/core/arrayType.h"
 #include "genie/util/bitreader.h"
@@ -28,8 +28,29 @@ VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::stringstre
       fieldWriter{},
       numberOfAttributes(0),
       startPos(0) {
-    JsonInfoFieldParser InfoFieldParser(_jsonInfoFields);
+    genie::annotation::JsonAttributeParser InfoFieldParser(_jsonInfoFields);
     infoFields = InfoFieldParser.getInfoFields();
+    init();
+    descriptors.setTileSize(rowsPerTile);
+
+    util::BitReader reader(siteMGrecs);
+    while (fillRecord(reader)) {
+        descriptors.write(variantSite);
+        attributes.add(variantSite.getInfoTag());
+        numberOfRows++;
+    }
+    descriptors.writeDanglingBits();
+}
+
+VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::vector<genie::annotation::InfoField>& _fields, uint64_t _rowsPerTile)
+    :siteMGrecs(_site_MGrecs),
+    rowsPerTile(_rowsPerTile),
+    numberOfRows(0),
+    infoFields(_fields),
+    fieldWriter{},
+    numberOfAttributes(0),
+    startPos(0)
+{
     init();
     descriptors.setTileSize(rowsPerTile);
 

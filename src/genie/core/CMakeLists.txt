@@ -56,7 +56,6 @@ set(source_files
         record/annotation_parameter_set/TileStructure.cc
         record/annotation_parameter_set/DescriptorConfiguration.cc
         record/annotation_parameter_set/CompressorParameterSet.cc
-        record/annotation_parameter_set/Compressors.cc
         record/annotation_parameter_set/AnnotationEncodingParameters.cc
         record/annotation_parameter_set/AttributeData.cc
 

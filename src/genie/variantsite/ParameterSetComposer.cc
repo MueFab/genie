@@ -37,6 +37,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     //----------------------------------------------------//
     // default values
     core::record::annotation_parameter_set::ParameterSettings defaultset;
+    defaultset.ATCoordSize = 3;
     genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
     uint8_t AG_class = 1;

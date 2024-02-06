@@ -4,35 +4,42 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORS_H_
-#define SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORS_H_
+#ifndef SRC_GENIE_ANNOTATION_COMPRESSORS_H_
+#define SRC_GENIE_ANNOTATION_COMPRESSORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <iostream>
 #include <utility>
 #include <vector>
+#include <cassert>
+
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/runtime-exception.h"
 
-#include "CompressorParameterSet.h"
+#include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+
+#include "genie/entropy/lzma/encoder.h"
+#include  "genie/entropy/bsc/encoder.h"
+#include "genie/entropy/zstd/encoder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
-namespace record {
-namespace annotation_parameter_set {
+namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 class Compressor {
  public:
-    Compressor(uint8_t compressorID);
-
+    Compressor();
+    void parseConfig(std::stringstream& config);
     uint8_t getNrOfCompressorIDs() const { return static_cast<uint8_t>(compressorParameters.size()); };
 
     void compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID);
@@ -40,20 +47,23 @@ class Compressor {
  private:
     uint8_t selectedCompressorID;
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
+    void parseCompressor(std::vector<std::string> commandline);
 
-    void initCompressors();
+    genie::entropy::lzma::LZMAParameters readLzmaParameters(std::vector<std::string>& stringpars);
+    genie::entropy::bsc::BSCParameters readBscParameters(std::vector<std::string>& stringpars);
+    genie::entropy::zstd::ZSTDParameters readZstdParameters(std::vector<std::string>& stringpars);
+
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace annotation_parameter_set
-}  // namespace record
-}  // namespace core
+}  // namespace annotation
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ANNOTATION_PARAMETER_SET_COMPRESSORS_H_
+#endif  // SRC_GENIE_ANNOTATION_COMPRESSORS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
