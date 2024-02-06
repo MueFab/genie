@@ -23,8 +23,8 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/watch.h"
 
-#include "codecs/include/mpegg-codecs.h"
 #include "apps/genie/annotation/code.h"
+#include "codecs/include/mpegg-codecs.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -52,23 +52,19 @@ class LZMAParameters {
           fb(MPEGG_LZMA_DEFAULT_FB),
           numThreads(MPEGG_LZMA_DEFAULT_THREADS) {}
 
-    LZMAParameters(uint8_t _level,
-                   uint32_t _dictSize,
-                   uint8_t _lc,
-                   uint8_t _lp,
-                   uint8_t _pb,
-                   uint16_t _fb,
+    LZMAParameters(uint8_t _level, uint32_t _dictSize, uint8_t _lc, uint8_t _lp, uint8_t _pb, uint16_t _fb,
                    uint8_t _numThreads)
-        : level(_level),
-          dictSize(_dictSize),
-          lc(_lc),
-          lp(_lp),
-          pb(_pb),
-          fb(_fb),
-          numThreads(_numThreads) {}
+        : level(_level), dictSize(_dictSize), lc(_lc), lp(_lp), pb(_pb), fb(_fb), numThreads(_numThreads) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
-    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(uint8_t compressor_ID) const;
+    genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
+        uint8_t compressor_ID) const;
+
+    bool parsAreDefault() const {
+        return level == MPEGG_LZMA_DEFAULT_LEVEL && dictSize == MPEGG_LZMA_DEFAULT_DIC_SIZE &&
+               lc == MPEGG_LZMA_DEFAULT_LC && lp == MPEGG_LZMA_DEFAULT_LP && pb == MPEGG_LZMA_DEFAULT_PB &&
+               fb == MPEGG_LZMA_DEFAULT_FB && numThreads == MPEGG_LZMA_DEFAULT_THREADS;
+    }
 };
 
 class LZMAEncoder {
@@ -98,8 +94,6 @@ class LZMAEncoder {
     uint16_t fb;        /* 5 <= fb <= 273, default = 32 */
     uint8_t numThreads; /* 1 or 2, default = 2 */
 };
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

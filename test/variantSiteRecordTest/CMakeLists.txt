@@ -10,6 +10,7 @@ add_executable(VariantSiteRecord-tests ${source_files})
 
 target_link_libraries(VariantSiteRecord-tests PRIVATE gtest_main)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-core)
+target_link_libraries(VariantSiteRecord-tests PRIVATE genie-annotation)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-util)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-bsc)
 target_link_libraries(VariantSiteRecord-tests PRIVATE genie-lzma)

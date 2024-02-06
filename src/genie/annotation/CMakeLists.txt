@@ -5,6 +5,7 @@ project("genie-annotation")
 set(source_files
         annotation.cc
         JsonAttributeParser.cc
+        Compressors.cc
 )
 
 add_library(genie-annotation ${source_files})

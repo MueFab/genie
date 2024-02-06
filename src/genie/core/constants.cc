@@ -6,9 +6,12 @@
 
 #include "genie/core/constants.h"
 #include <algorithm>
+#include <map>
 #include <limits>
 #include <utility>
 #include "genie/core/record/alignment/class-type.h"
+#include "genie/util/runtime-exception.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -553,6 +556,28 @@ std::string AnnotDescToString(AnnotDesc desc) {
     }
 }
 
+AlgoID stringToAlgoID(std::string& algostring)
+{
+    std::map<std::string, AlgoID> stringtoalgo;
+    stringtoalgo["CABAC"] = AlgoID::CABAC;
+    stringtoalgo["LZMA"] = AlgoID::LZMA;
+    stringtoalgo["ZSTD"] = AlgoID::ZSTD;
+    stringtoalgo["BSC"] = AlgoID::BSC;
+    stringtoalgo["PROCRUSTES"] = AlgoID::PROCRUSTES;
+    stringtoalgo["JBIG"] = AlgoID::JBIG;
+    stringtoalgo["LZW"] = AlgoID::LZW;
+    stringtoalgo["BIN"] = AlgoID::BIN;
+    stringtoalgo["SPARSE"] = AlgoID::SPARSE;
+    stringtoalgo["DEL"] = AlgoID::DEL;
+    stringtoalgo["RLE"] = AlgoID::RLE;
+    stringtoalgo["SER"] = AlgoID::SER;
+
+    std::map<std::string, AlgoID>::iterator it;
+    it = stringtoalgo.find(algostring);
+    if (it == stringtoalgo.end())
+        throw genie::util::RuntimeException(__FILE__, __FUNCTION__, __LINE__, "invalid string to algorithmID ");
+    return stringtoalgo[algostring];
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

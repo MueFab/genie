@@ -4,7 +4,6 @@ project("genie-vsite")
 
 set(source_files
         VariantSiteParser.cc
-        JsonInfoFieldParser.cc
         ParameterSetComposer.cc
         AccessUnitComposer.cc
         Attributes.cc

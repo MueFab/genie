@@ -26,7 +26,7 @@ namespace genotype {
 
 enum class BinarizationID : uint8_t {
     BIT_PLANE = 0,
-    ROW_BIN = 1, // should be ROW_SPLIT?
+    ROW_BIN = 1,  // should be ROW_SPLIT?
     UNDEFINED = 2,
 };
 
@@ -46,6 +46,11 @@ struct GenotypeBinMatParameters {
     bool sort_cols_flag;
     bool transpose_mat_flag;
     genie::core::AlgoID variants_codec_ID;
+    GenotypeBinMatParameters()
+        : sort_rows_flag(false),
+          sort_cols_flag(false),
+          transpose_mat_flag(false),
+          variants_codec_ID(genie::core::AlgoID::BSC) {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -73,7 +78,7 @@ class GenotypeParameters {
                        std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
                        GenotypeBinMatParameters phases_payload_params, bool phases_value);
 
-//    GenotypeParameters(GenotypeParameters&& other);
+    //    GenotypeParameters(GenotypeParameters&& other);
 
     uint8_t getMaxPloidy() const;
     bool getNoRerefernceFlag() const;

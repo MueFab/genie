@@ -23,10 +23,9 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/watch.h"
 
-
 #include "apps/genie/annotation/code.h"
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "codecs/include/mpegg-codecs.h"
+#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,17 +45,22 @@ class BSCParameters {
           lzpMinLen(MPEGG_BSC_DEFAULT_LZPMINLEN),
           blockSorter(MPEGG_BSC_BLOCKSORTER_BWT),
           coder(MPEGG_BSC_CODER_QLFC_STATIC) {}
-    BSCParameters(
-        uint8_t _lzpHashSize,
-        uint8_t _lzpMinLen,
-        uint8_t _blockSorter,
-        uint8_t _coder,
-        uint16_t _features = 0)
-        : lzpHashSize(_lzpHashSize), lzpMinLen(_lzpMinLen), blockSorter(_blockSorter), coder(_coder), features(_features) {}
+    BSCParameters(uint8_t _lzpHashSize, uint8_t _lzpMinLen, uint8_t _blockSorter, uint8_t _coder,
+                  uint16_t _features = 0)
+        : lzpHashSize(_lzpHashSize),
+          lzpMinLen(_lzpMinLen),
+          blockSorter(_blockSorter),
+          coder(_coder),
+          features(_features) {}
 
     genie::core::record::annotation_parameter_set::AlgorithmParameters convertToAlgorithmParameters() const;
     genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterSet(
         uint8_t compressor_ID) const;
+
+    bool parsAreDefault() const {
+        return lzpHashSize == MPEGG_BSC_DEFAULT_LZPHASHSIZE && lzpMinLen == MPEGG_BSC_DEFAULT_LZPMINLEN &&
+               blockSorter == MPEGG_BSC_BLOCKSORTER_BWT && coder == MPEGG_BSC_CODER_QLFC_STATIC;
+    }
 };
 
 class BSCEncoder {

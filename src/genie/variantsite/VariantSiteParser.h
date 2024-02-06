@@ -27,7 +27,7 @@
 #include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
-#include "genie/variantsite/JsonInfoFieldParser.h"
+#include "genie/annotation/JsonAttributeParser.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,9 +39,10 @@ namespace variant_site {
 class VariantSiteParser {
  public:
     using AttributeData = genie::core::record::annotation_parameter_set::AttributeData;
-    using InfoField = genie::variant_site::InfoField;
+    using InfoField = genie::annotation::InfoField;
 
     VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
+    VariantSiteParser(std::istream& _site_MGrecs, std::vector<genie::annotation::InfoField>& _fields, uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
@@ -55,8 +56,8 @@ class VariantSiteParser {
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
-    std::vector<std::string> testAltern;
     std::vector<InfoField> infoFields;
+    std::vector<std::string> testAltern;
     std::map<std::string, uint8_t> infoFieldType;
 
     std::vector<genie::core::Writer> fieldWriter;

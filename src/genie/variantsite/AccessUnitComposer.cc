@@ -83,6 +83,7 @@ void AccessUnitComposer::setAccessUnit(
     // ------------------------------- //
 
     uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
+    ATCoordSize = _annotationParameterSet.getATCoordSize();
     genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
         attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
         attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,

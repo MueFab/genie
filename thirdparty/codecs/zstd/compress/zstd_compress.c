@@ -3242,7 +3242,7 @@ static size_t ZSTD_estimateBlockSize_literal(const BYTE* literals, size_t litSiz
 {
     unsigned* const countWksp = (unsigned*)workspace;
     unsigned maxSymbolValue = HUF_SYMBOLVALUE_MAX;
-    size_t literalSectionHeaderSize = 3 + (litSize >= 1 KB) + (litSize >= 16 KB);
+    size_t literalSectionHeaderSize = (size_t)(3) + (litSize >= 1 KB) + (litSize >= 16 KB);
     U32 singleStream = litSize < 256;
 
     if (hufMetadata->hType == set_basic) return litSize;

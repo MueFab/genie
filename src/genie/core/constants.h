@@ -321,6 +321,7 @@ enum class AlgoID : uint8_t {
     SER = 21
 };
 
+AlgoID stringToAlgoID(std::string& algostring);
 
 
 enum class DataType : uint8_t {
@@ -339,8 +340,8 @@ enum class DataType : uint8_t {
     DOUBLE = 12
 };
 
-typedef boost::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
-                       float, double>
+typedef boost::variant<std::string, char, bool, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t,
+                       uint64_t, float, double>
     DynamicDataType;
 
 // ---------------------------------------------------------------------------------------------------------------------

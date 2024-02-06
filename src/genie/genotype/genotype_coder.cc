@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
+#include <cassert>
 #include <cmath>
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
@@ -193,7 +193,8 @@ void binarize_row_bin(EncodingBlock& block) {
     size_t i2 = 0;
     for (size_t i = 0; i < nrows; i++) {
         for (size_t i_bit = 0; i_bit < amax_vec[i]; i_bit++) {
-            xt::view(bin_mat, i2++, xt::all()) = xt::view(allele_mat, i, xt::all()) & (1 << i_bit);
+            xt::view(bin_mat, i2, xt::all()) = xt::view(allele_mat, i, xt::all()) & (1 << i_bit);
+            i2++;
         }
     }
 }
@@ -301,10 +302,10 @@ void sort_bin_mat(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void invert_sorted_bin_mat(
-    BinMatDtype& bin_mat,
-    UIntVecDtype& row_ids,
-    UIntVecDtype& col_ids,
-    const GenotypeBinMatParameters params
+    [[maybe_unused]] BinMatDtype& bin_mat,
+    [[maybe_unused]] UIntVecDtype& row_ids,
+    [[maybe_unused]] UIntVecDtype& col_ids,
+    [[maybe_unused]] const GenotypeBinMatParameters params
 ) {
 
 

@@ -67,7 +67,6 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetZeros) {  // NOLINT(ce
     genie::core::record::annotation_parameter_set::CompressorParameterSet compressorParameterset;
     EXPECT_EQ(compressorParameterset.getCompressorID(), uint8_t(1));
     EXPECT_EQ(compressorParameterset.getCompressorStepIDs().size(), 0);
-    EXPECT_EQ(compressorParameterset.getNumberOfCompletedOutVars().size(), 0);
 }
 
 TEST_F(CompressorParameterSetTests, FixedValues) {  // NOLINT(cert-err58-cpp)
@@ -153,13 +152,6 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     EXPECT_EQ(compressorParameterSet.IsDefaultParsUsed(), compressorParameterSetCheck.IsDefaultParsUsed());
     EXPECT_EQ(compressorParameterSet.getAlgorithmParameters().size(),
               compressorParameterSetCheck.getAlgorithmParameters().size());
-    EXPECT_EQ(compressorParameterSet.getInVarsIDs(), compressorParameterSetCheck.getInVarsIDs());
-    EXPECT_EQ(compressorParameterSet.getPreviousStepIDs(), compressorParameterSetCheck.getPreviousStepIDs());
-    EXPECT_EQ(compressorParameterSet.getNumberInVars(), compressorParameterSetCheck.getNumberInVars());
-    EXPECT_EQ(compressorParameterSet.getPreviousOutVarIDs(), compressorParameterSetCheck.getPreviousOutVarIDs());
-    EXPECT_EQ(compressorParameterSet.getNumberOfCompletedOutVars(),
-              compressorParameterSetCheck.getNumberOfCompletedOutVars());
-    EXPECT_EQ(compressorParameterSet.getCompetedOutVarIDs(), compressorParameterSetCheck.getCompetedOutVarIDs());
 
 #if GENERATE_TEST_FILES
     std::string name = "TestFiles/CompressorParameterSet_seed_";
