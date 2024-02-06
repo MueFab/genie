@@ -21,6 +21,8 @@ namespace core {
 namespace record {
 namespace annotation_access_unit {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void TypedData::writeElement(std::vector<CustomType> matrixRow) {
     ArrayType arrayType;
     for (auto elem : matrixRow) arrayType.toFile(data_type_ID, elem, writer);
@@ -95,13 +97,13 @@ void TypedData::write(core::Writer& outputWriter) const {
         n_elements = n_elements * array_dims[i];
     }
 
-    if (compressedDataStream.str().size() > 0) {
+    if (!compressedDataStream.str().empty()) {
     //    outputWriter.write(compressedDataStream.str().size(), 32);
         outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
     } else {
         outputWriter.write(const_cast<std::stringstream*>(&dataStream));
     }
-};
+}
 
 }  // namespace annotation_access_unit
 }  // namespace record
