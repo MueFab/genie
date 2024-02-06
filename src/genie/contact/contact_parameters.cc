@@ -12,14 +12,18 @@
 namespace genie {
 namespace contact {
 
-ContactParameters::ContactParameters():
-    sample_infos(),
-    chr_infos(),
-    interval(1),
-    tile_size(1),
-    interval_multipliers(),
-    norm_method_infos(),
-    norm_mat_infos() {
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactParameters::ContactParameters()
+    : sample_infos(),
+      chr_infos(),
+      interval(0),
+      tile_size(0),
+      interval_multipliers(),
+      norm_method_infos(),
+      norm_mat_infos(),
+      scm_params()
+{
     // TODO (Yeremia): Check if interval multipliers are valid
     // TODO (Yeremia): Set default value so that interval_multipliers is valid
 }
@@ -35,13 +39,13 @@ ContactParameters::ContactParameters(
     std::unordered_map<uint8_t, NormalizationMethodInformation>&& _norm_method_infos,
     std::unordered_map<uint8_t, NormalizedMatrixInformations>&& _norm_mat_infos
 ):
-    sample_infos(_sample_infos),
-    chr_infos(_chr_infos),
+    sample_infos(std::move(_sample_infos)),
+    chr_infos(std::move(_chr_infos)),
     interval(_interval),
     tile_size(_tile_size),
-    interval_multipliers(_interval_multipliers),
-    norm_method_infos(_norm_method_infos),
-    norm_mat_infos(_norm_mat_infos) {
+    interval_multipliers(std::move(_interval_multipliers)),
+    norm_method_infos(std::move(_norm_method_infos)),
+    norm_mat_infos(std::move(_norm_mat_infos)) {
 
     // TODO (Yeremia): check if interval multipliers are valid
     for (uint32_t mult: _interval_multipliers){
@@ -124,51 +128,103 @@ ContactParameters::ContactParameters(util::BitReader& reader){
 
         norm_mat_infos.emplace(ID, std::move(norm_mat_info));
     }
+
+    auto num_scm = reader.readBypassBE<uint16_t>();
+    for (uint16_t i = 0; i<num_scm; i++){
+        auto chr1_ID = reader.readBypassBE<uint8_t>();
+        auto chr2_ID = reader.readBypassBE<uint8_t>();
+
+        auto scm_param = ContactSubmatParameters(
+            reader,
+            chr1_ID,
+            chr2_ID,
+            getNumTiles(chr1_ID),
+            getNumTiles(chr2_ID)
+        );
+
+        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
+        UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "Chromosome pair already exist!");
+        scm_params.emplace(chr_pair, std::move(scm_param));
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberSamples() const {return static_cast<uint8_t>(sample_infos.size());}
+uint8_t ContactParameters::getNumberSamples() const { return static_cast<uint8_t>(sample_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::AddSample(uint8_t ID, SampleInformation&& _sample_info) {
-    sample_infos.emplace(ID, std::move(_sample_info));
+void ContactParameters::addSample(SampleInformation&& sample_info) {
+    UTILS_DIE_IF(sample_infos.find(sample_info.ID) != sample_infos.end(), "sample_ID already exists!");
+    sample_infos.emplace(sample_info.ID, std::move(sample_info));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::unordered_map<uint8_t, SampleInformation>& ContactParameters::getSamples() const{ return sample_infos;}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t ContactParameters::getNumberChromosomes() const {return static_cast<uint8_t>(chr_infos.size());}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ContactParameters::AddChromosome(uint8_t ID, ChromosomeInformation&& _chr_info) {
-    chr_infos.emplace(ID, std::move(_chr_info));
+void ContactParameters::addSample(uint8_t ID, std::string&& sample_name) {
+    UTILS_DIE_IF(sample_infos.find(ID) != sample_infos.end(), "sample_ID already exists!");
+    SampleInformation sample_info = {ID, std::move(sample_name)};
+    sample_infos.emplace(ID, std::move(sample_info));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::unordered_map<uint8_t, ChromosomeInformation>& ContactParameters::getChromosomes() const{ return chr_infos;}
+const std::unordered_map<uint8_t, SampleInformation>& ContactParameters::getSamples() const{ return sample_infos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactParameters::getInterval() const {return interval;}
+uint8_t ContactParameters::getNumberChromosomes() const { return static_cast<uint8_t>(chr_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberIntervalMultipliers() const {return static_cast<uint8_t>(interval_multipliers.size());}
+void ContactParameters::addChromosome(ChromosomeInformation&& chr_info) {chr_infos.emplace(chr_info.ID, std::move(chr_info));}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMethods() const {return static_cast<uint8_t>(norm_method_infos.size());}
+void ContactParameters::upsertChromosome(uint8_t ID, const std::string& name, uint64_t length){
+    auto chr_info = chr_infos.find(ID);
+    if (chr_info == chr_infos.end()){
+        chr_infos.emplace(ID, ChromosomeInformation{ID, std::move(name), length});
+    } else{
+        auto curr_chr_info = chr_info->second;
+        UTILS_DIE_IF(curr_chr_info.name != name, "Given chr_ID the name differs!");
+        if (curr_chr_info.length < length){
+            curr_chr_info.length = length;
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info){
+const std::unordered_map<uint8_t, ChromosomeInformation>& ContactParameters::getChromosomes() const{ return chr_infos; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactParameters::getInterval() const { return interval; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactParameters::setInterval(uint32_t _interval) {interval = _interval;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactParameters::getTileSize() const { return tile_size; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactParameters::setTileSize(uint32_t _tile_size) {tile_size = _tile_size;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t ContactParameters::getNumberIntervalMultipliers() const { return static_cast<uint8_t>(interval_multipliers.size()); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t ContactParameters::getNumberNormMethods() const { return static_cast<uint8_t>(norm_method_infos.size()); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactParameters::addNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info){
     norm_method_infos.emplace(ID, std::move(norm_method_info));
 }
 
@@ -180,19 +236,33 @@ const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactParame
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMats() const {return static_cast<uint8_t>(norm_mat_infos.size());}
+uint8_t ContactParameters::getNumberNormMats() const { return static_cast<uint8_t>(norm_mat_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info){
+void ContactParameters::addNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info){
     norm_mat_infos.emplace(ID, norm_mat_info);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactParameters::getNormMats() const {
-    return norm_mat_infos;
+const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactParameters::getNormMats() const {return norm_mat_infos;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t ContactParameters::getNumSCMParams() const {return static_cast<uint16_t>(scm_params.size());}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactParameters::addSCMParam(ContactSubmatParameters&& scm_param){
+    auto chr_pair = scm_param.getChrPair();
+    UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "SCM parameter already exists!");
+    scm_params.emplace(chr_pair, std::move(scm_param));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const SCMParamsDtype& ContactParameters::getSCMParams() const {return scm_params;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -220,11 +290,7 @@ void ContactParameters::write(core::Writer& writer) const {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): implement this!
-size_t ContactParameters::getSize(core::Writer& writesize) const {return 0;}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool isSymmetrical(uint8_t chr1_ID, uint8_t chr2_ID){return chr1_ID == chr2_ID;}
+size_t ContactParameters::getSize(core::Writer& writesize) const { return 0; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

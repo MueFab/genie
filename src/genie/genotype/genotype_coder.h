@@ -152,28 +152,17 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values);
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-/*
-{
-}
-*/
-// TODO(Yeremia): Finalize this function, do not return local memory
-// void encode_block(
-//    const EncodingOptions& opt,
-//    std::list<core::record::VariantGenotype>& recs
-//);
 std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
                                                            std::vector<core::record::VariantGenotype>& recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-
 
 }  // namespace genotype
 }  // namespace genie

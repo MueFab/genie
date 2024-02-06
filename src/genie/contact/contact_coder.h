@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CODER_H
-#define GENIE_CONTACT_CODER_H
+#ifndef GENIE_CONTACT_CONTACT_CODER_H
+#define GENIE_CONTACT_CONTACT_CODER_H
 
 #include <cstdint>
 #include <list>
@@ -20,7 +20,7 @@
 namespace genie {
 namespace contact {
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
@@ -31,18 +31,32 @@ using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
-// -----------------------------------------------------------------------------
+using ChrIDPair = std::pair<uint8_t, uint8_t>;
+using SCMRecDtype = std::unordered_map<ChrIDPair, core::record::ContactRecord>;
+using IntervSCMRecDtype = std::unordered_map<uint32_t, SCMRecDtype>;
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingOptions {
-    uint32_t interval{};
-    uint32_t tile_size{};
+    uint32_t tile_size;
+    bool multi_intervals = false;
     bool diag_transform = true;
     bool binarize = true;
 };
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
+struct EncodingBlock {
+    ContactParameters params;
+    IntervSCMRecDtype interv_scm_recs;
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::ContactRecord>& recs);
+
+// ---------------------------------------------------------------------------------------------------------------------
 }
 }
 
-#endif  // GENIE_CONTACT_CODER_H
+#endif  // GENIE_CONTACT_CONTACT_CODER_H

@@ -43,24 +43,24 @@ ContactSubmatParameters::ContactSubmatParameters(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactSubmatParameters::ContactSubmatParameters(util::BitReader& reader, ContactParameters param)
-{
-    chr1_ID = reader.readBypassBE<uint8_t>();
-    chr2_ID = reader.readBypassBE<uint8_t>();
-    auto ntiles_in_row = param.getNumTiles(chr1_ID);
-    auto ntiles_in_col = param.getNumTiles(chr2_ID);
-
+ContactSubmatParameters::ContactSubmatParameters(
+    util::BitReader& reader,
+    uint8_t chr1_ID,
+    uint8_t chr2_ID,
+    uint32_t ntiles_in_row,
+    uint32_t ntiles_in_col
+) {
     tile_parameters.resize(ntiles_in_row);
     for (uint32_t i = 0; i<ntiles_in_row; i++){
         tile_parameters[i].resize(ntiles_in_col);
-        
+
         for (uint32_t j = 0; j<ntiles_in_col; j++){
 
-            if (!(isSymmetrical(chr1_ID, chr2_ID) && i <= j)){
+            if (!(chr1_ID == chr2_ID && i <= j)){
                 auto diag_transform_flag = reader.read<bool>();
                 auto diag_tranform_mode = DiagonalTransformMode::MODE_0;
                 if (diag_transform_flag){}
-                    diag_tranform_mode = reader.read<DiagonalTransformMode>(2);
+                diag_tranform_mode = reader.read<DiagonalTransformMode>(2);
                 auto binarization_flag = reader.read<bool>();
 
                 tile_parameters[i][j] = {
@@ -84,6 +84,10 @@ uint8_t ContactSubmatParameters::getChr1ID() const {return chr1_ID;}
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t ContactSubmatParameters::getChr2ID() const {return chr2_ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ChrIDPair ContactSubmatParameters::getChrPair(){return {chr1_ID, chr2_ID};}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
