@@ -132,11 +132,6 @@ void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void invert_sorted_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids,
-                           GenotypeBinMatParameters params);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void sort_block(const EncodingOptions& opt, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,7 +161,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 {
 }
 */
-// TODO(yeremia): Finalize this function, do not return local memory
+// TODO(Yeremia): Finalize this function, do not return local memory
 // void encode_block(
 //    const EncodingOptions& opt,
 //    std::list<core::record::VariantGenotype>& recs

@@ -300,19 +300,6 @@ void sort_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void invert_sorted_bin_mat(
-    BinMatDtype& bin_mat,
-    UIntVecDtype& row_ids,
-    UIntVecDtype& col_ids,
-    const GenotypeBinMatParameters params
-) {
-
-
-
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
     auto num_bin_mats = getNumBinMats(block);
 
@@ -480,7 +467,7 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing funciton
+// TODO(Yeremia,Stefanie): Move and refactor this function to the parsing funciton
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,

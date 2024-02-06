@@ -34,7 +34,6 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
-#target_link_libraries(${PROJECT_NAME} PRIVATE xtensor-io)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-contact)
