@@ -1,8 +1,9 @@
 project("records-tests")
 
 set(source_files
-        variant_genotype-test.cc
         helpers.cc
+        variant_genotype-test.cc
+        contact-test.cc
 )
 
 add_executable(records-tests ${source_files})
