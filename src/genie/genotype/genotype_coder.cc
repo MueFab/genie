@@ -10,11 +10,11 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 #include <fstream>
-// #include <xtensor/xstrided_view.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -467,8 +467,8 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// TODO(Yeremia,Stefanie): Move and refactor this function to the parsing funciton
 
+// TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values) {

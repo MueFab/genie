@@ -43,7 +43,7 @@ class ContactRecord {
     std::vector<uint64_t> start_pos2;
     std::vector<uint64_t> end_pos2;
     std::vector<uint32_t> counts;
-    boost::optional<LinkRecord> link_record;
+    std::optional<LinkRecord> link_record;
 
  public:
     /**
@@ -138,6 +138,23 @@ class ContactRecord {
       *
       */
      void write(util::BitWriter &writer) const;
+
+     /**
+      *
+      * @return
+      */
+     uint64_t inferChr1Length();
+
+     /**
+      *
+      * @return
+      */
+     uint64_t inferChr2Length();
+
+     /**
+      *
+      */
+     uint32_t inferInterval();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

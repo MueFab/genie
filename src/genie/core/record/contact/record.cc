@@ -21,6 +21,24 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContactRecord::ContactRecord()
+    : sample_ID(0),
+      sample_name(),
+      chr1_ID(0),
+      chr1_name(),
+      chr2_ID(0),
+      chr2_name(),
+      norm_count_names(),
+      start_pos1(),
+      end_pos1(),
+      start_pos2(),
+      end_pos2(),
+      counts(),
+      link_record()
+{}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 ContactRecord::ContactRecord(util::BitReader &reader){
     // Sample
     sample_ID = reader.readBypassBE<uint8_t>();
@@ -129,7 +147,57 @@ const std::vector<uint32_t>& ContactRecord::getCounts() const {return counts;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactRecord::write(util::BitWriter &writer) const {}
+// TODO (Yeremia): Implement this
+//void ContactRecord::write(util::BitWriter &writer) const {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t ContactRecord::inferChr1Length(){
+    uint64_t max_pos = 0;
+    for (auto& pos: end_pos1){
+        if (pos > max_pos){
+            max_pos = pos;
+        }
+    }
+    return max_pos;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t ContactRecord::inferChr2Length(){
+    uint64_t max_pos = 0;
+    for (auto& pos: end_pos2){
+        if (pos > max_pos){
+            max_pos = pos;
+        }
+    }
+    return max_pos;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactRecord::inferInterval(){
+    uint32_t interval = 0;
+    for (auto i = 0; i<getNumCounts(); i++){
+        bool updated = false;
+
+        uint32_t new_interval = end_pos1[i] - start_pos1[i];
+        if (interval < new_interval){
+            interval = new_interval;
+            updated = true;
+        }
+
+        new_interval = end_pos2[i] - start_pos2[i];
+        if (interval < new_interval){
+            interval = new_interval;
+            updated = true;
+        }
+
+        if (!updated){
+            break;
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

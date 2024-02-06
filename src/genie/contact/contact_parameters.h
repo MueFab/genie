@@ -12,11 +12,11 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/optional/optional.hpp>
-#include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include <genie/core/constants.h>
+#include <genie/core/writer.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include "contact_subcm_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -55,6 +55,30 @@ struct NormalizedMatrixInformations {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO (Yeremia): This is a dummy hash pair function, update this function if necessary
+struct hash_pair {
+    template <class T1, class T2>
+    size_t operator()(const std::pair<T1, T2>& p) const
+    {
+        auto hash1 = std::hash<T1>{}(p.first);
+        auto hash2 = std::hash<T2>{}(p.second);
+
+        if (hash1 != hash2) {
+            return hash1 ^ hash2;
+        }
+
+        // If hash1 == hash2, their XOR is zero.
+        return hash1;
+    }
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+using ChrIDPair = std::pair<uint8_t, uint8_t>;
+using SCMParamsDtype = std::unordered_map<ChrIDPair, ContactSubmatParameters, hash_pair>;
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 class ContactParameters {
  private:
     std::unordered_map<uint8_t, SampleInformation> sample_infos;
@@ -66,6 +90,7 @@ class ContactParameters {
 
     std::unordered_map<uint8_t, NormalizationMethodInformation> norm_method_infos;
     std::unordered_map<uint8_t, NormalizedMatrixInformations> norm_mat_infos;
+    SCMParamsDtype scm_params;
 
  public:
     ContactParameters();
@@ -83,19 +108,27 @@ class ContactParameters {
     ContactParameters(util::BitReader& reader);
 
     uint8_t getNumberSamples() const;
-    void AddSample(uint8_t ID, SampleInformation&& sample_info);
+    void addSample(SampleInformation&& sample_info);
+    void addSample(uint8_t ID, std::string&& sample_name);
     const std::unordered_map<uint8_t, SampleInformation>& getSamples() const;
     uint8_t getNumberChromosomes() const;
-    void AddChromosome(uint8_t ID, ChromosomeInformation&& chr_info);
+    void addChromosome(ChromosomeInformation&& chr_info);
+    void upsertChromosome(uint8_t ID, const std::string& name, uint64_t length);
     const std::unordered_map<uint8_t, ChromosomeInformation>& getChromosomes() const;
     uint32_t getInterval() const;
+    void setInterval(uint32_t interval);
+    uint32_t getTileSize() const;
+    void setTileSize(uint32_t tile_size);
     uint8_t getNumberIntervalMultipliers() const;
     uint8_t getNumberNormMethods() const;
-    void AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
+    void addNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
     const std::unordered_map<uint8_t, NormalizationMethodInformation>& getNormMethods() const;
     uint8_t getNumberNormMats() const;
-    void AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
+    void addNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
     const std::unordered_map<uint8_t, NormalizedMatrixInformations>& getNormMats() const;
+    uint16_t getNumSCMParams() const;
+    void addSCMParam(ContactSubmatParameters&& scm_param);
+    const SCMParamsDtype& getSCMParams() const;
 
     uint32_t getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult=1);
     uint32_t getNumTiles(uint8_t chr_ID, uint8_t interv_mult=1);
@@ -103,6 +136,8 @@ class ContactParameters {
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& writesize) const;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool isSymmetrical(uint8_t chr1_ID, uint8_t chr2_ID);
 
