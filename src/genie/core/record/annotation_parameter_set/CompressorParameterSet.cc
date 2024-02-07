@@ -25,7 +25,7 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-CompressorParameterSet::CompressorParameterSet() : compressorSteps{}, compressor_ID(1) {}
+CompressorParameterSet::CompressorParameterSet() : compressor_ID(1), compressorSteps{} {}
 
 CompressorParameterSet::CompressorParameterSet(util::BitReader& reader) { read(reader); }
 
@@ -38,10 +38,13 @@ CompressorParameterSet::CompressorParameterSet(
     std::vector<std::vector<uint8_t>> completed_out_var_ID)
     : compressor_ID(compressor_ID) {
     compressorSteps.resize(n_compressor_steps);
+    size_t algParindex = 0;
     for (uint8_t i = 0; i < n_compressor_steps; ++i) {
         compressorSteps.at(i).stepID = compressor_step_ID.at(i);
         compressorSteps.at(i).algorithmID = algorithm_ID.at(i);
         compressorSteps.at(i).useDefaultAlgorithmParameters = use_default_pars.at(i);
+        if (!use_default_pars.at(i))
+            compressorSteps.at(i).algorithm_parameters = algorithm_parameters.at(algParindex++);
         compressorSteps.at(i).in_var_ID.resize(n_in_vars.at(i));
         compressorSteps.at(i).prev_step_ID.resize(n_in_vars.at(i));
         compressorSteps.at(i).prev_out_var_ID.resize(n_in_vars.at(i));
@@ -94,7 +97,7 @@ void CompressorParameterSet::write(core::Writer& writer) const {
         writer.write(step.useDefaultAlgorithmParameters, 1);
         if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.write(writer);
         writer.write(step.in_var_ID.size(), 4);
-        for (auto i = 0; i < step.in_var_ID.size(); ++i) {
+        for (size_t i = 0; i < step.in_var_ID.size(); ++i) {
             writer.write(step.in_var_ID.at(i), 4);
             writer.write(step.prev_step_ID.at(i), 4);
             writer.write(step.prev_out_var_ID.at(i), 4);
