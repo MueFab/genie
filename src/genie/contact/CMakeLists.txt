@@ -4,6 +4,8 @@ set(source_files
         contact_coder.cc
         contact_parameters.cc
         contact_subcm_parameters.cc
+        contact_scm_payload.cc
+        contact_scm_payload.h
 )
 
 add_library(${PROJECT_NAME} ${source_files})
