@@ -56,26 +56,27 @@ struct NormalizedMatrixInformations {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): This is a dummy hash pair function, update this function if necessary
-struct hash_pair {
+struct chr_pair_hash {
     template <class T1, class T2>
     size_t operator()(const std::pair<T1, T2>& p) const
     {
-        auto hash1 = std::hash<T1>{}(p.first);
-        auto hash2 = std::hash<T2>{}(p.second);
-
-        if (hash1 != hash2) {
-            return hash1 ^ hash2;
-        }
-
-        // If hash1 == hash2, their XOR is zero.
-        return hash1;
+//        auto hash1 = std::hash<T1>{}(p.first);
+//        auto hash2 = std::hash<T2>{}(p.second);
+//
+//        if (hash1 != hash2) {
+//            return hash1 ^ hash2;
+//        }
+//
+//        // If hash1 == hash2, their XOR is zero.
+//        return hash1;
+        return (static_cast<size_t>(p.first) << 16) + static_cast<size_t>(p.second);
     }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 using ChrIDPair = std::pair<uint8_t, uint8_t>;
-using SCMParamsDtype = std::unordered_map<ChrIDPair, ContactSubmatParameters, hash_pair>;
+using SCMParamsDtype = std::unordered_map<ChrIDPair, ContactSubmatParameters, chr_pair_hash>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
