@@ -153,8 +153,7 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
                                      annotationParameterSet, annotationAccessUnit.at(0), AG_class, AT_ID, 0);
 }
 
-void Annotation::parseSite(std::ifstream& inputfile)
-{
+void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
     uint64_t defaultTileSize = 1000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
@@ -198,13 +197,25 @@ void Annotation::parseSite(std::ifstream& inputfile)
         }
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
-            annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
+                                 annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
         rowIndex += defaultTileSize;
     }
-
 }
 
-void Annotation::setInfoFields(std::string jsonFileName) {}
+void Annotation::setInfoFields(std::string jsonFileName) {
+    // read attributes info from json file
+    std::ifstream AttributeFieldsFile;
+    AttributeFieldsFile.open(jsonFileName, std::ios::in);
+    std::stringstream attributeFields;
+    UTILS_DIE_IF(!AttributeFieldsFile.is_open(), "unable to open json file");
+
+    if (AttributeFieldsFile.is_open()) {
+        attributeFields << AttributeFieldsFile.rdbuf();
+        AttributeFieldsFile.close();
+    }
+    JsonAttributeParser attributeParser(attributeFields);
+    infoFields = attributeParser.getInfoFields();
+}
 
 }  // namespace annotation
 }  // namespace genie
