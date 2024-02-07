@@ -29,7 +29,7 @@ namespace annotation {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Compressor::Compressor() : selectedCompressorID(0) {  }
+Compressor::Compressor() : selectedCompressorID(0), compressorParameters{} {}
 
 void Compressor::parseConfig(std::stringstream& config) {
     UTILS_DIE_IF(config.str().empty(), "compressor config is empty ");
@@ -180,7 +180,6 @@ genie::entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<
         parameter.read(stringpars.at(index++), pars.pb) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.fb) || index == stringpars.size() ||
         parameter.read(stringpars.at(index++), pars.numThreads)) {
-        
     }
     if (stringpars.size() != index)
         stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
@@ -189,8 +188,7 @@ genie::entropy::lzma::LZMAParameters Compressor::readLzmaParameters(std::vector<
     return pars;
 }
 
-genie::entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std::string>& stringpars)
-{
+genie::entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std::string>& stringpars) {
     genie::entropy::bsc::BSCParameters pars;
     uint8_t index = 0;
     if (stringpars.empty()) return pars;
@@ -205,8 +203,7 @@ genie::entropy::bsc::BSCParameters Compressor::readBscParameters(std::vector<std
     return pars;
 }
 
-genie::entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<std::string>& stringpars)
-{
+genie::entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<std::string>& stringpars) {
     genie::entropy::zstd::ZSTDParameters pars;
     uint8_t index = 0;
     if (stringpars.empty()) return pars;
@@ -217,7 +214,6 @@ genie::entropy::zstd::ZSTDParameters Compressor::readZstdParameters(std::vector<
     }
     stringpars.erase(stringpars.begin(), stringpars.begin() + index - 1);
     return pars;
-
 }
 void Compressor::parseCompressor(std::vector<std::string> commandline) {
     // compressorID stepID algorithmID {parameter1 parameter2 ... parametern} {invar1 invar2 ... invarn} {outvar1
@@ -248,11 +244,11 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
             break;
         }
         case genie::core::AlgoID::BSC: {
-            genie::entropy::bsc::BSCParameters  parameters = readBscParameters(sub);
+            genie::entropy::bsc::BSCParameters parameters = readBscParameters(sub);
             step.useDefaultAlgorithmParameters = parameters.parsAreDefault();
             step.algorithm_parameters = parameters.convertToAlgorithmParameters();
             break;
-         }
+        }
         default:
             break;
     }
@@ -270,8 +266,6 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
 
     // genie::core::AlgoID algorithmID = genie::core::AlgoID.value
 }
-
-
 
 }  // namespace annotation
 }  // namespace genie

@@ -178,7 +178,7 @@ uint64_t ContactRecord::inferChr2Length(){
 
 uint32_t ContactRecord::inferInterval(){
     uint32_t interval = 0;
-    for (auto i = 0; i<getNumCounts(); i++){
+    for (auto i = 0u; i<getNumCounts(); i++){
         bool updated = false;
 
         uint32_t new_interval = static_cast<uint32_t>(end_pos1[i] - start_pos1[i]);

@@ -9,13 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cassert>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
-#include <iostream>
 #include <utility>
 #include <vector>
-#include <cassert>
 
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
@@ -23,11 +23,11 @@
 #include "genie/util/bitwriter.h"
 #include "genie/util/runtime-exception.h"
 
-#include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
+#include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 
+#include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
-#include  "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -47,13 +47,12 @@ class Compressor {
  private:
     uint8_t selectedCompressorID;
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;
+
     void parseCompressor(std::vector<std::string> commandline);
 
     genie::entropy::lzma::LZMAParameters readLzmaParameters(std::vector<std::string>& stringpars);
     genie::entropy::bsc::BSCParameters readBscParameters(std::vector<std::string>& stringpars);
     genie::entropy::zstd::ZSTDParameters readZstdParameters(std::vector<std::string>& stringpars);
-
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
