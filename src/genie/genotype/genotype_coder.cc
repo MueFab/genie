@@ -314,16 +314,13 @@ void debinarize_row_bin(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void binarize_allele_mat(
-    const EncodingOptions& opt,
-    EncodingBlock& block
+    Int8MatDtype& allele_mat,
+    const BinarizationID binarization_ID,
+    const ConcatAxis concat_axis,
+    std::vector<BinMatDtype>& bin_mats,
+    UIntVecDtype& amax_vec,
+    uint8_t& num_bit_planes
 ) {
-
-    auto& binarization_ID = opt.binarization_ID;
-    auto& num_bit_planes = block.num_bit_planes;
-    auto& concat_axis = opt.concat_axis;
-    auto& allele_mat = block.allele_mat;
-    auto& bin_mats = block.allele_bin_mat_vect;
-    auto& amax_vect =  block.amax_vec;
 
     switch (binarization_ID) {
         case genie::genotype::BinarizationID::BIT_PLANE: {
@@ -331,7 +328,7 @@ void binarize_allele_mat(
             break;
         }
         case genie::genotype::BinarizationID::ROW_BIN: {
-            binarize_row_bin(allele_mat, bin_mats, amax_vect);
+            binarize_row_bin(allele_mat, bin_mats, amax_vec);
             break;
         }
         default:
@@ -339,7 +336,7 @@ void binarize_allele_mat(
     }
 
     // TODO(Yeremia): Free memory of allele_mat
-    block.allele_mat.resize({0, 0});
+    allele_mat.resize({0, 0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -351,6 +348,9 @@ void sort_matrix(
 ) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
     UTILS_DIE_IF(bin_mat.shape(axis) != ids.shape(0), "bin_mat and ids have different dimension!");
+
+    if (ids.shape(0) == 0)
+        return;
 
     // TODO(Yeremia): (optimization) Create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
@@ -389,10 +389,11 @@ void sort_bin_mat(
     UIntVecDtype& row_ids,
     UIntVecDtype& col_ids,
     SortingAlgoID sort_row_method,
-    SortingAlgoID sort_col_method)
-{
+    SortingAlgoID sort_col_method
+) {
     switch (sort_row_method) {
         case genie::genotype::SortingAlgoID::NO_SORTING:
+            row_ids = UIntVecDtype({0});
             break;
         case genie::genotype::SortingAlgoID::RANDOM_SORT:
             random_sort_bin_mat(bin_mat, row_ids, 0);
@@ -409,6 +410,7 @@ void sort_bin_mat(
 
     switch (sort_col_method) {
         case genie::genotype::SortingAlgoID::NO_SORTING:
+            col_ids = UIntVecDtype({0});
             break;
         case genie::genotype::SortingAlgoID::RANDOM_SORT:
             random_sort_bin_mat(bin_mat, col_ids, 1);
@@ -421,6 +423,32 @@ void sort_bin_mat(
             break;
         default:
             UTILS_DIE("Invalid sort method!");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void invert_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids
+) {
+    if (row_ids.shape(0) != 1){
+        genie::genotype::sort_matrix(
+            bin_mat,
+            row_ids,
+            0
+        );
+        row_ids.resize({0});
+    }
+    if (col_ids.shape(0) != 1){
+        genie::genotype::sort_matrix(
+            bin_mat,
+            col_ids,
+            1
+        );
+
+        col_ids.resize({0});
     }
 }
 
@@ -623,7 +651,11 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t> payload) {
+void entropy_encode_bin_mat(
+    BinMatDtype& bin_mat,
+    genie::core::AlgoID codec_ID,
+    std::vector<uint8_t> payload
+) {
     uint8_t* raw_data;
     size_t raw_data_len;
     uint8_t* compressed_data;
@@ -682,10 +714,21 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     UTILS_DIE_IF(opt.sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(opt.sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
 
-    genie::genotype::EncodingBlock block{};
-    genie::genotype::decompose(opt, block, recs);
-    genie::genotype::transform_max_value(block);
-    genie::genotype::binarize_allele_mat(opt, block);
+    EncodingBlock block{};
+    decompose(opt, block, recs);
+    transform_max_value(
+        block.allele_mat,
+        block.dot_flag,
+        block.na_flag
+    );
+    binarize_allele_mat(
+        block.allele_mat,
+        opt.binarization_ID,
+        opt.concat_axis,
+        block.allele_bin_mat_vect,
+        block.amax_vec,
+        block.num_bit_planes
+    );
  
     // TODO(Yeremia): create function to create GenotypeParameters
     auto num_bin_mats = getNumBinMats(block);
@@ -709,9 +752,6 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
         phasing_payload_params.variants_codec_ID = opt.codec_ID;
     }
 
-//    GenotypeParameters parameter(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID, block.num_bit_planes,
-//                                 opt.concat_axis, std::move(payload_params), encode_phases_data_flag, phasing_payload_params,
-//                                 phases_value);
     genie::genotype::sort_block(opt, block);
     auto parameter = generate_genotype_parameters(opt, block);
 
