@@ -214,53 +214,86 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
     // Check DO_NOT_CONCAT
     {
+        auto concat_axis = genie::genotype::ConcatAxis::DO_NOT_CONCAT;
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
 
         orig_allele_mat = allele_mat;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,
+            concat_axis,
             bin_mats,
             num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 3);
         ASSERT_EQ(num_bin_mats, 3);
+        ASSERT_TRUE(allele_mat != orig_allele_mat);
+
+        genie::genotype::debinarize_bit_plane(
+            bin_mats,
+            num_bin_mats,
+            concat_axis,
+            allele_mat
+        );
+
+        ASSERT_TRUE(allele_mat == orig_allele_mat);
     }
 
     // Check CONCAT_ROW_DIR
     {
+        auto concat_axis = genie::genotype::ConcatAxis::CONCAT_ROW_DIR;
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
 
         orig_allele_mat = allele_mat;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
-            genie::genotype::ConcatAxis::CONCAT_ROW_DIR,
+            concat_axis,
             bin_mats,
             num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(num_bin_mats, 3);
+        ASSERT_TRUE(allele_mat != orig_allele_mat);
+
+        genie::genotype::debinarize_bit_plane(
+            bin_mats,
+            num_bin_mats,
+            concat_axis,
+            allele_mat
+        );
+
+        ASSERT_TRUE(allele_mat == orig_allele_mat);
     }
 
     // Check CONCAT_COL_DIR
     {
+        auto concat_axis = genie::genotype::ConcatAxis::CONCAT_COL_DIR;
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
 
         orig_allele_mat = allele_mat;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
-            genie::genotype::ConcatAxis::CONCAT_COL_DIR,
+            concat_axis,
             bin_mats,
             num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(num_bin_mats, 3);
+        ASSERT_TRUE(allele_mat != orig_allele_mat);
+
+        genie::genotype::debinarize_bit_plane(
+            bin_mats,
+            num_bin_mats,
+            concat_axis,
+            allele_mat
+        );
+
+        ASSERT_TRUE(allele_mat == orig_allele_mat);
     }
 }
 
@@ -288,7 +321,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
-        ASSERT_EQ(amax_vec.shape(0), allele_mat.shape(0));
+        ASSERT_EQ(amax_vec.shape(0), orig_allele_mat.shape(0));
         ASSERT_EQ(xt::sum(amax_vec)(0), bin_mats.front().shape(0));
 
         genie::genotype::debinarize_row_bin(
@@ -307,7 +340,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
 TEST(Genotype, RoundTrip_RandomSort) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
-    int8_t MAX_ALLELE_VAL = 2;
+    uint8_t MAX_BOOL_VAL = 2;
 
     genie::genotype::BinMatDtype bin_mat;
     genie::genotype::BinMatDtype orig_bin_mat;
@@ -316,7 +349,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, MAX_BOOL_VAL));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
@@ -342,7 +375,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort cols
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, MAX_BOOL_VAL));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
@@ -368,7 +401,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows and cols
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, MAX_BOOL_VAL));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
