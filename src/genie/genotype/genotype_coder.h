@@ -30,13 +30,13 @@ namespace genotype {
 
 // -----------------------------------------------------------------------------
 
-using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
+//using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
-using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
+//using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
 using Int8MatDtype = xt::xtensor<int8_t, 2, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 
-using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
+//using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 using AttrType = std::vector<uint8_t>;
 
@@ -53,13 +53,13 @@ enum class SortingAlgoID : uint8_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingOptions {
-    uint32_t block_size;
-    BinarizationID binarization_ID;
-    ConcatAxis concat_axis;
+    uint32_t block_size = 0;
+    BinarizationID binarization_ID = BinarizationID::UNDEFINED;
+    ConcatAxis concat_axis = ConcatAxis::UNDEFINED;
     bool transpose_mat = false;
-    SortingAlgoID sort_row_method;
-    SortingAlgoID sort_col_method;
-    genie::core::AlgoID codec_ID;
+    SortingAlgoID sort_row_method = SortingAlgoID::NO_SORTING;
+    SortingAlgoID sort_col_method = SortingAlgoID::NO_SORTING;
+    genie::core::AlgoID codec_ID = genie::core::AlgoID::JBIG;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -107,7 +107,20 @@ void transform_max_value(EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag, bool& not_avail_flag);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag, bool not_avail_flag);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//std::vector<BinMatDtype>&& binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis);
+void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::vector<BinMatDtype>& bin_mats);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -115,11 +128,19 @@ void binarize_row_bin(EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void debinarize_row_bin(std::vector<BinMatDtype>& bin_mat, UIntVecDtype& amax_vec, Int8MatDtype& allele_mat);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sort_matrix(BinMatDtype& bin_mat, UIntVecDtype ids, uint8_t axis);
+void sort_matrix(BinMatDtype& bin_mat, const UIntVecDtype& ids, uint8_t axis);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -144,10 +165,6 @@ void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_l
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t> payload);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -156,6 +173,10 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
                  std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
                  std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t> payload);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
