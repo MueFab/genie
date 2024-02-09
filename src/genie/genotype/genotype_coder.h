@@ -132,7 +132,8 @@ void debinarize_row_bin(std::vector<BinMatDtype>& bin_mat, UIntVecDtype& amax_ve
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block);
+void binarize_allele_mat(Int8MatDtype& allele_mat,BinarizationID binarization_ID,ConcatAxis concat_axis,
+                         std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec,uint8_t& num_bit_planes);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -146,6 +147,10 @@ void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis);
 
 void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids, SortingAlgoID sort_row_method,
                   SortingAlgoID sort_col_method);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void invert_sort_bin_mat(BinMatDtype& bin_mat,UIntVecDtype& row_ids,UIntVecDtype& col_ids);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
