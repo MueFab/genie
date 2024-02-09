@@ -104,10 +104,6 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_max_value(EncodingBlock& block);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag, bool& not_avail_flag);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -155,10 +151,6 @@ void invert_sort_bin_mat(BinMatDtype& bin_mat,UIntVecDtype& row_ids,UIntVecDtype
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_block(const EncodingOptions& opt, EncodingBlock& block);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void invert_sorted_block(const GenotypeParameters& params, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
