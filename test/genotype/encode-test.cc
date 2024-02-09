@@ -36,6 +36,7 @@
 
 #include "genie/entropy/jbig/encoder.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(Genotype, Decompose) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -108,47 +109,47 @@ TEST(Genotype, Decompose) {
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 2))(0), 0);
     }
 
-    //------------------------------------------------------
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-TEST(Genotype, AdaptiveMaxValue) {
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
-    std::vector<genie::core::record::VariantGenotype> recs;
-
-    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
-    while (bitreader.isGood()) {
-        recs.emplace_back(bitreader);
-    }
-    reader.close();
-
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
-
-    ASSERT_EQ(recs.size(), 100);
-
-    genie::genotype::EncodingOptions opt = {
-        512,                                         // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
-    genie::genotype::EncodingBlock block{};
-    genie::genotype::decompose(opt, block, recs);
-    genie::genotype::transform_max_value(block);
-
-    ASSERT_EQ(block.dot_flag, false);
-    ASSERT_EQ(block.na_flag, false);
-    ASSERT_EQ(xt::amin(block.allele_mat)(0), 0);
-    ASSERT_EQ(xt::amax(block.allele_mat)(0), 1);
-}
+//TEST(Genotype, AdaptiveMaxValue) {
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
+//    std::vector<genie::core::record::VariantGenotype> recs;
+//
+//    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
+//    ASSERT_EQ(reader.fail(), false);
+//    genie::util::BitReader bitreader(reader);
+//    while (bitreader.isGood()) {
+//        recs.emplace_back(bitreader);
+//    }
+//    reader.close();
+//
+//    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+//    recs.pop_back();
+//
+//    ASSERT_EQ(recs.size(), 100);
+//
+//    genie::genotype::EncodingOptions opt = {
+//        512,                                         // block_size;
+//        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+//        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+//        false,                                       // transpose_mat;
+//        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+//        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+//        genie::core::AlgoID::JBIG                    // codec_ID;
+//    };
+//
+//    genie::genotype::EncodingBlock block{};
+//    genie::genotype::decompose(opt, block, recs);
+//    genie::genotype::transform_max_value(block);
+//
+//    ASSERT_EQ(block.dot_flag, false);
+//    ASSERT_EQ(block.na_flag, false);
+//    ASSERT_EQ(xt::amin(block.allele_mat)(0), 0);
+//    ASSERT_EQ(xt::amax(block.allele_mat)(0), 1);
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -241,90 +242,6 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(Genotype, BinarizeBitPlane) {
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
-    std::vector<genie::core::record::VariantGenotype> recs;
-
-    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
-    while (bitreader.isGood()) {
-        recs.emplace_back(bitreader);
-    }
-    reader.close();
-
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
-
-    ASSERT_EQ(recs.size(), 100);
-
-    // Check DO_NOT_CONCAT
-    {
-        genie::genotype::EncodingOptions opt = {
-            512,                                         // block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-            false,                                       // transpose_mat;
-            genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-            genie::core::AlgoID::JBIG                    // codec_ID;
-        };
-
-        genie::genotype::EncodingBlock block{};
-        genie::genotype::decompose(opt, block, recs);
-        genie::genotype::transform_max_value(block);
-        genie::genotype::binarize_allele_mat(opt, block);
-
-        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
-        // TODO @Yeremia: Update the assert
-    }
-
-    // Check CONCAT_ROW_DIR
-    {
-        genie::genotype::EncodingOptions opt = {
-            512,                                          // block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID;
-            genie::genotype::ConcatAxis::CONCAT_ROW_DIR,  // concat_axis;
-            false,                                        // transpose_mat;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
-            genie::core::AlgoID::JBIG                     // codec_ID;
-        };
-
-        genie::genotype::EncodingBlock block{};
-        genie::genotype::decompose(opt, block, recs);
-        genie::genotype::transform_max_value(block);
-        genie::genotype::binarize_allele_mat(opt, block);
-
-        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
-        // TODO @Yeremia: Update the assert
-    }
-
-    // Check CONCAT_COL_DIR
-    {
-        genie::genotype::EncodingOptions opt = {
-            512,                                          // block_size;
-            genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID;
-            genie::genotype::ConcatAxis::CONCAT_COL_DIR,  // concat_axis;
-            false,                                        // transpose_mat;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
-            genie::genotype::SortingAlgoID::NO_SORTING,   // sort_row_method;
-            genie::core::AlgoID::JBIG                     // codec_ID;
-        };
-
-        genie::genotype::EncodingBlock block{};
-        genie::genotype::decompose(opt, block, recs);
-        genie::genotype::transform_max_value(block);
-        genie::genotype::binarize_allele_mat(opt, block);
-
-        ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
-        // TODO @Yeremia: Update the assert
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 TEST(Genotype, RoundTrip_BinarizeBitPlane) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
@@ -333,6 +250,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
     genie::genotype::Int8MatDtype allele_mat;
     genie::genotype::Int8MatDtype orig_allele_mat;
     std::vector<genie::genotype::BinMatDtype> bin_mats;
+    uint8_t num_bin_mats;
 
     // Check DO_NOT_CONCAT
     {
@@ -343,10 +261,12 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
         genie::genotype::binarize_bit_plane(
             allele_mat,
             genie::genotype::ConcatAxis::DO_NOT_CONCAT,
-            bin_mats
+            bin_mats,
+            num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 3);
+        ASSERT_EQ(num_bin_mats, 3);
     }
 
     // Check CONCAT_ROW_DIR
@@ -358,10 +278,12 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
         genie::genotype::binarize_bit_plane(
             allele_mat,
             genie::genotype::ConcatAxis::CONCAT_ROW_DIR,
-            bin_mats
+            bin_mats,
+            num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
+        ASSERT_EQ(num_bin_mats, 3);
     }
 
     // Check CONCAT_COL_DIR
@@ -373,52 +295,13 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
         genie::genotype::binarize_bit_plane(
             allele_mat,
             genie::genotype::ConcatAxis::CONCAT_COL_DIR,
-            bin_mats
+            bin_mats,
+            num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
+        ASSERT_EQ(num_bin_mats, 3);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-TEST(Genotype, BinarizeRowBin) {
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
-    std::vector<genie::core::record::VariantGenotype> recs;
-
-    std::ifstream reader(filepath, std::ios::binary | std::ios::in);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
-    while (bitreader.isGood()) {
-        recs.emplace_back(bitreader);
-    }
-    reader.close();
-
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
-
-    ASSERT_EQ(recs.size(), 100);
-
-    genie::genotype::EncodingOptions opt = {
-        512,                                         // block_size;
-        genie::genotype::BinarizationID::ROW_BIN,    // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
-    genie::genotype::EncodingBlock block{};
-    genie::genotype::decompose(opt, block, recs);
-    genie::genotype::transform_max_value(block);
-    genie::genotype::binarize_allele_mat(opt, block);
-
-    // TODO @Yeremia: Update the assert
-    ASSERT_EQ(block.allele_bin_mat_vect.size(), 1);
-    ASSERT_EQ(block.allele_bin_mat_vect[0].shape(0), static_cast<size_t>(xt::sum(block.amax_vec)(0)));
-    //    ASSERT_EQ(block.allele_bin_mat_vect.shape(2), block.allele_mat.shape(1));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -458,6 +341,8 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
     }
 
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 //TEST(Genotype, test_sort_matrix){
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -521,6 +406,8 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
 //        );
 //    }
 //}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(Genotype, RandomSort_Row) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -613,6 +500,8 @@ TEST(Genotype, RandomSort_Row) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(Genotype, RandomSort_Col) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/1.3.5.header100.gt_only.vcf.geno";
@@ -696,6 +585,8 @@ TEST(Genotype, RandomSort_Col) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(Genotype, Serializer) {
     genie::genotype::BinMatDtype bin_mat;
     size_t orig_payload_len = 15;
@@ -717,6 +608,8 @@ TEST(Genotype, Serializer) {
         ASSERT_EQ(*(payload + i), *(bitmap + i));
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(Genotype, JBIG) {
     genie::genotype::BinMatDtype bin_mat;

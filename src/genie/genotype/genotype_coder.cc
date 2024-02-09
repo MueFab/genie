@@ -41,11 +41,13 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
         phases_payload_param.variants_codec_ID = opt.codec_ID;
     }
 
+    // TODO (Yeremia): Fix this
     auto params = GenotypeParameters(
         block.max_ploidy,
         block.dot_flag,
         block.na_flag,
         opt.binarization_ID,
+        block.num_bit_planes,
         opt.concat_axis,
         std::move(variants_payload_params),
         encode_phases_data_flag,
@@ -53,7 +55,6 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
         false
     );
 
-//    return std::move(params);
     return params;
 }
 
@@ -191,43 +192,15 @@ void inverse_transform_max_val(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis) {
-    auto& allele_mat = block.allele_mat;
-    auto max_val = xt::amax(allele_mat)(0);
-
-    auto num_bit_planes = static_cast<uint8_t>(ceil(log2(max_val + 1)));
-    auto& bin_mats = block.allele_bin_mat_vect;
-    bin_mats.resize(num_bit_planes);
-
-    for (uint8_t k = 0; k < num_bit_planes; k++) {
-        bin_mats[k] = allele_mat & (1 << k);
-    }
-
-    if (concat_axis != ConcatAxis::DO_NOT_CONCAT) {
-        for (uint8_t k = 1; k < num_bit_planes; k++) {
-            if (concat_axis == ConcatAxis::CONCAT_ROW_DIR) {
-                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 0);
-            } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR) {
-                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1);
-            }
-        }
-        // Clean-up the remaining bin_mats
-        bin_mats.resize(1);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void binarize_bit_plane(
-//std::vector<BinMatDtype>&& binarize_bit_plane(
     Int8MatDtype& allele_mat,
     const ConcatAxis concat_axis,
-    std::vector<BinMatDtype>& bin_mats
+    std::vector<BinMatDtype>& bin_mats,
+    uint8_t& num_bit_planes
 ) {
     auto max_val = xt::amax(allele_mat)(0);
-    auto num_bit_planes = static_cast<uint8_t>(ceil(log2(max_val + 1)));
+    num_bit_planes = static_cast<uint8_t>(ceil(log2(max_val + 1)));
 
-//    auto bin_mats = std::vector<BinMatDtype>();
     bin_mats.resize(num_bit_planes);
 
     for (uint8_t k = 0; k < num_bit_planes; k++) {
@@ -246,40 +219,46 @@ void binarize_bit_plane(
         bin_mats.resize(1);
     }
 
-//    return std::move(bin_mats);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void debinarize_bit_plane(
-    const ConcatAxis concat_axis,
     std::vector<BinMatDtype>& bin_mats,
+    const uint8_t num_bit_planes,
+    const ConcatAxis concat_axis,
     Int8MatDtype& allele_mat
 ) {
+    size_t nrows;
+    size_t ncols;
 
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void binarize_row_bin(EncodingBlock& block) {
-    auto& allele_mat = block.allele_mat;
-    auto& amax_vec = block.amax_vec;
-    auto nrows = allele_mat.shape(0);
-    auto ncols = allele_mat.shape(1);
-    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, 1) + 1)));
-
-    auto& bin_mats = block.allele_bin_mat_vect;
-    bin_mats.resize(1);
-    auto new_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
-
-    auto& bin_mat = bin_mats[0];
-    bin_mat.resize({new_nrows, ncols});
-
-    size_t i2 = 0;
-    for (size_t i = 0; i < nrows; i++) {
-        for (size_t i_bit = 0; i_bit < amax_vec[i]; i_bit++) {
-            xt::view(bin_mat, i2++, xt::all()) = xt::view(allele_mat, i, xt::all()) & (1 << i_bit);
+    auto& bin_mat = bin_mats.front();
+    if (concat_axis == ConcatAxis::CONCAT_ROW_DIR){
+        nrows = bin_mat.shape(0);
+        auto new_nrows = nrows/num_bit_planes;
+        for (auto k = 0u; k< num_bit_planes; k++){
+            BinMatDtype curr_bin_mat = xt::view(bin_mat, xt::range((k)*new_nrows, (k+1)*new_nrows), xt::all());
+            bin_mats.emplace_back(std::move(curr_bin_mat));
         }
+    } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR){
+        ncols = bin_mat.shape(1);
+        auto new_ncols = ncols/num_bit_planes;
+        for (auto k = 0u; k< num_bit_planes; k++){
+            BinMatDtype curr_bin_mat = xt::view(bin_mat, xt::all(), xt::range((k)*new_ncols, (k+1)*new_ncols));
+            bin_mats.emplace_back(std::move(curr_bin_mat));
+        }
+    }
+
+    if (concat_axis == ConcatAxis::CONCAT_ROW_DIR || concat_axis == ConcatAxis::CONCAT_COL_DIR){
+        bin_mats.erase(bin_mats.begin());
+    }
+
+    auto num_bin_mats = bin_mats.size();
+    nrows = bin_mats.front().shape(0);
+    ncols = bin_mats.front().shape(1);
+    allele_mat = xt::zeros<int8_t>({nrows, ncols});
+    for (auto k = 0u; k<num_bin_mats; k++){
+        allele_mat += xt::cast<int8_t>(bin_mats[k]) << k;
     }
 }
 
@@ -334,8 +313,13 @@ void debinarize_row_bin(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
+void binarize_allele_mat(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+) {
+
     auto& binarization_ID = opt.binarization_ID;
+    auto& num_bit_planes = block.num_bit_planes;
     auto& concat_axis = opt.concat_axis;
     auto& allele_mat = block.allele_mat;
     auto& bin_mats = block.allele_bin_mat_vect;
@@ -343,7 +327,7 @@ void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
 
     switch (binarization_ID) {
         case genie::genotype::BinarizationID::BIT_PLANE: {
-            binarize_bit_plane(allele_mat, concat_axis, bin_mats);
+            binarize_bit_plane(allele_mat, concat_axis, bin_mats, num_bit_planes);
             break;
         }
         case genie::genotype::BinarizationID::ROW_BIN: {
@@ -725,11 +709,11 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
         phasing_payload_params.variants_codec_ID = opt.codec_ID;
     }
 
-    GenotypeParameters parameter(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID, opt.concat_axis,
-                                 std::move(payload_params), encode_phases_data_flag, phasing_payload_params,
-                                 phases_value);
-
+//    GenotypeParameters parameter(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID, block.num_bit_planes,
+//                                 opt.concat_axis, std::move(payload_params), encode_phases_data_flag, phasing_payload_params,
+//                                 phases_value);
     genie::genotype::sort_block(opt, block);
+    auto parameter = generate_genotype_parameters(opt, block);
 
     return {parameter, block};
 }
