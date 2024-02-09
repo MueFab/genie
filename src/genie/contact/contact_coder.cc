@@ -122,11 +122,11 @@ void encode_scm(
     auto num_counts = rec.getNumCounts();
 
     auto chr1_ID = rec.getChr1ID();
-    auto chr1_nbins = params.getNumBinEntries(chr1_ID);
+//    auto chr1_nbins = params.getNumBinEntries(chr1_ID);
     auto chr1_ntiles = params.getNumTiles(chr1_ID);
 
     auto chr2_ID = rec.getChr2ID();
-    auto chr2_nbins = params.getNumBinEntries(chr2_ID);
+//    auto chr2_nbins = params.getNumBinEntries(chr2_ID);
     auto chr2_ntiles = params.getNumTiles(chr2_ID);
 
     auto is_intra = chr1_ID == chr2_ID;
@@ -140,8 +140,8 @@ void encode_scm(
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
 
     auto mask_pair = std::pair<BinVecDtype, BinVecDtype>(compute_masks(row_ids, col_ids, is_intra));
-    auto& row_mask = mask_pair.first;
-    auto& col_mask = mask_pair.second;
+//    auto& row_mask = mask_pair.first;
+//    auto& col_mask = mask_pair.second;
 
 //    UInt64VecDtype unique_ids = xt::unique(xt::concatenate(xtuple(row_ids, col_ids), 0));
 ////    UInt64VecDtype mapping = xt::zeros<uint64_t>(counts.shape());

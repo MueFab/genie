@@ -3,18 +3,18 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include <cassert>
+
 #include <cmath>
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 #include <fstream>
-// #include <xtensor/xstrided_view.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/runtime-exception.h"
 #include "genotype_coder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -25,7 +25,7 @@ namespace genotype {
 GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block){
     auto num_bin_mat = getNumBinMats(block);
     std::vector<GenotypeBinMatParameters> variants_payload_params(num_bin_mat);
-    for (size_t i = 0; i < num_bin_mat; i++){
+    for (auto i = 0u; i < num_bin_mat; i++){
         variants_payload_params[i].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
         variants_payload_params[i].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
         variants_payload_params[i].transpose_mat_flag = opt.transpose_mat;
@@ -149,6 +149,48 @@ void transform_max_value(EncodingBlock& block) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void transform_max_value(
+    Int8MatDtype& allele_mat,
+    bool& no_ref_flag,
+    bool& not_avail_flag
+) {
+    no_ref_flag = xt::any(xt::equal(allele_mat, -1));
+    not_avail_flag = xt::any(xt::equal(allele_mat, -2));
+
+    auto max_val = static_cast<int8_t>(xt::amax(allele_mat)(0));
+
+    if (no_ref_flag) {
+        max_val++;
+        xt::filter(allele_mat, xt::equal(allele_mat, -1)) = max_val;
+    }
+
+    if (not_avail_flag) {
+        max_val++;
+        xt::filter(allele_mat, xt::equal(allele_mat, -2)) = max_val;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_transform_max_val(
+    Int8MatDtype& allele_mat,
+    bool no_ref_flag,
+    bool not_avail_flag
+){
+    auto max_val = static_cast<signed char>(xt::amax(allele_mat)(0));
+
+    if (not_avail_flag) {
+        xt::filter(allele_mat, xt::equal(allele_mat, max_val)) = -2;
+        max_val--;
+    }
+
+    if (no_ref_flag) {
+        xt::filter(allele_mat, xt::equal(allele_mat, max_val)) = -1;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis) {
     auto& allele_mat = block.allele_mat;
     auto max_val = xt::amax(allele_mat)(0);
@@ -176,6 +218,49 @@ void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void binarize_bit_plane(
+//std::vector<BinMatDtype>&& binarize_bit_plane(
+    Int8MatDtype& allele_mat,
+    const ConcatAxis concat_axis,
+    std::vector<BinMatDtype>& bin_mats
+) {
+    auto max_val = xt::amax(allele_mat)(0);
+    auto num_bit_planes = static_cast<uint8_t>(ceil(log2(max_val + 1)));
+
+//    auto bin_mats = std::vector<BinMatDtype>();
+    bin_mats.resize(num_bit_planes);
+
+    for (uint8_t k = 0; k < num_bit_planes; k++) {
+        bin_mats[k] = xt::cast<bool>(allele_mat & (1 << k));
+    }
+
+    if (concat_axis != ConcatAxis::DO_NOT_CONCAT) {
+        for (uint8_t k = 1; k < num_bit_planes; k++) {
+            if (concat_axis == ConcatAxis::CONCAT_ROW_DIR) {
+                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 0);
+            } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR) {
+                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1);
+            }
+        }
+        // Clean-up the remaining bin_mats
+        bin_mats.resize(1);
+    }
+
+//    return std::move(bin_mats);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void debinarize_bit_plane(
+    const ConcatAxis concat_axis,
+    std::vector<BinMatDtype>& bin_mats,
+    Int8MatDtype& allele_mat
+) {
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void binarize_row_bin(EncodingBlock& block) {
     auto& allele_mat = block.allele_mat;
     auto& amax_vec = block.amax_vec;
@@ -193,22 +278,78 @@ void binarize_row_bin(EncodingBlock& block) {
     size_t i2 = 0;
     for (size_t i = 0; i < nrows; i++) {
         for (size_t i_bit = 0; i_bit < amax_vec[i]; i_bit++) {
-            xt::view(bin_mat, i2, xt::all()) = xt::view(allele_mat, i, xt::all()) & (1 << i_bit);
-            i2++;
+            xt::view(bin_mat, i2++, xt::all()) = xt::view(allele_mat, i, xt::all()) & (1 << i_bit);
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void binarize_row_bin(
+    Int8MatDtype& allele_mat,
+    std::vector<BinMatDtype>& bin_mats,
+    UIntVecDtype& amax_vec
+) {
+    auto nrows = allele_mat.shape(0);
+    auto ncols = allele_mat.shape(1);
+
+    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, 1) + 1)));
+    auto new_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
+
+    BinMatDtype bin_mat = xt::zeros<bool>({new_nrows, ncols});
+
+    size_t i2 = 0;
+    for (size_t i = 0; i < nrows; i++) {
+        for (size_t i_bit = 0; i_bit < amax_vec[i]; i_bit++) {
+            xt::view(bin_mat, i2++, xt::all()) = xt::cast<bool>(xt::view(allele_mat, i, xt::all()) & (1 << i_bit));
+        }
+    }
+
+    bin_mats.emplace_back(std::move(bin_mat));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void debinarize_row_bin(
+    std::vector<BinMatDtype>& bin_mats,
+    UIntVecDtype& amax_vec,
+    Int8MatDtype& allele_mat
+) {
+    auto& bin_mat =  bin_mats.front();
+    auto nrows = amax_vec.shape(0);
+    auto ncols = bin_mat.shape(1);
+
+    // Initialize values, has to be zero
+    allele_mat = xt::zeros<int8_t>({nrows, ncols});
+
+    int l = 0;
+    for (auto i=0u; i<nrows; i++){
+        for (auto j=0u; j< amax_vec[i]; j++){
+            // Simplify the for-loop
+            xt::view(allele_mat, i, xt::all()) += xt::cast<int8_t>(xt::view(bin_mat, l++, xt::all())) << j;
+        }
+    }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
-    switch (opt.binarization_ID) {
-        case genie::genotype::BinarizationID::BIT_PLANE:
-            binarize_bit_plane(block, opt.concat_axis);
+    auto& binarization_ID = opt.binarization_ID;
+    auto& concat_axis = opt.concat_axis;
+    auto& allele_mat = block.allele_mat;
+    auto& bin_mats = block.allele_bin_mat_vect;
+    auto& amax_vect =  block.amax_vec;
+
+    switch (binarization_ID) {
+        case genie::genotype::BinarizationID::BIT_PLANE: {
+            binarize_bit_plane(allele_mat, concat_axis, bin_mats);
             break;
-        case genie::genotype::BinarizationID::ROW_BIN:
-            binarize_row_bin(block);
+        }
+        case genie::genotype::BinarizationID::ROW_BIN: {
+            binarize_row_bin(allele_mat, bin_mats, amax_vect);
             break;
+        }
         default:
             UTILS_DIE("Invalid binarization_ID!");
     }
@@ -221,7 +362,7 @@ void binarize_allele_mat(const EncodingOptions& opt, EncodingBlock& block) {
 
 void sort_matrix(
     BinMatDtype& bin_mat,
-    const UIntVecDtype ids,
+    const UIntVecDtype& ids,
     uint8_t axis
 ) {
     UTILS_DIE_IF(axis > 1, "Invalid axis value!");
@@ -230,17 +371,17 @@ void sort_matrix(
     // TODO(Yeremia): (optimization) Create a boolean vector for the buffer instead of whole matrix;
     BinMatDtype tmp_bin_mat = xt::empty_like(bin_mat);
     if (axis == 0) {
-        for (uint32_t i = 0; i < ids.shape(0); i++) {
+        for (auto i = 0u; i < ids.shape(0); i++) {
             xt::view(tmp_bin_mat, i, xt::all()) = xt::view(bin_mat, ids[i], xt::all());
         }
         for (uint32_t i = 0; i < ids.shape(0); i++) {
             xt::view(bin_mat, i, xt::all()) = xt::view(tmp_bin_mat, i, xt::all());
         }
     } else if (axis == 1) {
-        for (uint32_t i = 0; i < ids.shape(0); i++) {
+        for (auto i = 0u; i < ids.shape(0); i++) {
             xt::view(tmp_bin_mat, xt::all(), i) = xt::view(bin_mat, xt::all(), ids[i]);
         }
-        for (uint32_t i = 0; i < ids.shape(0); i++) {
+        for (auto i = 0u; i < ids.shape(0); i++) {
             xt::view(bin_mat, xt::all(), i) = xt::view(tmp_bin_mat, xt::all(), i);
         }
     }
@@ -301,19 +442,6 @@ void sort_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void invert_sorted_bin_mat(
-    [[maybe_unused]] BinMatDtype& bin_mat,
-    [[maybe_unused]] UIntVecDtype& row_ids,
-    [[maybe_unused]] UIntVecDtype& col_ids,
-    [[maybe_unused]] const GenotypeBinMatParameters params
-) {
-
-
-
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
     auto num_bin_mats = getNumBinMats(block);
 
@@ -348,7 +476,7 @@ void invert_sorted_block(
     auto num_bin_mats = getNumBinMats(block);
 
     auto& genotype_params = params.getVariantsPayloadParams();
-    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
+    for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
         auto& curr_params = genotype_params[i_mat];
         auto& curr_bin_mat = block.allele_bin_mat_vect[i_mat];
         auto& curr_row_ids = block.allele_row_ids_vect[i_mat];
@@ -386,9 +514,9 @@ void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_l
     payload_len = bpl * nrows;
     *payload = (unsigned char*)calloc(payload_len, sizeof(unsigned char));
 
-    for (size_t i = 0; i < nrows; i++) {
+    for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
-        for (size_t j = 0; j < ncols; j++) {
+        for (auto j = 0u; j < ncols; j++) {
             auto byte_offset = row_offset + (j >> 3);
             uint8_t shift = (7 - (j & 7));
             auto val = static_cast<uint8_t>(bin_mat(i, j));
@@ -444,9 +572,9 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     bin_mat.resize(bin_mat_shape);
     xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
 
-    for (size_t i = 0; i < nrows; i++) {
+    for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
-        for (size_t j = 0; j < ncols; j++) {
+        for (auto j = 0u; j < ncols; j++) {
             auto byte_offset = row_offset + (j >> 3);
             uint8_t shift = (7 - (j & 7));
             bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
@@ -490,15 +618,15 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
     for (auto& attrInfo : info) {
         values[attrInfo.first].resize(block_size);
     }
-    for (size_t i_rec = 0; i_rec < block_size; i_rec++) {
+    for (auto i_rec = 0u; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
         
         for (const auto& format : rec.getFormats()) {
             values[format.getFormat()];
-            if (values[format.getFormat()].size() == 0)values[format.getFormat()].resize(block_size);
+            if (values[format.getFormat()].empty())values[format.getFormat()].resize(block_size);
 
             std::vector<std::vector<AttrType>> formatValue = format.getValue();
-            if (values[format.getFormat()].at(i_rec).size() == 0)
+            if (values[format.getFormat()].at(i_rec).empty())
                 values[format.getFormat()].at(i_rec) = formatValue;
             else
                 values[format.getFormat()].at(i_rec).insert(values[format.getFormat()].at(i_rec).end(), formatValue.begin(), formatValue.end());
@@ -552,8 +680,8 @@ void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, 
     UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
     auto equality_check = xt::equal(bin_mat, recon_bin_mat);
     if (!xt::all(equality_check)) {
-        for (size_t i = 0; i < nrows; i++) {
-            for (size_t j = 0; j < ncols; j++) {
+        for (auto i = 0u; i < nrows; i++) {
+            for (auto j = 0u; j < ncols; j++) {
                 auto val = equality_check(i, j);
                 std::cerr << val;
             }
@@ -578,7 +706,7 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     // TODO(Yeremia): create function to create GenotypeParameters
     auto num_bin_mats = getNumBinMats(block);
     std::vector<GenotypeBinMatParameters> payload_params(num_bin_mats);
-    for (uint8_t i_mat = 0; i_mat < num_bin_mats; i_mat++) {
+    for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
         payload_params[i_mat].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
         payload_params[i_mat].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
         payload_params[i_mat].transpose_mat_flag = false;
