@@ -73,6 +73,7 @@ struct EncodingBlock {
     BinMatDtype phasing_mat;
 
     UIntVecDtype amax_vec;
+    uint8_t num_bit_planes;
     std::vector<BinMatDtype> allele_bin_mat_vect;
     std::vector<UIntVecDtype> allele_row_ids_vect;
     std::vector<UIntVecDtype> allele_col_ids_vect;
@@ -115,16 +116,11 @@ void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag, bool 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_bit_plane(EncodingBlock& block, ConcatAxis concat_axis);
+void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::vector<BinMatDtype>& bin_mats, uint8_t& num_bit_planes);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//std::vector<BinMatDtype>&& binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis);
-void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::vector<BinMatDtype>& bin_mats);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void binarize_row_bin(EncodingBlock& block);
+void debinarize_bit_plane(std::vector<BinMatDtype>& bin_mats, uint8_t num_bit_planes, ConcatAxis concat_axis,  Int8MatDtype& allele_mat);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -63,6 +63,7 @@ class GenotypeParameters {
     bool not_available_flag;
     BinarizationID binarization_ID;
 
+    uint8_t num_bit_plane;
     ConcatAxis concat_axis;
 
     std::vector<GenotypeBinMatParameters> variants_payload_params;
@@ -75,7 +76,7 @@ class GenotypeParameters {
     GenotypeParameters();
 
     GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
-                       BinarizationID binarization_ID, ConcatAxis concat_axis,
+                       BinarizationID binarization_ID, uint8_t num_bit_planes, ConcatAxis concat_axis,
                        std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
                        GenotypeBinMatParameters phases_payload_params, bool phases_value);
 
@@ -86,7 +87,7 @@ class GenotypeParameters {
     bool getNotAvailableFlag() const;
     BinarizationID getBinarizationID() const;
     uint8_t getNumBitPlanes() const;
-    ConcatAxis isConcatenated() const;
+    ConcatAxis getConcatAxis() const;
     const std::vector<GenotypeBinMatParameters>& getVariantsPayloadParams() const;
 
     bool isPhaseEncoded() const;

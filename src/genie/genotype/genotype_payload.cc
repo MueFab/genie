@@ -130,7 +130,7 @@ GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
 
 void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
     uint8_t num_variants_payloads = genotypeParameters.getBinarizationID() == BinarizationID::BIT_PLANE &&
-                                            genotypeParameters.isConcatenated() == ConcatAxis::DO_NOT_CONCAT
+                                            genotypeParameters.getConcatAxis() == ConcatAxis::DO_NOT_CONCAT
                                         ? genotypeParameters.getNumBitPlanes()
                                         : 1;
     auto indecRowIds = 0;
