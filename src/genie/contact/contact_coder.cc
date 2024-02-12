@@ -183,7 +183,8 @@ void sparse_to_dense(
     uint64_t row_id_offset,
     uint64_t col_id_offset
 ){
-    mat = UIntMatDtype({nrows, ncols});
+//    mat = UIntMatDtype({nrows, ncols});
+    mat = xt::zeros<uint32_t>({nrows, ncols});
 
     row_ids -= row_id_offset;
     col_ids -= col_id_offset;
