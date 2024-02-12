@@ -1,4 +1,4 @@
-project("records-tests")
+project("genie-test-records")
 
 set(source_files
         helpers.cc
@@ -6,11 +6,11 @@ set(source_files
         contact-test.cc
 )
 
-add_executable(records-tests ${source_files})
+add_executable(${PROJECT_NAME} ${source_files})
 
-target_link_libraries(records-tests PRIVATE gtest_main)
-target_link_libraries(records-tests PRIVATE genie-core)
-target_link_libraries(records-tests PRIVATE genie-util)
+target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 
-install(TARGETS records-tests
+install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "usr/bin")

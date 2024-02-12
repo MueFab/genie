@@ -81,35 +81,128 @@ void decompose(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinVecDtype&& compute_mask(UInt64VecDtype& ids){
-    BinVecDtype mask = BinVecDtype({xt::amax(ids)});
+void compute_mask(
+    UInt64VecDtype& ids,
+    // Output
+    BinVecDtype& mask
+){
+    auto nelems = xt::amax(ids)(0)+1;
+//    mask.resize({nelems});
+    mask = xt::zeros<bool>({nelems});
+
     UInt64VecDtype unique_ids = xt::unique(ids);
     for (auto id: unique_ids){
         mask(id) = true;
     }
-
-    return std::move(mask);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<BinVecDtype, BinVecDtype>&& compute_masks(
+void compute_masks(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    bool is_intra
+    const bool is_intra,
+    // Outputs:
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
 ){
-    auto row_mask = BinVecDtype(compute_mask(row_ids));
-    auto col_mask = BinVecDtype(compute_mask(col_ids));
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
 
     if (is_intra){
-        BinVecDtype mask = row_mask || col_mask;
-        xt::view(row_mask, xt::all()) = xt::view(mask, xt::all());
-        xt::view(col_mask, xt::all()) = xt::view(mask, xt::all());
+        BinVecDtype mask;
+        UInt64VecDtype ids = xt::concatenate(xt::xtuple(row_ids, col_ids));
+        compute_mask(ids, mask);
+
+        row_mask.resize(mask.shape());
+        row_mask = mask;
+        col_mask.resize(mask.shape());
+        col_mask = mask;
+    } else {
+        compute_mask(row_ids, row_mask);
+        compute_mask(col_ids, col_mask);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void remove_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
+
+    auto num_entries = row_ids.shape(0);
+
+    if (is_intra){
+        UTILS_DIE_IF(row_mask.shape(0) != col_mask.shape(0), "Invalid mask!");
+        // Does not matter either row_mask or col_mask
+        auto& mask = row_mask;
+        auto mapping = xt::cumsum(xt::cast<uint64_t>(mask)) - 1u;
+
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_id = row_ids(i);
+            auto new_id = mapping(old_id);
+            row_ids(i) = new_id;
+        }
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_id = col_ids(i);
+            auto new_id = mapping(old_id);
+            col_ids(i) = new_id;
+        }
+    } else {
+        auto row_mapping = xt::cumsum(xt::cast<uint64_t>(row_mask)) - 1u;
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_id = row_ids(i);
+            auto new_id = row_mapping(old_id);
+            row_ids(i) = new_id;
+        }
+        auto col_mapping = xt::cumsum(xt::cast<uint64_t>(col_mask)) - 1u;
+        for (auto i = 0u; i<num_entries; i++){
+            auto old_id = col_ids(i);
+            auto new_id = col_mapping(old_id);
+            col_ids(i) = new_id;
+        }
     }
 
-    std::pair<BinVecDtype, BinVecDtype> mask_pair = std::make_pair(std::move(row_mask), std::move(col_mask));
+}
 
-    return std::move(mask_pair);
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sparse_to_dense(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts,
+    UIntMatDtype& mat,
+    size_t nrows,
+    size_t ncols,
+    uint64_t row_id_offset,
+    uint64_t col_id_offset
+){
+    mat = UIntMatDtype({nrows, ncols});
+
+    row_ids -= row_id_offset;
+    col_ids -= col_id_offset;
+
+    auto nentries = counts.size();
+    for (auto i = 0u; i<nentries; i++){
+        auto row_id = row_ids(i);
+        auto col_id = col_ids(i);
+        auto count = counts(i);
+        mat(row_id, col_id) = count;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void diagonal_transform_scm(
+    UIntMatDtype& scm_at
+){
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,15 +211,20 @@ void encode_scm(
     ContactParameters& params,
     core::record::ContactRecord& rec
 ) {
+
+    // Initialize variables
+    BinVecDtype row_mask;
+    BinVecDtype col_mask;
+
     auto interval = params.getInterval();
     auto num_counts = rec.getNumCounts();
 
     auto chr1_ID = rec.getChr1ID();
-//    auto chr1_nbins = params.getNumBinEntries(chr1_ID);
+    auto chr1_nbins = params.getNumBinEntries(chr1_ID);
     auto chr1_ntiles = params.getNumTiles(chr1_ID);
 
     auto chr2_ID = rec.getChr2ID();
-//    auto chr2_nbins = params.getNumBinEntries(chr2_ID);
+    auto chr2_nbins = params.getNumBinEntries(chr2_ID);
     auto chr2_ntiles = params.getNumTiles(chr2_ID);
 
     auto is_intra = chr1_ID == chr2_ID;
@@ -139,16 +237,11 @@ void encode_scm(
 
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
 
-    auto mask_pair = std::pair<BinVecDtype, BinVecDtype>(compute_masks(row_ids, col_ids, is_intra));
-//    auto& row_mask = mask_pair.first;
-//    auto& col_mask = mask_pair.second;
+    // Compute mask
+    compute_masks(row_ids, col_ids, is_intra, row_mask, col_mask);
 
-//    UInt64VecDtype unique_ids = xt::unique(xt::concatenate(xtuple(row_ids, col_ids), 0));
-////    UInt64VecDtype mapping = xt::zeros<uint64_t>(counts.shape());
-////    size_t new_id = 0;
-////    for (auto unique_id: unique_ids){
-////        mapping(unique_id) = new_id++;
-////    }
+    // Create mapping
+    remove_unaligned(row_ids, col_ids, is_intra, row_mask, col_mask);
 
     for (size_t i_tile=0; i_tile<chr1_ntiles; i_tile++){
         auto min_row_id = i_tile*interval;
@@ -160,7 +253,26 @@ void encode_scm(
 
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
+            BinVecDtype mask = mask1 && mask2;
 
+            UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
+            UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
+            UIntVecDtype tile_counts = xt::filter(counts, mask);
+
+            auto nrows = std::max(max_row_id, chr1_nbins) - min_row_id;
+            auto ncols = std::max(max_col_id, chr2_nbins) - min_col_id;
+
+            UIntMatDtype tile_mat;
+            sparse_to_dense(
+                tile_row_ids,
+                tile_col_ids,
+                tile_counts,
+                tile_mat,
+                nrows,
+                ncols,
+                min_row_id,
+                min_col_id
+            );
         }
     }
 }
