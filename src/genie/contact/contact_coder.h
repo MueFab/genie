@@ -25,9 +25,10 @@ namespace contact {
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using UInt8VecDtype = xt::xtensor<uint8_t , 1, xt::layout_type::row_major>;
-using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
-using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
+//using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
+//using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
+using UIntMatDtype = xt::xtensor<uint32_t , 2, xt::layout_type::row_major>;
 using UInt64VecDtype = xt::xtensor<uint64_t, 1, xt::layout_type::row_major>;
 
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
@@ -58,6 +59,35 @@ struct EncodingBlock {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::ContactRecord>& recs);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void compute_mask(UInt64VecDtype& ids,BinVecDtype& mask);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void compute_masks(UInt64VecDtype& row_ids,UInt64VecDtype& col_ids,bool is_intra,
+                   BinVecDtype& row_mask,BinVecDtype& col_mask);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void remove_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_intra,
+                      BinVecDtype& row_mask, BinVecDtype& col_mask);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sparse_to_dense(
+    UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDtype& counts,
+    UIntMatDtype& mat, size_t nrows, size_t ncols,
+    uint64_t row_id_offset=0, uint64_t col_id_offset=0);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode_scm(ContactParameters& params, core::record::ContactRecord& rec);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode_cm(const EncodingOptions& opt, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

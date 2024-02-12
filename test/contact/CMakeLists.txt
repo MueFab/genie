@@ -11,9 +11,8 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 #message(STATUS "xio: ${xio_INCLUDE_DIRS}")
 
 set(source_files
-        helpers.cc
-        encode-test.cc
-        )
+        encode_test.cc
+)
 
 add_executable(${PROJECT_NAME} ${source_files})
 
@@ -34,10 +33,10 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
+#target_link_libraries(${PROJECT_NAME} PRIVATE xtensor-io)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-contact)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 
