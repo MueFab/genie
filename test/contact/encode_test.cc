@@ -8,7 +8,6 @@
 #include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xadapt.hpp>
-#include "genie/util/runtime-exception.h"
 #include "genie/contact/contact_coder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +22,6 @@ TEST(ContactCoder, compute_mask) {
 
     genie::contact::compute_mask(ids, mask);
 
-    auto shape = mask.shape(0);
     ASSERT_EQ(mask.size(), 6);
     ASSERT_EQ(xt::sum(xt::cast<uint8_t>(mask))(0), 4u);
     ASSERT_TRUE(mask(0));
@@ -153,9 +151,142 @@ TEST(ContactCoder, remove_unaligned) {
 TEST(ContactCoder, sparse_to_dense) {
     // Test a matrix divided in 4 tiles
     // 5x5 scm matrix with tile size equals to 3
+
+    // Tile (0,0)
     {
-        auto ROW_ID_OFFSET = 0;
-        auto ROW_ID_OFFSET = 0;
+        auto ROW_ID_OFFSET = 0u;
+        auto COL_ID_OFFSET = 0u;
+        auto NROWS = 3u;
+        auto NCOLS = 3u;
+
+        std::vector<uint64_t> row_ids_vec = {0, 1, 2};
+        std::vector<uint64_t> col_ids_vec = {1, 2, 0};
+        std::vector<uint32_t> counts_vec = {1, 2, 3};
+
+        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
+        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::UIntMatDtype tile_mat;
+        genie::contact::sparse_to_dense(
+            row_ids,
+            col_ids,
+            counts,
+            tile_mat,
+            NROWS,
+            NCOLS,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET
+        );
+
+        ASSERT_EQ(tile_mat.dimension(), 2);
+        ASSERT_EQ(tile_mat.shape(0), 3);
+        ASSERT_EQ(tile_mat.shape(1), 3);
+        ASSERT_EQ(tile_mat(0, 1), 1);
+        ASSERT_EQ(tile_mat(1, 2), 2);
+        ASSERT_EQ(tile_mat(2, 0), 3);
+        ASSERT_EQ(tile_mat(2, 2), 0);
+    }
+    // Tile (1,0)
+    {
+        auto ROW_ID_OFFSET = 3u;
+        auto COL_ID_OFFSET = 0u;
+        auto NROWS = 2u;
+        auto NCOLS = 3u;
+
+        std::vector<uint64_t> row_ids_vec = {3, 4};
+        std::vector<uint64_t> col_ids_vec = {2, 1};
+        std::vector<uint32_t> counts_vec = {4, 5};
+
+        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
+        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::UIntMatDtype tile_mat;
+        genie::contact::sparse_to_dense(
+            row_ids,
+            col_ids,
+            counts,
+            tile_mat,
+            NROWS,
+            NCOLS,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET
+        );
+
+        ASSERT_EQ(tile_mat.dimension(), 2);
+        ASSERT_EQ(tile_mat.shape(0), 2);
+        ASSERT_EQ(tile_mat.shape(1), 3);
+        ASSERT_EQ(tile_mat(0, 2), 4);
+        ASSERT_EQ(tile_mat(1, 1), 5);
+        ASSERT_EQ(tile_mat(1, 2), 0);
+    }
+    // Tile (0,1)
+    {
+        auto ROW_ID_OFFSET = 0u;
+        auto COL_ID_OFFSET = 3u;
+        auto NROWS = 3u;
+        auto NCOLS = 2u;
+
+        std::vector<uint64_t> row_ids_vec = {0, 2};
+        std::vector<uint64_t> col_ids_vec = {4, 4};
+        std::vector<uint32_t> counts_vec = {6, 7};
+
+        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
+        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::UIntMatDtype tile_mat;
+        genie::contact::sparse_to_dense(
+            row_ids,
+            col_ids,
+            counts,
+            tile_mat,
+            NROWS,
+            NCOLS,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET
+        );
+
+        ASSERT_EQ(tile_mat.dimension(), 2);
+        ASSERT_EQ(tile_mat.shape(0), 3);
+        ASSERT_EQ(tile_mat.shape(1), 2);
+        ASSERT_EQ(tile_mat(0, 1), 6);
+        ASSERT_EQ(tile_mat(2, 1), 7);
+        ASSERT_EQ(tile_mat(2, 0), 0);
+    }
+    // Tile (1,1)
+    {
+        auto ROW_ID_OFFSET = 3u;
+        auto COL_ID_OFFSET = 3u;
+        auto NROWS = 2u;
+        auto NCOLS = 2u;
+
+        std::vector<uint64_t> row_ids_vec = {3};
+        std::vector<uint64_t> col_ids_vec = {3};
+        std::vector<uint32_t> counts_vec = {8};
+
+        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
+        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::UIntMatDtype tile_mat;
+        genie::contact::sparse_to_dense(
+            row_ids,
+            col_ids,
+            counts,
+            tile_mat,
+            NROWS,
+            NCOLS,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET
+        );
+
+        ASSERT_EQ(tile_mat.dimension(), 2);
+        ASSERT_EQ(tile_mat.shape(0), 2);
+        ASSERT_EQ(tile_mat.shape(1), 2);
+        ASSERT_EQ(tile_mat(0, 0), 8);
+        ASSERT_EQ(tile_mat(0, 1), 0);
     }
 }
 
