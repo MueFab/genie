@@ -30,6 +30,7 @@ using UInt8VecDtype = xt::xtensor<uint8_t , 1, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 using UIntMatDtype = xt::xtensor<uint32_t , 2, xt::layout_type::row_major>;
 using UInt64VecDtype = xt::xtensor<uint64_t, 1, xt::layout_type::row_major>;
+using Int64VecDtype = xt::xtensor<int64_t, 1, xt::layout_type::row_major>;
 
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
@@ -86,6 +87,11 @@ void remove_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void append_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_intra,
+                      BinVecDtype& row_mask, BinVecDtype& col_mask);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void sparse_to_dense(
     UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDtype& counts,
     UIntMatDtype& mat, size_t nrows, size_t ncols,
@@ -104,7 +110,7 @@ void sort_by_row_ids(UInt64VecDtype& row_ids,UInt64VecDtype& col_ids,UIntVecDtyp
 
 void diag_transform(
     UIntMatDtype& mat,
-    uint8_t mode
+    DiagonalTransformMode mode
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
