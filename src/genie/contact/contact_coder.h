@@ -42,6 +42,16 @@ using IntervSCMRecDtype = std::unordered_map<uint32_t, SCMRecDtype>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+enum class SortingAlgoID : uint8_t {
+    NO_SORTING = 0,
+    RANDOM_SORT = 1,
+    NEAREST_NEIGHBOR = 2,
+    LIN_KERNIGHAN_HEURISTIC = 3,
+    UNDEFINED = 4
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 struct EncodingOptions {
     uint32_t tile_size;
     bool multi_intervals = false;
@@ -80,6 +90,22 @@ void sparse_to_dense(
     UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDtype& counts,
     UIntMatDtype& mat, size_t nrows, size_t ncols,
     uint64_t row_id_offset=0, uint64_t col_id_offset=0);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void dense_to_sparse(UIntMatDtype& mat, uint64_t row_id_offset, uint64_t col_id_offset,
+                     UInt64VecDtype& row_ids, UInt64VecDtype& col_ids,UIntVecDtype& counts);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_by_row_ids(UInt64VecDtype& row_ids,UInt64VecDtype& col_ids,UIntVecDtype& counts);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void diag_transform(
+    UIntMatDtype& mat,
+    uint8_t mode
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

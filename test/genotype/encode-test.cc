@@ -125,7 +125,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 1: all positive
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
+        allele_mat = xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 64);
 
         orig_allele_mat = allele_mat;
 
@@ -143,7 +143,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     // Case 2: no_ref
     {
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0u, 2u));
         xt::filter(allele_mat, mask) = -1;
 
         orig_allele_mat = allele_mat;
@@ -162,7 +162,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     // Case 3: not_avail_flag
     {
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0u, 2u));
         xt::filter(allele_mat, mask) = -2;
 
         orig_allele_mat = allele_mat;
@@ -181,9 +181,9 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     // Case 3: no_ref and not_avail_flag
     {
         allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0u, 2u));
         xt::filter(allele_mat, mask) = -1;
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0u, 2u));
         xt::filter(allele_mat, mask) = -2;
 
         orig_allele_mat = allele_mat;
