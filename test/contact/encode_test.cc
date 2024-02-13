@@ -148,7 +148,7 @@ TEST(ContactCoder, remove_unaligned) {
     }
 }
 
-TEST(ContactCoder, sparse_to_dense) {
+TEST(ContactCoder, RoundTrip_sparse_dense_rep) {
     // Test a matrix divided in 4 tiles
     // 5x5 scm matrix with tile size equals to 3
 
@@ -166,6 +166,12 @@ TEST(ContactCoder, sparse_to_dense) {
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
         genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::sort_by_row_ids(
+            row_ids,
+            col_ids,
+            counts
+        );
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
@@ -186,6 +192,29 @@ TEST(ContactCoder, sparse_to_dense) {
         ASSERT_EQ(tile_mat(1, 2), 2);
         ASSERT_EQ(tile_mat(2, 0), 3);
         ASSERT_EQ(tile_mat(2, 2), 0);
+
+        genie::contact::UInt64VecDtype recon_row_ids;
+        genie::contact::UInt64VecDtype recon_col_ids;
+        genie::contact::UIntVecDtype recon_counts;
+
+        genie::contact::dense_to_sparse(
+            tile_mat,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET,
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        genie::contact::sort_by_row_ids(
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        ASSERT_TRUE(row_ids == recon_row_ids);
+        ASSERT_TRUE(col_ids == recon_col_ids);
+        ASSERT_TRUE(counts == recon_counts);
     }
     // Tile (1,0)
     {
@@ -201,6 +230,12 @@ TEST(ContactCoder, sparse_to_dense) {
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
         genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::sort_by_row_ids(
+            row_ids,
+            col_ids,
+            counts
+        );
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
@@ -220,6 +255,29 @@ TEST(ContactCoder, sparse_to_dense) {
         ASSERT_EQ(tile_mat(0, 2), 4);
         ASSERT_EQ(tile_mat(1, 1), 5);
         ASSERT_EQ(tile_mat(1, 2), 0);
+
+        genie::contact::UInt64VecDtype recon_row_ids;
+        genie::contact::UInt64VecDtype recon_col_ids;
+        genie::contact::UIntVecDtype recon_counts;
+
+        genie::contact::dense_to_sparse(
+            tile_mat,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET,
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        genie::contact::sort_by_row_ids(
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        ASSERT_TRUE(row_ids == recon_row_ids);
+        ASSERT_TRUE(col_ids == recon_col_ids);
+        ASSERT_TRUE(counts == recon_counts);
     }
     // Tile (0,1)
     {
@@ -235,6 +293,12 @@ TEST(ContactCoder, sparse_to_dense) {
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
         genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::sort_by_row_ids(
+            row_ids,
+            col_ids,
+            counts
+        );
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
@@ -254,6 +318,29 @@ TEST(ContactCoder, sparse_to_dense) {
         ASSERT_EQ(tile_mat(0, 1), 6);
         ASSERT_EQ(tile_mat(2, 1), 7);
         ASSERT_EQ(tile_mat(2, 0), 0);
+
+        genie::contact::UInt64VecDtype recon_row_ids;
+        genie::contact::UInt64VecDtype recon_col_ids;
+        genie::contact::UIntVecDtype recon_counts;
+
+        genie::contact::dense_to_sparse(
+            tile_mat,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET,
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        genie::contact::sort_by_row_ids(
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        ASSERT_TRUE(row_ids == recon_row_ids);
+        ASSERT_TRUE(col_ids == recon_col_ids);
+        ASSERT_TRUE(counts == recon_counts);
     }
     // Tile (1,1)
     {
@@ -269,6 +356,12 @@ TEST(ContactCoder, sparse_to_dense) {
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
         genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+
+        genie::contact::sort_by_row_ids(
+            row_ids,
+            col_ids,
+            counts
+        );
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
@@ -287,6 +380,29 @@ TEST(ContactCoder, sparse_to_dense) {
         ASSERT_EQ(tile_mat.shape(1), 2);
         ASSERT_EQ(tile_mat(0, 0), 8);
         ASSERT_EQ(tile_mat(0, 1), 0);
+
+        genie::contact::UInt64VecDtype recon_row_ids;
+        genie::contact::UInt64VecDtype recon_col_ids;
+        genie::contact::UIntVecDtype recon_counts;
+
+        genie::contact::dense_to_sparse(
+            tile_mat,
+            ROW_ID_OFFSET,
+            COL_ID_OFFSET,
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        genie::contact::sort_by_row_ids(
+            recon_row_ids,
+            recon_col_ids,
+            recon_counts
+        );
+
+        ASSERT_TRUE(row_ids == recon_row_ids);
+        ASSERT_TRUE(col_ids == recon_col_ids);
+        ASSERT_TRUE(counts == recon_counts);
     }
 }
 

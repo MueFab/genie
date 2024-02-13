@@ -40,9 +40,10 @@ class BinMatPayload {
  public:
     BinMatPayload(core::AlgoID _codecID, std::vector<uint8_t> _payload, uint32_t _nrows, uint32_t _ncols)
         : codecID(_codecID), payload(_payload), nrows(_nrows), ncols(_ncols), CompressedPayload{} {}
+
     size_t payloadSize() const { return payload.size(); }
 
-    BinMatPayload(BinMatDtype binmat);
+    BinMatPayload(BinMatDtype& bin_mat);
 
     void write(core::Writer& writer) const;
 

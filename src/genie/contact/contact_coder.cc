@@ -183,16 +183,12 @@ void sparse_to_dense(
     uint64_t row_id_offset,
     uint64_t col_id_offset
 ){
-//    mat = UIntMatDtype({nrows, ncols});
     mat = xt::zeros<uint32_t>({nrows, ncols});
-
-    row_ids -= row_id_offset;
-    col_ids -= col_id_offset;
 
     auto nentries = counts.size();
     for (auto i = 0u; i<nentries; i++){
-        auto row_id = row_ids(i);
-        auto col_id = col_ids(i);
+        auto row_id = row_ids(i) - row_id_offset;
+        auto col_id = col_ids(i) - col_id_offset;
         auto count = counts(i);
         mat(row_id, col_id) = count;
     }
@@ -200,9 +196,101 @@ void sparse_to_dense(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void diagonal_transform_scm(
-    UIntMatDtype& scm_at
+void dense_to_sparse(
+    UIntMatDtype& mat,
+    uint64_t row_id_offset,
+    uint64_t col_id_offset,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
 ){
+    BinMatDtype mask = mat > 0u;
+
+    auto ids = xt::argwhere(mask);
+    auto num_entries = ids.size();
+
+    row_ids.resize({num_entries});
+    col_ids.resize({num_entries});
+    counts.resize({num_entries});
+
+    for (auto k = 0u; k< num_entries; k++){
+        auto i = ids[k][0];
+        auto j = ids[k][1];
+        auto c = mat(i,j);
+
+        row_ids[k] = i;
+        col_ids[k] = j;
+        counts[k] = c;
+    }
+
+    row_ids += row_id_offset;
+    col_ids += col_id_offset;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_by_row_ids(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+){
+    auto num_entries = row_ids.size();
+
+    UInt64VecDtype sort_ids = xt::argsort(row_ids);
+    UInt64VecDtype tmp_row_ids = row_ids;
+    UInt64VecDtype tmp_col_ids = col_ids;
+    UIntVecDtype tmp_counts = counts;
+
+    for (auto k = 0u; k< num_entries; k++){
+        tmp_row_ids(k) = row_ids(sort_ids(k));
+        tmp_col_ids(k) = col_ids(sort_ids(k));
+        tmp_counts(k) = counts(sort_ids(k));
+    }
+
+    row_ids = tmp_row_ids;
+    col_ids = tmp_col_ids;
+    counts = tmp_counts;
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+){
+    UIntMatDtype trans_mat;
+
+    if (mode == DiagonalTransformMode::MODE_0){
+        UTILS_DIE_IF(mat.shape(0) != mat.shape(1),
+                     "Matrix must be a square!");
+
+        auto n = mat.shape(0);
+        auto ndiags = n;
+        auto new_nrows = n / 2 + 1;
+        trans_mat = xt::zeros<uint32_t>({new_nrows, n});
+
+        auto o = 0u;
+        for (auto k=0u; k<ndiags; k++){
+            for (auto i=0u; i< n; i++){
+                auto j = i+k;
+
+                auto new_i = o % n;
+                auto new_j = o / n;
+
+                auto v = mat(i, j);
+                if (v != 0){
+                    trans_mat(new_i, new_j) = v;
+                }
+            }
+        }
+    } else if (mode == DiagonalTransformMode::MODE_1){
+
+    } else if (mode == DiagonalTransformMode::MODE_2){
+
+    } else if (mode == DiagonalTransformMode::MODE_3){
+
+    }
 
 }
 
