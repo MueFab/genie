@@ -430,157 +430,153 @@ TEST(ContactCoder, diagonal_transformation) {
     // Mode 0
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_0;
-        genie::contact::UIntMatDtype mat = {{1, 0, 4},
+        genie::contact::UIntMatDtype MAT = {{1, 0, 4},
                                             {0, 2, 3},
                                             {0, 0, 0}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 2, 0},
+                                                    {0, 3, 4}};
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,1), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(1,2), 4);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 1 Square
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
-        genie::contact::UIntMatDtype mat = {{1, 0, 5},
+        genie::contact::UIntMatDtype MAT = {{1, 0, 5},
                                             {4, 0, 3},
                                             {6, 0, 2}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 0, 2},
+                                                    {0, 3, 4},
+                                                    {0, 5, 6}};
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,2), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(1,2), 4);
-        ASSERT_EQ(mat(2,1), 5);
-        ASSERT_EQ(mat(2,2), 6);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 1 nrows < ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
-        genie::contact::UIntMatDtype mat = {{1, 0, 4},
+        genie::contact::UIntMatDtype MAT = {{1, 0, 4},
                                             {3, 0, 2}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 0, 0},
+                                                    {2, 3, 4}};
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(1,0), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(1,2), 4);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 1 nrows > ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
-        genie::contact::UIntMatDtype mat = {{1, 2},
+        genie::contact::UIntMatDtype MAT = {{1, 2},
                                             {3, 0},
                                             {4, 0}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 0},
+                                                    {2, 3},
+                                                    {0, 4}};
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(1,0), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(2,1), 4);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
 
     // Mode 2 Square
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
-        genie::contact::UIntMatDtype mat = {{3, 0, 6},
+        genie::contact::UIntMatDtype MAT = {{3, 0, 6},
                                             {2, 0, 5},
                                             {1, 0, 4}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 2, 0},
+                                                    {3, 0, 4},
+                                                    {0, 5, 6}};
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,1), 2);
-        ASSERT_EQ(mat(1,0), 3);
-        ASSERT_EQ(mat(1,2), 4);
-        ASSERT_EQ(mat(2,1), 5);
-        ASSERT_EQ(mat(2,2), 6);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 2 nrows < ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
-        genie::contact::UIntMatDtype mat = {{2, 0, 4},
+        genie::contact::UIntMatDtype MAT = {{2, 0, 4},
                                             {1, 0, 3}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 2, 0},
+                                                    {0, 3, 4}};
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::diag_transform(MAT, MODE);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,1), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(1,2), 4);
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 2 nrows > ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
-        genie::contact::UIntMatDtype mat = {{3, 4},
+        genie::contact::UIntMatDtype MAT = {{3, 4},
                                             {2, 0},
                                             {1, 0}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 2},
+                                                    {0, 3},
+                                                    {0, 4}};
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::diag_transform(MAT, MODE);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,1), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(2,1), 4);
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
 
     // Mode 3 Square
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
-        genie::contact::UIntMatDtype mat = {{3, 0, 1},
+        genie::contact::UIntMatDtype MAT = {{3, 0, 1},
                                             {5, 0, 2},
                                             {6, 0, 4}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 0, 2},
+                                                    {3, 0, 4},
+                                                    {5, 0, 6}};
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::diag_transform(MAT, MODE);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,2), 2);
-        ASSERT_EQ(mat(1,0), 3);
-        ASSERT_EQ(mat(1,2), 4);
-        ASSERT_EQ(mat(2,0), 5);
-        ASSERT_EQ(mat(2,2), 6);
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 3 nrows < ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
-        genie::contact::UIntMatDtype mat = {{3, 0, 1},
+        genie::contact::UIntMatDtype MAT = {{3, 0, 1},
                                             {4, 0, 2}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 0, 2},
+                                                    {3, 0, 4}};
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
+        genie::contact::diag_transform(MAT, MODE);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,2), 2);
-        ASSERT_EQ(mat(1,0), 3);
-        ASSERT_EQ(mat(1,2), 4);
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
     // Mode 3 nrows > ncols
     {
         auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
-        genie::contact::UIntMatDtype mat = {{2, 1},
+        genie::contact::UIntMatDtype MAT = {{2, 1},
                                             {3, 0},
                                             {4, 0}};
+        genie::contact::UIntMatDtype TARGET_MAT = { {1, 2},
+                                                    {0, 3},
+                                                    {0, 4}};
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
 
-        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-        genie::contact::diag_transform(mat, MODE);
 
-        ASSERT_EQ(mat(0,0), 1);
-        ASSERT_EQ(mat(0,1), 2);
-        ASSERT_EQ(mat(1,1), 3);
-        ASSERT_EQ(mat(2,1), 4);
+        genie::contact::diag_transform(MAT, MODE);
+
+        ASSERT_TRUE(MAT == TARGET_MAT);
     }
 }
 
