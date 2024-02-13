@@ -87,7 +87,6 @@ void compute_mask(
     BinVecDtype& mask
 ){
     auto nelems = xt::amax(ids)(0)+1;
-//    mask.resize({nelems});
     mask = xt::zeros<bool>({nelems});
 
     UInt64VecDtype unique_ids = xt::unique(ids);
@@ -412,6 +411,31 @@ void diag_transform(
             }
         }
         mat = trans_mat;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void binarize_rows(
+    UIntMatDtype& mat,
+    BinMatDtype& bin_mat
+) {
+    auto nrows = mat.shape(0);
+    auto ncols = mat.shape(1);
+
+    auto nbits_per_row = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(mat, {1}) + 1)));
+
+    uint64_t bin_mat_nrows = static_cast<uint64_t>(xt::sum(nbits_per_row)(0));
+    uint64_t bin_mat_ncols = ncols + 1;
+
+    bin_mat = xt::zeros<bool>({bin_mat_nrows, bin_mat_ncols});
+
+    size_t i2 = 0;
+    for (size_t i = 0; i < nrows; i++) {
+        for (size_t i_bit = 0; i_bit < nbits_per_row[i]; i_bit++) {
+            xt::view(bin_mat, i2++, xt::range(1, bin_mat_ncols)) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1 << i_bit));
+        }
+        bin_mat(i2-1, 0) = true;
     }
 }
 

@@ -164,6 +164,8 @@ TEST(ContactCoder, RoundTrip_remove_append_unaligned) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(ContactCoder, RoundTrip_sparse_dense_rep) {
     // Test a matrix divided in 4 tiles
     // 5x5 scm matrix with tile size equals to 3
@@ -422,6 +424,8 @@ TEST(ContactCoder, RoundTrip_sparse_dense_rep) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(ContactCoder, diagonal_transformation) {
     // Mode 0
     {
@@ -578,6 +582,24 @@ TEST(ContactCoder, diagonal_transformation) {
         ASSERT_EQ(mat(1,1), 3);
         ASSERT_EQ(mat(2,1), 4);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, binarize_rows) {
+    genie::contact::UIntMatDtype mat = {{1, 2, 3},
+                                        {4, 5, 6}};
+    genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+    genie::contact::BinMatDtype bin_mat;
+    genie::contact::binarize_rows(mat, bin_mat);
+
+    genie::contact::BinMatDtype target_bin_mat = { {false, true, false, true},
+                                                    {true, false, true, true},
+                                                    {false, false, true, false},
+                                                    {false, false, false, true},
+                                                    {true, true, true, true}};
+
+    ASSERT_TRUE(bin_mat == target_bin_mat);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
