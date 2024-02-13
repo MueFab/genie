@@ -173,6 +173,71 @@ void remove_unaligned(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void append_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
+                 "The size of row_ids and col_ids must be same!");
+
+    auto num_entries = row_ids.shape(0);
+
+    if (is_intra){
+        UTILS_DIE_IF(row_mask.shape(0) != col_mask.shape(0), "Invalid mask!");
+        // Does not matter either row_mask or col_mask
+        auto& mask = row_mask;
+        auto tmp_ids = xt::argwhere(mask);
+
+        auto mapping_len = xt::sum(xt::cast<uint64_t>(mask))(0);
+        auto mapping = xt::empty<uint64_t>({mapping_len});
+
+        auto k = 0u;
+        for (auto v : tmp_ids){
+            auto value = v[0];
+            mapping(k++) = value;
+        }
+
+        for (auto i=0u; i<num_entries; i++){
+            row_ids(i) = mapping(row_ids(i));
+            col_ids(i) = mapping(col_ids(i));
+        }
+
+    } else {
+        auto tmp_ids = xt::argwhere(row_mask);
+        auto mapping_len = xt::sum(xt::cast<uint64_t>(row_mask))(0);
+        auto mapping = xt::empty<uint64_t>({mapping_len});
+
+        auto k = 0u;
+        for (auto v : tmp_ids){
+            auto value = v[0];
+            mapping(k++) = value;
+        }
+
+        for (auto i=0u; i<num_entries; i++){
+            row_ids(i) = mapping(row_ids(i));
+        }
+
+        tmp_ids = xt::argwhere(col_mask);
+        mapping_len = xt::sum(xt::cast<uint64_t>(col_mask))(0);
+        mapping = xt::empty<uint64_t>({mapping_len});
+
+        k = 0u;
+        for (auto v : tmp_ids){
+            auto value = v[0];
+            mapping(k++) = value;
+        }
+
+        for (auto i=0u; i<num_entries; i++){
+            col_ids(i) = mapping(col_ids(i));
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void sparse_to_dense(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
@@ -261,37 +326,93 @@ void diag_transform(
 ){
     UIntMatDtype trans_mat;
 
-    if (mode == DiagonalTransformMode::MODE_0){
-        UTILS_DIE_IF(mat.shape(0) != mat.shape(1),
-                     "Matrix must be a square!");
+    if (mode == DiagonalTransformMode::MODE_0) {
+        UTILS_DIE_IF(mat.shape(0) != mat.shape(1), "Matrix must be a square!");
 
         auto n = mat.shape(0);
-        auto ndiags = n;
         auto new_nrows = n / 2 + 1;
         trans_mat = xt::zeros<uint32_t>({new_nrows, n});
 
         auto o = 0u;
-        for (auto k=0u; k<ndiags; k++){
-            for (auto i=0u; i< n; i++){
-                auto j = i+k;
-
-                auto new_i = o % n;
-                auto new_j = o / n;
+        for (auto k = 0u; k < n; k++) {
+            for (auto i = 0u; i < (n - k); i++) {
+                auto j = i + k;
 
                 auto v = mat(i, j);
-                if (v != 0){
+                if (v != 0) {
+                    auto new_i = o / n;
+                    auto new_j = o % n;
                     trans_mat(new_i, new_j) = v;
                 }
+                o++;
             }
         }
-    } else if (mode == DiagonalTransformMode::MODE_1){
+        mat.resize(trans_mat.shape());
+        mat = trans_mat;
 
-    } else if (mode == DiagonalTransformMode::MODE_2){
+    } else {
+        auto nrows = static_cast<int64_t>(mat.shape(0));
+        auto ncols = static_cast<int64_t>(mat.shape(1));
+        trans_mat = xt::zeros<uint32_t>({nrows, ncols});
 
-    } else if (mode == DiagonalTransformMode::MODE_3){
+        Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
+        size_t k_elem;
 
+        if (mode == DiagonalTransformMode::MODE_1){
+            diag_ids(0) = 0;
+            k_elem = 1u;
+            auto ndiags = std::max(nrows, ncols);
+            for (auto diag_id = 1; diag_id<ndiags; diag_id++){
+                if (diag_id < static_cast<int64_t>(ncols))
+                    diag_ids(k_elem++) = diag_id;
+                if (diag_id < static_cast<int64_t>(nrows))
+                    diag_ids(k_elem++) = -diag_id;
+            }
+        } else if (mode == DiagonalTransformMode::MODE_2){
+            k_elem = 0u;
+            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++)
+                diag_ids(k_elem++) = diag_id;
+        } else if (mode == DiagonalTransformMode::MODE_3){
+            k_elem = 0u;
+            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--)
+                diag_ids(k_elem++) = diag_id;
+        }
+
+        int64_t i;
+        int64_t j;
+        int64_t i_offset;
+        int64_t j_offset;
+        int64_t nelems_in_diag;
+        auto o = 0u;
+        for (auto diag_id : diag_ids){
+            if (diag_id >= 0) {
+                nelems_in_diag = std::max(nrows, ncols) - diag_id;
+                i_offset = 0;
+                j_offset = diag_id;
+            } else {
+                nelems_in_diag = std::max(nrows, ncols) + diag_id;
+                i_offset = -diag_id;
+                j_offset = 0;
+            }
+            for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+                i = k_diag + i_offset;
+                j = k_diag + j_offset;
+                if (i >= nrows)
+                    break;
+                if (j >= ncols)
+                    break;
+
+                auto v = mat(i, j);
+                if (v != 0) {
+                    size_t new_i = o / mat.shape(1);
+                    size_t new_j = o % mat.shape(1);
+                    trans_mat(new_i, new_j) = v;
+                }
+                o++;
+            }
+        }
+        mat = trans_mat;
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

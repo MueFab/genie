@@ -102,7 +102,7 @@ TEST(ContactCoder, compute_masks) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, remove_unaligned) {
+TEST(ContactCoder, RoundTrip_remove_append_unaligned) {
     // Intra case
     {
         auto IS_INTRA = true;
@@ -112,6 +112,9 @@ TEST(ContactCoder, remove_unaligned) {
 
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+
+        genie::contact::UInt64VecDtype orig_row_ids = genie::contact::UInt64VecDtype(row_ids);
+        genie::contact::UInt64VecDtype orig_col_ids = genie::contact::UInt64VecDtype(col_ids);
 
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
@@ -123,6 +126,11 @@ TEST(ContactCoder, remove_unaligned) {
         ASSERT_EQ(row_ids(1), 2u);
         ASSERT_EQ(col_ids(0), 1u);
         ASSERT_EQ(col_ids(1), 3u);
+
+        genie::contact::append_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+
+        ASSERT_TRUE(row_ids == orig_row_ids);
+        ASSERT_TRUE(col_ids == orig_col_ids);
     }
 
     // Inter case
@@ -135,6 +143,9 @@ TEST(ContactCoder, remove_unaligned) {
         genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
         genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
 
+        genie::contact::UInt64VecDtype orig_row_ids = genie::contact::UInt64VecDtype(row_ids);
+        genie::contact::UInt64VecDtype orig_col_ids = genie::contact::UInt64VecDtype(col_ids);
+
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
 
@@ -145,6 +156,11 @@ TEST(ContactCoder, remove_unaligned) {
         ASSERT_EQ(row_ids(1), 1u);
         ASSERT_EQ(col_ids(0), 0u);
         ASSERT_EQ(col_ids(1), 1u);
+
+        genie::contact::append_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+
+        ASSERT_TRUE(row_ids == orig_row_ids);
+        ASSERT_TRUE(col_ids == orig_col_ids);
     }
 }
 
@@ -403,6 +419,164 @@ TEST(ContactCoder, RoundTrip_sparse_dense_rep) {
         ASSERT_TRUE(row_ids == recon_row_ids);
         ASSERT_TRUE(col_ids == recon_col_ids);
         ASSERT_TRUE(counts == recon_counts);
+    }
+}
+
+TEST(ContactCoder, diagonal_transformation) {
+    // Mode 0
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_0;
+        genie::contact::UIntMatDtype mat = {{1, 0, 4},
+                                            {0, 2, 3},
+                                            {0, 0, 0}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,1), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(1,2), 4);
+    }
+    // Mode 1 Square
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
+        genie::contact::UIntMatDtype mat = {{1, 0, 5},
+                                            {4, 0, 3},
+                                            {6, 0, 2}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,2), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(1,2), 4);
+        ASSERT_EQ(mat(2,1), 5);
+        ASSERT_EQ(mat(2,2), 6);
+    }
+    // Mode 1 nrows < ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
+        genie::contact::UIntMatDtype mat = {{1, 0, 4},
+                                            {3, 0, 2}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(1,0), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(1,2), 4);
+    }
+    // Mode 1 nrows > ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_1;
+        genie::contact::UIntMatDtype mat = {{1, 2},
+                                            {3, 0},
+                                            {4, 0}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(1,0), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(2,1), 4);
+    }
+
+    // Mode 2 Square
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
+        genie::contact::UIntMatDtype mat = {{3, 0, 6},
+                                            {2, 0, 5},
+                                            {1, 0, 4}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,1), 2);
+        ASSERT_EQ(mat(1,0), 3);
+        ASSERT_EQ(mat(1,2), 4);
+        ASSERT_EQ(mat(2,1), 5);
+        ASSERT_EQ(mat(2,2), 6);
+    }
+    // Mode 2 nrows < ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
+        genie::contact::UIntMatDtype mat = {{2, 0, 4},
+                                            {1, 0, 3}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,1), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(1,2), 4);
+    }
+    // Mode 2 nrows > ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_2;
+        genie::contact::UIntMatDtype mat = {{3, 4},
+                                            {2, 0},
+                                            {1, 0}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,1), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(2,1), 4);
+    }
+
+    // Mode 3 Square
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
+        genie::contact::UIntMatDtype mat = {{3, 0, 1},
+                                            {5, 0, 2},
+                                            {6, 0, 4}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,2), 2);
+        ASSERT_EQ(mat(1,0), 3);
+        ASSERT_EQ(mat(1,2), 4);
+        ASSERT_EQ(mat(2,0), 5);
+        ASSERT_EQ(mat(2,2), 6);
+    }
+    // Mode 3 nrows < ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
+        genie::contact::UIntMatDtype mat = {{3, 0, 1},
+                                            {4, 0, 2}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,2), 2);
+        ASSERT_EQ(mat(1,0), 3);
+        ASSERT_EQ(mat(1,2), 4);
+    }
+    // Mode 3 nrows > ncols
+    {
+        auto MODE = genie::contact::DiagonalTransformMode::MODE_3;
+        genie::contact::UIntMatDtype mat = {{2, 1},
+                                            {3, 0},
+                                            {4, 0}};
+
+        genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
+        genie::contact::diag_transform(mat, MODE);
+
+        ASSERT_EQ(mat(0,0), 1);
+        ASSERT_EQ(mat(0,1), 2);
+        ASSERT_EQ(mat(1,1), 3);
+        ASSERT_EQ(mat(2,1), 4);
     }
 }
 
