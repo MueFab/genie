@@ -27,7 +27,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         AttributeFieldsFile.close();
     }
     JsonAttributeParser attributeParser(attributeFields);
-    // determine the compressors
 
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
@@ -36,7 +35,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         return;
 
     // read file - determine type?
-
     if (recType == RecType::GENO_FILE) {
         parseGenotype(inputfile);
 
@@ -45,10 +43,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         parseSite(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();
-
-    // determine and write the annotation parameter set to output(stream)
-    // parse n rows for complete tile or until end of file
-    // determine and write the annotation access unit to output(stream)
 
     std::ofstream testfile;
     std::string filename = outputFileName;
@@ -59,13 +53,14 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
     genie::core::Writer txtwriter(&txtfile, true);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
-    APS_dataUnit.write(testwriter);
-    APS_dataUnit.write(txtwriter);
+    auto sizeSofar = APS_dataUnit.write(testwriter);
+
+    APS_dataUnit.write(txtwriter, sizeSofar);
 
     for (auto& aau : annotationAccessUnit) {
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
-        AAU_dataUnit.write(testwriter);
-        AAU_dataUnit.write(txtwriter);
+        sizeSofar = AAU_dataUnit.write(testwriter);
+        AAU_dataUnit.write(txtwriter, sizeSofar);
     }
     testfile.close();
     txtfile.close();
@@ -85,24 +80,6 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
     }
     recs.pop_back();
 
-    uint32_t BLOCK_SIZE = 200;
-    bool TRANSFORM_MODE = true;
-
-    genie::likelihood::EncodingOptions likelihood_opt = {
-        BLOCK_SIZE,      // block_size
-        TRANSFORM_MODE,  // transform_flag;
-    };
-
-    genie::genotype::EncodingOptions genotype_opt = {
-        BLOCK_SIZE,                                  // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
-    };
-
     auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
     auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
     //--------------------------------------------------
@@ -112,15 +89,15 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
         std::get<genie::genotype::GenotypeParameters>(genotypeData);
     auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
-    annotationParameterSet =
-        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
-                                   std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
+    annotationParameterSet = genotypeParameterSet.Build(
+        AT_ID, datablock.attributeInfo, genotypeParameters,
+        std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), compressors, recs.size());
     std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
 
     for (auto formatdata : datablock.attributeData) {
         auto& info = datablock.attributeInfo[formatdata.first];
         std::vector<uint32_t> arrayDims;
-        arrayDims.push_back(std::min(BLOCK_SIZE, static_cast<uint32_t>(recs.size())));
+        arrayDims.push_back(std::min(likelihood_opt.block_size, static_cast<uint32_t>(recs.size())));
         arrayDims.push_back(recs.at(0).getNumSamples());
         arrayDims.push_back(recs.at(0).getFormatCount());
         attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
@@ -138,17 +115,19 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
 
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
     {
-        genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
-                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
+        genie::likelihood::LikelihoodPayload likelihoodPayload(
+            std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
+            std::get<genie::likelihood::EncodingBlock>(likelihoodData));
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-        payload.write(writer);
+        likelihoodPayload.write(writer);
     }
 
     // add LINK_ID default values
-    for (auto i = 0u; i < BLOCK_SIZE && i < recs.size(); ++i) {
+    for (auto i = 0u; i < genotype_opt.block_size && i < recs.size(); ++i) {
         char val = static_cast<char>(0xFF);
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
+    accessUnitcomposer.setCompressors(compressors);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, datablock.attributeInfo,
                                      annotationParameterSet, annotationAccessUnit.at(0), AG_class, AT_ID, 0);
 }
@@ -174,12 +153,13 @@ void Annotation::parseSite(std::ifstream& inputfile) {
     descrList.push_back(genie::core::AnnotDesc::ALTERN);
     descrList.push_back(genie::core::AnnotDesc::FILTER);
     genie::variant_site::ParameterSetComposer encodeParameters;
-    annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(), defaultTileSize);
+    annotationParameterSet = encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
+                                                              compressors.getCompressorParameters(), defaultTileSize);
 
     uint8_t AG_class = 1;
     uint8_t AT_ID = 0;
     genie::variant_site::AccessUnitComposer accessUnit;
+    accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
 

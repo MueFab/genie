@@ -5,9 +5,9 @@
  */
 
 #include <algorithm>
+#include <filesystem>
 #include <string>
 #include <utility>
-#include <filesystem>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -38,7 +38,7 @@ Record::Record(annotation_access_unit::Record& _annotationAccessUnit) : data_uni
     annotationAccessUnit = _annotationAccessUnit;
 }
 
-void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
+void Record::write(core::Writer& writer, uint64_t writeSize) const {
     writer.write(data_unit_type, 8);
     switch (data_unit_type) {
         case 0:
@@ -49,18 +49,45 @@ void genie::core::record::data_unit::Record::write(core::Writer& writer) const {
             break;
         case 3:
             writer.write_reserved(10);
-            writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
-
+            writer.write(writeSize, 22);
             annotationParameterSet.write(writer);
             break;
         case 4:
             writer.write_reserved(3);
+            writer.write(writeSize, 29);
+            annotationAccessUnit.write(writer);
+            break;
+        default:
+            break;
+    }
+}
+
+uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) const {
+    writer.write(data_unit_type, 8);
+    uint64_t writesize = 0;
+    switch (data_unit_type) {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            writer.write_reserved(10);
+            writesize = (annotationParameterSet.getSize() + 40) / 8;
+            writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
+            annotationParameterSet.write(writer);
+            break;
+        case 4:
+            writer.write_reserved(3);
+            writesize = (annotationAccessUnit.getSize() + 40) / 8;
             writer.write((annotationAccessUnit.getSize() + 40) / 8, 29);
             annotationAccessUnit.write(writer);
             break;
         default:
             break;
     }
+    return writesize;
 }
 }  // namespace data_unit
 }  // namespace record

@@ -26,9 +26,9 @@
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 
-#include "genie/core/record/data_unit/record.h"
 #include "genie/annotation/Compressors.h"
- // -----------------------------------------------------------------------------
+#include "genie/core/record/data_unit/record.h"
+// -----------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
@@ -42,10 +42,13 @@ class Descriptors {};
 
 class Annotation {
  public:
+    void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
+    void setInfoFields(std::string jsonFileName);
+    void startStream(RecType recType, std::string recordInputFileName, std::string attributeJsonFileName,
+                     std::string outputFileName);
 
-     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
-     void setInfoFields(std::string jsonFileName);
-     void startStream(RecType recType, std::string recordInputFileName, std::string attributeJsonFileName, std::string outputFileName);
+    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
+    void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
 
  private:
     std::ifstream recordInput;
@@ -55,6 +58,14 @@ class Annotation {
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
 
+    genie::likelihood::EncodingOptions likelihood_opt{200, true};
+    genie::genotype::EncodingOptions genotype_opt{200,                                         // block size
+                                                  genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+                                                  genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+                                                  false,                                       // transpose_mat;
+                                                  genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+                                                  genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+                                                  genie::core::AlgoID::JBIG};
 
     void parseGenotype(std::ifstream& inputfile);
     void parseSite(std::ifstream& inputfile);

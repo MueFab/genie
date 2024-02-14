@@ -12,7 +12,7 @@
 #include "genie/core/record/data_unit/record.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/variantsite/VariantSiteParser.h"
-
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/variantsite/AccessUnitComposer.h"
 #include "genie/variantsite/ParameterSetComposer.h"
 
@@ -220,6 +220,16 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         infoFieldsFile.close();
     }
 
+    std::string set1 = "compressor 1 0 BSC";
+    std::string set2 = "compressor 1 1 LZMA";
+    std::string set3 = "compressor 2 0 ZSTD";
+    std::string set4 = "compressor 3 0 BSC";
+    std::stringstream config;
+    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+
+    genie::annotation::Compressor compressors;
+    compressors.parseConfig(config);
+
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, 0);
     ASSERT_TRUE(inputfile.is_open());
     if (inputfile.is_open()) {
@@ -249,14 +259,19 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
         }
     }
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), parser.getNumberOfRows());
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
     uint8_t AT_ID = 0;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
-    accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit, AG_class, AT_ID);
+    uint64_t rowIndex = 0;
+
+    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTileStream;
+    accessUnit.setCompressors(compressors);
+    accessUnit.setAccessUnit(desc, attributeTileStream, info, annotationParameterSet,
+        annotationAccessUnit, AG_class, AT_ID, rowIndex);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
@@ -299,6 +314,16 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
     if (inputfile.is_open()) inputfile.close();
     EXPECT_EQ(parser.getNrOfTiles(), 10);
 
+    std::string set1 = "compressor 1 0 BSC";
+    std::string set2 = "compressor 1 1 LZMA";
+    std::string set3 = "compressor 2 0 ZSTD";
+    std::string set4 = "compressor 3 0 BSC";
+    std::stringstream config;
+    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+
+    genie::annotation::Compressor compressors;
+    compressors.parseConfig(config);
+
     auto info = parser.getAttributes().getInfo();
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
     auto& tile_attributeStream = parser.getAttributes().getTiles();
@@ -307,7 +332,7 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
 
     genie::variant_site::ParameterSetComposer encodeParameters;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, defaultTileSize);
+        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), defaultTileSize);
 
     uint8_t AG_class = 1;
     uint8_t AT_ID = 0;
@@ -356,6 +381,7 @@ TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
         }
 
         genie::variant_site::AccessUnitComposer accessUnit;
+        accessUnit.setCompressors(compressors);
         accessUnit.setAccessUnit(desc, attr, info, annotationParameterSet, annotationAccessUnit.at(i), AG_class, AT_ID,
                                  rowIndex);
         rowIndex += defaultTileSize;

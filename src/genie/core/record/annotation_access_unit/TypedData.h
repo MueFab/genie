@@ -91,6 +91,9 @@ class TypedData {
         writer.flush();
         return dataStream;
     }
+    std::stringstream& getCompresseddata() {
+        return compressedDataStream;
+    }
 
     void setCompressedData(std::stringstream& _compressed_data_block) {
         compressedDataStream.str("");

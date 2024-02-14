@@ -24,7 +24,7 @@
 
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-
+#include "genie/annotation/Compressors.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -39,7 +39,19 @@ class ParameterSetComposer {
         std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
         uint64_t defaultTileSize);
 
- private:
+    genie::core::record::annotation_parameter_set::Record setParameterSet(
+        std::vector<genie::core::AnnotDesc> descrList,
+        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+        const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressors,
+        uint64_t defaultTileSize);
+
+    genie::core::record::annotation_parameter_set::Record setParameterSet(
+        std::vector<genie::core::AnnotDesc> descrList,
+        std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
+        genie::annotation::Compressor compressors,
+        uint64_t defaultTileSize);
+
+private:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -72,7 +72,8 @@ class Record {
     explicit Record(annotation_access_unit::Record& annotationAccessUnit);
     explicit Record(annotation_parameter_set::Record& annotationParameterSet);
 
-    void write(core::Writer& writer) const;
+    uint64_t write(core::Writer& writer) const;
+    void write(core::Writer& writer, uint64_t writeSize) const;
 
 };
 

@@ -43,6 +43,7 @@ class BinMatPayload {
     size_t payloadSize() const { return payload.size(); }
 
     BinMatPayload(BinMatDtype binmat);
+    BinMatPayload(BinMatDtype binmat, core::AlgoID _codecID);
 
     void write(core::Writer& writer) const;
 
@@ -73,20 +74,22 @@ class AmaxPayload {
     uint32_t nelems;
     uint8_t nbits_per_elem;
     uint32_t nelements;
-    uint32_t sizeInBits;
     std::vector<uint64_t> amax_elements;
 
  public:
     AmaxPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<uint64_t> _amax_elements)
-        : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {
-        sizeInBits = 0;
-        for (auto& elem : amax_elements) {
-            sizeInBits++;
-            if (elem != 0) sizeInBits += nbits_per_elem;
-        }
-    }
+        : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {}
 
-    uint32_t sizeInBytes() const { return (sizeInBits + 7) / 8; }
+    uint32_t sizeInBytes() const {
+        uint32_t sizeInBits = 32 + 8;  // size of nelems + size of nbits_per_elem
+        for (uint32_t i = 0; i < nelements; ++i) {
+            sizeInBits++;  // size of is_one_flag
+            if (amax_elements[i] != 0) {
+                sizeInBits += nbits_per_elem;  // nbits_per_entry == nbits_per_elem
+            }
+        }
+        return static_cast<uint32_t>((sizeInBits + 7) / 8);
+    }
 
     void write(core::Writer& writer) const;
 };

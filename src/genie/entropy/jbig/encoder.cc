@@ -37,7 +37,7 @@ void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, ui
     int ret = mpegg_jbig_compress_default(&compressedBuffer, &compSize, inputBuffer, srcLen, nrows,
                                 ncols);
     if (ret != 0) {
-        std::cerr << "error with compression\n";
+        std::cerr << "error with jbig compression\n";
     }
     for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
  
