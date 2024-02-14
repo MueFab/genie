@@ -50,7 +50,7 @@ void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
     int ret = mpegg_lzma_compress(&compressedBuffer, &compSize, inputBuffer, inputSize, level, dictSize, lc, lp, pb, fb,
                                   numThreads);
     if (ret != 0) {
-        std::cerr << "error with compression\n";
+        std::cerr << "error with lzma compression\n";
     }
     for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
     if (compressedBuffer) free(compressedBuffer);

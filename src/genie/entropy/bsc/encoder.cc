@@ -40,7 +40,7 @@ void BSCEncoder::encode(std::stringstream &input, std::stringstream &output) {
     int ret = mpegg_bsc_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen,
                                  lzpHashSize, lzpMinLen, blockSorter, coder);
     if (ret != 0) {
-        std::cerr << "error with compression\n";
+        std::cerr << "error with bsc compression\n";
     }
     output.write((const char *)destination, destLen);
     if (destination) free(destination);

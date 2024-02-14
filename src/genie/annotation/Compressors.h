@@ -44,6 +44,11 @@ class Compressor {
 
     void compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID);
 
+    const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& getCompressorParameters()
+        const {
+        return compressorParameters;
+    }
+
  private:
     uint8_t selectedCompressorID;
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressorParameters;

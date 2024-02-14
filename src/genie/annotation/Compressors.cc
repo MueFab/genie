@@ -58,14 +58,20 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
     std::stringstream intermediateOut;
 
     auto& comp = compressorParameters.at(compressorID);
+    for (auto& compressor : compressorParameters)
+        if (compressor.getCompressorID() == compressorID) comp = compressor;
 
     for (uint8_t i = 0; i < comp.getNumberOfCompressorSteps(); ++i) {
-        intermediateOut.str("");
-        intermediateOut.clear();
         if (i == 0)
             intermediateIn << input.rdbuf();
-        else
+        else {
+            intermediateIn.str("");
+            intermediateIn.clear();
             intermediateIn << intermediateOut.rdbuf();
+            intermediateOut.str("");
+            intermediateOut.clear();
+        }
+
         switch (comp.getAlgorithmIDs().at(i)) {
             case genie::core::AlgoID::BSC: {
                 genie::entropy::bsc::BSCParameters parameters;

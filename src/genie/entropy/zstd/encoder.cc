@@ -35,7 +35,7 @@ void ZSTDEncoder::encode(std::stringstream &input, std::stringstream &output) {
     int ret = mpegg_zstd_compress(&destination, &destLen, (const unsigned char *)input.str().c_str(), srcLen, 0);
 
     if (ret != 0) {
-        std::cerr << "error with compression\n";
+        std::cerr << "error with zstd compression\n";
     }
     output.write((const char *)destination, destLen);
     if (destination) free(destination);

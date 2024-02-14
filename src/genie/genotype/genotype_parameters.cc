@@ -110,7 +110,7 @@ void GenotypeParameters::write(core::Writer& writer) const {
         writer.write(phases_payload_params.sort_rows_flag, 1);                  // sort_phases_rows_flag
         writer.write(phases_payload_params.sort_cols_flag, 1);                  // sort_phases_cols_flag
         writer.write(phases_payload_params.transpose_mat_flag, 1);              // transpose_phases_mat_flag
-        writer.write(static_cast<uint8_t>(phases_payload_params.variants_codec_ID), 1);  // phases_codec_ID
+        writer.write(static_cast<uint8_t>(phases_payload_params.variants_codec_ID), 8);  // phases_codec_ID
     } else {
         writer.write(phasing_value, 1);
     }

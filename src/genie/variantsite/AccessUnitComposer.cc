@@ -9,13 +9,13 @@
 #include <string>
 #include <utility>
 
+#include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
+#include "genie/core/record/annotation_access_unit/block.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/variantsite/AccessUnitComposer.h"
-#include "genie/core/record/annotation_access_unit/block.h"
-#include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
 
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/variant_site/record.h"
@@ -63,8 +63,25 @@ void AccessUnitComposer::setAccessUnit(
 
     for (auto& attribute : attributeParameterSets) {
         auto compressorId = attribute.getCompressorID();
+        {
+            std::string filename = attribute.getAttributeName() + "_before.bin";
+            std::ofstream output;
+            output.open(filename, std::ios::binary);
+            auto& temp = _attributeTileStream[attribute.getAttributeName()].getdata();
+            output.write(temp.str().c_str(),temp.str().length());
+            output.close();
+        }
         if (compressorId != 0) {
             compress(_attributeTileStream[attribute.getAttributeName()], compressorParameterSets.at(compressorId - 1));
+
+            {
+                std::string filename = attribute.getAttributeName() + "_after.bin";
+                std::ofstream output;
+                output.open(filename, std::ios::binary);
+                auto& temp = _attributeTileStream[attribute.getAttributeName()].getCompresseddata();
+                output.write(temp.str().c_str(), temp.str().length());
+                output.close();
+            }
         }
     }
 
@@ -84,72 +101,6 @@ void AccessUnitComposer::setAccessUnit(
 
     uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
     ATCoordSize = _annotationParameterSet.getATCoordSize();
-    genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
-        attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
-        attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
-        tile_index_2);
-    genie::core::record::annotation_access_unit::Record annotationAccessUnit(
-        AT_ID, AT_type, AT_subtype, AG_class, annotationAccessUnitHeadertot, blocks, attributeContiguity,
-        twoDimensional, columnMajorTileOrder, ATCoordSize, variable_size_tiles, n_blocks, numChrs);
-    _annotationAccessUnit = annotationAccessUnit;
-}
-
-void AccessUnitComposer::setAccessUnit(
-    std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
-    std::map<std::string, std::stringstream>& _attributeStream,
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> _attributeInfo,
-    const genie::core::record::annotation_parameter_set::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID) {
-    setAccessUnit(_descriptorStream, _attributeStream, _attributeInfo, _annotationParameterSet, _annotationAccessUnit,
-                  _AG_class, _AT_ID, 0);
-}
-void AccessUnitComposer::setAccessUnit(
-    std::map<core::AnnotDesc, std::stringstream>& _descriptorStream,
-    std::map<std::string, std::stringstream>& _attributeStream,
-    std::map<std::string, core::record::annotation_parameter_set::AttributeData> _attributeInfo,
-    const core::record::annotation_parameter_set::Record& _annotationParameterSet,
-    core::record::annotation_access_unit::Record& _annotationAccessUnit, uint8_t _AG_class, uint8_t _AT_ID,
-    uint64_t _rowIndex) {
-    tile_index_1 = _rowIndex;
-    std::vector<genie::core::record::annotation_access_unit::Block> blocks;
-    AT_ID = _AT_ID;
-    AG_class = _AG_class;
-    // -------- descriptors ---------- //
-    auto descriptorConfigurations =
-        _annotationParameterSet.getAnnotationEncodingParameters().getDescriptorConfigurations();
-    std::map<core::AnnotDesc, std::stringstream> encodedDescriptors;
-    compress(descriptorConfigurations, _descriptorStream, encodedDescriptors);
-
-    for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
-        std::vector<uint8_t> data;
-        for (auto readbyte : it->second.str()) data.push_back(readbyte);
-        genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, 0, data);
-        genie::core::record::annotation_access_unit::Block block;
-        block.set(blockInfo);
-        blocks.push_back(block);
-    }
-    // ------------------------------- //
-
-    // -------- attributes ----------- //
-    auto attributeParameterSets = _annotationParameterSet.getAnnotationEncodingParameters().getAttributeParameterSets();
-    auto compressorParameterSets =
-        _annotationParameterSet.getAnnotationEncodingParameters().getCompressorParameterSets();
-    std::map<std::string, std::stringstream> encodedAttributes;
-    compress(_attributeStream, attributeParameterSets, compressorParameterSets, encodedAttributes);
-    for (auto it = encodedAttributes.begin(); it != encodedAttributes.end(); ++it) {
-        auto attributeID = _attributeInfo[it->first].getAttributeID();
-        std::vector<uint8_t> data;
-        for (auto readbyte : it->second.str()) data.push_back(readbyte);
-        genie::core::record::annotation_access_unit::BlockVectorData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID,
-                                                                               data);
-        genie::core::record::annotation_access_unit::Block block;
-        block.set(blockInfo);
-
-        blocks.push_back(block);
-    }
-    // ------------------------------- //
-
-    uint64_t n_blocks = static_cast<uint64_t>(blocks.size());
     genie::core::record::annotation_access_unit::AnnotationAccessUnitHeader annotationAccessUnitHeadertot(
         attributeContiguity, twoDimensional, columnMajorTileOrder, variable_size_tiles, ATCoordSize, is_attribute,
         attribute_ID, descriptor_ID, n_tiles_per_col, n_tiles_per_row, n_blocks, tile_index_1, tile_index_2_exists,
@@ -228,25 +179,8 @@ void AccessUnitComposer::compress(genie::core::record::annotation_access_unit::T
                                   genie::core::record::annotation_parameter_set::CompressorParameterSet& compressor) {
     auto encodeId = compressor.getAlgorithmIDs();
     if (compressor.getCompressorID() != 0) {
-        genie::entropy::bsc::BSCEncoder bscEncoder;
-        genie::entropy::lzma::LZMAEncoder lzmaEncoder;
-        genie::entropy::zstd::ZSTDEncoder zstdEncoder;
         std::stringstream compressedData;
-
-        switch (encodeId[0]) {
-            case genie::core::AlgoID::BSC:
-                bscEncoder.encode(oneBlock.getdata(), compressedData);
-                break;
-            case genie::core::AlgoID::LZMA:
-                lzmaEncoder.encode(oneBlock.getdata(), compressedData);
-                break;
-            case genie::core::AlgoID::ZSTD:
-                zstdEncoder.encode(oneBlock.getdata(), compressedData);
-                break;
-
-            default:
-                break;
-        }
+        compressors.compress(oneBlock.getdata(), compressedData, compressor.getCompressorID());
         oneBlock.setCompressedData(compressedData);
     }
 }
