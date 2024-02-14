@@ -266,17 +266,17 @@ const SCMParamsDtype& ContactParameters::getSCMParams() const {return scm_params
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactParameters::getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult){
+uint64_t ContactParameters::getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult){
     uint64_t chr_len = chr_infos[chr_ID].length;
 
     // This is ceil operation for integer
-    return static_cast<uint32_t>(1 + ((chr_len - 1) / (interv_mult*interval)));
+    return static_cast<uint64_t>(1 + ((chr_len - 1) / (interv_mult*interval)));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t ContactParameters::getNumTiles(uint8_t chr_ID, uint8_t interv_mult){
-    uint32_t num_bins = getNumBinEntries(chr_ID, interv_mult);
+    uint64_t num_bins = getNumBinEntries(chr_ID, interv_mult);
 
     // This is ceil operation for integer
     return static_cast<uint32_t>(1 + ((num_bins - 1) / (tile_size)));

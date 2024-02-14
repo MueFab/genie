@@ -127,29 +127,6 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transform_max_value(EncodingBlock& block) {
-    auto& allele_mat = block.allele_mat;
-
-    block.dot_flag = xt::any(xt::equal(allele_mat, -1));
-    block.na_flag = xt::any(xt::equal(allele_mat, -2));
-    auto max_val = static_cast<signed char>(xt::amax(allele_mat)(0));
-
-    if (block.dot_flag) {
-        //        max_val += static_cast<signed char>(1);
-        //        max_val = max_val + static_cast<signed char>(1);
-        max_val = static_cast<signed char>(max_val + 1);
-        xt::filter(allele_mat, xt::equal(allele_mat, -1)) = max_val;
-    }
-
-    if (block.na_flag) {
-        //        max_val += static_cast<signed char>(1);
-        max_val = static_cast<signed char>(max_val + 1);
-        xt::filter(allele_mat, xt::equal(allele_mat, -2)) = max_val;
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void transform_max_value(
     Int8MatDtype& allele_mat,
     bool& no_ref_flag,
@@ -219,6 +196,7 @@ void binarize_bit_plane(
         bin_mats.resize(1);
     }
 
+    allele_mat.resize({0,0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -285,6 +263,8 @@ void binarize_row_bin(
     }
 
     bin_mats.emplace_back(std::move(bin_mat));
+
+    allele_mat.resize({0,0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -477,43 +457,6 @@ void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
         opt.sort_row_method,
         opt.sort_col_method
     );
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void invert_sorted_block(
-    const GenotypeParameters& params,
-    EncodingBlock& block
-) {
-    auto num_bin_mats = getNumBinMats(block);
-
-    auto& genotype_params = params.getVariantsPayloadParams();
-    for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
-        auto& curr_params = genotype_params[i_mat];
-        auto& curr_bin_mat = block.allele_bin_mat_vect[i_mat];
-        auto& curr_row_ids = block.allele_row_ids_vect[i_mat];
-        auto& curr_col_ids = block.allele_col_ids_vect[i_mat];
-
-        if (curr_params.sort_rows_flag){
-            sort_matrix(curr_bin_mat, curr_row_ids, 0);
-        }
-        if (curr_params.sort_cols_flag){
-            sort_matrix(curr_bin_mat, curr_col_ids, 1);
-        }
-    }
-
-    // Sort phasing matrix
-    auto& curr_params = params.getPhasesPayloadParams();
-    auto& curr_bin_mat = block.phasing_mat;
-    auto& curr_row_ids = block.phasing_row_ids;
-    auto& curr_col_ids = block.phasing_col_ids;
-
-    if (curr_params.sort_rows_flag){
-        sort_matrix(curr_bin_mat, curr_row_ids, 0);
-    }
-    if (curr_params.sort_cols_flag){
-        sort_matrix(curr_bin_mat, curr_col_ids, 1);
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
