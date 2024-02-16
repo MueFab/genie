@@ -88,16 +88,16 @@ void RowColIdsPayload::write(core::Writer& writer) const {
 }
 
 void AmaxPayload::write(core::Writer& writer) const {
-    uint64_t sizeInBits = 32 + 8;
+    uint64_t sizeInBits = 32 + 4;
     writer.write(nelems, 32);
-    writer.write(nbits_per_elem, 8);
+    writer.write(nbits_per_elem, 4);
     for (uint32_t i = 0; i < nelements; ++i) {
         sizeInBits++;
         if (amax_elements[i] == 0) {
             writer.write(1, 1);
         } else {
             writer.write(0, 1);
-            writer.write(amax_elements[i], nbits_per_elem);
+            writer.write(amax_elements[i]-1, nbits_per_elem);
             sizeInBits += nbits_per_elem;
         }
     }
