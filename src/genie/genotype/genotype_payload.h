@@ -81,7 +81,7 @@ class AmaxPayload {
         : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {}
 
     uint32_t sizeInBytes() const {
-        uint32_t sizeInBits = 32 + 8;  // size of nelems + size of nbits_per_elem
+        uint32_t sizeInBits = 32 + 4;  // size of nelems + size of nbits_per_elem
         for (uint32_t i = 0; i < nelements; ++i) {
             sizeInBits++;  // size of is_one_flag
             if (amax_elements[i] != 0) {
