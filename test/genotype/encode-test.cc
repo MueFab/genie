@@ -125,7 +125,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 1: all positive
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
 
         orig_allele_mat = allele_mat;
 
@@ -142,8 +142,8 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 2: no_ref
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -1;
 
         orig_allele_mat = allele_mat;
@@ -161,8 +161,8 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 3: not_avail_flag
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -2;
 
         orig_allele_mat = allele_mat;
@@ -180,10 +180,10 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 3: no_ref and not_avail_flag
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, 64);
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -1;
-        mask = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -2;
 
         orig_allele_mat = allele_mat;
@@ -214,7 +214,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
     // Check DO_NOT_CONCAT
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
         orig_allele_mat = allele_mat;
 
@@ -231,7 +231,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
     // Check CONCAT_ROW_DIR
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
         orig_allele_mat = allele_mat;
 
@@ -248,7 +248,7 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
     // Check CONCAT_COL_DIR
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
         orig_allele_mat = allele_mat;
 
@@ -277,7 +277,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
     genie::genotype::UIntVecDtype amax_vec;
 
     {
-        allele_mat = xt::random::randint<int8_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL);
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
         orig_allele_mat = allele_mat;
 
@@ -316,7 +316,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
@@ -342,7 +342,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort cols
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
@@ -368,7 +368,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows and cols
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint8_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
