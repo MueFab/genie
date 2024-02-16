@@ -288,7 +288,7 @@ TEST(Genotype, RoundTrip_BinarizeRowBin) {
         );
 
         ASSERT_EQ(bin_mats.size(), 1);
-        ASSERT_EQ(amax_vec.shape(0), allele_mat.shape(0));
+        ASSERT_EQ(amax_vec.shape(0), NROWS);
         ASSERT_EQ(xt::sum(amax_vec)(0), bin_mats.front().shape(0));
 
         genie::genotype::debinarize_row_bin(
