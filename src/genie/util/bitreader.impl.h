@@ -53,6 +53,7 @@ T BitReader::readBypassBE() {
     }
 
     // Extend sign bit if necessary
+    // TODO (Yeremia): Change how it behaves for signed integer!
     if (std::is_signed<T>::value && SIZE < sizeof(T) && reinterpret_cast<char*>(&ret)[SIZE - 1] < 0) {
         for (size_t i = SIZE; i < sizeof(T); ++i) {
             reinterpret_cast<unsigned char*>(&ret)[i] = static_cast<unsigned char>(0xff);
