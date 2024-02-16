@@ -45,11 +45,16 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
         UTILS_DIE_IF(n_alleles_per_sample == 0, "Invalid n_alleles_per_sample!");
 
         alleles.resize(sample_count, std::vector<int8_t>(n_alleles_per_sample));
-        phasings.resize(sample_count, std::vector<int8_t>(n_alleles_per_sample - 1));
+        phasings.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample - 1));
 
         for (auto& alleles_sample : alleles) {
             for (auto& allele : alleles_sample) {
-                allele = bitreader.readBypassBE<uint8_t>();
+                // TODO (Yeremia): move this signed integer fix to btreader!
+                auto v = bitreader.readBypassBE<uint8_t>();
+                bool is_neg = (v & 0x01);
+                allele = static_cast<int8_t>(v >> 1);
+                if (is_neg)
+                    allele = static_cast<int8_t>(-allele);
             }
         }
 
@@ -126,7 +131,7 @@ const std::vector<std::vector<int8_t>>& VariantGenotype::getAlleles() const { re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<int8_t>>& VariantGenotype::getPhasing() const { return phasings; }
+const std::vector<std::vector<uint8_t>>& VariantGenotype::getPhasing() const { return phasings; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

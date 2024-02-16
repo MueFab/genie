@@ -72,7 +72,7 @@ class VariantGenotype {
     std::vector<format_field> format;  //!< @brief
 
     std::vector<std::vector<int8_t>> alleles;   //!< @brief
-    std::vector<std::vector<int8_t>> phasings;  //!< @brief
+    std::vector<std::vector<uint8_t>> phasings;  //!< @brief
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
 
@@ -91,7 +91,7 @@ class VariantGenotype {
     bool isLikelihoodPresent() const;
     uint8_t getNumberOfAllelesPerSample() const;
     const std::vector<std::vector<int8_t>>& getAlleles() const;
-    const std::vector<std::vector<int8_t>>& getPhasing() const;
+    const std::vector<std::vector<uint8_t>>& getPhasing() const;
     uint8_t getNumberOfLikelihoods() const;
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool getLinkedRecord() const;

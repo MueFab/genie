@@ -93,7 +93,6 @@ TEST(Genotype, Decompose) {
 
     // Check the content of the first row of allele_tensor
     {
-        //        const auto& allele_rec = xt::view(allele_mat, 0, xt::all(), xt::all());
         auto allele_rec = xt::view(allele_mat, 0LL, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2067);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 117);
@@ -102,7 +101,6 @@ TEST(Genotype, Decompose) {
 
     // Check the content of the last row of allele_tensor
     {
-        //        const auto& allele_rec = xt::view(allele_mat, -1, xt::all(), xt::all());
         auto allele_rec = xt::view(allele_mat, -1LL, xt::all());
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 0))(0), 2178);
         ASSERT_EQ(xt::sum(xt::equal(allele_rec, 1))(0), 6);
