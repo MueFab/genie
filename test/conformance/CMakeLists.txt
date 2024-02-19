@@ -1,4 +1,4 @@
-project("conformance-tests")
+project("genie-test-conformance")
 
 set(XTENSOR_USE_XSIMD 0)
 set(XTENSOR_USE_TBB 0)
@@ -15,7 +15,7 @@ set(source_files
         main.cc
 )
 
-add_executable(conformance-tests ${source_files})
+add_executable(${PROJECT_NAME} ${source_files})
 
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -41,8 +41,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
-
-target_link_libraries(conformance-tests PRIVATE gtest_main)
 
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "usr/bin")
