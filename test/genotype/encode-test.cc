@@ -306,7 +306,8 @@ TEST(Genotype, RoundTrip_RandomSort) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
     int8_t MAX_ALLELE_VAL = 2;
-
+    (void) MAX_ALLELE_VAL;
+    
     genie::genotype::BinMatDtype bin_mat;
     genie::genotype::BinMatDtype orig_bin_mat;
     genie::genotype::UIntVecDtype row_ids;

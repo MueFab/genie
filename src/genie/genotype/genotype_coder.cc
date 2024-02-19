@@ -686,7 +686,7 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
     auto unique_phasing_vals = xt::unique(block.phasing_mat);
     bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
     bool phases_value = unique_phasing_vals(0);  // unique_phasing_vals has (at least) 1 value
-
+    (void) phases_value;
     GenotypeBinMatParameters phasing_payload_params{};
     if (encode_phases_data_flag) {
         phasing_payload_params.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
