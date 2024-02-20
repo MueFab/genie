@@ -652,7 +652,6 @@ void entropy_encode_bin_mat(
 
 std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
                                                            std::vector<core::record::VariantGenotype>& recs) {
-  //  UTILS_DIE_IF(opt.codec_ID != genie::core::AlgoID::JBIG, "Invalid AlgoID or algorithm is not yet implemented");
     UTILS_DIE_IF(opt.binarization_ID == BinarizationID::UNDEFINED, "Invalid BinarizationID");
     UTILS_DIE_IF(opt.sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(opt.sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
