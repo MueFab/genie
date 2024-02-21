@@ -21,7 +21,11 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 
 run_the_test()
 {
-    cd $git_root_dir/cmake-build-debug/bin/Debug
+    cd $git_root_dir/cmake-build-debug/bin
+    if [[ $fileExt == ".exe" ]]
+    then
+        cd Debug
+    fi
     TestSetName=$1
     if [[ ! -x $TestSetName$fileExt ]]
     then
