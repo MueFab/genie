@@ -195,7 +195,6 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
     }
 
     auto written = writer.getBitsWritten();
-    std::cerr << "genotype payload: " << written << std::endl;
 }
 }  // namespace genotype
 }  // namespace genie
