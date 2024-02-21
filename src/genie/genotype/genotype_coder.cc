@@ -32,9 +32,10 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
         variants_payload_params[i].variants_codec_ID = opt.codec_ID;
     }
 
-    bool encode_phases_data_flag = (block.max_ploidy - 1) > 0;
+    auto unique_phasing_vals = xt::unique(block.phasing_mat);
+    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
     GenotypeBinMatParameters phases_payload_param;
-    if (encode_phases_data_flag){
+    if (encode_phases_data_flag) {
         phases_payload_param.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
         phases_payload_param.sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
         phases_payload_param.transpose_mat_flag = opt.transpose_mat;
@@ -408,25 +409,13 @@ void sort_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void invert_sort_bin_mat(
-    BinMatDtype& bin_mat,
-    UIntVecDtype& row_ids,
-    UIntVecDtype& col_ids
-) {
-    if (row_ids.shape(0) != 1){
-        genie::genotype::sort_matrix(
-            bin_mat,
-            row_ids,
-            0
-        );
+void invert_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids) {
+    if (row_ids.shape(0) != 1) {
+        genie::genotype::sort_matrix(bin_mat, row_ids, 0);
         row_ids.resize({0});
     }
-    if (col_ids.shape(0) != 1){
-        genie::genotype::sort_matrix(
-            bin_mat,
-            col_ids,
-            1
-        );
+    if (col_ids.shape(0) != 1) {
+        genie::genotype::sort_matrix(bin_mat, col_ids, 1);
 
         col_ids.resize({0});
     }
@@ -578,7 +567,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
         
         for (const auto& format : rec.getFormats()) {
             values[format.getFormat()];
-            if (values[format.getFormat()].empty())values[format.getFormat()].resize(block_size);
+            if (values[format.getFormat()].empty()) values[format.getFormat()].resize(block_size);
 
             std::vector<std::vector<AttrType>> formatValue = format.getValue();
             if (values[format.getFormat()].at(i_rec).empty())
@@ -658,41 +647,15 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
 
     EncodingBlock block{};
     decompose(opt, block, recs);
-    transform_max_value(
-        block.allele_mat,
-        block.dot_flag,
-        block.na_flag
-    );
-    binarize_allele_mat(
-        block.allele_mat,
-        opt.binarization_ID,
-        opt.concat_axis,
-        block.allele_bin_mat_vect,
-        block.amax_vec,
-        block.num_bit_planes
-    );
- 
-    // TODO(Yeremia): create function to create GenotypeParameters
-    auto num_bin_mats = getNumBinMats(block);
-    std::vector<GenotypeBinMatParameters> payload_params(num_bin_mats);
-    for (auto i_mat = 0u; i_mat < num_bin_mats; i_mat++) {
-        payload_params[i_mat].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        payload_params[i_mat].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        payload_params[i_mat].transpose_mat_flag = false;
-        payload_params[i_mat].variants_codec_ID = opt.codec_ID;
-    }
-
-    auto unique_phasing_vals = xt::unique(block.phasing_mat);
-    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
-    bool phases_value = unique_phasing_vals(0);  // unique_phasing_vals has (at least) 1 value
-    (void) phases_value;
-    GenotypeBinMatParameters phasing_payload_params{};
-    if (encode_phases_data_flag) {
-        phasing_payload_params.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        phasing_payload_params.sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        phasing_payload_params.transpose_mat_flag = false;
-        phasing_payload_params.variants_codec_ID = opt.codec_ID;
-    }
+    transform_max_value(block.allele_mat, 
+                        block.dot_flag, 
+                        block.na_flag);
+    binarize_allele_mat(block.allele_mat, 
+                        opt.binarization_ID, 
+                        opt.concat_axis, 
+                        block.allele_bin_mat_vect,
+                        block.amax_vec, 
+                        block.num_bit_planes);
 
     genie::genotype::sort_block(opt, block);
     auto parameter = generate_genotype_parameters(opt, block);
@@ -701,8 +664,6 @@ std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-
 
 }  // namespace genotype
 }  // namespace genie

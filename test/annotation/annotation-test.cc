@@ -138,6 +138,6 @@ TEST_F(AnnotationTests, annotationGeno) {
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
 
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 300 * 1024;  // at least 300kB
+    size_t expectedSize = 4 * 1024;  // at least 4kB
     EXPECT_LE(expectedSize, filesize);
 }
