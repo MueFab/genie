@@ -61,7 +61,13 @@ void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& outp
     for (size_t i = 0; i < dest_data_len; ++i) output.push_back(decompressedBuffer[i]);
 }
 
-void JBIGEncoder::decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows) {
+void JBIGEncoder::decode(
+    std::stringstream& input,
+    std::stringstream& output,
+    uint32_t& nrows,
+    uint32_t& ncols
+) {
+
     const size_t srcLen = input.str().size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
@@ -70,8 +76,20 @@ void JBIGEncoder::decode(std::stringstream& input, std::stringstream& output, ui
     unsigned char* decompressedBuffer = NULL;
     size_t dest_data_len;
 
-    int ret = mpegg_jbig_decompress_default(&decompressedBuffer, &dest_data_len, inputBuffer, srcLen, (unsigned long*) &nrows,
-                                  (unsigned long*)&ncols);
+    unsigned long buf_nrows, buf_ncols;
+
+    int ret = mpegg_jbig_decompress_default(
+        &decompressedBuffer,
+        &dest_data_len,
+        inputBuffer,
+        srcLen,
+        &buf_nrows,
+        &buf_ncols
+    );
+
+    nrows = (uint32_t) buf_nrows;
+    ncols = (uint32_t) buf_ncols;
+
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
