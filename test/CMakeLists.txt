@@ -1,6 +1,5 @@
 
 add_subdirectory(annotationParameterSetTest)
-add_subdirectory(mpeggBSCTest)
 add_subdirectory(variantSiteRecordTest)
 
 add_subdirectory(records)

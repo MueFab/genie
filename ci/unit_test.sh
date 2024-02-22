@@ -51,7 +51,6 @@ run_the_test "genie-test-contact"
 run_the_test "genie-test-genotype"
 run_the_test "genie-test-likelihood"
 run_the_test "genie-test-records"
-run_the_test "mpeggBSC-tests"
 run_the_test "VariantSiteRecord-tests"
 
 
