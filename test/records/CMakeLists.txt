@@ -4,6 +4,9 @@ set(source_files
         helpers.cc
         variant_genotype-test.cc
         contact-test.cc
+        annotationAccessUnit-test.cc
+        blockTests.cc
+
 )
 
 add_executable(${PROJECT_NAME} ${source_files})

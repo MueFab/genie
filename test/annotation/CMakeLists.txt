@@ -1,4 +1,4 @@
-project("annotation-tests")
+project("genie-test-annotation")
 
 set(source_files
         annotation-test.cc

@@ -38,6 +38,7 @@ LZMAEncoder::LZMAEncoder()
 
 void LZMAEncoder::encode(std::stringstream &input, std::stringstream &output) {
     const size_t srcLen = input.str().size();
+    if (srcLen == 0) return;
     unsigned char *inputBuffer = NULL;
 
     inputBuffer = (unsigned char *)malloc(sizeof(*inputBuffer) * srcLen);

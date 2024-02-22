@@ -82,6 +82,7 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
 
     auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
     auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
+
     //--------------------------------------------------
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
