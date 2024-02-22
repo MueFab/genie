@@ -70,7 +70,7 @@ class JBIGEncoder {
                 uint32_t nrows);
     void encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows);
 
-    void decode(std::stringstream& input, std::stringstream& output, uint32_t& ncols, uint32_t& nrows);
+    void decode(std::stringstream& input, std::stringstream& output, uint32_t& nrows, uint32_t& ncols);
 
 
  private:

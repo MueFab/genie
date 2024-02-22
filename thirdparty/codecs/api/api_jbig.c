@@ -7,9 +7,7 @@
 #include "mpegg-codecs.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "jbig/jbig_interface.h"
-#include "libjbig/jbig_ar.h"
 #include "libjbig/jbig85.h"
 #include "libjbig/jbig.h"
 
@@ -204,7 +202,7 @@ int mpegg_jbig_decompress(
     unsigned char* src_ptr = (unsigned char*)src;
 
     inbuf = (unsigned char *)calloc(buf_len, sizeof(unsigned char));
-    outbuflen = ((xmax >> 3) + ((xmax & 7) != 0)) * 3;
+    outbuflen = ((xmax >> 3u) + ((xmax & 7u) != 0)) * 3;
     outbuf = (unsigned char *)calloc(outbuflen, sizeof(unsigned char));
     if (!inbuf || !outbuf)
     {
@@ -307,7 +305,7 @@ int mpegg_jbig_decompress(
         else
         {
             fprintf(stderr, "Problem while updating nrows in output file '%s'",
-                    (fnout)?fnout:"NULL");
+                    (fnout) ? fnout : "NULL");
             perror("'");
             exit(1);
         }
