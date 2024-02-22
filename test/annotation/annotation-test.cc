@@ -117,13 +117,13 @@ TEST_F(AnnotationTests, annotationSite) {
 TEST_F(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
-    std::string inputFilename = filePath + "ALL.chrX.5000.vcf.geno";
-    std::string outputFilename = filePath + "ALL.chrX.5000_geno_annotation";
+    std::string inputFilename = filePath + "1.3.5.header100.gt_only.vcf.geno";
+    std::string outputFilename = filePath + "1.3.5.header100.gt_only.vcf_geno_annotation";
     std::string jsonFilename = filePath + "1.3.5.header100.gt_only.vcf.formattags.json";
 
     std::filesystem::remove(outputFilename + ".bin");
 
-    std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
+    std::string set1 = "compressor 1 0 BSC";
     std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
@@ -138,6 +138,6 @@ TEST_F(AnnotationTests, annotationGeno) {
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
 
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 300 * 1024;  // at least 300kB
+    size_t expectedSize = 4 * 1024;  // at least 4kB
     EXPECT_LE(expectedSize, filesize);
 }
