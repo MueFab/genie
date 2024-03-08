@@ -61,6 +61,7 @@ class AttributeTile {
 
     void write(std::vector<std::vector<uint8_t>> value);
 
+    uint64_t getCurrentsize() const {return  writers.back().getBitsWritten(); }
     void writeMissing();
 
     std::vector<std::stringstream> convertTilesToTypedData();
@@ -87,6 +88,7 @@ class Attributes {
     }
 
     void add(std::vector<genie::core::record::variant_site::Info_tag> tags);
+    void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }

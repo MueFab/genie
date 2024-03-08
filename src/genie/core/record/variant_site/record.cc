@@ -10,13 +10,13 @@
 #include <string>
 #include <utility>
 
+#include "genie/core/arrayType.h"
+#include "genie/core/record/annotation_parameter_set/record.h"
+#include "genie/core/record/variant_site/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/record.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,8 +24,6 @@ namespace genie {
 namespace core {
 namespace record {
 namespace variant_site {
-
-
 
 uint8_t Record::determineSize(uint8_t selectType) const {
     if (selectType == 0) return 0;
@@ -139,7 +137,7 @@ bool Record::read(genie::util::BitReader& reader) {
         reader.readBypass(&ID[0], ID_len);
     }
     description_len = static_cast<uint8_t>(reader.read_b(8));
-    ;
+
     if (description_len > 0) {
         description.resize(description_len);
         reader.readBypass(&description[0], description_len);
@@ -177,7 +175,6 @@ bool Record::read(genie::util::BitReader& reader) {
             reader.readBypass(&infoTag.info_tag[0], infoTag.info_tag_len);
         }
         infoTag.info_type = static_cast<core::DataType>(reader.read_b(8));
-
         infoTag.info_array_len = static_cast<uint8_t>(reader.read_b(8));
 
         if (infoTag.info_array_len > 0) {

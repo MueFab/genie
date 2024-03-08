@@ -27,6 +27,12 @@ BinMatPayload::BinMatPayload(BinMatDtype binMat, core::AlgoID _codecID) : codecI
     nrows = (uint32_t)(shape.at(0));
     ncols = static_cast<uint32_t>(shape.at(1));
 
+    std::vector<bool> phases;
+    for (auto phasing : binMat) {
+        phases.push_back(phasing);
+    }
+
+
     size_t payloadSize = 0;
     uint8_t* payloadArray;
     genie::genotype::bin_mat_to_bytes(binMat, &payloadArray, payloadSize);
