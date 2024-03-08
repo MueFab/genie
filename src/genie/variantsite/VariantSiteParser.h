@@ -43,6 +43,7 @@ class VariantSiteParser {
 
     VariantSiteParser(std::istream& _site_MGrecs, std::stringstream& _jsonInfoFields, uint64_t rowsPerTile);
     VariantSiteParser(std::istream& _site_MGrecs, std::vector<genie::annotation::InfoField>& _fields, uint64_t _rowsPerTile);
+    VariantSiteParser(std::istream& _site_MGrecs, std::map<std::string, genie::core::record::variant_site::Info_tag>& _fields, uint64_t _rowsPerTile);
 
     size_t getNumberOfRows() const { return numberOfRows; }
 
@@ -56,6 +57,7 @@ class VariantSiteParser {
     std::istream& siteMGrecs;
     uint64_t rowsPerTile;
     size_t numberOfRows;
+    std::map<std::string, genie::core::record::variant_site::Info_tag> tags;
     std::vector<InfoField> infoFields;
     std::vector<std::string> testAltern;
     std::map<std::string, uint8_t> infoFieldType;

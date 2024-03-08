@@ -33,6 +33,7 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
     }
 
     auto unique_phasing_vals = xt::unique(block.phasing_mat);
+    auto phase_value = unique_phasing_vals.at(0);
     bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
     GenotypeBinMatParameters phases_payload_param;
     if (encode_phases_data_flag) {
@@ -53,7 +54,7 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
         std::move(variants_payload_params),
         encode_phases_data_flag,
         phases_payload_param,
-        false
+        phase_value
     );
 
     return params;

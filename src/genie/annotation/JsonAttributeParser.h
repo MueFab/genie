@@ -28,6 +28,8 @@ namespace annotation {
 
 class InfoField {
  public:
+     InfoField() = default;
+    InfoField(std::string _ID, genie::core::DataType _Type, uint8_t _Number) : ID(_ID), Type(_Type), Number(_Number) {}
     std::string ID;
     genie::core::DataType Type;
     uint8_t Number;
@@ -67,7 +69,7 @@ class JsonAttributeParser {
     std::map<std::string, uint8_t> infoFieldType;
 
     void ParseInfoFields();
-    void ParseFormatFields() {};
+    void ParseFormatFields(){};
     genie::core::DataType InterpretType(std::string type) const;
     uint8_t InterpretSize(std::string size) const;
 };

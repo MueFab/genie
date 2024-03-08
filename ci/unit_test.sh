@@ -34,7 +34,7 @@ run_the_test()
     fi
 
     echo $TestSetName
-    ./$TestSetName$fileExt --gtest_output=xml:$TestSetName.xml --gtest_brief=1 || { echo $TestSetName ' failed!';  }
+    ./$TestSetName$fileExt --gtest_output=xml:$TestSetName.xml --gtest_brief=1 || { echo $TestSetName ' failed!'; return 0; }
     echo $TestSetName" passed!"
 }
 

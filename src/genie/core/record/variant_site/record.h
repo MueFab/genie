@@ -157,6 +157,10 @@ class Record {
     /**
      * @brief
      */
+    Record(genie::util::BitReader& reader, std::vector<Info_tag> infoTag) :info_tag(infoTag) { read(reader); }
+    /**
+     * @brief
+     */
     bool read(genie::util::BitReader& reader);
     /**
      * @brief

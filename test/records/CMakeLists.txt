@@ -3,6 +3,7 @@ project("genie-test-records")
 set(source_files
         helpers.cc
         variant_genotype-test.cc
+        variant_site-test.cc
         contact-test.cc
         annotationAccessUnit-test.cc
         blockTests.cc
