@@ -16,18 +16,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
                                                 std::string attributeJsonFileName, std::string outputFileName)
 
 {
-    // read attributes info from json file
-    std::ifstream AttributeFieldsFile;
-    AttributeFieldsFile.open(attributeJsonFileName, std::ios::in);
-    std::stringstream attributeFields;
-    UTILS_DIE_IF(!AttributeFieldsFile.is_open(), "unable to open json file");
-
-    if (AttributeFieldsFile.is_open()) {
-        attributeFields << AttributeFieldsFile.rdbuf();
-        AttributeFieldsFile.close();
-    }
-    JsonAttributeParser attributeParser(attributeFields);
-
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
 
@@ -56,7 +44,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         for (auto info : infoTags)
             infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
 
-        //  if (useJson) infoFields = attributeParser.getInfoFields();
         parseSite(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();
