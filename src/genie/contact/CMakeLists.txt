@@ -9,8 +9,11 @@ find_package(xtensor REQUIRED)
 set(source_files
         contact_coder.cc
         contact_parameters.cc
-        contact_subcm_parameters.cc
-        contact_scm_payload.cc
+        subcontact_matrix_parameters.cc
+        subcontact_matrix_payload.cc
+        contact_matrix_tile_payload.h
+        contact_matrix_tile_payload.cc
+        subcontact_matrix_mask_payload.h
 )
 
 add_library(${PROJECT_NAME} ${source_files})

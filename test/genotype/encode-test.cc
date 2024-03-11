@@ -14,26 +14,13 @@
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
-#include <xtensor/xnpy.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
-#include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
-#include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/genotype/genotype_parameters.h"
-#include "genie/genotype/genotype_payload.h"
-
-#include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/data_unit/record.h"
-#include "genie/genotype/ParameterSetComposer.h"
-#include "genie/variantsite/AccessUnitComposer.h"
-
 #include "genie/entropy/jbig/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -114,6 +101,8 @@ TEST(Genotype, Decompose) {
 TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
+    int8_t MAX_VAL = 127;
+    int8_t MIN_VAL = -2;
 
     genie::genotype::Int8MatDtype allele_mat;
     genie::genotype::Int8MatDtype orig_allele_mat;
@@ -123,7 +112,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 1: all positive
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
 
         orig_allele_mat = allele_mat;
 
@@ -140,7 +129,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 2: no_ref
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -1;
 
@@ -159,7 +148,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 3: not_avail_flag
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -2;
 
@@ -178,7 +167,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
     // Case 3: no_ref and not_avail_flag
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, 64));
+        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
         xt::filter(allele_mat, mask) = -1;
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
@@ -306,7 +295,6 @@ TEST(Genotype, RoundTrip_RandomSort) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
     int8_t MAX_ALLELE_VAL = 2;
-    (void) MAX_ALLELE_VAL;
     
     genie::genotype::BinMatDtype bin_mat;
     genie::genotype::BinMatDtype orig_bin_mat;
@@ -315,7 +303,7 @@ TEST(Genotype, RoundTrip_RandomSort) {
 
     // Sort rows
     {
-        bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
+        bin_mat = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
         orig_bin_mat = bin_mat;
 
         genie::genotype::sort_bin_mat(
@@ -418,6 +406,7 @@ TEST(Genotype, Serializer) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO (Yeremia): Move this test to JBIG
 TEST(Genotype, JBIG) {
     genie::genotype::BinMatDtype bin_mat;
     size_t orig_payload_len = 15;

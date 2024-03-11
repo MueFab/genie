@@ -21,8 +21,7 @@ ContactParameters::ContactParameters()
       tile_size(0),
       interval_multipliers(),
       norm_method_infos(),
-      norm_mat_infos(),
-      scm_params()
+      norm_mat_infos()
 {
     // TODO (Yeremia): Check if interval multipliers are valid
     // TODO (Yeremia): Set default value so that interval_multipliers is valid
@@ -129,23 +128,24 @@ ContactParameters::ContactParameters(util::BitReader& reader){
         norm_mat_infos.emplace(ID, std::move(norm_mat_info));
     }
 
-    auto num_scm = reader.readBypassBE<uint16_t>();
-    for (uint16_t i = 0; i<num_scm; i++){
-        auto chr1_ID = reader.readBypassBE<uint8_t>();
-        auto chr2_ID = reader.readBypassBE<uint8_t>();
+//    auto num_scm = reader.readBypassBE<uint16_t>();
+//    for (uint16_t i = 0; i<num_scm; i++){
+//        auto chr1_ID = reader.readBypassBE<uint8_t>();
+//        auto chr2_ID = reader.readBypassBE<uint8_t>();
 
-        auto scm_param = ContactSubmatParameters(
-            reader,
-            chr1_ID,
-            chr2_ID,
-            getNumTiles(chr1_ID),
-            getNumTiles(chr2_ID)
-        );
-
-        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
-        UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "Chromosome pair already exist!");
-        scm_params.emplace(chr_pair, std::move(scm_param));
-    }
+//        auto scm_param =
+//            SubcontactMatrixParameters(
+//            reader,
+//            chr1_ID,
+//            chr2_ID,
+//            getNumTiles(chr1_ID),
+//            getNumTiles(chr2_ID)
+//        );
+//
+//        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
+//        UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "Chromosome pair already exist!");
+//        scm_params.emplace(chr_pair, std::move(scm_param));
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -161,10 +161,17 @@ void ContactParameters::addSample(SampleInformation&& sample_info) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::addSample(uint8_t ID, std::string&& sample_name) {
-    UTILS_DIE_IF(sample_infos.find(ID) != sample_infos.end(), "sample_ID already exists!");
-    SampleInformation sample_info = {ID, std::move(sample_name)};
-    sample_infos.emplace(ID, std::move(sample_info));
+void ContactParameters::addSample(uint8_t ID, std::string&& name, bool exist_ok) {
+    auto it = sample_infos.find(ID);
+    if (it == sample_infos.end()) {
+        SampleInformation sample_info = {ID, std::move(name)};
+        sample_infos.emplace(ID, std::move(sample_info));
+    } else if (exist_ok){
+        UTILS_DIE_IF(it->second.name != name,
+                     "name differs for the same sample_ID");
+    } else{
+        UTILS_DIE("sample_ID already exists!");
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -181,16 +188,22 @@ void ContactParameters::addChromosome(ChromosomeInformation&& chr_info) {chr_inf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::upsertChromosome(uint8_t ID, const std::string& name, uint64_t length){
-    auto chr_info = chr_infos.find(ID);
-    if (chr_info == chr_infos.end()){
-        chr_infos.emplace(ID, ChromosomeInformation{ID, std::move(name), length});
+void ContactParameters::upsertChromosome(uint8_t ID, std::string&& name, uint64_t length, bool exist_ok){
+    auto it = chr_infos.find(ID);
+    if (it == chr_infos.end()){
+        ChromosomeInformation chr_info = {ID, std::move(name), length};
+        chr_infos.emplace(ID, std::move(chr_info));
+    } else if (exist_ok){
+        UTILS_DIE_IF(it->second.name != name,
+                     "name differs for the same chr_ID");
+
+        // Update length if longer
+        // This is because ContactRecord does not store the true chromosome length
+        if (it->second.length < length)
+            it->second.length = length;
+
     } else{
-        auto curr_chr_info = chr_info->second;
-        UTILS_DIE_IF(curr_chr_info.name != name, "Given chr_ID the name differs!");
-        if (curr_chr_info.length < length){
-            curr_chr_info.length = length;
-        }
+        UTILS_DIE("chr_ID already exists!");
     }
 }
 
@@ -250,19 +263,19 @@ const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactParamete
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t ContactParameters::getNumSCMParams() const {return static_cast<uint16_t>(scm_params.size());}
+//uint16_t ContactParameters::getNumSCMParams() const {return static_cast<uint16_t>(scm_params.size());}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::addSCMParam(ContactSubmatParameters&& scm_param){
-    auto chr_pair = scm_param.getChrPair();
-    UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "SCM parameter already exists!");
-    scm_params.emplace(chr_pair, std::move(scm_param));
-}
+//void ContactParameters::addSCMParam(SubcontactMatrixParameters&& scm_param){
+//    auto chr_pair = scm_param.getChrPair();
+//    UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "SCM parameter already exists!");
+//    scm_params.emplace(chr_pair, std::move(scm_param));
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const SCMParamsDtype& ContactParameters::getSCMParams() const {return scm_params;}
+//const SCMParamsDtype& ContactParameters::getSCMParams() const {return scm_params;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
