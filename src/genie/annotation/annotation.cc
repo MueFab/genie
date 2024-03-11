@@ -39,7 +39,24 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         parseGenotype(inputfile);
 
     } else {
-        infoFields = attributeParser.getInfoFields();
+        std::ifstream readForTags;
+        readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
+        genie::util::BitReader bitreader(readForTags);
+        std::vector<genie::core::record::variant_site::Info_tag> infoTag;
+        genie::core::record::variant_site::Record recs;
+        while (recs.read(bitreader)) {
+            infoTag = recs.getInfoTag();
+            for (auto tag : infoTag) {
+                InfoField infoField(tag.info_tag, tag.info_type, tag.info_array_len);
+                infoTags[tag.info_tag] = tag;
+                attributeInfo[tag.info_tag] = infoField;
+            }
+        }
+        readForTags.close();
+        for (auto info : infoTags)
+            infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
+
+        //  if (useJson) infoFields = attributeParser.getInfoFields();
         parseSite(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();
@@ -67,11 +84,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 }
 
 void Annotation::parseGenotype(std::ifstream& inputfile) {
-    std::vector<genie::core::AnnotDesc> descrList;
     annotationAccessUnit.resize(1);
-    descrList.push_back(genie::core::AnnotDesc::GENOTYPE);
-    descrList.push_back(genie::core::AnnotDesc::LIKELIHOOD);
-    descrList.push_back(genie::core::AnnotDesc::LINKID);
 
     std::vector<genie::core::record::VariantGenotype> recs;
     genie::util::BitReader bitreader(inputfile);
@@ -114,8 +127,9 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
         genotypePayload.write(writer);
     }
 
-    descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-    {
+    if (std::get<genie::likelihood::EncodingBlock>(likelihoodData).nrows > 0 &&
+        std::get<genie::likelihood::EncodingBlock>(likelihoodData).ncols > 0) {
+        descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
         genie::likelihood::LikelihoodPayload likelihoodPayload(
             std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
             std::get<genie::likelihood::EncodingBlock>(likelihoodData));
@@ -137,8 +151,9 @@ void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
     uint64_t defaultTileSize = 1000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
-    std::map<std::string, InfoField> attributeInfo;
+
     for (auto infoField : infoFields) attributeInfo[infoField.ID] = infoField;
+
     descrList.push_back(genie::core::AnnotDesc::SEQUENCEID);
     descrList.push_back(genie::core::AnnotDesc::STARTPOS);
     descrList.push_back(genie::core::AnnotDesc::STRAND);
@@ -195,6 +210,9 @@ void Annotation::setInfoFields(std::string jsonFileName) {
         AttributeFieldsFile.close();
     }
     JsonAttributeParser attributeParser(attributeFields);
+    for (auto field : attributeParser.getInfoFields()) {
+        attributeInfo[field.ID] = field;
+    }
     infoFields = attributeParser.getInfoFields();
 }
 

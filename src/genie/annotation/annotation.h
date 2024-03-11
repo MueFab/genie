@@ -56,7 +56,10 @@ class Annotation {
  private:
     std::ifstream recordInput;
     genie::annotation::Compressor compressors;
-    std::vector<genie::annotation::InfoField> infoFields;
+    std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
+    std::map<std::string, InfoField> attributeInfo;
+    std::vector<InfoField> infoFields;
+
     genie::core::record::annotation_parameter_set::Record annotationParameterSet;
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;

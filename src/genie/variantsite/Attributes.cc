@@ -68,7 +68,7 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
         typedData.write(writer);
     }
 
-    return std::vector<std::stringstream>();
+    return TypedTiles;
 }
 
 void AttributeTile::AddFirst() {
@@ -110,6 +110,21 @@ void Attributes::add(std::vector<genie::core::record::variant_site::Info_tag> ta
     for (auto& tag : tags) {
         attributeTiles[tag.info_tag].write(tag.infoValue);
         attrWritten[tag.info_tag] = true;
+    }
+    for (auto isWritten : attrWritten) {
+        if (!isWritten.second) {
+            attributeTiles[isWritten.first].writeMissing();
+        }
+        attrWritten[isWritten.first] = false;
+    }
+    auto temp = attributeTiles["AC"].getCurrentsize();
+    if (temp == 0) ++temp;
+}
+
+void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags) {
+    for (auto& tag : tags) {
+        attributeTiles[tag.first].write(tag.second.infoValue);
+        attrWritten[tag.first] = true;
     }
     for (auto isWritten : attrWritten) {
         if (!isWritten.second) {

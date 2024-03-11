@@ -89,11 +89,3 @@ TEST_F(AnnotationAccessUnitTests, annotationAccessUnitHeader) {  // NOLINT(cert-
     EXPECT_EQ(unitHeader.getNumberOfBlocks(), n_blocks);
     EXPECT_EQ(unitHeader.getDescriptorID(), descriptor_ID);
 }
-TEST_F(AnnotationAccessUnitTests, annotationAccessUnitHeader2) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
- //   genie::core::record::variant_site::VaritanSiteParser parser;
-
-
-}

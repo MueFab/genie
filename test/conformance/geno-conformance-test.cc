@@ -69,7 +69,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     if (testparams.binID == genie::genotype::BinarizationID::ROW_BIN) name += "_ROWBIN";
     if (testparams.SortingID == genie::genotype::SortingAlgoID::NO_SORTING) name += "_NOSORT";
     if (testparams.SortingID == genie::genotype::SortingAlgoID::RANDOM_SORT) name += "_RANDOMSORT";
-    std::string jsonFilename = gitRootDir+"/data/records/conformance/1.3.11.bgz.formattags.json";
+    std::string jsonFilename = gitRootDir+"/data/records/conformance/variants/1.3.11.bgz.formattags.json";
     uint32_t BLOCK_SIZE = 200;
     bool TRANSFORM_MODE = true;
 
@@ -107,14 +107,14 @@ INSTANTIATE_TEST_CASE_P(
     testallGenoConformance, GenotypeConformanceTest,
     ::testing::Values(
         genoTestValues(genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.5.bgz.CASE01"),
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.5.bgz.CASE01"),
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE04"},
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.11.bgz.CASE04"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::ROW_BIN,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::BSC, "/data/records/conformance/1.3.11.bgz.CASE03"}));
+                       genie::core::AlgoID::BSC, "/data/records/conformance/variants/1.3.11.bgz.CASE03"}));

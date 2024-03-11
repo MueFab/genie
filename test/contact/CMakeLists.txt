@@ -11,6 +11,7 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 #message(STATUS "xio: ${xio_INCLUDE_DIRS}")
 
 set(source_files
+        helpers.cc
         encode_test.cc
 )
 
