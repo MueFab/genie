@@ -15,8 +15,6 @@ namespace jbig {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 JBIGEncoder::JBIGEncoder()
     : num_lines_per_stripe(-1),
       deterministic_pred(false),
@@ -24,7 +22,14 @@ JBIGEncoder::JBIGEncoder()
       diff_layer_typical_pred(false),
       two_line_template(false) {}
 
-void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, uint32_t ncols, uint32_t nrows) {
+// ---------------------------------------------------------------------------------------------------------------------
+
+void JBIGEncoder::encode(
+    std::stringstream& input,
+    std::stringstream& output,
+    uint32_t ncols,
+    uint32_t nrows
+) {
     const size_t srcLen = input.str().size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
@@ -33,18 +38,34 @@ void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, ui
     unsigned char* compressedBuffer = NULL;
     size_t compSize = 3*srcLen;
 
+    auto buf_nrows = (unsigned long) ncols;
+    auto buf_ncols = (unsigned long) nrows;
 
-    int ret = mpegg_jbig_compress_default(&compressedBuffer, &compSize, inputBuffer, srcLen, nrows,
-                                ncols);
+    int ret = mpegg_jbig_compress_default(
+        &compressedBuffer,
+        &compSize,
+        inputBuffer,
+        srcLen,
+        buf_nrows,
+        buf_ncols
+    );
     if (ret != 0) {
         std::cerr << "error with jbig compression\n";
     }
-    for (size_t i = 0; i < compSize; ++i) output << compressedBuffer[i];
+    for (size_t i = 0; i < compSize; ++i)
+        output << compressedBuffer[i];
  
 
 }
 
-void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows) {
+// ---------------------------------------------------------------------------------------------------------------------
+
+void JBIGEncoder::encode(
+    std::vector<uint8_t>& input,
+    std::vector<uint8_t>& output,
+    uint32_t ncols,
+    uint32_t nrows
+) {
     const size_t srcLen = input.size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
@@ -53,13 +74,25 @@ void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& outp
     unsigned char* decompressedBuffer = NULL;
     size_t dest_data_len;
 
-    int ret = mpegg_jbig_decompress_default(&decompressedBuffer, &dest_data_len, inputBuffer, srcLen,
-                                            (unsigned long*)&nrows, (unsigned long*)&ncols);
+    auto buf_nrows = (unsigned long) ncols;
+    auto buf_ncols = (unsigned long) nrows;
+
+    int ret = mpegg_jbig_compress_default(
+        &decompressedBuffer,
+        &dest_data_len,
+        inputBuffer,
+        srcLen,
+        buf_nrows,
+        buf_ncols
+    );
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    for (size_t i = 0; i < dest_data_len; ++i) output.push_back(decompressedBuffer[i]);
+    for (size_t i = 0; i < dest_data_len; ++i)
+        output.push_back(decompressedBuffer[i]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void JBIGEncoder::decode(
     std::stringstream& input,
@@ -93,8 +126,11 @@ void JBIGEncoder::decode(
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    for (size_t i = 0; i < dest_data_len; ++i) output << decompressedBuffer[i];
+    for (size_t i = 0; i < dest_data_len; ++i)
+        output << decompressedBuffer[i];
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameters::convertToAlgorithmParameters()
     const {
@@ -123,6 +159,8 @@ genie::core::record::annotation_parameter_set::AlgorithmParameters JBIGparameter
         n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 genie::core::record::annotation_parameter_set::CompressorParameterSet JBIGparameters::compressorParameterSet(
     uint8_t compressor_ID) const {
     std::vector<genie::core::AlgoID> JBIGalgorithm_ID{genie::core::AlgoID::JBIG};
@@ -141,6 +179,8 @@ genie::core::record::annotation_parameter_set::CompressorParameterSet JBIGparame
         compressor_ID, n_compressor_steps, compressor_step_ID, JBIGalgorithm_ID, use_default_pars, algorithm_parameters,
         n_in_vars, in_var_ID, prev_step_ID, prev_out_var_ID, n_completed_out_vars, completed_out_var_ID);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace jbig
 }  // namespace entropy

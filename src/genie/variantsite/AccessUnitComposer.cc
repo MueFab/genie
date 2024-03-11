@@ -51,8 +51,10 @@ void AccessUnitComposer::setAccessUnit(
         for (auto readbyte : it->second.str()) data.push_back(readbyte);
         genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, 0, data);
         genie::core::record::annotation_access_unit::Block block;
-        block.set(blockInfo);
-        blocks.push_back(block);
+        if (data.size() != 0) {
+            block.set(blockInfo);
+            blocks.push_back(block);
+        }
     }
 
     // -------- attributes ----------- //
@@ -61,29 +63,16 @@ void AccessUnitComposer::setAccessUnit(
         _annotationParameterSet.getAnnotationEncodingParameters().getCompressorParameterSets();
     std::map<std::string, std::stringstream> encodedAttributes;
 
+    //auto temp1 = _attributeTileStream["AA"].getdata().str().length();
+
     for (auto& attribute : attributeParameterSets) {
         auto compressorId = attribute.getCompressorID();
-        {
-            std::string filename = attribute.getAttributeName() + "_before.bin";
-            std::ofstream output;
-            output.open(filename, std::ios::binary);
-            auto& temp = _attributeTileStream[attribute.getAttributeName()].getdata();
-            output.write(temp.str().c_str(),temp.str().length());
-            output.close();
-        }
         if (compressorId != 0) {
             compress(_attributeTileStream[attribute.getAttributeName()], compressorParameterSets.at(compressorId - 1));
-
-            {
-                std::string filename = attribute.getAttributeName() + "_after.bin";
-                std::ofstream output;
-                output.open(filename, std::ios::binary);
-                auto& temp = _attributeTileStream[attribute.getAttributeName()].getCompresseddata();
-                output.write(temp.str().c_str(), temp.str().length());
-                output.close();
-            }
         }
     }
+    //auto temp2 = _attributeTileStream["AA"].getCompresseddata().str().length();
+    //if (temp1 == temp2) {}
 
     for (auto& tile : _attributeTileStream) {
         std::stringstream data;

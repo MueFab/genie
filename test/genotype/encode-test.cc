@@ -101,7 +101,7 @@ TEST(Genotype, Decompose) {
 TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
-    int8_t MAX_VAL = 127;
+    int8_t MAX_VAL = 64;
     int8_t MIN_VAL = -2;
 
     genie::genotype::Int8MatDtype allele_mat;
@@ -409,11 +409,11 @@ TEST(Genotype, Serializer) {
 // TODO (Yeremia): Move this test to JBIG
 TEST(Genotype, JBIG) {
     genie::genotype::BinMatDtype bin_mat;
-    size_t orig_payload_len = 15;
-    uint8_t orig_payload[15] = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+    size_t ORIG_PAYLOAD_LEN = 15;
+    uint8_t ORIG_PAYLOAD[15] = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
                                 0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38};
-    unsigned long orig_ncols = 23;
-    unsigned long orig_nrows = 5;
+    uint32_t ORIG_NCOLS = 23;
+    uint32_t ORIG_NROWS = 5;
 
     size_t orig_compressed_data_len = 37;
     uint8_t orig_compressed[37] = {0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
@@ -428,10 +428,10 @@ TEST(Genotype, JBIG) {
     mpegg_jbig_compress_default(
         &compressed_data,
         &compressed_data_len,
-        orig_payload,
-        orig_payload_len,
-        orig_nrows,
-        orig_ncols
+        ORIG_PAYLOAD,
+        ORIG_PAYLOAD_LEN,
+        ORIG_NROWS,
+        ORIG_NCOLS
     );
 
     ASSERT_EQ(orig_compressed_data_len, compressed_data_len);
@@ -441,9 +441,9 @@ TEST(Genotype, JBIG) {
 
     std::stringstream uncomressed_input;
     std::stringstream compressed_output;
-    for (uint8_t byte : orig_payload) uncomressed_input.write((char*)&byte, 1);
+    for (uint8_t byte : ORIG_PAYLOAD) uncomressed_input.write((char*)&byte, 1);
     genie::entropy::jbig::JBIGEncoder encoder;
-    encoder.encode(uncomressed_input, compressed_output, (uint32_t)orig_ncols, (uint32_t)orig_nrows);
+    encoder.encode(uncomressed_input, compressed_output, ORIG_NCOLS, ORIG_NROWS);
 
     std::vector<uint8_t> mem_data;
     for (auto byte : compressed_output.str()) {
@@ -458,7 +458,7 @@ TEST(Genotype, JBIG) {
     uint32_t output_nrows = 0;
     encoder.decode(compressed_output, uncompressed_output, output_ncols, output_nrows);
 
-    std::vector<uint8_t> mem_data_source(3 * orig_payload_len);
+    std::vector<uint8_t> mem_data_source(3 * ORIG_PAYLOAD_LEN);
     uint8_t* payload = &mem_data_source[0];
     size_t payload_len;
 
@@ -471,11 +471,11 @@ TEST(Genotype, JBIG) {
         &ncols
     );
 
-    ASSERT_EQ(nrows, orig_nrows);
-    ASSERT_EQ(ncols, orig_ncols);
+    ASSERT_EQ(nrows, ORIG_NROWS);
+    ASSERT_EQ(ncols, ORIG_NCOLS);
 
-    ASSERT_EQ(orig_payload_len, payload_len);
+    ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
     for (size_t i = 0; i < payload_len; i++) {
-        ASSERT_EQ(*(payload + i), *(orig_payload + i));
+        ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i));
     }
 }

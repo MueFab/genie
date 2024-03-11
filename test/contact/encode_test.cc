@@ -5,10 +5,16 @@
 */
 
 #include <gtest/gtest.h>
+#include <fstream>
 #include <vector>
-#include <xtensor/xarray.hpp>
 #include <xtensor/xadapt.hpp>
+#include <xtensor/xarray.hpp>
 #include "genie/contact/contact_coder.h"
+#include "genie/core/record/contact/record.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/runtime-exception.h"
+#include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +35,7 @@ TEST(ContactCoder, compute_mask) {
     ASSERT_FALSE(mask(2));
     ASSERT_FALSE(mask(4));
 
-    // ids may not changed
+    // ids shall not change
     ASSERT_TRUE(orig_ids == ids);
 }
 
@@ -596,6 +602,62 @@ TEST(ContactCoder, binarize_rows) {
                                                     {true, true, true, true}};
 
     ASSERT_TRUE(bin_mat == target_bin_mat);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, full_coding) {
+
+    std::vector<uint64_t> v = {0, 1, 3, 5};
+    genie::contact::UInt64VecDtype ids = xt::adapt(v, {v.size()});
+    genie::contact::BinVecDtype mask;
+
+    genie::contact::UInt64VecDtype orig_ids = ids;
+
+    genie::contact::compute_mask(ids, mask);
+
+    ASSERT_EQ(mask.size(), 6);
+    ASSERT_EQ(xt::sum(xt::cast<uint8_t>(mask))(0), 4u);
+    ASSERT_TRUE(mask(0));
+    ASSERT_TRUE(mask(5));
+    ASSERT_FALSE(mask(2));
+    ASSERT_FALSE(mask(4));
+
+    // ids may not changed
+    ASSERT_TRUE(orig_ids == ids);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, EncodeCM){
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-three_recs.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::ifstream reader(filepath, std::ios::binary);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::ContactRecord> recs;
+
+    while (bitreader.isGood()) {
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    genie::contact::EncodingOptions opt = {
+        500, // tile_size;
+        false, // multi_intervals = false;
+        true, // diag_transform = true;
+        true // binarize = true;
+    };
+
+    genie::contact::EncodingBlock block;
+
+    encode_cm(recs, opt, block);
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
