@@ -20,15 +20,14 @@
 #include "genie/variantsite/ParameterSetComposer.h"
 #include "genie/variantsite/VariantSiteParser.h"
 
+#include "genie/contact/contact_coder.h"
+#include "genie/contact/contact_parameters.h"
+#include "genie/contact/subcontact_matrix_payload.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
-#include "genie/contact/contact_coder.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
-#include "genie/contact/contact_parameters.h"
-#include "genie/contact/contact_scm_payload.h"
-
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"
