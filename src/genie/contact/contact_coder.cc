@@ -7,9 +7,9 @@
 #include "contact_coder.h"
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime-exception.h>
-#include "xtensor/xsort.hpp"
 #include "contact_parameters.h"
-#include "contact_subcm_parameters.h"
+#include "subcontact_matrix_parameters.h"
+#include "xtensor/xsort.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,18 +45,12 @@ void decompose(
         }
 
         auto chr1_ID = rec.getChr1ID();
-        auto chr2_ID = rec.getChr2ID();
-        params.upsertChromosome(
-            chr1_ID,
-            rec.getChr1Name(),
-            rec.inferChr1Length()
-        );
+        auto chr1_name = std::string(rec.getChr1Name());
+        params.upsertChromosome(chr1_ID, std::move(chr1_name), rec.inferChr1Length());
 
-        params.upsertChromosome(
-            chr2_ID,
-            rec.getChr2Name(),
-            rec.inferChr2Length()
-        );
+        auto chr2_ID = rec.getChr2ID();
+        auto chr2_name = std::string(rec.getChr2Name());
+        params.upsertChromosome(chr2_ID, std::move(chr2_name), rec.inferChr2Length());
 
         // TODO (Yeremia): Extend to norm_methods and norm_mat
 
@@ -199,7 +193,7 @@ void append_unaligned(
             mapping(k++) = value;
         }
 
-        for (auto i=0u; i<num_entries; i++){
+        for (auto i = 0u; i<num_entries; i++){
             row_ids(i) = mapping(row_ids(i));
             col_ids(i) = mapping(col_ids(i));
         }
@@ -215,7 +209,7 @@ void append_unaligned(
             mapping(k++) = value;
         }
 
-        for (auto i=0u; i<num_entries; i++){
+        for (auto i = 0u; i<num_entries; i++){
             row_ids(i) = mapping(row_ids(i));
         }
 
@@ -229,7 +223,7 @@ void append_unaligned(
             mapping(k++) = value;
         }
 
-        for (auto i=0u; i<num_entries; i++){
+        for (auto i = 0u; i<num_entries; i++){
             col_ids(i) = mapping(col_ids(i));
         }
     }
@@ -433,7 +427,7 @@ void binarize_rows(
     size_t i2 = 0;
     for (size_t i = 0; i < nrows; i++) {
         for (size_t i_bit = 0; i_bit < nbits_per_row[i]; i_bit++) {
-            xt::view(bin_mat, i2++, xt::range(1, bin_mat_ncols)) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1 << i_bit));
+            xt::view(bin_mat, i2++, xt::range(1, bin_mat_ncols)) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
         }
         bin_mat(i2-1, 0) = true;
     }
@@ -514,15 +508,37 @@ void encode_scm(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encode_cm(
+    std::vector<genie::core::record::ContactRecord>& recs,
     const EncodingOptions& opt,
     EncodingBlock& block
 ) {
-    (void)opt;
+
     auto& params = block.params;
     auto& interv_scm_recs = block.interv_scm_recs;
 
-    auto interval = params.getInterval();
-    auto& scm_recs = interv_scm_recs[interval];
+//    auto& interval = params.getInterval();
+//    auto& scm_recs = interv_scm_recs[interval];
+
+    uint32_t interval = 0;
+    std::map<uint8_t, SampleInformation> samples;
+    std::map<uint8_t, ChromosomeInformation> chrs;
+    for (auto& rec: recs){
+        auto rec_interval = rec.inferInterval();
+        if (interval == 0)
+            interval = rec_interval;
+        else
+            UTILS_DIE_IF(interval != rec_interval, "records has different interval");
+
+        {
+            auto sample_name = std::string(rec.getSampleName());
+            params.addSample(rec.getSampleID(), std::move(sample_name));
+            auto chr1_name = std::string(rec.getChr1Name());
+            params.upsertChromosome(rec.getChr1ID(), std::move(chr1_name), rec.inferChr1Length());
+            auto chr2_name = std::string(rec.getChr2Name());
+            params.upsertChromosome(rec.getChr2ID(), std::move(chr2_name), rec.inferChr2Length());
+        }
+
+    }
 
     UInt8VecDtype sorted_chr_IDs = {params.getNumberChromosomes()};
     size_t i = 0;
@@ -534,16 +550,27 @@ void encode_cm(
 
     for (uint8_t chr1_ID: sorted_chr_IDs){
         for (uint8_t chr2_ID: sorted_chr_IDs){
+
+            // Store only the upper triangle part of the contact matrix
             if (chr1_ID > chr2_ID){
                 continue;
             }
 
             auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
-            auto& rec = scm_recs[chr_pair];
+//            auto& rec = scm_recs[chr_pair];
 
-            encode_scm(params, rec);
+//            encode_scm(params, rec);
         }
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<ContactParameters, EncodingBlock> encode_block(
+    const EncodingOptions& opt,
+    std::vector<core::record::ContactRecord>& recs){
+
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

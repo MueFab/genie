@@ -11,6 +11,7 @@
 #include "genie/entropy/zstd/encoder.h"
 
 #include "genotype_coder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

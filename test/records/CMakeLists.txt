@@ -3,10 +3,9 @@ project("genie-test-records")
 set(source_files
         helpers.cc
         variant_genotype-test.cc
-        contact-test.cc
         annotationAccessUnit-test.cc
         blockTests.cc
-
+        contact-test.cc
 )
 
 add_executable(${PROJECT_NAME} ${source_files})

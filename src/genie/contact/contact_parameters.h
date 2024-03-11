@@ -7,16 +7,16 @@
 #ifndef GENIE_CONTACT_CONTACT_PARAMETERS_H
 #define GENIE_CONTACT_CONTACT_PARAMETERS_H
 
+#include <genie/core/constants.h>
+#include <genie/core/writer.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <genie/core/constants.h>
-#include <genie/core/writer.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include "contact_subcm_parameters.h"
+#include "subcontact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ struct chr_pair_hash {
 // ---------------------------------------------------------------------------------------------------------------------
 
 using ChrIDPair = std::pair<uint8_t, uint8_t>;
-using SCMParamsDtype = std::unordered_map<ChrIDPair, ContactSubmatParameters, chr_pair_hash>;
+using SCMParamsDtype = std::unordered_map<ChrIDPair, SubcontactMatrixParameters, chr_pair_hash>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,6 @@ class ContactParameters {
 
     std::unordered_map<uint8_t, NormalizationMethodInformation> norm_method_infos;
     std::unordered_map<uint8_t, NormalizedMatrixInformations> norm_mat_infos;
-    SCMParamsDtype scm_params;
 
  public:
     ContactParameters();
@@ -110,11 +109,11 @@ class ContactParameters {
 
     uint8_t getNumberSamples() const;
     void addSample(SampleInformation&& sample_info);
-    void addSample(uint8_t ID, std::string&& sample_name);
+    void addSample(uint8_t ID, std::string&& name, bool exist_ok=true);
     const std::unordered_map<uint8_t, SampleInformation>& getSamples() const;
     uint8_t getNumberChromosomes() const;
     void addChromosome(ChromosomeInformation&& chr_info);
-    void upsertChromosome(uint8_t ID, const std::string& name, uint64_t length);
+    void upsertChromosome(uint8_t ID, std::string&& name, uint64_t length, bool exist_ok=true);
     const std::unordered_map<uint8_t, ChromosomeInformation>& getChromosomes() const;
     uint32_t getInterval() const;
     void setInterval(uint32_t interval);
@@ -127,9 +126,9 @@ class ContactParameters {
     uint8_t getNumberNormMats() const;
     void addNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
     const std::unordered_map<uint8_t, NormalizedMatrixInformations>& getNormMats() const;
-    uint16_t getNumSCMParams() const;
-    void addSCMParam(ContactSubmatParameters&& scm_param);
-    const SCMParamsDtype& getSCMParams() const;
+//    uint16_t getNumSCMParams() const;
+//    void addSCMParam(SubcontactMatrixParameters&& scm_param);
+//    const SCMParamsDtype& getSCMParams() const;
 
     uint64_t getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult=1);
     uint32_t getNumTiles(uint8_t chr_ID, uint8_t interv_mult=1);

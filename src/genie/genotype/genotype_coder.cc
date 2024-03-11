@@ -641,21 +641,28 @@ void entropy_encode_bin_mat(
 
 std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
                                                            std::vector<core::record::VariantGenotype>& recs) {
+
     UTILS_DIE_IF(opt.binarization_ID == BinarizationID::UNDEFINED, "Invalid BinarizationID");
     UTILS_DIE_IF(opt.sort_row_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
     UTILS_DIE_IF(opt.sort_col_method == SortingAlgoID::UNDEFINED, "Invalid SortingAlgoID");
 
     EncodingBlock block{};
     decompose(opt, block, recs);
-    transform_max_value(block.allele_mat, 
-                        block.dot_flag, 
-                        block.na_flag);
-    binarize_allele_mat(block.allele_mat, 
-                        opt.binarization_ID, 
-                        opt.concat_axis, 
-                        block.allele_bin_mat_vect,
-                        block.amax_vec, 
-                        block.num_bit_planes);
+
+    transform_max_value(
+        block.allele_mat,
+        block.dot_flag,
+        block.na_flag
+    );
+
+    binarize_allele_mat(
+        block.allele_mat,
+        opt.binarization_ID,
+        opt.concat_axis,
+        block.allele_bin_mat_vect,
+        block.amax_vec,
+        block.num_bit_planes
+    );
 
     genie::genotype::sort_block(opt, block);
     auto parameter = generate_genotype_parameters(opt, block);
