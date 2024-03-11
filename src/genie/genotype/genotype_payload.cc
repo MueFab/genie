@@ -32,7 +32,6 @@ BinMatPayload::BinMatPayload(BinMatDtype binMat, core::AlgoID _codecID) : codecI
         phases.push_back(phasing);
     }
 
-
     size_t payloadSize = 0;
     uint8_t* payloadArray;
     genie::genotype::bin_mat_to_bytes(binMat, &payloadArray, payloadSize);
@@ -43,9 +42,9 @@ BinMatPayload::BinMatPayload(BinMatDtype binMat, core::AlgoID _codecID) : codecI
 }
 
 void BinMatPayload::write(core::Writer& writer) const {
-        writer.write(nrows, 32);
-        writer.write(ncols, 32);
-        for (auto byte : payload) writer.write(byte, 8); 
+    writer.write(nrows, 32);
+    writer.write(ncols, 32);
+    for (auto byte : payload) writer.write(byte, 8);
 }
 
 void BinMatPayload::writeCompressed(core::Writer& writer) const {
@@ -103,7 +102,7 @@ void AmaxPayload::write(core::Writer& writer) const {
             writer.write(1, 1);
         } else {
             writer.write(0, 1);
-            writer.write(amax_elements[i]-1, nbits_per_elem);
+            writer.write(amax_elements[i] - 1, nbits_per_elem);
             sizeInBits += nbits_per_elem;
         }
     }
@@ -199,8 +198,6 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
         writer.write(phasesSize, 32);
         phases_payload.writeCompressed(writer);
     }
-
-    auto written = writer.getBitsWritten();
 }
 }  // namespace genotype
 }  // namespace genie

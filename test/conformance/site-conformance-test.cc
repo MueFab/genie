@@ -48,7 +48,7 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = GetParam();
     std::string filepath = gitRootDir + filename;
-    std::string infofilename = "/data/records/conformance/variants/1.3.11.bgz.infotags.mgrec.json";
+    std::string infofilename = "/data/records/conformance/1.3.11.bgz.infotags.json";
 
 
     std::string set1 = "compressor 1 0 BSC";
@@ -66,6 +66,6 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
 }
 
 INSTANTIATE_TEST_CASE_P(testallsiteConformance, SiteConformanceTest,
-                        ::testing::Values("/data/records/conformance/variants/1.3.5.bgz.CASE01.site",
-                                          "/data/records/conformance/variants/1.3.11.bgz.CASE03.site",
-                                          "/data/records/conformance/variants/1.3.11.bgz.CASE04.site"));
+                        ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
+                                          "/data/records/conformance/1.3.11.bgz.CASE03.site",
+                                          "/data/records/conformance/1.3.11.bgz.CASE04.site"));

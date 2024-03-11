@@ -50,11 +50,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
         for (auto& alleles_sample : alleles) {
             for (auto& allele : alleles_sample) {
                 // TODO (Yeremia): move this signed integer fix to btreader!
-                auto v = bitreader.readBypassBE<uint8_t>();
-                bool is_neg = (v & 0x01);
-                allele = static_cast<int8_t>(v >> 1);
-                if (is_neg)
-                    allele = static_cast<int8_t>(-allele);
+                allele = bitreader.readBypassBE<int8_t>();
             }
         }
 
