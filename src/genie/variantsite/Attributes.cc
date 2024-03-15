@@ -106,10 +106,13 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
     (void)compressedData;
 }
 
-void Attributes::add(std::vector<genie::core::record::variant_site::Info_tag> tags) {
+void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)//, std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
+{
+    size_t index = 0;
     for (auto& tag : tags) {
-        attributeTiles[tag.info_tag].write(tag.infoValue);
-        attrWritten[tag.info_tag] = true;
+        attributeTiles[tag.tag].write(tag.values);// infoValues.at(index));
+        attrWritten[tag.tag] = true;
+        index++;
     }
     for (auto isWritten : attrWritten) {
         if (!isWritten.second) {
@@ -121,9 +124,9 @@ void Attributes::add(std::vector<genie::core::record::variant_site::Info_tag> ta
     if (temp == 0) ++temp;
 }
 
-void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags) {
+void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {
     for (auto& tag : tags) {
-        attributeTiles[tag.first].write(tag.second.infoValue);
+        attributeTiles[tag.first].write(infoValues[tag.first]);
         attrWritten[tag.first] = true;
     }
     for (auto isWritten : attrWritten) {

@@ -69,3 +69,5 @@ INSTANTIATE_TEST_CASE_P(testallsiteConformance, SiteConformanceTest,
                         ::testing::Values("/data/records/conformance/1.3.5.bgz.CASE01.site",
                                           "/data/records/conformance/1.3.11.bgz.CASE03.site",
                                           "/data/records/conformance/1.3.11.bgz.CASE04.site"));
+
+
