@@ -62,27 +62,8 @@ VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::vector<gen
     }
     descriptors.writeDanglingBits();
 }
-VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs,
-                                     std::map<std::string, genie::core::record::variant_site::Info_tag>& _fields,
-                                     uint64_t _rowsPerTile)
-    : siteMGrecs(_site_MGrecs),
-      rowsPerTile(_rowsPerTile),
-      numberOfRows(0),
-      tags(_fields),
-      fieldWriter{},
-      numberOfAttributes(0),
-      startPos(0) {
-    init();
-    descriptors.setTileSize(rowsPerTile);
 
-    util::BitReader reader(siteMGrecs);
-    while (fillRecord(reader)) {
-        descriptors.write(variantSite);
-        numberOfRows++;
-        attributes.add(tags);
-    }
-    descriptors.writeDanglingBits();
-}
+
 
 void VariantSiteParser::init() {
     uint16_t attributeID = 0;
@@ -116,7 +97,7 @@ void VariantSiteParser::init() {
 
 bool VariantSiteParser::fillRecord(util::BitReader reader) {
     if (!variantSite.read(reader)) return false;
-    for (auto field : variantSite.getInfoTag()) tags[field.info_tag].infoValue = field.infoValue;
+ //   for (auto field : variantSite.getInfoTag()) tags[field.info_tag].infoValue = field.infoValue;
     return true;
 }
 

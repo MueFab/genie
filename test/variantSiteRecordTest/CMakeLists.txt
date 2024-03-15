@@ -3,7 +3,6 @@ project("VariantSiteRecord-tests")
 set(source_files
         variantSiteRecord-test.cc
         main.cc
-        JsonInfoFieldParser-test.cc
 )
 
 add_executable(VariantSiteRecord-tests ${source_files})

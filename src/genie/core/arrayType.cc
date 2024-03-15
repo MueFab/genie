@@ -104,19 +104,19 @@ uint64_t ArrayType::getDefaultValue(core::DataType type) const {
         case core::DataType::BOOL:
             return 0;
         case core::DataType::INT8:
-            return 0x01;
+            return 0x80;
         case core::DataType::UINT8:
             return 0xFF;
         case core::DataType::INT16:
-            return 0x0001;
+            return 0x8000;
         case core::DataType::UINT16:
             return 0xFFFF;
         case core::DataType::INT32:
-            return 0x00000001;
+            return 0x80000000;
         case core::DataType::UINT32:
             return 0xFFFFFFFF;
         case core::DataType::INT64:
-            return 0x0000000000000001;
+            return 0x8000000000000000;
         case core::DataType::UINT64:
             return 0xFFFFFFFFFFFFFFFF;
         case core::DataType::FLOAT:
@@ -148,7 +148,7 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
         case DataType::INT16: {
             uint16_t readValue = static_cast<uint16_t>(reader.read_b(16));
             byteArray.resize(2);
-            memcpy(&byteArray[0], &readValue, 4);
+            memcpy(&byteArray[0], &readValue, 2);
             break;
         }
         case DataType::UINT16: {

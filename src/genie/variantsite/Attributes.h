@@ -87,8 +87,8 @@ class Attributes {
         initAttributeTiles();
     }
 
-    void add(std::vector<genie::core::record::variant_site::Info_tag> tags);
-    void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags);
+    void add(std::vector<genie::core::record::variant_site::InfoFields::Field> fields);// std::vector<genie::core::record::variant_site::Info_tag> tags, std::vector<std::vector<std::vector<uint8_t>>> infoValues);
+    void add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues);
 
     std::map<std::string, AttributeTile>& getTiles() { return attributeTiles; }
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& getInfo() { return info; }

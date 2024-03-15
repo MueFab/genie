@@ -25,59 +25,6 @@ namespace core {
 namespace record {
 namespace variant_site {
 
-uint8_t Record::determineSize(uint8_t selectType) const {
-    if (selectType == 0) return 0;
-    if (selectType < 5) return 1;
-    if (selectType < 7) return 2;
-    if (selectType < 9 || selectType == 11) return 4;
-    return 4;
-}
-
-std::string Record::infoToCorrectString(std::string& value, uint8_t selectType) const {
-    std::string outputstring;
-    auto type_size = determineSize(selectType);
-    if (selectType == 0) {
-        outputstring = '"' + value + '"' + ",";
-    } else {
-        if (selectType == 0) {
-            outputstring = '"' + value + '"' + ",";
-        } else if (selectType == 1 || selectType == 2 || selectType == 4 || selectType == 6 || selectType == 8 ||
-                   selectType == 10) {
-            uint64_t temp = 0;
-            memcpy(&temp, value.c_str(), type_size);
-            outputstring = std::to_string(temp) + ",";
-        } else if (selectType == 3) {
-            int8_t temp = 0;
-            memcpy(&temp, value.c_str(), type_size);
-            outputstring = std::to_string(temp) + ",";
-
-        } else if (selectType == 5) {
-            int16_t temp = 0;
-            memcpy(&temp, value.c_str(), type_size);
-            outputstring = std::to_string(temp) + ",";
-
-        } else if (selectType == 7 || selectType == 11) {
-            int32_t temp = 0;
-            char bytearray[4];
-            for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[3 - i];
-            memcpy(&temp, bytearray, type_size);
-            outputstring = std::to_string(temp) + ",";
-
-        } else if (selectType == 9) {
-            int64_t temp = 0;
-            char bytearray[8];
-            for (auto i = 0; i < type_size; ++i) bytearray[i] = value.c_str()[7 - i];
-            memcpy(&temp, bytearray, type_size);
-            outputstring = std::to_string(temp) + ",";
-
-        } else if (selectType == 11) {
-            uint32_t temp = 0;
-            memcpy(&temp, value.c_str(), type_size);
-            outputstring = std::to_string(temp) + ",";
-        }
-    }
-    return outputstring;
-}
 
 Record::Record(util::BitReader& reader) { read(reader); }
 
@@ -92,6 +39,7 @@ void Record::write(core::Writer& writer) {
     writer.write(description);
     writer.write(ref_len, 32);
     writer.write(ref);
+
     writer.write(alt_count, 8);
     for (auto i = 0; i < alt_count; ++i) {
         writer.write(alt_len[i], 32);
@@ -103,16 +51,18 @@ void Record::write(core::Writer& writer) {
     writer.write(map_num_qual_0, 32);
     writer.write(filters_len, 8);
     writer.write(filters);
+
     writer.write(info_count, 8);
+    auto info_tag = info.getFields();
     for (auto i = 0; i < info_count; ++i) {
-        writer.write(info_tag[i].info_tag_len, 8);
-        writer.write(info_tag[i].info_tag);
-        writer.write(static_cast<uint8_t>(info_tag[i].info_type), 8);
-        writer.write(info_tag[i].info_array_len, 8);
+        writer.write(info_tag[i].tag.size(), 8);
+        writer.write(info_tag[i].tag);
+        writer.write(static_cast<uint8_t>(info_tag[i].type), 8);
+        writer.write(info_tag[i].values.size(), 8);
         ArrayType writeType;
-        for (auto j = 0; j < info_tag[i].info_array_len; ++j) {
-            writeType.toFile(info_tag[i].info_type, info_tag[i].infoValue[j], writer);
-            if (info_tag[i].info_type == DataType::STRING) writer.write_reserved(8);
+        for (auto j = 0; j < info_tag[i].values.size(); ++j) {
+            writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
+            if (info_tag[i].type == DataType::STRING) writer.write_reserved(8);
         }
     }
     writer.write_reserved(7);
@@ -166,8 +116,12 @@ bool Record::read(genie::util::BitReader& reader) {
         filters.resize(filters_len);
         reader.readBypass(&filters[0], filters_len);
     }
+
+    info.read(reader);
+    /*
     info_count = static_cast<uint8_t>(reader.read_b(8));
     info_tag.resize(info_count);
+    infoValue.resize(0);
     for (auto& infoTag : info_tag) {
         infoTag.info_tag_len = static_cast<uint8_t>(reader.read_b(8));
         if (infoTag.info_tag_len > 0) {
@@ -178,14 +132,15 @@ bool Record::read(genie::util::BitReader& reader) {
         infoTag.info_array_len = static_cast<uint8_t>(reader.read_b(8));
 
         if (infoTag.info_array_len > 0) {
-            infoTag.infoValue.resize(infoTag.info_array_len);
+            std::vector<std::vector<uint8_t>> info_value(infoTag.info_array_len);
             ArrayType infoArray;
-            for (auto& value : infoTag.infoValue) {
+            for (auto& value : info_value) {
                 value = infoArray.toArray(infoTag.info_type, reader);
             }
+            infoValue.emplace_back(info_value);
         }
     }
-
+    */
     linked_record = static_cast<uint8_t>(reader.read_b(8));
     if (linked_record) {
         link_name_len = static_cast<uint8_t>(reader.read_b(8));
@@ -219,7 +174,21 @@ void Record::clearData() {
     filters_len = 0;
     filters = "";
     info_count = 0;
-    info_tag = {};
+
+ //   for (auto i = 0; i < info_tag.size();++i) {
+
+ //      info_tag.at(i).info_array_len = 0;
+ //       info_tag.at(i).info_tag = "";
+  ///      info_tag.at(i).info_tag_len = 0;
+ //       std::vector <std::vector<uint8_t>> temp(0,std::vector<uint8_t>(0));
+      //  for (auto j = 0; j <info_tag.at(i).infoValue.size(); ++j)
+     //   info_tag.at(i).infoValue.at(j).clear();
+     //   info_tag.at(i).infoValue.resize(1, std::vector<uint8_t>(0));
+  //  }
+ //   infoValue = {};
+    info.clear();
+ //   info_tag = emptyTags;
+    
     linked_record = 0;
     link_name_len = 0;
     link_name = "";

@@ -24,7 +24,7 @@ JBIGEncoder::JBIGEncoder()
       diff_layer_typical_pred(false),
       two_line_template(false) {}
 
-void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, uint64_t ncols, uint64_t nrows) {
+void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, uint32_t ncols, uint32_t nrows) {
     const size_t srcLen = input.str().size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
@@ -44,7 +44,7 @@ void JBIGEncoder::encode(std::stringstream& input, std::stringstream& output, ui
 
 }
 
-void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint64_t ncols, uint64_t nrows) {
+void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& output, uint32_t ncols, uint32_t nrows) {
     const size_t srcLen = input.size();
     unsigned char* inputBuffer = NULL;
     inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
@@ -64,8 +64,8 @@ void JBIGEncoder::encode(std::vector<uint8_t>& input, std::vector<uint8_t>& outp
 void JBIGEncoder::decode(
     std::stringstream& input,
     std::stringstream& output,
-    uint64_t& nrows,
-    uint64_t& ncols
+    uint32_t& nrows,
+    uint32_t& ncols
 ) {
 
     const size_t srcLen = input.str().size();
@@ -87,8 +87,8 @@ void JBIGEncoder::decode(
         &buf_ncols
     );
 
-    nrows = (uint64_t) buf_nrows;
-    ncols = (uint64_t) buf_ncols;
+    nrows = (uint32_t) buf_nrows;
+    ncols = (uint32_t) buf_ncols;
 
     if (ret != 0) {
         std::cerr << "error with decompression\n";
