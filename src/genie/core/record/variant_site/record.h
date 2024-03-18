@@ -109,11 +109,6 @@ class Record {
 
     InfoFields info;
 
-    uint8_t info_count;
-
-//    std::vector<Info_tag> info_tag;
-//    std::vector<std::vector<std::vector<uint8_t>>> infoValue;
-
     uint8_t linked_record;
     uint8_t link_name_len;
     std::string link_name;
@@ -145,8 +140,6 @@ class Record {
           map_num_qual_0(0),
           filters_len(0),
           filters(""),
-          info_count(0),
-  //        info_tag(0),
           linked_record(0),
           link_name_len(0),
           link_name(""),
@@ -158,7 +151,7 @@ class Record {
            uint8_t _description_len, std::string _description, uint32_t _ref_len, std::string _ref, uint8_t _alt_count,
            std::vector<uint32_t> _alt_len, std::vector<std::string> _altern, uint32_t _depth, uint32_t _seq_qual,
            uint32_t _map_qual, uint32_t _map_num_qual_0, uint8_t _filters_len, std::string _filters,
-           uint8_t _info_count, std::vector<Info_tag> _info_tag, uint8_t _linked_record, uint8_t _link_name_len,
+            uint8_t _linked_record, uint8_t _link_name_len,
            std::string _link_name, uint8_t _reference_box_ID)
         : variant_index(_variant_index),
           seq_ID(_seq_ID),
@@ -179,8 +172,6 @@ class Record {
           map_num_qual_0(_map_num_qual_0),
           filters_len(_filters_len),
           filters(_filters),
-          info_count(_info_count),
-  //        info_tag(_info_tag),
           linked_record(_linked_record),
           link_name_len(_link_name_len),
           link_name(_link_name),
@@ -221,7 +212,6 @@ class Record {
     uint32_t getMapQual() const { return map_qual; }
     uint32_t getMapNumQual0() const { return map_num_qual_0; }
     std::string getFilters() const { return filters; }
-    uint8_t getInfoCount() const { return info_count; }
     std::vector<InfoFields::Field>& getInfoTag() { return info.getFields(); }
   //  std::vector<std::vector<std::vector<uint8_t>>> getInfoValues() const { return infoValue; }
     bool isLinkedRecord() const { return (linked_record == 0 ? false : true); }
