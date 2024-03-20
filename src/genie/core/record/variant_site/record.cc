@@ -54,13 +54,13 @@ void Record::write(core::Writer& writer) {
 
     auto info_tag = info.getFields();
     writer.write(static_cast<uint8_t>(info_tag.size()), 8);
-    for (auto i = 0; i < info_tag.size(); ++i) {
+    for (auto i = 0u; i < info_tag.size(); ++i) {
         writer.write(info_tag[i].tag.size(), 8);
         writer.write(info_tag[i].tag);
         writer.write(static_cast<uint8_t>(info_tag[i].type), 8);
         writer.write(info_tag[i].values.size(), 8);
         ArrayType writeType;
-        for (auto j = 0; j < info_tag[i].values.size(); ++j) {
+        for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
             writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
             if (info_tag[i].type == DataType::STRING) writer.write_reserved(8);
         }
