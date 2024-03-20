@@ -60,8 +60,8 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     genoTestValues testparams = GetParam();
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-//    util_tests::FileIn filein(testparams.filepath, "geno");
-    std::string name = gitRootDir+testparams.filepath + ".geno";
+    //    util_tests::FileIn filein(testparams.filepath, "geno");
+    std::string name = gitRootDir + testparams.filepath + ".geno";
 
     if (testparams.algID == genie::core::AlgoID::JBIG) name += "_JBIG";
     if (testparams.algID == genie::core::AlgoID::BSC) name += "_BSC";
@@ -69,7 +69,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     if (testparams.binID == genie::genotype::BinarizationID::ROW_BIN) name += "_ROWBIN";
     if (testparams.SortingID == genie::genotype::SortingAlgoID::NO_SORTING) name += "_NOSORT";
     if (testparams.SortingID == genie::genotype::SortingAlgoID::RANDOM_SORT) name += "_RANDOMSORT";
-    std::string jsonFilename = gitRootDir+"/data/records/conformance/variants/1.3.11.bgz.formattags.json";
+    //   std::string jsonFilename = gitRootDir+"/data/records/conformance/variants/1.3.11.bgz.formattags.json";
     uint32_t BLOCK_SIZE = 200;
     bool TRANSFORM_MODE = true;
 
@@ -99,8 +99,8 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
-    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir+testparams.filepath + ".geno", jsonFilename, name);
-
+    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir + testparams.filepath + ".geno",
+                                    name);
 }
 
 INSTANTIATE_TEST_CASE_P(

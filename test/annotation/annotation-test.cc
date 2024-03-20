@@ -93,7 +93,6 @@ TEST_F(AnnotationTests, annotationSite) {
     std::string filePath = gitRootDir + "/data/records/";
     std::string inputFilename = filePath + "ALL.chrX.10000.site";
     std::string outputFilename = filePath + "ALL.chrX.10000_site_annotation";
-    std::string jsonFilename = filePath + "1.3.5.header100.gt_only.vcf.infotags.json";
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -107,7 +106,7 @@ TEST_F(AnnotationTests, annotationSite) {
 
 
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, jsonFilename, outputFilename);
+    annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
@@ -119,7 +118,6 @@ TEST_F(AnnotationTests, annotationGeno) {
     std::string filePath = gitRootDir + "/data/records/";
     std::string inputFilename = filePath + "1.3.5.header100.gt_only.vcf.geno";
     std::string outputFilename = filePath + "1.3.5.header100.gt_only.vcf_geno_annotation";
-    std::string jsonFilename = filePath + "1.3.5.header100.gt_only.vcf.formattags.json";
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -133,7 +131,7 @@ TEST_F(AnnotationTests, annotationGeno) {
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, jsonFilename, outputFilename);
+    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
 
