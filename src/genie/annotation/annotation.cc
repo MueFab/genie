@@ -13,7 +13,7 @@ namespace genie {
 namespace annotation {
 
 void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
-                                                std::string attributeJsonFileName, std::string outputFileName)
+                                                std::string outputFileName)
 
 {
     std::ifstream inputfile;

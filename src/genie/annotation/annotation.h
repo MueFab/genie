@@ -20,15 +20,14 @@
 #include "genie/variantsite/ParameterSetComposer.h"
 #include "genie/variantsite/VariantSiteParser.h"
 
+#include "genie/contact/contact_coder.h"
+#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_scm_payload.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
-#include "genie/contact/contact_coder.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
-#include "genie/contact/contact_parameters.h"
-#include "genie/contact/contact_scm_payload.h"
-
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"
@@ -48,8 +47,7 @@ class Annotation {
  public:
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setInfoFields(std::string jsonFileName);
-    void startStream(RecType recType, std::string recordInputFileName, std::string attributeJsonFileName,
-                     std::string outputFileName);
+    void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
@@ -60,7 +58,7 @@ class Annotation {
     std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
-    ;
+
     genie::core::record::annotation_parameter_set::Record annotationParameterSet;
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
