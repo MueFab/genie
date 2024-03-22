@@ -17,7 +17,7 @@ namespace contact {
 ContactParameters::ContactParameters()
     : sample_infos(),
       chr_infos(),
-      interval(0),
+      bin_size(0),
       tile_size(0),
       interval_multipliers(),
       norm_method_infos(),
@@ -40,7 +40,7 @@ ContactParameters::ContactParameters(
 ):
     sample_infos(std::move(_sample_infos)),
     chr_infos(std::move(_chr_infos)),
-    interval(_interval),
+    bin_size(_interval),
     tile_size(_tile_size),
     interval_multipliers(std::move(_interval_multipliers)),
     norm_method_infos(std::move(_norm_method_infos)),
@@ -91,7 +91,7 @@ ContactParameters::ContactParameters(util::BitReader& reader){
         chr_infos.emplace(ID, std::move(chr_info));
     }
 
-    interval = reader.readBypassBE<uint32_t>();
+    bin_size = reader.readBypassBE<uint32_t>();
     tile_size = reader.readBypassBE<uint32_t>();
     auto num_interval_mults = reader.readBypassBE<uint8_t>();
     for (uint8_t i = 0; i<num_interval_mults; i++){
@@ -150,7 +150,7 @@ ContactParameters::ContactParameters(util::BitReader& reader){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberSamples() const { return static_cast<uint8_t>(sample_infos.size()); }
+uint8_t ContactParameters::getNumSamples() const { return static_cast<uint8_t>(sample_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -180,7 +180,7 @@ const std::unordered_map<uint8_t, SampleInformation>& ContactParameters::getSamp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberChromosomes() const { return static_cast<uint8_t>(chr_infos.size()); }
+uint8_t ContactParameters::getNumChromosomes() const { return static_cast<uint8_t>(chr_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -213,11 +213,11 @@ const std::unordered_map<uint8_t, ChromosomeInformation>& ContactParameters::get
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactParameters::getInterval() const { return interval; }
+uint32_t ContactParameters::getBinSize() const { return bin_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactParameters::setInterval(uint32_t _interval) {interval = _interval;}
+void ContactParameters::setBinSize(uint32_t _bin_size) { bin_size = _bin_size;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -229,11 +229,11 @@ void ContactParameters::setTileSize(uint32_t _tile_size) {tile_size = _tile_size
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberIntervalMultipliers() const { return static_cast<uint8_t>(interval_multipliers.size()); }
+uint8_t ContactParameters::getNumIntervalMultipliers() const { return static_cast<uint8_t>(interval_multipliers.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMethods() const { return static_cast<uint8_t>(norm_method_infos.size()); }
+uint8_t ContactParameters::getNumNormMethods() const { return static_cast<uint8_t>(norm_method_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -249,7 +249,7 @@ const std::unordered_map<uint8_t, NormalizationMethodInformation>& ContactParame
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactParameters::getNumberNormMats() const { return static_cast<uint8_t>(norm_mat_infos.size()); }
+uint8_t ContactParameters::getNumNormMats() const { return static_cast<uint8_t>(norm_mat_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -280,15 +280,22 @@ const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactParamete
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ContactParameters::getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult){
+    UTILS_DIE_IF(bin_size == 0, "Please set the bin size!");
+    UTILS_DIE_IF(chr_infos.find(chr_ID) == chr_infos.end(), "chr_ID does not exist!");
+
     uint64_t chr_len = chr_infos[chr_ID].length;
 
+    UTILS_DIE_IF(chr_len == 0, "Please set the chromosome length!");
+
     // This is ceil operation for integer
-    return static_cast<uint64_t>(1 + ((chr_len - 1) / (interv_mult*interval)));
+    return static_cast<uint64_t>(1 + ((chr_len - 1) / (interv_mult* bin_size)));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t ContactParameters::getNumTiles(uint8_t chr_ID, uint8_t interv_mult){
+    UTILS_DIE_IF(tile_size == 0, "Please set the tile size!");
+
     uint64_t num_bins = getNumBinEntries(chr_ID, interv_mult);
 
     // This is ceil operation for integer

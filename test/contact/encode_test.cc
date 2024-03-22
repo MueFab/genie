@@ -12,8 +12,8 @@
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+//#include "genie/util/bitwriter.h"
+//#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ TEST(ContactCoder, compute_masks) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_remove_append_unaligned) {
+TEST(ContactCoder, RoundTrip_ProcessingUnalignedRegion) {
     // Intra case
     {
         auto IS_INTRA = true;
@@ -172,7 +172,7 @@ TEST(ContactCoder, RoundTrip_remove_append_unaligned) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_sparse_dense_rep) {
+TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
     // Test a matrix divided in 4 tiles
     // 5x5 scm matrix with tile size equals to 3
 
@@ -589,19 +589,20 @@ TEST(ContactCoder, diagonal_transformation) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(ContactCoder, binarize_rows) {
-    genie::contact::UIntMatDtype mat = {{1, 2, 3},
+    genie::contact::UIntMatDtype MAT = {{1, 2, 3},
                                         {4, 5, 6}};
-    genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(mat);
-    genie::contact::BinMatDtype bin_mat;
-    genie::contact::binarize_rows(mat, bin_mat);
-
-    genie::contact::BinMatDtype target_bin_mat = { {false, true, false, true},
+    genie::contact::BinMatDtype TARGET_BIN_MAT = { {false, true, false, true},
                                                     {true, false, true, true},
                                                     {false, false, true, false},
                                                     {false, false, false, true},
                                                     {true, true, true, true}};
 
-    ASSERT_TRUE(bin_mat == target_bin_mat);
+    genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
+    genie::contact::BinMatDtype bin_mat;
+    genie::contact::binarize_rows(MAT, bin_mat);
+
+
+    ASSERT_TRUE(bin_mat == TARGET_BIN_MAT);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -631,6 +632,7 @@ TEST(ContactCoder, full_coding) {
 
 TEST(ContactCoder, EncodeCM){
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-three_recs.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
@@ -638,7 +640,7 @@ TEST(ContactCoder, EncodeCM){
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
 
-    std::vector<genie::core::record::ContactRecord> recs;
+    std::list<genie::core::record::ContactRecord> recs;
 
     while (bitreader.isGood()) {
         recs.emplace_back(bitreader);
@@ -648,6 +650,7 @@ TEST(ContactCoder, EncodeCM){
     recs.pop_back();
 
     genie::contact::EncodingOptions opt = {
+        250000, // bin_size;
         500, // tile_size;
         false, // multi_intervals = false;
         true, // diag_transform = true;

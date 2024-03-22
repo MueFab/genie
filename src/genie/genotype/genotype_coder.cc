@@ -451,6 +451,7 @@ void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): completely the same as the function with same name in contact. Move this to somewhere elsee
 void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_len) {
     auto nrows = static_cast<size_t>(bin_mat.shape(0));
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
@@ -469,46 +470,11 @@ void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_l
             *(*payload + byte_offset) |= val;
         }
     }
-
-    //    auto* payload_ptr = *payload;
-    //        size_t byte_offset = 0;
-    //            auto byte_offset = static_cast<size_t>(floor(static_cast<double>(j)/8));
-    //            auto rem_j = j % 8;
-    //            auto bit_offset = (7 - (rem_j));
-    //            auto mask = static_cast<uint8_t>(bin_mat(i, j));
-    //            auto x = mask << bit_offset;
-    //            *(payload_ptr + byte_offset) |= mask << bit_offset;
-    //            byte_offset += (!rem_j && j > 0) ? 1 : 0;
-
-    //            *(payload_ptr + byte_offset) |= bin_mat(i, j);
-    //            *(payload_ptr + byte_offset) << 1;
-    //            if (j % 8 && j > 0){
-    //                byte_offset++;
-    //            }
-    //        payload_ptr += bpl;
-
-    // SIMD version of the for loop
-    //    MatShapeDtype buffer_mat_shape {nrows, bpl};
-    ////    auto buffer_mat = UInt8MatDtype(buffer_mat_shape);
-    //    UInt8MatDtype buffer_mat = xt::zeros<uint8_t>(buffer_mat_shape);
-    ////    auto ncols_byte_aligned = static_cast<size_t>(floor(static_cast<double>(ncols) / 8));
-    //    // Handle byte-aligned columns
-    //    for (uint8_t ibit = 0; ibit < 8; ibit++){
-    //        auto ith_bit_bin_mat = xt::view(bin_mat, xt::all(), xt::range(ibit, ncols_byte_aligned *8, 8));
-    //        xt::view(buffer_mat, xt::all(), xt::range(0, ncols_byte_aligned)) |= xt::cast<uint8_t>(ith_bit_bin_mat) <<
-    //        (7-ibit);
-    //    }
-    //    for (uint8_t ibit = 0; ibit < static_cast<uint8_t>(ncols % 8); ibit++){
-    //        auto ith_bit_bin_mat = xt::view(bin_mat, xt::all(), xt::range(ncols_byte_aligned*8,
-    //        ncols_byte_aligned*8+ibit)); xt::view(buffer_mat, xt::all(), ncols_byte_aligned) |=
-    //        xt::cast<uint8_t>(ith_bit_bin_mat) << (7-ibit);
-    //    }
-
-    //    std::vector<double> w(a1.begin(), a1.end());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): completely the same as the function with same name in contact. Move this to somewhere elsee
 void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols) {
     auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
@@ -525,32 +491,6 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
             bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
         }
     }
-    //    auto* payload_ptr = payload;
-    //        size_t byte_offset = 0;
-    //        uint8_t val = 0;
-    //            *(payload_ptr + byte_offset) |= bin_mat(i, j);
-    //            *(payload_ptr + byte_offset) << 1;
-    //            if (j % 8 && j > 0){
-    //                byte_offset++;
-    //            }
-    //            auto rem_j = j % 8;
-    //            auto bit_offset = (7 - (rem_j));
-    //            auto val =  (*(payload_ptr + byte_offset) >> bit_offset);
-    //            val &= 1;
-    //            bin_mat(i, j) = val;
-    //            byte_offset += (!rem_j && j > 0) ? 1 : 0;
-    //            if (j % 8 == 0)
-    //                val = *(payload_ptr + byte_offset);
-    //
-    //            bin_mat(i, j) = val & 1;
-    //            val >>= 1;
-    //            if (j % 8 && j > 0){
-    //                byte_offset++;
-    //            }
-    //            *(payload + byte_offset) |= static_cast<uint8_t>(static_cast<uint8_t>(bin_mat(i, j)) << (7-(j%8)));
-    //        }
-    //        payload_ptr += bpl;
-    //    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
