@@ -13,6 +13,36 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+SubcontactMatrixPayload::SubcontactMatrixPayload()
+    : parameter_set_ID(0),
+      sample_ID(0),
+      chr1_ID(0),
+      chr2_ID(0),
+      tile_payloads(),
+      row_mask_payload(),
+      col_mask_payload() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SubcontactMatrixPayload::SubcontactMatrixPayload(
+    uint8_t _parameter_set_ID,
+    uint8_t _sample_ID,
+    uint8_t _chr1_ID,
+    uint8_t _chr2_ID,
+    TilePayloads&& _tile_payloads,
+    std::optional<SubcontactMatrixMaskPayload>&& _row_mask_payload,
+    std::optional<SubcontactMatrixMaskPayload>&& _col_mask_payload
+    ) : parameter_set_ID(_parameter_set_ID),
+        sample_ID(_sample_ID),
+        chr1_ID(_chr1_ID),
+        chr2_ID(_chr2_ID),
+        tile_payloads(std::move(_tile_payloads)),
+        row_mask_payload(std::move(_row_mask_payload)),
+        col_mask_payload(std::move(_col_mask_payload)) {}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t SubcontactMatrixPayload::getParameterSetID() const { return parameter_set_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,11 +75,11 @@ void SubcontactMatrixPayload::setChr2ID(uint8_t id) { chr2_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TilePayloadsDtype& SubcontactMatrixPayload::getTilePayloads() const { return tile_payloads; }
+const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return tile_payloads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setTilePayloads(const TilePayloadsDtype& payloads) { tile_payloads = payloads; }
+void SubcontactMatrixPayload::setTilePayloads(const TilePayloads& payloads) { tile_payloads = payloads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,7 +4,6 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <codecs/include/mpegg-codecs.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <fstream>
@@ -14,6 +13,7 @@
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
+#include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
@@ -56,7 +56,7 @@ TEST(Genotype, Decompose) {
     genie::genotype::EncodingBlock block{};
     genie::genotype::decompose(opt, block, recs);
 
-    ASSERT_EQ(block.max_ploidy, 2);
+    ASSERT_EQ(block.max_ploidy, 2u);
     ASSERT_EQ(block.dot_flag, false);
     ASSERT_EQ(block.na_flag, false);
 
@@ -64,8 +64,8 @@ TEST(Genotype, Decompose) {
     auto& phasing_mat = block.phasing_mat;
 
     // Check allele_mat shape
-    ASSERT_EQ(allele_mat.dimension(), 2);
-    ASSERT_EQ(allele_mat.shape(0), 100);
+    ASSERT_EQ(allele_mat.dimension(), 2u);
+    ASSERT_EQ(allele_mat.shape(0), 100u);
     ASSERT_EQ(allele_mat.shape(1), 1092 * 2);
     ASSERT_EQ(allele_mat(0, 3), 1);
 
@@ -413,7 +413,7 @@ TEST(Genotype, Serializer) {
 
 // TODO (Yeremia): Move this test to JBIG
 TEST(Genotype, RoundTrip_JBIG) {
-    genie::genotype::BinMatDtype bin_mat;
+//    genie::genotype::BinMatDtype bin_mat;
     size_t ORIG_PAYLOAD_LEN = 15;
     uint8_t ORIG_PAYLOAD[15] = {0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
                                 0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38};

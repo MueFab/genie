@@ -24,10 +24,13 @@ namespace record {
 ContactRecord::ContactRecord()
     : sample_ID(0),
       sample_name(),
+      bin_size(0),
       chr1_ID(0),
       chr1_name(),
+      chr1_length(0),
       chr2_ID(0),
       chr2_name(),
+      chr2_length(0),
       norm_count_names(),
       start_pos1(),
       end_pos1(),
@@ -39,21 +42,66 @@ ContactRecord::ContactRecord()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContactRecord::ContactRecord(
+    uint8_t _sample_ID,
+    std::string&& _sample_name,
+    uint32_t _bin_size,
+    uint8_t _chr1_ID,
+    std::string&& _chr1_name,
+    uint64_t _chr1_length,
+    uint8_t _chr2_ID,
+    std::string&& _chr2_name,
+    uint64_t _chr2_length,
+    std::vector<std::string>&& _norm_count_names,
+    std::vector<uint64_t>&& _start_pos1,
+    std::vector<uint64_t>&& _end_pos1,
+    std::vector<uint64_t>&& _start_pos2,
+    std::vector<uint64_t>&& _end_pos2,
+    std::vector<uint32_t>&& _counts)
+    : sample_ID(_sample_ID),
+      sample_name(std::move(_sample_name)),
+      bin_size(_bin_size),
+      chr1_ID(_chr1_ID),
+      chr1_name(std::move(_chr1_name)),
+      chr1_length(_chr1_length),
+      chr2_ID(_chr2_ID),
+      chr2_name(std::move(_chr2_name)),
+      chr2_length(_chr2_length),
+      norm_count_names(std::move(_norm_count_names)),
+      start_pos1(std::move(_start_pos1)),
+      end_pos1(std::move(_end_pos1)),
+      start_pos2(std::move(_start_pos2)),
+      end_pos2(std::move(_end_pos2)),
+      counts(std::move(_counts)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactRecord::ContactRecord(const ContactRecord& rec) {*this = rec;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactRecord::ContactRecord(ContactRecord&& rec) noexcept {*this = std::move(rec); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 ContactRecord::ContactRecord(util::BitReader &reader){
     // Sample
     sample_ID = reader.readBypassBE<uint8_t>();
     sample_name.resize(reader.readBypassBE<uint8_t>());
     reader.readBypass(&sample_name[0], sample_name.size());
+    bin_size = reader.readBypassBE<uint32_t>();
 
     // chr1
     chr1_ID = reader.readBypassBE<uint8_t>();
     chr1_name.resize(reader.readBypassBE<uint8_t>());
     reader.readBypass(&chr1_name[0], chr1_name.size());
+    chr1_length = reader.read<uint64_t>();
 
     // chr2
     chr2_ID = reader.readBypassBE<uint8_t>();
     chr2_name.resize(reader.readBypassBE<uint8_t>());
     reader.readBypass(&chr2_name[0], chr2_name.size());
+    chr2_length = reader.read<uint64_t>();
 
     // num_counts and num_norm_counts
     auto num_counts = reader.readBypassBE<uint64_t>();
@@ -95,11 +143,85 @@ ContactRecord::ContactRecord(util::BitReader &reader){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContactRecord &ContactRecord::operator=(const ContactRecord &rec) {
+    if (this == &rec) {
+        return *this;
+    }
+
+    this->sample_ID = rec.sample_ID;
+    this->sample_name = rec.sample_name;
+    this->bin_size = rec.bin_size;
+    this->chr1_ID = rec.chr1_ID;
+    this->chr1_name = rec.chr1_name;
+    this->chr1_length = rec.chr1_length;
+    this->chr2_ID = rec.chr2_ID;
+    this->chr2_name = rec.chr2_name;
+    this->chr2_length = rec.chr2_length;
+    this->norm_count_names = rec.norm_count_names;
+    this->start_pos1 = rec.start_pos1;
+    this->end_pos1 = rec.end_pos1;
+    this->start_pos2 = rec.start_pos2;
+    this->end_pos2 = rec.end_pos2;
+    this->counts = rec.counts;
+
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactRecord &ContactRecord::operator=(ContactRecord &&rec) noexcept {
+    this->sample_ID = rec.sample_ID;
+    this->sample_name = std::move(rec.sample_name);
+    this->bin_size = rec.bin_size;
+    this->chr1_ID = rec.chr1_ID;
+    this->chr1_name = std::move(rec.chr1_name);
+    this->chr1_length = rec.chr1_length;
+    this->chr2_ID = rec.chr2_ID;
+    this->chr2_name = std::move(rec.chr2_name);
+    this->chr2_length = rec.chr2_length;
+    this->norm_count_names = std::move(rec.norm_count_names);
+    this->start_pos1 = std::move(rec.start_pos1);
+    this->end_pos1 = std::move(rec.end_pos1);
+    this->start_pos2 = std::move(rec.start_pos2);
+    this->end_pos2 = std::move(rec.end_pos2);
+    this->counts = std::move(rec.counts);
+
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::transposeCM(){
+    uint8_t chr_ID = chr1_ID;
+    std::string chr_name = std::move(chr1_name);
+    uint64_t chr_length = chr1_length;
+
+    chr1_ID = chr2_ID;
+    chr1_name = std::move(chr2_name);
+    chr1_length = chr2_length;
+    chr2_ID = chr_ID;
+    chr2_name = std::move(chr_name);
+    chr2_length = chr_length;
+
+    std::vector<uint64_t> start_pos = std::move(start_pos1);
+    std::vector<uint64_t> end_pos = std::move(end_pos1);
+    start_pos1 = std::move(start_pos2);
+    end_pos1 = std::move(end_pos2);
+    start_pos2 = std::move(start_pos1);
+    end_pos2 = std::move(end_pos1);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t ContactRecord::getSampleID() const {return sample_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& ContactRecord::getSampleName() const {return sample_name;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t ContactRecord::getBinSize() const {return bin_size;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,11 +233,19 @@ const std::string& ContactRecord::getChr1Name() const {return chr1_name;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t ContactRecord::getChr1Length() const {return chr1_length;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t ContactRecord::getChr2ID() const {return chr2_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& ContactRecord::getChr2Name() const {return chr2_name;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t ContactRecord::getChr2Length() const {return chr2_length;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -149,57 +279,6 @@ const std::vector<uint32_t>& ContactRecord::getCounts() const {return counts;}
 
 // TODO (Yeremia): Implement this
 //void ContactRecord::write(util::BitWriter &writer) const {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t ContactRecord::inferChr1Length(){
-    uint64_t max_pos = 0;
-    for (auto& pos: end_pos1){
-        if (pos > max_pos){
-            max_pos = pos;
-        }
-    }
-    return max_pos;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t ContactRecord::inferChr2Length(){
-    uint64_t max_pos = 0;
-    for (auto& pos: end_pos2){
-        if (pos > max_pos){
-            max_pos = pos;
-        }
-    }
-    return max_pos;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t ContactRecord::inferInterval(){
-    uint32_t interval = 0;
-    for (auto i = 0u; i<getNumCounts(); i++){
-        bool updated = false;
-
-        uint32_t new_interval = static_cast<uint32_t>(end_pos1[i] - start_pos1[i]);
-        if (interval < new_interval){
-            interval = new_interval;
-            updated = true;
-        }
-
-        new_interval = static_cast<uint32_t>(end_pos2[i] - start_pos2[i]);
-        if (interval < new_interval){
-            interval = new_interval;
-            updated = true;
-        }
-
-        if (!updated){
-            break;
-        }
-    }
-    //FIXED: must return a value
-    return interval;
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

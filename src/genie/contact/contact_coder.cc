@@ -7,9 +7,11 @@
 #include "contact_coder.h"
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime-exception.h>
+#include <xtensor/xsort.hpp>
+#include <codecs/include/mpegg-codecs.h>
 #include "contact_parameters.h"
 #include "subcontact_matrix_parameters.h"
-#include "xtensor/xsort.hpp"
+#include "contact_matrix_tile_payload.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,60 +20,60 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void decompose(
-    const EncodingOptions& opt,
-    EncodingBlock& block,
-    std::vector<core::record::ContactRecord>& recs
-){
-    UTILS_DIE_IF(recs.empty(), "No records found for the process!");
-
-    auto& params = block.params;
-    auto& interv_scm_recs = block.interv_scm_recs;
-
-    bool sample_parsed = false;
-    bool interv_parsed = false;
-
-    for (auto& rec: recs){
-        auto sample_ID = rec.getSampleID();
-        auto sample_name = rec.getSampleName();
-
-        // TODO (Yeremia): Extend to multi-samples
-        if (sample_parsed) {
-            auto& samples = params.getSamples();
-            UTILS_DIE_IF(samples.find(sample_ID) != samples.end(), "sample_ID already exists!");
-        } else {
-            params.addSample(sample_ID, std::move(sample_name));
-            sample_parsed = true;
-        }
-
-        auto chr1_ID = rec.getChr1ID();
-        auto chr1_name = std::string(rec.getChr1Name());
-        params.upsertChromosome(chr1_ID, std::move(chr1_name), rec.inferChr1Length());
-
-        auto chr2_ID = rec.getChr2ID();
-        auto chr2_name = std::string(rec.getChr2Name());
-        params.upsertChromosome(chr2_ID, std::move(chr2_name), rec.inferChr2Length());
-
-        // TODO (Yeremia): Extend to norm_methods and norm_mat
-
-        // TODO (Yeremia): Extend to multi-intervals
-        auto rec_interval = rec.inferInterval();
-        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
-        if (interv_parsed){
-            if (opt.multi_intervals){
-                UTILS_DIE("Not implemented error!");
-            } else {
-                UTILS_DIE_IF(params.getInterval() != rec.inferInterval(), "Interval differs");
-            }
-        } else {
-            params.setInterval(rec_interval);
-            auto scm_rec = SCMRecDtype();
-            scm_rec.emplace(chr_pair, std::move(rec));
-            interv_scm_recs.emplace(rec_interval, std::move(scm_rec));
-            interv_parsed = true;
-        }
-    }
-}
+//void decompose(
+//    const EncodingOptions& opt,
+//    EncodingBlock& block,
+//    std::vector<core::record::ContactRecord>& recs
+//){
+//    UTILS_DIE_IF(recs.empty(), "No records found for the process!");
+//
+//    auto& params = block.params;
+//    auto& interv_scm_recs = block.interv_scm_recs;
+//
+//    bool sample_parsed = false;
+//    bool interv_parsed = false;
+//
+//    for (auto& rec: recs){
+//        auto sample_ID = rec.getSampleID();
+//        auto sample_name = rec.getSampleName();
+//
+//        // TODO (Yeremia): Extend to multi-samples
+//        if (sample_parsed) {
+//            auto& samples = params.getSamples();
+//            UTILS_DIE_IF(samples.find(sample_ID) != samples.end(), "sample_ID already exists!");
+//        } else {
+//            params.addSample(sample_ID, std::move(sample_name));
+//            sample_parsed = true;
+//        }
+//
+//        auto chr1_ID = rec.getChr1ID();
+//        auto chr1_name = std::string(rec.getChr1Name());
+//        params.upsertChromosome(chr1_ID, std::move(chr1_name), rec.getChr2Length());
+//
+//        auto chr2_ID = rec.getChr2ID();
+//        auto chr2_name = std::string(rec.getChr2Name());
+//        params.upsertChromosome(chr2_ID, std::move(chr2_name), rec.getChr2Length());
+//
+//        // TODO (Yeremia): Extend to norm_methods and norm_mat
+//
+//        // TODO (Yeremia): Extend to multi-intervals
+//        auto rec_interval = rec.getBinSize();
+//        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
+//        if (interv_parsed){
+//            if (opt.multi_intervals){
+//                UTILS_DIE("Not implemented error!");
+//            } else {
+//                UTILS_DIE_IF(params.getBinSize() != rec.getBinSize(), "Interval differs");
+//            }
+//        } else {
+//            params.setBinSize(rec_interval);
+//            auto scm_rec = SCMRecDtype();
+//            scm_rec.emplace(chr_pair, std::move(rec));
+//            interv_scm_recs.emplace(rec_interval, std::move(scm_rec));
+//            interv_parsed = true;
+//        }
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -241,7 +243,11 @@ void sparse_to_dense(
     uint64_t row_id_offset,
     uint64_t col_id_offset
 ){
-    mat = xt::zeros<uint32_t>({nrows, ncols});
+    auto dim = mat.shape(0);
+    if (mat.shape(0) == 0 || mat.shape(1) == 0)
+        mat = xt::zeros<uint32_t>({nrows, ncols});
+    else
+        mat.resize({nrows, ncols});
 
     auto nentries = counts.size();
     for (auto i = 0u; i<nentries; i++){
@@ -319,7 +325,9 @@ void diag_transform(
 ){
     UIntMatDtype trans_mat;
 
-    if (mode == DiagonalTransformMode::MODE_0) {
+    if (mode == DiagonalTransformMode::NONE){
+        return ; // Do nothing
+    } else if (mode == DiagonalTransformMode::MODE_0) {
         UTILS_DIE_IF(mat.shape(0) != mat.shape(1), "Matrix must be a square!");
 
         auto n = mat.shape(0);
@@ -327,14 +335,14 @@ void diag_transform(
         trans_mat = xt::zeros<uint32_t>({new_nrows, n});
 
         auto o = 0u;
-        for (auto k = 0u; k < n; k++) {
-            for (auto i = 0u; i < (n - k); i++) {
-                auto j = i + k;
+        for (size_t k = 0u; k < n; k++) {
+            for (size_t i = 0u; i < (n - k); i++) {
+                size_t j = i + k;
 
                 auto v = mat(i, j);
                 if (v != 0) {
-                    auto new_i = o / n;
-                    auto new_j = o % n;
+                    size_t new_i = o / n;
+                    size_t new_j = o % n;
                     trans_mat(new_i, new_j) = v;
                 }
                 o++;
@@ -435,7 +443,61 @@ void binarize_rows(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void debinarize_row_bin(BinMatDtype& bin_mat, UIntMatDtype& mat){
+    UTILS_DIE("Not yet implemented!");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
+void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_len) {
+    auto nrows = static_cast<size_t>(bin_mat.shape(0));
+    auto ncols = static_cast<size_t>(bin_mat.shape(1));
+
+    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
+    payload_len = bpl * nrows;
+    *payload = (unsigned char*)calloc(payload_len, sizeof(unsigned char));
+
+    for (auto i = 0u; i < nrows; i++) {
+        size_t row_offset = i * bpl;
+        for (auto j = 0u; j < ncols; j++) {
+            auto byte_offset = row_offset + (j >> 3);
+            uint8_t shift = (7 - (j & 7));
+            auto val = static_cast<uint8_t>(bin_mat(i, j));
+            val = static_cast<uint8_t>(val << shift);
+            *(*payload + byte_offset) |= val;
+        }
+    }
+
+    // TODO(yeremia): find a better solution to free the memory of bin_mat
+    bin_mat.resize({0,0});
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
+void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols) {
+    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // bytes per line with ceil operation
+    UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
+
+    MatShapeDtype bin_mat_shape = {nrows, ncols};
+    bin_mat.resize(bin_mat_shape);
+    xt::view(bin_mat, xt::all(), xt::all()) = false;  // Initialize value with 0
+
+    for (auto i = 0u; i < nrows; i++) {
+        size_t row_offset = i * bpl;
+        for (auto j = 0u; j < ncols; j++) {
+            auto byte_offset = row_offset + (j >> 3);
+            uint8_t shift = (7 - (j & 7));
+            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void encode_scm(
+    const EncodingOptions& opt,
     ContactParameters& params,
     core::record::ContactRecord& rec
 ) {
@@ -444,7 +506,7 @@ void encode_scm(
     BinVecDtype row_mask;
     BinVecDtype col_mask;
 
-    auto interval = params.getInterval();
+    auto interval = params.getBinSize();
     auto num_counts = rec.getNumCounts();
 
     auto chr1_ID = rec.getChr1ID();
@@ -455,7 +517,7 @@ void encode_scm(
     auto chr2_nbins = params.getNumBinEntries(chr2_ID);
     auto chr2_ntiles = params.getNumTiles(chr2_ID);
 
-    auto is_intra = chr1_ID == chr2_ID;
+    auto is_intra_scm = chr1_ID == chr2_ID;
 
     UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_counts});
     row_ids /= interval;
@@ -466,18 +528,20 @@ void encode_scm(
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
 
     // Compute mask
-    compute_masks(row_ids, col_ids, is_intra, row_mask, col_mask);
+    compute_masks(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
 
     // Create mapping
-    remove_unaligned(row_ids, col_ids, is_intra, row_mask, col_mask);
+    remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+
+    std::list<ContactMatrixTilePayload> tile_payloads;
 
     for (size_t i_tile=0; i_tile<chr1_ntiles; i_tile++){
-        auto min_row_id = i_tile*interval;
-        auto max_row_id = (i_tile+1)*interval;
+        auto min_row_id = i_tile*opt.tile_size;
+        auto max_row_id = (i_tile+1)*opt.tile_size;
 
         for (size_t j_tile=0; j_tile<chr2_ntiles; j_tile++){
-            auto min_col_id = j_tile*interval;
-            auto max_col_id = (j_tile+1)*interval;
+            auto min_col_id = j_tile*opt.tile_size;
+            auto max_col_id = (j_tile+1)*opt.tile_size;
 
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
@@ -487,8 +551,8 @@ void encode_scm(
             UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
             UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-            auto nrows = std::max(max_row_id, chr1_nbins) - min_row_id;
-            auto ncols = std::max(max_col_id, chr2_nbins) - min_col_id;
+            auto tile_nrows = std::min(max_row_id, chr1_nbins) - min_row_id;
+            auto tile_ncols = std::min(max_col_id, chr2_nbins) - min_col_id;
 
             UIntMatDtype tile_mat;
             sparse_to_dense(
@@ -496,11 +560,62 @@ void encode_scm(
                 tile_col_ids,
                 tile_counts,
                 tile_mat,
-                nrows,
-                ncols,
+                tile_nrows,
+                tile_ncols,
                 min_row_id,
                 min_col_id
             );
+
+            auto mode = DiagonalTransformMode::NONE;
+            if (opt.diag_transform) {
+                if (is_intra_scm && i_tile == j_tile)
+                    mode = DiagonalTransformMode::MODE_0;
+                else if (i_tile < j_tile)
+                    mode = DiagonalTransformMode::MODE_1;
+                else if (i_tile > j_tile)
+                    mode = DiagonalTransformMode::MODE_2;
+            }
+
+            genie::contact::diag_transform(tile_mat, mode);
+
+
+            if (opt.binarize){
+                genie::contact::BinMatDtype bin_mat;
+                genie::contact::binarize_rows(tile_mat, bin_mat);
+
+                if (opt.codec == genie::core::AlgoID::JBIG) {
+                    uint8_t* payload;
+                    size_t payload_len;
+                    uint8_t* compressed_payload;
+                    size_t compressed_payload_len;
+
+                    size_t bin_mat_nrows = bin_mat.shape(0);
+                    size_t bin_mat_ncols = bin_mat.shape(1);
+
+                    bin_mat_to_bytes(bin_mat, &payload, payload_len);
+
+                    mpegg_jbig_compress_default(
+                        &compressed_payload,
+                        &compressed_payload_len,
+                        payload,
+                        payload_len,
+                        bin_mat_nrows,
+                        bin_mat_ncols
+                    );
+
+                    tile_payloads.emplace_back(
+                        opt.codec,
+                        bin_mat_nrows,
+                        bin_mat_ncols,
+                        &compressed_payload,
+                        compressed_payload_len
+                    );
+                } else {
+                    UTILS_DIE("Not yet implemented for other codec!");
+                }
+            } else {
+                UTILS_DIE("Not yet implemented!");
+            }
         }
     }
 }
@@ -508,59 +623,49 @@ void encode_scm(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encode_cm(
-    std::vector<genie::core::record::ContactRecord>& recs,
+    std::list<genie::core::record::ContactRecord>& recs,
     const EncodingOptions& opt,
     EncodingBlock& block
 ) {
 
-    auto& params = block.params;
-    auto& interv_scm_recs = block.interv_scm_recs;
-
-//    auto& interval = params.getInterval();
-//    auto& scm_recs = interv_scm_recs[interval];
-
-    uint32_t interval = 0;
+    auto params = ContactParameters();
+    params.setBinSize(opt.bin_size);
+    params.setTileSize(opt.tile_size);
     std::map<uint8_t, SampleInformation> samples;
     std::map<uint8_t, ChromosomeInformation> chrs;
+
+    std::map<uint8_t, std::map<uint8_t, genie::core::record::ContactRecord>> recs_map;
+
     for (auto& rec: recs){
-        auto rec_interval = rec.inferInterval();
-        if (interval == 0)
-            interval = rec_interval;
-        else
-            UTILS_DIE_IF(interval != rec_interval, "records has different interval");
+        auto rec_bin_size = rec.getBinSize();
+        UTILS_DIE_IF(rec_bin_size != opt.bin_size, "Found record with different bin_size!");
 
-        {
-            auto sample_name = std::string(rec.getSampleName());
-            params.addSample(rec.getSampleID(), std::move(sample_name));
-            auto chr1_name = std::string(rec.getChr1Name());
-            params.upsertChromosome(rec.getChr1ID(), std::move(chr1_name), rec.inferChr1Length());
-            auto chr2_name = std::string(rec.getChr2Name());
-            params.upsertChromosome(rec.getChr2ID(), std::move(chr2_name), rec.inferChr2Length());
-        }
+        if (rec.getChr1ID() > rec.getChr2ID())
+            rec.transposeCM();
 
-    }
+        uint8_t chr1_ID = rec.getChr1ID();
+        uint8_t chr2_ID = rec.getChr2ID();
 
-    UInt8VecDtype sorted_chr_IDs = {params.getNumberChromosomes()};
-    size_t i = 0;
-    for (auto& chr_info: params.getChromosomes()){
-        sorted_chr_IDs(i) = chr_info.second.ID;
-    }
+        auto sample_name = std::string(rec.getSampleName());
+        params.addSample(rec.getSampleID(), std::move(sample_name));
+        auto chr1_name = std::string(rec.getChr1Name());
+        params.upsertChromosome(
+            chr1_ID,
+            std::move(chr1_name),
+            rec.getChr1Length()
+        );
+        auto chr2_name = std::string(rec.getChr2Name());
+        params.upsertChromosome(
+            chr2_ID,
+            std::move(chr2_name),
+            rec.getChr2Length()
+        );
 
-    sorted_chr_IDs = xt::sort(sorted_chr_IDs);
-
-    for (uint8_t chr1_ID: sorted_chr_IDs){
-        for (uint8_t chr2_ID: sorted_chr_IDs){
-
-            // Store only the upper triangle part of the contact matrix
-            if (chr1_ID > chr2_ID){
-                continue;
-            }
-
-            auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
-//            auto& rec = scm_recs[chr_pair];
-
-//            encode_scm(params, rec);
-        }
+        encode_scm(
+            opt,
+            params,
+            rec
+        );
     }
 }
 

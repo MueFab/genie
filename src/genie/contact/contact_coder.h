@@ -22,6 +22,7 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+using CountsDtype = uint32_t;
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using UInt8VecDtype = xt::xtensor<uint8_t , 1, xt::layout_type::row_major>;
@@ -38,23 +39,26 @@ using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 // ---------------------------------------------------------------------------------------------------------------------
 
 //using ChrIDPair = std::pair<uint8_t, uint8_t>;
+using ContactRecords = std::list<genie::core::record::ContactRecord>;
 using SCMRecDtype = std::unordered_map<ChrIDPair, core::record::ContactRecord, chr_pair_hash>;
 using IntervSCMRecDtype = std::unordered_map<uint32_t, SCMRecDtype>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingOptions {
-    uint32_t tile_size;
+    uint32_t bin_size = 0;
+    uint32_t tile_size = 0;
     bool multi_intervals = false;
     bool diag_transform = true;
     bool binarize = true;
+    genie::core::AlgoID codec = genie::core::AlgoID::JBIG;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingBlock {
     ContactParameters params;
-    IntervSCMRecDtype interv_scm_recs;
+//    IntervSCMRecDtype interv_scm_recs;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -202,6 +206,48 @@ void debinarize_row_bin(BinMatDtype& bin_mat, UIntMatDtype& mat);
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
+ * @brief Converts a binary matrix to a byte array.
+ *
+ * This function takes a binary matrix (bin_mat) and converts it into a byte array (payload).
+ * The length of the byte array is stored in payload_len.
+ *
+ * @param bin_mat The binary matrix to be converted.
+ * @param payload The byte array to store the converted binary matrix.
+ * @param payload_len The length of the byte array.
+ */
+void bin_mat_to_bytes(
+    BinMatDtype& bin_mat,
+    uint8_t** payload,
+    size_t& payload_len
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Converts a byte array to a binary matrix.
+ *
+ * This function takes a byte array (payload) and converts it into a binary matrix (bin_mat).
+ * The byte array is assumed to be of length (payload_len) and represents a binary matrix with
+ * (nrows) rows and (ncols) columns.
+ *
+ * @param bin_mat The binary matrix to store the converted byte array.
+ * @param payload The byte array to be converted.
+ * @param payload_len The length of the byte array.
+ * @param nrows The number of rows in the binary matrix.
+ * @param ncols The number of columns in the binary matrix.
+ */
+void bin_mat_from_bytes(
+    BinMatDtype& bin_mat,
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols
+);
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
  * Encodes contact parameters into a contact record.
  *
  * This function encodes the given contact parameters into a contact record. The encoding
@@ -210,7 +256,11 @@ void debinarize_row_bin(BinMatDtype& bin_mat, UIntMatDtype& mat);
  * @param params A reference to the contact parameters to be encoded.
  * @param rec A reference to the contact record where the encoded parameters will be stored.
  */
-void encode_scm(ContactParameters& params, core::record::ContactRecord& rec);
+void encode_scm(
+    const EncodingOptions& opt,
+    ContactParameters& params,
+    core::record::ContactRecord& rec
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -224,7 +274,7 @@ void encode_scm(ContactParameters& params, core::record::ContactRecord& rec);
  * @param block A reference to the encoding block that contains the data to be encoded.
  */
 void encode_cm(
-    std::vector<genie::core::record::ContactRecord>& recs,
+    ContactRecords& recs,
     const EncodingOptions& opt,
     EncodingBlock& block
 );
@@ -241,7 +291,10 @@ void encode_cm(
  * @param recs A reference to the vector of contact records to be encoded.
  * @return A tuple containing the encoded contact parameters and the encoding block.
  */
-std::tuple<ContactParameters, EncodingBlock> encode_block(const EncodingOptions& opt, std::vector<core::record::ContactRecord>& recs);
+std::tuple<ContactParameters, EncodingBlock> encode_block(
+    const EncodingOptions& opt,
+    std::vector<core::record::ContactRecord>& recs
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

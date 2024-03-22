@@ -34,10 +34,13 @@ class ContactRecord {
  private:
     uint8_t sample_ID;
     std::string sample_name;
+    uint32_t bin_size;
     uint8_t chr1_ID;
     std::string chr1_name;
+    uint64_t chr1_length;
     uint8_t chr2_ID;
     std::string chr2_name;
+    uint64_t chr2_length;
     std::vector<std::string> norm_count_names;
     std::vector<uint64_t> start_pos1;
     std::vector<uint64_t> end_pos1;
@@ -54,9 +57,67 @@ class ContactRecord {
 
     /**
      *
+     */
+    ContactRecord(
+        uint8_t sample_ID,
+        std::string&& sample_name,
+        uint32_t bin_size,
+        uint8_t chr1_ID,
+        std::string&& chr1_name,
+        uint64_t chr1_length,
+        uint8_t chr2_ID,
+        std::string&& chr2_name,
+        uint64_t chr2_length,
+        std::vector<std::string>&& norm_count_names,
+        std::vector<uint64_t>&& start_pos1,
+        std::vector<uint64_t>&& end_pos1,
+        std::vector<uint64_t>&& start_pos2,
+        std::vector<uint64_t>&& end_pos2,
+        std::vector<uint32_t>&& counts
+    );
+
+    /**+
+     *
+     *
+     * @param other
+     */
+    ContactRecord(const ContactRecord& rec);
+
+    /**
+     *
+     * @param other
+     */
+    ContactRecord(ContactRecord&& rec) noexcept;
+
+    /**
+     *
      * @param reader
      */
     explicit ContactRecord(util::BitReader& reader);
+
+    /**
+     *
+     */
+    ~ContactRecord() = default;
+
+    /**
+     *
+     * @param rec
+     * @return
+     */
+    ContactRecord& operator=(const ContactRecord& rec);
+
+    /**
+     * @brief
+     * @param rec
+     * @return
+     */
+    ContactRecord& operator=(ContactRecord&& rec) noexcept;
+
+    /**
+     *
+     */
+    void transposeCM();
 
     /**
      *
@@ -74,6 +135,12 @@ class ContactRecord {
      *
      * @return
      */
+    uint32_t getBinSize() const;
+
+    /**
+     *
+     * @return
+     */
     uint8_t getChr1ID() const;
 
     /**
@@ -86,6 +153,12 @@ class ContactRecord {
      *
      * @return
      */
+    uint64_t getChr1Length() const;
+
+    /**
+     *
+     * @return
+     */
     uint8_t getChr2ID() const;
 
     /**
@@ -93,6 +166,12 @@ class ContactRecord {
      * @return
      */
     const std::string& getChr2Name() const;
+
+    /**
+     *
+     * @return
+     */
+    uint64_t getChr2Length() const;
 
     /**
      *
@@ -139,23 +218,6 @@ class ContactRecord {
       *
       */
      void write(util::BitWriter &writer) const;
-
-     /**
-      *
-      * @return
-      */
-     uint64_t inferChr1Length();
-
-     /**
-      *
-      * @return
-      */
-     uint64_t inferChr2Length();
-
-     /**
-      *
-      */
-     uint32_t inferInterval();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
