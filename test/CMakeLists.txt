@@ -1,7 +1,7 @@
 
 add_subdirectory(annotationParameterSetTest)
 add_subdirectory(variantSiteRecordTest)
-
+add_subdirectory(example)
 add_subdirectory(records)
 add_subdirectory(genotype)
 add_subdirectory(likelihood)

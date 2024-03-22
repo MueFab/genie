@@ -141,20 +141,14 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
             break;
         case DataType::INT8: {
             uint8_t readValue = static_cast<uint8_t>(reader.read_b(8));
-            bool isNeg = readValue & 0x1;
-            int8_t value = readValue >> 1;
-            if (isNeg) value = value * -1;
-            byteArray.resize(1);
-            memcpy(&byteArray[0], &value, 1);
+             byteArray.resize(1);
+            memcpy(&byteArray[0], &readValue, 1);
             break;
         }
         case DataType::INT16: {
             uint16_t readValue = static_cast<uint16_t>(reader.read_b(16));
-            bool isNeg = readValue & 0x1;
-            int32_t value = readValue >> 1;
-            if (isNeg) value = value * -1;
-            byteArray.resize(4);
-            memcpy(&byteArray[0], &value, 4);
+            byteArray.resize(2);
+            memcpy(&byteArray[0], &readValue, 2);
             break;
         }
         case DataType::UINT16: {
@@ -166,11 +160,8 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
         }
         case DataType::INT32: {
             uint32_t readValue = static_cast<uint32_t>(reader.read_b(32));
-            bool isNeg = readValue & 0x1;
-            int32_t value = readValue >> 1;
-            if (isNeg) value = value * -1;
             byteArray.resize(4);
-            memcpy(&byteArray[0], &value, 4);
+            memcpy(&byteArray[0], &readValue, 4);
             break;
         }
         case DataType::UINT32: {

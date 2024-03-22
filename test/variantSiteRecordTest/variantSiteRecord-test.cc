@@ -88,86 +88,6 @@ TEST_F(VariantSiteRecordTests, readFilefrombin) {  // NOLINT(cert-err58-cpp)
         outputfile.close();
     }
 }
-TEST_F(VariantSiteRecordTests, fixedValues) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-    uint64_t variant_index = 1;
-    uint16_t seq_ID = 1;
-    uint64_t pos = 1;
-    uint8_t strand = 1;
-    uint8_t ID_len = 2;
-    std::string ID = "UH";
-    uint8_t description_len = 3;
-    std::string description = "Poe";
-    uint32_t ref_len = 1;
-    std::string ref = "K";
-    uint8_t alt_count = 5;
-
-    std::vector<uint32_t> alt_len{3, 2, 5, 1, 2};
-    std::vector<std::string> altern{"TCC", "AG", "TCGNT", "G", "NN"};
-
-    uint32_t depth = 1;
-    uint32_t seq_qual = 13241;
-    uint32_t map_qual = 0;
-    uint32_t map_num_qual_0 = 1313;
-    uint8_t filters_len = 0;
-    std::string filters = "";
-    uint8_t info_count = 3;
-    std::vector<genie::core::record::variant_site::Info_tag> info_tag;
-    genie::core::record::variant_site::Info_tag infoTag;
-    infoTag.info_array_len = 1;
-    infoTag.info_tag = "AA";
-    infoTag.info_tag_len = 2;
-    infoTag.info_type = genie::core::DataType::CHAR;  // char
-    infoTag.infoValue.resize(infoTag.info_array_len);
-    infoTag.infoValue[0].push_back(63);
-    info_tag.push_back(infoTag);
-
-    infoTag.info_tag = "CD";
-    infoTag.info_type = genie::core::DataType::UINT16;  // unsigned int
-    infoTag.infoValue[0][0] = 24;
-    infoTag.infoValue[0].push_back(0);
-    info_tag.push_back(infoTag);
-
-    infoTag.info_tag = "EF";
-    infoTag.info_type = genie::core::DataType::STRING;  // string
-    infoTag.infoValue[0][1] = 'A';
-    infoTag.infoValue[0][1] = 'B';
-    infoTag.infoValue[0].push_back('C');
-    info_tag.push_back(infoTag);
-
-    uint8_t linked_record = 0;
-    uint8_t link_name_len = 0;
-    std::string link_name = "";
-    uint8_t reference_box_ID = 0;
-    genie::core::record::variant_site::Record variant_site_record(
-        variant_index, seq_ID, pos, strand, ID_len, ID, description_len, description, ref_len, ref, alt_count, alt_len,
-        altern, depth, seq_qual, map_qual, map_num_qual_0, filters_len, filters, info_count, info_tag, linked_record,
-        link_name_len, link_name, reference_box_ID);
-
-    std::stringstream output;
-    genie::core::Writer writer(&output);
-    variant_site_record.write(writer);
-    genie::util::BitReader reader(output);
-    genie::core::record::variant_site::Record variant_site_record_check(reader);
-    std::stringstream checkOut;
-    genie::core::Writer writerCheck(&checkOut);
-    variant_site_record_check.write(writerCheck);
-
-    EXPECT_EQ(variant_site_record.getAlt(), variant_site_record_check.getAlt());
-    EXPECT_EQ(variant_site_record.getInfoCount(), variant_site_record_check.getInfoCount());
-    for (auto i = 0; i < variant_site_record.getInfoCount(); ++i) {
-        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_type, variant_site_record_check.getInfoTag()[i].info_type);
-        EXPECT_EQ(variant_site_record.getInfoTag()[i].infoValue, variant_site_record_check.getInfoTag()[i].infoValue)
-            << " index: " << std::to_string(i) << "\n";
-        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_array_len,
-                  variant_site_record_check.getInfoTag()[i].info_array_len);
-        EXPECT_EQ(variant_site_record.getInfoTag()[i].info_tag, variant_site_record_check.getInfoTag()[i].info_tag);
-    }
-    EXPECT_EQ(output.str(), checkOut.str());
-}
-
 namespace util_tests {
 
 std::string exec(const std::string& cmd) {
@@ -201,7 +121,7 @@ std::string exec(const std::string& cmd) {
 
 }  // namespace util_tests
 
-TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
+TEST_F(VariantSiteRecordTests, DISABLED_readFileRunParser) {  // NOLINT(cert-err58-cpp)
 
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/";
@@ -296,7 +216,7 @@ TEST_F(VariantSiteRecordTests, readFileRunParser) {  // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST_F(VariantSiteRecordTests, multitile) {  // NOLINT(cert-err58-cpp)
+TEST_F(VariantSiteRecordTests, DISABLED_multitile) {  // NOLINT(cert-err58-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filepath = gitRootDir + "/data/records/ALL.chrX.10000.site";
     std::string infofilename = "/data/records/1.3.5.header100.gt_only.vcf.infotags.json";

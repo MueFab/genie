@@ -195,32 +195,37 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
     int8_t MAX_ALLELE_VAL = 8;
 
     genie::genotype::Int8MatDtype allele_mat;
-    genie::genotype::Int8MatDtype orig_allele_mat;
     std::vector<genie::genotype::BinMatDtype> bin_mats;
     uint8_t num_bin_mats;
 
     // Check DO_NOT_CONCAT
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
+        auto concat_axis_mode = genie::genotype::ConcatAxis::DO_NOT_CONCAT;
+        genie::genotype::Int8MatDtype ORIG_ALLELE_MAT = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
-        orig_allele_mat = allele_mat;
+        allele_mat = ORIG_ALLELE_MAT;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
-            genie::genotype::ConcatAxis::DO_NOT_CONCAT,
+            concat_axis_mode,
             bin_mats,
             num_bin_mats
         );
 
         ASSERT_EQ(bin_mats.size(), 3);
         ASSERT_EQ(num_bin_mats, 3);
+
+        genie::genotype::Int8MatDtype recon_allele_mat;
+        debinarize_bit_plane(bin_mats, num_bin_mats, concat_axis_mode, recon_allele_mat);
+
+        ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
 
     // Check CONCAT_ROW_DIR
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
+        genie::genotype::Int8MatDtype ORIG_ALLELE_MAT = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
-        orig_allele_mat = allele_mat;
+        allele_mat = ORIG_ALLELE_MAT;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
@@ -235,9 +240,9 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
     // Check CONCAT_COL_DIR
     {
-        allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
+        genie::genotype::Int8MatDtype ORIG_ALLELE_MAT = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_ALLELE_VAL));
 
-        orig_allele_mat = allele_mat;
+        allele_mat = ORIG_ALLELE_MAT;
 
         genie::genotype::binarize_bit_plane(
             allele_mat,
@@ -415,8 +420,8 @@ TEST(Genotype, JBIG) {
     uint32_t ORIG_NCOLS = 23;
     uint32_t ORIG_NROWS = 5;
 
-    size_t orig_compressed_data_len = 37;
-    uint8_t orig_compressed[37] = {0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
+    size_t ORIG_COMPRESSED_PAYLOAD_LEN = 37;
+    uint8_t ORIG_COMPRESSED_PAYLOAD[37] = {0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
                                  0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2};
 
     uint8_t* compressed_data;
@@ -434,9 +439,9 @@ TEST(Genotype, JBIG) {
         ORIG_NCOLS
     );
 
-    ASSERT_EQ(orig_compressed_data_len, compressed_data_len);
+    ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_data_len);
     for (size_t i = 0; i < compressed_data_len; ++i) {
-        EXPECT_EQ(orig_compressed[i], compressed_data[i]);
+        EXPECT_EQ(ORIG_COMPRESSED_PAYLOAD[i], compressed_data[i]);
     }
 
     std::stringstream uncomressed_input;
@@ -450,7 +455,7 @@ TEST(Genotype, JBIG) {
         mem_data.push_back(static_cast<unsigned char>(byte));
     }
     for (size_t i = 0; i < compressed_data_len; ++i) {
-        EXPECT_EQ(orig_compressed[i], mem_data[i]);
+        EXPECT_EQ(ORIG_COMPRESSED_PAYLOAD[i], mem_data[i]);
     }
 
     std::stringstream uncompressed_output;
