@@ -16,6 +16,7 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
 #include "contact_parameters.h"
+#include "subcontact_matrix_payload.h"
 
 namespace genie {
 namespace contact {
@@ -57,7 +58,7 @@ struct EncodingOptions {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingBlock {
-    ContactParameters params;
+    ContactMatrixParameters params;
 //    IntervSCMRecDtype interv_scm_recs;
 };
 
@@ -248,18 +249,20 @@ void bin_mat_from_bytes(
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * Encodes contact parameters into a contact record.
+ * @brief Encodes a subcontact matrix.
  *
- * This function encodes the given contact parameters into a contact record. The encoding
- * process is tailored to the specific requirements of the application.
+ * This function encodes a subcontact matrix from a given contact record and encoding options.
  *
- * @param params A reference to the contact parameters to be encoded.
- * @param rec A reference to the contact record where the encoded parameters will be stored.
+ * @param opt The encoding options.
+ * @param params The contact matrix parameters.
+ * @param rec The contact record.
+ * @param scm_payload The subcontact matrix payload.
  */
 void encode_scm(
     const EncodingOptions& opt,
-    ContactParameters& params,
-    core::record::ContactRecord& rec
+    ContactMatrixParameters& params,
+    core::record::ContactRecord& rec,
+    genie::contact::SubcontactMatrixPayload& scm_payload
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -291,7 +294,7 @@ void encode_cm(
  * @param recs A reference to the vector of contact records to be encoded.
  * @return A tuple containing the encoded contact parameters and the encoding block.
  */
-std::tuple<ContactParameters, EncodingBlock> encode_block(
+std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
     const EncodingOptions& opt,
     std::vector<core::record::ContactRecord>& recs
 );

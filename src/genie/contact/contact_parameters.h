@@ -80,7 +80,7 @@ using SCMParamsDtype = std::unordered_map<ChrIDPair, SubcontactMatrixParameters,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class ContactParameters {
+class ContactMatrixParameters {
  private:
     std::unordered_map<uint8_t, SampleInformation> sample_infos;
     std::unordered_map<uint8_t, ChromosomeInformation> chr_infos;
@@ -95,16 +95,16 @@ class ContactParameters {
  public:
 
     /**
-     * @brief Default constructor for ContactParameters.
+     * @brief Default constructor for ContactMatrixParameters.
      *
-     * This is the default constructor for the ContactParameters class. It initializes an empty object.
+     * This is the default constructor for the ContactMatrixParameters class. It initializes an empty object.
      */
-    ContactParameters();
+    ContactMatrixParameters();
 
     /**
-     * @brief Parameterized constructor for ContactParameters.
+     * @brief Parameterized constructor for ContactMatrixParameters.
      *
-     * This is the parameterized constructor for the ContactParameters class. It initializes an object with the given parameters.
+     * This is the parameterized constructor for the ContactMatrixParameters class. It initializes an object with the given parameters.
      *
      * @param sample_infos The sample information.
      * @param chr_infos The chromosome information.
@@ -114,7 +114,7 @@ class ContactParameters {
      * @param norm_method_infos The normalization method information.
      * @param norm_mat_infos The normalized matrix information.
      */
-    ContactParameters(
+    ContactMatrixParameters(
         std::unordered_map<uint8_t, SampleInformation>&& sample_infos,
         std::unordered_map<uint8_t, ChromosomeInformation>&& chr_infos,
         uint32_t interval,
@@ -125,13 +125,13 @@ class ContactParameters {
     );
 
     /**
-     * @brief Constructor for ContactParameters from a bit reader.
+     * @brief Constructor for ContactMatrixParameters from a bit reader.
      *
      * This constructor initializes an object from a bit reader.
      *
      * @param reader The bit reader to read from.
      */
-    ContactParameters(util::BitReader& reader);
+    ContactMatrixParameters(util::BitReader& reader);
 
     /**
      * @brief Gets the number of samples.

@@ -498,8 +498,9 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
 void encode_scm(
     const EncodingOptions& opt,
-    ContactParameters& params,
-    core::record::ContactRecord& rec
+    ContactMatrixParameters& params,
+    core::record::ContactRecord& rec,
+    genie::contact::SubcontactMatrixPayload& scm_payload
 ) {
 
     // Initialize variables
@@ -509,11 +510,11 @@ void encode_scm(
     auto interval = params.getBinSize();
     auto num_counts = rec.getNumCounts();
 
-    auto chr1_ID = rec.getChr1ID();
+    auto chr1_ID = scm_payload.getChr1ID();
     auto chr1_nbins = params.getNumBinEntries(chr1_ID);
     auto chr1_ntiles = params.getNumTiles(chr1_ID);
 
-    auto chr2_ID = rec.getChr2ID();
+    auto chr2_ID = scm_payload.getChr2ID();
     auto chr2_nbins = params.getNumBinEntries(chr2_ID);
     auto chr2_ntiles = params.getNumTiles(chr2_ID);
 
@@ -628,13 +629,11 @@ void encode_cm(
     EncodingBlock& block
 ) {
 
-    auto params = ContactParameters();
+    auto params = ContactMatrixParameters();
     params.setBinSize(opt.bin_size);
     params.setTileSize(opt.tile_size);
     std::map<uint8_t, SampleInformation> samples;
     std::map<uint8_t, ChromosomeInformation> chrs;
-
-    std::map<uint8_t, std::map<uint8_t, genie::core::record::ContactRecord>> recs_map;
 
     for (auto& rec: recs){
         auto rec_bin_size = rec.getBinSize();
@@ -661,22 +660,27 @@ void encode_cm(
             rec.getChr2Length()
         );
 
+        auto scm_payload = genie::contact::SubcontactMatrixPayload(
+            0, //TODO(yeremia): change the default parameter_set_ID
+            rec.getSampleID(),
+            chr1_ID,
+            chr2_ID
+        );
+
         encode_scm(
             opt,
             params,
-            rec
+            rec,
+            scm_payload
         );
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<ContactParameters, EncodingBlock> encode_block(
+std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
     const EncodingOptions& opt,
-    std::vector<core::record::ContactRecord>& recs){
-
-
-}
+    std::vector<core::record::ContactRecord>& recs){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

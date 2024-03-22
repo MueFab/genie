@@ -13,6 +13,15 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContactMatrixTilePayload::ContactMatrixTilePayload()
+    : codec_ID(core::AlgoID::JBIG),
+      tile_nrows(0),
+      tile_ncols(0),
+      payload()
+{}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 ContactMatrixTilePayload::ContactMatrixTilePayload(
     core::AlgoID _codec_ID,
     uint32_t _tile_nrows,
@@ -40,6 +49,25 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     free(*_payload);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactMatrixTilePayload::ContactMatrixTilePayload(ContactMatrixTilePayload&& other) noexcept
+    : codec_ID(other.codec_ID),
+      tile_nrows(other.tile_nrows),
+      tile_ncols(other.tile_ncols),
+      payload(std::move(other.payload)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(ContactMatrixTilePayload&& other) noexcept {
+    if (this != &other) {
+        codec_ID = other.codec_ID;
+        tile_nrows = other.tile_nrows;
+        tile_ncols = other.tile_ncols;
+        payload = std::move(other.payload);
+    }
+    return *this;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +87,17 @@ size_t ContactMatrixTilePayload::getPayloadSize() const { return payload.size();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::write(core::Writer& writer) const {}
+void ContactMatrixTilePayload::write(util::BitWriter &writer) const {
+    writer.writeBypassBE(codec_ID);
+
+    if (codec_ID != core::AlgoID::JBIG){
+        writer.writeBypassBE(tile_nrows);
+        writer.writeBypassBE(tile_ncols);
+    }
+
+    for (auto v: payload)
+        writer.writeBypassBE(v);
+}
 
 
 // ---------------------------------------------------------------------------------------------------------------------
