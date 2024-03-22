@@ -41,6 +41,8 @@ class ContactMatrixTilePayload {
 
   public:
 
+     ContactMatrixTilePayload();
+
     /**
      * @brief Constructor for ContactMatrixTilePayload.
      *
@@ -79,6 +81,25 @@ class ContactMatrixTilePayload {
     );
 
     /**
+     * @brief Move constructor for ContactMatrixTilePayload.
+     *
+     * This is the move constructor for the ContactMatrixTilePayload class. It initializes an object by moving the contents of another object.
+     *
+     * @param other The other object to move from.
+     */
+    ContactMatrixTilePayload(ContactMatrixTilePayload&& other) noexcept;
+
+    /**
+     * @brief Move assignment operator for ContactMatrixTilePayload.
+     *
+     * This is the move assignment operator for the ContactMatrixTilePayload class. It assigns the contents of another object to this object by moving it.
+     *
+     * @param other The other object to move from.
+     * @return A reference to this object.
+     */
+    ContactMatrixTilePayload& operator=(ContactMatrixTilePayload&& other) noexcept;
+
+    /**
      * @brief Gets the size of this structure.
      *
      * This function returns the size of this structure.
@@ -103,7 +124,7 @@ class ContactMatrixTilePayload {
      *
      * @param writer The writer to write to.
      */
-    void write(core::Writer& writer) const;
+    void write(util::BitWriter &writer) const;
 };
 
 }

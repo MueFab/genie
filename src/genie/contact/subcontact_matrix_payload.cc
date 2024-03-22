@@ -28,6 +28,18 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     uint8_t _parameter_set_ID,
     uint8_t _sample_ID,
     uint8_t _chr1_ID,
+    uint8_t _chr2_ID
+    ) : parameter_set_ID(_parameter_set_ID),
+        sample_ID(_sample_ID),
+        chr1_ID(_chr1_ID),
+        chr2_ID(_chr2_ID){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SubcontactMatrixPayload::SubcontactMatrixPayload(
+    uint8_t _parameter_set_ID,
+    uint8_t _sample_ID,
+    uint8_t _chr1_ID,
     uint8_t _chr2_ID,
     TilePayloads&& _tile_payloads,
     std::optional<SubcontactMatrixMaskPayload>&& _row_mask_payload,
@@ -79,7 +91,24 @@ const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return ti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setTilePayloads(const TilePayloads& payloads) { tile_payloads = payloads; }
+void SubcontactMatrixPayload::addTilePayload(
+    size_t i_tile,
+    size_t j_tile,
+    ContactMatrixTilePayload&& tile_payload
+) {
+    // Assuming TilePayloads is a 2D vector of ContactMatrixTilePayload
+    if (i_tile >= tile_payloads.size()) {
+        tile_payloads.resize(i_tile + 1);
+    }
+    if (j_tile >= tile_payloads[i_tile].size()) {
+        tile_payloads[i_tile].resize(j_tile + 1);
+    }
+    tile_payloads[i_tile][j_tile] = std::move(tile_payload);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void SubcontactMatrixPayload::setTilePayloads(TilePayloads&& payloads) { tile_payloads = payloads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -97,6 +126,11 @@ const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getCo
 
 void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { col_mask_payload = payload; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SubcontactMatrixPayload::isIntraSCM() const{
+    return chr1_ID == chr2_ID;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

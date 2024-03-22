@@ -43,8 +43,43 @@ class SubcontactMatrixPayload {
 
   public:
 
+     /**
+     * @brief Default constructor for SubcontactMatrixPayload.
+     *
+     * This is the default constructor for the SubcontactMatrixPayload class. It initializes an empty object.
+      */
     SubcontactMatrixPayload();
 
+    /**
+     * @brief Parameterized constructor for SubcontactMatrixPayload.
+     *
+     * This is the parameterized constructor for the SubcontactMatrixPayload class. It initializes an object with the given parameters.
+     *
+     * @param parameter_set_ID The parameter set ID.
+     * @param sample_ID The sample ID.
+     * @param chr1_ID The ID of the first chromosome.
+     * @param chr2_ID The ID of the second chromosome.
+     */
+    SubcontactMatrixPayload(
+        uint8_t parameter_set_ID,
+        uint8_t sample_ID,
+        uint8_t chr1_ID,
+        uint8_t chr2_ID
+    );
+
+    /**
+     * @brief Parameterized constructor for SubcontactMatrixPayload.
+     *
+     * This is the parameterized constructor for the SubcontactMatrixPayload class. It initializes an object with the given parameters.
+     *
+     * @param parameter_set_ID The parameter set ID.
+     * @param sample_ID The sample ID.
+     * @param chr1_ID The ID of the first chromosome.
+     * @param chr2_ID The ID of the second chromosome.
+     * @param tile_payloads The tile payloads.
+     * @param row_mask_payload The row mask payload.
+     * @param col_mask_payload The column mask payload.
+     */
     SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
         uint8_t sample_ID,
@@ -134,16 +169,20 @@ class SubcontactMatrixPayload {
     *
     * @return A constant reference to the tile payloads.
     */
-    const TilePayloads& getTilePayloads() const;
+   const TilePayloads& getTilePayloads() const;
 
-    /**
-     * @brief Get the Chromosome 2 ID.
+   /**
+     * @brief Adds a tile payload.
      *
-     * This function returns the ID of the second chromosome.
+     * This method adds a tile payload at the given indices.
      *
-     * @return The ID of the second chromosome.
-     */
-   void setTilePayloads(const TilePayloads& payloads);
+     * @param i_tile The index of the first dimension.
+     * @param j_tile The index of the second dimension.
+     * @param tile_payload The tile payload to set.
+    */
+   void addTilePayload(size_t i_tile, size_t j_tile, ContactMatrixTilePayload&& tile_payload);
+
+//   void setTilePayloads(TilePayloads&& payloads);
 
    /**
     * @brief Sets the payload for the row mask.
@@ -180,6 +219,16 @@ class SubcontactMatrixPayload {
     * @return A constant reference to the payload for the column mask.
     */
    const std::optional<SubcontactMatrixMaskPayload>& getColMaskPayload() const;
+
+   /**
+    * @brief Checks if the subcontact matrix matrix is intra subcontact matrix.
+    *
+    * This method checks if the subcontact matrix is intra.
+    * It returns true if the chromosome IDs are the same, and false otherwise.
+    *
+    * @return True if the subcontact matrix is intra, false otherwise.
+    */
+   bool isIntraSCM() const;
 
 };
 
