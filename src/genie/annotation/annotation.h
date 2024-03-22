@@ -47,8 +47,7 @@ class Annotation {
  public:
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setInfoFields(std::string jsonFileName);
-    void startStream(RecType recType, std::string recordInputFileName, std::string attributeJsonFileName,
-                     std::string outputFileName);
+    void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }

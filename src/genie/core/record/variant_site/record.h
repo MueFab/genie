@@ -30,21 +30,54 @@ namespace core {
 namespace record {
 namespace variant_site {
 
-class Info_tag {
+class InfoFields {
  public:
-    uint8_t info_tag_len{};
-    std::string info_tag{};
-    genie::core::DataType info_type{};
-    uint8_t info_array_len{};
-    std::vector<std::vector<uint8_t>> infoValue;
-    Info_tag& operator=(const Info_tag& other) {
-        info_tag_len = other.info_tag_len;
-        info_tag = other.info_tag;
-        info_type = other.info_type;
-        info_array_len = other.info_array_len;
-        infoValue = other.infoValue;
-        return *this;
+    using CustomType = std::vector<uint8_t>;
+    struct Field {
+        std::string tag;
+        genie::core::DataType type;
+        std::vector<CustomType> values;
+    };
+    void read(genie::util::BitReader& reader) {
+        auto alt_count = static_cast<uint8_t>(reader.read_b(8));
+        fields.reserve(alt_count * 16);
+        for (auto i = 0; i < alt_count; ++i) {
+            auto alt_len = static_cast<uint8_t>(reader.read_b(8));
+            std::string alttag(alt_len, 0);
+            for (auto& tag : alttag) tag = reader.readBypassBE<uint8_t>();
+            auto alt_type = static_cast<genie::core::DataType>(reader.readBypassBE<uint8_t>());
+            auto arrayLength = reader.readBypassBE<uint8_t>();
+            ArrayType arrayType;
+            std::vector<CustomType> values;
+            for (auto j = 0; j < arrayLength; ++j) {
+                std::vector<uint8_t> value = arrayType.toArray(alt_type, reader);
+                values.push_back(value);
+            }
+            
+            Field field{alttag, alt_type, values};
+            fields.push_back(field);
+        }
     }
+    void clear() {
+        fields.clear();
+        fields.shrink_to_fit();
+    }
+    std::vector<Field>& getFields() { return fields; }
+
+ private:
+    std::vector<Field> fields;
+};
+
+struct Info_tag {
+    uint8_t info_tag_len;
+    std::string info_tag;
+    genie::core::DataType info_type;
+    uint8_t info_array_len;
+    std::vector<std::vector<uint8_t>> infoValue;
+};
+
+struct AlternativeAllele {
+    std::string alt;
 };
 
 /**
@@ -73,17 +106,14 @@ class Record {
     uint32_t map_num_qual_0;
     uint8_t filters_len;
     std::string filters;
-    uint8_t info_count;
 
-    std::vector<Info_tag> info_tag;
+    InfoFields info;
 
     uint8_t linked_record;
     uint8_t link_name_len;
     std::string link_name;
     uint8_t reference_box_ID;
 
-    uint8_t determineSize(uint8_t selectType) const;
-    std::string infoToCorrectString(std::string& value, uint8_t selectType) const;
     void clearData();
 
  public:
@@ -110,8 +140,6 @@ class Record {
           map_num_qual_0(0),
           filters_len(0),
           filters(""),
-          info_count(0),
-          info_tag(0),
           linked_record(0),
           link_name_len(0),
           link_name(""),
@@ -123,7 +151,7 @@ class Record {
            uint8_t _description_len, std::string _description, uint32_t _ref_len, std::string _ref, uint8_t _alt_count,
            std::vector<uint32_t> _alt_len, std::vector<std::string> _altern, uint32_t _depth, uint32_t _seq_qual,
            uint32_t _map_qual, uint32_t _map_num_qual_0, uint8_t _filters_len, std::string _filters,
-           uint8_t _info_count, std::vector<Info_tag> _info_tag, uint8_t _linked_record, uint8_t _link_name_len,
+            uint8_t _linked_record, uint8_t _link_name_len,
            std::string _link_name, uint8_t _reference_box_ID)
         : variant_index(_variant_index),
           seq_ID(_seq_ID),
@@ -144,8 +172,6 @@ class Record {
           map_num_qual_0(_map_num_qual_0),
           filters_len(_filters_len),
           filters(_filters),
-          info_count(_info_count),
-          info_tag(_info_tag),
           linked_record(_linked_record),
           link_name_len(_link_name_len),
           link_name(_link_name),
@@ -157,7 +183,8 @@ class Record {
     /**
      * @brief
      */
-    Record(genie::util::BitReader& reader, std::vector<Info_tag> infoTag) :info_tag(infoTag) { read(reader); }
+  //  Record(genie::util::BitReader& reader, std::vector<Info_tag> infoTag) : info_tag(infoTag) { read(reader); }
+ //   Record(genie::util::BitReader& reader) { read(reader); }
     /**
      * @brief
      */
@@ -185,8 +212,8 @@ class Record {
     uint32_t getMapQual() const { return map_qual; }
     uint32_t getMapNumQual0() const { return map_num_qual_0; }
     std::string getFilters() const { return filters; }
-    uint8_t getInfoCount() const { return info_count; }
-    std::vector<Info_tag> getInfoTag() const { return info_tag; }
+    std::vector<InfoFields::Field>& getInfoTag() { return info.getFields(); }
+  //  std::vector<std::vector<std::vector<uint8_t>>> getInfoValues() const { return infoValue; }
     bool isLinkedRecord() const { return (linked_record == 0 ? false : true); }
     std::string getLinkName() const { return link_name; }
     uint8_t getReferenceBoxID() const { return reference_box_ID; }

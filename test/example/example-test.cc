@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 class ExampleTestCase : public ::testing::Test {
-   protected:
+ protected:
     // Do any necessary setup for your tests here
     ExampleTestCase() = default;
 
@@ -45,10 +45,31 @@ class ExampleTestCase : public ::testing::Test {
     // }
 };
 
-TEST_F(ExampleTestCase, ExampleTest) {  // NOLINT(cert-err58-cpp)
-    // The rule of thumb is to use EXPECT_* when you want the test to continue
-    // to reveal more errors after the assertion failure, and use ASSERT_*
-    // when continuing after failure doesn't make sense.
-    EXPECT_EQ(0, 0);
-    ASSERT_EQ(0, 0);
+
+struct info {
+    std::string str;
+    uint8_t type;
+    std::vector<std::vector<uint8_t>> values;
+};
+struct MoreInfo {
+    std::vector<info> allInfo;
+    void add(info Info) { allInfo.push_back(Info); }
+};
+
+TEST_F(ExampleTestCase, ExampleTest) {
+    info info1{ "AC", 8, {{9,0,0,0}} };
+    info info2{ "AF", 11, {{75,89,134,59}} };
+    info info3{ "AFR_AF", 11, {{10,215,35,60}} };
+    info info4{ "CIEND" , 5, {{185,225},{82,0}} };
+    MoreInfo infos;
+
+    {
+        infos.add(info1);
+        infos.add(info2);
+        infos.add(info3);
+        infos.add(info2);
+        infos.add(info4);
+    }
+
+    EXPECT_EQ(infos.allInfo.size(), 5);
 }

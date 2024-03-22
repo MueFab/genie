@@ -13,21 +13,9 @@ namespace genie {
 namespace annotation {
 
 void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
-                                                std::string attributeJsonFileName, std::string outputFileName)
+                                                std::string outputFileName)
 
 {
-    // read attributes info from json file
-    std::ifstream AttributeFieldsFile;
-    AttributeFieldsFile.open(attributeJsonFileName, std::ios::in);
-    std::stringstream attributeFields;
-    UTILS_DIE_IF(!AttributeFieldsFile.is_open(), "unable to open json file");
-
-    if (AttributeFieldsFile.is_open()) {
-        attributeFields << AttributeFieldsFile.rdbuf();
-        AttributeFieldsFile.close();
-    }
-    JsonAttributeParser attributeParser(attributeFields);
-
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
 
@@ -42,21 +30,23 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         std::ifstream readForTags;
         readForTags.open(recordInputFileName, std::ios::in | std::ios::binary);
         genie::util::BitReader bitreader(readForTags);
-        std::vector<genie::core::record::variant_site::Info_tag> infoTag;
+        std::vector<genie::core::record::variant_site::InfoFields::Field> infoTag;
         genie::core::record::variant_site::Record recs;
         while (recs.read(bitreader)) {
             infoTag = recs.getInfoTag();
             for (auto tag : infoTag) {
-                InfoField infoField(tag.info_tag, tag.info_type, tag.info_array_len);
-                infoTags[tag.info_tag] = tag;
-                attributeInfo[tag.info_tag] = infoField;
+                InfoField infoField(tag.tag, tag.type, static_cast<uint8_t>(tag.values.size()));
+                genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.tag.size()), tag.tag,
+                                                                    tag.type, static_cast<uint8_t>(tag.values.size()),
+                                                                    tag.values};
+                infoTags[tag.tag] = infotag;
+                attributeInfo[tag.tag] = infoField;
             }
         }
         readForTags.close();
         for (auto info : infoTags)
             infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
 
-        //  if (useJson) infoFields = attributeParser.getInfoFields();
         parseSite(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();

@@ -115,4 +115,5 @@ target_link_libraries(genie-core PUBLIC genie-likelihood)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)
+message("topdir='${TOP_DIR}'")
 target_include_directories(genie-core PUBLIC "${TOP_DIR}")
