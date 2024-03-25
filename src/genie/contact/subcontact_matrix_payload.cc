@@ -49,8 +49,8 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
         chr1_ID(_chr1_ID),
         chr2_ID(_chr2_ID),
         tile_payloads(std::move(_tile_payloads)),
-        row_mask_payload(std::move(_row_mask_payload)),
-        col_mask_payload(std::move(_col_mask_payload)) {}
+        row_mask_payload(_row_mask_payload),
+        col_mask_payload(_col_mask_payload) {}
 
 
 // ---------------------------------------------------------------------------------------------------------------------
