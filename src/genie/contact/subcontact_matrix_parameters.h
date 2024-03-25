@@ -73,9 +73,6 @@ class SubcontactMatrixParameters {
     // Constructor by reference
     SubcontactMatrixParameters(const SubcontactMatrixParameters& other);
 
-    // Constructor using operator=
-    SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
-
     // Getters
     /**
      * @brief Get the parameter set ID.
@@ -238,6 +235,16 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void write(util::BitWriter& writer) const;
+
+    // Constructor using operator=
+    SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
+
+    bool operator==(const SubcontactMatrixParameters& other) const;
+
+//    friend bool operator==(
+//        const SubcontactMatrixParameters& lhs,
+//        const SubcontactMatrixParameters& rhs
+//    );
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
