@@ -60,9 +60,12 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(const Subconta
 // ---------------------------------------------------------------------------------------------------------------------
 
 SubcontactMatrixParameters::SubcontactMatrixParameters(
-    uint8_t _parameter_set_ID, uint8_t _chr1_ID, uint8_t _chr2_ID,
+    uint8_t _parameter_set_ID,
+    uint8_t _chr1_ID,
+    uint8_t _chr2_ID,
     std::vector<std::vector<TileParameter>>&& _tile_parameters,
-    bool _row_mask_exists_flag, bool _col_mask_exists_flag)
+    bool _row_mask_exists_flag,
+    bool _col_mask_exists_flag)
     : parameter_set_ID(_parameter_set_ID),
       chr1_ID(_chr1_ID),
       chr2_ID(_chr2_ID),
@@ -73,34 +76,6 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(
         UTILS_DIE_IF(getNTilesInCol() != tile_parameters[i].size(), "There are less TileParameters than expected!");
     }
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader)
-//    : parameter_set_ID(reader.read<uint8_t>()),
-//      chr1_ID(reader.read<uint8_t>()),
-//      chr2_ID(reader.read<uint8_t>()) {
-//    tile_parameters.resize(ntiles_in_row);
-//    for (uint32_t i = 0; i < ntiles_in_row; i++) {
-//        tile_parameters[i].resize(ntiles_in_col);
-//
-//        for (uint32_t j = 0; j < ntiles_in_col; j++) {
-//            if (!(chr1_ID == chr2_ID && i <= j)) {
-//                auto diag_transform_flag = reader.read<bool>();
-//                auto diag_tranform_mode = DiagonalTransformMode::MODE_0;
-//                if (diag_transform_flag) {
-//                }
-//                diag_tranform_mode = reader.read<DiagonalTransformMode>(2);
-//                auto binarization_flag = reader.read<bool>();
-//
-//                tile_parameters[i][j] = {diag_transform_flag, diag_tranform_mode, binarization_flag};
-//            }
-//        }
-//    }
-//    row_mask_exists_flag = reader.read<bool>();
-//    col_mask_exists_flag = reader.read<bool>();
-//    reader.flush();
-//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -199,7 +174,6 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): Implement this!
 size_t SubcontactMatrixParameters::getSize() const {
     size_t size = 0;
 
@@ -234,8 +208,14 @@ void SubcontactMatrixParameters::write(
     writer.writeBypassBE(chr2_ID);
 
     // Write the tile_parameters
-    for (const auto& row : tile_parameters) {
-        for (const auto& tile : row) {
+    for (size_t i = 0; i < getNTilesInRow(); ++i) {
+        auto& row = tile_parameters[i];
+        for (size_t j = 0; j < getNTilesInCol(); ++j) {
+            if (isSymmetrical() && i > j){
+                continue;
+            }
+            auto &tile = row[j];
+
             writer.write(static_cast<uint8_t>(tile.diag_tranform_mode), 6);
             writer.write(static_cast<uint8_t>(tile.binarization_mode), 2);
         }
@@ -245,6 +225,39 @@ void SubcontactMatrixParameters::write(
     writer.writeBypassBE(row_mask_exists_flag);
     writer.writeBypassBE(col_mask_exists_flag);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SubcontactMatrixParameters::operator==(const SubcontactMatrixParameters& other) const {
+    bool ret = parameter_set_ID == other.parameter_set_ID &&
+           chr1_ID == other.chr1_ID &&
+           chr2_ID == other.chr2_ID &&
+           row_mask_exists_flag == other.row_mask_exists_flag &&
+           col_mask_exists_flag == other.col_mask_exists_flag &&
+           getNTilesInCol() == other.getNTilesInCol() &&
+           getNTilesInRow() == other.getNTilesInRow();
+
+    if (ret){
+        auto& other_tile_params = other.getTileParameters();
+        for (size_t i = 0; i < getNTilesInRow(); ++i) {
+            auto& row1 = tile_parameters[i];
+            auto& row2 = other_tile_params[i];
+            for (size_t j = 0; j < getNTilesInCol(); ++j) {
+                if (isSymmetrical() && i > j){
+                    continue;
+                }
+                auto &tile1 = row1[j];
+                auto &tile2 = row2[j];
+
+                ret = ret && tile1.diag_tranform_mode == tile2.diag_tranform_mode;
+                ret = ret && tile1.binarization_mode == tile2.binarization_mode;
+            }
+        }
+    }
+
+    return ret;
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
