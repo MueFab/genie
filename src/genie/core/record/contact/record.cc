@@ -19,26 +19,26 @@ namespace genie {
 namespace core {
 namespace record {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-ContactRecord::ContactRecord()
-    : sample_ID(0),
-      sample_name(),
-      bin_size(0),
-      chr1_ID(0),
-      chr1_name(),
-      chr1_length(0),
-      chr2_ID(0),
-      chr2_name(),
-      chr2_length(0),
-      norm_count_names(),
-      start_pos1(),
-      end_pos1(),
-      start_pos2(),
-      end_pos2(),
-      counts(),
-      link_record()
-{}
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//ContactRecord::ContactRecord()
+//    : sample_ID(0),
+//      sample_name(),
+//      bin_size(0),
+//      chr1_ID(0),
+//      chr1_name(),
+//      chr1_length(0),
+//      chr2_ID(0),
+//      chr2_name(),
+//      chr2_length(0),
+//      norm_count_names(),
+//      start_pos1(),
+//      end_pos1(),
+//      start_pos2(),
+//      end_pos2(),
+//      counts(),
+//      link_record()
+//{}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,11 +76,11 @@ ContactRecord::ContactRecord(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactRecord::ContactRecord(const ContactRecord& rec) {*this = rec;}
+//ContactRecord::ContactRecord(const ContactRecord& rec) {*this = rec;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactRecord::ContactRecord(ContactRecord&& rec) noexcept {*this = std::move(rec); }
+//ContactRecord::ContactRecord(ContactRecord&& rec) noexcept {*this = std::move(rec); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -107,9 +107,12 @@ ContactRecord::ContactRecord(util::BitReader &reader){
     auto num_counts = reader.readBypassBE<uint64_t>();
     auto num_norm_counts = reader.readBypassBE<uint8_t>();
 
-    //TODO @Yeremia: Implement this!
-    UTILS_DIE_IF(num_norm_counts != 0, "Not yet implemented for num_norm_counts > 0");
+//    TODO @Yeremia: Implement this!
+//    UTILS_DIE_IF(num_norm_counts != 0, "Not yet implemented for num_norm_counts > 0");
+    norm_count_names.resize(num_norm_counts);
     for (auto i = 0; i < num_norm_counts; i++){
+        norm_count_names[i].resize(reader.readBypassBE<uint8_t>());
+        reader.readBypass(&norm_count_names[i][0], norm_count_names[i].size());
     }
 
     start_pos1.resize(num_counts);
@@ -135,6 +138,14 @@ ContactRecord::ContactRecord(util::BitReader &reader){
     counts.resize(num_counts);
     for (size_t i = 0; i< num_counts; i++){
         counts[i] = reader.readBypassBE<uint32_t>();
+    }
+
+    norm_counts.resize(num_norm_counts);
+    for (size_t j = 0; j < num_norm_counts; j++){
+        norm_counts[j].resize(num_counts);
+        for (size_t i = 0; i< num_counts; i++){
+            norm_counts[j][i] = reader.readBypassBE<double_t>();
+        }
     }
 
     auto link_record_flag = reader.readBypassBE<uint8_t>();
@@ -257,6 +268,10 @@ uint8_t ContactRecord::getNumNormCounts() const {return static_cast<uint8_t>(nor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const std::vector<std::string>& ContactRecord::getNormCountNames() const{ return norm_count_names;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::vector<uint64_t>& ContactRecord::getStartPos1() const {return start_pos1;}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -274,6 +289,10 @@ const std::vector<uint64_t>& ContactRecord::getEndPos2() const {return end_pos2;
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<uint32_t>& ContactRecord::getCounts() const {return counts;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<std::vector<double_t>>& ContactRecord::getNormCounts() const { return norm_counts;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

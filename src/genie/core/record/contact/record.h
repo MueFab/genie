@@ -47,13 +47,18 @@ class ContactRecord {
     std::vector<uint64_t> start_pos2;
     std::vector<uint64_t> end_pos2;
     std::vector<uint32_t> counts;
+    std::vector<std::vector<double_t>> norm_counts;
     std::optional<LinkRecord> link_record;
 
  public:
-    /**
-     * @brief
-     */
-    ContactRecord();
+    // Default constructor
+    ContactRecord() = default;
+
+    // Constructor from move
+    ContactRecord(ContactRecord&& rec) noexcept = default;
+
+    // Constructor by reference
+    ContactRecord(const ContactRecord& rec) = default;
 
     /**
      *
@@ -75,20 +80,6 @@ class ContactRecord {
         std::vector<uint64_t>&& end_pos2,
         std::vector<uint32_t>&& counts
     );
-
-    /**+
-     *
-     *
-     * @param other
-     */
-    ContactRecord(const ContactRecord& rec);
-
-    /**
-     *
-     * @param other
-     */
-    ContactRecord(ContactRecord&& rec) noexcept;
-
     /**
      *
      * @param reader
@@ -100,11 +91,7 @@ class ContactRecord {
      */
     ~ContactRecord() = default;
 
-    /**
-     *
-     * @param rec
-     * @return
-     */
+    // Constructor using operator=
     ContactRecord& operator=(const ContactRecord& rec);
 
     /**
@@ -114,109 +101,60 @@ class ContactRecord {
      */
     ContactRecord& operator=(ContactRecord&& rec) noexcept;
 
-    /**
-     *
-     */
+
     void transposeCM();
 
     /**
+     * @brief Get the Sample ID.
      *
-     * @return
+     * @return The Sample ID.
      */
     uint8_t getSampleID() const;
 
     /**
+     * @brief Get the Sample Name.
      *
-     * @return
+     * @return The Sample Name.
      */
     const std::string& getSampleName() const;
 
     /**
+     * @brief Get the Bin Size.
      *
-     * @return
+     * @return The Bin Size.
      */
     uint32_t getBinSize() const;
 
-    /**
-     *
-     * @return
-     */
     uint8_t getChr1ID() const;
 
-    /**
-     *
-     * @return
-     */
     const std::string& getChr1Name() const;
 
-    /**
-     *
-     * @return
-     */
     uint64_t getChr1Length() const;
 
-    /**
-     *
-     * @return
-     */
     uint8_t getChr2ID() const;
 
-    /**
-     *
-     * @return
-     */
     const std::string& getChr2Name() const;
 
-    /**
-     *
-     * @return
-     */
-    uint64_t getChr2Length() const;
+     uint64_t getChr2Length() const;
 
-    /**
-     *
-     * @return
-     */
-    uint64_t getNumCounts() const;
+     uint64_t getNumCounts() const;
 
-     /**
-     *
-     */
      uint8_t getNumNormCounts() const;
 
-     /**
-      *
-      * @return
-      */
+     const std::vector<std::string>& getNormCountNames() const;
+
      const std::vector<uint64_t>& getStartPos1() const;
 
-     /**
-      *
-      * @return
-      */
      const std::vector<uint64_t>& getEndPos1() const;
 
-     /**
-      *
-      * @return
-      */
      const std::vector<uint64_t>& getStartPos2() const;
 
-     /**
-      *
-      * @return
-      */
      const std::vector<uint64_t>& getEndPos2() const;
 
-     /**
-      *
-      * @return
-      */
      const std::vector<uint32_t>& getCounts() const;
 
-     /**
-      *
-      */
+     const std::vector<std::vector<double_t>>& getNormCounts() const;
+
      void write(util::BitWriter &writer) const;
 };
 
