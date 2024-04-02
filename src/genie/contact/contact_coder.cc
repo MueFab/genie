@@ -379,10 +379,8 @@ void diag_transform(
                 diag_ids(k_elem++) = diag_id;
         }
 
-        int64_t i;
-        int64_t j;
-        int64_t i_offset;
-        int64_t j_offset;
+        int64_t i, j;
+        int64_t i_offset, j_offset;
         int64_t nelems_in_diag;
         auto o = 0u;
         for (auto diag_id : diag_ids){
@@ -496,6 +494,16 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void decode_scm(
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    ContactMatrixParameters& params,
+    core::record::ContactRecord& rec
+){
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void encode_scm(
     const EncodingOptions& opt,
     ContactMatrixParameters& params,
@@ -568,6 +576,7 @@ void encode_scm(
             );
 
             auto mode = DiagonalTransformMode::NONE;
+            // Hardcoded option for the chosen mode
             if (opt.diag_transform) {
                 if (is_intra_scm && i_tile == j_tile)
                     mode = DiagonalTransformMode::MODE_0;
@@ -578,7 +587,6 @@ void encode_scm(
             }
 
             genie::contact::diag_transform(tile_mat, mode);
-
 
             if (opt.binarize){
                 genie::contact::BinMatDtype bin_mat;

@@ -41,7 +41,61 @@ class ContactMatrixTilePayload {
 
   public:
 
+     /**
+      * @brief Default constructor for ContactMatrixTilePayload.
+      *
+      * This constructor initializes the object with default values.
+      */
      ContactMatrixTilePayload();
+
+     /**
+      * @brief Constructor using operator=.
+      *
+      * This constructor assigns the contents of another ContactMatrixTilePayload object to this one.
+      *
+      * @param other The ContactMatrixTilePayload object to assign from.
+      */
+     ContactMatrixTilePayload(const ContactMatrixTilePayload& other);
+
+    /**
+     * @brief Move constructor for ContactMatrixTilePayload.
+     *
+     * This is the move constructor for the ContactMatrixTilePayload class.
+     * It initializes an object by moving the contents of another object.
+     *
+     * @param other The other object to move from.
+     */
+    ContactMatrixTilePayload(ContactMatrixTilePayload&& other) noexcept;
+
+    /**
+     * @brief Move assignment operator for ContactMatrixTilePayload.
+     *
+     * This is the move assignment operator for the ContactMatrixTilePayload class. It assigns the contents of another object to this object by moving it.
+     *
+     * @param other The other object to move from.
+     * @return A reference to this object.
+     */
+    ContactMatrixTilePayload& operator=(ContactMatrixTilePayload&& other) noexcept;
+
+    /**
+     * @brief Constructor that reads from a BitReader.
+     *
+     * This constructor reads the parameters from a BitReader.
+     *
+     *  @param reader The BitReader to read from.
+     */
+    explicit ContactMatrixTilePayload(util::BitReader &reader) noexcept;
+
+    /**
+     * @brief Overloaded equality operator.
+     *
+     * This operator compares two ContactMatrixTilePayload objects for equality.
+     * It returns true if all the member variables of the two objects are equal, and false otherwise.
+     *
+     * @param other The ContactMatrixTilePayload object to compare with.
+     * @return True if the two objects are equal, false otherwise.
+     */
+    bool operator==(const ContactMatrixTilePayload& other) const;
 
     /**
      * @brief Constructor for ContactMatrixTilePayload.
@@ -81,32 +135,76 @@ class ContactMatrixTilePayload {
     );
 
     /**
-     * @brief Move constructor for ContactMatrixTilePayload.
+     * @brief Get the Codec ID.
      *
-     * This is the move constructor for the ContactMatrixTilePayload class. It initializes an object by moving the contents of another object.
+     * This function returns the Codec ID.
      *
-     * @param other The other object to move from.
+     * @return The Codec ID.
      */
-    ContactMatrixTilePayload(ContactMatrixTilePayload&& other) noexcept;
+    core::AlgoID getCodecID() const;
 
     /**
-     * @brief Move assignment operator for ContactMatrixTilePayload.
+     * @brief Get the number of rows in the tile.
      *
-     * This is the move assignment operator for the ContactMatrixTilePayload class. It assigns the contents of another object to this object by moving it.
+     * This function returns the number of rows in the tile.
      *
-     * @param other The other object to move from.
-     * @return A reference to this object.
+     * @return The number of rows in the tile.
      */
-    ContactMatrixTilePayload& operator=(ContactMatrixTilePayload&& other) noexcept;
+    uint32_t getTileNRows() const;
 
     /**
-     * @brief Gets the size of this structure.
+     * @brief Get the number of columns in the tile.
      *
-     * This function returns the size of this structure.
+     * This function returns the number of columns in the tile.
      *
-     * @return The size of the payload.
+     * @return The number of columns in the tile.
      */
-    size_t getSize() const;
+    uint32_t getTileNCols() const;
+
+    /**
+     * @brief Get the payload.
+     *
+     * This function returns the payload.
+     *
+     * @return The payload.
+     */
+    std::vector<uint8_t> getPayload() const;
+
+    /**
+     * @brief Set the Codec ID.
+     *
+     * This function sets the Codec ID.
+     *
+     * @param id The new Codec ID.
+     */
+    void setCodecID(core::AlgoID id);
+
+    /**
+     * @brief Set the number of rows in the tile.
+     *
+     * This function sets the number of rows in the tile.
+     *
+     * @param rows The new number of rows.
+     */
+    void setTileNRows(uint32_t rows);
+
+    /**
+     * @brief Set the number of columns in the tile.
+     *
+     * This function sets the number of columns in the tile.
+     *
+     * @param cols The new number of columns.
+     */
+    void setTileNCols(uint32_t cols);
+
+    /**
+     * @brief Set the payload.
+     *
+     * This function sets the payload.
+     *
+     * @param data The new payload.
+     */
+    void setPayload(const std::vector<uint8_t>& data);
 
     /**
      * @brief Gets the size of the payload.
@@ -118,6 +216,15 @@ class ContactMatrixTilePayload {
     size_t getPayloadSize() const;
 
     /**
+     * @brief Gets the size of this structure.
+     *
+     * This function returns the size of this structure.
+     *
+     * @return The size of the payload.
+     */
+    size_t getSize() const;
+
+    /**
      * @brief Writes the object to a writer.
      *
      * This function writes the object to a writer.
@@ -127,8 +234,10 @@ class ContactMatrixTilePayload {
     void write(util::BitWriter &writer) const;
 };
 
-}
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
+} // contact
+} // genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
