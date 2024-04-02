@@ -245,6 +245,22 @@ void bin_mat_from_bytes(
     size_t ncols
 );
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Decode a Subcontact Matrix Payload.
+ *
+ * This function decodes a Subcontact Matrix Payload into a Contact Matrix Parameters object and a Contact Record object.
+ *
+ * @param scm_payload The Subcontact Matrix Payload to decode.
+ * @param params The Contact Matrix Parameters object to store the decoded parameters.
+ * @param rec The Contact Record object to store the decoded record.
+ */
+void decode_scm(
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    ContactMatrixParameters& params,
+    core::record::ContactRecord& rec
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
