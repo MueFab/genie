@@ -13,10 +13,6 @@
 namespace genie {
 namespace contact {
 
-#define TRANSFORM_ID_BLEN 2
-#define FIRST_VAL_BLEN 1
-#define NUM_RL_ENTRIES_BLEN 32
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SubcontactMatrixMaskPayload::operator==(const SubcontactMatrixMaskPayload& other) {
@@ -120,33 +116,33 @@ size_t SubcontactMatrixMaskPayload::getSize() const{
 
 void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
     // Write everything on-memory before dumping it to the writer
-//    auto payload = std::stringstream();
-//    std::ostream& _writer = payload;
-//    auto bitwriter = genie::util::BitWriter(&_writer);
+    auto payload = std::stringstream();
+    std::ostream& _writer = payload;
+    auto onmem_writer = genie::util::BitWriter(&_writer);
 
-    writer.write(static_cast<uint64_t>(transform_ID), TRANSFORM_ID_BLEN);
+    onmem_writer.write(static_cast<uint64_t>(transform_ID), TRANSFORM_ID_BLEN);
     if (transform_ID == TransformID::ID_0){
         auto num_bin_entries = mask_array->shape(0);
         for (auto i = 0u; i < num_bin_entries; i++){
-            writer.write(mask_array->at(i), 1);
+            onmem_writer.write(mask_array->at(i), 1);
         }
     } else {
-        writer.write(first_val, 1);
+        onmem_writer.write(first_val, 1);
         auto num_rl_entries = rl_entries->shape(0);
-        writer.write(num_rl_entries, NUM_RL_ENTRIES_BLEN);
+        onmem_writer.write(num_rl_entries, NUM_RL_ENTRIES_BLEN);
         for (auto i = 0u; i < num_rl_entries; i++){
             auto nbits = static_cast<uint8_t>(4u << static_cast<uint8_t>(transform_ID));
             auto val = static_cast<uint64_t>(rl_entries->at(i));
-            writer.write(val, nbits);
+            onmem_writer.write(val, nbits);
         }
     }
     // Align to byte
-    writer.flush();
+    onmem_writer.flush();
 
-//    auto payload_str = payload.str();
-//    for (auto& v: payload_str){
-//        writer.write(static_cast<uint64_t>(v), 8);
-//    }
+    auto payload_str = payload.str();
+    for (auto& v: payload_str){
+        writer.write(static_cast<uint64_t>(v), 8);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
