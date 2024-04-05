@@ -47,21 +47,33 @@ class JBIGTestCase : public ::testing::Test {
     // }
 };
 
-TEST_F(JBIGTestCase, DISABLED_JBIGEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
+TEST_F(JBIGTestCase, JBIGEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
     const size_t NrOfInputBytes = 15;
     std::vector<uint8_t> testDataUncompressed(NrOfInputBytes);
     for (size_t i = 0; i < NrOfInputBytes; ++i) {
         uint8_t byte = static_cast<uint8_t>(rand() % 256);
         testDataUncompressed[i] = byte;
     }
+    testDataUncompressed = { 0x7c, 0xe2, 0x38, 0x04, 0x92, 0x40, 0x04, 0xe2,
+                                0x5c, 0x44, 0x92, 0x44, 0x38, 0xe2, 0x38 };
     uint32_t ncols = 23;
     uint32_t nrows = 5;
     std::stringstream uncomressed_input;
     std::stringstream compressed_output;
-    for (uint8_t byte : testDataUncompressed) uncomressed_input.write((char*)&byte, 1);
+    for (uint8_t byte : testDataUncompressed) uncomressed_input << byte;
+
+    ASSERT_EQ(NrOfInputBytes, uncomressed_input.str().size());
+    for (uint8_t i = 0; i < NrOfInputBytes; ++i)
+        EXPECT_EQ((uint8_t)uncomressed_input.str().at(i), testDataUncompressed.at(i));
 
     genie::entropy::jbig::JBIGEncoder encoder;
     encoder.encode(uncomressed_input, compressed_output, ncols, nrows);
+
+    size_t ORIG_COMPRESSED_PAYLOAD_LEN = 37;
+    uint8_t ORIG_COMPRESSED_PAYLOAD[37] = { 0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
+                                 0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2 };
+
+    ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_output.str().size());
 
     std::stringstream uncompressed_output;
     encoder.decode(compressed_output, uncompressed_output, ncols, nrows);

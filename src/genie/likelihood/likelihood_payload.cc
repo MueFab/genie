@@ -101,9 +101,9 @@ void LikelihoodPayload::write(core::Writer& writer) const {
         for(unsigned char i : payload)
             writer.write(i,8);
         if (transform_flag) {
-            writer.write(additionalPayload.size(), 32);
-            for (size_t i = 0; i < additionalPayload.size(); ++i)
-                writer.write(additionalPayload.at(i), 8);
+            writer.write(additionalPayload.size(), 4u << PAYLOAD_SIZE_LEN);
+            for (unsigned char val : additionalPayload)
+                writer.write(val, 8);
         }
     } else{
         writer.write(payloadStream.str().size(), 32);

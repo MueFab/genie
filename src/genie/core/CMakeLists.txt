@@ -112,6 +112,7 @@ add_library(genie-core ${source_files})
 
 target_link_libraries(genie-core PUBLIC genie-util)
 target_link_libraries(genie-core PUBLIC genie-likelihood)
+target_link_libraries(genie-core PUBLIC genie-contact)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)

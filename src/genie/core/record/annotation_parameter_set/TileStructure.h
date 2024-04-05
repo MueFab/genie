@@ -39,7 +39,7 @@ class TileStructure {
     uint8_t coordSizeInBits(uint8_t ATCoordSize) const;
 
  public:
-    TileStructure(uint8_t ATCoordSize, bool two_dimensional);
+    TileStructure(uint8_t ATCoordSize, bool two_dimensional, uint64_t defaultTileSize);
     TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
                   std::vector<std::vector<uint64_t>> start_index, std::vector<std::vector<uint64_t>> end_index,
                   std::vector<uint64_t> tile_size);

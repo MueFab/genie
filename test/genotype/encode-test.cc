@@ -463,7 +463,7 @@ TEST(Genotype, RoundTrip_JBIG) {
 
         ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
         for (size_t i = 0; i < payload_len; i++) {
-            ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i));
+            ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i)) << "index:" << i;
         }
     }
 

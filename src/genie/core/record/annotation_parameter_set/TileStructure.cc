@@ -52,12 +52,12 @@ TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool 
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
     read(reader);
 }
-TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional)
+TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, uint64_t defaultTileSize)
     : variable_size_tiles(false),
-      n_tiles(0),
+      n_tiles(1),
       start_index{},
       end_index{},
-      tile_size{0},
+      tile_size{1,defaultTileSize},
       ATCoordSize(ATCoordSize),
       two_dimensional(two_dimensional) {}
 
