@@ -88,6 +88,14 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
         testparams.algID                             // codec_ID;
     };
 
+    genie::contact::EncodingOptions contact_opt = {
+        250000, // bin_size;
+        500, // tile_size;
+        false, // multi_intervals = false;
+        true, // diag_transform = true;
+        true // binarize = true;
+    };
+
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
     std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
     std::string set3 = "compressor 2 0 ZSTD";
@@ -99,6 +107,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
+    annotationGenerator.setContactOptions(contact_opt);
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir + testparams.filepath + ".geno",
                                     name);
 }

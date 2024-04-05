@@ -19,27 +19,6 @@ namespace genie {
 namespace core {
 namespace record {
 
-//// ---------------------------------------------------------------------------------------------------------------------
-//
-//ContactRecord::ContactRecord()
-//    : sample_ID(0),
-//      sample_name(),
-//      bin_size(0),
-//      chr1_ID(0),
-//      chr1_name(),
-//      chr1_length(0),
-//      chr2_ID(0),
-//      chr2_name(),
-//      chr2_length(0),
-//      norm_count_names(),
-//      start_pos1(),
-//      end_pos1(),
-//      start_pos2(),
-//      end_pos2(),
-//      counts(),
-//      link_record()
-//{}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactRecord::ContactRecord(

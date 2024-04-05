@@ -182,20 +182,19 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     bool TRANSFORM_MODE = true;
 
     genie::likelihood::EncodingOptions likelihood_opt = {
-    BLOCK_SIZE,       // block_size
-    TRANSFORM_MODE,  // transform_flag;
+        BLOCK_SIZE,      // block_size
+        TRANSFORM_MODE,  // transform_flag;
     };
 
     genie::genotype::EncodingOptions genotype_opt = {
-    BLOCK_SIZE,                                   // block_size;
-    genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-    genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-    false,                                       // transpose_mat;
-    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-    genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-    genie::core::AlgoID::JBIG                    // codec_ID;
+        BLOCK_SIZE,                                  // block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+        false,                                       // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::core::AlgoID::JBIG                    // codec_ID;
     };
-
 
     auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
     auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
@@ -207,9 +206,10 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         std::get<genie::genotype::GenotypeParameters>(genotypeData);
     auto datablock = std::get<genie::genotype::EncodingBlock>(genotypeData);
     genie::genotype::ParameterSetComposer genotypeParameterSet;
+    genotypeParameterSet.setGenotypeParameters(genotypeParameters);
+    genotypeParameterSet.setLikelihoodParameters(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData));
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, genotypeParameters,
-            std::get<genie::likelihood::LikelihoodParameters>(likelihoodData), recs.size());
+        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, recs.size());
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 
@@ -225,7 +225,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         arrayDims.push_back(recs.at(0).getNumSamples());
         arrayDims.push_back(recs.at(0).getFormatCount());
         attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
-            arrayDims);
+                                                arrayDims);
         attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
     }
 
@@ -240,7 +240,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
     {
         genie::likelihood::LikelihoodPayload payload(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData),
-            std::get<genie::likelihood::EncodingBlock>(likelihoodData));
+                                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData));
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
         payload.write(writer);
     }
@@ -254,9 +254,9 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
 
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributesInfo, annotationParameterSet,
-        annotationAccessUnit, AG_class, AT_ID, 0);
+                                     annotationAccessUnit, AG_class, AT_ID, 0);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
-    
+
     // ---------------------------------------- //
 
     std::ofstream outputFile;

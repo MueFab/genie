@@ -15,6 +15,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
+#include "genie/contact/contact_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
@@ -56,35 +57,15 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressor_parameter_set,
     uint64_t defaultTileSize) {
     //----------------------------------------------------//
-    // default values
     core::record::annotation_parameter_set::ParameterSettings defaultset;
     defaultset.ATCoordSize = 3;
     defaultset.AG_class = 1;
-    genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
-
-    uint64_t n_tiles = 1;
-
-    std::vector<std::vector<uint64_t>> start_index;
-    std::vector<std::vector<uint64_t>> end_index;
-    std::vector<uint64_t> tile_size(1, defaultTileSize);
-
-    std::vector<uint16_t> nAttributes;
-    std::vector<std::vector<uint16_t>> attribute_IDs;
-    std::vector<uint8_t> nDescriptors;
-    std::vector<std::vector<uint8_t>> descriptor_IDs;
-    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure(
-        defaultset.ATCoordSize, defaultset.tileParameterSettings.twoDimensional,
-        defaultset.tileParameterSettings.variable_size_tiles, n_tiles, start_index, end_index, tile_size);
-    std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
-    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
+    bool two_dimensional = false;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
-        defaultset.ATCoordSize, defaultset.AG_class, defaultset.tileParameterSettings.attributeContiguity,
-        defaultset.tileParameterSettings.twoDimensional, defaultset.tileParameterSettings.columnMajorTileOrder,
-        defaultset.tileParameterSettings.symmetry_mode, defaultset.tileParameterSettings.symmetry_minor_diagonal,
-        defaultset.tileParameterSettings.attribute_dependent_tiles, default_tile_structure,
-        defaultset.tileParameterSettings.n_add_tile_structures, nAttributes, attribute_IDs, nDescriptors,
-        descriptor_IDs, additional_tile_structure);
+        defaultset.ATCoordSize, defaultset.AG_class, two_dimensional, defaultTileSize);
+    std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
+    genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
     tile_configurations.push_back(tileConfiguration);
 
@@ -115,10 +96,6 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     auto ZSTDalgorithmParameters = zstdParameters.convertToAlgorithmParameters();
     // -----------------------------------------------------------------------------------------
 
-    genie::genotype::GenotypeParameters genotype_parameters;
-    genie::likelihood::LikelihoodParameters likelihood_parameters;
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
-
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
     uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());
     for (auto descr : descrList) {
@@ -130,11 +107,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         else
             encoding_mode_ID = genie::core::AlgoID::BSC;
 
-        genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
-            DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
-            BSCalgorithmParameters);
-
-        descriptor_configuration.push_back(descrConf);
+        descriptor_configuration.emplace_back(DescrID, encoding_mode_ID, BSCalgorithmParameters);
     }
 
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
@@ -190,37 +163,16 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
     genie::annotation::Compressor compressors, uint64_t defaultTileSize) {
-
-
     // default values
     core::record::annotation_parameter_set::ParameterSettings defaultset;
     defaultset.ATCoordSize = 3;
     defaultset.AG_class = 1;
     genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
-    uint64_t n_tiles = 1;
-
-    std::vector<std::vector<uint64_t>> start_index;
-    std::vector<std::vector<uint64_t>> end_index;
-    std::vector<uint64_t> tile_size(1, defaultTileSize);
-
-    std::vector<uint16_t> nAttributes;
-    std::vector<std::vector<uint16_t>> attribute_IDs;
-    std::vector<uint8_t> nDescriptors;
-    std::vector<std::vector<uint8_t>> descriptor_IDs;
-    genie::core::record::annotation_parameter_set::TileStructure default_tile_structure(
-        defaultset.ATCoordSize, defaultset.tileParameterSettings.twoDimensional,
-        defaultset.tileParameterSettings.variable_size_tiles, n_tiles, start_index, end_index, tile_size);
-    std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
-        defaultset.ATCoordSize, defaultset.AG_class, defaultset.tileParameterSettings.attributeContiguity,
-        defaultset.tileParameterSettings.twoDimensional, defaultset.tileParameterSettings.columnMajorTileOrder,
-        defaultset.tileParameterSettings.symmetry_mode, defaultset.tileParameterSettings.symmetry_minor_diagonal,
-        defaultset.tileParameterSettings.attribute_dependent_tiles, default_tile_structure,
-        defaultset.tileParameterSettings.n_add_tile_structures, nAttributes, attribute_IDs, nDescriptors,
-        descriptor_IDs, additional_tile_structure);
+        defaultset.ATCoordSize, defaultset.AG_class, defaultset.tileParameterSettings.twoDimensional, defaultTileSize);
 
     tile_configurations.push_back(tileConfiguration);
 
@@ -251,10 +203,6 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     auto ZSTDalgorithmParameters = zstdParameters.convertToAlgorithmParameters();
     // -----------------------------------------------------------------------------------------
 
-    genie::genotype::GenotypeParameters genotype_parameters;
-    genie::likelihood::LikelihoodParameters likelihood_parameters;
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
-
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
     uint8_t n_descriptors = static_cast<uint8_t>(descrList.size());
     for (auto descr : descrList) {
@@ -266,11 +214,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         else
             encoding_mode_ID = genie::core::AlgoID::BSC;
 
-        genie::core::record::annotation_parameter_set::DescriptorConfiguration descrConf(
-            DescrID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
-            BSCalgorithmParameters);
-
-        descriptor_configuration.push_back(descrConf);
+        descriptor_configuration.emplace_back(DescrID, encoding_mode_ID, BSCalgorithmParameters);
     }
 
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
@@ -285,8 +229,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         std::vector<uint8_t> attribute_array_dims;
         if (info[it->first].getArrayLength() == 1) {
             attribute_num_array_dims = 0;
-        }
-        else {
+        } else {
             attribute_num_array_dims = 1;
             attribute_array_dims.push_back(info[it->first].getArrayLength());
         }

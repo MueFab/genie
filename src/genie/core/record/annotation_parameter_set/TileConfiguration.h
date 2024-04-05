@@ -60,6 +60,7 @@ class TileConfiguration {
     TileConfiguration();
     explicit TileConfiguration(uint8_t AT_coord_size);
     TileConfiguration(util::BitReader& reader, uint8_t AT_coord_size);
+    TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool two_dimensional, uint64_t defaultTileSize);
 
  
   TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool attribute_contiguity, bool two_dimensional,
@@ -73,6 +74,10 @@ class TileConfiguration {
     void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
+
+    void setAGClass(uint8_t AGClass) { AG_class = AGClass; }
+    void setATCoordSize(uint8_t ATCoordSize) { AT_coord_size = ATCoordSize; }
+
 
     size_t getSize(core::Writer& writesize) const;
 
