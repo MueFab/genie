@@ -102,7 +102,8 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
     int8_t MAX_VAL = 64;
-    int8_t MIN_VAL = -2;
+    int8_t NO_REF_VAL = -1;
+    int8_t NOT_AVAIL_VAL = -2;
 
     genie::genotype::Int8MatDtype allele_mat;
     genie::genotype::Int8MatDtype orig_allele_mat;
@@ -131,7 +132,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     {
         allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
-        xt::filter(allele_mat, mask) = -1;
+        xt::filter(allele_mat, mask) = NO_REF_VAL;
 
         orig_allele_mat = allele_mat;
 
@@ -143,14 +144,14 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == -1);
+        ASSERT_TRUE(xt::amin(allele_mat)(0) == NO_REF_VAL);
     }
 
     // Case 3: not_avail_flag
     {
         allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
-        xt::filter(allele_mat, mask) = -2;
+        xt::filter(allele_mat, mask) = NOT_AVAIL_VAL;
 
         orig_allele_mat = allele_mat;
 
@@ -162,16 +163,16 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == -2);
+        ASSERT_TRUE(xt::amin(allele_mat)(0) == NOT_AVAIL_VAL);
     }
 
     // Case 3: no_ref and not_avail_flag
     {
         allele_mat = xt::cast<int8_t>(xt::random::randint<int16_t>({NROWS, NCOLS}, 0, MAX_VAL));
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
-        xt::filter(allele_mat, mask) = -1;
+        xt::filter(allele_mat, mask) = NO_REF_VAL;
         mask = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2));
-        xt::filter(allele_mat, mask) = -2;
+        xt::filter(allele_mat, mask) = NOT_AVAIL_VAL;
 
         orig_allele_mat = allele_mat;
 
@@ -183,7 +184,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
 
         genie::genotype::inverse_transform_max_val(allele_mat, no_ref_flag, not_avail_flag);
         ASSERT_TRUE(allele_mat == orig_allele_mat);
-        ASSERT_TRUE(xt::amin(allele_mat)(0) == -2);
+        ASSERT_TRUE(xt::amin(allele_mat)(0) == NOT_AVAIL_VAL);
     }
 }
 
