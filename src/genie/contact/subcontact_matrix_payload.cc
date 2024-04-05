@@ -203,11 +203,19 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
 
     // TODO (Yeremia): Missing norm_matrices
 
-    if (row_mask_payload.has_value())
+    if (row_mask_payload.has_value()){
+        writer.writeBypassBE(
+            static_cast<uint32_t>(row_mask_payload->getSize())
+        );
         row_mask_payload->write(writer);
+    }
 
-    if (col_mask_payload.has_value())
+    if (col_mask_payload.has_value()){
+        writer.writeBypassBE(
+            static_cast<uint32_t>(col_mask_payload->getSize())
+        );
         col_mask_payload->write(writer);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
