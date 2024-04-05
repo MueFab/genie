@@ -101,6 +101,7 @@ class SubcontactMatrixParameters {
      */
     uint8_t getChr2ID() const;
 
+    //TODO(yeremia): Create docstring
     const std::vector<std::vector<TileParameter>>& getTileParameters() const;
 
     /**
@@ -240,11 +241,6 @@ class SubcontactMatrixParameters {
     SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
 
     bool operator==(const SubcontactMatrixParameters& other) const;
-
-//    friend bool operator==(
-//        const SubcontactMatrixParameters& lhs,
-//        const SubcontactMatrixParameters& rhs
-//    );
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

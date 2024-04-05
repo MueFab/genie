@@ -86,8 +86,6 @@ ContactRecord::ContactRecord(util::BitReader &reader){
     auto num_counts = reader.readBypassBE<uint64_t>();
     auto num_norm_counts = reader.readBypassBE<uint8_t>();
 
-//    TODO @Yeremia: Implement this!
-//    UTILS_DIE_IF(num_norm_counts != 0, "Not yet implemented for num_norm_counts > 0");
     norm_count_names.resize(num_norm_counts);
     for (auto i = 0; i < num_norm_counts; i++){
         norm_count_names[i].resize(reader.readBypassBE<uint8_t>());
