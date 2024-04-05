@@ -128,6 +128,7 @@ TEST_F(AnnotationTests, annotationGeno) {
     std::stringstream config;
     config << set1 << '\n' <<  set3 << '\n' << set4 << '\n';
 
+    ASSERT_FALSE(!std::filesystem::is_regular_file(inputFilename));
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);

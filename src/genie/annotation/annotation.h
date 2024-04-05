@@ -51,6 +51,7 @@ class Annotation {
 
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
+    void setContactOptions(genie::contact::EncodingOptions opt) { contact_opt = opt; }
 
  private:
     std::ifstream recordInput;
@@ -71,6 +72,14 @@ class Annotation {
                                                   genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
                                                   genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
                                                   genie::core::AlgoID::JBIG};
+
+    genie::contact::EncodingOptions contact_opt{
+        250000,  // bin_size;
+        500,     // tile_size;
+        false,   // multi_intervals = false;
+        true,    // diag_transform = true;
+        true     // binarize = true;
+    };
 
     void parseGenotype(std::ifstream& inputfile);
     void parseSite(std::ifstream& inputfile);
