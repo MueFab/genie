@@ -15,34 +15,12 @@
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
+#include "consts.h"
 #include "contact_parameters.h"
 #include "subcontact_matrix_payload.h"
 
 namespace genie {
 namespace contact {
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-using CountsDtype = uint32_t;
-using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
-using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
-using UInt8VecDtype = xt::xtensor<uint8_t , 1, xt::layout_type::row_major>;
-//using UInt8MatDtype = xt::xtensor<uint8_t , 2, xt::layout_type::row_major>;
-//using Int8MatDtype = xt::xtensor<int8_t , 2, xt::layout_type::row_major>;
-using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
-using UIntMatDtype = xt::xtensor<uint32_t , 2, xt::layout_type::row_major>;
-using UInt64VecDtype = xt::xtensor<uint64_t, 1, xt::layout_type::row_major>;
-using Int64VecDtype = xt::xtensor<int64_t, 1, xt::layout_type::row_major>;
-
-using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
-using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//using ChrIDPair = std::pair<uint8_t, uint8_t>;
-using ContactRecords = std::list<genie::core::record::ContactRecord>;
-using SCMRecDtype = std::unordered_map<ChrIDPair, core::record::ContactRecord, chr_pair_hash>;
-using IntervSCMRecDtype = std::unordered_map<uint32_t, SCMRecDtype>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,16 +42,39 @@ struct EncodingBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::ContactRecord>& recs);
+/**
+ * @brief Compute a mask.
+ *
+ * This function computes a mask based on the given IDs.
+ *
+ * @param ids The IDs to compute the mask from.
+ * @param mask The computed mask.
+ */
+void compute_mask(
+    UInt64VecDtype& ids,
+    BinVecDtype& mask
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void compute_mask(UInt64VecDtype& ids,BinVecDtype& mask);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void compute_masks(UInt64VecDtype& row_ids,UInt64VecDtype& col_ids,bool is_intra,
-                   BinVecDtype& row_mask,BinVecDtype& col_mask);
+/**
+ * @brief Compute masks.
+ *
+ * This function computes masks based on the given row and column IDs.
+ *
+ * @param row_ids The row IDs to compute the masks from.
+ * @param col_ids The column IDs to compute the masks from.
+ * @param is_intra A boolean indicating whether the computation is intra or not.
+ * @param row_mask The computed row mask.
+ * @param col_mask The computed column mask.
+ */
+void compute_masks(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,8 +91,13 @@ void compute_masks(UInt64VecDtype& row_ids,UInt64VecDtype& col_ids,bool is_intra
  * @param row_mask A reference to the binary vector representing the row mask.
  * @param col_mask A reference to the binary vector representing the column mask.
  */
-void remove_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_intra,
-                      BinVecDtype& row_mask, BinVecDtype& col_mask);
+void remove_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,8 +114,13 @@ void remove_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_
  * @param row_mask A reference to the binary vector representing the row mask.
  * @param col_mask A reference to the binary vector representing the column mask.
  */
-void append_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_intra,
-                      BinVecDtype& row_mask, BinVecDtype& col_mask);
+void append_unaligned(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    bool is_intra,
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -129,9 +140,16 @@ void append_unaligned(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, bool is_
  * @param row_id_offset An optional offset for row IDs, defaulting to  0.
  * @param col_id_offset An optional offset for column IDs, defaulting to  0.
  */
-void sparse_to_dense(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDtype& counts,
-                     UIntMatDtype& mat, size_t nrows, size_t ncols,
-                     uint64_t row_id_offset=0, uint64_t col_id_offset=0);
+void sparse_to_dense(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts,
+    UIntMatDtype& mat,
+    size_t nrows,
+    size_t ncols,
+    uint64_t row_id_offset=0,
+    uint64_t col_id_offset=0
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -149,8 +167,14 @@ void sparse_to_dense(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDt
  * @param col_ids A reference to the vector of column IDs to be filled.
  * @param counts A reference to the vector of counts corresponding to each row and column pair.
  */
-void dense_to_sparse(UIntMatDtype& mat, uint64_t row_id_offset, uint64_t col_id_offset,
-                     UInt64VecDtype& row_ids, UInt64VecDtype& col_ids,UIntVecDtype& counts);
+void dense_to_sparse(
+    UIntMatDtype& mat,
+    uint64_t row_id_offset,
+    uint64_t col_id_offset,
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -164,7 +188,11 @@ void dense_to_sparse(UIntMatDtype& mat, uint64_t row_id_offset, uint64_t col_id_
  * @param col_ids A reference to the vector of column IDs to be sorted.
  * @param counts A reference to the vector of counts to be sorted accordingly.
  */
-void sort_by_row_ids(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDtype& counts);
+void sort_by_row_ids(
+    UInt64VecDtype& row_ids,
+    UInt64VecDtype& col_ids,
+    UIntVecDtype& counts
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -177,7 +205,10 @@ void sort_by_row_ids(UInt64VecDtype& row_ids, UInt64VecDtype& col_ids, UIntVecDt
  * @param mat A reference to the matrix data structure to be transformed.
  * @param mode The diagonal transformation mode to apply.
  */
-void diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode);
+void diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -190,7 +221,10 @@ void diag_transform(UIntMatDtype& mat, DiagonalTransformMode mode);
  * @param mat A reference to the matrix data structure to be binarized.
  * @param bin_mat A reference to the binary matrix data structure to store the result.
  */
-void binarize_rows(UIntMatDtype& mat, BinMatDtype& bin_mat);
+void binarize_rows(
+    UIntMatDtype& mat,
+    BinMatDtype& bin_mat
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -202,7 +236,10 @@ void binarize_rows(UIntMatDtype& mat, BinMatDtype& bin_mat);
  * @param bin_mat A reference to the binary matrix row to be converted.
  * @param mat A reference to the matrix of unsigned integers where the converted row will be stored.
  */
-void debinarize_row_bin(BinMatDtype& bin_mat, UIntMatDtype& mat);
+void debinarize_row_bin(
+    BinMatDtype& bin_mat,
+    UIntMatDtype& mat
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -257,8 +294,9 @@ void bin_mat_from_bytes(
  * @param rec The Contact Record object to store the decoded record.
  */
 void decode_scm(
+    ContactMatrixParameters& cm_params,
+    SubcontactMatrixParameters scm_params,
     genie::contact::SubcontactMatrixPayload& scm_payload,
-    ContactMatrixParameters& params,
     core::record::ContactRecord& rec
 );
 
@@ -313,6 +351,24 @@ void encode_cm(
 std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
     const EncodingOptions& opt,
     std::vector<core::record::ContactRecord>& recs
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_cm_masks(
+    ContactMatrixParameters& cm_params,
+    SubcontactMatrixParameters scm_params,
+    genie::contact::SubcontactMatrixPayload& scm_payload
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_scm(
+    ContactMatrixParameters& cm_params,
+    SubcontactMatrixParameters scm_params,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    core::record::ContactRecord& rec,
+    uint32_t mult
 );
 
 // ---------------------------------------------------------------------------------------------------------------------

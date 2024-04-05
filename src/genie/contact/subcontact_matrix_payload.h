@@ -50,11 +50,11 @@ class SubcontactMatrixPayload {
       */
     SubcontactMatrixPayload() = default;
 
-    SubcontactMatrixPayload(SubcontactMatrixPayload&&) = default;
+    SubcontactMatrixPayload(SubcontactMatrixPayload&& other) = default;
 
-    SubcontactMatrixPayload(const SubcontactMatrixPayload&) = default;
+    SubcontactMatrixPayload(const SubcontactMatrixPayload& other) = default;
 
-    SubcontactMatrixPayload& operator=(const SubcontactMatrixPayload&) = default;
+    SubcontactMatrixPayload& operator=(const SubcontactMatrixPayload& other) = default;
 
     /**
      * @brief Parameterized constructor for SubcontactMatrixPayload.
@@ -96,9 +96,9 @@ class SubcontactMatrixPayload {
         std::optional<SubcontactMatrixMaskPayload>&& col_mask_payload
     );
 
-    bool operator==(const SubcontactMatrixPayload& other) const;
+//    bool operator==(const SubcontactMatrixPayload& other) const;
 
-    friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs);
+//    friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs);
 
    /**
     * @brief Get the Parameter Set ID.
