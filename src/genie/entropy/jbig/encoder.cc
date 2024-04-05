@@ -31,20 +31,16 @@ void JBIGEncoder::encode(
     uint32_t nrows
 ) {
     const size_t srcLen = input.str().size();
-    unsigned char* inputBuffer = NULL;
-    inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
-    memcpy(inputBuffer, input.str().c_str(), srcLen);
+    unsigned char* compressedBuffer;
+    size_t compSize;
 
-    unsigned char* compressedBuffer = NULL;
-    size_t compSize = 3*srcLen;
-
-    auto buf_nrows = (unsigned long) ncols;
-    auto buf_ncols = (unsigned long) nrows;
+    auto buf_nrows = (unsigned long) nrows;
+    auto buf_ncols = (unsigned long) ncols;
 
     int ret = mpegg_jbig_compress_default(
         &compressedBuffer,
         &compSize,
-        inputBuffer,
+        (const unsigned char* )input.str().c_str(),
         srcLen,
         buf_nrows,
         buf_ncols
@@ -97,16 +93,12 @@ void JBIGEncoder::encode(
 void JBIGEncoder::decode(
     std::stringstream& input,
     std::stringstream& output,
-    uint32_t& nrows,
-    uint32_t& ncols
+    uint32_t& ncols,
+    uint32_t& nrows
 ) {
 
     const size_t srcLen = input.str().size();
-    unsigned char* inputBuffer = NULL;
-    inputBuffer = (unsigned char*)malloc(sizeof(*inputBuffer) * srcLen);
-    memcpy(inputBuffer, input.str().c_str(), srcLen);
-
-    unsigned char* decompressedBuffer = NULL;
+     unsigned char* decompressedBuffer;
     size_t dest_data_len;
 
     unsigned long buf_nrows, buf_ncols;
@@ -114,7 +106,7 @@ void JBIGEncoder::decode(
     int ret = mpegg_jbig_decompress_default(
         &decompressedBuffer,
         &dest_data_len,
-        inputBuffer,
+        (const unsigned char* )input.str().c_str(),
         srcLen,
         &buf_nrows,
         &buf_ncols
@@ -126,8 +118,9 @@ void JBIGEncoder::decode(
     if (ret != 0) {
         std::cerr << "error with decompression\n";
     }
-    for (size_t i = 0; i < dest_data_len; ++i)
+    for (size_t i = 0; i < dest_data_len; ++i) {
         output << decompressedBuffer[i];
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,10 +5,11 @@
 #include <fstream>
 #include <iostream>
 #include "RandomRecordFillIn.h"
+#include "genie/contact/contact_parameters.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/likelihood/likelihood_parameters.h"
 #include "genie/core/writer.h"
+#include "genie/likelihood/likelihood_parameters.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -58,7 +59,6 @@ class AnnotationParameterSetTests : public ::testing::Test {
     //    // If needed, define subroutines for your tests to share
     // }
 };
-
 
 TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
@@ -117,13 +117,12 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
 #endif
 }
 
-
 TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // NOLINT(cert-err58-cpp)
     // The rule of thumb is to use EXPECT_* when you want the test to continue
     // to reveal more errors after the assertion failure, and use ASSERT_*
     // when continuing after failure doesn't make sense.
 
-     //annotation_parameter_set parameters
+    // annotation_parameter_set parameters
     uint8_t parameter_set_ID = 1;
     uint8_t AT_ID = 1;
     genie::core::AlphabetID AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
@@ -201,15 +200,11 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
     for (auto item : descriptorIDlist) {
         DescriptorID descriptor_ID = item;
         genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
-        genie::genotype::GenotypeParameters genotype_parameters;
-        genie::likelihood::LikelihoodParameters likelihood_parameters;
-        genie::core::record::annotation_parameter_set::ContactMatrixParameters contact_matrix_parameters;
 
         uint8_t n_pars = 4;
         std::vector<uint8_t> par_ID{1, 2, 3, 4};
         std::vector<genie::core::DataType> par_type{genie::core::DataType::UINT8, genie::core::DataType::UINT8,
-                                      genie::core::DataType::UINT8,
-                                      genie::core::DataType::UINT8};
+                                                    genie::core::DataType::UINT8, genie::core::DataType::UINT8};
         std::vector<uint8_t> par_num_array_dims{0, 0, 0, 0};
         std::vector<std::vector<uint8_t>> par_array_dims;
         std::vector<uint8_t> val1{10};
@@ -225,8 +220,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
             n_pars, par_ID, par_type, par_num_array_dims, par_array_dims, par_val);
 
         genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptor(
-            descriptor_ID, encoding_mode_ID, genotype_parameters, likelihood_parameters, contact_matrix_parameters,
-            algorithm_patarmeters);
+            descriptor_ID, encoding_mode_ID, algorithm_patarmeters);
         descriptor_configuration.push_back(descriptor);
     }
 

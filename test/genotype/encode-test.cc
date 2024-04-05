@@ -102,7 +102,7 @@ TEST(Genotype, RoundTrip_AdaptiveMaxValue) {
     size_t NROWS = 100;
     size_t NCOLS = 200;
     int8_t MAX_VAL = 64;
-    int8_t MIN_VAL = -2;
+//    int8_t MIN_VAL = -2;
 
     genie::genotype::Int8MatDtype allele_mat;
     genie::genotype::Int8MatDtype orig_allele_mat;
@@ -462,7 +462,7 @@ TEST(Genotype, RoundTrip_JBIG) {
 
         ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
         for (size_t i = 0; i < payload_len; i++) {
-            ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i));
+            ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i)) << "index:" << i;
         }
     }
 

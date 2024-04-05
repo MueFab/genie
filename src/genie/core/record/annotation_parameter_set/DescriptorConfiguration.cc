@@ -5,18 +5,20 @@
  */
 
 // ---------------------------------------------------------------------------------------------------------------------
+#include "DescriptorConfiguration.h"
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "genie/core/constants.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
-#include "DescriptorConfiguration.h"
 #include "genie/likelihood/likelihood_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -32,30 +34,30 @@ DescriptorConfiguration::DescriptorConfiguration()
 DescriptorConfiguration::DescriptorConfiguration(util::BitReader& reader) { read(reader); }
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
-                                                 genie::genotype::GenotypeParameters _genotype_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
-    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters,
-                              genie::likelihood::LikelihoodParameters{}, ContactMatrixParameters{},
-                              _algorithm_parameters) {}
+    : descriptor_ID(_descriptor_ID), encoding_mode_ID(_encoding_mode_ID), algorithm_parameters(_algorithm_parameters) {}
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
                                                  genie::genotype::GenotypeParameters _genotype_parameters,
-                                                 genie::likelihood::LikelihoodParameters _likelihood_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
-    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _genotype_parameters, _likelihood_parameters,
-                              ContactMatrixParameters{}, _algorithm_parameters) {}
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
+    genotype_parameters = _genotype_parameters;
+}
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
-                                                 genie::genotype::GenotypeParameters _genotype_parameters,
                                                  genie::likelihood::LikelihoodParameters _likelihood_parameters,
-                                                 ContactMatrixParameters _contact_matrix_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
-    : descriptor_ID(_descriptor_ID),
-      encoding_mode_ID(_encoding_mode_ID),
-      genotype_parameters(_genotype_parameters),
-      likelihood_parameters(_likelihood_parameters),
-      contact_matrix_parameters(_contact_matrix_parameters),
-      algorithm_parameters(_algorithm_parameters) {}
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
+    likelihood_parameters = _likelihood_parameters;
+}
+
+DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
+    genie::contact::ContactMatrixParameters _contact_matrix_parameters,
+    AlgorithmParameters _algorithm_parameters)
+    : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
+    contact_matrix_parameters = _contact_matrix_parameters;
+}
+
 
 void DescriptorConfiguration::read(util::BitReader& reader) {
     descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.read_b(8)));
@@ -65,10 +67,10 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
             genotype_parameters.read(reader);
             break;
         case AnnotDesc::LIKELIHOOD:
-          //  likelihood_parameters.read(reader);
+            //  likelihood_parameters.read(reader);
             break;
         case AnnotDesc::CONTACT:
-            contact_matrix_parameters.read(reader);
+            //  contact_matrix_parameters.read(reader);
             break;
         default:
             break;

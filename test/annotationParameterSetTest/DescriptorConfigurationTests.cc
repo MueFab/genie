@@ -10,6 +10,7 @@
 #include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
+#include "genie/contact/contact_parameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
@@ -67,16 +68,10 @@ TEST_F(DescriptorConfigurationTests, DescriptorParameterSetsubRecords) {  // NOL
     // when continuing after failure doesn't make sense.
     genie::core::record::annotation_parameter_set::AlgorithmParameters algorithmParameters(
         1, {2}, {genie::core::DataType::BOOL}, {0}, {{0}}, {{{{{0}}}}});
-    genie::genotype::GenotypeParameters genotypeParameters;
-    genie::likelihood::LikelihoodParameters likelihoodParameters;
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters contactMatrixParameters;
 
     genie::core::record::annotation_parameter_set::DescriptorConfiguration descriptorConfiguration(
-        genie::core::AnnotDesc::ATTRIBUTE, genie::core::AlgoID::BSC, genotypeParameters, likelihoodParameters,
-        contactMatrixParameters, algorithmParameters);
+        genie::core::AnnotDesc::ATTRIBUTE, genie::core::AlgoID::BSC, algorithmParameters);
 
     EXPECT_EQ(algorithmParameters.getNumberOfPars(),
               descriptorConfiguration.getAlgorithmParameters().getNumberOfPars());
 }
-
-
