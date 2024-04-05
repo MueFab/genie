@@ -48,11 +48,56 @@ LikelihoodPayload::LikelihoodPayload(genie::likelihood::LikelihoodParameters par
 
 // -----------------------------------------------------------------------------
 
+uint32_t LikelihoodPayload::getNRows() const { return nrows; }
+
+// -----------------------------------------------------------------------------
+
+uint32_t LikelihoodPayload::getNCols() const { return ncols; }
+
+// -----------------------------------------------------------------------------
+
+bool LikelihoodPayload::getTransformFlag() const { return transform_flag; }
+
+// -----------------------------------------------------------------------------
+
+const std::vector<uint8_t>& LikelihoodPayload::getPayload() const { return payload; }
+
+// -----------------------------------------------------------------------------
+
+const std::vector<uint8_t>& LikelihoodPayload::getAdditionalPayload() const { return additionalPayload; }
+
+// -----------------------------------------------------------------------------
+
+const std::stringstream& LikelihoodPayload::getPayloadStream() const { return payloadStream; }
+
+// -----------------------------------------------------------------------------
+
+const std::stringstream& LikelihoodPayload::getAdditionalPayloadStream() const { return additionalPayloadStream; }
+
+// -----------------------------------------------------------------------------
+
+void LikelihoodPayload::setNRows(uint32_t rows) { nrows = rows; }
+
+// -----------------------------------------------------------------------------
+
+void LikelihoodPayload::setNCols(uint32_t cols) { ncols = cols; }
+
+// -----------------------------------------------------------------------------
+
+void LikelihoodPayload::setTransformFlag(bool flag) { transform_flag = flag; }
+
+// -----------------------------------------------------------------------------
+
+void LikelihoodPayload::setPayload(const std::vector<uint8_t>& _payload) { payload = _payload; }
+
+// -----------------------------------------------------------------------------
+
 void LikelihoodPayload::write(core::Writer& writer) const { 
-    writer.write(nrows, 32);
-    writer.write(ncols, 32);
+    writer.write(nrows, 4u << NROWS_NCOLS_LEN);
+    writer.write(ncols, 4u << NROWS_NCOLS_LEN);
+
     if (!payload.empty()) {
-        writer.write(payload.size(), 32);
+        writer.write(payload.size(), 4u << PAYLOAD_SIZE_LEN);
         for(unsigned char i : payload)
             writer.write(i,8);
         if (transform_flag) {

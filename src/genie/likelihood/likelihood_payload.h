@@ -28,6 +28,11 @@ namespace likelihood {
 
 // -----------------------------------------------------------------------------
 
+#define NROWS_NCOLS_LEN 4u
+#define PAYLOAD_SIZE_LEN 4u
+
+// -----------------------------------------------------------------------------
+
 class LikelihoodPayload {
  private:
     uint32_t nrows;
@@ -49,6 +54,22 @@ class LikelihoodPayload {
 
     LikelihoodPayload(genie::likelihood::EncodingBlock& block);
     LikelihoodPayload(genie::likelihood::LikelihoodParameters parameters, genie::likelihood::EncodingBlock& data);
+
+    // Getters
+    uint32_t getNRows() const;
+    uint32_t getNCols() const;
+    bool getTransformFlag() const;
+    const std::vector<uint8_t>& getPayload() const;
+    const std::vector<uint8_t>& getAdditionalPayload() const;
+    const std::stringstream& getPayloadStream() const;
+    const std::stringstream& getAdditionalPayloadStream() const;
+
+    // Setters
+    void setNRows(uint32_t rows);
+    void setNCols(uint32_t cols);
+    void setTransformFlag(bool flag);
+    void setPayload(const std::vector<uint8_t>& _payload);
+
     void write(core::Writer& writer) const;
 };
 
