@@ -277,6 +277,11 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixMaskPayload){
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, RoundTrip_SubcontactMatrixPayload){
 
 }
 

@@ -26,6 +26,11 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define TILE_PAYLOAD_SIZE_LEN 4u;
+#define MASK_PAYLOAD_SIZE_LEN 4u;
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 using TilePayloads = std::vector<std::vector<ContactMatrixTilePayload>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,18 +47,38 @@ class SubcontactMatrixPayload {
       std::optional<SubcontactMatrixMaskPayload> col_mask_payload;
 
   public:
-
-     /**
+    /**
      * @brief Default constructor for SubcontactMatrixPayload.
      *
      * This is the default constructor for the SubcontactMatrixPayload class. It initializes an empty object.
-      */
-    SubcontactMatrixPayload() = default;
+     */
+    SubcontactMatrixPayload();
 
+    /**
+     * @brief Constructor from move.
+     *
+     * This constructor moves the contents of another SubcontactMatrixPayload object into this one.
+     *
+     * @param other The SubcontactMatrixPayload object to move from.
+     */
     SubcontactMatrixPayload(SubcontactMatrixPayload&& other) = default;
 
+    /**
+     * @brief Constructor by reference.
+     *
+     * This constructor copies the contents of another SubcontactMatrixPayload object into this one.
+     *
+     * @param other The SubcontactMatrixPayload object to copy from.
+     */
     SubcontactMatrixPayload(const SubcontactMatrixPayload& other) = default;
 
+    /**
+     * @brief Constructor using operator=.
+     *
+     * This constructor assigns the contents of another SubcontactMatrixPayload object to this one.
+     *
+     * @param other The SubcontactMatrixPayload object to assign from.
+     */
     SubcontactMatrixPayload& operator=(const SubcontactMatrixPayload& other) = default;
 
     /**
@@ -199,6 +224,13 @@ class SubcontactMatrixPayload {
     */
    void setChr2ID(uint8_t id);
 
+   /**
+    * @brief Set the Tile Payloads.
+    *
+    * This function sets the Tile Payloads.
+    *
+    *  @param payloads The new Tile Payloads.
+    */
    void setTilePayloads(const TilePayloads& payloads);
 
    /**
@@ -239,6 +271,25 @@ class SubcontactMatrixPayload {
     * @return True if the subcontact matrix is intra, false otherwise.
     */
    bool isIntraSCM() const;
+
+   /**
+     * @brief Gets the size of this structure.
+     *
+     * This function returns the size of this structure.
+     *
+     * @return The size of the payload.
+    */
+   size_t getSize() const;
+
+   /**
+     * @brief Writes the object to a writer.
+     *
+     * This function writes the object to a writer.
+     *
+     * @param writer The writer to write to.
+    */
+   void write(util::BitWriter &writer) const;
+
 
 };
 

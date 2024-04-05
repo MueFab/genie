@@ -13,14 +13,14 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//SubcontactMatrixPayload::SubcontactMatrixPayload()
-//    : parameter_set_ID(0),
-//      sample_ID(0),
-//      chr1_ID(0),
-//      chr2_ID(0),
-//      tile_payloads(),
-//      row_mask_payload(),
-//      col_mask_payload() {}
+SubcontactMatrixPayload::SubcontactMatrixPayload()
+    : parameter_set_ID(0),
+      sample_ID(0),
+      chr1_ID(0),
+      chr2_ID(0),
+      tile_payloads(),
+      row_mask_payload(),
+      col_mask_payload() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -147,6 +147,67 @@ void SubcontactMatrixPayload::addTilePayload(
 
 bool SubcontactMatrixPayload::isIntraSCM() const{
     return chr1_ID == chr2_ID;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t SubcontactMatrixPayload::getSize() const{
+    size_t size = 1 + 1 + 1 + 1; // parameter_sert_ID, sample_ID, chr1_ID, chr2_ID
+    auto nrows = tile_payloads.size();
+    auto ncols = tile_payloads[0].size();
+    for (auto i = 0u; i<nrows; i++){
+        for (auto j = 0u; j<ncols; j++){
+            if (i>j && isIntraSCM()){
+                continue;
+            }
+            size += TILE_PAYLOAD_SIZE_LEN;
+            size += tile_payloads[i][j].getSize();
+        }
+    }
+
+    // TODO (Yeremia): Missing norm_matrices
+
+    if (row_mask_payload.has_value())
+        size += MASK_PAYLOAD_SIZE_LEN;
+        size += row_mask_payload->getSize();
+
+    if (col_mask_payload.has_value())
+        size += MASK_PAYLOAD_SIZE_LEN;
+        size += col_mask_payload->getSize();
+
+    return size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
+    writer.writeBypassBE(parameter_set_ID);
+    writer.writeBypassBE(sample_ID);
+    writer.writeBypassBE(chr1_ID);
+    writer.writeBypassBE(chr2_ID);
+
+    auto nrows = tile_payloads.size();
+    auto ncols = tile_payloads[0].size();
+    for (auto i = 0u; i<nrows; i++){
+        for (auto j = 0u; j<ncols; j++){
+            if (i>j && isIntraSCM()){
+                continue;
+            }
+
+            writer.writeBypassBE(
+                static_cast<uint32_t>(tile_payloads[i][j].getSize())
+            );
+            tile_payloads[i][j].write(writer);
+        }
+    }
+
+    // TODO (Yeremia): Missing norm_matrices
+
+    if (row_mask_payload.has_value())
+        row_mask_payload->write(writer);
+
+    if (col_mask_payload.has_value())
+        col_mask_payload->write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
