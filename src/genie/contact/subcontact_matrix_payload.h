@@ -48,7 +48,13 @@ class SubcontactMatrixPayload {
      *
      * This is the default constructor for the SubcontactMatrixPayload class. It initializes an empty object.
       */
-    SubcontactMatrixPayload();
+    SubcontactMatrixPayload() = default;
+
+    SubcontactMatrixPayload(SubcontactMatrixPayload&& other) = default;
+
+    SubcontactMatrixPayload(const SubcontactMatrixPayload& other) = default;
+
+    SubcontactMatrixPayload& operator=(const SubcontactMatrixPayload& other) = default;
 
     /**
      * @brief Parameterized constructor for SubcontactMatrixPayload.
@@ -90,6 +96,10 @@ class SubcontactMatrixPayload {
         std::optional<SubcontactMatrixMaskPayload>&& col_mask_payload
     );
 
+//    bool operator==(const SubcontactMatrixPayload& other) const;
+
+//    friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs);
+
    /**
     * @brief Get the Parameter Set ID.
     *
@@ -98,15 +108,6 @@ class SubcontactMatrixPayload {
     * @return The ID of the parameter set.
     */
    uint8_t getParameterSetID() const;
-
-   /**
-    * @brief Set the Parameter Set ID.
-    *
-    * This function sets the ID of the parameter set.
-    *
-    * @param id The ID of the parameter set.
-    */
-   void setParameterSetID(uint8_t id);
 
    /**
     * @brief Get the Sample ID.
@@ -118,15 +119,6 @@ class SubcontactMatrixPayload {
    uint8_t getSampleID() const;
 
    /**
-    * @brief Set the Sample ID.
-    *
-    * This function sets the ID of the sample.
-    *
-    * @param id The ID of the sample.
-    */
-   void setSampleID(uint8_t id);
-
-   /**
     * @brief Get the Chromosome 1 ID.
     *
     * This function returns the ID of the first chromosome.
@@ -134,15 +126,6 @@ class SubcontactMatrixPayload {
     * @return The ID of the first chromosome.
     */
    uint8_t getChr1ID() const;
-
-   /**
-    * @brief Set the Chromosome 1 ID.
-    *
-    * This function sets the ID of the first chromosome.
-    *
-    * @param id The ID of the first chromosome.
-    */
-   void setChr1ID(uint8_t id);
 
    /**
     * @brief Get the Chromosome 2 ID.
@@ -154,15 +137,6 @@ class SubcontactMatrixPayload {
    uint8_t getChr2ID() const;
 
    /**
-    * @brief Set the Chromosome 2 ID.
-    *
-    * This function sets the ID of the second chromosome.
-    *
-    * @param id The ID of the second chromosome.
-    */
-   void setChr2ID(uint8_t id);
-
-   /**
     * @brief Gets the tile payloads.
     *
     * This function returns a constant reference to the tile payloads. The payloads are of type `TilePayloads`.
@@ -170,28 +144,6 @@ class SubcontactMatrixPayload {
     * @return A constant reference to the tile payloads.
     */
    const TilePayloads& getTilePayloads() const;
-
-   /**
-     * @brief Adds a tile payload.
-     *
-     * This method adds a tile payload at the given indices.
-     *
-     * @param i_tile The index of the first dimension.
-     * @param j_tile The index of the second dimension.
-     * @param tile_payload The tile payload to set.
-    */
-   void addTilePayload(size_t i_tile, size_t j_tile, ContactMatrixTilePayload&& tile_payload);
-
-//   void setTilePayloads(TilePayloads&& payloads);
-
-   /**
-    * @brief Sets the payload for the row mask.
-    *
-    * This function sets the payload for the row mask. The payload is an optional object of type `SubcontactMatrixMaskPayload`.
-    *
-    * @param payload The payload to set for the row mask.
-    */
-   void setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
    /**
     * @brief Gets the payload for the row mask.
@@ -203,6 +155,62 @@ class SubcontactMatrixPayload {
    const std::optional<SubcontactMatrixMaskPayload>& getRowMaskPayload() const;
 
    /**
+    * @brief Gets the payload for the column mask.
+    *
+    * This function returns the payload for the column mask. It returns a reference to a constant `std::optional` object of type `SubcontactMatrixMaskPayload`.
+    *
+    * @return A constant reference to the payload for the column mask.
+    */
+   const std::optional<SubcontactMatrixMaskPayload>& getColMaskPayload() const;
+
+   /**
+    * @brief Set the Parameter Set ID.
+    *
+    * This function sets the ID of the parameter set.
+    *
+    * @param id The ID of the parameter set.
+    */
+   void setParameterSetID(uint8_t id);
+
+   /**
+    * @brief Set the Sample ID.
+    *
+    * This function sets the ID of the sample.
+    *
+    * @param id The ID of the sample.
+    */
+   void setSampleID(uint8_t id);
+
+   /**
+    * @brief Set the Chromosome 1 ID.
+    *
+    * This function sets the ID of the first chromosome.
+    *
+    * @param id The ID of the first chromosome.
+    */
+   void setChr1ID(uint8_t id);
+
+   /**
+    * @brief Set the Chromosome 2 ID.
+    *
+    * This function sets the ID of the second chromosome.
+    *
+    * @param id The ID of the second chromosome.
+    */
+   void setChr2ID(uint8_t id);
+
+   void setTilePayloads(const TilePayloads& payloads);
+
+   /**
+    * @brief Sets the payload for the row mask.
+    *
+    * This function sets the payload for the row mask. The payload is an optional object of type `SubcontactMatrixMaskPayload`.
+    *
+    * @param payload The payload to set for the row mask.
+    */
+   void setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+
+   /**
     * @brief Sets the payload for the column mask.
     *
     * This function sets the payload for the column mask. The payload is an optional object of type `SubcontactMatrixMaskPayload`.
@@ -212,13 +220,15 @@ class SubcontactMatrixPayload {
    void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
    /**
-    * @brief Gets the payload for the column mask.
-    *
-    * This function returns the payload for the column mask. It returns a reference to a constant `std::optional` object of type `SubcontactMatrixMaskPayload`.
-    *
-    * @return A constant reference to the payload for the column mask.
+     * @brief Adds a tile payload.
+     *
+     * This method adds a tile payload at the given indices.
+     *
+     * @param i_tile The index of the first dimension.
+     * @param j_tile The index of the second dimension.
+     * @param tile_payload The tile payload to set.
     */
-   const std::optional<SubcontactMatrixMaskPayload>& getColMaskPayload() const;
+   void addTilePayload(size_t i_tile, size_t j_tile, ContactMatrixTilePayload&& tile_payload);
 
    /**
     * @brief Checks if the subcontact matrix matrix is intra subcontact matrix.

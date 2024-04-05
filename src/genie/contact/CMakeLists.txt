@@ -7,13 +7,13 @@ find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
 
 set(source_files
+        consts.h
         contact_coder.cc
         contact_parameters.cc
         subcontact_matrix_parameters.cc
         subcontact_matrix_payload.cc
-        contact_matrix_tile_payload.h
+        subcontact_matrix_mask_payload.cc
         contact_matrix_tile_payload.cc
-        subcontact_matrix_mask_payload.h
 )
 
 add_library(${PROJECT_NAME} ${source_files})
@@ -44,3 +44,5 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 foreach(dir ${dirs})
     message(STATUS "dir='${dir}'")
 endforeach()
+
+target_include_directories(${PROJECT_NAME} PUBLIC "${TOP_DIR}")

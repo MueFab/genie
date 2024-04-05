@@ -13,14 +13,14 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SubcontactMatrixPayload::SubcontactMatrixPayload()
-    : parameter_set_ID(0),
-      sample_ID(0),
-      chr1_ID(0),
-      chr2_ID(0),
-      tile_payloads(),
-      row_mask_payload(),
-      col_mask_payload() {}
+//SubcontactMatrixPayload::SubcontactMatrixPayload()
+//    : parameter_set_ID(0),
+//      sample_ID(0),
+//      chr1_ID(0),
+//      chr2_ID(0),
+//      tile_payloads(),
+//      row_mask_payload(),
+//      col_mask_payload() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,6 +52,23 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
         row_mask_payload(_row_mask_payload),
         col_mask_payload(_col_mask_payload) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+//bool SubcontactMatrixPayload::operator==(const SubcontactMatrixPayload& other) const {
+//    return parameter_set_ID == other.parameter_set_ID &&
+//           sample_ID == other.sample_ID &&
+//           chr1_ID == other.chr1_ID &&
+//           chr2_ID == other.chr2_ID &&
+//           tile_payloads == other.tile_payloads &&
+//           row_mask_payload == other.row_mask_payload &&
+//           col_mask_payload == other.col_mask_payload;
+//}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs){
+//
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,15 +76,7 @@ uint8_t SubcontactMatrixPayload::getParameterSetID() const { return parameter_se
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setParameterSetID(uint8_t id) { parameter_set_ID = id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint8_t SubcontactMatrixPayload::getSampleID() const { return sample_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubcontactMatrixPayload::setSampleID(uint8_t id) { sample_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -75,11 +84,31 @@ uint8_t SubcontactMatrixPayload::getChr1ID() const { return chr1_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setChr1ID(uint8_t id) { chr1_ID = id; }
+uint8_t SubcontactMatrixPayload::getChr2ID() const { return chr2_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t SubcontactMatrixPayload::getChr2ID() const { return chr2_ID; }
+const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return tile_payloads; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getRowMaskPayload() const { return row_mask_payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getColMaskPayload() const { return col_mask_payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setParameterSetID(uint8_t id) { parameter_set_ID = id; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setSampleID(uint8_t id) { sample_ID = id; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setChr1ID(uint8_t id) { chr1_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -87,7 +116,15 @@ void SubcontactMatrixPayload::setChr2ID(uint8_t id) { chr2_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return tile_payloads; }
+//void SubcontactMatrixPayload::setTilePayloads(TilePayloads&& payloads) { tile_payloads = payloads; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { row_mask_payload = payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { col_mask_payload = payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -105,26 +142,6 @@ void SubcontactMatrixPayload::addTilePayload(
     }
     tile_payloads[i_tile][j_tile] = std::move(tile_payload);
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//void SubcontactMatrixPayload::setTilePayloads(TilePayloads&& payloads) { tile_payloads = payloads; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getRowMaskPayload() const { return row_mask_payload; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubcontactMatrixPayload::setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { row_mask_payload = payload; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getColMaskPayload() const { return col_mask_payload; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { col_mask_payload = payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
