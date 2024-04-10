@@ -5,13 +5,13 @@
  */
 
 #include "contact_coder.h"
+#include <codecs/include/mpegg-codecs.h>
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime-exception.h>
 #include <xtensor/xsort.hpp>
-#include <codecs/include/mpegg-codecs.h>
-#include "contact_parameters.h"
-#include "subcontact_matrix_parameters.h"
+#include "contact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
+#include "subcontact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -186,7 +186,6 @@ void sparse_to_dense(
     uint64_t row_id_offset,
     uint64_t col_id_offset
 ){
-    auto dim = mat.shape(0);
     if (mat.shape(0) == 0 || mat.shape(1) == 0)
         mat = xt::zeros<uint32_t>({nrows, ncols});
     else
@@ -428,9 +427,39 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
         for (auto j = 0u; j < ncols; j++) {
-            auto byte_offset = row_offset + (j >> 3);
-            uint8_t shift = (7 - (j & 7));
-            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
+            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1u;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_scm(
+    ContactMatrixParameters& cm_param,
+    const SubcontactMatrixParameters scm_param,
+    const genie::contact::SubcontactMatrixPayload& scm_payload,
+    core::record::ContactRecord& rec,
+    uint32_t mult
+){
+    // (not part of specification) Initialize variables
+    BinVecDtype row_mask;
+    BinVecDtype col_mask;
+
+    auto chr1_ID = scm_param.getChr1ID();
+    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
+    auto chr2_ID = scm_param.getChr2ID();
+    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
+
+    for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
+        for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
+            UIntMatDtype tile_mat;
+
+            if (i_tile > j_tile && scm_param.isIntraSCM())
+                continue;
+
+            auto& tile_param = scm_param.getTileParameters();
         }
     }
 }
@@ -438,28 +467,37 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encode_scm(
-    const EncodingOptions& opt,
-    ContactMatrixParameters& params,
+    ContactMatrixParameters& cm_param,
     core::record::ContactRecord& rec,
-    genie::contact::SubcontactMatrixPayload& scm_payload
+    SubcontactMatrixParameters& scm_param,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    bool transform_mask,
+    bool transform_tile,
+    core::AlgoID codec_ID
 ) {
 
     // Initialize variables
     BinVecDtype row_mask;
     BinVecDtype col_mask;
 
-    auto interval = params.getBinSize();
+    auto interval = cm_param.getBinSize();
+    auto tile_size = cm_param.getTileSize();
     auto num_counts = rec.getNumCounts();
-
-    auto chr1_ID = scm_payload.getChr1ID();
-    auto chr1_nbins = params.getNumBinEntries(chr1_ID);
-    auto ntiles_in_row = params.getNumTiles(chr1_ID);
-
-    auto chr2_ID = scm_payload.getChr2ID();
-    auto chr2_nbins = params.getNumBinEntries(chr2_ID);
-    auto ntiles_in_col = params.getNumTiles(chr2_ID);
+    auto chr1_ID = rec.getChr1ID();
+    auto chr1_nbins = cm_param.getNumBinEntries(chr1_ID);
+    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
+    auto chr2_ID = rec.getChr2ID();
+    auto chr2_nbins = cm_param.getNumBinEntries(chr2_ID);
+    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
 
     auto is_intra_scm = chr1_ID == chr2_ID;
+
+    scm_param.setChr1ID(chr1_ID);
+    scm_param.setChr2ID(chr2_ID);
+    scm_param.setCodecID(codec_ID);
+
+    scm_param.setNumTiles(ntiles_in_row, ntiles_in_col);
+    scm_payload.setNumTiles(ntiles_in_row, ntiles_in_col);
 
     UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_counts});
     row_ids /= interval;
@@ -475,15 +513,66 @@ void encode_scm(
     // Create mapping
     remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
 
-    std::list<ContactMatrixTilePayload> tile_payloads;
+    if (transform_mask){
 
-    for (size_t i_tile=0; i_tile< ntiles_in_row; i_tile++){
-        auto min_row_id = i_tile*opt.tile_size;
-        auto max_row_id = (i_tile+1)*opt.tile_size;
+    } else {
+        auto rowmask_payload = SubcontactMatrixMaskPayload(
+            std::move(row_mask)
+        );
 
-        for (size_t j_tile=0; j_tile< ntiles_in_col; j_tile++){
-            auto min_col_id = j_tile*opt.tile_size;
-            auto max_col_id = (j_tile+1)*opt.tile_size;
+        scm_payload.setRowMaskPayload(
+            std::move(row_mask)
+        );
+
+        auto colmask_payload = SubcontactMatrixMaskPayload(
+            std::move(col_mask)
+        );
+
+        scm_payload.setColMaskPayload(
+            std::move(col_mask)
+        );
+    }
+
+    for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
+
+        auto min_row_id = i_tile*tile_size;
+        auto max_row_id = (i_tile+1)*tile_size;
+
+        for (size_t j_tile = 0u; j_tile< ntiles_in_col; j_tile++){
+
+            if (i_tile > j_tile && scm_param.isIntraSCM())
+                continue;
+
+            auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
+            auto& diag_transform_mode = tile_param.diag_tranform_mode;
+            auto& binarization_mode = tile_param.binarization_mode;
+
+            uint32_t tile_nrows, tile_ncols;
+            uint8_t* payload;
+            size_t payload_len;
+
+            // Mode selection for encoding
+            if (transform_tile){
+                if (i_tile == j_tile){
+                    if (is_intra_scm){
+                        diag_transform_mode = DiagonalTransformMode::MODE_0;
+                    } else
+                        diag_transform_mode = DiagonalTransformMode::MODE_1;
+                } else if (i_tile < j_tile)
+                    diag_transform_mode = DiagonalTransformMode::MODE_2;
+                else if (j_tile > i_tile)
+                    diag_transform_mode = DiagonalTransformMode::MODE_3;
+                else
+                    UTILS_DIE("This should never be reached!");
+
+                binarization_mode = BinarizationMode::ROW_BINARIZATION;
+            } else {
+                diag_transform_mode = DiagonalTransformMode::NONE;
+                binarization_mode = BinarizationMode::NONE;
+            }
+
+            auto min_col_id = j_tile*tile_size;
+            auto max_col_id = (j_tile+1)*tile_size;
 
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
@@ -493,10 +582,13 @@ void encode_scm(
             UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
             UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-            auto tile_nrows = std::min(max_row_id, chr1_nbins) - min_row_id;
-            auto tile_ncols = std::min(max_col_id, chr2_nbins) - min_col_id;
+            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_nbins) - min_row_id);
+            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_nbins) - min_col_id);
 
             UIntMatDtype tile_mat;
+
+            //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
+            //                  better for no transformation compression
             sparse_to_dense(
                 tile_row_ids,
                 tile_col_ids,
@@ -508,31 +600,19 @@ void encode_scm(
                 min_col_id
             );
 
-            auto mode = DiagonalTransformMode::NONE;
-            // Hardcoded option for the chosen mode
-            if (opt.diag_transform) {
-                if (is_intra_scm && i_tile == j_tile)
-                    mode = DiagonalTransformMode::MODE_0;
-                else if (i_tile < j_tile)
-                    mode = DiagonalTransformMode::MODE_1;
-                else if (i_tile > j_tile)
-                    mode = DiagonalTransformMode::MODE_2;
-            }
+            genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
-            genie::contact::diag_transform(tile_mat, mode);
-
-            if (opt.binarize){
+            if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 genie::contact::BinMatDtype bin_mat;
                 genie::contact::binarize_rows(tile_mat, bin_mat);
 
-                if (opt.codec == genie::core::AlgoID::JBIG) {
-                    uint8_t* payload;
-                    size_t payload_len;
+                tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
+                tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
+
+                if (codec_ID == genie::core::AlgoID::JBIG) {
                     uint8_t* compressed_payload;
                     size_t compressed_payload_len;
 
-                    size_t bin_mat_nrows = bin_mat.shape(0);
-                    size_t bin_mat_ncols = bin_mat.shape(1);
 
                     bin_mat_to_bytes(bin_mat, &payload, payload_len);
 
@@ -541,23 +621,32 @@ void encode_scm(
                         &compressed_payload_len,
                         payload,
                         payload_len,
-                        bin_mat_nrows,
-                        bin_mat_ncols
+                        tile_nrows,
+                        tile_ncols
                     );
 
-                    tile_payloads.emplace_back(
-                        opt.codec,
-                        bin_mat_nrows,
-                        bin_mat_ncols,
-                        &compressed_payload,
-                        compressed_payload_len
-                    );
                 } else {
                     UTILS_DIE("Not yet implemented for other codec!");
                 }
+
+            // BinarizationMode::NONE
             } else {
                 UTILS_DIE("Not yet implemented!");
             }
+
+            auto tile_payload = ContactMatrixTilePayload(
+                codec_ID,
+                tile_nrows,
+                tile_ncols,
+                &payload,
+                payload_len
+            );
+
+            scm_payload.setTilePayload(
+                i_tile,
+                j_tile,
+                std::move(tile_payload)
+            );
         }
     }
 }
@@ -608,12 +697,12 @@ void encode_cm(
             chr2_ID
         );
 
-        encode_scm(
-            opt,
-            params,
-            rec,
-            scm_payload
-        );
+//        encode_scm(
+//            codec_ID,
+//            params,
+//            rec,
+//            scm_payload
+//        );
     }
 }
 
@@ -646,19 +735,6 @@ void decode_cm_masks(
 
     }
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decode_scm(
-    ContactMatrixParameters& cm_params,
-    SubcontactMatrixParameters scm_params,
-    genie::contact::SubcontactMatrixPayload& scm_payload,
-    core::record::ContactRecord& rec,
-    uint32_t mult
-){
-
-}
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

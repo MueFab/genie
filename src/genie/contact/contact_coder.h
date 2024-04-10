@@ -9,14 +9,15 @@
 
 #include <cstdint>
 #include <list>
-#include <tuple>
 #include <optional>
+#include <tuple>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
+#include "consts.h"
+#include "contact_matrix_parameters.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/contact/record.h"
-#include "consts.h"
-#include "contact_parameters.h"
+#include "subcontact_matrix_parameters.h"
 #include "subcontact_matrix_payload.h"
 
 namespace genie {
@@ -294,29 +295,23 @@ void bin_mat_from_bytes(
  * @param rec The Contact Record object to store the decoded record.
  */
 void decode_scm(
-    ContactMatrixParameters& cm_params,
-    SubcontactMatrixParameters scm_params,
-    genie::contact::SubcontactMatrixPayload& scm_payload,
-    core::record::ContactRecord& rec
+    ContactMatrixParameters& cm_param,
+    const SubcontactMatrixParameters scm_param,
+    const genie::contact::SubcontactMatrixPayload& scm_payload,
+    core::record::ContactRecord& rec,
+    uint32_t mult
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/**
- * @brief Encodes a subcontact matrix.
- *
- * This function encodes a subcontact matrix from a given contact record and encoding options.
- *
- * @param opt The encoding options.
- * @param params The contact matrix parameters.
- * @param rec The contact record.
- * @param scm_payload The subcontact matrix payload.
- */
 void encode_scm(
-    const EncodingOptions& opt,
-    ContactMatrixParameters& params,
+    ContactMatrixParameters& cm_param,
     core::record::ContactRecord& rec,
-    genie::contact::SubcontactMatrixPayload& scm_payload
+    SubcontactMatrixParameters& scm_param,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
+    bool transform_mask=true,
+    bool transform_tile=true,
+    core::AlgoID codec_ID=core::AlgoID::JBIG
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -359,16 +354,6 @@ void decode_cm_masks(
     ContactMatrixParameters& cm_params,
     SubcontactMatrixParameters scm_params,
     genie::contact::SubcontactMatrixPayload& scm_payload
-);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decode_scm(
-    ContactMatrixParameters& cm_params,
-    SubcontactMatrixParameters scm_params,
-    genie::contact::SubcontactMatrixPayload& scm_payload,
-    core::record::ContactRecord& rec,
-    uint32_t mult
 );
 
 // ---------------------------------------------------------------------------------------------------------------------

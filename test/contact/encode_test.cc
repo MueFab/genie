@@ -636,36 +636,59 @@ TEST(ContactCoder, full_coding) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Create round trip test
-TEST(ContactCoder, EncodeCM){
+TEST(ContactCoder, RoundTrip_OneRecNoNorm){
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-three_recs.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::ifstream reader(filepath, std::ios::binary);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
 
-    std::list<genie::core::record::ContactRecord> recs;
+    std::vector<genie::core::record::ContactRecord> recs;
 
-    while (bitreader.isGood()) {
+    while (bitreader.isGood()){
         recs.emplace_back(bitreader);
     }
 
     // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
     recs.pop_back();
 
-    genie::contact::EncodingOptions opt = {
-        250000, // bin_size;
-        500, // tile_size;
-        false, // multi_intervals = false;
-        true, // diag_transform = true;
-        true // binarize = true;
-    };
+    {
+        auto TRANSFORM_MASK = true;
+        auto TRANSFORM_TILE = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 5000u;
 
-    genie::contact::EncodingBlock block;
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-    encode_cm(recs, opt, block);
+        cm_param.setBinSize(recs.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: recs){
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+        }
+
+        auto& rec = recs.front();
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            TRANSFORM_MASK,
+            TRANSFORM_TILE,
+            CODEC_ID
+        );
+
+        auto scm_payload_len = scm_payload.getSize();
+        auto x = 10;
+    }
 
 }
 
