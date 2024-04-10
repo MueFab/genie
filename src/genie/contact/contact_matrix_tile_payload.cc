@@ -22,7 +22,9 @@ ContactMatrixTilePayload::ContactMatrixTilePayload()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixTilePayload::ContactMatrixTilePayload(const ContactMatrixTilePayload& other)
+ContactMatrixTilePayload::ContactMatrixTilePayload(
+    const ContactMatrixTilePayload& other
+)
     : codec_ID(other.codec_ID),
       tile_nrows(other.tile_nrows),
       tile_ncols(other.tile_ncols),
@@ -36,11 +38,14 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(const ContactMatrixTilePayloa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixTilePayload::ContactMatrixTilePayload(ContactMatrixTilePayload&& other) noexcept
+ContactMatrixTilePayload::ContactMatrixTilePayload(
+    ContactMatrixTilePayload&& other
+) noexcept
     : codec_ID(other.codec_ID),
       tile_nrows(other.tile_nrows),
       tile_ncols(other.tile_ncols),
-      payload(std::move(other.payload)) {
+      payload(std::move(other.payload))
+{
 
     if (codec_ID == core::AlgoID::JBIG){
         tile_nrows = 0;
@@ -50,7 +55,10 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(ContactMatrixTilePayload&& ot
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(ContactMatrixTilePayload&& other) noexcept {
+ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
+    ContactMatrixTilePayload&& other
+) noexcept
+{
     if (this != &other) {
         codec_ID = other.codec_ID;
         tile_nrows = other.tile_nrows;

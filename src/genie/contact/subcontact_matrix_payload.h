@@ -15,7 +15,7 @@
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
 //#include "genie/core/record/contact/record.h"
-#include "contact_parameters.h"
+#include "contact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
 #include "subcontact_matrix_mask_payload.h"
 
@@ -31,6 +31,7 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+//using TilePayloads = xt::xtensor<ContactMatrixTilePayload, 2, xt::layout_type::row_major>;
 using TilePayloads = std::vector<std::vector<ContactMatrixTilePayload>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -251,6 +252,12 @@ class SubcontactMatrixPayload {
     */
    void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
+   void setNumTiles(
+       size_t ntiles_in_row,
+       size_t ntiles_in_col,
+       bool free_mem=true
+   );
+
    /**
      * @brief Adds a tile payload.
      *
@@ -260,7 +267,29 @@ class SubcontactMatrixPayload {
      * @param j_tile The index of the second dimension.
      * @param tile_payload The tile payload to set.
     */
-   void addTilePayload(size_t i_tile, size_t j_tile, ContactMatrixTilePayload&& tile_payload);
+   void setTilePayload(
+       size_t i_tile,
+       size_t j_tile,
+       ContactMatrixTilePayload&& tile_payload
+   );
+
+   /**
+     * @brief Get the number of tiles in a row.
+     *
+     * This method returns the number of tiles in a row.
+     *
+     * @return The number of tiles in a row.
+    */
+   size_t getNTilesInRow() const;
+
+   /**
+     * @brief Get the number of tiles in a column.
+     *
+     * This method returns the number of tiles in a column.
+     *
+     * @return The number of tiles in a column.
+    */
+   size_t getNTilesInCol() const;
 
    /**
     * @brief Checks if the subcontact matrix matrix is intra subcontact matrix.

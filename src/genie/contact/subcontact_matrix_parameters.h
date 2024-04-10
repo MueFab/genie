@@ -6,21 +6,26 @@
 #ifndef GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_PARAMETERS_H
 
+#include <genie/core/constants.h>
+#include <genie/core/writer.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <genie/core/constants.h>
-#include <genie/core/writer.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-//#include "contact_parameters.h"
+#include "contact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace contact {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define ENA_TRANSFORM_BLEN 1
+#define CODEC_ID_BLEN 5
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +36,8 @@ enum class DiagonalTransformMode : uint8_t {
     MODE_2 = 3,
     MODE_3 = 4
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 enum class BinarizationMode : uint8_t {
     NONE = 0,
@@ -46,7 +53,8 @@ struct TileParameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-using ChrIDPair = std::pair<uint8_t, uint8_t>;
+//using ChrIDPair = std::pair<uint8_t, uint8_t>;
+using TileParameters = std::vector<std::vector<TileParameter>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +63,8 @@ class SubcontactMatrixParameters {
     uint8_t parameter_set_ID;
     uint8_t chr1_ID;
     uint8_t chr2_ID;
-    std::vector<std::vector<TileParameter>> tile_parameters;
+    core::AlgoID codec_ID;
+    TileParameters tile_parameters;
     bool row_mask_exists_flag;
     bool col_mask_exists_flag;
 
@@ -64,16 +73,40 @@ class SubcontactMatrixParameters {
     SubcontactMatrixParameters();
 
     // Constructor from move
-    SubcontactMatrixParameters(uint8_t parameter_set_ID, uint8_t chr1_ID, uint8_t chr2_ID, std::vector<std::vector<TileParameter>>&& tile_parameters,
-                               bool row_mask_exists_flag, bool col_mask_exists_flag);
-
-    // Constructor from move
-    SubcontactMatrixParameters(SubcontactMatrixParameters&& other) noexcept;
+    SubcontactMatrixParameters(
+        SubcontactMatrixParameters&& other
+    ) noexcept;
 
     // Constructor by reference
-    SubcontactMatrixParameters(const SubcontactMatrixParameters& other);
+    SubcontactMatrixParameters(
+        const SubcontactMatrixParameters& other
+    ) noexcept;
 
-    // Getters
+    bool operator==(
+        const SubcontactMatrixParameters& other
+    );
+
+    // Constructor from move
+//    SubcontactMatrixParameters(
+//        uint8_t parameter_set_ID,
+//        uint8_t chr1_ID,
+//        uint8_t chr2_ID,
+//        core::AlgoID codec_ID,
+//        TileParameters&& tile_parameters,
+//        bool row_mask_exists_flag,
+//        bool col_mask_exists_flag
+//    ) noexcept;
+
+    SubcontactMatrixParameters(
+        util::BitReader& reader,
+        ContactMatrixParameters& params
+    );
+
+    // Constructor using operator=
+    SubcontactMatrixParameters& operator=(
+        const SubcontactMatrixParameters& other
+    );
+
     /**
      * @brief Get the parameter set ID.
      *
@@ -101,8 +134,11 @@ class SubcontactMatrixParameters {
      */
     uint8_t getChr2ID() const;
 
+    core::AlgoID getCodecID() const;
+
     //TODO(yeremia): Create docstring
-    const std::vector<std::vector<TileParameter>>& getTileParameters() const;
+//    const std::vector<std::vector<TileParameter>>& getTileParameters() const;
+    const TileParameters& getTileParameters() const;
 
     /**
      * @brief Get the row mask exists flag.
@@ -150,6 +186,8 @@ class SubcontactMatrixParameters {
      */
     void setChr2ID(uint8_t ID);
 
+    void setCodecID(core::AlgoID codec_ID);
+
     /**
      * @brief Set the tile parameters.
      *
@@ -157,7 +195,7 @@ class SubcontactMatrixParameters {
      *
      * @param parameters The new tile parameters.
      */
-    void setTileParameters(const std::vector<std::vector<TileParameter>>& parameters);
+    void setTileParameters(TileParameters&& parameters);
 
     /**
      * @brief Set the row mask exists flag.
@@ -177,17 +215,22 @@ class SubcontactMatrixParameters {
      */
     void setColMaskExistsFlag(bool flag);
 
-    ChrIDPair getChrPair();
+    void setNumTiles(
+        size_t ntiles_in_row,
+        size_t ntiles_in_col,
+        bool free_mem=true
+    );
 
-    /**
-     * @brief Check if the subcontact matrix is symmetrical.
-     *
-     * This method checks if the subcontact matrix is symmetrical.
-     * It returns true if the chromosome IDs are the same, and false otherwise.
-     *
-     * @return True if the subcontact matrix is symmetrical, false otherwise.
-     */
-    bool isSymmetrical() const;
+    TileParameter& getTileParameter(
+        size_t i_tile,
+        size_t j_tile
+    );
+
+    void setTileParameter(
+        size_t i_tile,
+        size_t j_tile,
+        TileParameter tile_parameter
+    );
 
     /**
      * @brief Get the number of tiles in a row.
@@ -207,15 +250,17 @@ class SubcontactMatrixParameters {
      */
     size_t getNTilesInCol() const;
 
+    bool getEnaTransform() const;
 
     /**
-     * @brief Constructor that reads from a BitReader.
+     * @brief Check if the subcontact matrix is symmetrical.
      *
-     * This constructor reads the parameters from a BitReader.
+     * This method checks if the subcontact matrix is symmetrical.
+     * It returns true if the chromosome IDs are the same, and false otherwise.
      *
-     * @param reader The BitReader to read from.
+     * @return True if the subcontact matrix is symmetrical, false otherwise.
      */
-    SubcontactMatrixParameters(util::BitReader& reader);
+    bool isIntraSCM() const;
 
     /**
      * @brief Computes the size of the object in bytes.
@@ -236,11 +281,6 @@ class SubcontactMatrixParameters {
      * @param writer The BitWriter to write to.
      */
     void write(util::BitWriter& writer) const;
-
-    // Constructor using operator=
-    SubcontactMatrixParameters& operator=(const SubcontactMatrixParameters& other);
-
-    bool operator==(const SubcontactMatrixParameters& other) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

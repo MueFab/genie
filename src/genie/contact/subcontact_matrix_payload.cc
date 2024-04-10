@@ -5,6 +5,7 @@
 */
 
 #include "subcontact_matrix_payload.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -128,19 +129,54 @@ void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::addTilePayload(
+void SubcontactMatrixPayload::setNumTiles(
+    size_t ntiles_in_row,
+    size_t ntiles_in_col,
+    bool free_mem
+) {
+    if (free_mem){
+        tile_payloads.clear();
+    }
+
+    tile_payloads.resize(ntiles_in_row);
+    for (auto& v:tile_payloads){
+        v.resize(ntiles_in_col);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setTilePayload(
     size_t i_tile,
     size_t j_tile,
     ContactMatrixTilePayload&& tile_payload
 ) {
     // Assuming TilePayloads is a 2D vector of ContactMatrixTilePayload
-    if (i_tile >= tile_payloads.size()) {
-        tile_payloads.resize(i_tile + 1);
-    }
-    if (j_tile >= tile_payloads[i_tile].size()) {
-        tile_payloads[i_tile].resize(j_tile + 1);
-    }
+//    if (i_tile >= tile_payloads.size()) {
+//        tile_payloads.resize(i_tile + 1);
+//    }
+//    if (j_tile >= tile_payloads[i_tile].size()) {
+//        tile_payloads[i_tile].resize(j_tile + 1);
+//    }
+//    tile_payloads(i_tile, j_tile) = std::move(tile_payload);
+    UTILS_DIE_IF(i_tile >= tile_payloads.size(), "i_tile is greater than ntiles_in_row");
+    UTILS_DIE_IF(j_tile >= tile_payloads[i_tile].size(), "j_tile is greater than ntiles_in_col");
     tile_payloads[i_tile][j_tile] = std::move(tile_payload);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t SubcontactMatrixPayload::getNTilesInRow() const {
+    return tile_payloads.size();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t SubcontactMatrixPayload::getNTilesInCol() const {
+    if (getNTilesInRow() > 0)
+        return tile_payloads[0].size();
+    else
+        return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -153,15 +189,19 @@ bool SubcontactMatrixPayload::isIntraSCM() const{
 
 size_t SubcontactMatrixPayload::getSize() const{
     size_t size = 1 + 1 + 1 + 1; // parameter_sert_ID, sample_ID, chr1_ID, chr2_ID
-    auto nrows = tile_payloads.size();
-    auto ncols = tile_payloads[0].size();
-    for (auto i = 0u; i<nrows; i++){
-        for (auto j = 0u; j<ncols; j++){
+    auto ntiles_in_row = getNTilesInRow();
+    auto ntiles_in_col = getNTilesInCol();
+//    auto shape = tile_payloads.shape();
+//    auto ntiles_in_row = shape[0];
+//    auto ntiles_in_col = shape[1];
+    for (auto i = 0u; i< ntiles_in_row; i++){
+        for (auto j = 0u; j< ntiles_in_col; j++){
             if (i>j && isIntraSCM()){
                 continue;
             }
             size += TILE_PAYLOAD_SIZE_LEN;
             size += tile_payloads[i][j].getSize();
+//            size += tile_payloads(i, j).getSize();
         }
     }
 
@@ -186,18 +226,22 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
     writer.writeBypassBE(chr1_ID);
     writer.writeBypassBE(chr2_ID);
 
-    auto nrows = tile_payloads.size();
-    auto ncols = tile_payloads[0].size();
-    for (auto i = 0u; i<nrows; i++){
-        for (auto j = 0u; j<ncols; j++){
+    auto ntiles_in_row = getNTilesInRow();
+    auto ntiles_in_col = getNTilesInCol();
+
+    for (auto i = 0u; i<ntiles_in_row; i++){
+        for (auto j = 0u; j<ntiles_in_col; j++){
             if (i>j && isIntraSCM()){
                 continue;
             }
 
+            auto& tile_payload = tile_payloads[i][j];
+
             writer.writeBypassBE(
-                static_cast<uint32_t>(tile_payloads[i][j].getSize())
+                static_cast<uint32_t>(tile_payload.getSize())
             );
-            tile_payloads[i][j].write(writer);
+
+            tile_payload.write(writer);
         }
     }
 

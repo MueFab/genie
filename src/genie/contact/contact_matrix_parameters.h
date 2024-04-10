@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTACT_CONTACT_PARAMETERS_H
-#define GENIE_CONTACT_CONTACT_PARAMETERS_H
+#ifndef GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
+#define GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
 
 #include <genie/core/constants.h>
 #include <genie/core/writer.h>
@@ -16,7 +16,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "subcontact_matrix_parameters.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,31 +51,6 @@ struct NormalizedMatrixInformations {
     uint8_t ID;
     std::string name;
 };
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// TODO (Yeremia): This is a dummy hash pair function, update this function if necessary
-struct chr_pair_hash {
-    template <class T1, class T2>
-    size_t operator()(const std::pair<T1, T2>& p) const
-    {
-//        auto hash1 = std::hash<T1>{}(p.first);
-//        auto hash2 = std::hash<T2>{}(p.second);
-//
-//        if (hash1 != hash2) {
-//            return hash1 ^ hash2;
-//        }
-//
-//        // If hash1 == hash2, their XOR is zero.
-//        return hash1;
-        return (static_cast<size_t>(p.first) << 16) + static_cast<size_t>(p.second);
-    }
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-using ChrIDPair = std::pair<uint8_t, uint8_t>;
-using SCMParamsDtype = std::unordered_map<ChrIDPair, SubcontactMatrixParameters, chr_pair_hash>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -199,7 +173,19 @@ class ContactMatrixParameters {
      * @param length The length
      *  @param exist_ok If true, allows the upsert if the chromosome already exists.
      */
-    void upsertChromosome(uint8_t ID, std::string&& name, uint64_t length, bool exist_ok=true);
+    void upsertChromosome(
+        uint8_t ID,
+        const std::string& name,
+        uint64_t length,
+        bool exist_ok=true
+    );
+
+    void upsertChromosome(
+        uint8_t ID,
+        std::string&& name,
+        uint64_t length,
+        bool exist_ok=true
+    );
 
     /**
      * @brief Gets the chromosomes.
@@ -368,7 +354,7 @@ class ContactMatrixParameters {
 // *
 // * @return True if the pair of chromosomes is symmetrical, false otherwise.
 // */
-//bool isSymmetrical(uint8_t chr1_ID, uint8_t chr2_ID);
+//bool isIntraSCM(uint8_t chr1_ID, uint8_t chr2_ID);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -33,12 +33,12 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     if (transform_ID == TransformID::ID_0){
         BinVecDtype tmp_mask_array = xt::empty<bool>({num_bin_entries}); // Not part of the spec
         for (auto i = 0u; i<num_bin_entries; i++){
-            tmp_mask_array[i] = reader.read<bool>(1);
+            tmp_mask_array[i] = reader.read<bool>(MASK_ARR_BLEN);
         }
         setMaskArray(tmp_mask_array);
 
     } else {
-        first_val = reader.read<bool>(1);
+        first_val = reader.read<bool>(FIRST_VAL_BLEN);
 
         auto num_rl_entries = reader.read<uint32_t>();
         UIntVecDtype tmp_rl_entries = xt::empty<uint32_t>({num_rl_entries}); // Not part of the spec
@@ -64,6 +64,30 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 
     reader.flush();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
+    BinVecDtype&& _mask_array
+) noexcept
+    : transform_ID(TransformID::ID_0),
+      mask_array(std::move(_mask_array)),
+      first_val(),
+      rl_entries()
+{}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
+    TransformID _transform_ID,
+    bool _first_val,
+    UIntVecDtype _rl_entries
+) noexcept
+    : transform_ID(_transform_ID),
+      mask_array(),
+      first_val(_first_val),
+      rl_entries(std::move(_rl_entries))
+{}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -127,7 +151,7 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
             onmem_writer.write(mask_array->at(i), 1);
         }
     } else {
-        onmem_writer.write(first_val, 1);
+        onmem_writer.write(first_val, FIRST_VAL_BLEN);
         auto num_rl_entries = rl_entries->shape(0);
         onmem_writer.write(num_rl_entries, NUM_RL_ENTRIES_BLEN);
         for (auto i = 0u; i < num_rl_entries; i++){
@@ -141,7 +165,7 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
 
     auto payload_str = payload.str();
     for (auto& v: payload_str){
-        writer.write(static_cast<uint64_t>(v), 8);
+        writer.writeBypassBE(v);
     }
 }
 

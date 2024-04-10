@@ -15,7 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactRecord, one_rec_no_norm) {
+TEST(ContactRecord, OneRecNoNorm) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -57,7 +57,7 @@ TEST(ContactRecord, one_rec_no_norm) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactRecord, three_rec_no_norm) {
+TEST(ContactRecord, ThreeRecsNoNorm) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-three_recs.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -124,7 +124,7 @@ TEST(ContactRecord, three_rec_no_norm) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactRecord, one_rec_with_norm) {
+TEST(ContactRecord, OneRecWithNorm) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
@@ -170,7 +170,7 @@ TEST(ContactRecord, one_rec_with_norm) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactRecord, three_rec_with_norm) {
+TEST(ContactRecord, ThreeRecsWithNorm) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-three_recs.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;

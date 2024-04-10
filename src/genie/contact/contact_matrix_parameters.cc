@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "contact_parameters.h"
+#include "contact_matrix_parameters.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -188,7 +188,31 @@ void ContactMatrixParameters::addChromosome(ChromosomeInformation&& chr_info) {c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixParameters::upsertChromosome(uint8_t ID, std::string&& name, uint64_t length, bool exist_ok){
+void ContactMatrixParameters::upsertChromosome(
+    uint8_t ID,
+    const std::string& name,
+    uint64_t length,
+    bool exist_ok
+){
+    auto _name = std::string(name);
+
+    upsertChromosome(
+        ID,
+        std::move(_name),
+        length,
+        exist_ok
+    );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactMatrixParameters::upsertChromosome(
+    uint8_t ID,
+    std::string&& name,
+    uint64_t length,
+    bool exist_ok
+){
+
     auto it = chr_infos.find(ID);
     if (it == chr_infos.end()){
         ChromosomeInformation chr_info = {ID, std::move(name), length};

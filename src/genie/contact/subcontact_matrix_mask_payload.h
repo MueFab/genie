@@ -18,6 +18,7 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define MASK_ARR_BLEN 1
 #define TRANSFORM_ID_BLEN 2
 #define FIRST_VAL_BLEN 1
 #define NUM_RL_ENTRIES_BLEN 32
@@ -41,22 +42,80 @@ class SubcontactMatrixMaskPayload{
     std::optional<UIntVecDtype> rl_entries;
 
  public:
-    // Default constructor
+    /**
+     * @brief Default constructor for SubcontactMatrixMaskPayload.
+     *
+     * This constructor initializes the object with default values.
+     */
     SubcontactMatrixMaskPayload() = default;
 
-    // Constructor from move
+    /**
+     * @brief Constructor from move.
+     *
+     * This constructor moves the contents of another SubcontactMatrixMaskPayload object into this one.
+     *
+     * @param other The SubcontactMatrixMaskPayload object to move from.
+     */
     SubcontactMatrixMaskPayload(SubcontactMatrixMaskPayload&&) = default;
 
-    // Constructor by reference
+    /**
+     * @brief Constructor by reference.
+     *
+     * This constructor copies the contents of another SubcontactMatrixMaskPayload object into this one.
+     *
+     * @param other The SubcontactMatrixMaskPayload object to copy from.
+     */
     SubcontactMatrixMaskPayload(const SubcontactMatrixMaskPayload&) = default;
 
-    // Constructor using operator=
-    SubcontactMatrixMaskPayload& operator=(const SubcontactMatrixMaskPayload&) = default;
+    /**
+     * @brief Constructor using operator=.
+     *
+     * This constructor assigns the contents of another SubcontactMatrixMaskPayload object to this one.
+     *
+     * @param other The SubcontactMatrixMaskPayload object to assign from.
+     */
+    SubcontactMatrixMaskPayload& operator=(
+        const SubcontactMatrixMaskPayload&
+    ) = default;
 
+    /**
+     * @brief Constructor that reads from a BitReader.
+     *
+     * This constructor reads the parameters from a BitReader.
+     *
+     * @param reader The BitReader to read from.
+     * @param num_bin_entries The number of binary entries.
+     */
     SubcontactMatrixMaskPayload(
         util::BitReader &reader,
         uint32_t num_bin_entries
-    ) noexcept ;
+    ) noexcept;
+
+    /**
+     * @brief Constructor that takes a mask array.
+     *
+     * This constructor takes a moveable mask array and initializes the object with it.
+     *
+     *  @param mask_array The moveable mask array.
+     */
+    SubcontactMatrixMaskPayload(
+        BinVecDtype&& mask_array
+    ) noexcept;
+
+    /**
+     * @brief Constructor that takes a transform ID, a boolean value, and a RLE-transformed mask array.
+     *
+     * This constructor takes a transform ID, a boolean value, and a run-length entries vector and initializes the object with them.
+     *
+     *  @param transform_ID The transform ID.
+     *  @param first_val The boolean value.
+     *  @param rl_entries The RLE-transformed mask array.
+     */
+    SubcontactMatrixMaskPayload(
+        TransformID transform_ID,
+        bool first_val,
+        UIntVecDtype rl_entries
+    ) noexcept;
 
     /**
      * @brief Overloaded equality operator.
