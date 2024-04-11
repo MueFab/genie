@@ -19,8 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): Create round trip test
-TEST(ContactCoder, compute_mask) {
+TEST(ContactCoder, Simple_Coding_ComputeMask) {
 
     std::vector<uint64_t> IDS_VEC = {0, 1, 3, 5};
     auto IDS_NENTRIES = 8u;
@@ -45,7 +44,7 @@ TEST(ContactCoder, compute_mask) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Create round trip test
-TEST(ContactCoder, compute_masks) {
+TEST(ContactCoder, Simple_Coding_ComputeMasks) {
     // Intra SCM
     {
         auto IS_INTRA = true;
@@ -139,7 +138,7 @@ TEST(ContactCoder, compute_masks) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_ProcessingUnalignedRegion) {
+TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
     // Intra SCM
     {
         auto IS_INTRA = true;
@@ -188,8 +187,8 @@ TEST(ContactCoder, RoundTrip_ProcessingUnalignedRegion) {
             col_mask
         );
 
-        ASSERT_TRUE(ROW_IDS == row_ids);
-        ASSERT_TRUE(COL_IDS == col_ids);
+        ASSERT_EQ(row_ids, ROW_IDS);
+        ASSERT_EQ(col_ids, COL_IDS);
     }
 
     // Inter SCM
@@ -689,77 +688,77 @@ TEST(ContactCoder, RoundTrip_Binarization) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Create round trip test
-//TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
-//    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
-//
-//    std::ifstream reader(filepath, std::ios::binary);
-//    ASSERT_EQ(reader.fail(), false);
-//    genie::util::BitReader bitreader(reader);
-//
-//    std::vector<genie::core::record::ContactRecord> recs;
-//
-//    while (bitreader.isGood()){
-//        recs.emplace_back(bitreader);
-//    }
-//
-//    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-//    recs.pop_back();
-//
-//    {
-//        auto TRANSFORM_MASK = false;
-//        auto TRANSFORM_TILE = true;
-//        auto CODEC_ID = genie::core::AlgoID::JBIG;
-//        auto TILE_SIZE = 1000u;
-//
-//        auto cm_param = genie::contact::ContactMatrixParameters();
-//        auto scm_param = genie::contact::SubcontactMatrixParameters();
-//        auto scm_payload = genie::contact::SubcontactMatrixPayload();
-//
-//        cm_param.setBinSize(recs.front().getBinSize());
-//        cm_param.setTileSize(TILE_SIZE);
-//
-//        for (auto& rec: recs){
-//            cm_param.upsertChromosome(
-//                rec.getChr1ID(),
-//                rec.getChr1Name(),
-//                rec.getChr1Length()
-//            );
-//        }
-//
-//        auto& rec = recs.front();
-//        genie::contact::encode_scm(
-//            cm_param,
-//            rec,
-//            scm_param,
-//            scm_payload,
-//            TRANSFORM_MASK,
-//            TRANSFORM_TILE,
-//            CODEC_ID
+TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::ifstream reader(filepath, std::ios::binary);
+    ASSERT_EQ(reader.fail(), false);
+    genie::util::BitReader bitreader(reader);
+
+    std::vector<genie::core::record::ContactRecord> recs;
+
+    while (bitreader.isGood()){
+        recs.emplace_back(bitreader);
+    }
+
+    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+    recs.pop_back();
+
+    {
+        auto TRANSFORM_MASK = false;
+        auto TRANSFORM_TILE = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 1000u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(recs.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: recs){
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+        }
+
+        auto& rec = recs.front();
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            TRANSFORM_MASK,
+            TRANSFORM_TILE,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), rec.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+//        auto recon_obj = genie::contact::SubcontactMatrixPayload(
+//            bitreader,
+//            cm_param
 //        );
-//
-//        auto obj_payload = std::stringstream();
-//        std::ostream& writer = obj_payload;
-//        auto bitwriter = genie::util::BitWriter(&writer);
-//        scm_payload.write(bitwriter);
-//
-//        ASSERT_EQ(scm_payload.getSampleID(), rec.getSampleID());
-//        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-//        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-//        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
-//
-//        std::istream& reader = obj_payload;
-//        auto bitreader = genie::util::BitReader(reader);
-////        auto recon_obj = genie::contact::SubcontactMatrixPayload(
-////            bitreader,
-////            cm_param
-////        );
-//
-//        auto scm_payload_len = scm_payload.getSize();
-//        auto x = 10;
-//    }
-//
-//}
+
+        auto scm_payload_len = scm_payload.getSize();
+        auto x = 10;
+    }
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------

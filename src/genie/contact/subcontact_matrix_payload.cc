@@ -166,11 +166,19 @@ void SubcontactMatrixPayload::setChr2ID(uint8_t id) { chr2_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { row_mask_payload = payload; }
+//void SubcontactMatrixPayload::setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { row_mask_payload = payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { col_mask_payload = payload; }
+void SubcontactMatrixPayload::setRowMaskPayload(SubcontactMatrixMaskPayload&& payload){ row_mask_payload = payload;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) { col_mask_payload = payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SubcontactMatrixPayload::setColMaskPayload(SubcontactMatrixMaskPayload&& payload){ col_mask_payload = payload;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -245,13 +253,15 @@ size_t SubcontactMatrixPayload::getSize() const{
 
     // TODO (Yeremia): Missing norm_matrices
 
-    if (row_mask_payload.has_value())
+    if (row_mask_payload.has_value()){
         size += MASK_PAYLOAD_SIZE_LEN;
         size += row_mask_payload->getSize();
+    }
 
-    if (!isIntraSCM() && col_mask_payload.has_value())
+    if (!isIntraSCM() && col_mask_payload.has_value()) {
         size += MASK_PAYLOAD_SIZE_LEN;
         size += col_mask_payload->getSize();
+    }
 
     return size;
 }

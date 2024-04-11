@@ -66,7 +66,7 @@ void compute_mask(
  *
  * @param row_ids The row IDs to compute the masks from.
  * @param col_ids The column IDs to compute the masks from.
- * @param is_intra A boolean indicating whether the computation is intra or not.
+ * @param is_intra_scm A boolean indicating whether the computation is intra or not.
  * @param row_mask The computed row mask.
  * @param col_mask The computed column mask.
  */
@@ -76,7 +76,7 @@ void compute_masks(
     size_t nrows,
     UInt64VecDtype& col_ids,
     size_t ncols,
-    const bool is_intra,
+    const bool is_intra_scm,
     // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
