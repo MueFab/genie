@@ -750,10 +750,12 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
-//        auto recon_obj = genie::contact::SubcontactMatrixPayload(
+//        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
 //            bitreader,
 //            cm_param
 //        );
+
+        auto recon_rec = genie::contact::ContactRecords();
 
         auto scm_payload_len = scm_payload.getSize();
         auto x = 10;

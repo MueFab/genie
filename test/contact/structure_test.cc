@@ -160,7 +160,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             );
 
             ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-            ASSERT_EQ(recon_obj.getMaskArray(), MASK_ARRAY);
+            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
+                ASSERT_EQ(recon_obj.getMaskArray()->at(i), MASK_ARRAY(i));
+            }
             ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
             ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
 
@@ -190,7 +192,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             );
 
             ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-            ASSERT_EQ(recon_obj.getMaskArray(), MASK_ARRAY);
+            for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
+                ASSERT_EQ(recon_obj.getMaskArray()->at(i), MASK_ARRAY(i));
+            }
             ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
             ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
 
@@ -210,9 +214,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setTransformID(TRANSFORM_ID);
-        orig_obj.setFirstVal(FIRST_VAL);
-        orig_obj.setRLEntries(orig_rl_entries);
+        orig_obj.setRLEntries(
+            TRANSFORM_ID,
+            FIRST_VAL,
+            orig_rl_entries
+        );
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -231,7 +237,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.getMaskArray().has_value());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
-        ASSERT_EQ(recon_obj.getRLEntries(), RL_ENTRIES);
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+        }
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
@@ -248,10 +256,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setTransformID(TRANSFORM_ID);
-        orig_obj.setFirstVal(FIRST_VAL);
-        orig_obj.setRLEntries(orig_rl_entries);
-
+        orig_obj.setRLEntries(
+            TRANSFORM_ID,
+            FIRST_VAL,
+            orig_rl_entries
+        );
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
@@ -269,7 +278,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.getMaskArray().has_value());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
-        ASSERT_EQ(recon_obj.getRLEntries(), RL_ENTRIES);
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+        }
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
@@ -286,9 +297,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setTransformID(TRANSFORM_ID);
-        orig_obj.setFirstVal(FIRST_VAL);
-        orig_obj.setRLEntries(orig_rl_entries);
+        orig_obj.setRLEntries(
+            TRANSFORM_ID,
+            FIRST_VAL,
+            orig_rl_entries
+        );
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -307,7 +320,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
         ASSERT_FALSE(recon_obj.getMaskArray().has_value());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
-        ASSERT_EQ(recon_obj.getRLEntries(), RL_ENTRIES);
+        for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
+            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+        }
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }

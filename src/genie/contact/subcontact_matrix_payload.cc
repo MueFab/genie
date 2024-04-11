@@ -253,7 +253,7 @@ size_t SubcontactMatrixPayload::getSize() const{
 
     // TODO (Yeremia): Missing norm_matrices
 
-    if (row_mask_payload.has_value()){
+    if (row_mask_payload.has_value()) {
         size += MASK_PAYLOAD_SIZE_LEN;
         size += row_mask_payload->getSize();
     }
