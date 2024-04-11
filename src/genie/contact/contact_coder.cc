@@ -493,10 +493,13 @@ void decode_scm(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void encode_scm(
+    // Inputs
     ContactMatrixParameters& cm_param,
     core::record::ContactRecord& rec,
+    // Outputs
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
+    // Options
     bool transform_mask,
     bool transform_tile,
     core::AlgoID codec_ID
@@ -518,8 +521,14 @@ void encode_scm(
 
     auto is_intra_scm = chr1_ID == chr2_ID;
 
+    scm_payload.setSampleID(rec.getSampleID());
+
     scm_param.setChr1ID(chr1_ID);
+    scm_payload.setChr1ID(chr1_ID);
+
     scm_param.setChr2ID(chr2_ID);
+    scm_payload.setChr2ID(chr1_ID);
+
     scm_param.setCodecID(codec_ID);
 
     scm_param.setNumTiles(ntiles_in_row, ntiles_in_col);

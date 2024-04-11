@@ -82,10 +82,6 @@ class SubcontactMatrixParameters {
         const SubcontactMatrixParameters& other
     ) noexcept;
 
-    bool operator==(
-        const SubcontactMatrixParameters& other
-    );
-
     // Constructor from move
 //    SubcontactMatrixParameters(
 //        uint8_t parameter_set_ID,
@@ -104,6 +100,10 @@ class SubcontactMatrixParameters {
 
     // Constructor using operator=
     SubcontactMatrixParameters& operator=(
+        const SubcontactMatrixParameters& other
+    );
+
+    bool operator==(
         const SubcontactMatrixParameters& other
     );
 

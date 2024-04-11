@@ -85,6 +85,8 @@ class SubcontactMatrixPayload {
         const SubcontactMatrixPayload& other
     ) = default;
 
+
+
     /**
      * @brief Parameterized constructor for SubcontactMatrixPayload.
      *
@@ -128,11 +130,14 @@ class SubcontactMatrixPayload {
     //TODO(yeremia): docstring
     SubcontactMatrixPayload(
         util::BitReader &reader,
-        ContactMatrixParameters cm_param,
+        ContactMatrixParameters& cm_param,
         const SubcontactMatrixParameters& scm_param
     ) noexcept;
 
-//    bool operator==(const SubcontactMatrixPayload& other) const;
+    //TODO(yeremia): docstring
+    bool operator==(
+        const SubcontactMatrixPayload& other
+    );
 
 //    friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs);
 
