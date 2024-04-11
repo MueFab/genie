@@ -41,10 +41,7 @@ using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//using ChrIDPair = std::pair<uint8_t, uint8_t>;
 using ContactRecords = std::list<genie::core::record::ContactRecord>;
-//using SCMRecDtype = std::unordered_map<ChrIDPair, core::record::ContactRecord, chr_pair_hash>;
-//using IntervSCMRecDtype = std::unordered_map<uint32_t, SCMRecDtype>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

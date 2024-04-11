@@ -44,7 +44,7 @@ void compute_masks(
     size_t nrows,
     UInt64VecDtype& col_ids,
     size_t ncols,
-    const bool is_intra,
+    const bool is_intra_scm,
     // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
@@ -52,20 +52,23 @@ void compute_masks(
     UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
                  "The size of row_ids and col_ids must be same!");
 
-    if (is_intra){
+    if (is_intra_scm){
         UTILS_DIE_IF(nrows != ncols,
             "Both nentries must be the same for intra SCM!"
         );
 
         BinVecDtype mask;
+
+        // Handle the symmetry of intra SCM
         UInt64VecDtype ids = xt::concatenate(xt::xtuple(row_ids, col_ids));
         ids = xt::unique(ids);
+
         compute_mask(ids, nrows, mask);
 
         row_mask.resize(mask.shape());
-        row_mask = mask;
+        row_mask = BinVecDtype(mask);
         col_mask.resize(mask.shape());
-        col_mask = mask;
+        col_mask = BinVecDtype(std::move(mask));
     } else {
         compute_mask(row_ids, nrows, row_mask);
         compute_mask(col_ids, ncols, col_mask);
@@ -388,6 +391,7 @@ void binarize_row_bin(
     UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
         xt::log2(xt::amax(mat, {1}) + 1)
     ));
+    // Handle the case where maximum value is 0 -> log2(1) = 0 bits
     xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
 
     uint64_t bin_mat_nrows = static_cast<uint64_t>(xt::sum(nbits_per_row)(0));
@@ -395,14 +399,17 @@ void binarize_row_bin(
 
     bin_mat = xt::zeros<bool>({bin_mat_nrows, bin_mat_ncols});
 
-    size_t i2 = 0;
+    size_t target_i = 0;
+    auto target_js = xt::range(1u, bin_mat_ncols);
     for (size_t i = 0; i < nrows; i++) {
         auto bitlength = nbits_per_row[i];
         for (size_t i_bit = 0; i_bit < bitlength; i_bit++) {
-            xt::view(bin_mat, i2++, xt::range(1, bin_mat_ncols)) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
+            xt::view(bin_mat, target_i++, target_js) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
         }
 
-        bin_mat(i2-1, 0) = true;
+        // Set the sentinel flag
+        // Add offset due to "++" operation in the for-loop
+        bin_mat(target_i - 1, 0) = true;
     }
 }
 
@@ -535,26 +542,6 @@ void encode_scm(
     UTILS_DIE_IF(row_ids.shape(0) == 0, "row_ids is empty?");
     UTILS_DIE_IF(col_ids.shape(0) == 0, "col_ids is empty?");
 
-    if (transform_mask){
-
-    } else {
-        auto rowmask_payload = SubcontactMatrixMaskPayload(
-            std::move(row_mask)
-        );
-
-        scm_payload.setRowMaskPayload(
-            std::move(row_mask)
-        );
-
-        auto colmask_payload = SubcontactMatrixMaskPayload(
-            std::move(col_mask)
-        );
-
-        scm_payload.setColMaskPayload(
-            std::move(col_mask)
-        );
-    }
-
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
 
         auto min_row_id = i_tile*tile_size;
@@ -675,6 +662,26 @@ void encode_scm(
             );
         }
     }
+
+//    if (transform_mask){
+//
+//    } else {
+//        auto row_mask_payload = SubcontactMatrixMaskPayload(
+//            std::move(row_mask)
+//        );
+//
+//        scm_payload.setRowMaskPayload(
+//            std::move(row_mask)
+//        );
+//
+//        auto col_mask_payload = SubcontactMatrixMaskPayload(
+//            std::move(col_mask)
+//        );
+//
+//        scm_payload.setColMaskPayload(
+//            std::move(col_mask)
+//        );
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
