@@ -67,9 +67,50 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs){
-//
-//}
+SubcontactMatrixPayload::SubcontactMatrixPayload(
+    util::BitReader &reader,
+    ContactMatrixParameters cm_param,
+    const SubcontactMatrixParameters& scm_param
+) noexcept{
+
+    reader.flush();
+
+    auto MULT = 1u;
+    parameter_set_ID = reader.readBypassBE<uint8_t>();
+    sample_ID = reader.readBypassBE<uint8_t>();
+    chr1_ID = reader.readBypassBE<uint8_t>();
+    chr2_ID = reader.readBypassBE<uint8_t>();
+
+    UTILS_DIE_IF(chr1_ID != scm_param.getChr1ID(), "chr1_ID differs");
+    UTILS_DIE_IF(chr2_ID != scm_param.getChr2ID(), "chr2_ID differs");
+
+    auto ntiles_in_row = cm_param.getNumBinEntries(chr1_ID, MULT);
+    auto ntiles_in_col = cm_param.getNumBinEntries(chr2_ID, MULT);
+
+    UTILS_DIE_IF(ntiles_in_row != scm_param.getNTilesInRow(), "chr1_ID differs");
+    UTILS_DIE_IF(ntiles_in_col != scm_param.getNTilesInCol(), "chr2_ID differs");
+
+    for (auto i = 0u; i<ntiles_in_row; i++){
+        for (auto j = 0u; j<ntiles_in_col; j++){
+            if (i>j && isIntraSCM()){
+                continue;
+            }
+
+            size_t tile_payload_size = reader.readBypassBE<uint32_t>();
+
+        }
+    }
+
+    //TODO(yeremia): Missing norm_matrices
+
+    if (scm_param.getRowMaskExistsFlag()){
+        auto row_mask_payload_len = reader.read<uint32_t>();
+
+    }
+
+    //TODO(yeremia): row_mask
+    //TODO(yeremia): col_mask
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,6 +131,10 @@ uint8_t SubcontactMatrixPayload::getChr2ID() const { return chr2_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return tile_payloads; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const size_t SubcontactMatrixPayload::getNumNormMatrices() const { return norm_tile_payloads.size(); };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -151,16 +196,10 @@ void SubcontactMatrixPayload::setTilePayload(
     size_t j_tile,
     ContactMatrixTilePayload&& tile_payload
 ) {
-    // Assuming TilePayloads is a 2D vector of ContactMatrixTilePayload
-//    if (i_tile >= tile_payloads.size()) {
-//        tile_payloads.resize(i_tile + 1);
-//    }
-//    if (j_tile >= tile_payloads[i_tile].size()) {
-//        tile_payloads[i_tile].resize(j_tile + 1);
-//    }
-//    tile_payloads(i_tile, j_tile) = std::move(tile_payload);
-    UTILS_DIE_IF(i_tile >= tile_payloads.size(), "i_tile is greater than ntiles_in_row");
-    UTILS_DIE_IF(j_tile >= tile_payloads[i_tile].size(), "j_tile is greater than ntiles_in_col");
+    UTILS_DIE_IF(i_tile >= getNTilesInRow(), "i_tile is greater than ntiles_in_row");
+    UTILS_DIE_IF(j_tile >= getNTilesInCol(), "j_tile is greater than ntiles_in_col");
+    UTILS_DIE_IF(i_tile > j_tile && isIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
+
     tile_payloads[i_tile][j_tile] = std::move(tile_payload);
 }
 
@@ -188,20 +227,19 @@ bool SubcontactMatrixPayload::isIntraSCM() const{
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t SubcontactMatrixPayload::getSize() const{
-    size_t size = 1 + 1 + 1 + 1; // parameter_sert_ID, sample_ID, chr1_ID, chr2_ID
+    size_t size = 1u; // parameter_set_ID
+    size += 1u; // sample_ID
+    size += 1u; // chr1_ID
+    size += 1u; // chr2_ID
+
     auto ntiles_in_row = getNTilesInRow();
     auto ntiles_in_col = getNTilesInCol();
-//    auto shape = tile_payloads.shape();
-//    auto ntiles_in_row = shape[0];
-//    auto ntiles_in_col = shape[1];
     for (auto i = 0u; i< ntiles_in_row; i++){
         for (auto j = 0u; j< ntiles_in_col; j++){
-            if (i>j && isIntraSCM()){
-                continue;
+            if (!(isIntraSCM() && i>j)){
+                size += TILE_PAYLOAD_SIZE_LEN;
+                size += tile_payloads[i][j].getSize();
             }
-            size += TILE_PAYLOAD_SIZE_LEN;
-            size += tile_payloads[i][j].getSize();
-//            size += tile_payloads(i, j).getSize();
         }
     }
 
@@ -211,7 +249,7 @@ size_t SubcontactMatrixPayload::getSize() const{
         size += MASK_PAYLOAD_SIZE_LEN;
         size += row_mask_payload->getSize();
 
-    if (col_mask_payload.has_value())
+    if (!isIntraSCM() && col_mask_payload.has_value())
         size += MASK_PAYLOAD_SIZE_LEN;
         size += col_mask_payload->getSize();
 
@@ -226,37 +264,38 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
     writer.writeBypassBE(chr1_ID);
     writer.writeBypassBE(chr2_ID);
 
-    auto ntiles_in_row = getNTilesInRow();
-    auto ntiles_in_col = getNTilesInCol();
+    for (auto i = 0u; i<getNTilesInRow(); i++){
+        for (auto j = 0u; j<getNTilesInCol(); j++){
+            if (!(isIntraSCM() && i>j)){
+                auto& tile_payload = tile_payloads[i][j];
+                auto tile_payload_size = tile_payload.getSize();
 
-    for (auto i = 0u; i<ntiles_in_row; i++){
-        for (auto j = 0u; j<ntiles_in_col; j++){
-            if (i>j && isIntraSCM()){
-                continue;
+                writer.writeBypassBE(
+                    static_cast<uint32_t>(tile_payload_size)
+                );
+
+                tile_payload.write(writer);
             }
-
-            auto& tile_payload = tile_payloads[i][j];
-
-            writer.writeBypassBE(
-                static_cast<uint32_t>(tile_payload.getSize())
-            );
-
-            tile_payload.write(writer);
         }
     }
 
     // TODO (Yeremia): Missing norm_matrices
+    for (auto& v: norm_tile_payloads){
+
+    }
 
     if (row_mask_payload.has_value()){
+        auto row_mask_payload_size = row_mask_payload->getSize();
         writer.writeBypassBE(
-            static_cast<uint32_t>(row_mask_payload->getSize())
+            static_cast<uint32_t>(row_mask_payload_size)
         );
         row_mask_payload->write(writer);
     }
 
-    if (col_mask_payload.has_value()){
+    if (!isIntraSCM() && col_mask_payload.has_value()){
+        auto col_mask_payload_size = col_mask_payload->getSize();
         writer.writeBypassBE(
-            static_cast<uint32_t>(col_mask_payload->getSize())
+            static_cast<uint32_t>(col_mask_payload_size)
         );
         col_mask_payload->write(writer);
     }

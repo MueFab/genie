@@ -303,7 +303,10 @@ const std::unordered_map<uint8_t, NormalizedMatrixInformations>& ContactMatrixPa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t ContactMatrixParameters::getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult){
+uint64_t ContactMatrixParameters::getNumBinEntries(
+    uint8_t chr_ID,
+    uint32_t interv_mult
+){
     UTILS_DIE_IF(bin_size == 0, "Please set the bin size!");
     UTILS_DIE_IF(chr_infos.find(chr_ID) == chr_infos.end(), "chr_ID does not exist!");
 
@@ -317,7 +320,10 @@ uint64_t ContactMatrixParameters::getNumBinEntries(uint8_t chr_ID, uint8_t inter
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactMatrixParameters::getNumTiles(uint8_t chr_ID, uint8_t interv_mult){
+uint32_t ContactMatrixParameters::getNumTiles(
+    uint8_t chr_ID,
+    uint32_t interv_mult
+){
     UTILS_DIE_IF(tile_size == 0, "Please set the tile size!");
 
     uint64_t num_bins = getNumBinEntries(chr_ID, interv_mult);

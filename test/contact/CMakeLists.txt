@@ -12,8 +12,8 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 
 set(source_files
         helpers.cc
-        encode_test.cc
         structure_test.cc
+        encode_test.cc
 )
 
 add_executable(${PROJECT_NAME} ${source_files})

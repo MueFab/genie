@@ -24,7 +24,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_ContactMatrixTilePayload){
+TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
 
     std::srand(std::time(0)); // seed the random number generator
 
@@ -128,40 +128,74 @@ TEST(ContactCoder, RoundTrip_ContactMatrixTilePayload){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_SubcontactMatrixMaskPayload){
+TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
     // TransformID 0
     {
         auto TRANSFORM_ID = genie::contact::TransformID::ID_0;
         auto NUM_BIN_ENTRIES = 100u;
+
         genie::contact::BinVecDtype MASK_ARRAY = xt::cast<bool>(xt::random::randint<uint16_t>({NUM_BIN_ENTRIES}, 0, 2));
 
-        genie::contact::BinVecDtype orig_mask_arr = genie::contact::BinVecDtype(MASK_ARRAY);
+        // Default Constructor
+        {
+            genie::contact::BinVecDtype orig_mask_arr = genie::contact::BinVecDtype(MASK_ARRAY);
 
-        auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setTransformID(TRANSFORM_ID);
-        orig_obj.setMaskArray(orig_mask_arr);
+            auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
+            orig_obj.setTransformID(TRANSFORM_ID);
+            orig_obj.setMaskArray(orig_mask_arr);
 
-        auto obj_payload = std::stringstream();
-        std::ostream& writer = obj_payload;
-        auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+            auto obj_payload = std::stringstream();
+            std::ostream& writer = obj_payload;
+            auto bitwriter = genie::util::BitWriter(&writer);
+            orig_obj.write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+            ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
 
-        std::istream& reader = obj_payload;
-        auto bitreader = genie::util::BitReader(reader);
-        auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
-            bitreader,
-            NUM_BIN_ENTRIES
-        );
+            std::istream& reader = obj_payload;
+            auto bitreader = genie::util::BitReader(reader);
+            auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
+                bitreader,
+                NUM_BIN_ENTRIES
+            );
 
-        ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_EQ(recon_obj.getMaskArray(), MASK_ARRAY);
-        ASSERT_FALSE(recon_obj.getFirstVal());
-        ASSERT_FALSE(recon_obj.getRLEntries().has_value());
+            ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
+            ASSERT_EQ(recon_obj.getMaskArray(), MASK_ARRAY);
+            ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
 
-        ASSERT_TRUE(orig_obj == recon_obj);
+            ASSERT_TRUE(orig_obj == recon_obj);
+        }
+
+        // Move Constructor
+        {
+            genie::contact::BinVecDtype orig_mask_arr = genie::contact::BinVecDtype(MASK_ARRAY);
+
+            auto orig_obj = genie::contact::SubcontactMatrixMaskPayload(
+                std::move(orig_mask_arr)
+            );
+
+            auto obj_payload = std::stringstream();
+            std::ostream& writer = obj_payload;
+            auto bitwriter = genie::util::BitWriter(&writer);
+            orig_obj.write(bitwriter);
+
+            ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+
+            std::istream& reader = obj_payload;
+            auto bitreader = genie::util::BitReader(reader);
+            auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
+                bitreader,
+                NUM_BIN_ENTRIES
+            );
+
+            ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
+            ASSERT_EQ(recon_obj.getMaskArray(), MASK_ARRAY);
+            ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
+
+            ASSERT_TRUE(orig_obj == recon_obj);
+        }
     }
 
     // TransformID 1
@@ -281,7 +315,7 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixMaskPayload){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_ContactMatrixParameter){
+TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
     auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
     auto SAMPLE1_ID = 10u;
     auto SAMPLE1_NAME = std::string("SAMPLE1");
@@ -303,25 +337,25 @@ TEST(ContactCoder, RoundTrip_ContactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
+TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
     // Intra-SCM case
     {
         auto BINARIZATION_MODE = genie::contact::BinarizationMode::ROW_BINARIZATION;
         auto DIAG_MODE = genie::contact::DiagonalTransformMode::MODE_0;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
-        auto CHR1_ID = 0u;
+        uint8_t CHR1_ID = 0u;
         auto CHR1_NAME = std::string("CHR1");
         auto CHR1_LEN = 70u;
-        auto CHR2_ID = 0u;
+        uint8_t CHR2_ID = 0u;
         auto CHR2_NAME = std::string(CHR1_NAME);
         auto CHR2_LEN = CHR1_LEN;
-        auto BIN_SIZE = 5u;
-        auto TILE_SIZE = 5u;
-        auto MULTIPLIER = 1u;
+        uint32_t BIN_SIZE = 5u;
+        uint32_t TILE_SIZE = 5u;
+        uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
-        ORIG_CM_PARAM.upsertChromosome(static_cast<uint8_t>(CHR1_ID), CHR1_NAME, CHR1_LEN);
-        ORIG_CM_PARAM.upsertChromosome(static_cast<uint8_t>(CHR2_ID), CHR2_NAME, CHR2_LEN);
+        ORIG_CM_PARAM.upsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
+        ORIG_CM_PARAM.upsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
         ORIG_CM_PARAM.setBinSize(BIN_SIZE);
         ORIG_CM_PARAM.setTileSize(TILE_SIZE);
         auto NTILES_IN_ROW = ORIG_CM_PARAM.getNumTiles(CHR1_ID, MULTIPLIER);
@@ -329,21 +363,24 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
         ORIG_SCM_PARAM.setCodecID(CODEC_ID);
-        ORIG_SCM_PARAM.setChr1ID(static_cast<uint8_t>(CHR1_ID));
-        ORIG_SCM_PARAM.setChr2ID(static_cast<uint8_t>(CHR2_ID));
+        ORIG_SCM_PARAM.setChr1ID(CHR1_ID);
+        ORIG_SCM_PARAM.setChr2ID(CHR2_ID);
         ORIG_SCM_PARAM.setNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                auto tile_param = genie::contact::TileParameter();
-                tile_param.binarization_mode = BINARIZATION_MODE;
-                tile_param.diag_tranform_mode = DIAG_MODE;
 
-                ORIG_SCM_PARAM.setTileParameter(
-                    i,
-                    j,
-                    tile_param
-                );
+                if (!(i>j && ORIG_SCM_PARAM.isIntraSCM())){
+                    auto tile_param = genie::contact::TileParameter();
+                    tile_param.binarization_mode = BINARIZATION_MODE;
+                    tile_param.diag_tranform_mode = DIAG_MODE;
+
+                    ORIG_SCM_PARAM.setTileParameter(
+                        i,
+                        j,
+                        tile_param
+                    );
+                }
             }
         }
 
@@ -370,22 +407,20 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
+                if (!(i>j && orig_obj.isIntraSCM())){
+                    auto& orig_tile_param = orig_obj.getTileParameter(i, j);
+                    auto& recon_tile_param = orig_obj.getTileParameter(i, j);
 
-                if (i > j && orig_obj.isIntraSCM()){
-                    continue;
+                    ASSERT_EQ(
+                        orig_tile_param.diag_tranform_mode,
+                        recon_tile_param.diag_tranform_mode
+                    );
+
+                    ASSERT_EQ(
+                        orig_tile_param.binarization_mode,
+                        recon_tile_param.binarization_mode
+                    );
                 }
-                auto& orig_tile_param = orig_obj.getTileParameter(i, j);
-                auto& recon_tile_param = orig_obj.getTileParameter(i, j);
-
-                ASSERT_EQ(
-                    orig_tile_param.diag_tranform_mode,
-                    recon_tile_param.diag_tranform_mode
-                );
-
-                ASSERT_EQ(
-                    orig_tile_param.binarization_mode,
-                    recon_tile_param.binarization_mode
-                );
             }
         }
 
@@ -397,15 +432,15 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
         auto BINARIZATION_MODE = genie::contact::BinarizationMode::ROW_BINARIZATION;
         auto DIAG_MODE = genie::contact::DiagonalTransformMode::MODE_0;
         auto CODEC_ID = genie::core::AlgoID::CABAC;
-        auto CHR1_ID = 0u;
+        uint8_t CHR1_ID = 0u;
         auto CHR1_NAME = std::string("CHR1");
         auto CHR1_LEN = 70u;
-        auto CHR2_ID = 1u;
+        uint8_t CHR2_ID = 1u;
         auto CHR2_NAME = std::string("CHR2");
         auto CHR2_LEN = 48u;
-        auto BIN_SIZE = 5u;
-        auto TILE_SIZE = 5u;
-        auto MULTIPLIER = 1u;
+        uint32_t BIN_SIZE = 5u;
+        uint32_t TILE_SIZE = 5u;
+        uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
         ORIG_CM_PARAM.setBinSize(BIN_SIZE);
@@ -425,21 +460,24 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
         ORIG_SCM_PARAM.setCodecID(CODEC_ID);
-        ORIG_SCM_PARAM.setChr1ID(static_cast<uint8_t>(CHR1_ID));
-        ORIG_SCM_PARAM.setChr2ID(static_cast<uint8_t>(CHR2_ID));
+        ORIG_SCM_PARAM.setChr1ID(CHR1_ID);
+        ORIG_SCM_PARAM.setChr2ID(CHR2_ID);
         ORIG_SCM_PARAM.setNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                auto tile_param = genie::contact::TileParameter();
-                tile_param.binarization_mode = BINARIZATION_MODE;
-                tile_param.diag_tranform_mode = DIAG_MODE;
 
-                ORIG_SCM_PARAM.setTileParameter(
-                    i,
-                    j,
-                    tile_param
-                );
+                if (!(i>j && ORIG_SCM_PARAM.isIntraSCM())){
+                    auto tile_param = genie::contact::TileParameter();
+                    tile_param.binarization_mode = BINARIZATION_MODE;
+                    tile_param.diag_tranform_mode = DIAG_MODE;
+
+                    ORIG_SCM_PARAM.setTileParameter(
+                        i,
+                        j,
+                        tile_param
+                    );
+                }
             }
         }
 
@@ -468,22 +506,20 @@ TEST(ContactCoder, RoundTrip_SubcontactMatrixParameter){
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
+                if (!(i>j && orig_obj.isIntraSCM())){
+                    auto& orig_tile_param = orig_obj.getTileParameter(i, j);
+                    auto& recon_tile_param = orig_obj.getTileParameter(i, j);
 
-                if (i > j && orig_obj.isIntraSCM()){
-                    continue;
+                    ASSERT_EQ(
+                        orig_tile_param.diag_tranform_mode,
+                        recon_tile_param.diag_tranform_mode
+                    );
+
+                    ASSERT_EQ(
+                        orig_tile_param.binarization_mode,
+                        recon_tile_param.binarization_mode
+                    );
                 }
-                auto& orig_tile_param = orig_obj.getTileParameter(i, j);
-                auto& recon_tile_param = orig_obj.getTileParameter(i, j);
-
-                ASSERT_EQ(
-                    orig_tile_param.diag_tranform_mode,
-                    recon_tile_param.diag_tranform_mode
-                );
-
-                ASSERT_EQ(
-                    orig_tile_param.binarization_mode,
-                    recon_tile_param.binarization_mode
-                );
             }
         }
 
