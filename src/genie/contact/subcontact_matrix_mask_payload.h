@@ -37,9 +37,9 @@ enum class TransformID : uint8_t {
 class SubcontactMatrixMaskPayload{
  private:
     TransformID transform_ID;
-    std::optional<BinVecDtype> mask_array;
+    std::optional<std::vector<bool>> mask_array;
     bool first_val;
-    std::optional<UIntVecDtype> rl_entries;
+    std::optional<std::vector<uint32_t>> rl_entries;
 
  public:
     /**
@@ -112,9 +112,9 @@ class SubcontactMatrixMaskPayload{
      *  @param rl_entries The RLE-transformed mask array.
      */
     SubcontactMatrixMaskPayload(
-        TransformID transform_ID,
-        bool first_val,
-        UIntVecDtype rl_entries
+        TransformID _transform_ID,
+        bool _first_val,
+        UIntVecDtype& _rl_entries
     ) noexcept;
 
     /**
@@ -144,7 +144,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Mask Array.
      */
-    std::optional<BinVecDtype> getMaskArray() const;
+    std::optional<std::vector<bool>> getMaskArray() const;
 
     /**
      *  @brief Get the First Value.
@@ -162,7 +162,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Run-Length Entries.
      */
-    std::optional<UIntVecDtype> getRLEntries() const;
+    std::optional<std::vector<uint32_t>> getRLEntries() const;
 
     /**
      *  @brief Set the Transform ID.
@@ -178,9 +178,9 @@ class SubcontactMatrixMaskPayload{
      *
      *  This function sets the Mask Array.
      *
-     *  @param array The new Mask Array.
+     *  @param opt_array The new Mask Array.
      */
-    void setMaskArray(const std::optional<BinVecDtype>& array);
+    void setMaskArray(const std::optional<BinVecDtype>& opt_array);
 
     /**
      *  @brief Set the First Value.
@@ -198,7 +198,11 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param _rl_entries The new Run-Length Entries.
      */
-    void setRLEntries(const std::optional<UIntVecDtype>& _rl_entries);
+    void setRLEntries(
+        TransformID _transform_ID,
+        bool _first_val,
+        const std::optional<UIntVecDtype>& _rl_entries
+    );
 
     /**
      * @brief Gets the size of this structure.

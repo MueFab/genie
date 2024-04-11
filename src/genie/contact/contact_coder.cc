@@ -663,25 +663,25 @@ void encode_scm(
         }
     }
 
-//    if (transform_mask){
-//
-//    } else {
-//        auto row_mask_payload = SubcontactMatrixMaskPayload(
-//            std::move(row_mask)
-//        );
-//
-//        scm_payload.setRowMaskPayload(
-//            std::move(row_mask)
-//        );
-//
-//        auto col_mask_payload = SubcontactMatrixMaskPayload(
-//            std::move(col_mask)
-//        );
-//
-//        scm_payload.setColMaskPayload(
-//            std::move(col_mask)
-//        );
-//    }
+    if (transform_mask){
+
+    } else {
+        auto row_mask_payload = SubcontactMatrixMaskPayload(
+            std::move(row_mask)
+        );
+
+        scm_payload.setRowMaskPayload(
+            std::move(row_mask)
+        );
+
+        auto col_mask_payload = SubcontactMatrixMaskPayload(
+            std::move(col_mask)
+        );
+
+        scm_payload.setColMaskPayload(
+            std::move(col_mask)
+        );
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
