@@ -55,48 +55,54 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//bool SubcontactMatrixPayload::operator==(const SubcontactMatrixPayload& other) const {
-//    return parameter_set_ID == other.parameter_set_ID &&
-//           sample_ID == other.sample_ID &&
-//           chr1_ID == other.chr1_ID &&
-//           chr2_ID == other.chr2_ID &&
-//           tile_payloads == other.tile_payloads &&
-//           row_mask_payload == other.row_mask_payload &&
-//           col_mask_payload == other.col_mask_payload;
-//}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 SubcontactMatrixPayload::SubcontactMatrixPayload(
     util::BitReader &reader,
-    ContactMatrixParameters cm_param,
+    ContactMatrixParameters& cm_param,
     const SubcontactMatrixParameters& scm_param
 ) noexcept{
 
-    reader.flush();
-
     auto MULT = 1u;
+
+    UTILS_DIE_IF(!reader.isAligned(),  "Not byte aligned!");
+
     parameter_set_ID = reader.readBypassBE<uint8_t>();
     sample_ID = reader.readBypassBE<uint8_t>();
     chr1_ID = reader.readBypassBE<uint8_t>();
     chr2_ID = reader.readBypassBE<uint8_t>();
 
-    UTILS_DIE_IF(chr1_ID != scm_param.getChr1ID(), "chr1_ID differs");
-    UTILS_DIE_IF(chr2_ID != scm_param.getChr2ID(), "chr2_ID differs");
+    UTILS_DIE_IF(
+        parameter_set_ID != scm_param.getParameterSetID(),
+        "parameter_set_ID differs"
+    );
+    UTILS_DIE_IF(
+        chr1_ID != scm_param.getChr1ID(),
+        "chr1_ID differs"
+    );
+    UTILS_DIE_IF(
+        chr2_ID != scm_param.getChr2ID(),
+        "chr2_ID differs"
+    );
 
-    auto ntiles_in_row = cm_param.getNumBinEntries(chr1_ID, MULT);
-    auto ntiles_in_col = cm_param.getNumBinEntries(chr2_ID, MULT);
+    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID, MULT);
+    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID, MULT);
 
     UTILS_DIE_IF(ntiles_in_row != scm_param.getNTilesInRow(), "chr1_ID differs");
     UTILS_DIE_IF(ntiles_in_col != scm_param.getNTilesInCol(), "chr2_ID differs");
 
-    for (auto i = 0u; i<ntiles_in_row; i++){
-        for (auto j = 0u; j<ntiles_in_col; j++){
-            if (i>j && isIntraSCM()){
-                continue;
-            }
+    setNumTiles(ntiles_in_row, ntiles_in_col);
 
-            size_t tile_payload_size = reader.readBypassBE<uint32_t>();
+    for (auto i = 0u; i<getNTilesInRow(); i++){
+        for (auto j = 0u; j<getNTilesInCol(); j++){
+            if (!(isIntraSCM() && i>j)){
+
+                auto tile_payload_size = reader.readBypassBE<uint32_t>();
+                auto tile_payload = ContactMatrixTilePayload(reader);
+                UTILS_DIE_IF(
+                    tile_payload_size != tile_payload.getSize(),
+                    "Invalid tile_payload size!"
+                );
+                setTilePayload(i, j, std::move(tile_payload));
+            }
 
         }
     }
@@ -108,8 +114,42 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
     }
 
-    //TODO(yeremia): row_mask
-    //TODO(yeremia): col_mask
+    if (scm_param.getRowMaskExistsFlag()){
+        auto num_entries = cm_param.getNumBinEntries(chr1_ID, MULT);
+        auto mask_payload_size = reader.readBypassBE<uint32_t>();
+        auto mask_payload = SubcontactMatrixMaskPayload(
+            reader,
+            num_entries
+        );
+        UTILS_DIE_IF(mask_payload_size != mask_payload.getSize(), "Invalid mask_payload_size");
+        setRowMaskPayload(std::move(mask_payload));
+    }
+    if (!isIntraSCM() && scm_param.getColMaskExistsFlag()){
+        auto num_entries = cm_param.getNumBinEntries(chr2_ID, MULT);
+        auto mask_payload_size = reader.readBypassBE<uint32_t>();
+        auto mask_payload = SubcontactMatrixMaskPayload(
+            reader,
+            num_entries
+        );
+        UTILS_DIE_IF(mask_payload_size != mask_payload.getSize(), "Invalid mask_payload_size");
+        setRowMaskPayload(std::move(mask_payload));
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SubcontactMatrixPayload::operator==(
+    const SubcontactMatrixPayload& other
+) {
+    return parameter_set_ID == other.parameter_set_ID &&
+           sample_ID == other.sample_ID &&
+           chr1_ID == other.chr1_ID &&
+           chr2_ID == other.chr2_ID &&
+           tile_payloads == other.tile_payloads &&
+           row_mask_payload.has_value() == other.row_mask_payload.has_value() &&
+           col_mask_payload.has_value() == other.col_mask_payload.has_value() &&
+           row_mask_payload.value() == other.row_mask_payload.value() &&
+           col_mask_payload.value() == other.col_mask_payload.value();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
