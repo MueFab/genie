@@ -14,8 +14,8 @@
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
-//#include "genie/core/record/contact/record.h"
 #include "contact_matrix_parameters.h"
+#include "subcontact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
 #include "subcontact_matrix_mask_payload.h"
 
@@ -33,6 +33,7 @@ namespace contact {
 
 //using TilePayloads = xt::xtensor<ContactMatrixTilePayload, 2, xt::layout_type::row_major>;
 using TilePayloads = std::vector<std::vector<ContactMatrixTilePayload>>;
+using NormTilePayloads = std::vector<std::vector<uint8_t>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +44,7 @@ class SubcontactMatrixPayload {
       uint8_t chr1_ID;
       uint8_t chr2_ID;
       TilePayloads tile_payloads;
-      // TODO (Yeremia): Missing norm_matrices
+      std::vector<NormTilePayloads> norm_tile_payloads;
       std::optional<SubcontactMatrixMaskPayload> row_mask_payload;
       std::optional<SubcontactMatrixMaskPayload> col_mask_payload;
 
@@ -80,7 +81,9 @@ class SubcontactMatrixPayload {
      *
      * @param other The SubcontactMatrixPayload object to assign from.
      */
-    SubcontactMatrixPayload& operator=(const SubcontactMatrixPayload& other) = default;
+    SubcontactMatrixPayload& operator=(
+        const SubcontactMatrixPayload& other
+    ) = default;
 
     /**
      * @brief Parameterized constructor for SubcontactMatrixPayload.
@@ -121,6 +124,13 @@ class SubcontactMatrixPayload {
         std::optional<SubcontactMatrixMaskPayload>&& row_mask_payload,
         std::optional<SubcontactMatrixMaskPayload>&& col_mask_payload
     );
+
+    //TODO(yeremia): docstring
+    SubcontactMatrixPayload(
+        util::BitReader &reader,
+        ContactMatrixParameters cm_param,
+        const SubcontactMatrixParameters& scm_param
+    ) noexcept;
 
 //    bool operator==(const SubcontactMatrixPayload& other) const;
 
@@ -170,6 +180,9 @@ class SubcontactMatrixPayload {
     * @return A constant reference to the tile payloads.
     */
    const TilePayloads& getTilePayloads() const;
+
+   //TODO(yeremia): docstring
+   const size_t getNumNormMatrices() const;
 
    /**
     * @brief Gets the payload for the row mask.
@@ -252,6 +265,7 @@ class SubcontactMatrixPayload {
     */
    void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
+   //TODO(yeremia): docstring
    void setNumTiles(
        size_t ntiles_in_row,
        size_t ntiles_in_col,
@@ -318,8 +332,6 @@ class SubcontactMatrixPayload {
      * @param writer The writer to write to.
     */
    void write(util::BitWriter &writer) const;
-
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -15,15 +15,6 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SubcontactMatrixMaskPayload::operator==(const SubcontactMatrixMaskPayload& other) {
-    return transform_ID == other.transform_ID &&
-           mask_array == other.mask_array &&
-           first_val == other.first_val &&
-           rl_entries == other.rl_entries;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     util::BitReader& reader,
     uint32_t num_bin_entries
@@ -36,6 +27,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
             tmp_mask_array[i] = reader.read<bool>(MASK_ARR_BLEN);
         }
         setMaskArray(tmp_mask_array);
+        first_val = mask_array->at(0);
 
     } else {
         first_val = reader.read<bool>(FIRST_VAL_BLEN);
@@ -74,7 +66,11 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
       mask_array(std::move(_mask_array)),
       first_val(),
       rl_entries()
-{}
+{
+    auto nentries = mask_array->shape(0);
+    UTILS_DIE_IF(nentries == 0, "Uninitialized mask_array?");
+    first_val = mask_array->at(0);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -88,6 +84,15 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
       first_val(_first_val),
       rl_entries(std::move(_rl_entries))
 {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SubcontactMatrixMaskPayload::operator==(const SubcontactMatrixMaskPayload& other) {
+    return transform_ID == other.transform_ID &&
+           mask_array == other.mask_array &&
+           first_val == other.first_val &&
+           rl_entries == other.rl_entries;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,7 +116,10 @@ void SubcontactMatrixMaskPayload::setTransformID(TransformID id) { transform_ID 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::setMaskArray(const std::optional<BinVecDtype>& array) { mask_array = array; }
+void SubcontactMatrixMaskPayload::setMaskArray(const std::optional<BinVecDtype>& array) {
+    mask_array = array;
+    first_val = mask_array->at(0);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -144,11 +152,20 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
     std::ostream& _writer = payload;
     auto onmem_writer = genie::util::BitWriter(&_writer);
 
-    onmem_writer.write(static_cast<uint64_t>(transform_ID), TRANSFORM_ID_BLEN);
+    onmem_writer.write(
+        static_cast<uint64_t>(transform_ID),
+        TRANSFORM_ID_BLEN
+    );
+
     if (transform_ID == TransformID::ID_0){
+        UTILS_DIE_IF(!mask_array.has_value(), "mask_array is missing?");
         auto num_bin_entries = mask_array->shape(0);
+        auto dim = mask_array->dimension();
+
         for (auto i = 0u; i < num_bin_entries; i++){
-            onmem_writer.write(mask_array->at(i), 1);
+            auto _mask_array = mask_array.value();
+            uint64_t val = _mask_array(i);
+            onmem_writer.write(val, 1);
         }
     } else {
         onmem_writer.write(first_val, FIRST_VAL_BLEN);

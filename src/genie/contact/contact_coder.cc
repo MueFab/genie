@@ -21,11 +21,13 @@ namespace contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void compute_mask(
+    // input
     UInt64VecDtype& ids,
+    size_t nelems,
     // Output
     BinVecDtype& mask
 ){
-    auto nelems = xt::amax(ids)(0)+1;
+//    auto nelems = xt::amax(ids)(0)+1;
     mask = xt::zeros<bool>({nelems});
 
     UInt64VecDtype unique_ids = xt::unique(ids);
@@ -37,8 +39,11 @@ void compute_mask(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void compute_masks(
+    // Inputs
     UInt64VecDtype& row_ids,
+    size_t nrows,
     UInt64VecDtype& col_ids,
+    size_t ncols,
     const bool is_intra,
     // Outputs:
     BinVecDtype& row_mask,
@@ -48,17 +53,22 @@ void compute_masks(
                  "The size of row_ids and col_ids must be same!");
 
     if (is_intra){
+        UTILS_DIE_IF(nrows != ncols,
+            "Both nentries must be the same for intra SCM!"
+        );
+
         BinVecDtype mask;
         UInt64VecDtype ids = xt::concatenate(xt::xtuple(row_ids, col_ids));
-        compute_mask(ids, mask);
+        ids = xt::unique(ids);
+        compute_mask(ids, nrows, mask);
 
         row_mask.resize(mask.shape());
         row_mask = mask;
         col_mask.resize(mask.shape());
         col_mask = mask;
     } else {
-        compute_mask(row_ids, row_mask);
-        compute_mask(col_ids, col_mask);
+        compute_mask(row_ids, nrows, row_mask);
+        compute_mask(col_ids, ncols, col_mask);
     }
 }
 
@@ -111,7 +121,7 @@ void remove_unaligned(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void append_unaligned(
+void insert_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     bool is_intra,
@@ -358,14 +368,27 @@ void diag_transform(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_rows(
+void debinarize_row_bin(
+    BinMatDtype& bin_mat,
+    UIntMatDtype& mat
+){
+    //    auto ncols = bin_mat.shape(1);
+    //    auto ncols = bin_mat.shape(1);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void binarize_row_bin(
     UIntMatDtype& mat,
     BinMatDtype& bin_mat
 ) {
     auto nrows = mat.shape(0);
     auto ncols = mat.shape(1);
 
-    auto nbits_per_row = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(mat, {1}) + 1)));
+    UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
+        xt::log2(xt::amax(mat, {1}) + 1)
+    ));
+    xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
 
     uint64_t bin_mat_nrows = static_cast<uint64_t>(xt::sum(nbits_per_row)(0));
     uint64_t bin_mat_ncols = ncols + 1;
@@ -374,17 +397,13 @@ void binarize_rows(
 
     size_t i2 = 0;
     for (size_t i = 0; i < nrows; i++) {
-        for (size_t i_bit = 0; i_bit < nbits_per_row[i]; i_bit++) {
+        auto bitlength = nbits_per_row[i];
+        for (size_t i_bit = 0; i_bit < bitlength; i_bit++) {
             xt::view(bin_mat, i2++, xt::range(1, bin_mat_ncols)) = xt::cast<bool>(xt::view(mat, i, xt::all()) & (1u << i_bit));
         }
+
         bin_mat(i2-1, 0) = true;
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void debinarize_row_bin(BinMatDtype& bin_mat, UIntMatDtype& mat){
-    UTILS_DIE("Not yet implemented!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -507,11 +526,14 @@ void encode_scm(
 
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
 
-    // Compute mask
-    compute_masks(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+    // Compute mask for
+    compute_masks(row_ids, chr1_nbins, col_ids, chr2_nbins, is_intra_scm, row_mask, col_mask);
 
     // Create mapping
     remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+
+    UTILS_DIE_IF(row_ids.shape(0) == 0, "row_ids is empty?");
+    UTILS_DIE_IF(col_ids.shape(0) == 0, "col_ids is empty?");
 
     if (transform_mask){
 
@@ -536,7 +558,7 @@ void encode_scm(
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
 
         auto min_row_id = i_tile*tile_size;
-        auto max_row_id = (i_tile+1)*tile_size;
+        auto max_row_id = min_row_id+tile_size;
 
         for (size_t j_tile = 0u; j_tile< ntiles_in_col; j_tile++){
 
@@ -547,7 +569,7 @@ void encode_scm(
             auto& diag_transform_mode = tile_param.diag_tranform_mode;
             auto& binarization_mode = tile_param.binarization_mode;
 
-            uint32_t tile_nrows, tile_ncols;
+            uint32_t tile_nrows = 0, tile_ncols = 0;
             uint8_t* payload;
             size_t payload_len;
 
@@ -572,12 +594,16 @@ void encode_scm(
             }
 
             auto min_col_id = j_tile*tile_size;
-            auto max_col_id = (j_tile+1)*tile_size;
+            auto max_col_id = min_col_id+tile_size;
 
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
 
+            //TODO(yeremia): create pipelien where the whole tile is part of unaligned region
+            UTILS_DIE_IF(xt::sum(xt::cast<uint32_t>(mask))(0) == 0, "There is no entry in tile_mat at all?!");
+
+            // Filter the values only for the corresponding tile
             UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
             UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
             UIntVecDtype tile_counts = xt::filter(counts, mask);
@@ -604,7 +630,7 @@ void encode_scm(
 
             if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 genie::contact::BinMatDtype bin_mat;
-                genie::contact::binarize_rows(tile_mat, bin_mat);
+                genie::contact::binarize_row_bin(tile_mat, bin_mat);
 
                 tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
                 tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));

@@ -53,6 +53,7 @@ struct EncodingBlock {
  */
 void compute_mask(
     UInt64VecDtype& ids,
+    size_t nelems,
     BinVecDtype& mask
 );
 
@@ -70,9 +71,13 @@ void compute_mask(
  * @param col_mask The computed column mask.
  */
 void compute_masks(
+    // Inputs
     UInt64VecDtype& row_ids,
+    size_t nrows,
     UInt64VecDtype& col_ids,
-    bool is_intra,
+    size_t ncols,
+    const bool is_intra,
+    // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 );
@@ -115,7 +120,7 @@ void remove_unaligned(
  * @param row_mask A reference to the binary vector representing the row mask.
  * @param col_mask A reference to the binary vector representing the column mask.
  */
-void append_unaligned(
+void insert_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     bool is_intra,
@@ -222,7 +227,7 @@ void diag_transform(
  * @param mat A reference to the matrix data structure to be binarized.
  * @param bin_mat A reference to the binary matrix data structure to store the result.
  */
-void binarize_rows(
+void binarize_row_bin(
     UIntMatDtype& mat,
     BinMatDtype& bin_mat
 );

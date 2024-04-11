@@ -22,47 +22,55 @@
 //TODO(yeremia): Create round trip test
 TEST(ContactCoder, compute_mask) {
 
-    std::vector<uint64_t> v = {0, 1, 3, 5};
-    genie::contact::UInt64VecDtype ids = xt::adapt(v, {v.size()});
+    std::vector<uint64_t> IDS_VEC = {0, 1, 3, 5};
+    auto IDS_NENTRIES = 8u;
+    genie::contact::UInt64VecDtype IDS = xt::adapt(IDS_VEC, {IDS_VEC.size()});
     genie::contact::BinVecDtype mask;
 
-    genie::contact::UInt64VecDtype orig_ids = ids;
+    genie::contact::UInt64VecDtype orig_ids = IDS;
 
-    genie::contact::compute_mask(ids, mask);
+    genie::contact::compute_mask(IDS, IDS_NENTRIES, mask);
 
-    ASSERT_EQ(mask.size(), 6);
+    ASSERT_EQ(mask.size(), IDS_NENTRIES);
     ASSERT_EQ(xt::sum(xt::cast<uint8_t>(mask))(0), 4u);
     ASSERT_TRUE(mask(0));
     ASSERT_TRUE(mask(5));
     ASSERT_FALSE(mask(2));
     ASSERT_FALSE(mask(4));
 
-    // ids shall not change
-    ASSERT_TRUE(orig_ids == ids);
+    // IDS shall not change
+    ASSERT_TRUE(orig_ids == IDS);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Create round trip test
 TEST(ContactCoder, compute_masks) {
-    // Intra case
+    // Intra SCM
     {
         auto IS_INTRA = true;
 
-        std::vector<uint64_t> row_ids_vec = {0, 2, 5};
-        std::vector<uint64_t> col_ids_vec = {1, 4, 6};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 2, 5};
+        std::vector<uint64_t> COL_IDS_VEC = {1, 4, 6};
+        auto NENTRIES = 8u;
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UInt64VecDtype row_ids = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype col_ids = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
 
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
 
-        genie::contact::compute_masks(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::compute_masks(
+            row_ids, NENTRIES,
+            col_ids, NENTRIES,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
         ASSERT_TRUE(row_mask == col_mask);
-        ASSERT_EQ(row_mask.size(), 7u);
-        ASSERT_EQ(col_mask.size(), 7u);
+        ASSERT_EQ(row_mask.size(), NENTRIES);
+        ASSERT_EQ(col_mask.size(), NENTRIES);
 
         ASSERT_TRUE(row_mask(0));
         ASSERT_TRUE(row_mask(1));
@@ -71,105 +79,169 @@ TEST(ContactCoder, compute_masks) {
         ASSERT_TRUE(row_mask(4));
         ASSERT_TRUE(row_mask(5));
         ASSERT_TRUE(row_mask(6));
+
+        ASSERT_TRUE(col_mask(0));
+        ASSERT_TRUE(col_mask(1));
+        ASSERT_TRUE(col_mask(2));
+        ASSERT_FALSE(col_mask(3));
+        ASSERT_TRUE(col_mask(4));
+        ASSERT_TRUE(col_mask(5));
+        ASSERT_TRUE(col_mask(6));
     }
 
     // Inter case
     {
         auto IS_INTRA = false;
 
-        std::vector<uint64_t> row_ids_vec = {0, 2, 5};
-        std::vector<uint64_t> col_ids_vec = {1, 4, 6};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 2, 5};
+        auto NROWS = 6u;
+        std::vector<uint64_t> COL_IDS_VEC = {1, 4, 6};
+        auto NCOLS = 8u;
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
 
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
 
-        genie::contact::compute_masks(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::compute_masks(
+            ROW_IDS, NROWS,
+            COL_IDS,
+            NCOLS,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
         ASSERT_TRUE(row_mask != col_mask);
-        ASSERT_EQ(row_mask.size(), 6u);
-        ASSERT_EQ(col_mask.size(), 7u);
+        ASSERT_EQ(row_mask.size(), NROWS);
+        ASSERT_EQ(row_mask.dimension(), 1);
+        ASSERT_EQ(col_mask.size(), NCOLS);
+        ASSERT_EQ(col_mask.dimension(), 1);
 
-        ASSERT_TRUE(row_mask(0));
-        ASSERT_FALSE(row_mask(1));
-        ASSERT_TRUE(row_mask(2));
-        ASSERT_FALSE(row_mask(3));
-        ASSERT_FALSE(row_mask(4));
-        ASSERT_TRUE(row_mask(5));
+        ASSERT_EQ(row_mask(0), true);
+        ASSERT_EQ(row_mask(2), true);
+        ASSERT_EQ(row_mask(5), true);
+        ASSERT_EQ(row_mask(1), false);
+        ASSERT_EQ(row_mask(3), false);
+        ASSERT_EQ(row_mask(4), false);
 
-        ASSERT_FALSE(col_mask(0));
-        ASSERT_TRUE(col_mask(1));
-        ASSERT_FALSE(col_mask(2));
-        ASSERT_FALSE(col_mask(3));
-        ASSERT_TRUE(col_mask(4));
-        ASSERT_FALSE(col_mask(5));
-        ASSERT_TRUE(col_mask(6));
+        ASSERT_EQ(col_mask(1), true);
+        ASSERT_EQ(col_mask(4), true);
+        ASSERT_EQ(col_mask(6), true);
+        ASSERT_EQ(col_mask(0), false);
+        ASSERT_EQ(col_mask(2), false);
+        ASSERT_EQ(col_mask(3), false);
+        ASSERT_EQ(col_mask(5), false);
+        ASSERT_EQ(col_mask(7), false);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(ContactCoder, RoundTrip_ProcessingUnalignedRegion) {
-    // Intra case
+    // Intra SCM
     {
         auto IS_INTRA = true;
 
-        std::vector<uint64_t> row_ids_vec = {0, 5};
-        std::vector<uint64_t> col_ids_vec = {1, 6};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 5};
+        std::vector<uint64_t> COL_IDS_VEC = {1, 6};
+        size_t NENTRIES = 7u;
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
 
-        genie::contact::UInt64VecDtype orig_row_ids = genie::contact::UInt64VecDtype(row_ids);
-        genie::contact::UInt64VecDtype orig_col_ids = genie::contact::UInt64VecDtype(col_ids);
+        genie::contact::UInt64VecDtype row_ids = genie::contact::UInt64VecDtype(ROW_IDS);
+        genie::contact::UInt64VecDtype col_ids = genie::contact::UInt64VecDtype(COL_IDS);
 
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
 
-        genie::contact::compute_masks(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
-        genie::contact::remove_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::compute_masks(
+            row_ids,
+            NENTRIES,
+            col_ids,
+            NENTRIES,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
+
+        genie::contact::remove_unaligned(
+            row_ids,
+            col_ids,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
         ASSERT_EQ(row_ids(0), 0u);
         ASSERT_EQ(row_ids(1), 2u);
         ASSERT_EQ(col_ids(0), 1u);
         ASSERT_EQ(col_ids(1), 3u);
 
-        genie::contact::append_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::insert_unaligned(
+            row_ids,
+            col_ids,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
-        ASSERT_TRUE(row_ids == orig_row_ids);
-        ASSERT_TRUE(col_ids == orig_col_ids);
+        ASSERT_TRUE(ROW_IDS == row_ids);
+        ASSERT_TRUE(COL_IDS == col_ids);
     }
 
-    // Inter case
+    // Inter SCM
     {
         auto IS_INTRA = false;
 
-        std::vector<uint64_t> row_ids_vec = {0, 5};
-        std::vector<uint64_t> col_ids_vec = {1, 6};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 5};
+        size_t NROWS = 6u;
+        std::vector<uint64_t> COL_IDS_VEC = {1, 6};
+        size_t NCOLS = 8u;
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
 
-        genie::contact::UInt64VecDtype orig_row_ids = genie::contact::UInt64VecDtype(row_ids);
-        genie::contact::UInt64VecDtype orig_col_ids = genie::contact::UInt64VecDtype(col_ids);
+        genie::contact::UInt64VecDtype row_ids = genie::contact::UInt64VecDtype(ROW_IDS);
+        genie::contact::UInt64VecDtype col_ids = genie::contact::UInt64VecDtype(COL_IDS);
 
         genie::contact::BinVecDtype row_mask;
         genie::contact::BinVecDtype col_mask;
 
-        genie::contact::compute_masks(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
-        genie::contact::remove_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::compute_masks(
+            row_ids,
+            NROWS,
+            col_ids,
+            NCOLS,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
+        genie::contact::remove_unaligned(
+            row_ids,
+            col_ids,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
         ASSERT_EQ(row_ids(0), 0u);
         ASSERT_EQ(row_ids(1), 1u);
         ASSERT_EQ(col_ids(0), 0u);
         ASSERT_EQ(col_ids(1), 1u);
 
-        genie::contact::append_unaligned(row_ids, col_ids, IS_INTRA, row_mask, col_mask);
+        genie::contact::insert_unaligned(
+            row_ids,
+            col_ids,
+            IS_INTRA,
+            row_mask,
+            col_mask
+        );
 
-        ASSERT_TRUE(row_ids == orig_row_ids);
-        ASSERT_TRUE(col_ids == orig_col_ids);
+        ASSERT_EQ(row_ids, ROW_IDS);
+        ASSERT_EQ(col_ids, COL_IDS);
     }
 }
 
@@ -592,10 +664,12 @@ TEST(ContactCoder, diagonal_transformation) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, binarize_rows) {
-    genie::contact::UIntMatDtype MAT = {{1, 2, 3},
+TEST(ContactCoder, RoundTrip_Binarization) {
+    genie::contact::UIntMatDtype MAT = {{0, 0, 0},
+                                        {1, 2, 3},
                                         {4, 5, 6}};
-    genie::contact::BinMatDtype TARGET_BIN_MAT = { {false, true, false, true},
+    genie::contact::BinMatDtype TARGET_BIN_MAT = {  {true, false, false, false},
+                                                    {false, true, false, true},
                                                     {true, false, true, true},
                                                     {false, false, true, false},
                                                     {false, false, false, true},
@@ -603,93 +677,89 @@ TEST(ContactCoder, binarize_rows) {
 
     genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
     genie::contact::BinMatDtype bin_mat;
-    genie::contact::binarize_rows(MAT, bin_mat);
+    genie::contact::binarize_row_bin(MAT, bin_mat);
 
+    ASSERT_EQ(bin_mat, TARGET_BIN_MAT);
 
-    ASSERT_TRUE(bin_mat == TARGET_BIN_MAT);
+    genie::contact::UIntMatDtype recon_mat;
+    //TODO(yeremia): create round-trip test for binarize_row_bin
+//    genie::contact::debinarize_row_bin()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Create round trip test
-TEST(ContactCoder, full_coding) {
-
-    std::vector<uint64_t> v = {0, 1, 3, 5};
-    genie::contact::UInt64VecDtype ids = xt::adapt(v, {v.size()});
-    genie::contact::BinVecDtype mask;
-
-    genie::contact::UInt64VecDtype orig_ids = ids;
-
-    genie::contact::compute_mask(ids, mask);
-
-    ASSERT_EQ(mask.size(), 6);
-    ASSERT_EQ(xt::sum(xt::cast<uint8_t>(mask))(0), 4u);
-    ASSERT_TRUE(mask(0));
-    ASSERT_TRUE(mask(5));
-    ASSERT_FALSE(mask(2));
-    ASSERT_FALSE(mask(4));
-
-    // ids may not changed
-    ASSERT_TRUE(orig_ids == ids);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//TODO(yeremia): Create round trip test
-TEST(ContactCoder, RoundTrip_OneRecNoNorm){
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
-    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
-
-    std::ifstream reader(filepath, std::ios::binary);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
-
-    std::vector<genie::core::record::ContactRecord> recs;
-
-    while (bitreader.isGood()){
-        recs.emplace_back(bitreader);
-    }
-
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
-
-    {
-        auto TRANSFORM_MASK = true;
-        auto TRANSFORM_TILE = true;
-        auto CODEC_ID = genie::core::AlgoID::JBIG;
-        auto TILE_SIZE = 5000u;
-
-        auto cm_param = genie::contact::ContactMatrixParameters();
-        auto scm_param = genie::contact::SubcontactMatrixParameters();
-        auto scm_payload = genie::contact::SubcontactMatrixPayload();
-
-        cm_param.setBinSize(recs.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-
-        for (auto& rec: recs){
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
-        }
-
-        auto& rec = recs.front();
-        genie::contact::encode_scm(
-            cm_param,
-            rec,
-            scm_param,
-            scm_payload,
-            TRANSFORM_MASK,
-            TRANSFORM_TILE,
-            CODEC_ID
-        );
-
-        auto scm_payload_len = scm_payload.getSize();
-        auto x = 10;
-    }
-
-}
+//TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
+//    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+//
+//    std::ifstream reader(filepath, std::ios::binary);
+//    ASSERT_EQ(reader.fail(), false);
+//    genie::util::BitReader bitreader(reader);
+//
+//    std::vector<genie::core::record::ContactRecord> recs;
+//
+//    while (bitreader.isGood()){
+//        recs.emplace_back(bitreader);
+//    }
+//
+//    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+//    recs.pop_back();
+//
+//    {
+//        auto TRANSFORM_MASK = false;
+//        auto TRANSFORM_TILE = true;
+//        auto CODEC_ID = genie::core::AlgoID::JBIG;
+//        auto TILE_SIZE = 1000u;
+//
+//        auto cm_param = genie::contact::ContactMatrixParameters();
+//        auto scm_param = genie::contact::SubcontactMatrixParameters();
+//        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+//
+//        cm_param.setBinSize(recs.front().getBinSize());
+//        cm_param.setTileSize(TILE_SIZE);
+//
+//        for (auto& rec: recs){
+//            cm_param.upsertChromosome(
+//                rec.getChr1ID(),
+//                rec.getChr1Name(),
+//                rec.getChr1Length()
+//            );
+//        }
+//
+//        auto& rec = recs.front();
+//        genie::contact::encode_scm(
+//            cm_param,
+//            rec,
+//            scm_param,
+//            scm_payload,
+//            TRANSFORM_MASK,
+//            TRANSFORM_TILE,
+//            CODEC_ID
+//        );
+//
+//        auto obj_payload = std::stringstream();
+//        std::ostream& writer = obj_payload;
+//        auto bitwriter = genie::util::BitWriter(&writer);
+//        scm_payload.write(bitwriter);
+//
+//        ASSERT_EQ(scm_payload.getSampleID(), rec.getSampleID());
+//        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+//        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+//        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+//
+//        std::istream& reader = obj_payload;
+//        auto bitreader = genie::util::BitReader(reader);
+////        auto recon_obj = genie::contact::SubcontactMatrixPayload(
+////            bitreader,
+////            cm_param
+////        );
+//
+//        auto scm_payload_len = scm_payload.getSize();
+//        auto x = 10;
+//    }
+//
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------

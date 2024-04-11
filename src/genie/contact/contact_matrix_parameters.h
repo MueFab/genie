@@ -307,7 +307,10 @@ class ContactMatrixParameters {
      *
      * @return The number of bin entries.
      */
-    uint64_t getNumBinEntries(uint8_t chr_ID, uint8_t interv_mult=1);
+    uint64_t getNumBinEntries(
+        uint8_t chr_ID,
+        uint32_t interv_mult=1
+    );
 
     /**
      * @brief Gets the number of tiles.
@@ -319,7 +322,10 @@ class ContactMatrixParameters {
      *
      * @return The number of tiles.
      */
-    uint32_t getNumTiles(uint8_t chr_ID, uint8_t interv_mult=1);
+    uint32_t getNumTiles(
+        uint8_t chr_ID,
+        uint32_t interv_mult=1
+    );
 
     /**
      * @brief Writes the object to a writer.
