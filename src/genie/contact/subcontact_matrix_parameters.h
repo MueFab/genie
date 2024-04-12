@@ -215,17 +215,20 @@ class SubcontactMatrixParameters {
      */
     void setColMaskExistsFlag(bool flag);
 
+    //TODO(yeremia): docstring
     void setNumTiles(
         size_t ntiles_in_row,
         size_t ntiles_in_col,
         bool free_mem=true
     );
 
+    //TODO(yeremia): docstring
     TileParameter& getTileParameter(
         size_t i_tile,
         size_t j_tile
     );
 
+    //TODO(yeremia): docstring
     void setTileParameter(
         size_t i_tile,
         size_t j_tile,
@@ -250,6 +253,7 @@ class SubcontactMatrixParameters {
      */
     size_t getNTilesInCol() const;
 
+    //TODO(yeremia): docstring
     bool getEnaTransform() const;
 
     /**

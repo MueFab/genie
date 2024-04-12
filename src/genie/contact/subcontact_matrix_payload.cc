@@ -259,16 +259,23 @@ void SubcontactMatrixPayload::setNumTiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContactMatrixTilePayload& SubcontactMatrixPayload::getTilePayload(size_t i_tile, size_t j_tile){
+    UTILS_DIE_IF(i_tile >= getNTilesInRow(), "i_tile is greater than ntiles_in_row");
+    UTILS_DIE_IF(j_tile >= getNTilesInCol(), "j_tile is greater than ntiles_in_col");
+    UTILS_DIE_IF(i_tile > j_tile && isIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
+
+    return tile_payloads[i_tile][j_tile];
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void SubcontactMatrixPayload::setTilePayload(
     size_t i_tile,
     size_t j_tile,
     ContactMatrixTilePayload&& tile_payload
 ) {
-    UTILS_DIE_IF(i_tile >= getNTilesInRow(), "i_tile is greater than ntiles_in_row");
-    UTILS_DIE_IF(j_tile >= getNTilesInCol(), "j_tile is greater than ntiles_in_col");
-    UTILS_DIE_IF(i_tile > j_tile && isIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
 
-    tile_payloads[i_tile][j_tile] = std::move(tile_payload);
+    getTilePayload(i_tile, j_tile) = std::move(tile_payload);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

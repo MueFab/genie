@@ -281,6 +281,11 @@ class SubcontactMatrixPayload {
        bool free_mem=true
    );
 
+   ContactMatrixTilePayload& getTilePayload(
+       size_t i_tile,
+       size_t j_tile
+   );
+
    /**
      * @brief Adds a tile payload.
      *

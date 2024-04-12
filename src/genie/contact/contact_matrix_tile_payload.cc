@@ -156,7 +156,7 @@ uint32_t ContactMatrixTilePayload::getTileNCols() const { return tile_ncols; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<uint8_t> ContactMatrixTilePayload::getPayload() const { return payload; }
+const std::vector<uint8_t>& ContactMatrixTilePayload::getPayload() const { return payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -172,7 +172,24 @@ void ContactMatrixTilePayload::setTileNCols(uint32_t cols) { tile_ncols = cols; 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::setPayload(const std::vector<uint8_t>& data) { payload = data; }
+void ContactMatrixTilePayload::setPayload(const std::vector<uint8_t>& data) {payload = data; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void ContactMatrixTilePayload::setJBIGPayload(
+//    uint8_t** _payload,
+//    size_t _payload_len
+//) {
+//    payload = std::move(*_payload, )
+//    codec_ID = core::AlgoID::JBIG;
+//
+//    free(*_payload);
+//
+//    if (codec_ID == core::AlgoID::JBIG){
+//        tile_nrows = 0;
+//        tile_ncols = 0;
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

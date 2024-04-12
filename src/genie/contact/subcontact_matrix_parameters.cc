@@ -232,7 +232,6 @@ TileParameter& SubcontactMatrixParameters::getTileParameter(
 ) {
     UTILS_DIE_IF(i_tile >= getNTilesInRow(), "Invalid i_tile!");
     UTILS_DIE_IF(j_tile >= getNTilesInCol(), "Invalid j_tile!");
-
     UTILS_DIE_IF(i_tile > j_tile && isIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
 
     return tile_parameters[i_tile][j_tile];
@@ -245,6 +244,10 @@ void SubcontactMatrixParameters::setTileParameter(
     size_t j_tile,
     TileParameter tile_parameter
 ){
+//    UTILS_DIE_IF(i_tile >= getNTilesInRow(), "Invalid i_tile!");
+//    UTILS_DIE_IF(j_tile >= getNTilesInCol(), "Invalid j_tile!");
+//    UTILS_DIE_IF(i_tile > j_tile && isIntraSCM(), "Accessing lower triangle of intra SCM is not allowed!");
+
     getTileParameter(i_tile, j_tile) = tile_parameter;
 }
 
