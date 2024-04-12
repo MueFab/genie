@@ -9,13 +9,13 @@
 #include <vector>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
-//#include <xtensor/xrandom.hpp>
+#include <xtensor/xrandom.hpp>
+#include "helpers.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 #include "genie/util/bitreader.h"
 //#include "genie/util/bitwriter.h"
 //#include "genie/util/runtime-exception.h"
-#include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -663,7 +663,7 @@ TEST(ContactCoder, diagonal_transformation) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Binarization) {
+TEST(ContactCoder, RoundTrip_Coding_TransformRowBin) {
     genie::contact::UIntMatDtype MAT = {{0, 0, 0},
                                         {1, 2, 3},
                                         {4, 5, 6}};
@@ -676,13 +676,49 @@ TEST(ContactCoder, RoundTrip_Binarization) {
 
     genie::contact::UIntMatDtype orig_mat = genie::contact::UIntMatDtype(MAT);
     genie::contact::BinMatDtype bin_mat;
-    genie::contact::binarize_row_bin(MAT, bin_mat);
+    genie::contact::transform_row_bin(orig_mat, bin_mat);
 
+    ASSERT_EQ(bin_mat.shape(0), TARGET_BIN_MAT.shape(0));
+    ASSERT_EQ(bin_mat.shape(1), TARGET_BIN_MAT.shape(1));
     ASSERT_EQ(bin_mat, TARGET_BIN_MAT);
 
     genie::contact::UIntMatDtype recon_mat;
-    //TODO(yeremia): create round-trip test for binarize_row_bin
-//    genie::contact::debinarize_row_bin()
+    genie::contact::inverse_transform_row_bin(bin_mat, recon_mat);
+
+    ASSERT_EQ(recon_mat.shape(0), MAT.shape(0));
+    ASSERT_EQ(recon_mat.shape(1), MAT.shape(1));
+    ASSERT_EQ(recon_mat, MAT);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
+    // Test coding of bin_mat using JBI
+    {
+        auto NROWS = 100u;
+        auto NCOLS = 200u;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+
+        genie::contact::BinMatDtype ORIG_BIN_MAT = xt::cast<bool>(xt::random::randint<uint16_t>({NROWS, NCOLS}, 0, 2u));
+
+        auto bin_mat = genie::contact::BinMatDtype(ORIG_BIN_MAT);
+        genie::contact::BinMatDtype recon_bin_mat;
+        auto tile_payload = genie::contact::ContactMatrixTilePayload();
+
+        encode_cm_tile(
+            bin_mat,
+            CODEC_ID,
+            tile_payload
+        );
+
+        decode_cm_tile(
+            tile_payload,
+            CODEC_ID,
+            recon_bin_mat
+        );
+
+        ASSERT_EQ(recon_bin_mat, ORIG_BIN_MAT);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -715,6 +751,7 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         auto TRANSFORM_TILE = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
+        auto MULT = 1u;
 
         auto cm_param = genie::contact::ContactMatrixParameters();
         auto scm_param = genie::contact::SubcontactMatrixParameters();
@@ -764,6 +801,14 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
         auto recon_rec = genie::contact::ContactRecords();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            rec,
+            MULT
+        );
     }
 
 }

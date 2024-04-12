@@ -5,6 +5,9 @@
  */
 
 #include "contact_coder.h"
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 #include <codecs/include/mpegg-codecs.h>
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime-exception.h>
@@ -371,18 +374,51 @@ void diag_transform(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void debinarize_row_bin(
-    BinMatDtype& bin_mat,
+void inverse_transform_row_bin(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
     UIntMatDtype& mat
 ){
-    //    auto ncols = bin_mat.shape(1);
-    //    auto ncols = bin_mat.shape(1);
+    size_t bin_mat_nrows = bin_mat.shape(0);
+    size_t bin_mat_ncols = bin_mat.shape(1);
+
+    UTILS_DIE_IF(bin_mat_nrows == 0, "Invalid mat_nrows!");
+    UTILS_DIE_IF(bin_mat_ncols == 0, "Invalid mat_ncols!");
+
+//    size_t mat_nrows = 0;
+    size_t mat_ncols = bin_mat_ncols-1;
+
+    UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0));
+    size_t mat_nrows = xt::sum(first_col)(0);
+
+    UTILS_DIE_IF(mat_nrows == 0, "Invalid mat_nrows!");
+    UTILS_DIE_IF(mat_ncols == 0, "Invalid mat_ncols!");
+
+    mat = xt::zeros<uint32_t>({mat_nrows, mat_ncols});
+
+    size_t target_i = 0;
+    uint8_t bit_pos = 0;
+    auto target_js = xt::range(1u, bin_mat_ncols);
+    for (auto i = 0u; i<bin_mat_nrows; i++){
+        xt::view(mat, target_i, xt::all()) |= xt::cast<uint32_t>(xt::view(bin_mat, i, target_js)) << bit_pos;
+        bool sentinel_flag = bin_mat(i, 0);
+
+        if (sentinel_flag){
+            target_i++;
+            bit_pos = 0;
+        } else{
+            bit_pos++;
+        }
+    }
+
+    UTILS_DIE_IF(target_i != mat_nrows, "Not all of the mat rows are processed!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void binarize_row_bin(
-    UIntMatDtype& mat,
+void transform_row_bin(
+    const UIntMatDtype& mat,
     BinMatDtype& bin_mat
 ) {
     auto nrows = mat.shape(0);
@@ -416,34 +452,49 @@ void binarize_row_bin(
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
-void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_len) {
+void bin_mat_to_bytes(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
+    uint8_t** payload,
+    size_t& payload_len
+) {
     auto nrows = static_cast<size_t>(bin_mat.shape(0));
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
-    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // Ceil div operation
     payload_len = bpl * nrows;
     *payload = (unsigned char*) calloc (payload_len, sizeof(unsigned char));
 
     for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
         for (auto j = 0u; j < ncols; j++) {
-            auto byte_offset = row_offset + (j >> 3);
-            uint8_t shift = (7 - (j & 7));
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
             auto val = static_cast<uint8_t>(bin_mat(i, j));
             val = static_cast<uint8_t>(val << shift);
             *(*payload + byte_offset) |= val;
         }
     }
 
-    // TODO(yeremia): find a better solution to free the memory of bin_mat
-    bin_mat.resize({0,0});
+//    // TODO(yeremia): find a better solution to free the memory of bin_mat
+//    bin_mat.resize({0,0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
-void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols) {
-    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // bytes per line with ceil operation
+void bin_mat_from_bytes(
+    // Inputs
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+) {
+
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // bytes per line with ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
 
     MatShapeDtype bin_mat_shape = {nrows, ncols};
@@ -462,10 +513,108 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void decode_cm_tile(
+    // Inputs
+    const genie::contact::ContactMatrixTilePayload& tile_payload,
+    core::AlgoID codec_ID,
+    // Outputs
+    BinMatDtype& bin_mat
+){
+    uint8_t* raw_data;
+    size_t raw_data_len;
+    uint8_t* compressed_data;
+    size_t compressed_data_len;
+
+    unsigned long tile_nrows;
+    unsigned long tile_ncols;
+
+    if (codec_ID == core::AlgoID::JBIG){
+        compressed_data_len = tile_payload.getPayloadSize();
+        auto& payload = tile_payload.getPayload();
+
+        compressed_data = (uint8_t*)malloc(compressed_data_len * sizeof(uint8_t));
+        memcpy(compressed_data, payload.data(), compressed_data_len);
+
+        mpegg_jbig_decompress_default(
+            &raw_data,
+            &raw_data_len,
+            compressed_data,
+            compressed_data_len,
+            &tile_nrows,
+            &tile_ncols
+        );
+
+        bin_mat_from_bytes(
+            raw_data,
+            raw_data_len,
+            tile_nrows,
+            tile_ncols,
+            bin_mat
+        );
+        free(compressed_data);
+
+    } else {
+
+        tile_nrows = tile_payload.getTileNRows();
+        tile_ncols = tile_payload.getTileNCols();
+
+        UTILS_DIE("Not yet implemented");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void encode_cm_tile(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    core::AlgoID codec_ID,
+    // Outputs
+    genie::contact::ContactMatrixTilePayload& tile_payload
+) {
+    uint8_t* payload;
+    size_t payload_len;
+    uint8_t* compressed_payload;
+    size_t compressed_payload_len;
+
+    auto tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
+    auto tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
+
+    if (codec_ID == genie::core::AlgoID::JBIG) {
+
+        bin_mat_to_bytes(bin_mat, &payload, payload_len);
+
+        mpegg_jbig_compress_default(
+            &compressed_payload,
+            &compressed_payload_len,
+            payload,
+            payload_len,
+            tile_nrows,
+            tile_ncols
+        );
+
+        free(payload);
+
+    } else {
+        UTILS_DIE("Not yet implemented for other codec!");
+    }
+
+    auto _tile_payload = ContactMatrixTilePayload(
+        codec_ID,
+        tile_nrows,
+        tile_ncols,
+        &compressed_payload,
+        compressed_payload_len
+    );
+
+    tile_payload = std::move(_tile_payload);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void decode_scm(
     ContactMatrixParameters& cm_param,
-    const SubcontactMatrixParameters scm_param,
-    const genie::contact::SubcontactMatrixPayload& scm_payload,
+    SubcontactMatrixParameters scm_param,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
     uint32_t mult
 ){
@@ -473,19 +622,38 @@ void decode_scm(
     BinVecDtype row_mask;
     BinVecDtype col_mask;
 
+    // Input parameters retrieved from parameter set
     auto chr1_ID = scm_param.getChr1ID();
-    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
     auto chr2_ID = scm_param.getChr2ID();
+    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
     auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
+    auto is_intra_scm = scm_param.isIntraSCM();
+    auto codec_ID = scm_param.getCodecID();
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
-            UIntMatDtype tile_mat;
-
-            if (i_tile > j_tile && scm_param.isIntraSCM())
+            if (i_tile > j_tile && is_intra_scm){
                 continue;
+            }
 
-            auto& tile_param = scm_param.getTileParameters();
+            UIntMatDtype tile_mat;
+            auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
+            auto& tile_payload = scm_payload.getTilePayload(i_tile, j_tile);
+
+            if (tile_param.binarization_mode == BinarizationMode::ROW_BINARIZATION){
+                BinMatDtype bin_mat;
+
+                decode_cm_tile(
+                    tile_payload,
+                    codec_ID,
+                    bin_mat
+                );
+
+
+            } else {
+                UTILS_DIE("no binarization is not supported yet!");
+            }
+
         }
     }
 }
@@ -561,8 +729,9 @@ void encode_scm(
 
         for (size_t j_tile = 0u; j_tile< ntiles_in_col; j_tile++){
 
-            if (i_tile > j_tile && scm_param.isIntraSCM())
+            if (i_tile > j_tile && scm_param.isIntraSCM()){
                 continue;
+            }
 
             auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
             auto& diag_transform_mode = tile_param.diag_tranform_mode;
@@ -599,7 +768,7 @@ void encode_scm(
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
 
-            //TODO(yeremia): create pipelien where the whole tile is part of unaligned region
+            //TODO(yeremia): create a pipeline where the whole tile is unaligned
             UTILS_DIE_IF(xt::sum(xt::cast<uint32_t>(mask))(0) == 0, "There is no entry in tile_mat at all?!");
 
             // Filter the values only for the corresponding tile
@@ -629,49 +798,25 @@ void encode_scm(
 
             if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 genie::contact::BinMatDtype bin_mat;
-                genie::contact::binarize_row_bin(tile_mat, bin_mat);
+                genie::contact::transform_row_bin(tile_mat, bin_mat);
 
-                tile_nrows = static_cast<uint32_t>(bin_mat.shape(0));
-                tile_ncols = static_cast<uint32_t>(bin_mat.shape(1));
+                auto tile_payload = ContactMatrixTilePayload();
+                encode_cm_tile(
+                    bin_mat,
+                    codec_ID,
+                    tile_payload
+                );
 
-                if (codec_ID == genie::core::AlgoID::JBIG) {
-                    uint8_t* compressed_payload;
-                    size_t compressed_payload_len;
-
-
-                    bin_mat_to_bytes(bin_mat, &payload, payload_len);
-
-                    mpegg_jbig_compress_default(
-                        &compressed_payload,
-                        &compressed_payload_len,
-                        payload,
-                        payload_len,
-                        tile_nrows,
-                        tile_ncols
-                    );
-
-                } else {
-                    UTILS_DIE("Not yet implemented for other codec!");
-                }
+                scm_payload.setTilePayload(
+                    i_tile,
+                    j_tile,
+                    std::move(tile_payload)
+                );
 
             // BinarizationMode::NONE
             } else {
                 UTILS_DIE("Not yet implemented!");
             }
-
-            auto tile_payload = ContactMatrixTilePayload(
-                codec_ID,
-                tile_nrows,
-                tile_ncols,
-                &payload,
-                payload_len
-            );
-
-            scm_payload.setTilePayload(
-                i_tile,
-                j_tile,
-                std::move(tile_payload)
-            );
         }
     }
 

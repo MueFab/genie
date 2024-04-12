@@ -202,6 +202,13 @@ void sort_by_row_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void inverse_diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /**
  * Applies a diagonal transformation to the given matrix.
  *
@@ -216,21 +223,6 @@ void diag_transform(
     DiagonalTransformMode mode
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-/**
- * Transform the given matrix using row binarization.
- *
- * This function binarizes the rows of the matrix, setting each element to  1 if it is non-zero,
- * and  0 otherwise. The result is stored in a binary matrix data structure.
- *
- * @param mat A reference to the matrix data structure to be binarized.
- * @param bin_mat A reference to the binary matrix data structure to store the result.
- */
-void binarize_row_bin(
-    UIntMatDtype& mat,
-    BinMatDtype& bin_mat
-);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -242,10 +234,31 @@ void binarize_row_bin(
  * @param bin_mat A reference to the binary matrix row to be converted.
  * @param mat A reference to the matrix of unsigned integers where the converted row will be stored.
  */
-void debinarize_row_bin(
-    BinMatDtype& bin_mat,
+void inverse_transform_row_bin(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
     UIntMatDtype& mat
 );
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Transform the given matrix using row binarization.
+ *
+ * This function binarizes the rows of the matrix, setting each element to  1 if it is non-zero,
+ * and  0 otherwise. The result is stored in a binary matrix data structure.
+ *
+ * @param mat A reference to the matrix data structure to be binarized.
+ * @param bin_mat A reference to the binary matrix data structure to store the result.
+ */
+void transform_row_bin(
+    // Inputs
+    const UIntMatDtype& mat,
+    // Outputs
+    BinMatDtype& bin_mat
+);
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -260,7 +273,9 @@ void debinarize_row_bin(
  * @param payload_len The length of the byte array.
  */
 void bin_mat_to_bytes(
-    BinMatDtype& bin_mat,
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
     uint8_t** payload,
     size_t& payload_len
 );
@@ -274,18 +289,43 @@ void bin_mat_to_bytes(
  * The byte array is assumed to be of length (payload_len) and represents a binary matrix with
  * (nrows) rows and (ncols) columns.
  *
- * @param bin_mat The binary matrix to store the converted byte array.
  * @param payload The byte array to be converted.
  * @param payload_len The length of the byte array.
  * @param nrows The number of rows in the binary matrix.
  * @param ncols The number of columns in the binary matrix.
+ * @param bin_mat The binary matrix to store the converted byte array.
  */
 void bin_mat_from_bytes(
-    BinMatDtype& bin_mat,
+    // Inputs
     const uint8_t* payload,
     size_t payload_len,
     size_t nrows,
-    size_t ncols
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TODO(yeremia): docstring
+void encode_cm_tile(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    core::AlgoID codec_ID,
+    // Outputs
+    genie::contact::ContactMatrixTilePayload& tile_payload
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// TODO(yeremia): docstring
+void decode_cm_tile(
+    // Inputs
+    const genie::contact::ContactMatrixTilePayload& tile_payload,
+    core::AlgoID codec_ID,
+    // Outputs
+    BinMatDtype& bin_mat
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -301,8 +341,8 @@ void bin_mat_from_bytes(
  */
 void decode_scm(
     ContactMatrixParameters& cm_param,
-    const SubcontactMatrixParameters scm_param,
-    const genie::contact::SubcontactMatrixPayload& scm_payload,
+    SubcontactMatrixParameters scm_param,
+    genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
     uint32_t mult
 );

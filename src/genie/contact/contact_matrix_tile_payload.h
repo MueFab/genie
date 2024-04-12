@@ -170,7 +170,7 @@ class ContactMatrixTilePayload {
      *
      * @return The payload.
      */
-    std::vector<uint8_t> getPayload() const;
+    const std::vector<uint8_t>& getPayload() const;
 
     /**
      * @brief Set the Codec ID.
