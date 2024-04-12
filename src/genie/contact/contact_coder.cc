@@ -422,7 +422,7 @@ void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_l
 
     auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
     payload_len = bpl * nrows;
-    *payload = (unsigned char*)calloc(payload_len, sizeof(unsigned char));
+    *payload = (unsigned char*) calloc (payload_len, sizeof(unsigned char));
 
     for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
@@ -500,6 +500,7 @@ void encode_scm(
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     // Options
+    bool transform_ids,
     bool transform_mask,
     bool transform_tile,
     core::AlgoID codec_ID
@@ -542,11 +543,13 @@ void encode_scm(
 
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
 
-    // Compute mask for
-    compute_masks(row_ids, chr1_nbins, col_ids, chr2_nbins, is_intra_scm, row_mask, col_mask);
+    if (transform_ids){
+        // Compute mask for
+        compute_masks(row_ids, chr1_nbins, col_ids, chr2_nbins, is_intra_scm, row_mask, col_mask);
 
-    // Create mapping
-    remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+        // Create mapping
+        remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+    }
 
     UTILS_DIE_IF(row_ids.shape(0) == 0, "row_ids is empty?");
     UTILS_DIE_IF(col_ids.shape(0) == 0, "col_ids is empty?");
@@ -672,24 +675,28 @@ void encode_scm(
         }
     }
 
-    if (transform_mask){
+    if (transform_ids){
+        if (transform_mask){
 
-    } else {
-        auto row_mask_payload = SubcontactMatrixMaskPayload(
-            std::move(row_mask)
-        );
+        } else {
+            auto row_mask_payload = SubcontactMatrixMaskPayload(
+                std::move(row_mask)
+            );
 
-        scm_payload.setRowMaskPayload(
-            std::move(row_mask)
-        );
+            scm_payload.setRowMaskPayload(
+                std::move(row_mask)
+            );
+            scm_param.setRowMaskExistsFlag(true);
 
-        auto col_mask_payload = SubcontactMatrixMaskPayload(
-            std::move(col_mask)
-        );
+            auto col_mask_payload = SubcontactMatrixMaskPayload(
+                std::move(col_mask)
+            );
 
-        scm_payload.setColMaskPayload(
-            std::move(col_mask)
-        );
+            scm_payload.setColMaskPayload(
+                std::move(col_mask)
+            );
+            scm_param.setColMaskExistsFlag(true);
+        }
     }
 }
 

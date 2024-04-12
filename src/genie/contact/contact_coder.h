@@ -314,6 +314,7 @@ void encode_scm(
     core::record::ContactRecord& rec,
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
+    bool transform_ids=true,
     bool transform_mask=true,
     bool transform_tile=true,
     core::AlgoID codec_ID=core::AlgoID::JBIG

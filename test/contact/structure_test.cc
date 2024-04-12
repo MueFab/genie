@@ -5,21 +5,17 @@
 */
 
 #include <gtest/gtest.h>
-#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/record/contact/record.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-//#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -207,7 +203,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto TRANSFORM_ID = genie::contact::TransformID::ID_1;
         auto NUM_RL_ENTRIES = 10u;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(1, MAX_VAL, NUM_RL_ENTRIES);
+        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(
+            1,
+            static_cast<uint8_t>(MAX_VAL),
+            NUM_RL_ENTRIES
+        );
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -249,7 +249,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto TRANSFORM_ID = genie::contact::TransformID::ID_2;
         auto NUM_RL_ENTRIES = 10u;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(1, MAX_VAL, NUM_RL_ENTRIES);
+        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint16_t>(
+            1,
+            static_cast<uint16_t>(MAX_VAL),
+            NUM_RL_ENTRIES
+        );
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -290,7 +294,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto TRANSFORM_ID = genie::contact::TransformID::ID_3;
         auto NUM_RL_ENTRIES = 10u;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
-        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(1, MAX_VAL, NUM_RL_ENTRIES);
+        genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint32_t>(
+            1,
+            MAX_VAL,
+            NUM_RL_ENTRIES
+        );
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
         auto FIRST_VAL = true;
 
@@ -332,20 +340,20 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
 TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
     auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
-    auto SAMPLE1_ID = 10u;
+//    auto SAMPLE1_ID = 10u;
     auto SAMPLE1_NAME = std::string("SAMPLE1");
-    auto SAMPLE2_ID = 20u;
+//    auto SAMPLE2_ID = 20u;
     auto SAMPLE2_NAME = std::string("SAMPLE2");
 
-    auto CHR1_ID = 30u;
+//    auto CHR1_ID = 30u;
     auto CHR1_NAME = std::string("CHR1");
-    auto CHR1_LEN = 70u;
-    auto CHR2_ID = 40u;
+//    auto CHR1_LEN = 70u;
+//    auto CHR2_ID = 40u;
     auto CHR2_NAME = std::string(CHR1_NAME);
-    auto CHR2_LEN = CHR1_LEN;
+//    auto CHR2_LEN = CHR1_LEN;
 
-    auto BIN_SIZE = 5u;
-    auto TILE_SIZE = 5u;
+//    auto BIN_SIZE = 5u;
+//    auto TILE_SIZE = 5u;
 
     //TODO(yeremia): Complete this unit test!
 }
@@ -539,6 +547,20 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixPayload){
+    // Intra SCM
+    {
+
+    }
+
+    // Inter SCM
+    {
+
     }
 }
 
