@@ -136,7 +136,7 @@ class SubcontactMatrixPayload {
 
     //TODO(yeremia): docstring
     bool operator==(
-        const SubcontactMatrixPayload& other
+        SubcontactMatrixPayload& other
     );
 
 //    friend bool operator==(const SubcontactMatrixPayload& lhs, const SubcontactMatrixPayload& rhs);
@@ -259,9 +259,9 @@ class SubcontactMatrixPayload {
     *
     * @param payload The payload to set for the row mask.
     */
-//   void setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
-   void setRowMaskPayload(SubcontactMatrixMaskPayload&& payload);
+//   void setRowMaskPayload(SubcontactMatrixMaskPayload&& payload);
 
    /**
     * @brief Sets the payload for the column mask.
@@ -270,9 +270,9 @@ class SubcontactMatrixPayload {
     *
     * @param payload The payload to set for the column mask.
     */
-//   void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
-   void setColMaskPayload(SubcontactMatrixMaskPayload&& payload);
+//   void setColMaskPayload(SubcontactMatrixMaskPayload&& payload);
 
    //TODO(yeremia): docstring
    void setNumTiles(

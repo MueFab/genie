@@ -9,7 +9,7 @@
 #include <vector>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
-#include <xtensor/xrandom.hpp>
+//#include <xtensor/xrandom.hpp>
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 #include "genie/util/bitreader.h"
@@ -693,20 +693,24 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
     std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
-    std::ifstream reader(filepath, std::ios::binary);
-    ASSERT_EQ(reader.fail(), false);
-    genie::util::BitReader bitreader(reader);
+    std::vector<genie::core::record::ContactRecord> RECS;
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
 
-    std::vector<genie::core::record::ContactRecord> recs;
 
-    while (bitreader.isGood()){
-        recs.emplace_back(bitreader);
+        while (bitreader.isGood()){
+            RECS.emplace_back(bitreader);
+        }
+
+        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        RECS.pop_back();
     }
 
-    // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
-    recs.pop_back();
 
     {
+        auto TRANSFORM_IDS = true;
         auto TRANSFORM_MASK = false;
         auto TRANSFORM_TILE = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
@@ -716,10 +720,10 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(recs.front().getBinSize());
+        cm_param.setBinSize(RECS.front().getBinSize());
         cm_param.setTileSize(TILE_SIZE);
 
-        for (auto& rec: recs){
+        for (auto& rec: RECS){
             cm_param.upsertChromosome(
                 rec.getChr1ID(),
                 rec.getChr1Name(),
@@ -727,12 +731,13 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
             );
         }
 
-        auto& rec = recs.front();
+        auto& rec = RECS.front();
         genie::contact::encode_scm(
             cm_param,
             rec,
             scm_param,
             scm_payload,
+            TRANSFORM_IDS,
             TRANSFORM_MASK,
             TRANSFORM_TILE,
             CODEC_ID
@@ -756,10 +761,9 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
             scm_param
         );
 
-        auto recon_rec = genie::contact::ContactRecords();
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
 
-        auto scm_payload_len = scm_payload.getSize();
-        auto x = 10;
+        auto recon_rec = genie::contact::ContactRecords();
     }
 
 }
