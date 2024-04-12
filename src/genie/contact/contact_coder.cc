@@ -274,6 +274,110 @@ void sort_by_row_ids(
     counts = tmp_counts;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+void inverse_diag_transform(
+    UIntMatDtype& mat,
+    DiagonalTransformMode mode
+){
+    UIntMatDtype trans_mat;
+    auto k = 0u;
+    auto l = 0u;
+
+    if (mode == DiagonalTransformMode::NONE) {
+        return;  // Do nothing
+    } else {
+        if (mode == DiagonalTransformMode::MODE_0) {
+            auto nrows = mat.shape(0);
+            auto ncols = mat.shape(1);
+            auto target_nrows = ncols;
+
+            // Initailze trans_mat with zeros
+            trans_mat = xt::zeros<uint32_t>({target_nrows, ncols});
+
+            auto o = 0u;
+            for (size_t k_diag = 0u; k_diag < ncols; k_diag++) {
+                for (size_t target_i = 0u; target_i < (target_nrows - k_diag); target_i++) {
+                    size_t target_j = target_i + k_diag;
+
+                    size_t i = o / target_nrows;
+                    size_t j = o % target_nrows;
+
+                    auto v = mat(i, j);
+                    trans_mat(target_i, target_j) = v;
+
+                    o++;
+                }
+            }
+            mat.resize(trans_mat.shape());
+            mat = trans_mat;
+        } else {
+            auto nrows = static_cast<int64_t>(mat.shape(0));
+            auto ncols = static_cast<int64_t>(mat.shape(1));
+            trans_mat = xt::zeros<uint32_t>({nrows, ncols});
+
+            Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
+            size_t k_elem;
+
+            if (mode == DiagonalTransformMode::MODE_1){
+                diag_ids(0) = 0;
+                k_elem = 1u;
+                auto ndiags = std::max(nrows, ncols);
+                for (auto diag_id = 1; diag_id<ndiags; diag_id++){
+                    if (diag_id < static_cast<int64_t>(ncols)){
+                        diag_ids(k_elem++) = diag_id;
+                    }
+                    if (diag_id < static_cast<int64_t>(nrows)){
+                        diag_ids(k_elem++) = -diag_id;
+                    }
+                }
+            } else if (mode == DiagonalTransformMode::MODE_2){
+                //            k_elem = 0u;
+                //            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
+                //                diag_ids(k_elem++) = diag_id;
+                //            }
+                diag_ids = xt::arange(-nrows+1, ncols, 1);
+            } else if (mode == DiagonalTransformMode::MODE_3){
+                //            k_elem = 0u;
+                //            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
+                //                diag_ids(k_elem++) = diag_id;
+                //            }
+                diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
+            }
+
+            int64_t target_i, target_j;
+            int64_t i_offset, j_offset;
+            int64_t nelems_in_diag;
+            auto o = 0u;
+            for (auto diag_id : diag_ids){
+                if (diag_id >= 0) {
+                    nelems_in_diag = std::max(nrows, ncols) - diag_id;
+                    i_offset = 0;
+                    j_offset = diag_id;
+                } else {
+                    nelems_in_diag = std::max(nrows, ncols) + diag_id;
+                    i_offset = -diag_id;
+                    j_offset = 0;
+                }
+                for (auto k_diag = 0; k_diag<nelems_in_diag; k_diag++){
+                    target_i = k_diag + i_offset;
+                    target_j = k_diag + j_offset;
+                    if (target_i >= nrows)
+                        break;
+                    if (target_j >= ncols)
+                        break;
+
+                    size_t i = o / mat.shape(1);
+                    size_t j = o % mat.shape(1);
+                    trans_mat(target_i, target_j) = mat(i, j);
+
+                    o++;
+                }
+            }
+            mat = std::move(trans_mat);
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -288,20 +392,20 @@ void diag_transform(
     } else if (mode == DiagonalTransformMode::MODE_0) {
         UTILS_DIE_IF(mat.shape(0) != mat.shape(1), "Matrix must be a square!");
 
-        auto n = mat.shape(0);
-        auto new_nrows = n / 2 + 1;
-        trans_mat = xt::zeros<uint32_t>({new_nrows, n});
+        auto nrows = mat.shape(0);
+        auto new_nrows = nrows / 2 + 1;
+        trans_mat = xt::zeros<uint32_t>({new_nrows, nrows});
 
         auto o = 0u;
-        for (size_t k = 0u; k < n; k++) {
-            for (size_t i = 0u; i < (n - k); i++) {
-                size_t j = i + k;
+        for (size_t k_diag = 0u; k_diag < nrows; k_diag++) {
+            for (size_t i = 0u; i < (nrows - k_diag); i++) {
+                size_t j = i + k_diag;
 
                 auto v = mat(i, j);
                 if (v != 0) {
-                    size_t new_i = o / n;
-                    size_t new_j = o % n;
-                    trans_mat(new_i, new_j) = v;
+                    size_t target_i = o / nrows;
+                    size_t target_j = o % nrows;
+                    trans_mat(target_i, target_j) = v;
                 }
                 o++;
             }
@@ -328,13 +432,17 @@ void diag_transform(
                     diag_ids(k_elem++) = -diag_id;
             }
         } else if (mode == DiagonalTransformMode::MODE_2){
-            k_elem = 0u;
-            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++)
-                diag_ids(k_elem++) = diag_id;
+//            k_elem = 0u;
+//            for (int64_t diag_id = -nrows+1; diag_id < ncols; diag_id++){
+//                diag_ids(k_elem++) = diag_id;
+//            }
+            diag_ids = xt::arange(-nrows+1, ncols, 1);
         } else if (mode == DiagonalTransformMode::MODE_3){
-            k_elem = 0u;
-            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--)
-                diag_ids(k_elem++) = diag_id;
+//            k_elem = 0u;
+//            for (int64_t diag_id = ncols-1; diag_id > -nrows; diag_id--){
+//                diag_ids(k_elem++) = diag_id;
+//            }
+            diag_ids = xt::arange<int64_t>(ncols-1, -nrows, -1);
         }
 
         int64_t i, j;
@@ -368,7 +476,7 @@ void diag_transform(
                 o++;
             }
         }
-        mat = trans_mat;
+        mat = std::move(trans_mat);
     }
 }
 
@@ -386,7 +494,6 @@ void inverse_transform_row_bin(
     UTILS_DIE_IF(bin_mat_nrows == 0, "Invalid mat_nrows!");
     UTILS_DIE_IF(bin_mat_ncols == 0, "Invalid mat_ncols!");
 
-//    size_t mat_nrows = 0;
     size_t mat_ncols = bin_mat_ncols-1;
 
     UIntVecDtype first_col = xt::cast<uint32_t>(xt::view(bin_mat, xt::all(), 0));
@@ -476,9 +583,6 @@ void bin_mat_to_bytes(
             *(*payload + byte_offset) |= val;
         }
     }
-
-//    // TODO(yeremia): find a better solution to free the memory of bin_mat
-//    bin_mat.resize({0,0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -649,10 +753,16 @@ void decode_scm(
                     bin_mat
                 );
 
+                inverse_transform_row_bin(
+                    bin_mat,
+                    tile_mat
+                );
 
             } else {
                 UTILS_DIE("no binarization is not supported yet!");
             }
+
+
 
         }
     }
@@ -738,8 +848,6 @@ void encode_scm(
             auto& binarization_mode = tile_param.binarization_mode;
 
             uint32_t tile_nrows = 0, tile_ncols = 0;
-            uint8_t* payload;
-            size_t payload_len;
 
             // Mode selection for encoding
             if (transform_tile){
@@ -782,7 +890,7 @@ void encode_scm(
             UIntMatDtype tile_mat;
 
             //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
-            //                  better for no transformation compression
+            //               better for no transformation compression
             sparse_to_dense(
                 tile_row_ids,
                 tile_col_ids,
@@ -800,12 +908,13 @@ void encode_scm(
                 genie::contact::BinMatDtype bin_mat;
                 genie::contact::transform_row_bin(tile_mat, bin_mat);
 
-                auto tile_payload = ContactMatrixTilePayload();
+                ContactMatrixTilePayload tile_payload;
                 encode_cm_tile(
                     bin_mat,
                     codec_ID,
                     tile_payload
                 );
+                bin_mat.resize({0,0}); //TODO(yeremia): find better way to clear the memory
 
                 scm_payload.setTilePayload(
                     i_tile,
