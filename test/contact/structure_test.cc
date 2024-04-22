@@ -157,10 +157,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.getMaskArray()->at(i), MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.getMaskArray()[i], MASK_ARRAY(i));
             }
             ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
-            ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
+            ASSERT_EQ(recon_obj.anyRLEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
         }
@@ -189,10 +189,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
             ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.getMaskArray()->at(i), MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.getMaskArray()[i], MASK_ARRAY(i));
             }
             ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
-            ASSERT_EQ(recon_obj.getRLEntries().has_value(), false);
+            ASSERT_EQ(recon_obj.anyRLEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
         }
@@ -202,9 +202,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
     {
         auto TRANSFORM_ID = genie::contact::TransformID::ID_1;
         auto NUM_RL_ENTRIES = 10u;
+        auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint8_t>(
-            1,
+            static_cast<uint8_t>(MIN_VAL),
             static_cast<uint8_t>(MAX_VAL),
             NUM_RL_ENTRIES
         );
@@ -235,10 +236,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         );
 
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.getMaskArray().has_value());
+        ASSERT_FALSE(recon_obj.anyMaskArray());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -248,9 +249,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
     {
         auto TRANSFORM_ID = genie::contact::TransformID::ID_2;
         auto NUM_RL_ENTRIES = 10u;
+        auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint16_t>(
-            1,
+            static_cast<uint16_t>(MIN_VAL),
             static_cast<uint16_t>(MAX_VAL),
             NUM_RL_ENTRIES
         );
@@ -280,10 +282,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         );
 
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.getMaskArray().has_value());
+        ASSERT_FALSE(recon_obj.anyMaskArray());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -293,10 +295,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
     {
         auto TRANSFORM_ID = genie::contact::TransformID::ID_3;
         auto NUM_RL_ENTRIES = 10u;
+        auto MIN_VAL = 1;
         auto MAX_VAL = (1u <<  (static_cast<uint8_t>(TRANSFORM_ID)*8) )-1;
         genie::contact::UIntVecDtype RL_ENTRIES = xt::linspace<uint32_t>(
-            1,
-            MAX_VAL,
+            static_cast<uint32_t>(MIN_VAL),
+            static_cast<uint32_t>(MAX_VAL),
             NUM_RL_ENTRIES
         );
         auto NUM_BIN_ENTRIES = static_cast<uint32_t>(xt::sum(RL_ENTRIES)(0));
@@ -326,10 +329,10 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         );
 
         ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.getMaskArray().has_value());
+        ASSERT_FALSE(recon_obj.anyMaskArray());
         ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()->at(i), RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);

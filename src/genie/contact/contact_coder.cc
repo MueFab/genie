@@ -44,8 +44,8 @@ void compute_mask(
 void compute_masks(
     // Inputs
     UInt64VecDtype& row_ids,
-    size_t nrows,
     UInt64VecDtype& col_ids,
+    size_t nrows,
     size_t ncols,
     const bool is_intra_scm,
     // Outputs:
@@ -75,6 +75,65 @@ void compute_masks(
     } else {
         compute_mask(row_ids, nrows, row_mask);
         compute_mask(col_ids, ncols, col_mask);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_cm_masks(
+    // Inputs
+    ContactMatrixParameters& cm_param,
+    SubcontactMatrixParameters& scm_param,
+    const SubcontactMatrixPayload& scm_payload,
+    // Outputs
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+){
+    auto row_nentries = cm_param.getNumTiles(scm_param.getChr1ID(), 1);
+    row_mask = BinVecDtype();
+    if (scm_param.getRowMaskExistsFlag()){
+
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void decode_cm_mask_payload(
+    // Inputs
+    const SubcontactMatrixMaskPayload& mask_payload,
+    size_t num_entries,
+    // Outputs
+    BinVecDtype& mask
+) {
+    auto transform_ID = mask_payload.getTransformID();
+    if (transform_ID == TransformID::ID_0){
+        auto& mask_array = mask_payload.getMaskArray();
+        UTILS_DIE_IF(
+            num_entries != mask_array.size(),
+            "num_entries and the size of mask_array differ!"
+        );
+        mask = xt::adapt(mask_array, {mask_array.size()});
+    } else {
+        mask.resize({num_entries});
+
+        bool first_val = mask_payload.getFirstVal();
+        auto& rl_entries = mask_payload.getRLEntries();
+
+        size_t start_idx = 0;
+        size_t end_idx = 0;
+        for (const auto& rl_entry: rl_entries){
+            end_idx += rl_entry;
+            // This is the for-loop for assigning the values based on run-lenght
+            xt::view(mask, xt::range(start_idx, end_idx)) = first_val;
+            start_idx = end_idx;
+            first_val = !first_val;
+        }
+        UTILS_DIE_IF(
+            start_idx >= num_entries,
+            "start_idx value must be smaller than num_entries!"
+        );
+        // This is the for-loop for assigning the remaining values
+        xt::view(mask, xt::range(start_idx, num_entries)) = first_val;
     }
 }
 
@@ -276,6 +335,21 @@ void sort_by_row_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void comp_start_end_idx(
+    // Inputs
+    size_t nentries,
+    size_t tile_size,
+    size_t tile_idx,
+    // Outputs
+    size_t& start_idx,
+    size_t& end_idx
+){
+    start_idx = tile_idx * tile_size;
+    end_idx = std::min(nentries, start_idx + tile_size);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void inverse_diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
@@ -314,7 +388,7 @@ void inverse_diag_transform(
         } else {
             auto nrows = static_cast<int64_t>(mat.shape(0));
             auto ncols = static_cast<int64_t>(mat.shape(1));
-            trans_mat = xt::zeros<uint32_t>({nrows, ncols});
+            trans_mat = xt::empty<uint32_t>({nrows, ncols});
 
             Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
             size_t k_elem;
@@ -390,7 +464,10 @@ void diag_transform(
     if (mode == DiagonalTransformMode::NONE){
         return ; // Do nothing
     } else if (mode == DiagonalTransformMode::MODE_0) {
-        UTILS_DIE_IF(mat.shape(0) != mat.shape(1), "Matrix must be a square!");
+        UTILS_DIE_IF(
+            mat.shape(0) != mat.shape(1),
+            "Matrix must be a square!"
+        );
 
         auto nrows = mat.shape(0);
         auto new_nrows = nrows / 2 + 1;
@@ -416,7 +493,7 @@ void diag_transform(
     } else {
         auto nrows = static_cast<int64_t>(mat.shape(0));
         auto ncols = static_cast<int64_t>(mat.shape(1));
-        trans_mat = xt::zeros<uint32_t>({nrows, ncols});
+        trans_mat = xt::empty<uint32_t>({nrows, ncols});
 
         Int64VecDtype diag_ids = xt::empty<int64_t>({nrows+ncols-1});
         size_t k_elem;
@@ -468,11 +545,14 @@ void diag_transform(
                     break;
 
                 auto v = mat(i, j);
-                if (v != 0) {
-                    size_t new_i = o / mat.shape(1);
-                    size_t new_j = o % mat.shape(1);
-                    trans_mat(new_i, new_j) = v;
-                }
+                size_t new_i = o / mat.shape(1);
+                size_t new_j = o % mat.shape(1);
+                trans_mat(new_i, new_j) = v;
+//                if (v != 0) {
+//                    size_t new_i = o / mat.shape(1);
+//                    size_t new_j = o % mat.shape(1);
+//                    trans_mat(new_i, new_j) = v;
+//                }
                 o++;
             }
         }
@@ -525,7 +605,9 @@ void inverse_transform_row_bin(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void transform_row_bin(
+    // Inputs
     const UIntMatDtype& mat,
+    // Outputs
     BinMatDtype& bin_mat
 ) {
     auto nrows = mat.shape(0);
@@ -729,10 +811,22 @@ void decode_scm(
     // Input parameters retrieved from parameter set
     auto chr1_ID = scm_param.getChr1ID();
     auto chr2_ID = scm_param.getChr2ID();
-    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
-    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
     auto is_intra_scm = scm_param.isIntraSCM();
     auto codec_ID = scm_param.getCodecID();
+    auto row_mask_exists = scm_param.getRowMaskExistsFlag();
+    auto col_mask_exists = scm_param.getColMaskExistsFlag();
+
+    auto chr1_nentries = cm_param.getNumBinEntries(chr1_ID, 1);
+    auto chr2_nentries = cm_param.getNumBinEntries(chr2_ID, 1);
+    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
+    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
+
+    //TODO(yeremia): Complete the decode_cm_masks step
+//    decode_cm_masks(
+//        cm_param,
+//        scm_param,
+//        scm_payload
+//    );
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
@@ -743,6 +837,8 @@ void decode_scm(
             UIntMatDtype tile_mat;
             auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
             auto& tile_payload = scm_payload.getTilePayload(i_tile, j_tile);
+
+            auto diag_transform_mode = tile_param.diag_tranform_mode;
 
             if (tile_param.binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 BinMatDtype bin_mat;
@@ -762,6 +858,10 @@ void decode_scm(
                 UTILS_DIE("no binarization is not supported yet!");
             }
 
+            inverse_diag_transform(
+                tile_mat,
+                diag_transform_mode
+            );
 
 
         }
@@ -823,7 +923,15 @@ void encode_scm(
 
     if (transform_ids){
         // Compute mask for
-        compute_masks(row_ids, chr1_nbins, col_ids, chr2_nbins, is_intra_scm, row_mask, col_mask);
+        compute_masks(
+            row_ids,
+            col_ids,
+            chr1_nbins,
+            chr2_nbins,
+            is_intra_scm,
+            row_mask,
+            col_mask
+        );
 
         // Create mapping
         remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
@@ -1013,30 +1121,8 @@ void encode_cm(
 
 std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
     const EncodingOptions& opt,
-    std::vector<core::record::ContactRecord>& recs){}
+    std::vector<core::record::ContactRecord>& recs){
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decode_cm_mask(
-    SubcontactMatrixMaskPayload& mask_payload,
-    size_t nentries,
-    BinVecDtype& bin_mask
-){
-
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decode_cm_masks(
-    ContactMatrixParameters& cm_params,
-    SubcontactMatrixParameters scm_params,
-    genie::contact::SubcontactMatrixPayload& scm_payload
-){
-    auto row_nentries = cm_params.getNumTiles(scm_params.getChr1ID(), 1);
-    auto row_mask = BinVecDtype();
-    if (scm_params.getRowMaskExistsFlag()){
-
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

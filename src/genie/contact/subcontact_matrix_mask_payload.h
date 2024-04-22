@@ -137,6 +137,9 @@ class SubcontactMatrixMaskPayload{
      */
     TransformID getTransformID() const;
 
+    //TODO(yeremia): create the docstring
+    bool anyMaskArray() const;
+
     /**
      * @brief Get the Mask Array.
      *
@@ -144,7 +147,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Mask Array.
      */
-    std::optional<std::vector<bool>> getMaskArray() const;
+    const std::vector<bool>& getMaskArray() const;
 
     /**
      *  @brief Get the First Value.
@@ -155,6 +158,9 @@ class SubcontactMatrixMaskPayload{
      */
     bool getFirstVal() const;
 
+    //TODO(yeremia): create the docstring
+    bool anyRLEntries() const;
+
     /**
      *  @brief Get the Run-Length Entries.
      *
@@ -162,7 +168,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Run-Length Entries.
      */
-    std::optional<std::vector<uint32_t>> getRLEntries() const;
+    const std::vector<uint32_t>& getRLEntries() const;
 
     /**
      *  @brief Set the Transform ID.
@@ -221,8 +227,6 @@ class SubcontactMatrixMaskPayload{
      * @param writer The writer to write to.
      */
     void write(util::BitWriter &writer) const;
-
-
 };
 
 
