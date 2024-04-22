@@ -104,7 +104,17 @@ TransformID SubcontactMatrixMaskPayload::getTransformID() const { return transfo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::optional<std::vector<bool>> SubcontactMatrixMaskPayload::getMaskArray() const { return mask_array; }
+bool SubcontactMatrixMaskPayload::anyMaskArray() const{ return mask_array.has_value();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<bool>& SubcontactMatrixMaskPayload::getMaskArray() const{
+    UTILS_DIE_IF(
+        !anyMaskArray(),
+        "mask_array is not set!"
+    );
+    return *mask_array;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -112,7 +122,17 @@ bool SubcontactMatrixMaskPayload::getFirstVal() const { return first_val; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::optional<std::vector<uint32_t>> SubcontactMatrixMaskPayload::getRLEntries() const { return rl_entries; }
+bool SubcontactMatrixMaskPayload::anyRLEntries() const{ return rl_entries.has_value();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<uint32_t>& SubcontactMatrixMaskPayload::getRLEntries() const {
+    UTILS_DIE_IF(
+        !anyRLEntries(),
+        "mask_array is not set!"
+    );
+    return *rl_entries;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

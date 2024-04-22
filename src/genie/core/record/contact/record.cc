@@ -157,7 +157,7 @@ ContactRecord &ContactRecord::operator=(const ContactRecord &rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactRecord &ContactRecord::operator=(ContactRecord &&rec) noexcept {
+ContactRecord& ContactRecord::operator=(ContactRecord &&rec) noexcept {
     this->sample_ID = rec.sample_ID;
     this->sample_name = std::move(rec.sample_name);
     this->bin_size = rec.bin_size;
@@ -175,6 +175,45 @@ ContactRecord &ContactRecord::operator=(ContactRecord &&rec) noexcept {
     this->counts = std::move(rec.counts);
 
     return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ContactRecord::operator==(const ContactRecord& other) {
+    bool ret =
+        sample_ID == other.sample_ID &&
+        sample_name == other.sample_name &&
+        bin_size == other.bin_size &&
+        chr1_ID == other.chr1_ID &&
+        chr1_name == other.chr1_name &&
+        chr1_length == other.chr1_length &&
+        chr2_ID == other.chr2_ID &&
+        chr2_name == other.chr2_name &&
+        chr2_length == other.chr2_length &&
+//        norm_count_names.size() == other.norm_count_names.size() &&
+        norm_count_names == other.norm_count_names &&
+//        start_pos1.size() == other.start_pos1.size() &&
+        start_pos1 == other.start_pos1 &&
+//        end_pos1.size() == other.end_pos1.size() &&
+        end_pos1 == other.end_pos1 &&
+//        start_pos2.size() == other.start_pos2.size() &&
+        start_pos2 == other.start_pos2 &&
+//        end_pos2.size() == other.end_pos2.size() &&
+        end_pos2 == other.end_pos2 &&
+//        counts.size() == other.counts.size() &&
+        counts == other.counts &&
+//        norm_counts.size() == other.norm_counts.size() &&
+        norm_counts == other.norm_counts &&
+        link_record.has_value() == other.link_record.has_value();
+
+    //TODO(yeremia): this this "const" problem
+//    if (ret){
+//        const auto& this_link_record = link_record.value();
+//        const auto& other_link_record = other.link_record.value();
+//        ret = this_link_record == other_link_record;
+//    }
+
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

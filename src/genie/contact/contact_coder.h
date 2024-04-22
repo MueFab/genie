@@ -73,13 +73,37 @@ void compute_mask(
 void compute_masks(
     // Inputs
     UInt64VecDtype& row_ids,
-    size_t nrows,
     UInt64VecDtype& col_ids,
+    size_t nrows,
     size_t ncols,
     const bool is_intra_scm,
     // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//TODO(yeremia): create the docstring
+void decode_cm_masks(
+    // Inputs
+    ContactMatrixParameters& cm_param,
+    SubcontactMatrixParameters& scm_param,
+    const SubcontactMatrixPayload& mask_payload,
+    // Outputs
+    BinVecDtype& row_mask,
+    BinVecDtype& col_mask
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//TODO(yeremia): create the docstring
+void decode_cm_mask_payload(
+    // Inputs
+    const SubcontactMatrixMaskPayload& mask_payload,
+    size_t num_entries,
+    // Outputs
+    BinVecDtype& mask
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -184,6 +208,19 @@ void dense_to_sparse(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
+void comp_start_end_idx(
+    // Inputs
+    size_t nentries,
+    size_t tile_size,
+    size_t tile_idx,
+    // Outputs
+    size_t& start_idx,
+    size_t& end_idx
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /**
  * Sorts the given row and column ID vectors by row IDs.
  *
@@ -202,6 +239,7 @@ void sort_by_row_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void inverse_diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
@@ -392,14 +430,6 @@ void encode_cm(
 std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
     const EncodingOptions& opt,
     std::vector<core::record::ContactRecord>& recs
-);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decode_cm_masks(
-    ContactMatrixParameters& cm_params,
-    SubcontactMatrixParameters scm_params,
-    genie::contact::SubcontactMatrixPayload& scm_payload
 );
 
 // ---------------------------------------------------------------------------------------------------------------------

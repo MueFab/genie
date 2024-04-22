@@ -60,8 +60,10 @@ TEST(ContactCoder, Simple_Coding_ComputeMasks) {
         genie::contact::BinVecDtype col_mask;
 
         genie::contact::compute_masks(
-            row_ids, NENTRIES,
-            col_ids, NENTRIES,
+            row_ids,
+            col_ids,
+            NENTRIES,
+            NENTRIES,
             IS_INTRA,
             row_mask,
             col_mask
@@ -104,8 +106,9 @@ TEST(ContactCoder, Simple_Coding_ComputeMasks) {
         genie::contact::BinVecDtype col_mask;
 
         genie::contact::compute_masks(
-            ROW_IDS, NROWS,
+            ROW_IDS,
             COL_IDS,
+            NROWS,
             NCOLS,
             IS_INTRA,
             row_mask,
@@ -158,8 +161,8 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
 
         genie::contact::compute_masks(
             row_ids,
-            NENTRIES,
             col_ids,
+            NENTRIES,
             NENTRIES,
             IS_INTRA,
             row_mask,
@@ -211,8 +214,8 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
 
         genie::contact::compute_masks(
             row_ids,
-            NROWS,
             col_ids,
+            NROWS,
             NCOLS,
             IS_INTRA,
             row_mask,
@@ -827,10 +830,9 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
             );
         }
 
-        auto& rec = RECS.front();
+        auto& REC = RECS.front();
         genie::contact::encode_scm(
-            cm_param,
-            rec,
+            cm_param, REC,
             scm_param,
             scm_payload,
             TRANSFORM_IDS,
@@ -844,7 +846,7 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), rec.getSampleID());
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
         ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
         ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
         ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
@@ -859,15 +861,17 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
 
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
-        auto recon_rec = genie::contact::ContactRecords();
+        auto recon_rec = genie::core::record::ContactRecord();
 
         decode_scm(
             cm_param,
             scm_param,
-            recon_scm_payload,
-            rec,
+            recon_scm_payload, REC,
             MULT
         );
+
+//        ASSERT_EQ(REC, recon_rec);
+        ASSERT_TRUE(REC == recon_rec);
     }
 
 }

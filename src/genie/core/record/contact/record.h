@@ -101,6 +101,9 @@ class ContactRecord {
      */
     ContactRecord& operator=(ContactRecord&& rec) noexcept;
 
+    //TODO(yeremia): Create the docstring
+    bool operator==(const ContactRecord& other);
+
 
     void transposeCM();
 
