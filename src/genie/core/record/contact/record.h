@@ -27,9 +27,6 @@ namespace genie {
 namespace core {
 namespace record {
 
-/**
- *  @brief
- */
 class ContactRecord {
  private:
     uint8_t sample_ID;
@@ -51,18 +48,12 @@ class ContactRecord {
     std::optional<LinkRecord> link_record;
 
  public:
-    // Default constructor
     ContactRecord() = default;
 
-    // Constructor from move
     ContactRecord(ContactRecord&& rec) noexcept = default;
 
-    // Constructor by reference
     ContactRecord(const ContactRecord& rec) = default;
 
-    /**
-     *
-     */
     ContactRecord(
         uint8_t sample_ID,
         std::string&& sample_name,
@@ -80,52 +71,23 @@ class ContactRecord {
         std::vector<uint64_t>&& end_pos2,
         std::vector<uint32_t>&& counts
     );
-    /**
-     *
-     * @param reader
-     */
+
     explicit ContactRecord(util::BitReader& reader);
 
-    /**
-     *
-     */
     ~ContactRecord() = default;
 
-    // Constructor using operator=
     ContactRecord& operator=(const ContactRecord& rec);
 
-    /**
-     * @brief
-     * @param rec
-     * @return
-     */
     ContactRecord& operator=(ContactRecord&& rec) noexcept;
 
-    //TODO(yeremia): Create the docstring
     bool operator==(const ContactRecord& other);
-
 
     void transposeCM();
 
-    /**
-     * @brief Get the Sample ID.
-     *
-     * @return The Sample ID.
-     */
     uint8_t getSampleID() const;
 
-    /**
-     * @brief Get the Sample Name.
-     *
-     * @return The Sample Name.
-     */
     const std::string& getSampleName() const;
 
-    /**
-     * @brief Get the Bin Size.
-     *
-     * @return The Bin Size.
-     */
     uint32_t getBinSize() const;
 
     uint8_t getChr1ID() const;
@@ -140,7 +102,7 @@ class ContactRecord {
 
      uint64_t getChr2Length() const;
 
-     uint64_t getNumCounts() const;
+     uint64_t getNumEntries() const;
 
      uint8_t getNumNormCounts() const;
 

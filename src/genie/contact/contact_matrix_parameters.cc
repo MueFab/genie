@@ -19,12 +19,12 @@ ContactMatrixParameters::ContactMatrixParameters()
       chr_infos(),
       bin_size(0),
       tile_size(0),
-      interval_multipliers(),
+      bin_size_multipliers(),
       norm_method_infos(),
       norm_mat_infos()
 {
     // TODO (Yeremia): Check if interval multipliers are valid
-    // TODO (Yeremia): Set default value so that interval_multipliers is valid
+    // TODO (Yeremia): Set default value so that bin_size_multipliers is valid
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ ContactMatrixParameters::ContactMatrixParameters(
     chr_infos(std::move(_chr_infos)),
     bin_size(_interval),
     tile_size(_tile_size),
-    interval_multipliers(std::move(_interval_multipliers)),
+      bin_size_multipliers(std::move(_interval_multipliers)),
     norm_method_infos(std::move(_norm_method_infos)),
     norm_mat_infos(std::move(_norm_mat_infos)) {
 
@@ -53,7 +53,7 @@ ContactMatrixParameters::ContactMatrixParameters(
 
     UTILS_DIE_IF(sample_infos.size() > UINT8_MAX, "sample_infos is not uint8!");
     UTILS_DIE_IF(chr_infos.size() > UINT8_MAX, "chr_infos is not uint8!");
-    UTILS_DIE_IF(interval_multipliers.size() > UINT8_MAX, "interval_multipliers is not uint8!");
+    UTILS_DIE_IF(bin_size_multipliers.size() > UINT8_MAX, "bin_size_multipliers is not uint8!");
     UTILS_DIE_IF(norm_method_infos.size() > UINT8_MAX, "norm_method_infos is not uint8!");
     UTILS_DIE_IF(norm_mat_infos.size() > UINT8_MAX, "norm_mat_infos is not uint8!");
 }
@@ -95,7 +95,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     tile_size = reader.readBypassBE<uint32_t>();
     auto num_interval_mults = reader.readBypassBE<uint8_t>();
     for (uint8_t i = 0; i<num_interval_mults; i++){
-        interval_multipliers.push_back(reader.readBypassBE<uint32_t>());
+        bin_size_multipliers.push_back(reader.readBypassBE<uint32_t>());
     }
 
     auto num_norm_methods = reader.readBypassBE<uint8_t>();
@@ -237,6 +237,18 @@ const std::unordered_map<uint8_t, ChromosomeInformation>& ContactMatrixParameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t ContactMatrixParameters::getChromosomeLength(
+    uint8_t chr_ID
+) const {
+    UTILS_DIE_IF(bin_size == 0, "Please set the bin size!");
+    auto chr_obj = chr_infos.find(chr_ID);
+    UTILS_DIE_IF(chr_obj == chr_infos.end(), "chr_ID does not exist!");
+
+    return chr_obj->second.length;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t ContactMatrixParameters::getBinSize() const { return bin_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -253,7 +265,30 @@ void ContactMatrixParameters::setTileSize(uint32_t _tile_size) {tile_size = _til
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactMatrixParameters::getNumIntervalMultipliers() const { return static_cast<uint8_t>(interval_multipliers.size()); }
+uint8_t ContactMatrixParameters::getNumBinSizeMultipliers() const {
+    return static_cast<uint8_t>(bin_size_multipliers.size());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ContactMatrixParameters::isBinSizeMultiplierValid(
+    size_t target_interv_mult
+) const{
+
+    // By default 1 is always valid
+    if (target_interv_mult == 1){
+        return true;
+    }
+
+    for (const auto& interv_mult: bin_size_multipliers){
+        if (interv_mult == target_interv_mult){
+            return true;
+        }
+    }
+
+    return false;
+};
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -335,16 +370,17 @@ uint32_t ContactMatrixParameters::getNumTiles(
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): implement this!
-void ContactMatrixParameters::write(core::Writer& writer) const {
-    (void)writer;
+size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
+    (void)writesize;
+    return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): implement this!
-size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
-    (void)writesize;
-    return 0; }
+void ContactMatrixParameters::write(core::Writer& writer) const {
+    (void)writer;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

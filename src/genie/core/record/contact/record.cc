@@ -82,8 +82,8 @@ ContactRecord::ContactRecord(util::BitReader &reader){
     reader.readBypass(&chr2_name[0], chr2_name.size());
     chr2_length = reader.read<uint64_t>();
 
-    // num_counts and num_norm_counts
-    auto num_counts = reader.readBypassBE<uint64_t>();
+    // num_entries and num_norm_counts
+    auto num_entries = reader.readBypassBE<uint64_t>();
     auto num_norm_counts = reader.readBypassBE<uint8_t>();
 
     norm_count_names.resize(num_norm_counts);
@@ -92,35 +92,35 @@ ContactRecord::ContactRecord(util::BitReader &reader){
         reader.readBypass(&norm_count_names[i][0], norm_count_names[i].size());
     }
 
-    start_pos1.resize(num_counts);
-    for (size_t i = 0; i< num_counts; i++){
+    start_pos1.resize(num_entries);
+    for (size_t i = 0; i< num_entries; i++){
         start_pos1[i] = reader.readBypassBE<uint64_t>();
     }
 
-    end_pos1.resize(num_counts);
-    for (size_t i = 0; i< num_counts; i++){
+    end_pos1.resize(num_entries);
+    for (size_t i = 0; i< num_entries; i++){
         end_pos1[i] = reader.readBypassBE<uint64_t>();
     }
 
-    start_pos2.resize(num_counts);
-    for (size_t i = 0; i< num_counts; i++){
+    start_pos2.resize(num_entries);
+    for (size_t i = 0; i< num_entries; i++){
         start_pos2[i] = reader.readBypassBE<uint64_t>();
     }
 
-    end_pos2.resize(num_counts);
-    for (size_t i = 0; i< num_counts; i++){
+    end_pos2.resize(num_entries);
+    for (size_t i = 0; i< num_entries; i++){
         end_pos2[i] = reader.readBypassBE<uint64_t>();
     }
 
-    counts.resize(num_counts);
-    for (size_t i = 0; i< num_counts; i++){
+    counts.resize(num_entries);
+    for (size_t i = 0; i< num_entries; i++){
         counts[i] = reader.readBypassBE<uint32_t>();
     }
 
     norm_counts.resize(num_norm_counts);
     for (size_t j = 0; j < num_norm_counts; j++){
-        norm_counts[j].resize(num_counts);
-        for (size_t i = 0; i< num_counts; i++){
+        norm_counts[j].resize(num_entries);
+        for (size_t i = 0; i< num_entries; i++){
             norm_counts[j][i] = reader.readBypassBE<double_t>();
         }
     }
@@ -276,7 +276,7 @@ uint64_t ContactRecord::getChr2Length() const {return chr2_length;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t ContactRecord::getNumCounts() const {return counts.size();}
+uint64_t ContactRecord::getNumEntries() const {return counts.size();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -313,7 +313,65 @@ const std::vector<std::vector<double_t>>& ContactRecord::getNormCounts() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): Implement this
-//void ContactRecord::write(util::BitWriter &writer) const {}
+void ContactRecord::write(util::BitWriter &writer) const {
+    // Sample
+    writer.writeBypassBE(sample_ID);
+    writer.writeBypassBE(static_cast<uint8_t>(sample_name.length()));
+    writer.writeBypass(sample_name.data(), sample_name.length());
+    writer.writeBypassBE(bin_size);
+
+    // chr1
+    writer.writeBypassBE(chr1_ID);
+    writer.writeBypassBE(static_cast<uint8_t>(chr1_name.length()));
+    writer.writeBypass(chr1_name.data(), chr1_name.length());
+    writer.writeBypassBE(chr1_length);
+
+    // chr2
+    writer.writeBypassBE(chr2_ID);
+    writer.writeBypassBE(static_cast<uint8_t>(chr2_name.length()));
+    writer.writeBypass(chr2_name.data(), chr2_name.length());
+    writer.writeBypassBE(chr2_length);
+
+    // num_entries and num_norm_counts
+    writer.writeBypassBE(getNumEntries());
+    writer.writeBypassBE(getNumNormCounts());
+
+    for (auto i = 0; i < getNumNormCounts(); i++){
+        writer.writeBypassBE(static_cast<uint8_t>(norm_count_names[i].length()));
+        writer.writeBypass(norm_count_names[i].data(), norm_count_names[i].length());
+    }
+
+    for (const auto& v: start_pos1){
+        writer.writeBypassBE(v);
+    }
+
+    for (const auto& v: end_pos1){
+        writer.writeBypassBE(v);
+    }
+
+    for (const auto& v: start_pos2){
+        writer.writeBypassBE(v);
+    }
+
+    for (const auto& v: end_pos2){
+        writer.writeBypassBE(v);
+    }
+
+    for (const auto& v: counts){
+        writer.writeBypassBE(v);
+    }
+
+    for (const auto& norm_count_vals: norm_counts){
+        for (const auto& v: norm_count_vals){
+            writer.writeBypassBE(v);
+        }
+    }
+
+    //TODO(yeremia): fix the flag
+    //    auto link_record_flag = reader.readBypassBE<uint8_t>();
+    writer.writeBypassBE(static_cast<uint8_t>(0));
+    //    UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

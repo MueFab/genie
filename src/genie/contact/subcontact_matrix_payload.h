@@ -189,23 +189,17 @@ class SubcontactMatrixPayload {
    //TODO(yeremia): docstring
    const size_t getNumNormMatrices() const;
 
-   /**
-    * @brief Gets the payload for the row mask.
-    *
-    * This function returns the payload for the row mask. It returns a reference to a constant `std::optional` object of type `SubcontactMatrixMaskPayload`.
-    *
-    * @return A constant reference to the payload for the row mask.
-    */
-   const std::optional<SubcontactMatrixMaskPayload>& getRowMaskPayload() const;
+   //TODO(yeremia): docstring
+   bool anyRowMaskPayload() const;
 
-   /**
-    * @brief Gets the payload for the column mask.
-    *
-    * This function returns the payload for the column mask. It returns a reference to a constant `std::optional` object of type `SubcontactMatrixMaskPayload`.
-    *
-    * @return A constant reference to the payload for the column mask.
-    */
-   const std::optional<SubcontactMatrixMaskPayload>& getColMaskPayload() const;
+   //TODO(yeremia): docstring
+   const SubcontactMatrixMaskPayload& getRowMaskPayload() const;
+
+   //TODO(yeremia): docstring
+   bool anyColMaskPayload() const;
+
+   //TODO(yeremia): docstring
+   const SubcontactMatrixMaskPayload& getColMaskPayload() const;
 
    /**
     * @brief Set the Parameter Set ID.

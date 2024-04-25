@@ -187,11 +187,33 @@ const size_t SubcontactMatrixPayload::getNumNormMatrices() const { return norm_t
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getRowMaskPayload() const { return row_mask_payload; }
+bool SubcontactMatrixPayload::anyRowMaskPayload() const { return row_mask_payload.has_value();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::optional<SubcontactMatrixMaskPayload>& SubcontactMatrixPayload::getColMaskPayload() const { return col_mask_payload; }
+const SubcontactMatrixMaskPayload& SubcontactMatrixPayload::getRowMaskPayload() const {
+    UTILS_DIE_IF(
+        !anyRowMaskPayload(),
+        "Row mask does not exists!"
+    );
+
+    return *row_mask_payload;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SubcontactMatrixPayload::anyColMaskPayload() const { return col_mask_payload.has_value();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const SubcontactMatrixMaskPayload& SubcontactMatrixPayload::getColMaskPayload() const {
+    UTILS_DIE_IF(
+        !anyColMaskPayload(),
+        "Column mask does not exists!"
+    );
+
+    return *col_mask_payload;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

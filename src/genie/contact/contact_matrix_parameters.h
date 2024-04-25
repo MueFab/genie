@@ -61,7 +61,7 @@ class ContactMatrixParameters {
 
     uint32_t bin_size;
     uint32_t tile_size;
-    std::vector<uint32_t> interval_multipliers;
+    std::vector<uint32_t> bin_size_multipliers;
 
     std::unordered_map<uint8_t, NormalizationMethodInformation> norm_method_infos;
     std::unordered_map<uint8_t, NormalizedMatrixInformations> norm_mat_infos;
@@ -196,6 +196,11 @@ class ContactMatrixParameters {
      */
     const std::unordered_map<uint8_t, ChromosomeInformation>& getChromosomes() const;
 
+    // TODO(yeremia): docstring
+    uint64_t getChromosomeLength(
+        uint8_t chr_ID
+    ) const;
+
     /**
      * @brief Gets the bin size.
      *
@@ -239,7 +244,12 @@ class ContactMatrixParameters {
      *
      *  @return The number of interval multipliers.
      */
-    uint8_t getNumIntervalMultipliers() const;
+    uint8_t getNumBinSizeMultipliers() const;
+
+    // TODO(yeremia): doscstring
+    bool isBinSizeMultiplierValid(
+        size_t target_interv_mult
+    ) const;
 
     /**
      * @brief Gets the number of normalization methods.
@@ -328,15 +338,6 @@ class ContactMatrixParameters {
     );
 
     /**
-     * @brief Writes the object to a writer.
-     *
-     * This function writes the object to a writer.
-     *
-     * @param writer The writer to write to.
-     */
-    void write(core::Writer& writer) const;
-
-    /**
      * @brief Gets the size of the object when written to a writer.
      *
      * This function returns the size of the object when written to a writer.
@@ -346,6 +347,15 @@ class ContactMatrixParameters {
      * @return The size of the object when written to the writer.
      */
     size_t getSize(core::Writer& writesize) const;
+
+    /**
+     * @brief Writes the object to a writer.
+     *
+     * This function writes the object to a writer.
+     *
+     * @param writer The writer to write to.
+     */
+    void write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
