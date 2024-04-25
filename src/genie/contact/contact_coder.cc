@@ -89,10 +89,29 @@ void decode_cm_masks(
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 ){
-    auto row_nentries = cm_param.getNumTiles(scm_param.getChr1ID(), 1);
-    row_mask = BinVecDtype();
-    if (scm_param.getRowMaskExistsFlag()){
+    auto row_nentries = cm_param.getNumBinEntries(scm_param.getChr1ID());
+    auto col_nentries = cm_param.getNumBinEntries(scm_param.getChr2ID());
 
+    if (scm_param.getRowMaskExistsFlag()){
+        decode_cm_mask_payload(
+            scm_payload.getRowMaskPayload(),
+            row_nentries,
+            row_mask
+        );
+    } else {
+        row_mask = xt::ones<bool>({row_nentries});
+    }
+
+    if (scm_param.isIntraSCM()){
+        col_mask = row_mask;
+    } else if (scm_param.getColMaskExistsFlag()){
+        decode_cm_mask_payload(
+            scm_payload.getColMaskPayload(),
+            col_nentries,
+            col_mask
+        );
+    } else {
+        col_mask = xt::ones<bool>({col_nentries});
     }
 }
 
@@ -279,11 +298,11 @@ void sparse_to_dense(
 
 void dense_to_sparse(
     UIntMatDtype& mat,
-    uint64_t row_id_offset,
-    uint64_t col_id_offset,
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    UIntVecDtype& counts
+    UIntVecDtype& counts,
+    uint64_t row_id_offset,
+    uint64_t col_id_offset
 ){
     BinMatDtype mask = mat > 0u;
 
@@ -294,7 +313,7 @@ void dense_to_sparse(
     col_ids.resize({num_entries});
     counts.resize({num_entries});
 
-    for (auto k = 0u; k< num_entries; k++){
+    for (auto k = 0u; k<num_entries; k++){
         auto i = ids[k][0];
         auto j = ids[k][1];
         auto c = mat(i,j);
@@ -304,8 +323,13 @@ void dense_to_sparse(
         counts[k] = c;
     }
 
-    row_ids += row_id_offset;
-    col_ids += col_id_offset;
+    if (row_id_offset != 0){
+        row_ids += row_id_offset;
+    }
+
+    if (col_id_offset != 0) {
+        col_ids += col_id_offset;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -640,6 +664,21 @@ void transform_row_bin(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void comp_start_end_ids(
+    // Inputs
+    size_t num_entries,
+    size_t tile_size,
+    size_t tile_idx,
+    // Outputs
+    size_t& start_idx,
+    size_t& end_idx
+){
+    start_idx = tile_idx * tile_size;
+    end_idx = std::min(start_idx + tile_size, num_entries);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 // TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
 void bin_mat_to_bytes(
     // Inputs
@@ -802,31 +841,49 @@ void decode_scm(
     SubcontactMatrixParameters scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
-    uint32_t mult
+    uint32_t bin_size_mult
 ){
     // (not part of specification) Initialize variables
     BinVecDtype row_mask;
     BinVecDtype col_mask;
 
+    auto bin_size = cm_param.getBinSize();
+    auto target_bin_size = bin_size * bin_size_mult;
+    auto tile_size = cm_param.getTileSize();
+
+    UTILS_DIE_IF(
+        !cm_param.isBinSizeMultiplierValid(bin_size_mult),
+        "Bin size multiplier is not supported!"
+    );
+
     // Input parameters retrieved from parameter set
     auto chr1_ID = scm_param.getChr1ID();
     auto chr2_ID = scm_param.getChr2ID();
     auto is_intra_scm = scm_param.isIntraSCM();
+
     auto codec_ID = scm_param.getCodecID();
     auto row_mask_exists = scm_param.getRowMaskExistsFlag();
     auto col_mask_exists = scm_param.getColMaskExistsFlag();
 
-    auto chr1_nentries = cm_param.getNumBinEntries(chr1_ID, 1);
-    auto chr2_nentries = cm_param.getNumBinEntries(chr2_ID, 1);
+    auto chr1_len = cm_param.getChromosomeLength(chr1_ID);
+    auto chr1_num_bin_entries = cm_param.getNumBinEntries(chr1_ID);
+    auto chr2_len = cm_param.getChromosomeLength(chr2_ID);
+    auto chr2_num_bin_entries = cm_param.getNumBinEntries(chr2_ID);
     auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
     auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
 
-    //TODO(yeremia): Complete the decode_cm_masks step
-//    decode_cm_masks(
-//        cm_param,
-//        scm_param,
-//        scm_payload
-//    );
+    UTILS_DIE_IF(
+        !cm_param.isBinSizeMultiplierValid(bin_size_mult),
+        "Bin size multiplier is not supported!"
+    );
+
+    decode_cm_masks(
+        cm_param,
+        scm_param,
+        scm_payload,
+        row_mask,
+        col_mask
+    );
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
@@ -834,13 +891,21 @@ void decode_scm(
                 continue;
             }
 
+            // Not part of the specification
             UIntMatDtype tile_mat;
+            BinVecDtype tile_row_mask, tile_col_mask;
+            size_t start1_idx, end1_idx, start2_idx, end2_idx;
+            UInt64VecDtype tile_row_ids, tile_col_ids;
+            UIntVecDtype tile_counts;
+
+            // Assign
             auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
             auto& tile_payload = scm_payload.getTilePayload(i_tile, j_tile);
 
+            auto binarization_mode = tile_param.binarization_mode;
             auto diag_transform_mode = tile_param.diag_tranform_mode;
 
-            if (tile_param.binarization_mode == BinarizationMode::ROW_BINARIZATION){
+            if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 BinMatDtype bin_mat;
 
                 decode_cm_tile(
@@ -861,6 +926,33 @@ void decode_scm(
             inverse_diag_transform(
                 tile_mat,
                 diag_transform_mode
+            );
+
+            comp_start_end_ids(
+                chr1_num_bin_entries,
+                tile_size,
+                i_tile,
+                start1_idx,
+                end1_idx
+            );
+
+            comp_start_end_ids(
+                chr2_num_bin_entries,
+                tile_size,
+                j_tile,
+                start2_idx,
+                end2_idx
+            );
+
+            if (bin_size_mult != 1){
+                UTILS_DIE("Not yet implemented!");
+            }
+
+            dense_to_sparse(
+                tile_mat,
+                tile_row_ids,
+                tile_col_ids,
+                tile_counts
             );
 
 
@@ -890,7 +982,7 @@ void encode_scm(
 
     auto interval = cm_param.getBinSize();
     auto tile_size = cm_param.getTileSize();
-    auto num_counts = rec.getNumCounts();
+    auto num_entries = rec.getNumEntries();
     auto chr1_ID = rec.getChr1ID();
     auto chr1_nbins = cm_param.getNumBinEntries(chr1_ID);
     auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
@@ -913,13 +1005,13 @@ void encode_scm(
     scm_param.setNumTiles(ntiles_in_row, ntiles_in_col);
     scm_payload.setNumTiles(ntiles_in_row, ntiles_in_col);
 
-    UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_counts});
+    UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
     row_ids /= interval;
 
-    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos1(), {num_counts});
+    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos1(), {num_entries});
     col_ids /= interval;
 
-    UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_counts});
+    UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
 
     if (transform_ids){
         // Compute mask for
@@ -1022,13 +1114,42 @@ void encode_scm(
                     codec_ID,
                     tile_payload
                 );
-                bin_mat.resize({0,0}); //TODO(yeremia): find better way to clear the memory
+
+                // TODO(yeremia): to be deleted
+                {
+                    genie::contact::BinMatDtype recon_bin_mat;
+                    decode_cm_tile(
+                        tile_payload,
+                        codec_ID,
+                        recon_bin_mat
+                    );
+
+                    UTILS_DIE_IF(
+                        bin_mat != recon_bin_mat,
+                        "Decode from tile_payload fails!"
+                    );
+                }
 
                 scm_payload.setTilePayload(
                     i_tile,
                     j_tile,
                     std::move(tile_payload)
                 );
+
+                // TODO(yeremia): to be deleted
+                {
+                    genie::contact::BinMatDtype recon_bin_mat;
+                    decode_cm_tile(
+                        scm_payload.getTilePayload(i_tile, j_tile),
+                        codec_ID,
+                        recon_bin_mat
+                    );
+
+                    UTILS_DIE_IF(
+                        bin_mat != recon_bin_mat,
+                        "Decode from tile_payload fails!"
+                    );
+                }
 
             // BinarizationMode::NONE
             } else {

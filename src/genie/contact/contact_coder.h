@@ -89,7 +89,7 @@ void decode_cm_masks(
     // Inputs
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
-    const SubcontactMatrixPayload& mask_payload,
+    const SubcontactMatrixPayload& scm_payload,
     // Outputs
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
@@ -199,11 +199,11 @@ void sparse_to_dense(
  */
 void dense_to_sparse(
     UIntMatDtype& mat,
-    uint64_t row_id_offset,
-    uint64_t col_id_offset,
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    UIntVecDtype& counts
+    UIntVecDtype& counts,
+    uint64_t row_id_offset=0,
+    uint64_t col_id_offset=0
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -297,6 +297,18 @@ void transform_row_bin(
     BinMatDtype& bin_mat
 );
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+// TOOD(yeremia): docstring
+void comp_start_end_ids(
+    // Inputs
+    size_t num_entries,
+    size_t tile_size,
+    size_t tile_idx,
+    // Outputs
+    size_t& start_idx,
+    size_t& end_idx
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -382,7 +394,7 @@ void decode_scm(
     SubcontactMatrixParameters scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
-    uint32_t mult
+    uint32_t bin_size_mult=1
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
