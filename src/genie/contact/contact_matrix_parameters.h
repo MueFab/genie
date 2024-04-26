@@ -145,6 +145,25 @@ class ContactMatrixParameters {
      */
     const std::unordered_map<uint8_t, SampleInformation>& getSamples() const;
 
+    // TODO(yeremia): docstring
+    const std::string& getSampleName(
+        uint8_t
+    ) const;
+
+    // TODO(yeremia): docstring
+    void upsertSample(
+        uint8_t ID,
+        const std::string& name,
+        bool exist_ok=true
+    );
+
+    // TODO(yeremia): docstring
+    void upsertSample(
+        uint8_t ID,
+        std::string&& name,
+        bool exist_ok=true
+    );
+
     /**
      * @brief Gets the number of chromosomes.
      *

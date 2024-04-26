@@ -162,8 +162,8 @@ void remove_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     bool is_intra,
-    BinVecDtype& row_mask,
-    BinVecDtype& col_mask
+    const BinVecDtype& row_mask,
+    const BinVecDtype& col_mask
 ){
     UTILS_DIE_IF(row_ids.shape(0) != col_ids.shape(0),
                  "The size of row_ids and col_ids must be same!");
@@ -179,11 +179,13 @@ void remove_unaligned(
         for (auto i = 0u; i<num_entries; i++){
             auto old_id = row_ids(i);
             auto new_id = mapping(old_id);
+            UTILS_DIE_IF(old_id < new_id, "ID is strange!?"); //TODO(yeremia): to be deleted
             row_ids(i) = new_id;
         }
         for (auto i = 0u; i<num_entries; i++){
             auto old_id = col_ids(i);
             auto new_id = mapping(old_id);
+            UTILS_DIE_IF(old_id < new_id, "ID is strange!?"); //TODO(yeremia): to be deleted
             col_ids(i) = new_id;
         }
     } else {
@@ -191,12 +193,14 @@ void remove_unaligned(
         for (auto i = 0u; i<num_entries; i++){
             auto old_id = row_ids(i);
             auto new_id = row_mapping(old_id);
+            UTILS_DIE_IF(old_id < new_id, "ID is strange!?"); //TODO(yeremia): to be deleted
             row_ids(i) = new_id;
         }
         auto col_mapping = xt::cumsum(xt::cast<uint64_t>(col_mask)) - 1u;
         for (auto i = 0u; i<num_entries; i++){
             auto old_id = col_ids(i);
             auto new_id = col_mapping(old_id);
+            UTILS_DIE_IF(old_id < new_id, "ID is strange!?"); //TODO(yeremia): to be deleted
             col_ids(i) = new_id;
         }
     }
@@ -271,25 +275,28 @@ void insert_unaligned(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sparse_to_dense(
-    UInt64VecDtype& row_ids,
-    UInt64VecDtype& col_ids,
-    UIntVecDtype& counts,
-    UIntMatDtype& mat,
+    // Inputs
+    const UInt64VecDtype& row_ids,
+    const UInt64VecDtype& col_ids,
+    const UIntVecDtype& counts,
     size_t nrows,
     size_t ncols,
-    uint64_t row_id_offset,
-    uint64_t col_id_offset
+    // Outputs
+    UIntMatDtype& mat
 ){
-    if (mat.shape(0) == 0 || mat.shape(1) == 0)
-        mat = xt::zeros<uint32_t>({nrows, ncols});
-    else
-        mat.resize({nrows, ncols});
+    // TODO(yeremia): to be deleted (?)
+    {
+        UTILS_DIE_IF(xt::amax(row_ids)(0) >= nrows, "Invalid nrows or row_ids!");
+        UTILS_DIE_IF(xt::amax(col_ids)(0) >= ncols, "Invalid ncols or col_ids!");
+        UTILS_DIE_IF(xt::any(xt::equal(counts, 0)), "Count with value 0 is found!");
+    }
+    mat = xt::zeros<uint32_t>({nrows, ncols});
 
-    auto nentries = counts.size();
+    auto nentries = counts.shape(0);
     for (auto i = 0u; i<nentries; i++){
-        auto row_id = row_ids(i) - row_id_offset;
-        auto col_id = col_ids(i) - col_id_offset;
         auto count = counts(i);
+        auto row_id = row_ids(i);
+        auto col_id = col_ids(i);
         mat(row_id, col_id) = count;
     }
 }
@@ -297,12 +304,12 @@ void sparse_to_dense(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void dense_to_sparse(
-    UIntMatDtype& mat,
+    // Inputs
+    const UIntMatDtype& mat,
+    // Outputs
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    UIntVecDtype& counts,
-    uint64_t row_id_offset,
-    uint64_t col_id_offset
+    UIntVecDtype& counts
 ){
     BinMatDtype mask = mat > 0u;
 
@@ -321,14 +328,6 @@ void dense_to_sparse(
         row_ids[k] = i;
         col_ids[k] = j;
         counts[k] = c;
-    }
-
-    if (row_id_offset != 0){
-        row_ids += row_id_offset;
-    }
-
-    if (col_id_offset != 0) {
-        col_ids += col_id_offset;
     }
 }
 
@@ -846,6 +845,13 @@ void decode_scm(
     // (not part of specification) Initialize variables
     BinVecDtype row_mask;
     BinVecDtype col_mask;
+    UInt64VecDtype row_ids, col_ids;
+    UIntVecDtype _counts;
+    std::vector<uint64_t> start1;
+    std::vector<uint64_t> end1;
+    std::vector<uint64_t> start2;
+    std::vector<uint64_t> end2;
+    std::vector<uint32_t> counts;
 
     auto bin_size = cm_param.getBinSize();
     auto target_bin_size = bin_size * bin_size_mult;
@@ -877,13 +883,15 @@ void decode_scm(
         "Bin size multiplier is not supported!"
     );
 
-    decode_cm_masks(
-        cm_param,
-        scm_param,
-        scm_payload,
-        row_mask,
-        col_mask
-    );
+    if (row_mask_exists || col_mask_exists){
+        decode_cm_masks(
+            cm_param,
+            scm_param,
+            scm_payload,
+            row_mask,
+            col_mask
+        );
+    }
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++) {
         for (size_t j_tile = 0u; j_tile < ntiles_in_col; j_tile++) {
@@ -893,7 +901,6 @@ void decode_scm(
 
             // Not part of the specification
             UIntMatDtype tile_mat;
-            BinVecDtype tile_row_mask, tile_col_mask;
             size_t start1_idx, end1_idx, start2_idx, end2_idx;
             UInt64VecDtype tile_row_ids, tile_col_ids;
             UIntVecDtype tile_counts;
@@ -945,6 +952,7 @@ void decode_scm(
             );
 
             if (bin_size_mult != 1){
+                // TODO(yeremia): implement the on-the-fly normalization
                 UTILS_DIE("Not yet implemented!");
             }
 
@@ -955,9 +963,78 @@ void decode_scm(
                 tile_counts
             );
 
+            if (row_mask_exists || col_mask_exists){
+                // This is slice function
+                BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(start1_idx, end1_idx));
+                BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(start2_idx, end2_idx));
+
+                insert_unaligned(
+                    tile_row_ids,
+                    tile_col_ids,
+                    is_intra_scm,
+                    tile_row_mask,
+                    tile_col_mask
+                );
+            }
+
+            if (i_tile != 0){
+                tile_row_ids += start1_idx;
+            }
+            if (j_tile != 0){
+                tile_col_ids += start2_idx;
+            }
+
+            // Not in the specification
+            // This is just for the concatenation
+            if (i_tile == 0 && j_tile == 0){
+                row_ids = tile_row_ids;
+                col_ids = tile_col_ids;
+                _counts = tile_counts;
+            } else {
+                row_ids = xt::concatenate(xt::xtuple(row_ids, tile_row_ids));
+                col_ids = xt::concatenate(xt::xtuple(col_ids, tile_col_ids));
+                _counts = xt::concatenate(xt::xtuple(_counts, tile_counts));
+            }
 
         }
     }
+
+    // Not in the specification
+    auto num_entries = _counts.shape(0);
+    start1.resize(num_entries);
+    end1.resize(num_entries);
+    start2.resize(num_entries);
+    end2.resize(num_entries);
+    counts.resize(num_entries);
+
+    for (auto i=0u; i<num_entries; i++){
+        start1[i] = row_ids(i) + target_bin_size;
+        end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
+        start2[i] = col_ids(i) + target_bin_size;
+        end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
+        counts[i] = _counts(i);
+    }
+
+    auto start1_len = start1.size();
+    auto end1_len = end1.size();
+    auto start2_len = start2.size();
+    auto end2_len = end2.size();
+    auto counts_len = counts.size();
+
+    auto sample_ID = scm_payload.getSampleID();
+    rec.setSampleID(sample_ID);
+    //TODO(yeremia): fix this
+//    auto sample_name = std::string(cm_param.getSampleName(sample_ID));
+//    rec.setSampleName(std::move(sample_name));
+    rec.setBinSize(bin_size);
+    rec.setChr1ID(chr1_ID);
+    rec.SetCMValues(
+        std::move(start1),
+        std::move(end1),
+        std::move(start2),
+        std::move(end2),
+        std::move(counts)
+    );
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -970,9 +1047,10 @@ void encode_scm(
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     // Options
-    bool transform_ids,
+    bool remove_unaligned_region,
     bool transform_mask,
-    bool transform_tile,
+    bool ena_diag_transform,
+    bool ena_binarization,
     core::AlgoID codec_ID
 ) {
 
@@ -984,13 +1062,11 @@ void encode_scm(
     auto tile_size = cm_param.getTileSize();
     auto num_entries = rec.getNumEntries();
     auto chr1_ID = rec.getChr1ID();
-    auto chr1_nbins = cm_param.getNumBinEntries(chr1_ID);
+    auto chr1_num_bin_entries = cm_param.getNumBinEntries(chr1_ID);
     auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
     auto chr2_ID = rec.getChr2ID();
-    auto chr2_nbins = cm_param.getNumBinEntries(chr2_ID);
+    auto chr2_num_bin_entries = cm_param.getNumBinEntries(chr2_ID);
     auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
-
-    auto is_intra_scm = chr1_ID == chr2_ID;
 
     scm_payload.setSampleID(rec.getSampleID());
 
@@ -999,6 +1075,8 @@ void encode_scm(
 
     scm_param.setChr2ID(chr2_ID);
     scm_payload.setChr2ID(chr1_ID);
+
+    auto is_intra_scm = scm_param.isIntraSCM();
 
     scm_param.setCodecID(codec_ID);
 
@@ -1013,20 +1091,20 @@ void encode_scm(
 
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
 
-    if (transform_ids){
+    if (remove_unaligned_region){
         // Compute mask for
         compute_masks(
             row_ids,
             col_ids,
-            chr1_nbins,
-            chr2_nbins,
+            chr1_num_bin_entries,
+            chr2_num_bin_entries,
             is_intra_scm,
             row_mask,
             col_mask
         );
-
-        // Create mapping
-        remove_unaligned(row_ids, col_ids, is_intra_scm, row_mask, col_mask);
+    } else {
+        row_mask = xt::ones<bool>({chr1_num_bin_entries});
+        col_mask = xt::ones<bool>({chr2_num_bin_entries});
     }
 
     UTILS_DIE_IF(row_ids.shape(0) == 0, "row_ids is empty?");
@@ -1039,7 +1117,7 @@ void encode_scm(
 
         for (size_t j_tile = 0u; j_tile< ntiles_in_col; j_tile++){
 
-            if (i_tile > j_tile && scm_param.isIntraSCM()){
+            if (i_tile > j_tile && is_intra_scm){
                 continue;
             }
 
@@ -1050,31 +1128,54 @@ void encode_scm(
             uint32_t tile_nrows = 0, tile_ncols = 0;
 
             // Mode selection for encoding
-            if (transform_tile){
+            if (ena_diag_transform){
                 if (i_tile == j_tile){
                     if (is_intra_scm){
                         diag_transform_mode = DiagonalTransformMode::MODE_0;
                     } else
                         diag_transform_mode = DiagonalTransformMode::MODE_1;
-                } else if (i_tile < j_tile)
+                } else if (i_tile < j_tile){
                     diag_transform_mode = DiagonalTransformMode::MODE_2;
-                else if (j_tile > i_tile)
+                } else if (j_tile > i_tile) {
                     diag_transform_mode = DiagonalTransformMode::MODE_3;
-                else
+                } else {
                     UTILS_DIE("This should never be reached!");
+                }
 
-                binarization_mode = BinarizationMode::ROW_BINARIZATION;
             } else {
                 diag_transform_mode = DiagonalTransformMode::NONE;
+            }
+
+            if (ena_binarization){
+                binarization_mode = BinarizationMode::ROW_BINARIZATION;
+            } else {
                 binarization_mode = BinarizationMode::NONE;
             }
 
             auto min_col_id = j_tile*tile_size;
             auto max_col_id = min_col_id+tile_size;
 
+            //TOOD(yeremia): to be deleted
+            {
+                auto min_row_id = xt::amin(row_ids)(0);
+                auto max_row_id = xt::amax(row_ids)(0);
+                auto min_col_id = xt::amin(col_ids)(0);
+                auto max_col_id = xt::amax(col_ids)(0);
+                auto y = 0;
+            }
+
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
+            {
+                auto nentries = xt::sum(mask1)(0);
+                auto y = 0;
+            }
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
+            {
+                auto nentries = xt::sum(mask1)(0);
+                UTILS_DIE_IF(nentries != num_entries, "ERROR!");
+                auto y = 0;
+            }
 
             //TODO(yeremia): create a pipeline where the whole tile is unaligned
             UTILS_DIE_IF(xt::sum(xt::cast<uint32_t>(mask))(0) == 0, "There is no entry in tile_mat at all?!");
@@ -1084,8 +1185,27 @@ void encode_scm(
             UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
             UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_nbins) - min_row_id);
-            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_nbins) - min_col_id);
+            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_num_bin_entries) - min_row_id);
+            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_num_bin_entries) - min_col_id);
+
+            if (remove_unaligned_region){
+                BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
+                BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
+
+                remove_unaligned(
+                    tile_row_ids,
+                    tile_col_ids,
+                    is_intra_scm,
+                    tile_row_mask,
+                    tile_col_mask
+                );
+
+                //TODO(yeremia): to be deleted
+                {
+                    auto tile_row_ids_num_entries = tile_row_ids.shape(0);
+                    UTILS_DIE_IF(tile_row_ids_num_entries != num_entries, "error!");
+                }
+            }
 
             UIntMatDtype tile_mat;
 
@@ -1095,12 +1215,24 @@ void encode_scm(
                 tile_row_ids,
                 tile_col_ids,
                 tile_counts,
-                tile_mat,
                 tile_nrows,
                 tile_ncols,
-                min_row_id,
-                min_col_id
+                tile_mat
             );
+
+            // TODO(yeremia): to be deleted
+            {
+                auto tile_num_nz = xt::sum(tile_mat > 0)(0);
+                UTILS_DIE_IF(tile_num_nz != num_entries, "Somehting is wrong!");
+
+                UIntMatDtype orig_tile_mat = tile_mat;
+                genie::contact::diag_transform(tile_mat, diag_transform_mode);
+                genie::contact::inverse_diag_transform(tile_mat, diag_transform_mode);
+
+                UTILS_DIE_IF(tile_mat != orig_tile_mat, "Something is wronge");
+                auto num_nz = xt::sum(xt::greater(tile_mat, 0))(0);
+                auto y = 0;
+            }
 
             genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
@@ -1128,6 +1260,9 @@ void encode_scm(
                         bin_mat != recon_bin_mat,
                         "Decode from tile_payload fails!"
                     );
+
+                    auto num_nz = xt::sum(bin_mat)(0);
+                    auto y = 0;
                 }
 
                 scm_payload.setTilePayload(
@@ -1158,9 +1293,10 @@ void encode_scm(
         }
     }
 
-    if (transform_ids){
+    if (remove_unaligned_region){
         if (transform_mask){
-
+            //TODO(yeremia): implement this
+            UTILS_DIE("Not yet implemented!");
         } else {
             auto row_mask_payload = SubcontactMatrixMaskPayload(
                 std::move(row_mask)

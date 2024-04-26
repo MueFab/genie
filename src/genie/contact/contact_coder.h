@@ -125,8 +125,8 @@ void remove_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     bool is_intra,
-    BinVecDtype& row_mask,
-    BinVecDtype& col_mask
+    const BinVecDtype& row_mask,
+    const BinVecDtype& col_mask
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -164,21 +164,19 @@ void insert_unaligned(
  * @param row_ids A reference to the vector of row IDs.
  * @param col_ids A reference to the vector of column IDs.
  * @param counts A reference to the vector of counts corresponding to each row and column pair.
- * @param mat A reference to the matrix data structure to be filled.
  * @param nrows The number of rows in the dense matrix.
  * @param ncols The number of columns in the dense matrix.
- * @param row_id_offset An optional offset for row IDs, defaulting to  0.
- * @param col_id_offset An optional offset for column IDs, defaulting to  0.
+ * @param mat A reference to the matrix data structure to be filled.
  */
 void sparse_to_dense(
-    UInt64VecDtype& row_ids,
-    UInt64VecDtype& col_ids,
-    UIntVecDtype& counts,
-    UIntMatDtype& mat,
+    // Inputs
+    const UInt64VecDtype& row_ids,
+    const UInt64VecDtype& col_ids,
+    const UIntVecDtype& counts,
     size_t nrows,
     size_t ncols,
-    uint64_t row_id_offset=0,
-    uint64_t col_id_offset=0
+    // Outputs
+    UIntMatDtype& mat
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -191,19 +189,17 @@ void sparse_to_dense(
  * accordingly.
  *
  * @param mat A reference to the dense matrix data structure.
- * @param row_id_offset An offset for row IDs.
- * @param col_id_offset An offset for column IDs.
  * @param row_ids A reference to the vector of row IDs to be filled.
  * @param col_ids A reference to the vector of column IDs to be filled.
  * @param counts A reference to the vector of counts corresponding to each row and column pair.
  */
 void dense_to_sparse(
-    UIntMatDtype& mat,
+    // Inputs
+    const UIntMatDtype& mat,
+    // Outputs
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    UIntVecDtype& counts,
-    uint64_t row_id_offset=0,
-    uint64_t col_id_offset=0
+    UIntVecDtype& counts
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -404,9 +400,10 @@ void encode_scm(
     core::record::ContactRecord& rec,
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
-    bool transform_ids=true,
+    bool remove_unaligned_region=true,
     bool transform_mask=true,
-    bool transform_tile=true,
+    bool ena_diag_transform=true,
+    bool ena_binarization=true,
     core::AlgoID codec_ID=core::AlgoID::JBIG
 );
 
