@@ -8,10 +8,14 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xarray.hpp>
+#include <xtensor/xrandom.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xio.hpp>
 #include <codecs/include/mpegg-codecs.h>
 #include <genie/core/record/contact/record.h>
 #include <genie/util/runtime-exception.h>
-#include <xtensor/xsort.hpp>
 #include "contact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
 #include "subcontact_matrix_parameters.h"
@@ -292,12 +296,30 @@ void sparse_to_dense(
     }
     mat = xt::zeros<uint32_t>({nrows, ncols});
 
+    std::cerr << row_ids << std::endl;
+    std::cerr << col_ids << std::endl << std::endl;
+
     auto nentries = counts.shape(0);
     for (auto i = 0u; i<nentries; i++){
         auto count = counts(i);
         auto row_id = row_ids(i);
         auto col_id = col_ids(i);
+
+//        // TODO(yeremia): to be deleted (?)
+//        {
+//            UTILS_DIE_IF(row_id >= nrows, "!");
+//            UTILS_DIE_IF(col_id >= ncols, "!");
+//            UTILS_DIE_IF(count == 0, "!");
+//        }
         mat(row_id, col_id) = count;
+    }
+
+    // TODO(yeremia): to be deleted (?)
+    {
+        UTILS_DIE_IF(
+            xt::sum(xt::greater(mat, 0))(0) != nentries,
+            "Something is wrong with the sparse_to_dense!"
+        );
     }
 }
 
@@ -1086,7 +1108,7 @@ void encode_scm(
     UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
     row_ids /= interval;
 
-    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos1(), {num_entries});
+    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos2(), {num_entries});
     col_ids /= interval;
 
     UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
@@ -1207,6 +1229,13 @@ void encode_scm(
                 }
             }
 
+            if (min_row_id > 0){
+                tile_row_ids -= min_row_id;
+            }
+            if (min_col_id > 0){
+                tile_col_ids -= min_col_id;
+            }
+
             UIntMatDtype tile_mat;
 
             //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
@@ -1223,6 +1252,7 @@ void encode_scm(
             // TODO(yeremia): to be deleted
             {
                 auto tile_num_nz = xt::sum(tile_mat > 0)(0);
+                auto tile_num_entries = tile_row_ids.shape(0);
                 UTILS_DIE_IF(tile_num_nz != num_entries, "Somehting is wrong!");
 
                 UIntMatDtype orig_tile_mat = tile_mat;
