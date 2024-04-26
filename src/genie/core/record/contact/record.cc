@@ -312,6 +312,66 @@ const std::vector<std::vector<double_t>>& ContactRecord::getNormCounts() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ContactRecord::setSampleID(uint8_t _sample_ID){ sample_ID = _sample_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setSampleName(std::string&& _sample_name){ sample_name = std::move(_sample_name); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setBinSize(uint32_t _bin_size){ bin_size = _bin_size; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr1ID(uint8_t _chr1_ID){ chr1_ID = _chr1_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr1Name(std::string&& _chr1_name){ chr1_name = std::move(_chr1_name); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr1Length(uint64_t _chr1_len){ chr1_length = _chr1_len;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr2ID(uint8_t _chr2_ID){ chr2_ID = _chr2_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr2Name(std::string&& _chr2_name){ chr2_name = std::move(_chr2_name); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::setChr2Length(uint64_t _chr2_len){ chr2_length = _chr2_len; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactRecord::SetCMValues(
+    std::vector<uint64_t>&& _start_pos1,
+    std::vector<uint64_t>&& _end_pos1,
+    std::vector<uint64_t>&& _start_pos2,
+    std::vector<uint64_t>&& _end_pos2,
+    std::vector<uint32_t>&& _counts
+){
+    UTILS_DIE_IF(
+        _counts.size() != _start_pos1.size() ||
+            _counts.size()!= _end_pos1.size() ||
+            _counts.size()!= _start_pos2.size() ||
+            _counts.size() != _end_pos2.size(),
+        "Invalid length of CM values"
+    );
+
+    start_pos1 = std::move(_start_pos1);
+    end_pos1 = std::move(_end_pos1);
+    start_pos2 = std::move(_start_pos2);
+    end_pos2 = std::move(_end_pos2);
+    counts = std::move(_counts);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 // TODO (Yeremia): Implement this
 void ContactRecord::write(util::BitWriter &writer) const {
     // Sample

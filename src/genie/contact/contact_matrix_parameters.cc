@@ -180,6 +180,54 @@ const std::unordered_map<uint8_t, SampleInformation>& ContactMatrixParameters::g
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const std::string& ContactMatrixParameters::getSampleName(
+    uint8_t _sample_ID
+) const{
+    auto sample_obj = sample_infos.find(_sample_ID);
+    UTILS_DIE_IF(sample_obj == sample_infos.end(), "sample_ID does not exist!");
+
+    return sample_obj->second.name;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactMatrixParameters::upsertSample(
+    uint8_t ID,
+    const std::string& name,
+    bool exist_ok
+){
+
+    auto _name = std::string(name);
+
+    upsertChromosome(
+        ID,
+        std::move(_name),
+        exist_ok
+    );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ContactMatrixParameters::upsertSample(
+    uint8_t ID,
+    std::string&& name,
+    bool exist_ok
+){
+
+    auto it = chr_infos.find(ID);
+    if (it == chr_infos.end()){
+        ChromosomeInformation chr_info = {ID, std::move(name)};
+        chr_infos.emplace(ID, std::move(chr_info));
+    } else if (exist_ok){
+        it->second.name = std::move(name);
+
+    } else{
+        UTILS_DIE("chr_ID already exists!");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t ContactMatrixParameters::getNumChromosomes() const { return static_cast<uint8_t>(chr_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -221,10 +269,8 @@ void ContactMatrixParameters::upsertChromosome(
         UTILS_DIE_IF(it->second.name != name,
                      "name differs for the same chr_ID");
 
-        // Update length if longer
-        // This is because ContactRecord does not store the true chromosome length
-        if (it->second.length < length)
-            it->second.length = length;
+        it->second.name = std::move(name);
+        it->second.length = length;
 
     } else{
         UTILS_DIE("chr_ID already exists!");

@@ -10,6 +10,8 @@
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xio.hpp>
 #include "helpers.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
@@ -249,7 +251,7 @@ TEST(ContactCoder, RoundTrip_Coding_ProcessingUnalignedRegion) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
+TEST(ContactCoder, RoundTrip_Coding_SparseDenseRepresentation) {
     // Test a matrix divided in 4 tiles
     // 5x5 scm matrix with tile size equals to 3
 
@@ -260,30 +262,25 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
         auto NROWS = 3u;
         auto NCOLS = 3u;
 
-        std::vector<uint64_t> row_ids_vec = {0, 1, 2};
-        std::vector<uint64_t> col_ids_vec = {1, 2, 0};
-        std::vector<uint32_t> counts_vec = {1, 2, 3};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 1, 2};
+        std::vector<uint64_t> COL_IDS_VEC = {1, 2, 0};
+        std::vector<uint32_t> COUNTS_VEC = {1, 2, 3};
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
-        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
+        genie::contact::UIntVecDtype COUNTS = xt::adapt(COUNTS_VEC, {COUNTS_VEC.size()});
 
-        genie::contact::sort_by_row_ids(
-            row_ids,
-            col_ids,
-            counts
-        );
+        genie::contact::UInt64VecDtype row_ids = ROW_IDS - ROW_ID_OFFSET;
+        genie::contact::UInt64VecDtype col_ids = COL_IDS - COL_ID_OFFSET;
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
             row_ids,
             col_ids,
-            counts,
-            tile_mat,
+            COUNTS,
             NROWS,
             NCOLS,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
+            tile_mat
         );
 
         ASSERT_EQ(tile_mat.dimension(), 2);
@@ -302,20 +299,15 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
-        );
-
-        genie::contact::sort_by_row_ids(
-            recon_row_ids,
-            recon_col_ids,
             recon_counts
         );
 
-        ASSERT_TRUE(row_ids == recon_row_ids);
-        ASSERT_TRUE(col_ids == recon_col_ids);
-        ASSERT_TRUE(counts == recon_counts);
+        recon_row_ids += ROW_ID_OFFSET;
+        recon_col_ids += COL_ID_OFFSET;
+
+        ASSERT_TRUE(xt::sort(ROW_IDS) == xt::sort(recon_row_ids)) << row_ids << recon_row_ids;
+        ASSERT_TRUE(xt::sort(COL_IDS) == xt::sort(recon_col_ids)) << col_ids << recon_col_ids;
+        ASSERT_TRUE(xt::sort(COUNTS) == xt::sort(recon_counts)) << COUNTS << recon_counts;
     }
     // Tile (1,0)
     {
@@ -324,30 +316,25 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
         auto NROWS = 2u;
         auto NCOLS = 3u;
 
-        std::vector<uint64_t> row_ids_vec = {3, 4};
-        std::vector<uint64_t> col_ids_vec = {2, 1};
-        std::vector<uint32_t> counts_vec = {4, 5};
+        std::vector<uint64_t> ROW_IDS_VEC = {3, 4};
+        std::vector<uint64_t> COL_IDS_VEC = {2, 1};
+        std::vector<uint32_t> COUNTS_VEC = {4, 5};
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
-        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
+        genie::contact::UIntVecDtype COUNTS = xt::adapt(COUNTS_VEC, {COUNTS_VEC.size()});
 
-        genie::contact::sort_by_row_ids(
-            row_ids,
-            col_ids,
-            counts
-        );
+        genie::contact::UInt64VecDtype row_ids = ROW_IDS - ROW_ID_OFFSET;
+        genie::contact::UInt64VecDtype col_ids = COL_IDS - COL_ID_OFFSET;
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
             row_ids,
             col_ids,
-            counts,
-            tile_mat,
+            COUNTS,
             NROWS,
             NCOLS,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
+            tile_mat
         );
 
         ASSERT_EQ(tile_mat.dimension(), 2);
@@ -365,20 +352,15 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
-        );
-
-        genie::contact::sort_by_row_ids(
-            recon_row_ids,
-            recon_col_ids,
             recon_counts
         );
 
-        ASSERT_TRUE(row_ids == recon_row_ids);
-        ASSERT_TRUE(col_ids == recon_col_ids);
-        ASSERT_TRUE(counts == recon_counts);
+        recon_row_ids += ROW_ID_OFFSET;
+        recon_col_ids += COL_ID_OFFSET;
+
+        ASSERT_TRUE(xt::sort(ROW_IDS) == xt::sort(recon_row_ids)) << row_ids << recon_row_ids;
+        ASSERT_TRUE(xt::sort(COL_IDS) == xt::sort(recon_col_ids)) << col_ids << recon_col_ids;
+        ASSERT_TRUE(xt::sort(COUNTS) == xt::sort(recon_counts)) << COUNTS << recon_counts;
     }
     // Tile (0,1)
     {
@@ -387,30 +369,25 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
         auto NROWS = 3u;
         auto NCOLS = 2u;
 
-        std::vector<uint64_t> row_ids_vec = {0, 2};
-        std::vector<uint64_t> col_ids_vec = {4, 4};
-        std::vector<uint32_t> counts_vec = {6, 7};
+        std::vector<uint64_t> ROW_IDS_VEC = {0, 2};
+        std::vector<uint64_t> COL_IDS_VEC = {4, 4};
+        std::vector<uint32_t> COUNTS_VEC = {6, 7};
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
-        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
+        genie::contact::UIntVecDtype COUNTS = xt::adapt(COUNTS_VEC, {COUNTS_VEC.size()});
 
-        genie::contact::sort_by_row_ids(
-            row_ids,
-            col_ids,
-            counts
-        );
+        genie::contact::UInt64VecDtype row_ids = ROW_IDS - ROW_ID_OFFSET;
+        genie::contact::UInt64VecDtype col_ids = COL_IDS - COL_ID_OFFSET;
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
             row_ids,
             col_ids,
-            counts,
-            tile_mat,
+            COUNTS,
             NROWS,
             NCOLS,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
+            tile_mat
         );
 
         ASSERT_EQ(tile_mat.dimension(), 2);
@@ -428,20 +405,15 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
-        );
-
-        genie::contact::sort_by_row_ids(
-            recon_row_ids,
-            recon_col_ids,
             recon_counts
         );
 
-        ASSERT_TRUE(row_ids == recon_row_ids);
-        ASSERT_TRUE(col_ids == recon_col_ids);
-        ASSERT_TRUE(counts == recon_counts);
+        recon_row_ids += ROW_ID_OFFSET;
+        recon_col_ids += COL_ID_OFFSET;
+
+        ASSERT_TRUE(xt::sort(ROW_IDS) == xt::sort(recon_row_ids)) << row_ids << recon_row_ids;
+        ASSERT_TRUE(xt::sort(COL_IDS) == xt::sort(recon_col_ids)) << col_ids << recon_col_ids;
+        ASSERT_TRUE(xt::sort(COUNTS) == xt::sort(recon_counts)) << COUNTS << recon_counts;
     }
     // Tile (1,1)
     {
@@ -450,30 +422,25 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
         auto NROWS = 2u;
         auto NCOLS = 2u;
 
-        std::vector<uint64_t> row_ids_vec = {3};
-        std::vector<uint64_t> col_ids_vec = {3};
-        std::vector<uint32_t> counts_vec = {8};
+        std::vector<uint64_t> ROW_IDS_VEC = {3};
+        std::vector<uint64_t> COL_IDS_VEC = {3};
+        std::vector<uint32_t> COUNTS_VEC = {8};
 
-        genie::contact::UInt64VecDtype row_ids = xt::adapt(row_ids_vec, {row_ids_vec.size()});
-        genie::contact::UInt64VecDtype col_ids = xt::adapt(col_ids_vec, {col_ids_vec.size()});
-        genie::contact::UIntVecDtype counts = xt::adapt(counts_vec, {counts_vec.size()});
+        genie::contact::UInt64VecDtype ROW_IDS = xt::adapt(ROW_IDS_VEC, {ROW_IDS_VEC.size()});
+        genie::contact::UInt64VecDtype COL_IDS = xt::adapt(COL_IDS_VEC, {COL_IDS_VEC.size()});
+        genie::contact::UIntVecDtype COUNTS = xt::adapt(COUNTS_VEC, {COUNTS_VEC.size()});
 
-        genie::contact::sort_by_row_ids(
-            row_ids,
-            col_ids,
-            counts
-        );
+        genie::contact::UInt64VecDtype row_ids = ROW_IDS - ROW_ID_OFFSET;
+        genie::contact::UInt64VecDtype col_ids = COL_IDS - COL_ID_OFFSET;
 
         genie::contact::UIntMatDtype tile_mat;
         genie::contact::sparse_to_dense(
             row_ids,
             col_ids,
-            counts,
-            tile_mat,
+            COUNTS,
             NROWS,
             NCOLS,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
+            tile_mat
         );
 
         ASSERT_EQ(tile_mat.dimension(), 2);
@@ -490,20 +457,15 @@ TEST(ContactCoder, RoundTrip_SparseDenseRepresentation) {
             tile_mat,
             recon_row_ids,
             recon_col_ids,
-            recon_counts,
-            ROW_ID_OFFSET,
-            COL_ID_OFFSET
-        );
-
-        genie::contact::sort_by_row_ids(
-            recon_row_ids,
-            recon_col_ids,
             recon_counts
         );
 
-        ASSERT_TRUE(row_ids == recon_row_ids);
-        ASSERT_TRUE(col_ids == recon_col_ids);
-        ASSERT_TRUE(counts == recon_counts);
+        recon_row_ids += ROW_ID_OFFSET;
+        recon_col_ids += COL_ID_OFFSET;
+
+        ASSERT_TRUE(xt::sort(ROW_IDS) == xt::sort(recon_row_ids)) << row_ids << recon_row_ids;
+        ASSERT_TRUE(xt::sort(COL_IDS) == xt::sort(recon_col_ids)) << col_ids << recon_col_ids;
+        ASSERT_TRUE(xt::sort(COUNTS) == xt::sort(recon_counts)) << COUNTS << recon_counts;
     }
 }
 
@@ -806,11 +768,11 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         RECS.pop_back();
     }
 
-
     {
-        auto TRANSFORM_IDS = true;
+        auto REMOVE_UNALIGNED_REGION = true;
         auto TRANSFORM_MASK = false;
-        auto TRANSFORM_TILE = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
@@ -823,6 +785,11 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         cm_param.setTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
             cm_param.upsertChromosome(
                 rec.getChr1ID(),
                 rec.getChr1Name(),
@@ -835,9 +802,10 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
             cm_param, REC,
             scm_param,
             scm_payload,
-            TRANSFORM_IDS,
+            REMOVE_UNALIGNED_REGION,
             TRANSFORM_MASK,
-            TRANSFORM_TILE,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
             CODEC_ID
         );
 
@@ -866,9 +834,12 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         decode_scm(
             cm_param,
             scm_param,
-            recon_scm_payload, REC,
+            recon_scm_payload,
+            recon_rec,
             MULT
         );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), 9812u);
 
 //        ASSERT_EQ(REC, recon_rec);
 //        ASSERT_TRUE(REC == recon_rec);

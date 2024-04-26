@@ -120,6 +120,32 @@ class ContactRecord {
 
      const std::vector<std::vector<double_t>>& getNormCounts() const;
 
+     void setSampleID(uint8_t _sample_ID);
+
+     void setSampleName(std::string&& _sample_name);
+
+     void setBinSize(uint32_t _bin_size);
+
+     void setChr1ID(uint8_t _chr1_ID);
+
+     void setChr1Name(std::string&& _chr1_name);
+
+     void setChr1Length(uint64_t _chr1_len);
+
+     void setChr2ID(uint8_t _chr2_ID);
+
+     void setChr2Name(std::string&& _chr2_name);
+
+     void setChr2Length(uint64_t _chr2_len);
+
+     void SetCMValues(
+         std::vector<uint64_t>&& _start_pos1,
+         std::vector<uint64_t>&& _end_pos1,
+         std::vector<uint64_t>&& _start_pos2,
+         std::vector<uint64_t>&& _end_pos2,
+         std::vector<uint32_t>&& _counts
+     );
+
      void write(util::BitWriter &writer) const;
 };
 
