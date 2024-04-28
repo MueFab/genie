@@ -798,8 +798,10 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         }
 
         auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
         genie::contact::encode_scm(
-            cm_param, REC,
+            cm_param,
+            rec,
             scm_param,
             scm_payload,
             REMOVE_UNALIGNED_REGION,
@@ -830,7 +832,7 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         ASSERT_TRUE(recon_scm_payload == scm_payload);
 
         auto recon_rec = genie::core::record::ContactRecord();
-//
+
         decode_scm(
             cm_param,
             scm_param,
@@ -840,9 +842,31 @@ TEST(ContactCoder, RoundTrip_CodingOneRecNoNorm){
         );
 
         ASSERT_EQ(recon_rec.getNumEntries(), 9812u);
-
-//        ASSERT_EQ(REC, recon_rec);
-//        ASSERT_TRUE(REC == recon_rec);
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
     }
 
 }

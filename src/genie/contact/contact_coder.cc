@@ -296,9 +296,6 @@ void sparse_to_dense(
     }
     mat = xt::zeros<uint32_t>({nrows, ncols});
 
-    std::cerr << row_ids << std::endl;
-    std::cerr << col_ids << std::endl << std::endl;
-
     auto nentries = counts.shape(0);
     for (auto i = 0u; i<nentries; i++){
         auto count = counts(i);
@@ -1030,24 +1027,20 @@ void decode_scm(
     counts.resize(num_entries);
 
     for (auto i=0u; i<num_entries; i++){
-        start1[i] = row_ids(i) + target_bin_size;
+        start1[i] = row_ids(i) * target_bin_size;
         end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
-        start2[i] = col_ids(i) + target_bin_size;
+        start2[i] = col_ids(i) * target_bin_size;
         end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
         counts[i] = _counts(i);
     }
-
-    auto start1_len = start1.size();
-    auto end1_len = end1.size();
-    auto start2_len = start2.size();
-    auto end2_len = end2.size();
-    auto counts_len = counts.size();
 
     auto sample_ID = scm_payload.getSampleID();
     rec.setSampleID(sample_ID);
     //TODO(yeremia): fix this
 //    auto sample_name = std::string(cm_param.getSampleName(sample_ID));
 //    rec.setSampleName(std::move(sample_name));
+    rec.setChr1ID(chr1_ID);
+    rec.setChr2ID(chr2_ID);
     rec.setBinSize(bin_size);
     rec.setChr1ID(chr1_ID);
     rec.SetCMValues(
