@@ -155,18 +155,21 @@ void insert_unaligned(
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * Converts a sparse matrix representation to a dense matrix representation.
+ * @brief Converts a sparse matrix to a dense matrix.
  *
- * This function takes row and column IDs along with counts and constructs a dense matrix
- * representation. It allows specifying offsets for row and column IDs to adjust the matrix
- * accordingly.
+ * This function converts a sparse matrix represented by three vectors (row_ids, col_ids, counts)
+ * into a dense matrix. The function first checks if the row_ids and col_ids are valid (i.e., they are
+ * within the range of nrows and ncols). It also checks if there are any counts with value 0. If any
+ * of these checks fail, the function throws an exception.
  *
- * @param row_ids A reference to the vector of row IDs.
- * @param col_ids A reference to the vector of column IDs.
- * @param counts A reference to the vector of counts corresponding to each row and column pair.
+ * @param row_ids A vector of row indices.
+ * @param col_ids A vector of column indices.
+ * @param counts A vector of counts.
  * @param nrows The number of rows in the dense matrix.
  * @param ncols The number of columns in the dense matrix.
- * @param mat A reference to the matrix data structure to be filled.
+ * @param mat The output dense matrix.
+ *
+ * @throws std::runtime_error If the row_ids or col_ids are invalid or if there are counts with value 0.
  */
 void sparse_to_dense(
     // Inputs
@@ -182,16 +185,17 @@ void sparse_to_dense(
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * Converts a dense matrix representation to a sparse matrix representation.
+ * @brief Converts a dense matrix to a sparse matrix.
  *
- * This function takes a dense matrix and converts it into a sparse representation using
- * row and column IDs and counts. It allows specifying offsets for row and column IDs to adjust the matrix
- * accordingly.
+ * This function converts a dense matrix into a sparse matrix represented by three vectors (row_ids, col_ids, counts).
+ * The function first creates a mask of the matrix where the elements are greater than 0. It then finds the indices of the mask
+ * where the elements are true. The function then resizes the output vectors to the number of entries and fills them with the row indices,
+ * column indices, and counts from the dense matrix.
  *
- * @param mat A reference to the dense matrix data structure.
- * @param row_ids A reference to the vector of row IDs to be filled.
- * @param col_ids A reference to the vector of column IDs to be filled.
- * @param counts A reference to the vector of counts corresponding to each row and column pair.
+ *  @param mat The input dense matrix.
+ *  @param row_ids The output vector of row indices.
+ *  @param col_ids The output vector of column indices.
+ *  @param counts The output vector of counts.
  */
 void dense_to_sparse(
     // Inputs
@@ -202,18 +206,18 @@ void dense_to_sparse(
     UIntVecDtype& counts
 );
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-// TODO(yeremia): docstring
-void comp_start_end_idx(
-    // Inputs
-    size_t nentries,
-    size_t tile_size,
-    size_t tile_idx,
-    // Outputs
-    size_t& start_idx,
-    size_t& end_idx
-);
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//// TODO(yeremia): docstring
+//void comp_start_end_idx(
+//    // Inputs
+//    size_t nentries,
+//    size_t tile_size,
+//    size_t tile_idx,
+//    // Outputs
+//    size_t& start_idx,
+//    size_t& end_idx
+//);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -235,7 +239,15 @@ void sort_by_row_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): docstring
+/**
+ * @brief Applies an inverse diagonal transform to a matrix.
+ *
+ * This function applies an inverse diagonal transform to a matrix. The transform mode determines the type of transform
+ * applied. If the mode is NONE, the function does nothing, otherwise applies diagonal transformation according to the mode
+ *
+ *   @param mat The input matrix.
+ *   @param mode The transform mode.
+ */
 void inverse_diag_transform(
     UIntMatDtype& mat,
     DiagonalTransformMode mode
@@ -295,7 +307,19 @@ void transform_row_bin(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TOOD(yeremia): docstring
+/**
+ * @brief Computes the start and end indices for a given tile.
+ *
+ * This function computes the start and end indices for a given tile. The tile is defined by its index and size. The
+ * function takes into account the total number of entries and ensures that the end index does not exceed the total number
+ * of entries.
+ *
+ *   @param num_entries The total number of entries.
+ *   @param tile_size The size of the tile.
+ *   @param tile_idx The index of the tile.
+ *   @param start_idx The output start index.
+ *   @param end_idx The output end index.
+ */
 void comp_start_end_ids(
     // Inputs
     size_t num_entries,
@@ -387,7 +411,7 @@ void decode_cm_tile(
  */
 void decode_scm(
     ContactMatrixParameters& cm_param,
-    SubcontactMatrixParameters scm_param,
+    SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
     uint32_t bin_size_mult=1
@@ -395,11 +419,33 @@ void decode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Encodes a subcontact matrix.
+ *
+ * This function encodes a subcontact matrix from a contact matrix. The function takes a contact matrix parameters object,
+ * a contact record, and outputs a subcontact matrix parameters object and a subcontact matrix payload. The function also
+ * takes several options to remove unaligned regions, transform masks, enable diagonal transform, enable binarization,
+ * and specify the codec ID. The default values for these options are true, true, true, true, and core::AlgoID::JBIG,
+ * respectively.
+ *
+ *     @param cm_param The contact matrix parameters.
+ *     @param rec The contact record.
+ *     @param scm_param The subcontact matrix parameters.
+ *     @param scm_payload The subcontact matrix payload.
+ *     @param remove_unaligned_region A flag indicating whether to remove unaligned regions. Default is true.
+ *     @param transform_mask A flag indicating whether to transform the mask. Default is true.
+ *     @param ena_diag_transform A flag indicating whether to enable diagonal transform. Default is true.
+ *     @param ena_binarization A flag indicating whether to enable binarization. Default is true.
+ *     @param codec_ID The codec ID. Default is core::AlgoID::JBIG.
+ */
 void encode_scm(
+    // Inputs
     ContactMatrixParameters& cm_param,
     core::record::ContactRecord& rec,
+    // Outputs
     SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
+    // Options
     bool remove_unaligned_region=true,
     bool transform_mask=true,
     bool ena_diag_transform=true,

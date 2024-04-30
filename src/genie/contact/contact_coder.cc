@@ -330,7 +330,7 @@ void sparse_to_dense(
     // Outputs
     UIntMatDtype& mat
 ){
-    // TODO(yeremia): to be deleted (?)
+    // TODO(yeremia): Moves this check somewhere else
     {
         UTILS_DIE_IF(xt::amax(row_ids)(0) >= nrows, "Invalid nrows or row_ids!");
         UTILS_DIE_IF(xt::amax(col_ids)(0) >= ncols, "Invalid ncols or col_ids!");
@@ -344,21 +344,7 @@ void sparse_to_dense(
         auto row_id = row_ids(i);
         auto col_id = col_ids(i);
 
-//        // TODO(yeremia): to be deleted (?)
-//        {
-//            UTILS_DIE_IF(row_id >= nrows, "!");
-//            UTILS_DIE_IF(col_id >= ncols, "!");
-//            UTILS_DIE_IF(count == 0, "!");
-//        }
         mat(row_id, col_id) = count;
-    }
-
-    // TODO(yeremia): to be deleted (?)
-    {
-        UTILS_DIE_IF(
-            xt::sum(xt::greater(mat, 0))(0) != nentries,
-            "Something is wrong with the sparse_to_dense!"
-        );
     }
 }
 
@@ -417,20 +403,20 @@ void sort_by_row_ids(
     counts = tmp_counts;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void comp_start_end_idx(
-    // Inputs
-    size_t nentries,
-    size_t tile_size,
-    size_t tile_idx,
-    // Outputs
-    size_t& start_idx,
-    size_t& end_idx
-){
-    start_idx = tile_idx * tile_size;
-    end_idx = std::min(nentries, start_idx + tile_size);
-}
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//void comp_start_end_idx(
+//    // Inputs
+//    size_t nentries,
+//    size_t tile_size,
+//    size_t tile_idx,
+//    // Outputs
+//    size_t& start_idx,
+//    size_t& end_idx
+//){
+//    start_idx = tile_idx * tile_size;
+//    end_idx = std::min(nentries, start_idx + tile_size);
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -739,7 +725,7 @@ void comp_start_end_ids(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
+// TODO(yeremia): This should be part of LCC?
 void bin_mat_to_bytes(
     // Inputs
     const BinMatDtype& bin_mat,
@@ -768,7 +754,7 @@ void bin_mat_to_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): completely the same as the function with same name in genotype. Move this to somewhere elsee
+// TODO(yeremia): This should be part of LCC?
 void bin_mat_from_bytes(
     // Inputs
     const uint8_t* payload,
@@ -898,7 +884,7 @@ void encode_cm_tile(
 
 void decode_scm(
     ContactMatrixParameters& cm_param,
-    SubcontactMatrixParameters scm_param,
+    SubcontactMatrixParameters& scm_param,
     genie::contact::SubcontactMatrixPayload& scm_payload,
     core::record::ContactRecord& rec,
     uint32_t bin_size_mult
@@ -1084,7 +1070,6 @@ void decode_scm(
     rec.setChr1ID(chr1_ID);
     rec.setChr2ID(chr2_ID);
     rec.setBinSize(bin_size);
-    rec.setChr1ID(chr1_ID);
     rec.SetCMValues(
         std::move(start1),
         std::move(end1),
@@ -1131,7 +1116,7 @@ void encode_scm(
     scm_payload.setChr1ID(chr1_ID);
 
     scm_param.setChr2ID(chr2_ID);
-    scm_payload.setChr2ID(chr1_ID);
+    scm_payload.setChr2ID(chr2_ID);
 
     auto is_intra_scm = scm_param.isIntraSCM();
 
@@ -1159,20 +1144,30 @@ void encode_scm(
             row_mask,
             col_mask
         );
-    }
-//    else {
-//        row_mask = xt::ones<bool>({chr1_num_bin_entries});
-//        col_mask = xt::ones<bool>({chr2_num_bin_entries});
-//    }
 
-    //TODO(yeremia): to be deleted
-//    {
-//        if (is_intra_scm){
-//            UTILS_DIE_IF(row_mask != col_mask, "masks are different!");
-//        }
-//        UTILS_DIE_IF(row_ids.shape(0) == 0, "row_ids is empty?");
-//        UTILS_DIE_IF(col_ids.shape(0) == 0, "col_ids is empty?");
-//    }
+        if (transform_mask){
+            //TODO(yeremia): implement this
+            UTILS_DIE("Not yet implemented!");
+        } else {
+            auto row_mask_payload = SubcontactMatrixMaskPayload(
+                std::move(row_mask)
+            );
+
+            scm_payload.setRowMaskPayload(
+                std::move(row_mask)
+            );
+            scm_param.setRowMaskExistsFlag(true);
+
+            auto col_mask_payload = SubcontactMatrixMaskPayload(
+                std::move(col_mask)
+            );
+
+            scm_payload.setColMaskPayload(
+                std::move(col_mask)
+            );
+            scm_param.setColMaskExistsFlag(true);
+        }
+    }
 
     for (size_t i_tile = 0u; i_tile < ntiles_in_row; i_tile++){
 
@@ -1221,12 +1216,13 @@ void encode_scm(
             auto min_col_id = j_tile*tile_size;
             auto max_col_id = std::min(min_col_id+tile_size, chr2_num_bin_entries);
 
+            // Filter entries that belongs to the current tile
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
 
             //TODO(yeremia): create a pipeline where the whole tile is unaligned
-            UTILS_DIE_IF(xt::sum(xt::cast<uint32_t>(mask))(0) == 0, "There is no entry in tile_mat at all?!");
+            UTILS_DIE_IF(!xt::any(mask), "There is no entry in tile_mat at all?!");
 
             // Filter the values only for the corresponding tile
             UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
@@ -1271,22 +1267,6 @@ void encode_scm(
                 tile_ncols,
                 tile_mat
             );
-
-//            // TODO(yeremia): to be deleted
-//            {
-//                auto tile_num_nz = xt::sum(tile_mat > 0)(0);
-//                auto tile_num_entries = tile_row_ids.shape(0);
-//                UTILS_DIE_IF(tile_num_nz != num_entries, "Somehting is wrong!");
-//
-//                UIntMatDtype orig_tile_mat = tile_mat;
-//                genie::contact::diag_transform(tile_mat, diag_transform_mode);
-//                genie::contact::inverse_diag_transform(tile_mat, diag_transform_mode);
-//
-//                UTILS_DIE_IF(tile_mat != orig_tile_mat, "Something is wronge");
-//                auto num_nz = xt::sum(xt::greater(tile_mat, 0))(0);
-//                auto y = 0;
-//            }
-
             genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
             if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
@@ -1300,74 +1280,16 @@ void encode_scm(
                     tile_payload
                 );
 
-//                // TODO(yeremia): to be deleted
-//                {
-//                    genie::contact::BinMatDtype recon_bin_mat;
-//                    decode_cm_tile(
-//                        tile_payload,
-//                        codec_ID,
-//                        recon_bin_mat
-//                    );
-//
-//                    UTILS_DIE_IF(
-//                        bin_mat != recon_bin_mat,
-//                        "Decode from tile_payload fails!"
-//                    );
-//
-//                    auto num_nz = xt::sum(bin_mat)(0);
-//                    auto y = 0;
-//                }
-
                 scm_payload.setTilePayload(
                     i_tile,
                     j_tile,
                     std::move(tile_payload)
                 );
 
-//                // TODO(yeremia): to be deleted
-//                {
-//                    genie::contact::BinMatDtype recon_bin_mat;
-//                    decode_cm_tile(
-//                        scm_payload.getTilePayload(i_tile, j_tile),
-//                        codec_ID,
-//                        recon_bin_mat
-//                    );
-//
-//                    UTILS_DIE_IF(
-//                        bin_mat != recon_bin_mat,
-//                        "Decode from tile_payload fails!"
-//                    );
-//                }
-
             // BinarizationMode::NONE
             } else {
                 UTILS_DIE("Not yet implemented!");
             }
-        }
-    }
-
-    if (remove_unaligned_region){
-        if (transform_mask){
-            //TODO(yeremia): implement this
-            UTILS_DIE("Not yet implemented!");
-        } else {
-            auto row_mask_payload = SubcontactMatrixMaskPayload(
-                std::move(row_mask)
-            );
-
-            scm_payload.setRowMaskPayload(
-                std::move(row_mask)
-            );
-            scm_param.setRowMaskExistsFlag(true);
-
-            auto col_mask_payload = SubcontactMatrixMaskPayload(
-                std::move(col_mask)
-            );
-
-            scm_payload.setColMaskPayload(
-                std::move(col_mask)
-            );
-            scm_param.setColMaskExistsFlag(true);
         }
     }
 }

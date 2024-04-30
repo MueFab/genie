@@ -133,7 +133,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
             mask_payload_size != mask_payload.getSize(),
             "Invalid mask_payload_size"
         );
-        setRowMaskPayload(std::move(mask_payload));
+        setColMaskPayload(std::move(mask_payload));
     }
 }
 
