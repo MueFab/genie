@@ -113,18 +113,18 @@ void decode_cm_mask_payload(
  *
  * This function iterates over the row and column ID vectors and removes elements that contains no observation
  * according to the given row and column masks. The alignment is determined by the
- * boolean flag is_intra, which specifies whether the operation is intra-chromosome or not.
+ * boolean flag is_intra_tile, which specifies whether the operation is intra-chromosome or not.
  *
  * @param row_ids A reference to the vector of row IDs.
  * @param col_ids A reference to the vector of column IDs.
- * @param is_intra A boolean flag indicating whether the sub-contact matrix is intra-chromosome.
+ * @param is_intra_tile A boolean flag indicating whether the sub-contact matrix is intra-chromosome.
  * @param row_mask A reference to the binary vector representing the row mask.
  * @param col_mask A reference to the binary vector representing the column mask.
  */
 void remove_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    bool is_intra,
+    bool is_intra_tile,
     const BinVecDtype& row_mask,
     const BinVecDtype& col_mask
 );
@@ -136,18 +136,18 @@ void remove_unaligned(
  *
  * This function iterates over the row and column ID vectors and appends elements that are not aligned
  * according to the given row and column masks. The alignment is determined by the
- * boolean flag is_intra, which specifies whether the operation is intra-chromosome or not.
+ * boolean flag is_intra_tile, which specifies whether the operation is intra-chromosome or not.
  *
  * @param row_ids A reference to the vector of row IDs.
  * @param col_ids A reference to the vector of column IDs.
- * @param is_intra A boolean flag indicating whether the sub-contact matrix is intra-chromosome.
+ * @param is_intra_tile A boolean flag indicating whether the sub-contact matrix is intra-chromosome.
  * @param row_mask A reference to the binary vector representing the row mask.
  * @param col_mask A reference to the binary vector representing the column mask.
  */
 void insert_unaligned(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
-    bool is_intra,
+    bool is_intra_tile,
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 );
