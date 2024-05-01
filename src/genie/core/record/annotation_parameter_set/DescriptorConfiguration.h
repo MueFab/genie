@@ -20,7 +20,7 @@
 
 #include "AlgorithmParameters.h"
 #include "ContactMatrixParameters.h"
-#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"

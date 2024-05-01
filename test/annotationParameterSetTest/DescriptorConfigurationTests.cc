@@ -10,7 +10,7 @@
 #include "genie/core/writer.h"
 
 #include "RandomRecordFillIn.h"
-#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/likelihood/likelihood_parameters.h"
 // ---------------------------------------------------------------------------------------------------------------------
