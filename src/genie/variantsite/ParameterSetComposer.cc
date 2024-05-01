@@ -15,7 +15,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
-#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
