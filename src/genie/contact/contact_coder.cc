@@ -432,7 +432,7 @@ void inverse_diag_transform(
         return;  // Do nothing
     } else {
         if (mode == DiagonalTransformMode::MODE_0) {
-            auto nrows = mat.shape(0);
+//            auto nrows = mat.shape(0);
             auto ncols = mat.shape(1);
             auto target_nrows = ncols;
 
@@ -1197,7 +1197,7 @@ void encode_scm(
                         diag_transform_mode = DiagonalTransformMode::MODE_1;
                 } else if (i_tile < j_tile){
                     diag_transform_mode = DiagonalTransformMode::MODE_2;
-                } else if (j_tile > i_tile) {
+                } else if (i_tile > j_tile) {
                     diag_transform_mode = DiagonalTransformMode::MODE_3;
                 } else {
                     UTILS_DIE("This should never be reached!");
@@ -1351,11 +1351,11 @@ void encode_cm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
-    const EncodingOptions& opt,
-    std::vector<core::record::ContactRecord>& recs){
-
-}
+//std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
+//    const EncodingOptions& opt,
+//    std::vector<core::record::ContactRecord>& recs){
+//
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -183,7 +183,7 @@ const TilePayloads& SubcontactMatrixPayload::getTilePayloads() const { return ti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const size_t SubcontactMatrixPayload::getNumNormMatrices() const { return norm_tile_payloads.size(); };
+const size_t SubcontactMatrixPayload::getNumNormMatrices() const { return norm_tile_payloads.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

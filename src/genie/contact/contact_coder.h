@@ -482,10 +482,10 @@ void encode_cm(
  * @param recs A reference to the vector of contact records to be encoded.
  * @return A tuple containing the encoded contact parameters and the encoding block.
  */
-std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
-    const EncodingOptions& opt,
-    std::vector<core::record::ContactRecord>& recs
-);
+//std::tuple<ContactMatrixParameters, EncodingBlock> encode_block(
+//    const EncodingOptions& opt,
+//    std::vector<core::record::ContactRecord>& recs
+//);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
