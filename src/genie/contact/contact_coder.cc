@@ -191,14 +191,14 @@ void remove_unaligned(
         }
 
         for (auto i = 0u; i<num_entries; i++){
-            auto old_id = row_ids(i);
-            auto new_id = mapping(old_id);
-            row_ids(i) = new_id;
+            auto old_row_id = row_ids(i);
+            auto new_row_id = mapping(old_row_id);
+            row_ids(i) = new_row_id;
         }
         for (auto i = 0u; i<num_entries; i++){
-            auto old_id = col_ids(i);
-            auto new_id = mapping(old_id);
-            col_ids(i) = new_id;
+            auto old_col_id = col_ids(i);
+            auto new_col_id = mapping(old_col_id);
+            col_ids(i) = new_col_id;
         }
     } else {
         auto row_mapping_len = row_mask.shape(0);
@@ -215,9 +215,9 @@ void remove_unaligned(
         }
         auto num_entries = row_ids.shape(0);
         for (auto i = 0u; i<num_entries; i++){
-            auto old_id = row_ids(i);
-            auto new_id = row_mapping(old_id);
-            row_ids(i) = new_id;
+            auto old_row_id = row_ids(i);
+            auto new_row_id = row_mapping(old_row_id);
+            row_ids(i) = new_row_id;
         }
 
         auto col_mapping_len = col_mask.shape(0);
@@ -234,9 +234,9 @@ void remove_unaligned(
         }
         num_entries = col_ids.shape(0);
         for (auto i = 0u; i<num_entries; i++){
-            auto old_id = col_ids(i);
-            auto new_id = col_mapping(old_id);
-            col_ids(i) = new_id;
+            auto old_col_id = col_ids(i);
+            auto new_col_id = col_mapping(old_col_id);
+            col_ids(i) = new_col_id;
         }
     }
 
@@ -425,8 +425,8 @@ void inverse_diag_transform(
     DiagonalTransformMode mode
 ){
     UIntMatDtype trans_mat;
-    auto k = 0u;
-    auto l = 0u;
+//    auto k = 0u;
+//    auto l = 0u;
 
     if (mode == DiagonalTransformMode::NONE) {
         return;  // Do nothing
@@ -1216,13 +1216,18 @@ void encode_scm(
             auto min_col_id = j_tile*tile_size;
             auto max_col_id = std::min(min_col_id+tile_size, chr2_num_bin_entries);
 
+            // Compute tile shape
+            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_num_bin_entries) - min_row_id);
+            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_num_bin_entries) - min_col_id);
+
             // Filter entries that belongs to the current tile
             BinVecDtype mask1 = (row_ids >= min_row_id) && (row_ids < max_row_id);
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
 
             //TODO(yeremia): create a pipeline where the whole tile is unaligned
-            UTILS_DIE_IF(!xt::any(mask), "There is no entry in tile_mat at all?!");
+            auto any_entry = xt::any(mask);
+            UTILS_DIE_IF(!any_entry, "There is no entry in tile_mat at all?!");
 
             // Filter the values only for the corresponding tile
             UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
@@ -1230,16 +1235,13 @@ void encode_scm(
             UIntVecDtype tile_counts = xt::filter(counts, mask);
 
             if (min_row_id > 0){
-                auto min_id = xt::amin(tile_row_ids)(0);
+//                auto min_id = xt::amin(tile_row_ids)(0);
                 tile_row_ids -= min_row_id;
             }
             if (min_col_id > 0){
-                auto min_id = xt::amin(tile_col_ids)(0);
+//                auto min_id = xt::amin(tile_col_ids)(0);
                 tile_col_ids -= min_col_id;
             }
-
-            tile_nrows = static_cast<uint32_t>(std::min(max_row_id, chr1_num_bin_entries) - min_row_id);
-            tile_ncols = static_cast<uint32_t>(std::min(max_col_id, chr2_num_bin_entries) - min_col_id);
 
             if (remove_unaligned_region){
                 BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
@@ -1296,58 +1298,58 @@ void encode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void encode_cm(
-    std::list<genie::core::record::ContactRecord>& recs,
-    const EncodingOptions& opt,
-    EncodingBlock& block
-) {
-
-    auto params = ContactMatrixParameters();
-    params.setBinSize(opt.bin_size);
-    params.setTileSize(opt.tile_size);
-    std::map<uint8_t, SampleInformation> samples;
-    std::map<uint8_t, ChromosomeInformation> chrs;
-
-    for (auto& rec: recs){
-        auto rec_bin_size = rec.getBinSize();
-        UTILS_DIE_IF(rec_bin_size != opt.bin_size, "Found record with different bin_size!");
-
-        if (rec.getChr1ID() > rec.getChr2ID())
-            rec.transposeCM();
-
-        uint8_t chr1_ID = rec.getChr1ID();
-        uint8_t chr2_ID = rec.getChr2ID();
-
-        auto sample_name = std::string(rec.getSampleName());
-        params.addSample(rec.getSampleID(), std::move(sample_name));
-        auto chr1_name = std::string(rec.getChr1Name());
-        params.upsertChromosome(
-            chr1_ID,
-            std::move(chr1_name),
-            rec.getChr1Length()
-        );
-        auto chr2_name = std::string(rec.getChr2Name());
-        params.upsertChromosome(
-            chr2_ID,
-            std::move(chr2_name),
-            rec.getChr2Length()
-        );
-
-        auto scm_payload = genie::contact::SubcontactMatrixPayload(
-            0, //TODO(yeremia): change the default parameter_set_ID
-            rec.getSampleID(),
-            chr1_ID,
-            chr2_ID
-        );
-
-//        encode_scm(
-//            codec_ID,
-//            params,
-//            rec,
-//            scm_payload
+//void encode_cm(
+//    std::list<genie::core::record::ContactRecord>& recs,
+//    const EncodingOptions& opt,
+//    EncodingBlock& block
+//) {
+//
+//    auto params = ContactMatrixParameters();
+//    params.setBinSize(opt.bin_size);
+//    params.setTileSize(opt.tile_size);
+//    std::map<uint8_t, SampleInformation> samples;
+//    std::map<uint8_t, ChromosomeInformation> chrs;
+//
+//    for (auto& rec: recs){
+//        auto rec_bin_size = rec.getBinSize();
+//        UTILS_DIE_IF(rec_bin_size != opt.bin_size, "Found record with different bin_size!");
+//
+//        if (rec.getChr1ID() > rec.getChr2ID())
+//            rec.transposeCM();
+//
+//        uint8_t chr1_ID = rec.getChr1ID();
+//        uint8_t chr2_ID = rec.getChr2ID();
+//
+//        auto sample_name = std::string(rec.getSampleName());
+//        params.addSample(rec.getSampleID(), std::move(sample_name));
+//        auto chr1_name = std::string(rec.getChr1Name());
+//        params.upsertChromosome(
+//            chr1_ID,
+//            std::move(chr1_name),
+//            rec.getChr1Length()
 //        );
-    }
-}
+//        auto chr2_name = std::string(rec.getChr2Name());
+//        params.upsertChromosome(
+//            chr2_ID,
+//            std::move(chr2_name),
+//            rec.getChr2Length()
+//        );
+//
+//        auto scm_payload = genie::contact::SubcontactMatrixPayload(
+//            0, //TODO(yeremia): change the default parameter_set_ID
+//            rec.getSampleID(),
+//            chr1_ID,
+//            chr2_ID
+//        );
+//
+////        encode_scm(
+////            codec_ID,
+////            params,
+////            rec,
+////            scm_payload
+////        );
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

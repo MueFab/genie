@@ -18,7 +18,7 @@ namespace contact {
 SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     util::BitReader& reader,
     uint32_t num_bin_entries
-) noexcept {
+) {
     transform_ID = reader.read<TransformID>(TRANSFORM_ID_BLEN);
 
     if (transform_ID == TransformID::ID_0){
@@ -65,7 +65,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 
 SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     BinVecDtype&& _mask_array
-) noexcept
+)
     : transform_ID(TransformID::ID_0),
       mask_array(),
       first_val(),
@@ -80,7 +80,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     TransformID _transform_ID,
     bool _first_val,
     UIntVecDtype& _rl_entries
-) noexcept
+)
     : transform_ID(_transform_ID),
       mask_array(),
       first_val(_first_val)

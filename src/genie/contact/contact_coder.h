@@ -464,11 +464,11 @@ void encode_scm(
  * @param opt A reference to the encoding options that dictate how the block should be encoded.
  * @param block A reference to the encoding block that contains the data to be encoded.
  */
-void encode_cm(
-    ContactRecords& recs,
-    const EncodingOptions& opt,
-    EncodingBlock& block
-);
+//void encode_cm(
+//    ContactRecords& recs,
+//    const EncodingOptions& opt,
+//    EncodingBlock& block
+//);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

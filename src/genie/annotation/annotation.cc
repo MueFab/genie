@@ -96,7 +96,7 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
 
     auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
     auto likelihoodData = genie::likelihood::encode_block(likelihood_opt, recs);
-    auto contactMatrixData = genie::contact::encode_block(contact_opt, recs_cm);
+//    auto contactMatrixData = genie::contact::encode_block(contact_opt, recs_cm);
 
     //--------------------------------------------------
     uint8_t AT_ID = 1;
@@ -108,8 +108,8 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
     genie::genotype::ParameterSetComposer parameterSetComposer;
     parameterSetComposer.setGenotypeParameters(genotypeParameters);
     parameterSetComposer.setLikelihoodParameters(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData));
-    parameterSetComposer.setContactMatrixParameters(
-        std::get<genie::contact::ContactMatrixParameters>(contactMatrixData));
+//    parameterSetComposer.setContactMatrixParameters(
+//        std::get<genie::contact::ContactMatrixParameters>(contactMatrixData));
     parameterSetComposer.setCompressors(compressors);
     annotationParameterSet = parameterSetComposer.Build(AT_ID, datablock.attributeInfo,  recs.size());
     std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
