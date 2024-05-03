@@ -21,7 +21,7 @@
 #include "genie/variantsite/VariantSiteParser.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/contact/subcontact_matrix_payload.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/ParameterSetComposer.h"
