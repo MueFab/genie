@@ -89,7 +89,7 @@ class SubcontactMatrixMaskPayload{
     SubcontactMatrixMaskPayload(
         util::BitReader &reader,
         uint32_t num_bin_entries
-    ) noexcept;
+    );
 
     /**
      * @brief Constructor that takes a mask array.
@@ -100,7 +100,7 @@ class SubcontactMatrixMaskPayload{
      */
     SubcontactMatrixMaskPayload(
         BinVecDtype&& mask_array
-    ) noexcept;
+    );
 
     /**
      * @brief Constructor that takes a transform ID, a boolean value, and a RLE-transformed mask array.
@@ -115,7 +115,7 @@ class SubcontactMatrixMaskPayload{
         TransformID _transform_ID,
         bool _first_val,
         UIntVecDtype& _rl_entries
-    ) noexcept;
+    );
 
     /**
      * @brief Overloaded equality operator.

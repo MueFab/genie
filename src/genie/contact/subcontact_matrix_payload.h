@@ -132,7 +132,7 @@ class SubcontactMatrixPayload {
         util::BitReader &reader,
         ContactMatrixParameters& cm_param,
         const SubcontactMatrixParameters& scm_param
-    ) noexcept;
+    );
 
     //TODO(yeremia): docstring
     bool operator==(

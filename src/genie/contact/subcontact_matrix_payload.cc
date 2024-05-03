@@ -59,7 +59,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     util::BitReader &reader,
     ContactMatrixParameters& cm_param,
     const SubcontactMatrixParameters& scm_param
-) noexcept{
+){
 
     auto MULT = 1u;
 
@@ -127,7 +127,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
         auto mask_payload_size = reader.readBypassBE<uint32_t>();
         auto mask_payload = SubcontactMatrixMaskPayload(
             reader,
-            num_entries
+            static_cast<uint32_t>(num_entries)
         );
         UTILS_DIE_IF(
             mask_payload_size != mask_payload.getSize(),
@@ -379,9 +379,9 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
     }
 
     // TODO (Yeremia): Missing norm_matrices
-    for (auto& v: norm_tile_payloads){
-
-    }
+//    for (auto& v: norm_tile_payloads){
+//
+//    }
 
     if (row_mask_payload.has_value()){
         auto row_mask_payload_size = row_mask_payload->getSize();
