@@ -29,7 +29,7 @@
 #include "genie/entropy/zstd/encoder.h"
 
 #include "genie/annotation/Compressors.h"
-#include "genie/contact/contact_parameters.h"
+#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
