@@ -139,12 +139,7 @@ int mpegg_jbig_compress(
 
     // Resize output
     *dest_len = ftell(fout);
-    *dest = (unsigned char*)realloc(*dest, *dest_len * sizeof(unsigned char));
-    if (dest == NULL){
-            fprintf(stderr, "Problem with resizing");
-            perror("'");
-            exit(1);
-    }
+
 
 #if defined(_WIN32) || defined(_WIN64)
     rewind(fout);
@@ -152,6 +147,13 @@ int mpegg_jbig_compress(
 #endif
     if (ferror(fout) || fclose(fout)) {
         fprintf(stderr, "Problem while writing output file");
+        perror("'");
+        exit(1);
+    }
+
+    *dest = (unsigned char*)realloc(*dest, *dest_len * sizeof(unsigned char));
+    if (dest == NULL){
+        fprintf(stderr, "Problem with resizing");
         perror("'");
         exit(1);
     }

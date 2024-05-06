@@ -187,7 +187,7 @@ class SubcontactMatrixPayload {
    const TilePayloads& getTilePayloads() const;
 
    //TODO(yeremia): docstring
-   const size_t getNumNormMatrices() const;
+   size_t getNumNormMatrices() const;
 
    //TODO(yeremia): docstring
    bool anyRowMaskPayload() const;
