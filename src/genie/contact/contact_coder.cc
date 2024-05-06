@@ -815,6 +815,8 @@ void decode_cm_tile(
             &tile_ncols
         );
 
+        free(compressed_data);
+
         bin_mat_from_bytes(
             raw_data,
             raw_data_len,
@@ -822,7 +824,8 @@ void decode_cm_tile(
             static_cast<size_t>(tile_ncols),
             bin_mat
         );
-        free(compressed_data);
+
+        free(raw_data);
 
     } else {
 
