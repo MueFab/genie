@@ -451,20 +451,26 @@ void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): completely the same as the function with same name in contact. Move this to somewhere elsee
-void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_len) {
+// TODO(yeremia): This should be part of LCC?
+void bin_mat_to_bytes(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
+    uint8_t** payload,
+    size_t& payload_len
+) {
     auto nrows = static_cast<size_t>(bin_mat.shape(0));
     auto ncols = static_cast<size_t>(bin_mat.shape(1));
 
-    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // Ceil div operation
     payload_len = bpl * nrows;
-    *payload = (unsigned char*)calloc(payload_len, sizeof(unsigned char));
+    *payload = (unsigned char*) calloc (payload_len, sizeof(unsigned char));
 
     for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
         for (auto j = 0u; j < ncols; j++) {
-            auto byte_offset = row_offset + (j >> 3);
-            uint8_t shift = (7 - (j & 7));
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
             auto val = static_cast<uint8_t>(bin_mat(i, j));
             val = static_cast<uint8_t>(val << shift);
             *(*payload + byte_offset) |= val;
@@ -475,8 +481,17 @@ void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_l
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO(yeremia): completely the same as the function with same name in contact. Move this to somewhere elsee
-void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols) {
-    auto bpl = (ncols >> 3) + ((ncols & 7) > 0);  // Ceil operation
+void bin_mat_from_bytes(
+    // Inputs
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+) {
+
+    auto bpl = (ncols >> 3u) + ((ncols & 7u) > 0u);  // bytes per line with ceil operation
     UTILS_DIE_IF(payload_len != static_cast<size_t>(nrows * bpl), "Invalid payload_len / nrows / ncols!");
 
     MatShapeDtype bin_mat_shape = {nrows, ncols};
@@ -486,9 +501,9 @@ void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t pay
     for (auto i = 0u; i < nrows; i++) {
         size_t row_offset = i * bpl;
         for (auto j = 0u; j < ncols; j++) {
-            auto byte_offset = row_offset + (j >> 3);
-            uint8_t shift = (7 - (j & 7));
-            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1;
+            auto byte_offset = row_offset + (j >> 3u);
+            uint8_t shift = (7u - (j & 7u));
+            bin_mat(i, j) = (*(payload + byte_offset) >> shift) & 1u;
         }
     }
 }
@@ -527,7 +542,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
-    std::vector<uint8_t> payload
+    std::vector<uint8_t>& payload
 ) {
     uint8_t* raw_data;
     size_t raw_data_len;
@@ -536,7 +551,11 @@ void entropy_encode_bin_mat(
     if (codec_ID == genie::core::AlgoID::BSC) {
     }
 
-    bin_mat_to_bytes(bin_mat, &raw_data, raw_data_len);
+    bin_mat_to_bytes(
+        bin_mat,
+        &raw_data,
+        raw_data_len
+    );
 
     if (codec_ID == genie::core::AlgoID::JBIG) {
         mpegg_jbig_compress_default(&compressed_data, &compressed_data_len, raw_data, raw_data_len,
@@ -550,32 +569,38 @@ void entropy_encode_bin_mat(
 
     free(raw_data);
 
-    //#ifdef DEBUG
-
-    unsigned long nrows;
-    unsigned long ncols;
-
-    mpegg_jbig_decompress_default(&raw_data, &raw_data_len, compressed_data, compressed_data_len, &nrows, &ncols);
-
-    BinMatDtype recon_bin_mat;
-
-    // recon_bin_mat must be initialized first with the correct size
-    bin_mat_from_bytes(recon_bin_mat, raw_data, raw_data_len, nrows, ncols);
-
-    //#endif
-
-    free(compressed_data);
-
-    UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
-    auto equality_check = xt::equal(bin_mat, recon_bin_mat);
-    if (!xt::all(equality_check)) {
-        for (auto i = 0u; i < nrows; i++) {
-            for (auto j = 0u; j < ncols; j++) {
-                auto val = equality_check(i, j);
-                std::cerr << val;
-            }
-        }
-    }
+//    //#ifdef DEBUG
+//
+//    unsigned long nrows;
+//    unsigned long ncols;
+//
+//    mpegg_jbig_decompress_default(&raw_data, &raw_data_len, compressed_data, compressed_data_len, &nrows, &ncols);
+//
+//    BinMatDtype recon_bin_mat;
+//
+//    // recon_bin_mat must be initialized first with the correct size
+//    bin_mat_from_bytes(
+//        raw_data,
+//        raw_data_len,
+//        nrows,
+//        ncols,
+//        recon_bin_mat
+//    );
+//
+//    //#endif
+//
+//    free(compressed_data);
+//
+//    UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
+//    auto equality_check = xt::equal(bin_mat, recon_bin_mat);
+//    if (!xt::all(equality_check)) {
+//        for (auto i = 0u; i < nrows; i++) {
+//            for (auto j = 0u; j < ncols; j++) {
+//                auto val = equality_check(i, j);
+//                std::cerr << val;
+//            }
+//        }
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

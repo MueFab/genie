@@ -758,9 +758,9 @@ void bin_mat_to_bytes(
 void bin_mat_from_bytes(
     // Inputs
     const uint8_t* payload,
-    const size_t payload_len,
-    const size_t nrows,
-    const size_t ncols,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
     // Outputs
     BinMatDtype& bin_mat
 ) {

@@ -396,18 +396,28 @@ TEST(Genotype, Serializer) {
     size_t NROWS = 5;
 
     genie::genotype::BinMatDtype bin_mat;
-    genie::genotype::bin_mat_from_bytes(bin_mat, ORIG_PAYLOAD, ORIG_PAYLOAD_LEN, NROWS, NCOLS);
+    genie::genotype::bin_mat_from_bytes(
+        ORIG_PAYLOAD,
+        ORIG_PAYLOAD_LEN,
+        NROWS,
+        NCOLS,
+        bin_mat
+    );
 
     uint8_t* payload;
     size_t payload_len;
-    genie::genotype::bin_mat_to_bytes(bin_mat, &payload, payload_len);
+    genie::genotype::bin_mat_to_bytes(
+        bin_mat,
+        &payload,
+        payload_len
+    );
 
     ASSERT_EQ(ORIG_PAYLOAD_LEN, payload_len);
     for (size_t i = 0; i < payload_len; i++) {
         ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i));
     }
 
-//    genie::genotype::bin_mat_from_bytes(payload, payload_len, NCOLS, NROWS);
+    free(payload);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -465,6 +475,9 @@ TEST(Genotype, RoundTrip_JBIG) {
         for (size_t i = 0; i < payload_len; i++) {
             ASSERT_EQ(*(payload + i), *(ORIG_PAYLOAD + i)) << "index:" << i;
         }
+
+        free(compressed_data);
+        free(payload);
     }
 
     // TODO(stefanie): Fix this encoding-decoding using stringstream process
