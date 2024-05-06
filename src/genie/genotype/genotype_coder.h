@@ -92,73 +92,109 @@ struct EncodingBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 uint8_t getNumBinMats(const EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::VariantGenotype>& recs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void transform_max_value(Int8MatDtype& allele_mat, bool& no_ref_flag, bool& not_avail_flag);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void inverse_transform_max_val(Int8MatDtype& allele_mat, bool no_ref_flag, bool not_avail_flag);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void binarize_bit_plane(Int8MatDtype& allele_mat, ConcatAxis concat_axis, std::vector<BinMatDtype>& bin_mats, uint8_t& num_bit_planes);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void debinarize_bit_plane(std::vector<BinMatDtype>& bin_mats, uint8_t num_bit_planes, ConcatAxis concat_axis,  Int8MatDtype& allele_mat);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void debinarize_row_bin(std::vector<BinMatDtype>& bin_mat, UIntVecDtype& amax_vec, Int8MatDtype& allele_mat);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void binarize_allele_mat(Int8MatDtype& allele_mat,BinarizationID binarization_ID,ConcatAxis concat_axis,
                          std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec,uint8_t& num_bit_planes);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void sort_matrix(BinMatDtype& bin_mat, const UIntVecDtype& ids, uint8_t axis);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDtype& col_ids, SortingAlgoID sort_row_method,
-                  SortingAlgoID sort_col_method);
+// TODO(yeremia): docstring
+void sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids,
+    SortingAlgoID sort_row_method,
+    SortingAlgoID sort_col_method
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void invert_sort_bin_mat(BinMatDtype& bin_mat,UIntVecDtype& row_ids,UIntVecDtype& col_ids);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO(yeremia): docstring
 void sort_block(const EncodingOptions& opt, EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void bin_mat_to_bytes(BinMatDtype& bin_mat, uint8_t** payload, size_t& payload_len);
+// TODO(yeremia): docstring
+void bin_mat_to_bytes(
+    // Inputs
+    const BinMatDtype& bin_mat,
+    // Outputs
+    uint8_t** payload,
+    size_t& payload_len
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void bin_mat_from_bytes(BinMatDtype& bin_mat, const uint8_t* payload, size_t payload_len, size_t nrows, size_t ncols);
+// TODO(yeremia): docstring
+void bin_mat_from_bytes(
+    // Inputs
+    const uint8_t* payload,
+    size_t payload_len,
+    size_t nrows,
+    size_t ncols,
+    // Outputs
+    BinMatDtype& bin_mat
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -169,7 +205,11 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t> payload);
+void entropy_encode_bin_mat(
+    BinMatDtype& bin_mat,
+    genie::core::AlgoID codec_ID,
+    std::vector<uint8_t>& payload
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
