@@ -76,7 +76,7 @@ void compute_masks(
     UInt64VecDtype& col_ids,
     size_t nrows,
     size_t ncols,
-    const bool is_intra_scm,
+    bool is_intra_scm,
     // Outputs:
     BinVecDtype& row_mask,
     BinVecDtype& col_mask

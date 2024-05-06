@@ -758,9 +758,9 @@ void bin_mat_to_bytes(
 void bin_mat_from_bytes(
     // Inputs
     const uint8_t* payload,
-    size_t payload_len,
-    size_t nrows,
-    size_t ncols,
+    const size_t payload_len,
+    const size_t nrows,
+    const size_t ncols,
     // Outputs
     BinMatDtype& bin_mat
 ) {
@@ -818,8 +818,8 @@ void decode_cm_tile(
         bin_mat_from_bytes(
             raw_data,
             raw_data_len,
-            tile_nrows,
-            tile_ncols,
+            static_cast<size_t>(tile_nrows),
+            static_cast<size_t>(tile_ncols),
             bin_mat
         );
         free(compressed_data);
@@ -838,7 +838,7 @@ void decode_cm_tile(
 void encode_cm_tile(
     // Inputs
     const BinMatDtype& bin_mat,
-    core::AlgoID codec_ID,
+    const core::AlgoID codec_ID,
     // Outputs
     genie::contact::ContactMatrixTilePayload& tile_payload
 ) {
@@ -853,6 +853,18 @@ void encode_cm_tile(
     if (codec_ID == genie::core::AlgoID::JBIG) {
 
         bin_mat_to_bytes(bin_mat, &payload, payload_len);
+
+        //TODO(yeremia): to be deleted!
+        {
+            BinMatDtype recon_bin_mat;
+            bin_mat_from_bytes(payload, payload_len, tile_nrows, tile_ncols, recon_bin_mat);
+            UTILS_DIE_IF(recon_bin_mat != bin_mat, "Different!");
+        }
+   /*     static int i = 0;
+        if (i == 1) {
+            exit(0);
+        }
+        i++;*/
 
         mpegg_jbig_compress_default(
             &compressed_payload,
