@@ -28,11 +28,6 @@ namespace likelihood {
 
 // -----------------------------------------------------------------------------
 
-#define NROWS_NCOLS_LEN 4u
-#define PAYLOAD_SIZE_LEN 4u
-
-// -----------------------------------------------------------------------------
-
 class LikelihoodPayload {
  private:
     uint32_t nrows;

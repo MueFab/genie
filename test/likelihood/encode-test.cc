@@ -203,7 +203,12 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     uint8_t* compressed_data;
     size_t compressed_data_len;
 
-    mpegg_lzma_compress_default(&compressed_data, &compressed_data_len, serialized_mat_payload, serialized_mat_len);
+    mpegg_lzma_compress_default(
+        &compressed_data,
+        &compressed_data_len,
+        serialized_mat_payload,
+        serialized_mat_len
+    );
 
     uint8_t* recon_data;
     size_t recon_data_len;
@@ -214,6 +219,10 @@ TEST(Likelihood, RoundTripNoTransformEncode) {
     for (size_t i = 0; i < recon_data_len; i++) {
         ASSERT_EQ((uint8_t) * (serialized_mat_payload + i), (uint8_t) * (recon_data + i)) << "Index " << i;
     }
+
+    free(serialized_mat_payload);
+    free(compressed_data);
+    free(recon_data);
 }
 
 TEST(Likelihood, RoundTripTransformEncode) {
@@ -274,7 +283,12 @@ TEST(Likelihood, RoundTripTransformEncode) {
     uint8_t* compressed_data;
     size_t compressed_data_len;
 
-    mpegg_lzma_compress_default(&compressed_data, &compressed_data_len, serialized_arr_payload, serialized_arr_len);
+    mpegg_lzma_compress_default(
+        &compressed_data,
+        &compressed_data_len,
+        serialized_arr_payload,
+        serialized_arr_len
+    );
 
     uint8_t* recon_data;
     size_t recon_data_len;
@@ -285,4 +299,8 @@ TEST(Likelihood, RoundTripTransformEncode) {
     for (size_t i = 0; i < recon_data_len; i++) {
         ASSERT_EQ((uint8_t) * (serialized_arr_payload + i), (uint8_t) * (recon_data + i)) << "Index " << i;
     }
+
+    free(serialized_arr_payload);
+    free(compressed_data);
+    free(recon_data);
 }
