@@ -93,15 +93,15 @@ void LikelihoodPayload::setPayload(const std::vector<uint8_t>& _payload) { paylo
 // -----------------------------------------------------------------------------
 
 void LikelihoodPayload::write(core::Writer& writer) const { 
-    writer.write(nrows, 4u << NROWS_NCOLS_LEN);
-    writer.write(ncols, 4u << NROWS_NCOLS_LEN);
+    writer.write(nrows, 32u);
+    writer.write(ncols, 32u);
 
     if (!payload.empty()) {
-        writer.write(payload.size(), 4u << PAYLOAD_SIZE_LEN);
+        writer.write(payload.size(), 32u);
         for(unsigned char i : payload)
             writer.write(i,8);
         if (transform_flag) {
-            writer.write(additionalPayload.size(), 4u << PAYLOAD_SIZE_LEN);
+            writer.write(additionalPayload.size(), 32u);
             for (unsigned char val : additionalPayload)
                 writer.write(val, 8);
         }
