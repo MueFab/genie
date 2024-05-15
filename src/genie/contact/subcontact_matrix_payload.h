@@ -127,14 +127,32 @@ class SubcontactMatrixPayload {
         std::optional<SubcontactMatrixMaskPayload>&& col_mask_payload
     );
 
-    //TODO(yeremia): docstring
+    /**
+    * @brief Constructs a SubcontactMatrixPayload object from a BitReader and initializes it with the given contact matrix parameters and subcontact matrix parameters.
+    *
+    * Initializes the SubcontactMatrixPayload object by reading data from the provided BitReader and sets the contact matrix
+    * parameters and subcontact matrix parameters. This constructor also checks for consistency between the read data and the
+    * provided parameters, and throws an error if they differ.
+    *
+    * @param reader The BitReader object to read data from.
+    * @param cm_param The contact matrix parameters to initialize with.
+    * @param scm_param The subcontact matrix parameters to initialize with.
+    */
     SubcontactMatrixPayload(
         util::BitReader &reader,
         ContactMatrixParameters& cm_param,
         const SubcontactMatrixParameters& scm_param
     );
 
-    //TODO(yeremia): docstring
+    /**
+    * @brief Checks if two SubcontactMatrixPayload objects are equal.
+    *
+    * Compares the current object with the given SubcontactMatrixPayload object for equality.
+    * The comparison includes the parameter set ID, sample ID, chromosome IDs, tile payloads, and row and column mask payloads.
+    *
+    * @param other The SubcontactMatrixPayload object to compare with.
+    * @return True if the objects are equal, otherwise false.
+    */
     bool operator==(
         SubcontactMatrixPayload& other
     );
@@ -186,19 +204,51 @@ class SubcontactMatrixPayload {
     */
    const TilePayloads& getTilePayloads() const;
 
-   //TODO(yeremia): docstring
+   /**
+    * @brief Gets the number of normalization tile payloads.
+    *
+    * Returns the number of normalization tile payloads stored in the SubcontactMatrixPayload object.
+    *
+    * @return The number of normalization tile payloads.
+    */
    size_t getNumNormMatrices() const;
 
-   //TODO(yeremia): docstring
+   /**
+   * @brief Checks if a row mask payload exists.
+   *
+   * Returns true if a row mask payload is present in the SubcontactMatrixPayload object, otherwise false.
+   *
+   * @return True if a row mask payload exists, false otherwise.
+   */
    bool anyRowMaskPayload() const;
 
-   //TODO(yeremia): docstring
+   /**
+   * @brief Gets the row mask payload.
+   *
+   * Returns the row mask payload if it exists, otherwise throws an error.
+   *
+   * @return A constant reference to the row mask payload.
+   * @throws std::runtime_error If the row mask payload does not exist.
+   */
    const SubcontactMatrixMaskPayload& getRowMaskPayload() const;
 
-   //TODO(yeremia): docstring
+   /**
+   * @brief Checks if a column mask payload exists.
+   *
+   * Returns true if a column mask payload is present in the SubcontactMatrixPayload object, otherwise false.
+   *
+   * @return True if a row mask payload exists, false otherwise.
+   */
    bool anyColMaskPayload() const;
 
-   //TODO(yeremia): docstring
+   /**
+   * @brief Gets the column mask payload.
+   *
+   * Returns the column mask payload if it exists, otherwise throws an error.
+   *
+   * @return A constant reference to the column mask payload.
+   * @throws std::runtime_error If the column mask payload does not exist.
+   */
    const SubcontactMatrixMaskPayload& getColMaskPayload() const;
 
    /**
@@ -268,7 +318,16 @@ class SubcontactMatrixPayload {
 
 //   void setColMaskPayload(SubcontactMatrixMaskPayload&& payload);
 
-   //TODO(yeremia): docstring
+   /**
+   * @brief Sets the number of tiles in the SubcontactMatrixPayload and resizes the internal storage accordingly.
+   *
+   * Resizes the tile payloads to accommodate the specified number of tiles in rows and columns.
+   * If free_mem is set to true, it clears the existing tile payloads before resizing.
+   *
+   * @param ntiles_in_row The new number of tiles in a row.
+   * @param ntiles_in_col The new number of tiles in a column.
+   * @param free_mem If true, frees the memory allocated for the current tile payloads before resizing.
+   */
    void setNumTiles(
        size_t ntiles_in_row,
        size_t ntiles_in_col,

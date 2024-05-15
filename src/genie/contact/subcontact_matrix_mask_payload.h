@@ -137,7 +137,13 @@ class SubcontactMatrixMaskPayload{
      */
     TransformID getTransformID() const;
 
-    //TODO(yeremia): create the docstring
+    /**
+    * @brief Checks if a mask array exists.
+    *
+    * Returns true if a mask array is present in the SubcontactMatrixMaskPayload object, otherwise false.
+    *
+    * @return True if a mask array exists, false otherwise.
+    */
     bool anyMaskArray() const;
 
     /**
@@ -158,7 +164,13 @@ class SubcontactMatrixMaskPayload{
      */
     bool getFirstVal() const;
 
-    //TODO(yeremia): create the docstring
+    /**
+     * @brief Checks if run-length encoded entries exist.
+     *
+     * Returns true if run-length encoded entries are present in the SubcontactMatrixMaskPayload object, false otherwise.
+     *
+     * @return True if run-length encoded entries exist, false otherwise.
+     */
     bool anyRLEntries() const;
 
     /**
