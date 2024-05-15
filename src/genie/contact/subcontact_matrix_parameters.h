@@ -136,8 +136,12 @@ class SubcontactMatrixParameters {
 
     core::AlgoID getCodecID() const;
 
-    //TODO(yeremia): Create docstring
 //    const std::vector<std::vector<TileParameter>>& getTileParameters() const;
+     /**
+     * returns a constant reference to the tile parameters.
+     *
+     * @return A constant reference to TileParameter.
+     */
     const TileParameters& getTileParameters() const;
 
     /**
@@ -215,20 +219,40 @@ class SubcontactMatrixParameters {
      */
     void setColMaskExistsFlag(bool flag);
 
-    //TODO(yeremia): docstring
+    /**
+    * @brief Sets the number of tiles in the subcontact matrix parameters and resizes the internal storage accordingly.
+    *
+    * @param ntiles_in_row The new number of tiles in a row.
+    * @param ntiles_in_col The new number of tiles in a column.
+    * @param free_mem If true, frees the memory allocated for the current tile parameters before resizing.
+    */
     void setNumTiles(
         size_t ntiles_in_row,
         size_t ntiles_in_col,
         bool free_mem=true
     );
 
-    //TODO(yeremia): docstring
+    /**
+    * @brief Retrieves a tile parameter from the subcontact matrix parameters.
+    *
+    * @param i_tile The row index of the tile parameter.
+    * @param j_tile The column index of the tile parameter.
+    * @return A reference to the tile parameter at the specified indices.
+    * @throws std::runtime_error If i_tile is out of bounds (i.e., i_tile >= getNTilesInRow()) or j_tile is out of bounds (i.e., j_tile >= getNTilesInCol()).
+    * @throws std::runtime_error If i_tile > j_tile and isIntraSCM() is true, indicating an attempt to access the lower triangle of an intra SCM, which is not allowed.
+    */
     TileParameter& getTileParameter(
         size_t i_tile,
         size_t j_tile
     );
 
-    //TODO(yeremia): docstring
+    /**
+     * This method sets the tile parameter for the tile in the position i and j.
+     *
+     * @param i_tile index of the tile in the row
+     * @param j_tile index of the tile in the column
+     * @param tile_parameter
+     */
     void setTileParameter(
         size_t i_tile,
         size_t j_tile,

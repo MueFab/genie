@@ -84,7 +84,18 @@ void compute_masks(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): create the docstring
+/**
+* @brief Decodes the row and column masks from a SubcontactMatrixPayload.
+*
+* Decodes the row and column masks from the given SubcontactMatrixPayload and stores them in the output vectors.
+* If a mask does not exist, it is set to a vector of ones.
+*
+* @param cm_param The contact matrix parameters.
+* @param scm_param The subcontact matrix parameters.
+* @param scm_payload The subcontact matrix payload to decode masks from.
+* @param row_mask The output vector for the row mask.
+* @param col_mask The output vector for the column mask.
+*/
 void decode_cm_masks(
     // Inputs
     ContactMatrixParameters& cm_param,
@@ -97,7 +108,18 @@ void decode_cm_masks(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO(yeremia): create the docstring
+/**
+ * @brief Decodes a mask payload into a binary vector.
+ *
+ * Decodes the mask payload into a binary vector based on the transform ID.
+ * If the transform ID is 0, it directly copies the mask array.
+ * Otherwise, it decodes the run-length encoded entries and assigns the values accordingly.
+ *
+ * @param mask_payload The mask payload to decode.
+ * @param num_entries The number of entries in the output mask.
+ * @param mask The output binary vector for the decoded mask.
+ * @throws std::runtime_error If the number of entries and the size of the mask array differ, or if the start index exceeds the number of entries.
+ */
 void decode_cm_mask_payload(
     // Inputs
     const SubcontactMatrixMaskPayload& mask_payload,
@@ -377,7 +399,17 @@ void bin_mat_from_bytes(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO(yeremia): docstring
+/**
+ * @brief Encodes a binary matrix into a ContactMatrixTilePayload.
+ *
+ * Encodes the binary matrix using the specified codec ID and stores the result in the output tile payload.
+ * Currently, only JBIG codec is supported.
+ *
+ * @param bin_mat The binary matrix to encode.
+ * @param codec_ID The codec ID to use for encoding.
+ * @param tile_payload The output ContactMatrixTilePayload object.
+ * @throws std::runtime_error If the codec ID is not JBIG.
+ */
 void encode_cm_tile(
     // Inputs
     const BinMatDtype& bin_mat,
@@ -388,8 +420,17 @@ void encode_cm_tile(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-// TODO(yeremia): docstring
+/**
+ * @brief Decodes a ContactMatrixTilePayload into a binary matrix.
+ *
+ * Decodes the tile payload using the specified codec ID and stores the result in the output binary matrix.
+ * Currently, only JBIG codec is supported.
+ *
+ * @param tile_payload The ContactMatrixTilePayload object to decode.
+ * @param codec_ID The codec ID to use for decoding.
+ * @param bin_mat The output binary matrix.
+ * @throws std::runtime_error If the codec ID is not JBIG.
+ */
 void decode_cm_tile(
     // Inputs
     const genie::contact::ContactMatrixTilePayload& tile_payload,

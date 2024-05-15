@@ -145,19 +145,45 @@ class ContactMatrixParameters {
      */
     const std::unordered_map<uint8_t, SampleInformation>& getSamples() const;
 
-    // TODO(yeremia): docstring
+    /**
+    * @brief Gets the sample name corresponding to the given sample ID.
+    *
+    * Retrieves the sample name from the sample information map using the provided sample ID.
+    *
+    * @param _sample_ID The sample ID to retrieve the name for.
+    * @return A constant reference to the sample name.
+    * @throws std::runtime_error If the sample ID does not exist in the sample information map.
+    */
     const std::string& getSampleName(
         uint8_t
     ) const;
 
-    // TODO(yeremia): docstring
+    /**
+    * @brief Upserts a sample in the contact matrix parameters.
+    *
+    * Inserts or updates a sample with the given ID and name in the sample information map.
+    *
+    * @param ID The sample ID to upsert.
+    * @param name The sample name to upsert.
+    * @param exist_ok If true, allows the sample to be updated if it already exists.
+    */
     void upsertSample(
         uint8_t ID,
         const std::string& name,
         bool exist_ok=true
     );
 
-    // TODO(yeremia): docstring
+    /**
+    * @brief Upserts a sample in the contact matrix parameters.
+    *
+    * Inserts or updates a sample with the given ID and name in the chromosome information map.
+    * If the sample ID does not exist, it is inserted. If it exists, the name is updated if exist_ok is true, otherwise an error is thrown.
+    *
+    * @param ID The sample ID to upsert.
+    * @param name The sample name to upsert.
+    * @param exist_ok If true, allows the sample to be updated if it already exists.
+    * @throws std::runtime_error If the sample ID already exists and exist_ok is false.
+    */
     void upsertSample(
         uint8_t ID,
         std::string&& name,
@@ -215,7 +241,15 @@ class ContactMatrixParameters {
      */
     const std::unordered_map<uint8_t, ChromosomeInformation>& getChromosomes() const;
 
-    // TODO(yeremia): docstring
+    /**
+    * @brief Gets the length of a chromosome.
+    *
+    * Retrieves the length of the chromosome with the given ID from the chromosome information map.
+    *
+    * @param chr_ID The chromosome ID to retrieve the length for.
+    * @return The length of the chromosome.
+    * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
+    */
     uint64_t getChromosomeLength(
         uint8_t chr_ID
     ) const;
@@ -265,7 +299,15 @@ class ContactMatrixParameters {
      */
     uint8_t getNumBinSizeMultipliers() const;
 
-    // TODO(yeremia): doscstring
+    /**
+    * @brief Gets the length of a chromosome.
+    *
+    * Retrieves the length of the chromosome with the given ID from the chromosome information map.
+    *
+    * @param chr_ID The chromosome ID to retrieve the length for.
+    * @return The length of the chromosome.
+    * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
+    */
     bool isBinSizeMultiplierValid(
         size_t target_interv_mult
     ) const;
