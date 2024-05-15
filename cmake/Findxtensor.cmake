@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
     xtensor
     GIT_REPOSITORY https://www.github.com/xtensor-stack/xtensor
-    GIT_TAG e534928cc30eb3a4a05539747d98e1d6868c2d62 # v0.24.6
+    GIT_TAG d9c3782ed51027b2d00be3c26288b2f74e4dbe94 # v0.25.0
 )
 
 FetchContent_MakeAvailable(xtensor)
