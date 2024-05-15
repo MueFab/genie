@@ -228,19 +228,6 @@ void dense_to_sparse(
     UIntVecDtype& counts
 );
 
-//// ---------------------------------------------------------------------------------------------------------------------
-//
-//// TODO(yeremia): docstring
-//void comp_start_end_idx(
-//    // Inputs
-//    size_t nentries,
-//    size_t tile_size,
-//    size_t tile_idx,
-//    // Outputs
-//    size_t& start_idx,
-//    size_t& end_idx
-//);
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**

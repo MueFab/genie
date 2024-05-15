@@ -403,21 +403,6 @@ void sort_by_row_ids(
     counts = tmp_counts;
 }
 
-//// ---------------------------------------------------------------------------------------------------------------------
-//
-//void comp_start_end_idx(
-//    // Inputs
-//    size_t nentries,
-//    size_t tile_size,
-//    size_t tile_idx,
-//    // Outputs
-//    size_t& start_idx,
-//    size_t& end_idx
-//){
-//    start_idx = tile_idx * tile_size;
-//    end_idx = std::min(nentries, start_idx + tile_size);
-//}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 void inverse_diag_transform(
