@@ -277,9 +277,6 @@ class SubcontactMatrixParameters {
      */
     size_t getNTilesInCol() const;
 
-    //TODO(yeremia): docstring
-    bool getEnaTransform() const;
-
     /**
      * @brief Check if the subcontact matrix is symmetrical.
      *
