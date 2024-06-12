@@ -1083,12 +1083,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         {
             genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
-            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1)) << xt::filter(START1, xt::not_equal(START1, recon_start1)) << xt::filter(recon_start1, xt::not_equal(START1, recon_start1));
         }
         {
             genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
             genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
-            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1)) << xt::filter(END1, xt::not_equal(END1, recon_end1)) << xt::filter(recon_end1, xt::not_equal(END1, recon_end1));
         }
         {
             genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
@@ -1543,7 +1543,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         {
             genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
-            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+            auto mask = xt::not_equal(START1, recon_start1);
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1)) << xt::filter(START1, mask) << xt::filter(recon_start1, mask);
         }
         {
             genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
