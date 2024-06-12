@@ -954,6 +954,10 @@ void decode_scm(
             auto diag_transform_mode = tile_param.diag_tranform_mode;
             bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
 
+            if (tile_payload.getPayloadSize() == 0){
+                continue;
+            }
+
             if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
                 BinMatDtype bin_mat;
 
@@ -1247,69 +1251,76 @@ void encode_scm(
 
             //TODO(yeremia): create a pipeline where the whole tile is unaligned
             auto any_entry = xt::any(mask);
-            UTILS_DIE_IF(!any_entry, "There is no entry in tile_mat at all?!");
+//            UTILS_DIE_IF(!any_entry, "There is no entry in tile_mat at all?!");
+            if (any_entry){
+                // Filter the values only for the corresponding tile
+                UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
+                UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
+                UIntVecDtype tile_counts = xt::filter(counts, mask);
 
-            // Filter the values only for the corresponding tile
-            UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
-            UInt64VecDtype tile_col_ids = xt::filter(col_ids, mask);
-            UIntVecDtype tile_counts = xt::filter(counts, mask);
+                if (min_row_id > 0){
+                    tile_row_ids -= min_row_id;
+                }
+                if (min_col_id > 0){
+                    tile_col_ids -= min_col_id;
+                }
 
-            if (min_row_id > 0){
-                tile_row_ids -= min_row_id;
-            }
-            if (min_col_id > 0){
-                tile_col_ids -= min_col_id;
-            }
+                if (remove_unaligned_region){
+                    BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
+                    BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
 
-            if (remove_unaligned_region){
-                BinVecDtype tile_row_mask = xt::view(row_mask, xt::range(min_row_id, max_row_id));
-                BinVecDtype tile_col_mask = xt::view(col_mask, xt::range(min_col_id, max_col_id));
+                    remove_unaligned(
+                        tile_row_ids,
+                        tile_col_ids,
+                        is_intra_tile,
+                        tile_row_mask,
+                        tile_col_mask
+                    );
 
-                remove_unaligned(
+                }
+
+                UIntMatDtype tile_mat;
+
+                //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
+                //               better for no transformation compression
+                sparse_to_dense(
                     tile_row_ids,
                     tile_col_ids,
-                    is_intra_tile,
-                    tile_row_mask,
-                    tile_col_mask
+                    tile_counts,
+                    tile_nrows,
+                    tile_ncols,
+                    tile_mat
                 );
+                genie::contact::diag_transform(tile_mat, diag_transform_mode);
 
-            }
+                if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
+                    genie::contact::BinMatDtype bin_mat;
+                    genie::contact::transform_row_bin(tile_mat, bin_mat);
 
-            UIntMatDtype tile_mat;
+                    ContactMatrixTilePayload tile_payload;
+                    encode_cm_tile(
+                        bin_mat,
+                        codec_ID,
+                        tile_payload
+                    );
 
-            //TODO(yeremia): Create a specification where sparse2dense transformation is disabled
-            //               better for no transformation compression
-            sparse_to_dense(
-                tile_row_ids,
-                tile_col_ids,
-                tile_counts,
-                tile_nrows,
-                tile_ncols,
-                tile_mat
-            );
-            genie::contact::diag_transform(tile_mat, diag_transform_mode);
+                    scm_payload.setTilePayload(
+                        i_tile,
+                        j_tile,
+                        std::move(tile_payload)
+                    );
 
-            if (binarization_mode == BinarizationMode::ROW_BINARIZATION){
-                genie::contact::BinMatDtype bin_mat;
-                genie::contact::transform_row_bin(tile_mat, bin_mat);
+                // BinarizationMode::NONE
+                } else {
+                    UTILS_DIE("Not yet implemented!");
+                }
 
-                ContactMatrixTilePayload tile_payload;
-                encode_cm_tile(
-                    bin_mat,
-                    codec_ID,
-                    tile_payload
-                );
-
-                scm_payload.setTilePayload(
-                    i_tile,
-                    j_tile,
-                    std::move(tile_payload)
-                );
-
-            // BinarizationMode::NONE
+            // There is no entry found in the current tile
             } else {
-                UTILS_DIE("Not yet implemented!");
+                std::vector<uint8_t> codec_payload;
+                ContactMatrixTilePayload tile_payload(core::AlgoID::JBIG, 0, 0, std::move(codec_payload));
             }
+
         }
     }
 }

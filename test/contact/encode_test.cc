@@ -832,8 +832,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
         auto& REC = RECS.front();
         auto rec = genie::core::record::ContactRecord(REC);
-        genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, REMOVE_UNALIGNED_REGION, TRANSFORM_MASK,
-                                   ENA_DIAG_TRANSFORM, ENA_BINARIZATION, CODEC_ID);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            CODEC_ID
+        );
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -853,13 +862,18 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
         auto recon_rec = genie::core::record::ContactRecord();
 
-        decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
 
         ASSERT_EQ(recon_rec.getNumEntries(), 9812u);
         {
             genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
-            genie::contact::UInt64VecDtype recon_start1 =
-                xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
             ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
         }
         {
@@ -869,8 +883,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         }
         {
             genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
-            genie::contact::UInt64VecDtype recon_start2 =
-                xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
             ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
         }
         {
@@ -923,8 +936,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
         auto& REC = RECS.front();
         auto rec = genie::core::record::ContactRecord(REC);
-        genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, REMOVE_UNALIGNED_REGION, TRANSFORM_MASK,
-                                   ENA_DIAG_TRANSFORM, ENA_BINARIZATION, CODEC_ID);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            CODEC_ID
+        );
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -949,8 +971,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         ASSERT_EQ(recon_rec.getNumEntries(), 9812u);
         {
             genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
-            genie::contact::UInt64VecDtype recon_start1 =
-                xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
             ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
         }
         {
@@ -960,8 +981,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         }
         {
             genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
-            genie::contact::UInt64VecDtype recon_start2 =
-                xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
             ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
         }
         {
@@ -1466,7 +1486,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
         auto CODEC_ID = genie::core::AlgoID::JBIG;
-        auto TILE_SIZE = 300u;
+        auto TILE_SIZE = 150u;
         auto MULT = 1u;
 
         auto cm_param = genie::contact::ContactMatrixParameters();
@@ -1575,7 +1595,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
         auto CODEC_ID = genie::core::AlgoID::JBIG;
-        auto TILE_SIZE = 300u;
+        auto TILE_SIZE = 150u;
         auto MULT = 1u;
 
         auto cm_param = genie::contact::ContactMatrixParameters();
