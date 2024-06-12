@@ -208,7 +208,11 @@ void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_ma
  * @param amax_vec The input vector of maximum values for each row.
  * @param allele_mat The output allele matrix.
  */
-void debinarize_row_bin(std::vector<BinMatDtype>& bin_mat, UIntVecDtype& amax_vec, Int8MatDtype& allele_mat);
+void debinarize_row_bin(
+    std::vector<BinMatDtype>& bin_mat,
+    UIntVecDtype& amax_vec,
+    Int8MatDtype& allele_mat
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -225,8 +229,14 @@ void debinarize_row_bin(std::vector<BinMatDtype>& bin_mat, UIntVecDtype& amax_ve
  * @param num_bit_planes The output number of bit planes (for BIT_PLANE binarization).
  * @throws std::runtime_error If the binarization ID is invalid.
  */
-void binarize_allele_mat(Int8MatDtype& allele_mat,BinarizationID binarization_ID,ConcatAxis concat_axis,
-                         std::vector<BinMatDtype>& bin_mats, UIntVecDtype& amax_vec,uint8_t& num_bit_planes);
+void binarize_allele_mat(
+    Int8MatDtype& allele_mat,
+    BinarizationID binarization_ID,
+    ConcatAxis concat_axis,
+    std::vector<BinMatDtype>& bin_mats,
+    UIntVecDtype& amax_vec,
+    uint8_t& num_bit_planes
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -240,7 +250,11 @@ void binarize_allele_mat(Int8MatDtype& allele_mat,BinarizationID binarization_ID
  * @param axis The axis to sort along (0 for rows, 1 for columns).
  * @throws std::runtime_error If the axis value is invalid or the dimensions of bin_mat and ids do not match.
  */
-void sort_matrix(BinMatDtype& bin_mat, const UIntVecDtype& ids, uint8_t axis);
+void sort_matrix(
+    BinMatDtype& bin_mat,
+    const UIntVecDtype& ids,
+    uint8_t axis
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -254,7 +268,11 @@ void sort_matrix(BinMatDtype& bin_mat, const UIntVecDtype& ids, uint8_t axis);
  * @param axis The axis to sort along (0 for rows, 1 for columns).
  * @throws std::runtime_error If the axis value is invalid.
  */
-void random_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& ids, uint8_t axis);
+void random_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& ids,
+    uint8_t axis
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -289,7 +307,11 @@ void sort_bin_mat(
  * @param row_ids The IDs to invert for row sorting.
  * @param col_ids The IDs to invert for column sorting.
  */
-void invert_sort_bin_mat(BinMatDtype& bin_mat,UIntVecDtype& row_ids,UIntVecDtype& col_ids);
+void invert_sort_bin_mat(
+    BinMatDtype& bin_mat,
+    UIntVecDtype& row_ids,
+    UIntVecDtype& col_ids
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -301,7 +323,10 @@ void invert_sort_bin_mat(BinMatDtype& bin_mat,UIntVecDtype& row_ids,UIntVecDtype
  * @param opt The encoding options.
  * @param block The encoding block to sort.
  */
-void sort_block(const EncodingOptions& opt, EncodingBlock& block);
+void sort_block(
+    const EncodingOptions& opt,
+    EncodingBlock& block
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -349,9 +374,13 @@ void bin_mat_from_bytes(
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
-void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size,
-                 std::map<std::string, core::record::annotation_parameter_set::AttributeData>& info,
-                 std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values);
+void sort_format(
+    const std::vector<core::record::VariantGenotype>& recs,
+    size_t block_size,
+    std::map<std::string,
+    core::record::annotation_parameter_set::AttributeData>& info,
+    std::map<std::string, std::vector<std::vector<std::vector<AttrType>>>>& values
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -363,8 +392,10 @@ void entropy_encode_bin_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<GenotypeParameters, EncodingBlock> encode_block(const EncodingOptions& opt,
-                                                           std::vector<core::record::VariantGenotype>& recs);
+std::tuple<GenotypeParameters, EncodingBlock> encode_block(
+    const EncodingOptions& opt,
+    std::vector<core::record::VariantGenotype>& recs
+);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
