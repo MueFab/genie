@@ -1026,58 +1026,61 @@ void decode_scm(
                 tile_col_ids += start2_idx;
             }
 
-            //TODO(yeremia): Assign directly to std::vector instead of using xt::concatenate
-//            auto curr_num_entries = counts.size();
-//            auto tile_num_entries = tile_counts.shape(0);
-//
-//            start1.resize(curr_num_entries + tile_num_entries);
-//            end1.resize(curr_num_entries + tile_num_entries);
-//            start2.resize(curr_num_entries + tile_num_entries);
-//            end2.resize(curr_num_entries + tile_num_entries);
-//            counts.resize(curr_num_entries + tile_num_entries);
-//
-//            for (auto i=curr_num_entries; i<curr_num_entries+tile_num_entries; i++){
-//                start1[i] = tile_row_ids(i) * target_bin_size;
-//                end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
-//                start2[i] = tile_col_ids(i) * target_bin_size;
-//                end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
-//                counts[i] = tile_counts(i);
-//            }
+            auto curr_num_entries = counts.size();
+            auto tile_num_entries = tile_counts.shape(0);
 
-            // Not in the specification
-            // This is just for the concatenation
-            if (i_tile == 0 && j_tile == 0){
-                row_ids = tile_row_ids;
-                col_ids = tile_col_ids;
-                _counts = tile_counts;
-            } else {
-                // Concatenation anc assignment have to be in separate lines or expresion
-                UInt64VecDtype c_row_ids = xt::concatenate(xt::xtuple(row_ids, tile_row_ids));
-                UInt64VecDtype c_col_ids = xt::concatenate(xt::xtuple(col_ids, tile_col_ids));
-                UInt64VecDtype c_counts = xt::concatenate(xt::xtuple(_counts, tile_counts));
-                row_ids = c_row_ids;
-                col_ids = c_col_ids;
-                _counts = c_counts;
+            start1.resize(curr_num_entries + tile_num_entries);
+            end1.resize(curr_num_entries + tile_num_entries);
+            start2.resize(curr_num_entries + tile_num_entries);
+            end2.resize(curr_num_entries + tile_num_entries);
+            counts.resize(curr_num_entries + tile_num_entries);
+
+            for (auto i_entry = 0u; i_entry < tile_num_entries; i_entry++){
+                auto start1_val = tile_row_ids(i_entry) * target_bin_size;
+                start1[i_entry+curr_num_entries] = start1_val;
+                end1[i_entry+curr_num_entries] = std::min(start1_val + target_bin_size, chr1_len);
+
+                auto start2_val = tile_col_ids(i_entry) * target_bin_size;
+                start2[i_entry+curr_num_entries] = start2_val;
+                end2[i_entry+curr_num_entries] = std::min(start2_val + target_bin_size, chr2_len);
+
+                counts[i_entry+curr_num_entries] = tile_counts(i_entry);
             }
+
+//            // Not in the specification
+//            // This is just for the concatenation
+//            if (i_tile == 0 && j_tile == 0){
+//                row_ids = tile_row_ids;
+//                col_ids = tile_col_ids;
+//                _counts = tile_counts;
+//            } else {
+//                // Concatenation anc assignment have to be in separate lines or expresion
+//                UInt64VecDtype c_row_ids = xt::concatenate(xt::xtuple(row_ids, tile_row_ids));
+//                UInt64VecDtype c_col_ids = xt::concatenate(xt::xtuple(col_ids, tile_col_ids));
+//                UInt64VecDtype c_counts = xt::concatenate(xt::xtuple(_counts, tile_counts));
+//                row_ids = c_row_ids;
+//                col_ids = c_col_ids;
+//                _counts = c_counts;
+//            }
 
         }
     }
 
-    // Not in the specification
-    auto num_entries = _counts.shape(0);
-    start1.resize(num_entries);
-    end1.resize(num_entries);
-    start2.resize(num_entries);
-    end2.resize(num_entries);
-    counts.resize(num_entries);
-
-    for (auto i=0u; i<num_entries; i++){
-        start1[i] = row_ids(i) * target_bin_size;
-        end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
-        start2[i] = col_ids(i) * target_bin_size;
-        end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
-        counts[i] = _counts(i);
-    }
+//    // Not in the specification
+//    auto num_entries = _counts.shape(0);
+//    start1.resize(num_entries);
+//    end1.resize(num_entries);
+//    start2.resize(num_entries);
+//    end2.resize(num_entries);
+//    counts.resize(num_entries);
+//
+//    for (auto i=0u; i<num_entries; i++){
+//        start1[i] = row_ids(i) * target_bin_size;
+//        end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
+//        start2[i] = col_ids(i) * target_bin_size;
+//        end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
+//        counts[i] = _counts(i);
+//    }
 
     auto sample_ID = scm_payload.getSampleID();
     rec.setSampleID(sample_ID);
