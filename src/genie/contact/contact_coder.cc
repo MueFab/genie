@@ -1081,9 +1081,8 @@ void decode_scm(
 
     auto sample_ID = scm_payload.getSampleID();
     rec.setSampleID(sample_ID);
-    //TODO(yeremia): fix this
-//    auto sample_name = std::string(cm_param.getSampleName(sample_ID));
-//    rec.setSampleName(std::move(sample_name));
+    auto sample_name = std::string(cm_param.getSampleName(sample_ID));
+    rec.setSampleName(std::move(sample_name));
     rec.setChr1ID(chr1_ID);
     rec.setChr2ID(chr2_ID);
     rec.setBinSize(bin_size);
@@ -1127,6 +1126,7 @@ void encode_scm(
     auto chr2_num_bin_entries = cm_param.getNumBinEntries(chr2_ID);
     auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
 
+    cm_param.upsertSample(rec.getSampleID(), rec.getSampleName());
     scm_payload.setSampleID(rec.getSampleID());
 
     scm_param.setChr1ID(chr1_ID);
