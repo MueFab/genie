@@ -199,7 +199,7 @@ void ContactMatrixParameters::upsertSample(
 
     auto _name = std::string(name);
 
-    upsertChromosome(
+    upsertSample(
         ID,
         std::move(_name),
         exist_ok
@@ -214,10 +214,10 @@ void ContactMatrixParameters::upsertSample(
     bool exist_ok
 ){
 
-    auto it = chr_infos.find(ID);
-    if (it == chr_infos.end()){
-        ChromosomeInformation chr_info = {ID, std::move(name)};
-        chr_infos.emplace(ID, std::move(chr_info));
+    auto it = sample_infos.find(ID);
+    if (it == sample_infos.end()){
+        SampleInformation sample_info = {ID, std::move(name)};
+        sample_infos.emplace(ID, std::move(sample_info));
     } else if (exist_ok){
         it->second.name = std::move(name);
 
