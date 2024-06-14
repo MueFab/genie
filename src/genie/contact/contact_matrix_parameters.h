@@ -219,7 +219,7 @@ class ContactMatrixParameters {
      *
      * @param ID The ID of the chromosome.
      * @param name The name of the chromosome.
-     * @param length The length
+     * @param length The length of the chromosome
      *  @param exist_ok If true, allows the upsert if the chromosome already exists.
      */
     void upsertChromosome(
@@ -411,7 +411,7 @@ class ContactMatrixParameters {
      *
      * @return The size of the object when written to the writer.
      */
-    size_t getSize(core::Writer& writesize) const;
+    size_t getSize() const;
 
     /**
      * @brief Writes the object to a writer.

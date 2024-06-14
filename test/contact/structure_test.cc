@@ -342,23 +342,60 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
-    auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
-//    auto SAMPLE1_ID = 10u;
-    auto SAMPLE1_NAME = std::string("SAMPLE1");
-//    auto SAMPLE2_ID = 20u;
-    auto SAMPLE2_NAME = std::string("SAMPLE2");
+    {
+        auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
+        auto SAMPLE1_ID = 10u;
+        auto SAMPLE1_NAME = std::string("SAMPLE1");
+        auto SAMPLE2_ID = 20u;
+        auto SAMPLE2_NAME = std::string("SAMPLE2");
 
-//    auto CHR1_ID = 30u;
-    auto CHR1_NAME = std::string("CHR1");
-//    auto CHR1_LEN = 70u;
-//    auto CHR2_ID = 40u;
-    auto CHR2_NAME = std::string(CHR1_NAME);
-//    auto CHR2_LEN = CHR1_LEN;
+        constexpr auto CHR1_ID = 30u;
+        constexpr auto CHR1_NAME = "CHR1";
+        constexpr auto CHR1_LEN = 70u;
+        constexpr auto CHR2_ID = 40u;
+        constexpr auto CHR2_NAME = "CHR2";
+        constexpr auto CHR2_LEN = CHR1_LEN;
 
-//    auto BIN_SIZE = 5u;
-//    auto TILE_SIZE = 5u;
+        auto BIN_SIZE = 5u;
+        auto TILE_SIZE = 5u;
 
-    //TODO(yeremia): Complete this unit test!
+        uint32_t MULTIPLIER = 1u;
+
+        auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
+        ORIG_CM_PARAM.upsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
+        ORIG_CM_PARAM.upsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
+        ORIG_CM_PARAM.setBinSize(BIN_SIZE);
+        ORIG_CM_PARAM.setTileSize(TILE_SIZE);
+        ORIG_CM_PARAM.addSample(SAMPLE1_ID, std::string(SAMPLE1_NAME), true);
+        ORIG_CM_PARAM.addSample(SAMPLE2_ID, std::string(SAMPLE2_NAME), true);
+
+        ASSERT_EQ(ORIG_CM_PARAM.getBinSize(), BIN_SIZE);
+        ASSERT_EQ(ORIG_CM_PARAM.getTileSize(), TILE_SIZE);
+        ASSERT_EQ(ORIG_CM_PARAM.getNumSamples(), 2u);
+        ASSERT_EQ(ORIG_CM_PARAM.getChromosomeLength(CHR1_ID), CHR1_LEN);
+        ASSERT_EQ(ORIG_CM_PARAM.getChromosomeLength(CHR2_ID), CHR2_LEN);
+        ASSERT_EQ(ORIG_CM_PARAM.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
+        ASSERT_EQ(ORIG_CM_PARAM.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+
+        std::stringstream obj_payload;
+        std::ostream& writer = obj_payload;
+        auto CMWriter = genie::core::Writer(&writer);
+        ORIG_CM_PARAM.write(CMWriter);
+
+        //ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize(CMWriter));
+
+        std::istream& reader = obj_payload;
+        auto bitReader = genie::util::BitReader(reader);
+        auto recon_obj = genie::contact::ContactMatrixParameters(bitReader);
+
+        ASSERT_EQ(recon_obj.getBinSize(), BIN_SIZE);
+        ASSERT_EQ(recon_obj.getTileSize(), TILE_SIZE);
+        ASSERT_EQ(recon_obj.getNumSamples(), 2u);
+        ASSERT_EQ(recon_obj.getChromosomeLength(CHR1_ID), CHR1_LEN);
+        ASSERT_EQ(recon_obj.getChromosomeLength(CHR2_ID), CHR2_LEN);
+        ASSERT_EQ(recon_obj.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
+        ASSERT_EQ(recon_obj.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
