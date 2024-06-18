@@ -428,6 +428,25 @@ void decode_cm_tile(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// TODO: Create docstring
+void conv_noop_on_sparse_mat(
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts,
+    uint32_t bin_size_mult,
+    bool sort_output=true
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_sparse_mat_inplace(
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /**
  * @brief Decode a Subcontact Matrix Payload.
  *

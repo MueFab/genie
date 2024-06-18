@@ -303,6 +303,10 @@ class ContactMatrixParameters {
      */
     uint8_t getNumBinSizeMultipliers() const;
 
+    void upsertBinSizeMultiplier(
+        size_t bin_size_multiplier
+    );
+
     /**
     * @brief Gets the length of a chromosome.
     *
