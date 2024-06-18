@@ -441,16 +441,48 @@ uint32_t ContactMatrixParameters::getNumTiles(
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia): implement this!
-size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
-    (void)writesize;
+size_t ContactMatrixParameters::getSize() const {
     return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): implement this!
 void ContactMatrixParameters::write(core::Writer& writer) const {
-    (void)writer;
+    writer.write(static_cast<uint8_t>(sample_infos.size()),8);
+    for(const auto& sample_info : sample_infos) {
+        writer.write(sample_info.second.ID, 8);
+        writer.write(sample_info.second.name + '\0');
+    }
+
+    writer.write(static_cast<uint8_t>(chr_infos.size()),8);
+    for(const auto& chr_info : chr_infos) {
+        writer.write(chr_info.second.ID, 8);
+        writer.write(chr_info.second.name + '\0');
+        writer.write(chr_info.second.length, 64);
+    }
+
+    writer.write(bin_size, 32);
+    writer.write(tile_size, 32);
+
+    writer.write(static_cast<uint8_t>(bin_size_multipliers.size()),8);
+    for(const auto& bin_size_multiplier : bin_size_multipliers) {
+        writer.write(bin_size_multiplier, 8);
+    }
+
+    writer.write(static_cast<uint8_t>(norm_method_infos.size()),8);
+    for(const auto& method_info : norm_method_infos) {
+        writer.write(method_info.second.ID, 8);
+        writer.write(method_info.second.name + '\0');
+        writer.write(method_info.second.mult_flag, 1);
+    }
+
+    writer.write(static_cast<uint8_t>(norm_mat_infos.size()),8);
+    for(const auto& mat_info : norm_mat_infos) {
+        writer.write(mat_info.second.ID, 8);
+        writer.write(mat_info.second.name + '\0');
+    }
+
+    writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
