@@ -317,6 +317,21 @@ uint8_t ContactMatrixParameters::getNumBinSizeMultipliers() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ContactMatrixParameters::upsertBinSizeMultiplier(
+    size_t bin_size_multiplier
+){
+    if (bin_size_multiplier != 1){
+        UTILS_DIE_IF(bin_size % bin_size_multiplier != 0, "Invalid bin_size_multiplier!");
+        auto iter = std::find(bin_size_multipliers.begin(), bin_size_multipliers.end(), bin_size_multiplier);
+        if (iter == bin_size_multipliers.end()){
+            bin_size_multipliers.push_back(static_cast<uint32_t>(bin_size_multiplier));
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool ContactMatrixParameters::isBinSizeMultiplierValid(
     size_t target_interv_mult
 ) const{
@@ -332,7 +347,17 @@ bool ContactMatrixParameters::isBinSizeMultiplierValid(
         }
     }
 
-    return false;
+    auto iter = std::find(
+        bin_size_multipliers.begin(),
+        bin_size_multipliers.end(),
+        target_interv_mult
+    );
+
+    if (iter != bin_size_multipliers.end()){
+        return true;
+    } else {
+        return false;
+    }
 };
 
 

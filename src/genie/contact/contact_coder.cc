@@ -338,8 +338,8 @@ void sparse_to_dense(
     }
     mat = xt::zeros<uint32_t>({nrows, ncols});
 
-    auto nentries = counts.shape(0);
-    for (auto i = 0u; i<nentries; i++){
+    auto num_entries = counts.shape(0);
+    for (auto i = 0u; i< num_entries; i++){
         auto count = counts(i);
         auto row_id = row_ids(i);
         auto col_id = col_ids(i);
@@ -842,13 +842,6 @@ void encode_cm_tile(
 
         bin_mat_to_bytes(bin_mat, &payload, payload_len);
 
-        //TODO(yeremia): to be deleted!
-        {
-            BinMatDtype recon_bin_mat;
-            bin_mat_from_bytes(payload, payload_len, tile_nrows, tile_ncols, recon_bin_mat);
-            UTILS_DIE_IF(recon_bin_mat != bin_mat, "Different!");
-        }
-
         mpegg_jbig_compress_default(
             &compressed_payload,
             &compressed_payload_len,
@@ -877,6 +870,174 @@ void encode_cm_tile(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void conv_noop_on_sparse_mat(
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts,
+    uint32_t bin_size_mult,
+    bool sort_output
+){
+
+    size_t num_entries = tile_counts.shape(0);
+
+//    // Sort the tile_row_ids, tile_col_ids, and tile_counts according to tile_row_ids and tile_col_ids
+//    {
+//        std::vector<size_t> sort_ids(num_entries);
+//        std::iota(sort_ids.begin(), sort_ids.end(), 0);
+//
+//        std::sort(sort_ids.begin(), sort_ids.end(),
+//                  [&tile_row_ids, &tile_col_ids](size_t i, size_t j) {
+//                      if (tile_row_ids(i) == tile_row_ids(j)){
+//                          return tile_col_ids(i) < tile_col_ids(j);
+//                      } else {
+//                          return tile_row_ids(i) < tile_row_ids(j);
+//                      }
+//                  }
+//        );
+//
+//        auto i2 = std::adjacent_find(
+//            sort_ids.begin(),
+//            sort_ids.end(),
+//            std::greater_equal<size_t>()
+//        );
+//        bool is_sorted = false;
+//        if (i2 == sort_ids.end()) {
+//            is_sorted = true;
+//        }
+//
+//        // Only reorder the ids and counts if the original order is not sorted
+//        if (!is_sorted){
+//            UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
+//            UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
+//            UIntVecDtype sorted_tile_counts = xt::empty<uint64_t>({num_entries});
+//            for (auto i = 0u; i<num_entries; i++){
+//                sorted_tile_row_ids(i) = tile_row_ids(sort_ids[i]);
+//                sorted_tile_col_ids(i) = tile_col_ids(sort_ids[i]);
+//                sorted_tile_counts(i) = tile_counts(sort_ids[i]);
+//            }
+//
+//            tile_row_ids = std::move(sorted_tile_row_ids);
+//            tile_col_ids = std::move(sorted_tile_col_ids);
+//            tile_counts = std::move(sorted_tile_counts);
+//        }
+//    }
+
+//    UInt64VecDtype lr_tile_row_ids = xt::unique(tile_row_ids/bin_size_mult);
+//    UInt64VecDtype lr_tile_col_ids = xt::unique(tile_col_ids/bin_size_mult);
+
+//    std::vector<std::tuple<uint64_t, uint64_t >> row_col_id_pairs;
+//    for (auto i_entry = 0u; i_entry<num_entries; i_entry++){
+//        auto lr_row_id = tile_row_ids(i_entry);
+//        auto lr_col_id = tile_col_ids(i_entry);
+//        auto it = std::find(
+//            row_col_id_pairs.begin(),
+//            row_col_id_pairs.end(),
+//            std::tuple(lr_row_id, lr_col_id)
+//        );
+//
+//        if (it.)
+//    }
+    std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_tile;
+    for (auto i = 0u; i<num_entries; i++){
+        auto lr_row_id = tile_row_ids(i) / bin_size_mult;
+        auto lr_col_id = tile_col_ids(i) / bin_size_mult;
+        auto count = tile_counts(i);
+
+        auto row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
+
+        auto it = lr_sparse_tile.find(row_col_id_pair);
+        if (it != lr_sparse_tile.end()){
+            it->second += count;
+        } else{
+            lr_sparse_tile.emplace(row_col_id_pair, count);
+        }
+    }
+
+    size_t lr_num_entries = lr_sparse_tile.size();
+
+    UInt64VecDtype lr_tile_row_ids = xt::empty<uint64_t>({lr_num_entries});
+    UInt64VecDtype lr_tile_col_ids = xt::empty<uint64_t>({lr_num_entries});
+    UIntVecDtype lr_tile_counts = xt::empty<uint32_t>({lr_num_entries});
+
+    auto i_entry = 0u;
+    for (auto it = lr_sparse_tile.cbegin(); it != lr_sparse_tile.cend(); ++it){
+        lr_tile_row_ids(i_entry) = (it->first).first;
+        lr_tile_col_ids(i_entry) = (it->first).second;
+        lr_tile_counts(i_entry) = it->second;
+        i_entry++;
+    }
+
+    lr_sparse_tile.clear();
+
+    // Sort the tile_row_ids, tile_col_ids, and tile_counts according to tile_row_ids and tile_col_ids
+    if (sort_output){
+        sort_sparse_mat_inplace(
+            lr_tile_row_ids,
+            lr_tile_col_ids,
+            lr_tile_counts
+        );
+    }
+
+    tile_row_ids = std::move(lr_tile_row_ids);
+    tile_col_ids = std::move(lr_tile_col_ids);
+    tile_counts = std::move(lr_tile_counts);
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sort_sparse_mat_inplace(
+    UInt64VecDtype& tile_row_ids,
+    UInt64VecDtype& tile_col_ids,
+    UIntVecDtype& tile_counts
+){
+    size_t num_entries = tile_counts.shape(0);
+
+    std::vector<size_t> sort_ids(num_entries);
+    std::iota(sort_ids.begin(), sort_ids.end(), 0);
+
+    std::sort(
+        sort_ids.begin(),
+        sort_ids.end(),
+        [&tile_row_ids, &tile_col_ids](size_t i, size_t j) {
+            if (tile_row_ids(i) == tile_row_ids(j)){
+                return tile_col_ids(i) < tile_col_ids(j);
+            } else {
+                return tile_row_ids(i) < tile_row_ids(j);
+            }
+        }
+    );
+
+    auto it = std::adjacent_find(
+        sort_ids.begin(),
+        sort_ids.end(),
+        std::greater_equal<size_t>()
+    );
+    bool is_sorted = false;
+    if (it == sort_ids.end()) {
+        is_sorted = true;
+    }
+
+    // Only reorder the ids and counts if the original order is not sorted
+    if (!is_sorted){
+        UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
+        UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
+        UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
+
+        for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
+            sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
+            sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
+            sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
+        }
+
+        tile_row_ids = std::move(sorted_tile_row_ids);
+        tile_col_ids = std::move(sorted_tile_col_ids);
+        tile_counts = std::move(sorted_tile_counts);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void decode_scm(
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
@@ -887,8 +1048,6 @@ void decode_scm(
     // (not part of specification) Initialize variables
     BinVecDtype row_mask;
     BinVecDtype col_mask;
-    UInt64VecDtype row_ids, col_ids;
-    UIntVecDtype _counts;
     std::vector<uint64_t> start1;
     std::vector<uint64_t> end1;
     std::vector<uint64_t> start2;
@@ -901,7 +1060,7 @@ void decode_scm(
 
     UTILS_DIE_IF(
         !cm_param.isBinSizeMultiplierValid(bin_size_mult),
-        "Bin size multiplier is not supported!"
+        "Bin size multiplier is invalid!"
     );
 
     // Input parameters retrieved from parameter set
@@ -997,11 +1156,6 @@ void decode_scm(
                 end2_idx
             );
 
-            if (bin_size_mult != 1){
-                // TODO(yeremia): implement the on-the-fly normalization
-                UTILS_DIE("Not yet implemented!");
-            }
-
             dense_to_sparse(
                 tile_mat,
                 tile_row_ids,
@@ -1030,6 +1184,15 @@ void decode_scm(
                 tile_col_ids += start2_idx;
             }
 
+            if (bin_size_mult != 1){
+                conv_noop_on_sparse_mat(
+                    tile_row_ids,
+                    tile_col_ids,
+                    tile_counts,
+                    bin_size_mult
+                );
+            }
+
             auto curr_num_entries = counts.size();
             auto tile_num_entries = tile_counts.shape(0);
 
@@ -1050,41 +1213,8 @@ void decode_scm(
 
                 counts[i_entry+curr_num_entries] = tile_counts(i_entry);
             }
-
-//            // Not in the specification
-//            // This is just for the concatenation
-//            if (i_tile == 0 && j_tile == 0){
-//                row_ids = tile_row_ids;
-//                col_ids = tile_col_ids;
-//                _counts = tile_counts;
-//            } else {
-//                // Concatenation anc assignment have to be in separate lines or expresion
-//                UInt64VecDtype c_row_ids = xt::concatenate(xt::xtuple(row_ids, tile_row_ids));
-//                UInt64VecDtype c_col_ids = xt::concatenate(xt::xtuple(col_ids, tile_col_ids));
-//                UInt64VecDtype c_counts = xt::concatenate(xt::xtuple(_counts, tile_counts));
-//                row_ids = c_row_ids;
-//                col_ids = c_col_ids;
-//                _counts = c_counts;
-//            }
-
         }
     }
-
-//    // Not in the specification
-//    auto num_entries = _counts.shape(0);
-//    start1.resize(num_entries);
-//    end1.resize(num_entries);
-//    start2.resize(num_entries);
-//    end2.resize(num_entries);
-//    counts.resize(num_entries);
-//
-//    for (auto i=0u; i<num_entries; i++){
-//        start1[i] = row_ids(i) * target_bin_size;
-//        end1[i] = std::min(start1[i] + target_bin_size, chr1_len);
-//        start2[i] = col_ids(i) * target_bin_size;
-//        end2[i] = std::min(start2[i] + target_bin_size, chr2_len);
-//        counts[i] = _counts(i);
-//    }
 
     auto sample_ID = scm_payload.getSampleID();
     rec.setSampleID(sample_ID);
@@ -1249,9 +1379,7 @@ void encode_scm(
             BinVecDtype mask2 = (col_ids >= min_col_id) && (col_ids < max_col_id);
             BinVecDtype mask = mask1 && mask2;
 
-            //TODO(yeremia): create a pipeline where the whole tile is unaligned
             auto any_entry = xt::any(mask);
-//            UTILS_DIE_IF(!any_entry, "There is no entry in tile_mat at all?!");
             if (any_entry){
                 // Filter the values only for the corresponding tile
                 UInt64VecDtype tile_row_ids = xt::filter(row_ids, mask);
