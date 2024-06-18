@@ -880,63 +880,6 @@ void conv_noop_on_sparse_mat(
 
     size_t num_entries = tile_counts.shape(0);
 
-//    // Sort the tile_row_ids, tile_col_ids, and tile_counts according to tile_row_ids and tile_col_ids
-//    {
-//        std::vector<size_t> sort_ids(num_entries);
-//        std::iota(sort_ids.begin(), sort_ids.end(), 0);
-//
-//        std::sort(sort_ids.begin(), sort_ids.end(),
-//                  [&tile_row_ids, &tile_col_ids](size_t i, size_t j) {
-//                      if (tile_row_ids(i) == tile_row_ids(j)){
-//                          return tile_col_ids(i) < tile_col_ids(j);
-//                      } else {
-//                          return tile_row_ids(i) < tile_row_ids(j);
-//                      }
-//                  }
-//        );
-//
-//        auto i2 = std::adjacent_find(
-//            sort_ids.begin(),
-//            sort_ids.end(),
-//            std::greater_equal<size_t>()
-//        );
-//        bool is_sorted = false;
-//        if (i2 == sort_ids.end()) {
-//            is_sorted = true;
-//        }
-//
-//        // Only reorder the ids and counts if the original order is not sorted
-//        if (!is_sorted){
-//            UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
-//            UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
-//            UIntVecDtype sorted_tile_counts = xt::empty<uint64_t>({num_entries});
-//            for (auto i = 0u; i<num_entries; i++){
-//                sorted_tile_row_ids(i) = tile_row_ids(sort_ids[i]);
-//                sorted_tile_col_ids(i) = tile_col_ids(sort_ids[i]);
-//                sorted_tile_counts(i) = tile_counts(sort_ids[i]);
-//            }
-//
-//            tile_row_ids = std::move(sorted_tile_row_ids);
-//            tile_col_ids = std::move(sorted_tile_col_ids);
-//            tile_counts = std::move(sorted_tile_counts);
-//        }
-//    }
-
-//    UInt64VecDtype lr_tile_row_ids = xt::unique(tile_row_ids/bin_size_mult);
-//    UInt64VecDtype lr_tile_col_ids = xt::unique(tile_col_ids/bin_size_mult);
-
-//    std::vector<std::tuple<uint64_t, uint64_t >> row_col_id_pairs;
-//    for (auto i_entry = 0u; i_entry<num_entries; i_entry++){
-//        auto lr_row_id = tile_row_ids(i_entry);
-//        auto lr_col_id = tile_col_ids(i_entry);
-//        auto it = std::find(
-//            row_col_id_pairs.begin(),
-//            row_col_id_pairs.end(),
-//            std::tuple(lr_row_id, lr_col_id)
-//        );
-//
-//        if (it.)
-//    }
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_tile;
     for (auto i = 0u; i<num_entries; i++){
         auto lr_row_id = tile_row_ids(i) / bin_size_mult;
@@ -969,7 +912,8 @@ void conv_noop_on_sparse_mat(
 
     lr_sparse_tile.clear();
 
-    // Sort the tile_row_ids, tile_col_ids, and tile_counts according to tile_row_ids and tile_col_ids
+    // Sort the tile_row_ids, tile_col_ids, and tile_counts
+    //      according to tile_row_ids and tile_col_ids
     if (sort_output){
         sort_sparse_mat_inplace(
             lr_tile_row_ids,
