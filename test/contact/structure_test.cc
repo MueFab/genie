@@ -395,6 +395,8 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         ASSERT_EQ(recon_obj.getChromosomeLength(CHR2_ID), CHR2_LEN);
         ASSERT_EQ(recon_obj.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
         ASSERT_EQ(recon_obj.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+
+        ASSERT_TRUE(ORIG_CM_PARAM==recon_obj);
     }
 }
 

@@ -487,6 +487,42 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+template <typename T>
+bool mapsEqual(const std::unordered_map<uint8_t, T>& current, const std::unordered_map<uint8_t, T>& other) {
+    if (current.size() != other.size()) {
+        return false;
+    }
+    for (const auto& pair : current) {
+        auto iter = other.find(pair.first);
+        if (iter == other.end() || !(pair.second == iter->second)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ContactMatrixParameters::operator==(const ContactMatrixParameters& other) {
+    bool ret;
+    ret = this->getNumSamples() == other.getNumSamples();
+    ret &= this->getBinSize() == other.getBinSize();
+    ret &= this->getTileSize() == other.getTileSize();
+    ret &= this->getNumChromosomes() == other.getNumChromosomes();
+    ret &= this->getNumNormMethods() == other.getNumNormMethods();
+    ret &= this->getNumNormMats() == other.getNumNormMats();
+
+    // compare all the samples inside
+    ret &= mapsEqual(this->sample_infos, other.sample_infos);
+    ret &= mapsEqual(this->getChromosomes(), other.getChromosomes());
+    ret &= mapsEqual(this->norm_mat_infos, other.norm_mat_infos);
+    ret &= mapsEqual(this->norm_method_infos, other.norm_method_infos);
+
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace contact
 }  // namespace genie
 
