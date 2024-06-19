@@ -27,6 +27,12 @@ namespace contact {
 struct SampleInformation {
     uint8_t ID;
     std::string name;
+
+    friend bool operator==(
+       const SampleInformation& lhs,
+       const SampleInformation& rhs) {
+       return lhs.ID == rhs.ID && lhs.name == rhs.name;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,6 +41,12 @@ struct ChromosomeInformation {
     uint8_t ID;
     std::string name;
     uint64_t length;
+
+    friend bool operator==(
+       const ChromosomeInformation& lhs,
+       const ChromosomeInformation& rhs) {
+       return lhs.ID == rhs.ID && lhs.name == rhs.name && lhs.length == rhs.length;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,6 +55,12 @@ struct NormalizationMethodInformation {
     uint8_t ID;
     std::string name;
     bool mult_flag;
+
+    friend bool operator==(
+     const NormalizationMethodInformation& lhs,
+     const NormalizationMethodInformation& rhs) {
+     return lhs.ID == rhs.ID && lhs.name == rhs.name && lhs.mult_flag == rhs.mult_flag;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -50,6 +68,12 @@ struct NormalizationMethodInformation {
 struct NormalizedMatrixInformations {
     uint8_t ID;
     std::string name;
+
+    friend bool operator==(
+     const NormalizedMatrixInformations& lhs,
+     const NormalizedMatrixInformations& rhs) {
+     return lhs.ID == rhs.ID && lhs.name == rhs.name;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -425,6 +449,16 @@ class ContactMatrixParameters {
      * @param writer The writer to write to.
      */
     void write(core::Writer& writer) const;
+
+    /**
+     * @brief Overloaded operator to compare two ContactMatrixParameters objects
+     *
+     * This function compares two ContactMatrixParameters objects and then returns
+     * a bool value.
+     *
+     * @param other The other ContactMatrixParameters to be compared with
+     */
+    bool operator==(const ContactMatrixParameters& other);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
