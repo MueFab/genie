@@ -440,9 +440,41 @@ uint32_t ContactMatrixParameters::getNumTiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): implement this!
 size_t ContactMatrixParameters::getSize() const {
-    return 0;
+    size_t size = 0;
+
+    size += sizeof(uint8_t);
+    for (const auto& sample_info : sample_infos) {
+        size += sizeof(uint8_t); // ID
+        size += sample_info.second.name.size() + 1; // +1 for the null terminator
+    }
+
+    size += sizeof(uint8_t);
+    for (const auto& chr_info : chr_infos) {
+        size += sizeof(uint8_t); // ID
+        size += chr_info.second.name.size() + 1;
+        size += sizeof(uint64_t); // length
+    }
+
+    size += sizeof(uint32_t); // bin_size
+    size += sizeof(uint32_t); // tile_size
+    size += sizeof(uint8_t);  // number of bin_size_multipliers
+    size += bin_size_multipliers.size() * sizeof(uint32_t);
+
+    size += sizeof(uint8_t); // number of normalization methods
+    for (const auto& norm_method_info : norm_method_infos) {
+        size += sizeof(uint8_t);
+        size += norm_method_info.second.name.size() + 1;
+        size += sizeof(uint8_t); // mult_flag
+    }
+
+    size += sizeof(uint8_t); // number of normalized matrices
+    for (const auto& norm_mat_info : norm_mat_infos) {
+        size += sizeof(uint8_t);
+        size += norm_mat_info.second.name.size() + 1;
+    }
+
+    return size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
