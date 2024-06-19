@@ -431,11 +431,9 @@ class ContactMatrixParameters {
     );
 
     /**
-     * @brief Gets the size of the object when written to a writer.
+     * @brief Gets the size of the object when written to a writer in bytes.
      *
-     * This function returns the size of the object when written to a writer.
-     *
-     * @param writesize The writer to calculate the size for.
+     * This function returns the size of the object when written to a writer in bytes.
      *
      * @return The size of the object when written to the writer.
      */
