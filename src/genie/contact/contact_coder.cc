@@ -871,10 +871,12 @@ void encode_cm_tile(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void conv_noop_on_sparse_mat(
+    // Inputs and Outputs
     UInt64VecDtype& tile_row_ids,
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts,
     uint32_t bin_size_mult,
+    // Options
     bool sort_output
 ){
 
@@ -931,53 +933,46 @@ void conv_noop_on_sparse_mat(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_sparse_mat_inplace(
+    // Inputs and Outputs
     UInt64VecDtype& tile_row_ids,
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts
 ){
     size_t num_entries = tile_counts.shape(0);
 
+    // Assert that all input vectors have the same size
+    assert(tile_row_ids.size() == num_entries);
+    assert(tile_col_ids.size() == num_entries);
+
     std::vector<size_t> sort_ids(num_entries);
     std::iota(sort_ids.begin(), sort_ids.end(), 0);
 
-    std::sort(
+    std::stable_sort(
         sort_ids.begin(),
         sort_ids.end(),
-        [&tile_row_ids, &tile_col_ids](size_t i, size_t j) {
-            if (tile_row_ids(i) == tile_row_ids(j)){
-                return tile_col_ids(i) < tile_col_ids(j);
-            } else {
-                return tile_row_ids(i) < tile_row_ids(j);
-            }
+        [&tile_row_ids, &tile_col_ids](size_t i1, size_t i2) {
+            return std::tie(tile_row_ids[i1], tile_col_ids[i1]) < std::tie(tile_row_ids[i2], tile_col_ids[i2]);
         }
     );
 
-    auto it = std::adjacent_find(
-        sort_ids.begin(),
-        sort_ids.end(),
-        std::greater_equal<size_t>()
-    );
-    bool is_sorted = false;
-    if (it == sort_ids.end()) {
-        is_sorted = true;
+    if (std::is_sorted(sort_ids.begin(), sort_ids.end())) {
+        return;
     }
 
     // Only reorder the ids and counts if the original order is not sorted
-    if (!is_sorted){
-        UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
-        UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
-        UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
+    UInt64VecDtype sorted_tile_row_ids = xt::empty<uint64_t>({num_entries});
+    UInt64VecDtype sorted_tile_col_ids = xt::empty<uint64_t>({num_entries});
+    UIntVecDtype sorted_tile_counts = xt::empty<uint32_t>({num_entries});
 
-        for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
-            sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
-            sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
-            sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
-        }
-
-        tile_row_ids = std::move(sorted_tile_row_ids);
-        tile_col_ids = std::move(sorted_tile_col_ids);
-        tile_counts = std::move(sorted_tile_counts);
+    for (auto i_entry = 0u; i_entry < num_entries; i_entry++){
+        sorted_tile_row_ids(i_entry) = tile_row_ids(sort_ids[i_entry]);
+        sorted_tile_col_ids(i_entry) = tile_col_ids(sort_ids[i_entry]);
+        sorted_tile_counts(i_entry) = tile_counts(sort_ids[i_entry]);
     }
+
+    tile_row_ids = std::move(sorted_tile_row_ids);
+    tile_col_ids = std::move(sorted_tile_col_ids);
+    tile_counts = std::move(sorted_tile_counts);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

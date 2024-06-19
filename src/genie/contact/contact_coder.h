@@ -428,7 +428,20 @@ void decode_cm_tile(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO: Create docstring
+/**
+ * @brief Converts a sparse matrix to a lower resolution version by pooling values.
+ *
+ * This function takes a sparse matrix represented by three vectors: tile_row_ids,
+ * tile_col_ids, and tile_counts. It then converts this sparse matrix to a lower
+ * resolution version by pooling values based on the bin_size_mult parameter. The
+ * output can be sorted based on the sort_output parameter.
+ *
+ * @param tile_row_ids Vector containing the row IDs of the sparse matrix.
+ * @param tile_col_ids Vector containing the column IDs of the sparse matrix.
+ * @param tile_counts Vector containing the counts of the sparse matrix.
+ * @param bin_size_mult The multiplier used to determine the bin size for pooling.
+ * @param sort_output Flag indicating whether to sort the output sparse matrix.
+ */
 void conv_noop_on_sparse_mat(
     UInt64VecDtype& tile_row_ids,
     UInt64VecDtype& tile_col_ids,
@@ -439,6 +452,16 @@ void conv_noop_on_sparse_mat(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Sorts a sparse matrix in-place based on row and column IDs.
+ *
+ * This function sorts the input sparse matrix in-place based on the row and column IDs.
+ * If the original order is not sorted, it reorders the IDs and counts accordingly.
+ *
+ * @param tile_row_ids Vector containing the row IDs of the sparse matrix.
+ * @param tile_col_ids Vector containing the column IDs of the sparse matrix.
+ * @param tile_counts Vector containing the counts of the sparse matrix.
+ */
 void sort_sparse_mat_inplace(
     UInt64VecDtype& tile_row_ids,
     UInt64VecDtype& tile_col_ids,

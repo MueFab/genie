@@ -2087,6 +2087,54 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
 
         auto& LR_REC = LR_RECS.front();
 
+        if (recon_rec.getNumEntries() != LR_REC.getNumEntries()){
+            size_t recon_num_entries = recon_rec.getNumEntries();
+
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_num_entries});
+            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_num_entries});
+            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+
+            genie::contact::UInt64VecDtype recon_counts = xt::adapt(recon_rec.getCounts(), {recon_num_entries});
+
+            std::map<std::pair<uint64_t, uint64_t>, uint32_t> recon_sparse_mat;
+            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+                auto recon_row_id = recon_row_ids(i_entry);
+                auto recon_col_id = recon_col_ids(i_entry);
+                auto recon_count = recon_counts(i_entry);
+                auto recon_row_col_id_pair = std::pair<uint64_t, uint64_t>(recon_row_id, recon_col_id);
+
+                auto it = recon_sparse_mat.find(recon_row_col_id_pair);
+                ASSERT_EQ(it, recon_sparse_mat.end());
+                recon_sparse_mat.emplace(recon_row_col_id_pair, recon_count);
+            }
+
+            size_t lr_num_entries = LR_REC.getNumEntries();
+
+            genie::contact::UInt64VecDtype lr_start1 = xt::adapt(LR_REC.getStartPos1(), {lr_num_entries});
+            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+
+            genie::contact::UInt64VecDtype lr_start2 = xt::adapt(LR_REC.getStartPos2(), {lr_num_entries});
+            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+
+            genie::contact::UInt64VecDtype lr_counts = xt::adapt(LR_REC.getCounts(), {lr_num_entries});
+
+            std::map<std::pair<uint64_t, uint64_t>, uint32_t> lr_sparse_mat;
+            for (auto i_entry = 0u; i_entry<recon_num_entries; i_entry++){
+                auto lr_row_id = lr_row_ids(i_entry);
+                auto lr_col_id = lr_col_ids(i_entry);
+                auto lr_count = lr_counts(i_entry);
+                auto lr_row_col_id_pair = std::pair<uint64_t, uint64_t>(lr_row_id, lr_col_id);
+
+                auto it = recon_sparse_mat.find(lr_row_col_id_pair);
+                ASSERT_EQ(it, lr_sparse_mat.end());
+                lr_sparse_mat.emplace(lr_row_col_id_pair, lr_count);
+            }
+
+            auto y = 10;
+        }
+
         ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
         {
             genie::contact::UInt64VecDtype START1 = xt::adapt(LR_REC.getStartPos1(), {LR_REC.getNumEntries()});
