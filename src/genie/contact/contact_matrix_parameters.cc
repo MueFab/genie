@@ -440,9 +440,41 @@ uint32_t ContactMatrixParameters::getNumTiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): implement this!
 size_t ContactMatrixParameters::getSize() const {
-    return 0;
+    size_t size = 0;
+
+    size += sizeof(uint8_t);
+    for (const auto& sample_info : sample_infos) {
+        size += sizeof(uint8_t); // ID
+        size += sample_info.second.name.size() + 1; // +1 for the null terminator
+    }
+
+    size += sizeof(uint8_t);
+    for (const auto& chr_info : chr_infos) {
+        size += sizeof(uint8_t); // ID
+        size += chr_info.second.name.size() + 1;
+        size += sizeof(uint64_t); // length
+    }
+
+    size += sizeof(uint32_t); // bin_size
+    size += sizeof(uint32_t); // tile_size
+    size += sizeof(uint8_t);  // number of bin_size_multipliers
+    size += bin_size_multipliers.size() * sizeof(uint32_t);
+
+    size += sizeof(uint8_t); // number of normalization methods
+    for (const auto& norm_method_info : norm_method_infos) {
+        size += sizeof(uint8_t);
+        size += norm_method_info.second.name.size() + 1;
+        size += sizeof(uint8_t); // mult_flag
+    }
+
+    size += sizeof(uint8_t); // number of normalized matrices
+    for (const auto& norm_mat_info : norm_mat_infos) {
+        size += sizeof(uint8_t);
+        size += norm_mat_info.second.name.size() + 1;
+    }
+
+    return size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -483,6 +515,42 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
     }
 
     writer.flush();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+bool mapsEqual(const std::unordered_map<uint8_t, T>& current, const std::unordered_map<uint8_t, T>& other) {
+    if (current.size() != other.size()) {
+        return false;
+    }
+    for (const auto& pair : current) {
+        auto iter = other.find(pair.first);
+        if (iter == other.end() || !(pair.second == iter->second)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ContactMatrixParameters::operator==(const ContactMatrixParameters& other) {
+    bool ret;
+    ret = this->getNumSamples() == other.getNumSamples();
+    ret &= this->getBinSize() == other.getBinSize();
+    ret &= this->getTileSize() == other.getTileSize();
+    ret &= this->getNumChromosomes() == other.getNumChromosomes();
+    ret &= this->getNumNormMethods() == other.getNumNormMethods();
+    ret &= this->getNumNormMats() == other.getNumNormMats();
+
+    // compare all the samples inside
+    ret &= mapsEqual(this->sample_infos, other.sample_infos);
+    ret &= mapsEqual(this->getChromosomes(), other.getChromosomes());
+    ret &= mapsEqual(this->norm_mat_infos, other.norm_mat_infos);
+    ret &= mapsEqual(this->norm_method_infos, other.norm_method_infos);
+
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
