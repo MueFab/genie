@@ -382,7 +382,7 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         auto CMWriter = genie::core::Writer(&writer);
         ORIG_CM_PARAM.write(CMWriter);
 
-        //ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize(CMWriter));
+        ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize());
 
         std::istream& reader = obj_payload;
         auto bitReader = genie::util::BitReader(reader);
