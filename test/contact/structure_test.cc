@@ -382,7 +382,7 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         auto CMWriter = genie::core::Writer(&writer);
         ORIG_CM_PARAM.write(CMWriter);
 
-        //ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize(CMWriter));
+        ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize());
 
         std::istream& reader = obj_payload;
         auto bitReader = genie::util::BitReader(reader);
@@ -395,6 +395,8 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         ASSERT_EQ(recon_obj.getChromosomeLength(CHR2_ID), CHR2_LEN);
         ASSERT_EQ(recon_obj.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
         ASSERT_EQ(recon_obj.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+
+        ASSERT_TRUE(ORIG_CM_PARAM==recon_obj);
     }
 }
 
