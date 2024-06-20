@@ -88,13 +88,6 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
         testparams.algID                             // codec_ID;
     };
 
-    genie::contact::EncodingOptions contact_opt = {
-        250000, // bin_size;
-        500, // tile_size;
-        false, // multi_intervals = false;
-        true, // diag_transform = true;
-        true // binarize = true;
-    };
 
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
     std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
@@ -107,7 +100,6 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
-    annotationGenerator.setContactOptions(contact_opt);
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir + testparams.filepath + ".geno",
                                     name);
 }
@@ -117,6 +109,8 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         genoTestValues(genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
                        genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.5.bgz.CASE01"),
+        genoTestValues{ genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
+                       genie::core::AlgoID::JBIG, "/data/records/conformance/ALL.chrY.phase3_integrated_v2a.20130502.genotypes.bgz.CASE02" },
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
                        genie::core::AlgoID::JBIG, "/data/records/conformance/variants/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
