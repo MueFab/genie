@@ -47,6 +47,10 @@ class Annotation {
     void setInfoFields(std::string jsonFileName);
     void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
+    void writeToFile(std::string& outputFileName);
+
+    void parseInfoTags(std::string& recordInputFileName);
+
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
 
