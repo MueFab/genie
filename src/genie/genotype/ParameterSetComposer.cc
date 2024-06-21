@@ -27,7 +27,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     AT_coord_size = 3;
     AT_pos_40_bits_flag = false;
     n_aux_attribute_groups = 0;
-    two_dimensional = false;
+    two_dimensional = true;
     n_tiles = 1;
     AG_class = 0;
 
