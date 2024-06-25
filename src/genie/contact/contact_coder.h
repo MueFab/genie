@@ -447,7 +447,7 @@ void conv_noop_on_sparse_mat(
     UInt64VecDtype& tile_col_ids,
     UIntVecDtype& tile_counts,
     uint32_t bin_size_mult,
-    bool sort_output=true
+    bool sort_output=false
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
