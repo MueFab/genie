@@ -21,8 +21,6 @@
 #include "genie/variantsite/VariantSiteParser.h"
 
 #include "genie/contact/contact_coder.h"
-#include "genie/contact/contact_matrix_parameters.h"
-#include "genie/contact/subcontact_matrix_payload.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
@@ -49,9 +47,12 @@ class Annotation {
     void setInfoFields(std::string jsonFileName);
     void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
+    void writeToFile(std::string& outputFileName);
+
+    void parseInfoTags(std::string& recordInputFileName);
+
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
-    void setContactOptions(genie::contact::EncodingOptions opt) { contact_opt = opt; }
 
  private:
     std::ifstream recordInput;
@@ -72,14 +73,6 @@ class Annotation {
                                                   genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
                                                   genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
                                                   genie::core::AlgoID::JBIG};
-
-    genie::contact::EncodingOptions contact_opt{
-        250000,  // bin_size;
-        500,     // tile_size;
-        false,   // multi_intervals = false;
-        true,    // diag_transform = true;
-        true     // binarize = true;
-    };
 
     void parseGenotype(std::ifstream& inputfile);
     void parseSite(std::ifstream& inputfile);

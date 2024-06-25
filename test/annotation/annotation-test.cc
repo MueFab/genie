@@ -90,7 +90,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
 
 TEST_F(AnnotationTests, annotationSite) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filePath = gitRootDir + "/data/records/";
+    std::string filePath = gitRootDir + "/data/";
     std::string inputFilename = filePath + "ALL.chrX.10000.site";
     std::string outputFilename = filePath + "ALL.chrX.10000_site_annotation";
 
@@ -98,12 +98,11 @@ TEST_F(AnnotationTests, annotationSite) {
 
     genie::annotation::Annotation annotationGenerator;
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
-    std::string set2 = "compressor 1 1 ZSTD";// {8 16777216 3 0 2 32}";
+    std::string set2 = "compressor 1 1 ZSTD";  // {8 16777216 3 0 2 32}";
     std::string set3 = "compressor 2 0 LZMA {8}";
     std::string set4 = "compressor 3 0 BSC {16 128 1 1}";
     std::stringstream config;
     config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
-
 
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
@@ -115,9 +114,11 @@ TEST_F(AnnotationTests, annotationSite) {
 }
 TEST_F(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filePath = gitRootDir + "/data/records/";
-    std::string inputFilename = filePath + "1.3.5.header100.gt_only.vcf.geno";
-    std::string outputFilename = filePath + "1.3.5.header100.gt_only.vcf_geno_annotation";
+    std::string filePath = gitRootDir + "/data/";
+    //  std::string inputFilename = filePath + "ALL.chrX.10000.geno";
+    //  std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
+    std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
+    std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -126,7 +127,7 @@ TEST_F(AnnotationTests, annotationGeno) {
     std::string set3 = "compressor 2 0 ZSTD";
     std::string set4 = "compressor 3 0 BSC";
     std::stringstream config;
-    config << set1 << '\n' <<  set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
 
     ASSERT_FALSE(!std::filesystem::is_regular_file(inputFilename));
 

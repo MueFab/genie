@@ -31,12 +31,14 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
         variants_payload_params[i].transpose_mat_flag = opt.transpose_mat;
         variants_payload_params[i].variants_codec_ID = opt.codec_ID;
     }
-
-    // TODO: NO phasing
+    bool phase_value = false;
+    bool encode_phases_data_flag = false;
     auto unique_phasing_vals = xt::unique(block.phasing_mat);
-    auto phase_value = unique_phasing_vals.at(0);
-    bool encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
-
+    if (unique_phasing_vals.size() > 0)
+    {
+        phase_value = unique_phasing_vals.at(0);
+        encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
+    }
     GenotypeBinMatParameters phases_payload_param;
     if (encode_phases_data_flag) {
         phases_payload_param.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
