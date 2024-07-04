@@ -80,7 +80,7 @@ class VariantGenotype {
 
  public:
     explicit VariantGenotype(util::BitReader& bitreader);
-
+    VariantGenotype(uint64_t variant_index, uint32_t sample_index_from);
     uint64_t getVariantIndex() const;
     uint32_t getStartSampleIndex() const;
     uint32_t getNumSamples() const;

@@ -37,13 +37,13 @@ class ParameterSetComposer {
     genie::core::record::annotation_parameter_set::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
         std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-        uint64_t defaultTileSize);
+        uint64_t defaultTileSize, uint8_t AT_ID);
 
     genie::core::record::annotation_parameter_set::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,
         std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
         const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressors,
-        uint64_t defaultTileSize);
+        uint64_t defaultTileSize, uint8_t _AT_ID);
 
     genie::core::record::annotation_parameter_set::Record setParameterSet(
         std::vector<genie::core::AnnotDesc> descrList,

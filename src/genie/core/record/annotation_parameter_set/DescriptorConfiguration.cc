@@ -85,8 +85,9 @@ void DescriptorConfiguration::write(core::Writer& writer) const {
         genotype_parameters.write(writer);
     else if (descriptor_ID == AnnotDesc::LIKELIHOOD)
         likelihood_parameters.write(writer);
-    else if (descriptor_ID == AnnotDesc::CONTACT)
-        contact_matrix_parameters.write(writer);
+   // else if (descriptor_ID == AnnotDesc::CONTACT)
+        //  contact_matrix_parameters.write(writer);
+        
     algorithm_parameters.write(writer);
 }
 

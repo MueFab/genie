@@ -179,11 +179,11 @@ TEST_F(VariantSiteRecordTests, DISABLED_readFileRunParser) {  // NOLINT(cert-err
         }
     }
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), parser.getNumberOfRows());
+        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), parser.getNumberOfRows(), 1);
 
     //----------------------------------------------------//
     uint8_t AG_class = 1;
-    uint8_t AT_ID = 0;
+    uint8_t AT_ID = 1;
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     uint64_t rowIndex = 0;
@@ -227,6 +227,7 @@ TEST_F(VariantSiteRecordTests, DISABLED_multitile) {  // NOLINT(cert-err58-cpp)
         infoFields << infoFieldsFile.rdbuf();
         infoFieldsFile.close();
     }
+    uint8_t AT_ID = 1;
     std::ifstream inputfile;
     inputfile.open(filepath, std::ios::in | std::ios::binary);
     uint64_t defaultTileSize = 1000;
@@ -252,10 +253,9 @@ TEST_F(VariantSiteRecordTests, DISABLED_multitile) {  // NOLINT(cert-err58-cpp)
 
     genie::variant_site::ParameterSetComposer encodeParameters;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), defaultTileSize);
+        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), defaultTileSize, AT_ID);
 
     uint8_t AG_class = 1;
-    uint8_t AT_ID = 0;
 
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
