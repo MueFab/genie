@@ -71,7 +71,7 @@ class VariantGenotype {
 
     std::vector<format_field> format;  //!< @brief
 
-    std::vector<std::vector<int8_t>> alleles;   //!< @brief
+    std::vector<std::vector<int8_t>> alleles;    //!< @brief
     std::vector<std::vector<uint8_t>> phasings;  //!< @brief
 
     std::vector<std::vector<uint32_t>> likelihoods;  //!< @brief
@@ -96,7 +96,12 @@ class VariantGenotype {
     const std::vector<std::vector<uint32_t>>& getLikelihoods() const;
     bool getLinkedRecord() const;
     const LinkRecord& getLinkRecord() const;
-    const std::vector<format_field>& getFormats() const ;
+    const std::vector<format_field>& getFormats() const;
+
+    void setLikelihood(std::vector<std::vector<uint32_t>> _likelihoods) { likelihoods = _likelihoods; }
+    void setPhasings(std::vector<std::vector<uint8_t>> _phasings) { phasings = _phasings; };
+    void setAlleles(std::vector<std::vector<int8_t>> _alleles) { alleles = _alleles; }
+    void setNumberOfSamples(uint32_t sampleSize) { sample_count = sampleSize; };
 };
 
 }  // namespace record
