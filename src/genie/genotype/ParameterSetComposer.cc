@@ -66,10 +66,10 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptor_ID, genie::core::AlgoID::BSC, BSCalgorithmParameters));
 
-    descriptor_ID = genie::core::AnnotDesc::CONTACT;
+   /* descriptor_ID = genie::core::AnnotDesc::CONTACT;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
         descriptor_ID, genie::core::AlgoID::BSC, contactMatrixParameters, BSCalgorithmParameters));
-
+*/
     uint8_t n_compressors = static_cast<uint8_t>(compressor_parameter_set.size());
 
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;

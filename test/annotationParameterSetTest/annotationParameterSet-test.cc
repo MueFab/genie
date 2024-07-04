@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "RandomRecordFillIn.h"
-#include "genie/contact/contact_matrix_parameters.h"
+//#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/writer.h"

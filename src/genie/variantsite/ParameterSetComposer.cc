@@ -15,7 +15,7 @@
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
-#include "genie/contact/contact_matrix_parameters.h"
+//#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
@@ -34,7 +34,7 @@ namespace variant_site {
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-    uint64_t defaultTileSize) {
+    uint64_t defaultTileSize, uint8_t AT_ID) {
     genie::entropy::bsc::BSCParameters bscParameters;
     auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
 
@@ -48,19 +48,20 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         bscParameters.compressorParameterSet(1), lzmaParameters.compressorParameterSet(2),
         zstdParameters.compressorParameterSet(3)};
 
-    return setParameterSet(descrList, info, compressor_parameter_set, defaultTileSize);
+    return setParameterSet(descrList, info, compressor_parameter_set, defaultTileSize,AT_ID);
 }
 
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(
     std::vector<genie::core::AnnotDesc> descrList,
     std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
     const std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet>& compressor_parameter_set,
-    uint64_t defaultTileSize) {
+    uint64_t defaultTileSize, uint8_t _AT_ID) {
     //----------------------------------------------------//
     core::record::annotation_parameter_set::ParameterSettings defaultset;
     defaultset.ATCoordSize = 3;
     defaultset.AG_class = 1;
     bool two_dimensional = false;
+    defaultset.AT_ID = _AT_ID;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
         defaultset.ATCoordSize, defaultset.AG_class, two_dimensional, defaultTileSize);

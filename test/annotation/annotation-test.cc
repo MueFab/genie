@@ -3,7 +3,9 @@
 #include <array>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+
 #include "genie/annotation/annotation.h"
 #include "helpers.h"
 
@@ -88,6 +90,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
+
 TEST_F(AnnotationTests, annotationSite) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/";
@@ -105,7 +108,11 @@ TEST_F(AnnotationTests, annotationSite) {
     config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
 
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
+    {
+        MeasureTime mesuretime;
+        annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
+//        EXPECT_TRUE(false);
+    }
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
@@ -115,10 +122,10 @@ TEST_F(AnnotationTests, annotationSite) {
 TEST_F(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/";
-    //  std::string inputFilename = filePath + "ALL.chrX.10000.geno";
-    //  std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
-    std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
-    std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
+      std::string inputFilename = filePath + "ALL.chrX.10000.geno";
+      std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
+    //std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
+    //std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -133,7 +140,10 @@ TEST_F(AnnotationTests, annotationGeno) {
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);
-    annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
+    {
+        MeasureTime mesuretime;
+        annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
+    }
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
 

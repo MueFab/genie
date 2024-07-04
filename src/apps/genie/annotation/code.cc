@@ -82,6 +82,8 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
                        const std::string& _infoFieldsFileName) {
     //------------- read input files  ------------------//
     std::stringstream infoFields;
+    uint8_t AT_ID = 1;
+    uint8_t AG_class = 1;
 
     auto infoFieldsFileName = _infoFieldsFileName;
     if (!infoFieldsFileName.empty()) {
@@ -109,13 +111,12 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
 
     genie::variant_site::ParameterSetComposer encodeParameters;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, parser.getNumberOfRows());
+        encodeParameters.setParameterSet(descrList, info, parser.getNumberOfRows(), AT_ID);
 
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
 
     genie::variant_site::AccessUnitComposer accessUnit;
-    uint8_t AG_class = 1;
-    uint8_t AT_ID = 0;
+   // uint8_t AT_ID = 1;
 
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;

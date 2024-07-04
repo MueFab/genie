@@ -23,6 +23,14 @@ namespace core {
 namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
+VariantGenotype::VariantGenotype(uint64_t _variant_index, uint32_t _sample_index_from)
+
+    : variant_index(_variant_index),
+      sample_index_from(_sample_index_from),
+      sample_count(0),
+      format(),
+      alleles(),
+      phasings() {}
 
 VariantGenotype::VariantGenotype(util::BitReader& bitreader)
     : variant_index(bitreader.readBypassBE<uint64_t>()),
@@ -31,7 +39,6 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
       format(),
       alleles(),
       phasings() {
-
     auto format_count = bitreader.readBypassBE<uint8_t>();
     for (uint8_t i = 0; i < format_count; i++) {
         format.emplace_back(bitreader, sample_count);
