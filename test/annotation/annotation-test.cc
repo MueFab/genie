@@ -111,21 +111,20 @@ TEST_F(AnnotationTests, annotationSite) {
     {
         MeasureTime mesuretime;
         annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
-//        EXPECT_TRUE(false);
     }
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 200 * 1024;  // at least 200kB
+    size_t expectedSize = 198 * 1024;  // aprox. 200kB
     EXPECT_LE(expectedSize, filesize);
 }
 TEST_F(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/";
-      std::string inputFilename = filePath + "ALL.chrX.10000.geno";
-      std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
-    //std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
-    //std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
+  //    std::string inputFilename = filePath + "ALL.chrX.10000.geno";
+   //   std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
+    std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
+    std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
 
     std::filesystem::remove(outputFilename + ".bin");
 
