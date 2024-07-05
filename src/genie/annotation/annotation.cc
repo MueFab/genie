@@ -103,7 +103,7 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
 }
 
 void Annotation::parseGenotype(std::ifstream& inputfile) {
-    const uint32_t defaultTileSize = 1000;
+    const uint32_t defaultTileSize = 10000;
     genotype_opt.block_size = defaultTileSize;
     likelihood_opt.block_size = defaultTileSize;
     uint8_t AT_ID = 1;
@@ -117,7 +117,7 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
     // std::vector<uint8_t> formatCount;
     std::vector<RecData> recData;
     size_t rowsRead = 0;
-    uint32_t defaultTileWidth = 2500;  // 2 * defaultTileSize;// 1050;
+    uint32_t defaultTileWidth = 3000;
     rowsRead =
         readBlocks(inputfile, defaultTileSize, defaultTileWidth, genotypeParameters, likelihoodParameters, recData);
     std::cerr << "recData size: " << std::to_string(recData.size()) << std::endl;
@@ -206,12 +206,12 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
                     recsTiled.at(i).emplace_back(recSplitOverCols.at(i));
                 rowCount++;
             }
-            std::cerr << "rowCount: " << std::to_string(rowCount) << ", ";
+            rowCount--;
         }
-        std::cerr << "\n recsTiled: " << std::to_string(recsTiled.size()) << std::endl;
 
-        if (!bitreader.isGood()) recsTiled.pop_back();
-        if (recsTiled.size() == 0) return TotalnumberOfRows;
+        if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
+        if (recsTiled.back().back().getNumSamples() == 0) recsTiled.back().pop_back();
+        if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
 
         uint32_t _colStart = 0;
         for (auto& recs : recsTiled) {
@@ -223,8 +223,6 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
             std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
                 genie::likelihood::encode_block(likelihood_opt, recs);
 
-            genie::genotype::EncodingBlock _genotypeDatablock;
-            genie::likelihood::EncodingBlock _likelihoodDatablock;
             uint32_t _numSamples = recs.front().getNumSamples();
             uint8_t _formatCount = recs.front().getFormatCount();
             recData.emplace_back(_rowStart, _colStart, std::get<genie::genotype::EncodingBlock>(genotypeData),
@@ -282,7 +280,7 @@ std::vector<genie::core::record::VariantGenotype> Annotation::splitOnRows(genie:
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 1000;
+    uint64_t defaultTileSize = 10000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
