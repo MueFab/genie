@@ -93,7 +93,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
 
 TEST_F(AnnotationTests, annotationSite) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filePath = gitRootDir + "/data/";
+    std::string filePath = gitRootDir + "/data/records/";
     std::string inputFilename = filePath + "ALL.chrX.10000.site";
     std::string outputFilename = filePath + "ALL.chrX.10000_site_annotation";
 
