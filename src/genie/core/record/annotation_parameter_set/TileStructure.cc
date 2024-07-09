@@ -57,9 +57,15 @@ TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, uint64_t
       n_tiles(1),
       start_index{},
       end_index{},
-      tile_size{1,defaultTileSize},
+      tile_size{defaultTileSize},
       ATCoordSize(ATCoordSize),
-      two_dimensional(two_dimensional) {}
+      two_dimensional(two_dimensional) {
+    if (two_dimensional) {
+        tile_size.resize(2);
+        tile_size.at(0) = defaultTileSize;
+        tile_size.at(1) = 3000;
+    }
+}
 
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
                              std::vector<std::vector<uint64_t>> start_index,

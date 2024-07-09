@@ -28,11 +28,11 @@ namespace annotation {
 
 class InfoField {
  public:
-     InfoField() = default;
+    InfoField() = default;
     InfoField(std::string _ID, genie::core::DataType _Type, uint8_t _Number) : ID(_ID), Type(_Type), Number(_Number) {}
-    std::string ID;
-    genie::core::DataType Type;
-    uint8_t Number;
+    std::string ID{""};
+    genie::core::DataType Type{genie::core::DataType::UINT16};
+    uint8_t Number{0};
 };
 
 //--------- file format ----------------//

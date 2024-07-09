@@ -13,27 +13,6 @@
 namespace genie {
 namespace annotation {
 
-class MeasureTime {
- public:
-    MeasureTime(std::string _message) : message(_message) { start = std::chrono::high_resolution_clock::now(); }
-    ~MeasureTime() {
-        using namespace std::chrono_literals;
-        auto end = std::chrono::high_resolution_clock::now();
-        auto diff = end - start;
-        auto sec = diff / 1s;
-        auto milli = diff / 1ms;
-        auto minutes = diff / 1min;
-        auto millisec = milli - sec * 1000;
-        auto secmin = sec - minutes * 60;
-        std::cerr << message << " Time(ns): " << minutes << " min " << secmin << " sec " << millisec << " millisec"
-                  << '\n';
-    }
-
- private:
-    std::chrono::steady_clock::time_point start;
-    std::string message;
-};
-
 void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
                                                 std::string outputFileName)
 
@@ -58,7 +37,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 }
 
 void Annotation::writeToFile(std::string& outputFileName) {
-    MeasureTime timeToFile("\t\tToFile: ");
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
@@ -104,38 +82,30 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
 
 void Annotation::parseGenotype(std::ifstream& inputfile) {
     const uint32_t defaultTileSize = 10000;
+    const uint32_t defaultTileWidth = 3000;
     genotype_opt.block_size = defaultTileSize;
     likelihood_opt.block_size = defaultTileSize;
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
 
-    // std::vector<genie::genotype::EncodingBlock> genotypeDatablock;
-    //  std::vector<genie::likelihood::EncodingBlock> likelihoodDatablock;
     genie::genotype::GenotypeParameters genotypeParameters;
     genie::likelihood::LikelihoodParameters likelihoodParameters;
-    // std::vector<uint32_t> numSamples;
-    // std::vector<uint8_t> formatCount;
     std::vector<RecData> recData;
     size_t rowsRead = 0;
-    uint32_t defaultTileWidth = 3000;
     rowsRead =
         readBlocks(inputfile, defaultTileSize, defaultTileWidth, genotypeParameters, likelihoodParameters, recData);
-    std::cerr << "recData size: " << std::to_string(recData.size()) << std::endl;
-    std::cerr << "rowsRead: " << std::to_string(rowsRead) << '\n';
     //--------------------------------------------------
 
     genie::genotype::ParameterSetComposer parameterSetComposer;
     {
-        MeasureTime timeParametersetComposer("ParameterSetComposer: ");
         parameterSetComposer.setGenotypeParameters(genotypeParameters);
         parameterSetComposer.setLikelihoodParameters(likelihoodParameters);
         parameterSetComposer.setCompressors(compressors);
         annotationParameterSet =
-            parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, rowsRead);
+            parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, defaultTileSize);
     }
     annotationAccessUnit.resize(recData.size());
     for (auto i = 0u; i < recData.size(); ++i) {
-        //       MeasureTime timeAAUtile("\tper tile: " + std::to_string(i) + " ");
         std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
 
         for (auto formatdata : recData.at(i).genotypeDatablock.attributeData) {
@@ -166,7 +136,7 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
         }
 
         // add LINK_ID default values
-        for (auto j = 0u; i < genotype_opt.block_size && j < rowsRead; ++j) {
+        for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
             char val = static_cast<char>(0xFF);
             descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
         }
@@ -176,14 +146,12 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
                                          recData.at(i).genotypeDatablock.attributeInfo, annotationParameterSet,
                                          annotationAccessUnit.at(i), AG_class, AT_ID, recData.at(i).rowStart);
     }
-    std::cerr << "nr of aaus: " << std::to_string(annotationAccessUnit.size()) << '\n';
 }
 
 size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize, const uint32_t& colTilesize,
                               genie::genotype::GenotypeParameters& genotypeParameters,
                               genie::likelihood::LikelihoodParameters& likelihoodParameters,
                               std::vector<RecData>& recData) {
-    //   MeasureTime measureReadBlocks("\treadBlocks: ");
     genie::util::BitReader bitreader(inputfile);
     size_t TotalnumberOfRows = 0;
     bool start = true;
@@ -194,8 +162,6 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
         uint32_t rowCount = 0;
         std::vector<std::vector<genie::core::record::VariantGenotype>> recsTiled;
         {
-            MeasureTime measurerowTile("\t\tReading1rowTile: ");
-
             while (bitreader.isGood() && rowCount < rowTileSize) {  // && rowCount < 100) {
                 genie::core::record::VariantGenotype varGenoType(bitreader);
                 auto recSplitOverCols = splitOnRows(varGenoType, colTilesize);
@@ -210,14 +176,13 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
         }
 
         if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
-        if (recsTiled.back().back().getNumSamples() == 0) recsTiled.back().pop_back();
         if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
+        if (recsTiled.back().back().getNumSamples() == 0) recsTiled.back().pop_back();
 
         uint32_t _colStart = 0;
         for (auto& recs : recsTiled) {
             std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
             {
-                MeasureTime timeGenotype("\tencodeBlockGenotype: (" + std::to_string(TotalnumberOfRows) + ")");
                 genotypeData = genie::genotype::encode_block(genotype_opt, recs);
             }
             std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
@@ -236,7 +201,7 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
             _colStart++;
         }
         _rowStart++;
-        TotalnumberOfRows += rowCount;
+        TotalnumberOfRows += (rowCount+1);
     }
     return TotalnumberOfRows;
 }
