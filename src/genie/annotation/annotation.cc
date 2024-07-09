@@ -177,7 +177,10 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
 
         if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
         if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
-        if (recsTiled.back().back().getNumSamples() == 0) recsTiled.back().pop_back();
+        if (recsTiled.back().back().getNumSamples() == 0) {
+            recsTiled.back().pop_back();
+            rowCount--;
+        }
 
         uint32_t _colStart = 0;
         for (auto& recs : recsTiled) {
