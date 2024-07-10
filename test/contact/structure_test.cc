@@ -22,7 +22,7 @@
 
 TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
 
-    std::srand(std::time(0)); // seed the random number generator
+    std::srand((unsigned)std::time(0)); // seed the random number generator
 
     // Test JBIG
     {
@@ -344,9 +344,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
     {
         auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
-        auto SAMPLE1_ID = 10u;
+        uint8_t SAMPLE1_ID = 10u;
         auto SAMPLE1_NAME = std::string("SAMPLE1");
-        auto SAMPLE2_ID = 20u;
+        uint8_t SAMPLE2_ID = 20u;
         auto SAMPLE2_NAME = std::string("SAMPLE2");
 
         constexpr auto CHR1_ID = 30u;
@@ -359,7 +359,7 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         auto BIN_SIZE = 5u;
         auto TILE_SIZE = 5u;
 
-        uint32_t MULTIPLIER = 1u;
+        // uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
         ORIG_CM_PARAM.upsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);

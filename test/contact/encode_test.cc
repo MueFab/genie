@@ -1921,7 +1921,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             }
 
 
-            auto y = 10;
+            // auto y = 10;
         }
 
         ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
@@ -2480,7 +2480,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
                 ASSERT_EQ(lr_it.second, recon_it->second) << "(" << lr_it.first.first << "," << lr_it.first.second << ")";
             }
 
-            auto y = 10;
+            // auto y = 10;
         }
 
         ASSERT_EQ(recon_rec.getNumEntries(), LR_REC.getNumEntries());
