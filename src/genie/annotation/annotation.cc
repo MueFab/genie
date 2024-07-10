@@ -81,7 +81,7 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
 }
 
 void Annotation::parseGenotype(std::ifstream& inputfile) {
-    const uint32_t defaultTileSize = 10000;
+    const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
     const uint32_t defaultTileWidth = 3000;
     genotype_opt.block_size = defaultTileSize;
     likelihood_opt.block_size = defaultTileSize;
@@ -112,8 +112,11 @@ void Annotation::parseGenotype(std::ifstream& inputfile) {
             auto& info = recData.at(i).genotypeDatablock.attributeInfo[formatdata.first];
             std::vector<uint32_t> arrayDims;
             arrayDims.push_back(std::min(likelihood_opt.block_size, static_cast<uint32_t>(rowsRead)));
-            arrayDims.push_back(recData.at(i).numSamples);
-            arrayDims.push_back(recData.at(i).formatCount);
+            arrayDims.push_back(
+                recData.at(i).numSamples);  // static_cast<uint32_t>(formatdata.second.at(0).size()));  //
+            arrayDims.push_back(
+                recData.at(i).formatCount);  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
+
             attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
                                                     arrayDims);
             attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
@@ -185,9 +188,7 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
         uint32_t _colStart = 0;
         for (auto& recs : recsTiled) {
             std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
-            {
-                genotypeData = genie::genotype::encode_block(genotype_opt, recs);
-            }
+            { genotypeData = genie::genotype::encode_block(genotype_opt, recs); }
             std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
                 genie::likelihood::encode_block(likelihood_opt, recs);
 
@@ -204,7 +205,7 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
             _colStart++;
         }
         _rowStart++;
-        TotalnumberOfRows += (rowCount+1);
+        TotalnumberOfRows += (rowCount + 1);
     }
     return TotalnumberOfRows;
 }
