@@ -302,7 +302,7 @@ int main(int argc, char* argv[]) {
             break;
     }
 
-    flowGraph->run();
+    // flowGraph->run();
 
 //    if (getOperation(pOpts.inputFile, pOpts.outputFile) == OperationCase::ENCODE) {
 //        std::ofstream jsonfile(pOpts.outputFile + ".json");
@@ -310,9 +310,9 @@ int main(int argc, char* argv[]) {
 //        jsonfile.write(jsonstring.data(), jsonstring.length());
 //    }
 
-    auto stats = flowGraph->getStats();
-    stats.addDouble("time-total", watch.check());
-    std::cerr << stats << std::endl;
+    // auto stats = flowGraph->getStats();
+    // stats.addDouble("time-total", watch.check());
+    // std::cerr << stats << std::endl;
 
     return 0;
 }

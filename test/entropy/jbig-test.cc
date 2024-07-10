@@ -70,8 +70,8 @@ TEST_F(JBIGTestCase, JBIGEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
     encoder.encode(uncomressed_input, compressed_output, ncols, nrows);
 
     size_t ORIG_COMPRESSED_PAYLOAD_LEN = 37;
-    uint8_t ORIG_COMPRESSED_PAYLOAD[37] = { 0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
-                                 0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2 };
+    // uint8_t ORIG_COMPRESSED_PAYLOAD[37] = { 0, 0,  1,   0,   0,   0,   0,  23,  0,   0,   0,  5,   255, 255, 255, 255, 127, 0, 0,
+    //                              0, 25, 211, 149, 216, 214, 10, 197, 251, 121, 11, 254, 217, 140, 25,  128, 255, 2 };
 
     ASSERT_EQ(ORIG_COMPRESSED_PAYLOAD_LEN, compressed_output.str().size());
 
