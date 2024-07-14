@@ -161,7 +161,7 @@ void ContactMatrixParameters::addSample(SampleInformation&& sample_info) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixParameters::addSample(uint8_t ID, std::string&& name, bool exist_ok) {
+void ContactMatrixParameters::addSample(uint16_t ID, std::string&& name, bool exist_ok) {
     auto it = sample_infos.find(ID);
     if (it == sample_infos.end()) {
         SampleInformation sample_info = {ID, std::move(name)};
@@ -181,7 +181,7 @@ const std::unordered_map<uint8_t, SampleInformation>& ContactMatrixParameters::g
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& ContactMatrixParameters::getSampleName(
-    uint8_t _sample_ID
+    uint16_t _sample_ID
 ) const{
     auto sample_obj = sample_infos.find(_sample_ID);
     UTILS_DIE_IF(sample_obj == sample_infos.end(), "sample_ID does not exist!");
@@ -192,7 +192,7 @@ const std::string& ContactMatrixParameters::getSampleName(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixParameters::upsertSample(
-    uint8_t ID,
+    uint16_t ID,
     const std::string& name,
     bool exist_ok
 ){
@@ -209,7 +209,7 @@ void ContactMatrixParameters::upsertSample(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixParameters::upsertSample(
-    uint8_t ID,
+    uint16_t ID,
     std::string&& name,
     bool exist_ok
 ){
@@ -480,9 +480,9 @@ size_t ContactMatrixParameters::getSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixParameters::write(core::Writer& writer) const {
-    writer.write(static_cast<uint8_t>(sample_infos.size()),8);
+    writer.write(static_cast<uint16_t>(sample_infos.size()),16);
     for(const auto& sample_info : sample_infos) {
-        writer.write(sample_info.second.ID, 8);
+        writer.write(sample_info.second.ID, 16);
         writer.write(sample_info.second.name + '\0');
     }
 

@@ -13,6 +13,7 @@ set(source_files
         subcontact_matrix_mask_payload.cc
         contact_matrix_parameters.cc
         contact_matrix_tile_payload.cc
+        contact_matrix_bin_payload.cc
         contact_coder.cc
 )
 

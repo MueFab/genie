@@ -99,6 +99,8 @@ class GenotypeParameters {
 
     void write(core::Writer& writer) const;
     size_t getSize(core::Writer& writesize) const;
+
+    //TODO: Why we have read function here instead of a constructor?
     void read(util::BitReader& reader) { (void)reader; }
 };
 
