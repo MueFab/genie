@@ -65,7 +65,7 @@ ContactRecord::ContactRecord(
 
 ContactRecord::ContactRecord(util::BitReader &reader){
     // Sample
-    sample_ID = reader.readBypassBE<uint8_t>();
+    sample_ID = reader.readBypassBE<uint16_t>();
     sample_name.resize(reader.readBypassBE<uint8_t>());
     reader.readBypass(&sample_name[0], sample_name.size());
     bin_size = reader.readBypassBE<uint32_t>();
@@ -240,7 +240,7 @@ void ContactRecord::transposeCM(){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactRecord::getSampleID() const {return sample_ID;}
+uint16_t ContactRecord::getSampleID() const {return sample_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ const std::vector<std::vector<double_t>>& ContactRecord::getNormCounts() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactRecord::setSampleID(uint8_t _sample_ID){ sample_ID = _sample_ID; }
+void ContactRecord::setSampleID(uint16_t _sample_ID){ sample_ID = _sample_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

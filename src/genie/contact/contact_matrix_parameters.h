@@ -25,7 +25,7 @@ namespace contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct SampleInformation {
-    uint8_t ID;
+    uint16_t ID;
     std::string name;
 
     friend bool operator==(
@@ -82,7 +82,7 @@ class ContactMatrixParameters {
  private:
     // Length of samples_info is num_samples with type uint8_t
     // key of the sample_infos equals to SampleInformation.ID
-    std::unordered_map<uint8_t, SampleInformation> sample_infos;
+    std::unordered_map<uint16_t, SampleInformation> sample_infos;
     // Length of chr_infos is num_chrs with type uint8_t
     // key of the chr_infos equals to ChromosomeInformation.ID
     std::unordered_map<uint8_t, ChromosomeInformation> chr_infos;
@@ -162,7 +162,7 @@ class ContactMatrixParameters {
      * @param name The name of the sample.
      * @param exist_ok If true, allows the addition if the sample already exists.
      */
-    void addSample(uint8_t ID, std::string&& name, bool exist_ok=true);
+    void addSample(uint16_t ID, std::string&& name, bool exist_ok=true);
 
     /**
      * @brief Gets the samples.
@@ -183,7 +183,7 @@ class ContactMatrixParameters {
     * @throws std::runtime_error If the sample ID does not exist in the sample information map.
     */
     const std::string& getSampleName(
-        uint8_t
+        uint16_t
     ) const;
 
     /**
@@ -196,7 +196,7 @@ class ContactMatrixParameters {
     * @param exist_ok If true, allows the sample to be updated if it already exists.
     */
     void upsertSample(
-        uint8_t ID,
+        uint16_t ID,
         const std::string& name,
         bool exist_ok=true
     );
@@ -213,7 +213,7 @@ class ContactMatrixParameters {
     * @throws std::runtime_error If the sample ID already exists and exist_ok is false.
     */
     void upsertSample(
-        uint8_t ID,
+        uint16_t ID,
         std::string&& name,
         bool exist_ok=true
     );
