@@ -70,7 +70,7 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader) noexcept{
+ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader){
     codec_ID = reader.readBypassBE<core::AlgoID>();
     if (codec_ID == core::AlgoID::JBIG){
         tile_nrows = 0;
