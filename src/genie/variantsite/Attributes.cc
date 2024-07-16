@@ -25,13 +25,15 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     }
 
     typedTiles.back().writeElement(value);
+
     if (rowsPerTile == 0) {
     } else if (rowInTile < rowsPerTile - 1) {
         rowInTile++;
+        typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {
         writers.back().flush();
         std::vector<uint32_t> arrayDims;
-        arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+        arrayDims.push_back(static_cast<uint32_t>(rowInTile));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
