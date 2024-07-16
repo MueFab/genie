@@ -95,11 +95,11 @@ void GenotypeParameters::write(core::Writer& writer) const {
     writer.write(not_available_flag, 1);
     writer.write(static_cast<uint8_t>(binarization_ID), 3);
     if (binarization_ID == BinarizationID::BIT_PLANE) {
-        writer.write(static_cast<uint8_t>(variants_payload_params.size()), 8);
+        writer.write(getNumVariantsPayloads(), 8);
         writer.write(static_cast<uint8_t>(concat_axis), 8);
     }
 
-    for (auto i = 0; i < static_cast<uint8_t>(variants_payload_params.size()); ++i) {
+    for (auto i = 0u; i < getNumVariantsPayloads(); ++i) {
         writer.write(variants_payload_params[i].sort_rows_flag, 1);
         writer.write(variants_payload_params[i].sort_cols_flag, 1);
         writer.write(variants_payload_params[i].transpose_mat_flag, 1);

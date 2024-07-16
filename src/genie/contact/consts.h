@@ -36,6 +36,8 @@ using UIntMatDtype = xt::xtensor<uint32_t, 2, xt::layout_type::row_major>;
 using UInt64VecDtype = xt::xtensor<uint64_t, 1, xt::layout_type::row_major>;
 using Int64VecDtype = xt::xtensor<int64_t, 1, xt::layout_type::row_major>;
 
+using DoubleVecDtype = xt::xtensor<double_t, 1, xt::layout_type::row_major>;
+
 using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 

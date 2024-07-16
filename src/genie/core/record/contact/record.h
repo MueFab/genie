@@ -55,7 +55,7 @@ class ContactRecord {
     ContactRecord(const ContactRecord& rec) = default;
 
     ContactRecord(
-        uint8_t sample_ID,
+        uint16_t sample_ID,
         std::string&& sample_name,
         uint32_t bin_size,
         uint8_t chr1_ID,
@@ -84,7 +84,7 @@ class ContactRecord {
 
     void transposeCM();
 
-    uint8_t getSampleID() const;
+    uint16_t getSampleID() const;
 
     const std::string& getSampleName() const;
 
@@ -120,7 +120,7 @@ class ContactRecord {
 
      const std::vector<std::vector<double_t>>& getNormCounts() const;
 
-     void setSampleID(uint8_t _sample_ID);
+     void setSampleID(uint16_t _sample_ID);
 
      void setSampleName(std::string&& _sample_name);
 
