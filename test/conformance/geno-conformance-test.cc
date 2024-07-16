@@ -103,7 +103,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
                                     name);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     testallGenoConformance, GenotypeConformanceTest,
     ::testing::Values(
         genoTestValues(genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,

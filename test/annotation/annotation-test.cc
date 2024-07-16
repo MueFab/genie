@@ -90,7 +90,6 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-
 TEST_F(AnnotationTests, annotationSite) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
@@ -112,7 +111,7 @@ TEST_F(AnnotationTests, annotationSite) {
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 198 * 1024;  // aprox. 200kB
+    size_t expectedSize = 70 * 1024;  // aprox. 70kB
     EXPECT_LE(expectedSize, filesize);
 }
 TEST_F(AnnotationTests, annotationGeno) {
@@ -132,9 +131,29 @@ TEST_F(AnnotationTests, annotationGeno) {
     std::stringstream config;
     config << set1 << '\n' << set3 << '\n' << set4 << '\n';
 
+    uint32_t BLOCK_SIZE = 10000;
+    bool TRANSFORM_MODE = true;
+
+    genie::likelihood::EncodingOptions likelihood_opt = {
+        BLOCK_SIZE,      // block_size
+        TRANSFORM_MODE,  // transform_flag;
+    };
+
+    genie::genotype::EncodingOptions genotype_opt = {
+        BLOCK_SIZE,                                  // block_size;
+        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+        false,                                       // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::core::AlgoID::JBIG                    // codec_ID;
+    };
+
     ASSERT_FALSE(!std::filesystem::is_regular_file(inputFilename));
 
     genie::annotation::Annotation annotationGenerator;
+    annotationGenerator.setLikelihoodOptions(likelihood_opt);
+    annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
 
