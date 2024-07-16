@@ -98,11 +98,17 @@ void TypedData::write(core::Writer& outputWriter) const {
     }
 
     if (!compressedDataStream.str().empty()) {
-    //    outputWriter.write(compressedDataStream.str().size(), 32);
+        bool encoded = true;
+        outputWriter.write(encoded, 1);
+        auto size = compressedDataStream.str().size();
+        outputWriter.write(size, 32);
         outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
     } else {
+        bool encoded = false;
+        outputWriter.write(encoded, 1);
         outputWriter.write(const_cast<std::stringstream*>(&dataStream));
     }
+    outputWriter.flush();
 }
 
 }  // namespace annotation_access_unit
