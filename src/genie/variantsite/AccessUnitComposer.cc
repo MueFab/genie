@@ -49,7 +49,7 @@ void AccessUnitComposer::setAccessUnit(
     for (auto it = encodedDescriptors.begin(); it != encodedDescriptors.end(); ++it) {
         std::vector<uint8_t> data;
         for (auto readbyte : it->second.str()) data.push_back(readbyte);
-        genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, 0, data);
+        genie::core::record::annotation_access_unit::BlockVectorData blockInfo(it->first, data);
         genie::core::record::annotation_access_unit::Block block;
         if (data.size() != 0) {
             block.set(blockInfo);
@@ -178,10 +178,17 @@ void AccessUnitComposer::compress(
     const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>& descriptorConfigurations,
     std::map<genie::core::AnnotDesc, std::stringstream>& inputstream,
     std::map<genie::core::AnnotDesc, std::stringstream>& encodedDescriptors) {
+
     genie::entropy::bsc::BSCEncoder bscEncoder;
     genie::entropy::lzma::LZMAEncoder lzmaEncoder;
     genie::entropy::zstd::ZSTDEncoder zstdEncoder;
     for (auto encodingpar : descriptorConfigurations) {
+
+        if (encodingpar.getDescriptorID() == genie::core::AnnotDesc::GENOTYPE ||
+            encodingpar.getDescriptorID() == genie::core::AnnotDesc::LIKELIHOOD ||
+            encodingpar.getDescriptorID() == genie::core::AnnotDesc::CONTACT)
+            encodedDescriptors[encodingpar.getDescriptorID()] << inputstream[encodingpar.getDescriptorID()].rdbuf();
+        else
         switch (encodingpar.getEncodingModeID()) {
             case genie::core::AlgoID::BSC:
                 bscEncoder.encode(inputstream[encodingpar.getDescriptorID()],

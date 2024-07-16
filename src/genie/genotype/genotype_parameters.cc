@@ -114,6 +114,7 @@ void GenotypeParameters::write(core::Writer& writer) const {
     } else {
         writer.write(phasing_value, 1);
     }
+    writer.flush();
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

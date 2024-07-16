@@ -52,43 +52,38 @@ DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoI
 }
 
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
-    genie::contact::ContactMatrixParameters _contact_matrix_parameters,
-    AlgorithmParameters _algorithm_parameters)
+                                                 genie::contact::ContactMatrixParameters _contact_matrix_parameters,
+                                                 AlgorithmParameters _algorithm_parameters)
     : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
     contact_matrix_parameters = _contact_matrix_parameters;
 }
 
-
 void DescriptorConfiguration::read(util::BitReader& reader) {
     descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.read_b(8)));
-    encoding_mode_ID = static_cast<AlgoID>(reader.read_b(8));
-    switch (descriptor_ID) {
-        case AnnotDesc::GENOTYPE:
-            genotype_parameters.read(reader);
-            break;
-        case AnnotDesc::LIKELIHOOD:
-            //  likelihood_parameters.read(reader);
-            break;
-        case AnnotDesc::CONTACT:
-            //  contact_matrix_parameters.read(reader);
-            break;
-        default:
-            break;
+    if (descriptor_ID == AnnotDesc::GENOTYPE) {
+        genotype_parameters.read(reader);
+    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
+        likelihood_parameters.read(reader);
+    } else if (descriptor_ID == AnnotDesc::CONTACT) {
+        // not implemented
+    } else {
+        encoding_mode_ID = static_cast<AlgoID>(reader.read_b(8));
+        algorithm_parameters.read(reader);
     }
-    algorithm_parameters.read(reader);
 }
 
 void DescriptorConfiguration::write(core::Writer& writer) const {
     writer.write(static_cast<uint8_t>(descriptor_ID), 8);
-    writer.write(static_cast<uint8_t>(encoding_mode_ID), 8);
-    if (descriptor_ID == AnnotDesc::GENOTYPE)
+    if (descriptor_ID == AnnotDesc::GENOTYPE) {
         genotype_parameters.write(writer);
-    else if (descriptor_ID == AnnotDesc::LIKELIHOOD)
+    } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_parameters.write(writer);
-   // else if (descriptor_ID == AnnotDesc::CONTACT)
-        //  contact_matrix_parameters.write(writer);
-        
-    algorithm_parameters.write(writer);
+    } else if (descriptor_ID == AnnotDesc::CONTACT) {
+        // not implemented
+    } else {
+        writer.write(static_cast<uint8_t>(encoding_mode_ID), 8);
+        algorithm_parameters.write(writer);
+    }
 }
 
 size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
