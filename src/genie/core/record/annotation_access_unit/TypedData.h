@@ -76,6 +76,11 @@ class TypedData {
         array_dims = arrayDims;
     }
 
+    void setArrayDim0(uint32_t value) { array_dims.at(0) = value; }
+    void setArrayDim1(uint32_t value) {
+        if (array_dims.size() > 1) array_dims.at(1) = value;
+    }
+
     void convertToTypedData(util::BitReader& reader);
 
     void writeElement(std::vector<CustomType> matrixRow);
@@ -91,9 +96,7 @@ class TypedData {
         writer.flush();
         return dataStream;
     }
-    std::stringstream& getCompresseddata() {
-        return compressedDataStream;
-    }
+    std::stringstream& getCompresseddata() { return compressedDataStream; }
 
     void setCompressedData(std::stringstream& _compressed_data_block) {
         compressedDataStream.str("");
@@ -108,7 +111,6 @@ class TypedData {
     }
 
     void write(core::Writer& writer) const;
-
 
  private:
     core::DataType data_type_ID;
