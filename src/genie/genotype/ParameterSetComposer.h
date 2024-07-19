@@ -50,10 +50,10 @@ class ParameterSetComposer {
     void setLikelihoodParameters(genie::likelihood::LikelihoodParameters _parameters) {
         likelihoodParameters = _parameters;
     }
-    void setContactMatrixParameters(genie::contact::ContactMatrixParameters _parameters) {
+    /* void setContactMatrixParameters(genie::contact::ContactMatrixParameters _parameters) {
         contactMatrixParameters = _parameters;
     }
-
+    */
     void setCompressors(genie::annotation::Compressor _compressors) {
         compressors = _compressors;
         useCompressors = true;

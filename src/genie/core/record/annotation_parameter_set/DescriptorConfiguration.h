@@ -20,7 +20,7 @@
 
 #include "AlgorithmParameters.h"
 #include "ContactMatrixParameters.h"
-#include "genie/contact/contact_matrix_parameters.h"
+//#include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"
@@ -38,7 +38,7 @@ class DescriptorConfiguration {
     AlgoID encoding_mode_ID;
     genie::genotype::GenotypeParameters genotype_parameters;
     genie::likelihood::LikelihoodParameters likelihood_parameters;
-    genie::contact::ContactMatrixParameters contact_matrix_parameters;
+  //  genie::contact::ContactMatrixParameters contact_matrix_parameters;
     AlgorithmParameters algorithm_parameters;
 
  public:
@@ -53,10 +53,10 @@ class DescriptorConfiguration {
         genie::likelihood::LikelihoodParameters likelihood_parameters,
         AlgorithmParameters algorithm_parameters);
 
-    DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
+ /* DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
         genie::contact::ContactMatrixParameters _contact_matrix_parameters,
         AlgorithmParameters algorithm_parameters);
- 
+ */
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID,
         AlgorithmParameters algorithm_parameters);
 
@@ -68,7 +68,7 @@ class DescriptorConfiguration {
 
     genie::genotype::GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }
     genie::likelihood::LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
-    genie::contact::ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }
+  //  genie::contact::ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }
     AlgorithmParameters getAlgorithmParameters() const { return algorithm_parameters; }
 };
 
