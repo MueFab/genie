@@ -29,7 +29,7 @@ namespace record {
 
 class ContactRecord {
  private:
-    uint8_t sample_ID;
+    uint16_t sample_ID;
     std::string sample_name;
     uint32_t bin_size;
     uint8_t chr1_ID;
