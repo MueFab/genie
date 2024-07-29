@@ -344,9 +344,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
     {
         auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
-        uint8_t SAMPLE1_ID = 10u;
+        uint16_t SAMPLE1_ID = 10u;
         auto SAMPLE1_NAME = std::string("SAMPLE1");
-        uint8_t SAMPLE2_ID = 20u;
+        uint16_t SAMPLE2_ID = 20u;
         auto SAMPLE2_NAME = std::string("SAMPLE2");
 
         constexpr auto CHR1_ID = 30u;

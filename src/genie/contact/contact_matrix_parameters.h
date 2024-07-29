@@ -117,7 +117,7 @@ class ContactMatrixParameters {
      * @param norm_mat_infos The normalized matrix information.
      */
     ContactMatrixParameters(
-        std::unordered_map<uint8_t, SampleInformation>&& sample_infos,
+        std::unordered_map<uint16_t, SampleInformation>&& sample_infos,
         std::unordered_map<uint8_t, ChromosomeInformation>&& chr_infos,
         uint32_t interval,
         uint32_t tile_size,
@@ -142,7 +142,7 @@ class ContactMatrixParameters {
      *
      * @return The number of samples.
      */
-    uint8_t getNumSamples() const;
+    uint16_t getNumSamples() const;
 
     /**
      * @brief Adds a sample.
@@ -171,7 +171,7 @@ class ContactMatrixParameters {
      *
      * @return A constant reference to the samples.
      */
-    const std::unordered_map<uint8_t, SampleInformation>& getSamples() const;
+    const std::unordered_map<uint16_t, SampleInformation>& getSamples() const;
 
     /**
     * @brief Gets the sample name corresponding to the given sample ID.
