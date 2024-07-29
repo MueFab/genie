@@ -30,7 +30,7 @@ ContactMatrixParameters::ContactMatrixParameters()
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixParameters::ContactMatrixParameters(
-    std::unordered_map<uint8_t, SampleInformation>&& _sample_infos,
+    std::unordered_map<uint16_t, SampleInformation>&& _sample_infos,
     std::unordered_map<uint8_t, ChromosomeInformation>&& _chr_infos,
     uint32_t _interval,
     uint32_t _tile_size,
@@ -61,9 +61,9 @@ ContactMatrixParameters::ContactMatrixParameters(
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
-    auto num_samples = reader.readBypassBE<uint8_t>();
+    auto num_samples = reader.readBypassBE<uint16_t>();
     for (uint8_t i = 0; i<num_samples; i++){
-        auto ID = reader.readBypassBE<uint8_t>();
+        auto ID = reader.readBypassBE<uint16_t>();
         std::string name;
         reader.readBypass_null_terminated(name);
 
@@ -150,7 +150,7 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ContactMatrixParameters::getNumSamples() const { return static_cast<uint8_t>(sample_infos.size()); }
+uint16_t ContactMatrixParameters::getNumSamples() const { return static_cast<uint16_t>(sample_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -176,7 +176,7 @@ void ContactMatrixParameters::addSample(uint16_t ID, std::string&& name, bool ex
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::unordered_map<uint8_t, SampleInformation>& ContactMatrixParameters::getSamples() const{ return sample_infos; }
+const std::unordered_map<uint16_t, SampleInformation>& ContactMatrixParameters::getSamples() const{ return sample_infos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -443,9 +443,9 @@ uint32_t ContactMatrixParameters::getNumTiles(
 size_t ContactMatrixParameters::getSize() const {
     size_t size = 0;
 
-    size += sizeof(uint8_t);
+    size += sizeof(uint16_t);
     for (const auto& sample_info : sample_infos) {
-        size += sizeof(uint8_t); // ID
+        size += sizeof(uint16_t); // ID
         size += sample_info.second.name.size() + 1; // +1 for the null terminator
     }
 
@@ -519,8 +519,8 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-template <typename T>
-bool mapsEqual(const std::unordered_map<uint8_t, T>& current, const std::unordered_map<uint8_t, T>& other) {
+template <typename KeyType, typename T>
+bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unordered_map<KeyType, T>& other) {
     if (current.size() != other.size()) {
         return false;
     }
