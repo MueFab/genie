@@ -55,7 +55,7 @@ void check_row_col_uniqueness(
 
 TEST(ContactRecord, IntraContactRecord_LR_Raw) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> recs;
@@ -114,7 +114,7 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
 
 TEST(ContactRecord, IntraContactRecord_LR_Norm) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-all-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> recs;
@@ -176,7 +176,7 @@ TEST(ContactRecord, IntraContactRecord_LR_Norm) {
 
 TEST(ContactRecord, IntraContactRecord_HR_Raw) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-50000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-50000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> recs;
@@ -235,7 +235,7 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
 
 TEST(ContactRecord, InterContactRecord_LR_Raw) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_22.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> recs;

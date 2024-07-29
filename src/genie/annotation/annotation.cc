@@ -249,7 +249,7 @@ std::vector<genie::core::record::VariantGenotype> Annotation::splitOnRows(genie:
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 10000;
+    uint64_t defaultTileSize = 1000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
@@ -294,7 +294,7 @@ void Annotation::parseSite(std::ifstream& inputfile) {
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
                                  annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
-        rowIndex += defaultTileSize;
+        rowIndex ++;
     }
 }
 
