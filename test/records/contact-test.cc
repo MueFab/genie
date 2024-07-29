@@ -112,9 +112,9 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactRecord, IntraContactRecord_LR_Norm) {
+TEST(ContactRecord, IntraContactRecord_LR_All) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-all-250000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> recs;
