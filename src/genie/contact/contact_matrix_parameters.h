@@ -189,7 +189,7 @@ class ContactMatrixParameters {
     /**
     * @brief Upserts a sample in the contact matrix parameters.
     *
-    * Inserts or updates a sample with the given ID and name in the sample information map.
+    * Inserts or updates a sample with the6 given ID and name in the sample information map.
     *
     * @param ID The sample ID to upsert.
     * @param name The sample name to upsert.
