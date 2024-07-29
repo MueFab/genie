@@ -22,7 +22,7 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactRecord::ContactRecord(
-    uint8_t _sample_ID,
+    uint16_t _sample_ID,
     std::string&& _sample_name,
     uint32_t _bin_size,
     uint8_t _chr1_ID,

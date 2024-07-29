@@ -18,6 +18,8 @@
 #include "genie/util/bitreader.h"
 //#include "genie/util/bitwriter.h"
 //#include "genie/util/runtime-exception.h"
+#include <unistd.h>
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -775,9 +777,16 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+
+size_t getAvailableSystemMemory() {
+    long pages = sysconf(_SC_PHYS_PAGES);
+    long page_size = sysconf(_SC_PAGE_SIZE);
+    return pages * page_size;
+}
+
 TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> RECS;
@@ -1001,7 +1010,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
 
 TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_21.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> RECS;
@@ -1505,7 +1514,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
 
 TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_22.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> RECS;
@@ -2068,7 +2077,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
 
 TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-raw-250000-21_22.cont";
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont";
     std::string filepath = gitRootDir + "/data/records/contact/" + filename;
 
     std::vector<genie::core::record::ContactRecord> RECS;

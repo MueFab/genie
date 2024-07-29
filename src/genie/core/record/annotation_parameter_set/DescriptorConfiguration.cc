@@ -50,14 +50,14 @@ DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoI
     : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
     likelihood_parameters = _likelihood_parameters;
 }
-
+/*
 DescriptorConfiguration::DescriptorConfiguration(AnnotDesc _descriptor_ID, AlgoID _encoding_mode_ID,
                                                  genie::contact::ContactMatrixParameters _contact_matrix_parameters,
                                                  AlgorithmParameters _algorithm_parameters)
     : DescriptorConfiguration(_descriptor_ID, _encoding_mode_ID, _algorithm_parameters) {
     contact_matrix_parameters = _contact_matrix_parameters;
 }
-
+*/
 void DescriptorConfiguration::read(util::BitReader& reader) {
     descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.read_b(8)));
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
