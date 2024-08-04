@@ -27,7 +27,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload()
 
 SubcontactMatrixPayload::SubcontactMatrixPayload(
     uint8_t _parameter_set_ID,
-    uint8_t _sample_ID,
+    uint16_t _sample_ID,
     uint8_t _chr1_ID,
     uint8_t _chr2_ID
     ) : parameter_set_ID(_parameter_set_ID),
@@ -39,7 +39,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
 SubcontactMatrixPayload::SubcontactMatrixPayload(
     uint8_t _parameter_set_ID,
-    uint8_t _sample_ID,
+    uint16_t _sample_ID,
     uint8_t _chr1_ID,
     uint8_t _chr2_ID,
     TilePayloads&& _tile_payloads,
@@ -66,7 +66,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     UTILS_DIE_IF(!reader.isAligned(),  "Not byte aligned!");
 
     parameter_set_ID = reader.readBypassBE<uint8_t>();
-    sample_ID = reader.readBypassBE<uint8_t>();
+    sample_ID = reader.readBypassBE<uint16_t>();
     chr1_ID = reader.readBypassBE<uint8_t>();
     chr2_ID = reader.readBypassBE<uint8_t>();
 
@@ -139,6 +139,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+//TOOD(yeremia): rewrite is as friend operator
 bool SubcontactMatrixPayload::operator==(
     SubcontactMatrixPayload& other
 ) {
@@ -167,7 +168,7 @@ uint8_t SubcontactMatrixPayload::getParameterSetID() const { return parameter_se
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t SubcontactMatrixPayload::getSampleID() const { return sample_ID; }
+uint16_t SubcontactMatrixPayload::getSampleID() const { return sample_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -221,7 +222,7 @@ void SubcontactMatrixPayload::setParameterSetID(uint8_t id) { parameter_set_ID =
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::setSampleID(uint8_t id) { sample_ID = id; }
+void SubcontactMatrixPayload::setSampleID(uint16_t id) { sample_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -233,17 +234,9 @@ void SubcontactMatrixPayload::setChr2ID(uint8_t id) { chr2_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void SubcontactMatrixPayload::setTilePayloads(TilePayloads&& payloads) { tile_payloads = payloads; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void SubcontactMatrixPayload::setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) {
     row_mask_payload = payload;
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//void SubcontactMatrixPayload::setRowMaskPayload(SubcontactMatrixMaskPayload&& payload){ row_mask_payload = payload;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -253,14 +246,6 @@ void SubcontactMatrixPayload::setColMaskPayload(const std::optional<SubcontactMa
         col_mask_payload = payload;
     }
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-//void SubcontactMatrixPayload::setColMaskPayload(SubcontactMatrixMaskPayload&& payload){
-//    if (!isIntraSCM()){
-//        col_mask_payload = payload;
-//    }
-//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -324,10 +309,10 @@ bool SubcontactMatrixPayload::isIntraSCM() const{
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t SubcontactMatrixPayload::getSize() const{
-    size_t size = 1u; // parameter_set_ID
-    size += 1u; // sample_ID
-    size += 1u; // chr1_ID
-    size += 1u; // chr2_ID
+    size_t size = sizeof(uint8_t); // parameter_set_ID
+    size += sizeof(uint16_t ); // sample_ID
+    size += sizeof(uint8_t ); // chr1_ID
+    size += sizeof(uint8_t ); // chr2_ID
 
     auto ntiles_in_row = getNTilesInRow();
     auto ntiles_in_col = getNTilesInCol();

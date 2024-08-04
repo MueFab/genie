@@ -40,7 +40,7 @@ using NormTilePayloads = std::vector<std::vector<uint8_t>>;
 class SubcontactMatrixPayload {
   private:
       uint8_t parameter_set_ID;
-      uint8_t sample_ID;
+      uint16_t sample_ID;
       uint8_t chr1_ID;
       uint8_t chr2_ID;
       TilePayloads tile_payloads;
@@ -99,7 +99,7 @@ class SubcontactMatrixPayload {
      */
     SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
-        uint8_t sample_ID,
+        uint16_t sample_ID,
         uint8_t chr1_ID,
         uint8_t chr2_ID
     );
@@ -119,7 +119,7 @@ class SubcontactMatrixPayload {
      */
     SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
-        uint8_t sample_ID,
+        uint16_t sample_ID,
         uint8_t chr1_ID,
         uint8_t chr2_ID,
         TilePayloads&& tile_payloads,
@@ -175,7 +175,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the sample.
     */
-   uint8_t getSampleID() const;
+   uint16_t getSampleID() const;
 
    /**
     * @brief Get the Chromosome 1 ID.
@@ -267,7 +267,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the sample.
     */
-   void setSampleID(uint8_t id);
+   void setSampleID(uint16_t id);
 
    /**
     * @brief Set the Chromosome 1 ID.
