@@ -51,7 +51,7 @@ ContactMatrixParameters::ContactMatrixParameters(
         UTILS_DIE_IF(tile_size % mult != 0, "Invalid multiplier!");
     }
 
-    UTILS_DIE_IF(sample_infos.size() > UINT8_MAX, "sample_infos is not uint8!");
+    UTILS_DIE_IF(sample_infos.size() > UINT16_MAX, "sample_infos is not uint8!");
     UTILS_DIE_IF(chr_infos.size() > UINT8_MAX, "chr_infos is not uint8!");
     UTILS_DIE_IF(bin_size_multipliers.size() > UINT8_MAX, "bin_size_multipliers is not uint8!");
     UTILS_DIE_IF(norm_method_infos.size() > UINT8_MAX, "norm_method_infos is not uint8!");
@@ -62,7 +62,7 @@ ContactMatrixParameters::ContactMatrixParameters(
 
 ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     auto num_samples = reader.readBypassBE<uint16_t>();
-    for (uint8_t i = 0; i<num_samples; i++){
+    for (uint16_t i = 0; i<num_samples; i++){
         auto ID = reader.readBypassBE<uint16_t>();
         std::string name;
         reader.readBypass_null_terminated(name);
@@ -479,6 +479,7 @@ size_t ContactMatrixParameters::getSize() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+//TODO(yeremia): use util::Bitwriter instead of core::Writer
 void ContactMatrixParameters::write(core::Writer& writer) const {
     writer.write(static_cast<uint16_t>(sample_infos.size()),16);
     for(const auto& sample_info : sample_infos) {
@@ -526,7 +527,10 @@ bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unorder
     }
     for (const auto& pair : current) {
         auto iter = other.find(pair.first);
-        if (iter == other.end() || !(pair.second == iter->second)) {
+        if (iter == other.end()) {
+            return false;
+        }
+        if (!(pair.second == iter->second)){
             return false;
         }
     }
@@ -536,21 +540,42 @@ bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unorder
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ContactMatrixParameters::operator==(const ContactMatrixParameters& other) {
-    bool ret;
-    ret = this->getNumSamples() == other.getNumSamples();
-    ret &= this->getBinSize() == other.getBinSize();
-    ret &= this->getTileSize() == other.getTileSize();
-    ret &= this->getNumChromosomes() == other.getNumChromosomes();
-    ret &= this->getNumNormMethods() == other.getNumNormMethods();
-    ret &= this->getNumNormMats() == other.getNumNormMats();
+    if (this->getNumSamples() != other.getNumSamples()){
+        return false;
+    }
+    if (!mapsEqual(this->sample_infos, other.sample_infos)){
+        return false;
+    }
 
-    // compare all the samples inside
-    ret &= mapsEqual(this->sample_infos, other.sample_infos);
-    ret &= mapsEqual(this->getChromosomes(), other.getChromosomes());
-    ret &= mapsEqual(this->norm_mat_infos, other.norm_mat_infos);
-    ret &= mapsEqual(this->norm_method_infos, other.norm_method_infos);
+    if (this->getNumChromosomes() != other.getNumChromosomes()){
+        return false;
+    }
+    if (!mapsEqual(this->getChromosomes(), other.getChromosomes())){
+        return false;
+    }
 
-    return ret;
+    if (this->getBinSize() != other.getBinSize()){
+        return false;
+    }
+    if (this->getTileSize() != other.getTileSize()){
+        return false;
+    }
+
+    if (this->getNumNormMethods() != other.getNumNormMethods()){
+        return false;
+    }
+    if (!mapsEqual(this->norm_method_infos, other.norm_method_infos)){
+        return false;
+    }
+
+    if (this->getNumNormMats() != other.getNumNormMats()){
+        return false;
+    }
+    if (!mapsEqual(this->norm_mat_infos, other.norm_mat_infos)){
+        return false;
+    }
+
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
