@@ -777,13 +777,6 @@ TEST(ContactCoder, RoundTrip_Coding_CodingCMTile) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-size_t getAvailableSystemMemory() {
-    long pages = sysconf(_SC_PHYS_PAGES);
-    long page_size = sysconf(_SC_PAGE_SIZE);
-    return pages * page_size;
-}
-
 TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_21.cont";
