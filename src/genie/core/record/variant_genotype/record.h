@@ -44,7 +44,6 @@ class info_field {
 class format_field {
  private:
     uint32_t sample_count;
-
     std::string format;
     core::DataType type;
     std::vector<std::vector<std::vector<uint8_t>>> value;
@@ -52,12 +51,17 @@ class format_field {
 
  public:
     format_field(util::BitReader& bitreader, uint32_t _sample_count);
-
+    format_field() = default;
     std::string getFormat() const { return format; }
     core::DataType getType() const { return type; }
     uint32_t getSampleCount() const { return sample_count; }
     const std::vector<std::vector<std::vector<uint8_t>>>& getValue() const { return value; }
     uint8_t getArrayLength() const { return arrayLength; }
+
+    format_field(std::string _format, core::DataType _type, uint8_t _arrayLength)
+        : sample_count(0), format(_format), type(_type), value{}, arrayLength(_arrayLength) {}
+    void setSampleCount(uint32_t _sample_count) { sample_count = _sample_count; }
+    void setValue(std::vector<std::vector<std::vector<uint8_t>>> _value) { value = _value; }
 };
 
 /**
@@ -86,7 +90,7 @@ class VariantGenotype {
     uint32_t getNumSamples() const;
 
     uint8_t getFormatCount() const;
-    //    const std::vector<format_field>& getFormat() const;
+
     bool isGenotypePresent() const;
     bool isLikelihoodPresent() const;
     uint8_t getNumberOfAllelesPerSample() const;
@@ -102,6 +106,7 @@ class VariantGenotype {
     void setPhasings(std::vector<std::vector<uint8_t>> _phasings) { phasings = _phasings; };
     void setAlleles(std::vector<std::vector<int8_t>> _alleles) { alleles = _alleles; }
     void setNumberOfSamples(uint32_t sampleSize) { sample_count = sampleSize; };
+    void setFormats(std::vector<format_field> _formats) { format = _formats; }
 };
 
 }  // namespace record

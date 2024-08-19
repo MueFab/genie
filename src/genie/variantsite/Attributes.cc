@@ -122,8 +122,6 @@ void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::
         }
         attrWritten[isWritten.first] = false;
     }
-    auto temp = attributeTiles["AC"].getCurrentsize();
-    if (temp == 0) ++temp;
 }
 
 void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {
