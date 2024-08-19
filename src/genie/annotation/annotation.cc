@@ -7,6 +7,7 @@
 
 #include <codecs/include/mpegg-codecs.h>
 #include "annotation.h"
+#include "genie/core/arrayType.h"
 #include "genie/util/runtime-exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -80,13 +81,15 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
         infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
 }
 
+typedef std::vector<genie::core::record::VariantGenotype> Tile;  // one tile contains a number of records
+
 void Annotation::parseGenotype(std::ifstream& inputfile) {
     const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
     const uint32_t defaultTileWidth = 3000;
-    genotype_opt.block_size = defaultTileSize;
     likelihood_opt.block_size = defaultTileSize;
-    uint8_t AT_ID = 1;
-    uint8_t AG_class = 0;
+
+    constexpr uint8_t AT_ID = 1;
+    constexpr uint8_t AG_class = 0;
 
     genie::genotype::GenotypeParameters genotypeParameters;
     genie::likelihood::LikelihoodParameters likelihoodParameters;
@@ -155,58 +158,137 @@ size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileS
                               genie::genotype::GenotypeParameters& genotypeParameters,
                               genie::likelihood::LikelihoodParameters& likelihoodParameters,
                               std::vector<RecData>& recData) {
-    genie::util::BitReader bitreader(inputfile);
     size_t TotalnumberOfRows = 0;
-    bool start = true;
-    std::vector<uint32_t> colTilesPerRow;
+
+    genie::util::BitReader bitreader(inputfile);
     uint32_t _rowStart = 0;
-    (void)rowTileSize;
-    while (bitreader.isGood()) {  //&& TotalnumberOfRows < 100) {
-        uint32_t rowCount = 0;
-        std::vector<std::vector<genie::core::record::VariantGenotype>> recsTiled;
-        {
-            while (bitreader.isGood() && rowCount < rowTileSize) {  // && rowCount < 100) {
+    bool start = true;
+    bool selectThis = true;
+    if (selectThis) {
+        while (bitreader.isGood()) {
+            std::vector<Tile> horizontalTiles;
+
+            for (uint32_t rowCount = 0; rowCount < rowTileSize && bitreader.isGood(); ++rowCount) {
                 genie::core::record::VariantGenotype varGenoType(bitreader);
-                auto recSplitOverCols = splitOnRows(varGenoType, colTilesize);
-                colTilesPerRow.push_back((uint32_t)recSplitOverCols.size());
-                if (recsTiled.size() == 0) recsTiled.resize(recSplitOverCols.size());
-
-                for (auto i = 0u; i < recSplitOverCols.size(); ++i)
-                    recsTiled.at(i).emplace_back(recSplitOverCols.at(i));
-                rowCount++;
+                if (bitreader.isGood()) {
+                    TotalnumberOfRows++;
+                    auto recSplitOverCols = splitOnRows(varGenoType, colTilesize);
+                    if (horizontalTiles.empty()) horizontalTiles.resize(recSplitOverCols.size());
+                    for (size_t coltile = 0; coltile < recSplitOverCols.size(); ++coltile)
+                        horizontalTiles.at(coltile).push_back(recSplitOverCols.at(coltile));
+                }
             }
-            rowCount--;
-        }
 
-        if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
-        if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
-        if (recsTiled.back().back().getNumSamples() == 0) {
-            recsTiled.back().pop_back();
-            rowCount--;
-        }
+            std::map<std::string, genie::core::record::format_field> formatList;
 
-        uint32_t _colStart = 0;
-        for (auto& recs : recsTiled) {
-            std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
-            { genotypeData = genie::genotype::encode_block(genotype_opt, recs); }
-            std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
-                genie::likelihood::encode_block(likelihood_opt, recs);
+            for (auto& hortile : horizontalTiles) {
+                for (auto& rec : hortile) {
+                    for (auto field : rec.getFormats()) {
+                        formatList[field.getFormat()] = field;
+                        genie::core::ArrayType convertArray;
+                        auto defaultValue =
+                            convertArray.toArray(field.getType(), convertArray.getDefaultValue(field.getType()));
 
-            uint32_t _numSamples = recs.front().getNumSamples();
-            uint8_t _formatCount = recs.front().getFormatCount();
-            recData.emplace_back(_rowStart, _colStart, std::get<genie::genotype::EncodingBlock>(genotypeData),
-                                 std::get<genie::likelihood::EncodingBlock>(likelihoodData), _numSamples, _formatCount);
-
-            if (start) {
-                genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
-                likelihoodParameters = std::get<genie::likelihood::LikelihoodParameters>(likelihoodData);
-                start = false;
+                        std::vector<std::vector<std::vector<uint8_t>>> formatvalue(
+                            field.getArrayLength(),
+                            std::vector<std::vector<uint8_t>>(field.getSampleCount(), defaultValue));
+                    }
+                }
             }
-            _colStart++;
+
+            for (auto& hortile : horizontalTiles) {
+                for (auto& rec : hortile) {
+                    auto formats = rec.getFormats();
+                    for (auto& availableFormats : formatList) {
+                        bool available = false;
+                        for (auto& currentFormat : formats)
+                            if (currentFormat.getFormat() == availableFormats.first) available = true;
+                        if (!available) formats.push_back(availableFormats.second);
+                    }
+                    rec.setFormats(formats);
+                }
+            }
+
+            uint32_t _colStart = 0;
+            for (auto& hortile : horizontalTiles) {
+                std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
+
+                genotypeData = genie::genotype::encode_block(genotype_opt, hortile);
+                std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
+                    genie::likelihood::encode_block(likelihood_opt, hortile);
+
+                uint32_t _numSamples = hortile.front().getNumSamples();
+                uint8_t _formatCount = hortile.front().getFormatCount();
+                recData.emplace_back(_rowStart, _colStart, std::get<genie::genotype::EncodingBlock>(genotypeData),
+                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData), _numSamples,
+                                     _formatCount);
+
+                if (start) {
+                    genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
+                    likelihoodParameters = std::get<genie::likelihood::LikelihoodParameters>(likelihoodData);
+                    start = false;
+                }
+                _colStart++;
+            }
+            _rowStart++;
         }
-        _rowStart++;
-        TotalnumberOfRows += (rowCount + 1);
+    } else {
+        std::vector<uint32_t> colTilesPerRow;
+
+        std::vector<std::vector<genie::core::record::format_field>> formats;
+        while (bitreader.isGood()) {  //&& TotalnumberOfRows < 100) {
+            uint32_t rowCount = 0;
+            std::vector<std::vector<genie::core::record::VariantGenotype>> recsTiled;
+            {
+                while (bitreader.isGood() && rowCount < rowTileSize) {  // && rowCount < 100) {
+                    genie::core::record::VariantGenotype varGenoType(bitreader);
+
+                    auto recSplitOverCols = splitOnRows(varGenoType, colTilesize);
+                    colTilesPerRow.push_back((uint32_t)recSplitOverCols.size());
+                    if (recsTiled.size() == 0) recsTiled.resize(recSplitOverCols.size());
+
+                    for (auto i = 0u; i < recSplitOverCols.size(); ++i) {
+                        recsTiled.at(i).emplace_back(recSplitOverCols.at(i));
+                        //      addFormats(formats, recsTiled.back().);
+                    }
+                    rowCount++;
+                }
+                rowCount--;
+            }
+
+            if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
+            if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
+            if (recsTiled.back().back().getNumSamples() == 0) {
+                recsTiled.back().pop_back();
+                rowCount--;
+            }
+            TotalnumberOfRows += (rowCount + 1);
+
+            uint32_t _colStart = 0;
+            for (auto& recs : recsTiled) {
+                std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
+
+                genotypeData = genie::genotype::encode_block(genotype_opt, recs);
+                std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
+                    genie::likelihood::encode_block(likelihood_opt, recs);
+
+                uint32_t _numSamples = recs.front().getNumSamples();
+                uint8_t _formatCount = recs.front().getFormatCount();
+                recData.emplace_back(_rowStart, _colStart, std::get<genie::genotype::EncodingBlock>(genotypeData),
+                                     std::get<genie::likelihood::EncodingBlock>(likelihoodData), _numSamples,
+                                     _formatCount);
+
+                if (start) {
+                    genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
+                    likelihoodParameters = std::get<genie::likelihood::LikelihoodParameters>(likelihoodData);
+                    start = false;
+                }
+                _colStart++;
+            }
+            _rowStart++;
+        }
     }
+
     return TotalnumberOfRows;
 }
 
@@ -220,27 +302,47 @@ std::vector<genie::core::record::VariantGenotype> Annotation::splitOnRows(genie:
         auto likelihoods = rec.getLikelihoods();
         auto phasings = rec.getPhasing();
         auto alleles = rec.getAlleles();
+        auto formats = rec.getFormats();
 
         auto totSampleSize = rec.getNumSamples();
 
         for (uint32_t colpos = 0; colpos < totSampleSize; colpos += colWidth) {
             genie::core::record::VariantGenotype variantGenotype(rec.getVariantIndex(), rec.getStartSampleIndex());
             uint32_t subSampleSize = std::min(colWidth, (totSampleSize - colpos));
-            auto LiklihoodStart = likelihoods.begin() + colpos;
-            auto LiklihoodEnd = likelihoods.begin() + colpos + subSampleSize;
+
+            if (likelihoods.size() > 0) {
+                auto LiklihoodStart = likelihoods.begin() + colpos;
+                auto LiklihoodEnd = likelihoods.begin() + colpos + subSampleSize;
+                std::vector<std::vector<uint32_t>> subLikelihoods(LiklihoodStart, LiklihoodEnd);
+                variantGenotype.setLikelihood(subLikelihoods);
+            }
             auto phasingStart = phasings.begin() + colpos;
             auto phasingEnd = phasings.begin() + colpos + subSampleSize;
             auto allelesStart = alleles.begin() + colpos;
             auto allelesEnd = alleles.begin() + colpos + subSampleSize;
-
-            std::vector<std::vector<uint32_t>> subLikelihoods(LiklihoodStart, LiklihoodEnd);
             std::vector<std::vector<uint8_t>> subPhasings(phasingStart, phasingEnd);
             std::vector<std::vector<int8_t>> subAlleles(allelesStart, allelesEnd);
 
-            variantGenotype.setLikelihood(subLikelihoods);
             variantGenotype.setPhasings(subPhasings);
             variantGenotype.setAlleles(subAlleles);
             variantGenotype.setNumberOfSamples(subSampleSize);
+
+            //--------------- formats ----------------//
+            if (formats.size() > 0) {
+                std::vector<genie::core::record::format_field> format;
+                for (auto& form : formats) {
+                    genie::core::record::format_field oneField(form.getFormat(), form.getType(), form.getArrayLength());
+                    oneField.setSampleCount(subSampleSize);
+                    auto FormatStart = form.getValue().begin() + colpos;
+                    auto FormatEnd = form.getValue().begin() + colpos + subSampleSize;
+                    std::vector<std::vector<std::vector<uint8_t>>> format_value(FormatStart, FormatEnd);
+                    oneField.setValue(format_value);
+                    format.push_back(oneField);
+                }
+                variantGenotype.setFormats(format);
+            }
+            //--------------- formats ----------------//
+
             splitRecs.push_back(variantGenotype);
         }
     }
@@ -249,7 +351,7 @@ std::vector<genie::core::record::VariantGenotype> Annotation::splitOnRows(genie:
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 1000;
+    uint64_t defaultTileSize = 10000;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
@@ -294,7 +396,7 @@ void Annotation::parseSite(std::ifstream& inputfile) {
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
                                  annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
-        rowIndex ++;
+        rowIndex++;
     }
 }
 
