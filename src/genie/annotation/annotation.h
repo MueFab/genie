@@ -20,12 +20,7 @@
 #include "genie/variantsite/ParameterSetComposer.h"
 #include "genie/variantsite/VariantSiteParser.h"
 
-#include "genie/contact/contact_coder.h"
-#include "genie/core/record/variant_genotype/record.h"
-#include "genie/genotype/ParameterSetComposer.h"
-#include "genie/genotype/genotype_coder.h"
-#include "genie/likelihood/likelihood_coder.h"
-#include "genie/likelihood/likelihood_payload.h"
+#include "genotype_annotation.h"
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"
@@ -41,6 +36,7 @@ class Descriptors {};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+
 class Annotation {
  public:
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
@@ -51,8 +47,8 @@ class Annotation {
 
     void parseInfoTags(std::string& recordInputFileName);
 
-    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
-    void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
+    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { genotypeAnnotation.setLikelihoodOptions(opt); }
+    void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotypeAnnotation.setGenotypeOptions(opt); }
 
  private:
     std::ifstream recordInput;
@@ -61,45 +57,11 @@ class Annotation {
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
 
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
 
-    //--------------------0--------------------------------------------------------------------//
-    struct RecData {
-        uint32_t rowStart;
-        uint32_t colStart;
-        genie::genotype::EncodingBlock genotypeDatablock;
-        genie::likelihood::EncodingBlock likelihoodDatablock;
-        uint32_t numSamples;
-        uint8_t formatCount;
-        RecData(uint32_t _rowStart, uint32_t _colStart, genie::genotype::EncodingBlock _genotypeDatablock,
-                genie::likelihood::EncodingBlock _likelihoodDatablock, uint32_t _numSamples, uint8_t _formatCount)
-            : rowStart(_rowStart),
-              colStart(_colStart),
-              genotypeDatablock(_genotypeDatablock),
-              likelihoodDatablock(_likelihoodDatablock),
-              numSamples(_numSamples),
-              formatCount(_formatCount) {}
-    };
-
-    genie::likelihood::EncodingOptions likelihood_opt{200, true};
-    genie::genotype::EncodingOptions genotype_opt{200,                                         // block size
-                                                  genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-                                                  genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-                                                  false,                                       // transpose_mat;
-                                                  genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-                                                  genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
-                                                  genie::core::AlgoID::JBIG};
-
-    void parseGenotype(std::ifstream& inputfile);
-
-    size_t readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize, const uint32_t& colTilesize,
-                      genie::genotype::GenotypeParameters& genotypeParameters,
-                      genie::likelihood::LikelihoodParameters& likelihoodParameters, std::vector<RecData>& recData);
-
-    std::vector<genie::core::record::VariantGenotype> splitOnRows(genie::core::record::VariantGenotype& rec,
-                                                                  uint32_t colWidth);
+    GenotypeAnnotation genotypeAnnotation;
 
     void parseSite(std::ifstream& inputfile);
 };
