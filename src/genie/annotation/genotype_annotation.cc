@@ -93,7 +93,6 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     genie::likelihood::LikelihoodParameters likelihoodParameters;
     std::vector<RecData> recData;
 
-    inputfile;
     size_t rowsRead =
         readBlocks(inputfile, defaultTileSize, defaultTileWidth, genotypeParameters, likelihoodParameters, recData);
 
