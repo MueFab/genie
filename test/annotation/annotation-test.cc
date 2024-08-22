@@ -99,12 +99,12 @@ TEST_F(AnnotationTests, annotationSite) {
     std::filesystem::remove(outputFilename + ".bin");
 
     genie::annotation::Annotation annotationGenerator;
-    std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
-    std::string set2 = "compressor 1 1 ZSTD";  // {8 16777216 3 0 2 32}";
-    std::string set3 = "compressor 2 0 LZMA {8}";
-    std::string set4 = "compressor 3 0 BSC {16 128 1 1}";
+    std::string comment = "# with parameters";
+    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
+    std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
 
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
@@ -124,12 +124,12 @@ TEST_F(AnnotationTests, annotationGeno) {
 
     std::filesystem::remove(outputFilename + ".bin");
 
-    std::string set1 = "compressor 1 0 BSC";
-    std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
-    std::string set3 = "compressor 2 0 ZSTD";
-    std::string set4 = "compressor 3 0 BSC";
+    std::string comment = "# with parameters";
+    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
+    std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
 
     uint32_t BLOCK_SIZE = 10000;
     bool TRANSFORM_MODE = true;
