@@ -449,7 +449,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 
     // fill all attribute data
     for (const auto& format : recs.at(0).getFormats()) {
-        auto& formatName = format.getFormat();
+        const auto& formatName = format.getFormat();
         block.attributeData[formatName].resize(block_size);
         block.attributeData[formatName];
         block.attributeData[formatName].resize(block_size);
