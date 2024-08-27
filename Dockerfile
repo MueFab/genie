@@ -1,5 +1,9 @@
+# How to build & run:
+# 1. docker build -t genie .
+# 2. docker run --rm -v /hostfs/work:/work genie run -i input.bam -o output.mgb
+
 # Start from the Alpine Linux base image
-FROM alpine:latest
+FROM alpine:3.20 AS builder
 
 # Install necessary packages: build dependencies and tools
 RUN apk add --no-cache \
@@ -16,22 +20,19 @@ RUN apk add --no-cache \
     libbz2 \
     autoconf \
     automake \
-    libtool \
-    libgomp
+    libtool 
 
-# Install htslib from source
 RUN git clone https://github.com/samtools/htslib.git \
     && cd htslib \
+    && git checkout tags/1.20 \
     && git submodule update --init --recursive \
     && autoreconf -i \
     && ./configure \
     && make -j \
     && make install \
     && cd .. \
-    && rm -rf ./htslib
-
-# Create the /genie directory
-RUN mkdir /genie
+    && rm -rf ./htslib \
+    && mkdir /genie
 
 # Copy the CMake project files into /genie
 COPY ./src /genie/src
@@ -42,16 +43,25 @@ COPY ./thirdparty /genie/thirdparty
 # Enter the /genie directory and build the project with CMake
 RUN cd /genie \
     && cmake . \
-    && make -j && make install
+    && make -j \
+    && make install \
+    && cd .. \
+    && rm -rf /genie
 
-# Clean up unnecessary files
-RUN apk del git curl cmake autoconf automake
-RUN rm -rf /genie
+FROM alpine:3.20
+
+RUN apk add --no-cache \
+    build-base \
+    xz \
+    libbz2
+    
+
+COPY --from=builder /usr/local/bin/genie /usr/local/bin/genie
+COPY --from=builder /usr/local/lib/libhts.so.3 /usr/local/lib/libhts.so.3
 
 RUN mkdir /work
 
 WORKDIR /work
 
-# Default command: start an interactive shell
-CMD ["/bin/sh"]
-
+# Default command: genie
+ENTRYPOINT ["/usr/local/bin/genie"]
