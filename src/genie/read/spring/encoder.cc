@@ -81,9 +81,9 @@ void Encoder::flushIn(uint64_t& pos) {
     mgr.setSource(srcVec);
     mgr.run();
 
-    ghc::filesystem::remove(preprocessor.temp_dir + "/blocks_id.bin");
-    ghc::filesystem::remove(preprocessor.temp_dir + "/read_order.bin");
-    ghc::filesystem::remove_all(preprocessor.temp_dir);
+    std::filesystem::remove(preprocessor.temp_dir + "/blocks_id.bin");
+    std::filesystem::remove(preprocessor.temp_dir + "/read_order.bin");
+    std::filesystem::remove_all(preprocessor.temp_dir);
 
     preprocessor.setup(preprocessor.working_dir, preprocessor.cp.num_thr, preprocessor.cp.paired_end);
 

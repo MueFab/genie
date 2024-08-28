@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 #include "genie/core/record/chunk.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"

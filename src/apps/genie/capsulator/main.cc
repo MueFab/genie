@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/capsulator/main.h"
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -14,7 +15,6 @@
 #include <utility>
 #include <vector>
 #include "apps/genie/capsulator/program-options.h"
-#include "filesystem/filesystem.hpp"
 #include "format/mgb/mgb_file.h"
 #include "format/mgg/encapsulator/decapsulated_file.h"
 #include "format/mgg/encapsulator/encapsulated_file.h"
