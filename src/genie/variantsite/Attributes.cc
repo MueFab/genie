@@ -58,7 +58,7 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
     core::DataType TypeId = info.getAttributeType();
     uint8_t numArrayDims = info.getArrayLength();
     std::vector<uint32_t> arrayDims;
-    arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+    arrayDims.push_back(static_cast<uint32_t>(rowInTile));
     for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
 
     for (auto& tile : tiles) {
