@@ -5,13 +5,13 @@
  */
 
 #include "apps/genie/capsulator/program-options.h"
+#include <filesystem>
 #include <iostream>
 #include <set>
 #include <string>
 #include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
-#include "filesystem/filesystem.hpp"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
 
@@ -84,7 +84,7 @@ std::string size_string(std::uintmax_t f_size) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateInputFile(const std::string &file) {
-    UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
+    UTILS_DIE_IF(!std::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
@@ -92,9 +92,9 @@ void validateInputFile(const std::string &file) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateOutputFile(const std::string &file, bool forced) {
-    UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
+    UTILS_DIE_IF(std::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
-    UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
+    UTILS_DIE_IF(std::filesystem::exists(file) && !std::filesystem::is_regular_file(file),
                  "Output file already existing, force flag set, but not a regular file. Genie won't overwrite folders "
                  "or special files: " +
                      file);
@@ -104,7 +104,7 @@ void validateOutputFile(const std::string &file, bool forced) {
         stream << TEST_STRING << std::endl;
         UTILS_DIE_IF(!stream, "Output file not accessible. Insufficient permissions? " + file);
     }
-    ghc::filesystem::remove(file);
+    std::filesystem::remove(file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -114,12 +114,12 @@ void ProgramOptions::validate() const {
 
     for (const auto &f : files) {
         validateInputFile(f);
-        std::cout << "Input file: " << f << " with size " << size_string(ghc::filesystem::file_size(f)) << std::endl;
+        std::cout << "Input file: " << f << " with size " << size_string(std::filesystem::file_size(f)) << std::endl;
     }
 
     //    validateOutputFile(outputFile, forceOverwrite);
     std::cout << "Output file: " << outputFile << " with "
-              << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+              << size_string(std::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -232,9 +232,9 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
         basedir = working_dir + "/" + random_str + '/';
-        if (!ghc::filesystem::exists(basedir)) break;
+        if (!std::filesystem::exists(basedir)) break;
     }
-    UTILS_DIE_IF(!ghc::filesystem::create_directory(basedir), "Cannot create temporary directory.");
+    UTILS_DIE_IF(!std::filesystem::create_directory(basedir), "Cannot create temporary directory.");
     std::cerr << "Temporary directory: " << basedir << "\n";
     // Read compression params
     std::string compression_params_file = "cp.bin";
@@ -528,8 +528,8 @@ void Decoder::flushIn(uint64_t& pos) {
                     add(chunk, std::move(r), pos);
                 }
             }
-            ghc::filesystem::remove(file_unmatched_readnames_1_sorted);
-            ghc::filesystem::remove(file_unmatched_readnames_2_sorted);
+            std::filesystem::remove(file_unmatched_readnames_1_sorted);
+            std::filesystem::remove(file_unmatched_readnames_2_sorted);
             auto reorder_unmatched_end = std::chrono::steady_clock::now();
             std::cerr << "Time for reordering unmatched reads: "
                       << std::chrono::duration_cast<std::chrono::seconds>(reorder_unmatched_end -
@@ -537,10 +537,10 @@ void Decoder::flushIn(uint64_t& pos) {
                              .count()
                       << " s\n";
         }
-        ghc::filesystem::remove(file_unmatched_fastq1);
-        ghc::filesystem::remove(file_unmatched_fastq2);
-        ghc::filesystem::remove(file_unmatched_readnames_1);
-        ghc::filesystem::remove(file_unmatched_readnames_2);
+        std::filesystem::remove(file_unmatched_fastq1);
+        std::filesystem::remove(file_unmatched_fastq2);
+        std::filesystem::remove(file_unmatched_readnames_1);
+        std::filesystem::remove(file_unmatched_readnames_2);
     }
 
     size_t size = chunk.getData().size() * 2;
@@ -549,7 +549,7 @@ void Decoder::flushIn(uint64_t& pos) {
         pos += size;
     }
 
-    ghc::filesystem::remove(basedir);
+    std::filesystem::remove(basedir);
 
     flushOut(pos);
 }

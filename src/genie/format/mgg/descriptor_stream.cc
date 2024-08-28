@@ -104,13 +104,13 @@ const DescriptorStreamProtection& DescriptorStream::getProtection() const { retu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DescriptorStream::hasProtection() const { return ds_protection != boost::none; }
+bool DescriptorStream::hasProtection() const { return ds_protection != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorStream::box_write(util::BitWriter& writer) const {
     header.write(writer);
-    if (ds_protection != boost::none) {
+    if (ds_protection != std::nullopt) {
         ds_protection->write(writer);
     }
     for (const auto& p : payload) {

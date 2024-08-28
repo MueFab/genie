@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -25,7 +25,7 @@ namespace dataset_header {
  */
 class USignature {
  private:
-    boost::optional<uint8_t> const_length;  //!< @brief
+    std::optional<uint8_t> const_length;  //!< @brief
 
  public:
     /**

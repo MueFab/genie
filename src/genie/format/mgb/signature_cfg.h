@@ -11,7 +11,7 @@
 
 #include <memory>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -30,7 +30,7 @@ class SignatureCfg {
     std::vector<uint64_t> U_cluster_signature;        //!< @brief
     std::vector<uint8_t> U_cluster_signature_length;  //!< @brief
 
-    boost::optional<uint8_t> U_signature_size;  //!< @brief
+    std::optional<uint8_t> U_signature_size;  //!< @brief
     uint8_t base_bits;
 
  public:

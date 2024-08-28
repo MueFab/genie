@@ -76,7 +76,7 @@ Block::Block(format::mgb::Block b)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::Payload Block::movePayload() { return std::move(boost::get<core::Payload>(payload)); }
+core::Payload Block::movePayload() { return std::move(payload); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

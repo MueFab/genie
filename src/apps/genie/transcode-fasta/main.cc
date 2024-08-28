@@ -6,14 +6,12 @@
 
 #define NOMINMAX
 #include "apps/genie/transcode-fasta/main.h"
+#include <filesystem>
 #include <string>
 #include <utility>
 #include "apps/genie/transcode-fasta/program-options.h"
 #include "genie/format/fasta/manager.h"
 #include "genie/format/mgb/raw_reference.h"
-
-// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
-#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,12 +48,12 @@ int main(int argc, char* argv[]) {
 
     std::string fai_name = pOpts.inputFile.substr(0, pOpts.inputFile.find_last_of('.')) + ".fai";
     std::string sha_name = pOpts.inputFile.substr(0, pOpts.inputFile.find_last_of('.')) + ".sha256";
-    if (!ghc::filesystem::exists(fai_name)) {
+    if (!std::filesystem::exists(fai_name)) {
         std::ifstream fasta_in(pOpts.inputFile);
         std::ofstream fai_out(fai_name);
         genie::format::fasta::FastaReader::index(fasta_in, fai_out);
     }
-    if (!ghc::filesystem::exists(sha_name)) {
+    if (!std::filesystem::exists(sha_name)) {
         std::ifstream fasta_in(pOpts.inputFile);
         std::ifstream fai_in(fai_name);
         genie::format::fasta::FaiFile faifile(fai_in);

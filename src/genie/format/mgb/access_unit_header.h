@@ -41,10 +41,10 @@ class AUHeader {
     uint8_t parameter_set_ID;                        //!< @brief
     core::record::ClassType au_type;                 //!< @brief
     uint32_t reads_count;                            //!< @brief
-    boost::optional<MmCfg> mm_cfg;                   //!< @brief
-    boost::optional<RefCfg> ref_cfg;                 //!< @brief
-    boost::optional<AuTypeCfg> au_Type_U_Cfg;        //!< @brief
-    boost::optional<SignatureCfg> signature_config;  //!< @brief
+    std::optional<MmCfg> mm_cfg;                   //!< @brief
+    std::optional<RefCfg> ref_cfg;                 //!< @brief
+    std::optional<AuTypeCfg> au_Type_U_Cfg;        //!< @brief
+    std::optional<SignatureCfg> signature_config;  //!< @brief
 
  public:
     /**

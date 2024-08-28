@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/format/mgg/dataset_header/u_signature.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,8 +25,8 @@ namespace dataset_header {
 class UOptions {
  private:
     uint64_t reserved1;                       //!< @brief
-    boost::optional<USignature> u_signature;  //!< @brief
-    boost::optional<uint8_t> reserved2;       //!< @brief
+    std::optional<USignature> u_signature;  //!< @brief
+    std::optional<uint8_t> reserved2;       //!< @brief
     bool reserved3;                           //!< @brief
 
  public:

@@ -69,11 +69,11 @@ const std::string& Dataset::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Dataset::hasMetadata() const { return metadata != boost::none; }
+bool Dataset::hasMetadata() const { return metadata != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Dataset::hasProtection() const { return metadata != boost::none; }
+bool Dataset::hasProtection() const { return metadata != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -175,10 +175,10 @@ Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MP
 
 void Dataset::patchID(uint8_t groupID, uint16_t setID) {
     header.patchID(groupID, setID);
-    if (metadata != boost::none) {
+    if (metadata != std::nullopt) {
         metadata->patchID(groupID, setID);
     }
-    if (protection != boost::none) {
+    if (protection != std::nullopt) {
         protection->patchID(groupID, setID);
     }
     for (auto& ps : parameterSets) {
@@ -200,23 +200,23 @@ void Dataset::read_box(util::BitReader& reader, bool in_offset) {
     std::string tmp_str(4, '\0');
     reader.readBypass(tmp_str);
     if (tmp_str == "dtmd") {
-        UTILS_DIE_IF(metadata != boost::none, "Metadata already present");
-        UTILS_DIE_IF(protection != boost::none, "Metadata must be before protection");
+        UTILS_DIE_IF(metadata != std::nullopt, "Metadata already present");
+        UTILS_DIE_IF(protection != std::nullopt, "Metadata must be before protection");
         UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-        UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
+        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
         UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
         UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
         metadata = DatasetMetadata(reader, version);
     } else if (tmp_str == "dtpr") {
-        UTILS_DIE_IF(protection != boost::none, "Protection already present");
+        UTILS_DIE_IF(protection != std::nullopt, "Protection already present");
         UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-        UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
+        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
         UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
         UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
         protection = DatasetProtection(reader, version);
     } else if (tmp_str == "pars") {
         UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table != boost::none, "Metadata must be before MIT");
+        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
         UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
         UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
         parameterSets.emplace_back(reader, version, header.getParameterUpdateFlag());
@@ -224,7 +224,7 @@ void Dataset::read_box(util::BitReader& reader, bool in_offset) {
             std::make_pair(size_t(parameterSets.back().getParameterSetID()), parameterSets.back().getEncodingSet()));
     } else if (tmp_str == "mitb") {
         UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table != boost::none, "MIT already present");
+        UTILS_DIE_IF(master_index_table != std::nullopt, "MIT already present");
         UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
         UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
         master_index_table = MasterIndexTable(reader, header);
@@ -234,7 +234,7 @@ void Dataset::read_box(util::BitReader& reader, bool in_offset) {
         access_units.emplace_back(reader, encoding_sets, header.isMITEnabled(), header.isBlockHeaderEnabled(), version);
     } else if (tmp_str == "dscn") {
         UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table == boost::none, "descriptor streams without MIT not allowed");
+        UTILS_DIE_IF(master_index_table == std::nullopt, "descriptor streams without MIT not allowed");
         UTILS_DIE_IF(header.isBlockHeaderEnabled(), "descriptor streams only allowed without block headers");
         descriptor_streams.emplace_back(reader, *master_index_table, header.getMITConfigs());
     } else if (tmp_str == "offs") {
