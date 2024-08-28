@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <thread>
 #include <utility>
@@ -17,7 +18,6 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
-#include "boost/optional/optional.hpp"
 #include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -581,7 +581,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::vector<std::unique_ptr<SubfileReader>> readers;
     readers.reserve(num_chunks);
     auto cmp = [&](const SubfileReader* a, SubfileReader* b) {
-        return !compare(a->getRecord().get(), b->getRecord().get());
+        return !compare(a->getRecord().value(), b->getRecord().value());
     };
     std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
     for (int i = 0; i < num_chunks; ++i) {
@@ -868,19 +868,19 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
 void transcode_mpg2sam(Config& options) {
     std::istream* input_file = &std::cin;
     std::ostream* output_file = &std::cout;
-    boost::optional<std::ifstream> input_stream;
-    boost::optional<std::ofstream> output_stream;
+    std::optional<std::ifstream> input_stream;
+    std::optional<std::ofstream> output_stream;
 
     RefInfo refinf(options.fasta_file_path);
 
     if (options.inputFile.substr(0, 2) != "-.") {
         input_stream = std::ifstream(options.inputFile);
-        input_file = &input_stream.get();
+        input_file = &input_stream.value();
     }
 
     if (options.outputFile.substr(0, 2) != "-.") {
         output_stream = std::ofstream(options.outputFile);
-        output_file = &output_stream.get();
+        output_file = &output_stream.value();
     }
 
     genie::util::BitReader reader(*input_file);

@@ -6000,7 +6000,7 @@ NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
-// boost::hash_combine
+// std::hash_combine
 inline std::size_t combine(std::size_t seed, std::size_t h) noexcept
 {
     seed ^= h + 0x9e3779b9 + (seed << 6U) + (seed >> 2U);

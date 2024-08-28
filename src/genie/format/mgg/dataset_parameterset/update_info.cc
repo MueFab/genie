@@ -43,8 +43,8 @@ void UpdateInfo::write(genie::util::BitWriter& writer) const {
     writer.write(multiple_alignment_flag, 1);
     writer.write(pos_40_bits_flag, 1);
     writer.write(static_cast<uint8_t>(alphabetId), 8);
-    writer.write(u_signature != boost::none, 1);
-    if (u_signature != boost::none) {
+    writer.write(u_signature != std::nullopt, 1);
+    if (u_signature != std::nullopt) {
         u_signature->write(writer);
     }
     writer.flush();
@@ -68,7 +68,7 @@ core::AlphabetID UpdateInfo::getAlphabetID() const { return alphabetId; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool UpdateInfo::hasUSignature() const { return u_signature != boost::none; }
+bool UpdateInfo::hasUSignature() const { return u_signature != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

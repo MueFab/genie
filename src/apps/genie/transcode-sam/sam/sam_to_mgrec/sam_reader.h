@@ -10,11 +10,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <htslib/sam.h>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
-#include "boost/optional/optional.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ class SamReader {
     bam1_t* sam_alignment;  //!< @brief
     kstring_t header_info;  //!< @brief
 
-    boost::optional<SamRecord> buffered_rec;
+    std::optional<SamRecord> buffered_rec;
 
  public:
     /**

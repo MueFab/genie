@@ -160,12 +160,12 @@ void EncodingSet::activateSignature() { signature_cfg = SignatureCfg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool EncodingSet::isSignatureActivated() const { return signature_cfg != boost::none; }
+bool EncodingSet::isSignatureActivated() const { return signature_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool EncodingSet::isSignatureConstLength() const {
-    return isSignatureActivated() && signature_cfg->signature_length != boost::none;
+    return isSignatureActivated() && signature_cfg->signature_length != std::nullopt;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -208,10 +208,10 @@ void EncodingSet::write(util::BitWriter &writer) const {
     writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
     writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
     writer.write(reserved, 30);
-    writer.write(signature_cfg != boost::none, 1);
-    if (signature_cfg != boost::none) {
-        writer.write(signature_cfg->signature_length != boost::none, 1);
-        if (signature_cfg->signature_length != boost::none) {
+    writer.write(signature_cfg != std::nullopt, 1);
+    if (signature_cfg != std::nullopt) {
+        writer.write(signature_cfg->signature_length != std::nullopt, 1);
+        if (signature_cfg->signature_length != std::nullopt) {
             writer.write(*signature_cfg->signature_length, 8);
         }
     }

@@ -91,7 +91,7 @@ bool SamReader::isValid() {
 int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
     sr.clear();
     if (buffered_rec) {
-        sr.push_back(std::move(buffered_rec.get()));
+        sr.push_back(std::move(buffered_rec.value()));
         buffered_rec.reset();
     } else {
         auto res = sam_read1(sam_file, sam_header, sam_alignment);
@@ -112,7 +112,7 @@ int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
         if (buffered_rec->qname != sr.front().qname) {
             return 0;
         } else {
-            sr.push_back(std::move(buffered_rec.get()));
+            sr.push_back(std::move(buffered_rec.value()));
             buffered_rec.reset();
         }
     }

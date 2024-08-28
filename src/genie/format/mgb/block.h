@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <sstream>
 #include <vector>
+#include <variant>
 #include "boost/variant/get.hpp"
 #include "boost/variant/variant.hpp"
 #include "genie/core/access-unit.h"
@@ -34,7 +35,7 @@ class Block {
 
     uint8_t count;  //!< @brief
 
-    boost::variant<genie::core::Payload, core::AccessUnit::Descriptor> payload;  //!< @brief
+    std::variant<genie::core::Payload, core::AccessUnit::Descriptor> payload;  //!< @brief
 
  public:
     /**

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/format/mgg/dataset_parameterset/u_signature.h"
 
@@ -28,7 +28,7 @@ class UpdateInfo {
     bool multiple_alignment_flag;             //!< @brief
     bool pos_40_bits_flag;                    //!< @brief
     core::AlphabetID alphabetId;              //!< @brief
-    boost::optional<USignature> u_signature;  //!< @brief
+    std::optional<USignature> u_signature;  //!< @brief
 
  public:
     /**
