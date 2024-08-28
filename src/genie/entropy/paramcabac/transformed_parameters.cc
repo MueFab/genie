@@ -60,13 +60,13 @@ TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = param;
+            rle_coding_guard = static_cast<uint8_t>(param);
             break;
         case TransformIdSubseq::MATCH_CODING:
             match_coding_buffer_size = param;
             break;
         case TransformIdSubseq::MERGE_CODING:
-            merge_coding_subseq_count = param;
+            merge_coding_subseq_count = static_cast<uint8_t>(param);
             break;
         default:
             UTILS_THROW_RUNTIME_EXCEPTION("Invalid subseq transformation");
