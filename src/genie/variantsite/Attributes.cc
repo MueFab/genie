@@ -27,7 +27,7 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     typedTiles.back().writeElement(value);
 
     if (rowsPerTile == 0) {
-    } else if (rowInTile < rowsPerTile - 1) {
+    } else if (rowInTile < rowsPerTile) {
         rowInTile++;
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {

@@ -32,8 +32,6 @@ namespace annotation {
 
 enum class RecType { SITE_FILE = 0, GENO_FILE };
 
-class Descriptors {};
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 
