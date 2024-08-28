@@ -39,7 +39,7 @@ class Importer : public core::FormatImporter {
     size_t discarded_missing_pair_U{};       //!< @brief
     size_t missing_additional_alignments{};  //!< @brief
 
-    boost::optional<core::record::Record> bufferedRecord;  //!< @brief
+    std::optional<core::record::Record> bufferedRecord;  //!< @brief
     bool checkSupport;                                     //!< @brief
 
     bool isRecordSupported(const core::record::Record& rec);  //!< @brief

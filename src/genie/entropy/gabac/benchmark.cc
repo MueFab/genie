@@ -10,7 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
@@ -363,7 +363,7 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
     ResultFull best_result;
     float best_score = INFINITY;
     ConfigSearch config(genie::core::getSubsequence(desc).range);
-    bool new_file = !ghc::filesystem::exists("benchmark_total.csv");
+    bool new_file = !std::filesystem::exists("benchmark_total.csv");
     std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
     do {
         std::cerr << "Optimizing transformation " << static_cast<int>(config.getTransform()) << "..." << std::endl;
@@ -572,7 +572,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
                                               const std::string& filename) {
     ResultTransformed ret;
     float score = INFINITY;
-    bool new_file = !ghc::filesystem::exists("benchmark_trans_" + std::to_string(transformation) + ".csv");
+    bool new_file = !std::filesystem::exists("benchmark_trans_" + std::to_string(transformation) + ".csv");
     std::ofstream results_file("benchmark_trans_" + std::to_string(transformation) + ".csv", std::ios_base::app);
     do {
         auto cfg = seq.createConfig(gensub, original);

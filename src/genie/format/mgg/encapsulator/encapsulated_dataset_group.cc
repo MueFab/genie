@@ -18,10 +18,10 @@ namespace encapsulator {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncapsulatedDatasetGroup::patchID(uint8_t id) {
-    if (group_meta != boost::none) {
+    if (group_meta != std::nullopt) {
         group_meta->patchID(id);
     }
-    if (group_protection != boost::none) {
+    if (group_protection != std::nullopt) {
         group_protection->patchID(id);
     }
     for (auto& r : references) {
@@ -35,7 +35,7 @@ void EncapsulatedDatasetGroup::patchID(uint8_t id) {
             d.patchID(id, d.getHeader().getDatasetID());
         }
     }
-    if (labelList != boost::none) {
+    if (labelList != std::nullopt) {
         labelList->patchID(id);
     }
 }
@@ -47,7 +47,7 @@ void EncapsulatedDatasetGroup::mergeMetadata(genie::core::MPEGMinorVersion versi
     std::string protection;
 
     for (auto& d : datasets) {
-        if (d->meta.getDataGroup() == boost::none) {
+        if (d->meta.getDataGroup() == std::nullopt) {
             continue;
         }
         if (protection != d->meta.getDataGroup()->getProtection()) {
@@ -78,7 +78,7 @@ void EncapsulatedDatasetGroup::mergeMetadata(genie::core::MPEGMinorVersion versi
 
 void EncapsulatedDatasetGroup::mergeReferences(genie::core::MPEGMinorVersion version) {
     for (auto& d : datasets) {
-        if (d->meta.getReference() == boost::none) {
+        if (d->meta.getReference() == std::nullopt) {
             continue;
         }
         genie::format::mgg::ReferenceMetadata ref_meta(0, 0, std::move(d->meta.getReference()->getInformation()));
@@ -156,7 +156,7 @@ void EncapsulatedDatasetGroup::mergeLabels() {
         for (auto& l : s.second) {
             label.addDataset(std::move(l));
         }
-        if (labelList == boost::none) {
+        if (labelList == std::nullopt) {
             labelList = genie::format::mgg::LabelList(0);
         }
         labelList->addLabel(std::move(label));
@@ -195,13 +195,13 @@ genie::format::mgg::DatasetGroup EncapsulatedDatasetGroup::assemble(genie::core:
     for (auto& r : reference_meta) {
         ret.addReferenceMeta(std::move(r));
     }
-    if (labelList != boost::none) {
+    if (labelList != std::nullopt) {
         ret.setLabels(std::move(*labelList));
     }
-    if (group_meta != boost::none) {
+    if (group_meta != std::nullopt) {
         ret.setMetadata(std::move(*group_meta));
     }
-    if (group_protection != boost::none) {
+    if (group_protection != std::nullopt) {
         ret.setProtection(std::move(*group_protection));
     }
 

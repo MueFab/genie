@@ -11,7 +11,7 @@
 
 #include <memory>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -119,9 +119,9 @@ class TransformedParameters {
 
  private:
     TransformIdSubseq transform_ID_subseq;               //!< @brief
-    boost::optional<uint16_t> match_coding_buffer_size;  //!< @brief
-    boost::optional<uint8_t> rle_coding_guard;           //!< @brief
-    boost::optional<uint8_t> merge_coding_subseq_count;  //!< @brief
+    std::optional<uint16_t> match_coding_buffer_size;  //!< @brief
+    std::optional<uint8_t> rle_coding_guard;           //!< @brief
+    std::optional<uint8_t> merge_coding_subseq_count;  //!< @brief
     std::vector<uint8_t> merge_coding_shift_size;        //!< @brief
 };
 

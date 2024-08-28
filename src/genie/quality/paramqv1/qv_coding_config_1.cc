@@ -7,6 +7,7 @@
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include <utility>
 #include <vector>
+#include <cassert>
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
@@ -64,10 +65,10 @@ void QualityValues1::write(util::BitWriter& writer) const {
 
 std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
     auto ret = util::make_unique<QualityValues1>(
-        qvps_preset_ID ? qvps_preset_ID.get() : QualityValues1::QvpsPresetId ::ASCII, qv_reverse_flag);
+        qvps_preset_ID ? qvps_preset_ID.value() : QualityValues1::QvpsPresetId ::ASCII, qv_reverse_flag);
     if (parameter_set_qvps) {
         auto qvps = parameter_set_qvps;
-        ret->setQvps(std::move(qvps.get()));
+        ret->setQvps(std::move(qvps.value()));
     }
     ret->qvps_preset_ID = qvps_preset_ID;
     return ret;
@@ -129,7 +130,7 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(co
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t QualityValues1::getNumberCodeBooks() const {
-    if (qvps_preset_ID.is_initialized()) {
+    if (qvps_preset_ID != std::nullopt) {
         return 1;
     }
     return parameter_set_qvps->getCodebooks().size();
@@ -138,9 +139,9 @@ size_t QualityValues1::getNumberCodeBooks() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Codebook& QualityValues1::getCodebook(size_t id) const {
-    if (qvps_preset_ID.is_initialized()) {
+    if (qvps_preset_ID != std::nullopt) {
         UTILS_DIE_IF(id > 0, "Codebook out of bounds");
-        return getPresetCodebook(qvps_preset_ID.get());
+        return getPresetCodebook(qvps_preset_ID.value());
     }
     return parameter_set_qvps->getCodebooks()[id];
 }

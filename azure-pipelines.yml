@@ -8,22 +8,22 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           binDir: 'bin'
-        macos1200:
-          imageName: 'macos-12'
-          artifactName: 'macos1200'
-          binDir: 'bin'
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          binDir: 'bin'
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          binDir: 'bin'
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          binDir: 'bin'
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -88,26 +88,26 @@ stages:
           artifactName: 'ubuntu2204'
           architecture: ''
           binDir: 'bin'
-        macos1200:
-          imageName: 'macos-12'
-          artifactName: 'macos1200'
-          architecture: ''
-          binDir: 'bin'
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          architecture: ''
-          binDir: 'bin'
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          architecture: ''
+#          binDir: 'bin'
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          architecture: ''
+#          binDir: 'bin'
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           architecture: '-A x64'
           binDir: 'bin/Release'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
@@ -150,22 +150,22 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           fileExt: ''
-        macos1200:
-          imageName: 'macos-12'
-          artifactName: 'macos1200'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          fileExt: ''
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          fileExt: ''
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           fileExt: '.exe'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          fileExt: '.exe'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -265,22 +265,22 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           fileExt: ''
-        macos1200:
-          imageName: 'macos-12'
-          artifactName: 'macos1200'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
+#        macos1200:
+#          imageName: 'macos-12'
+#          artifactName: 'macos1200'
+#          fileExt: ''
+#        macos1100:
+#          imageName: 'macos-11'
+#          artifactName: 'macos1100'
+#          fileExt: ''
         windows2022:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+ #       windows2019:
+ #         imageName: 'windows-2019'
+ #         artifactName: 'windows2019'
+ #         binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -310,7 +310,7 @@ stages:
         git init
         git config user.email "mitogen-group@gmail.com"
         git config user.name "Azure test script"
-        git pull http://${USERNAME}:${PASSWORD}@mpegx.int-evry.fr/software/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
+        git pull https://${USERNAME}:${PASSWORD}@git.mpeg.expert/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
       displayName: 'Reference decoder checkout'
       env:
         USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
@@ -356,23 +356,23 @@ stages:
       displayName: 'Download binaries'
     - bash: echo "Not yet implemented"
       displayName: 'Build debian package'
-  - job: 'OSX'
-    strategy:
-      matrix:
-        macos1200:
-          imageName: 'macos-12'
-          artifactName: 'macos1200'
-          fileExt: ''
-        macos1100:
-          imageName: 'macos-11'
-          artifactName: 'macos1100'
-          fileExt: ''
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - checkout: none
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-    - bash: echo "Not yet implemented"
-      displayName: 'Build OSX dmg'
+#  - job: 'OSX'
+#    strategy:
+ #     matrix:
+ #       macos1200:
+ #         imageName: 'macos-12'
+ #         artifactName: 'macos1200'
+ #         fileExt: ''
+ #       macos1100:
+ #         imageName: 'macos-11'
+ #         artifactName: 'macos1100'
+ #         fileExt: ''
+ #   pool:
+ #     vmImage: $(imageName)
+ #   steps:
+ #   - checkout: none
+ #   - download: current
+ #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+ #     displayName: 'Download binaries'
+ #   - bash: echo "Not yet implemented"
+ #     displayName: 'Build OSX dmg'

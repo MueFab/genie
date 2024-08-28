@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/transcode-fastq/main.h"
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -26,9 +27,6 @@
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
-
-// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
-#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

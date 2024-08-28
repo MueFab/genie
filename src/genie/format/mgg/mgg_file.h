@@ -32,7 +32,7 @@ class MggFile {
  private:
     std::vector<std::unique_ptr<Box>> boxes;  //!< @brief
     std::istream* file;                       //!< @brief
-    boost::optional<util::BitReader> reader;  //!< @brief
+    std::optional<util::BitReader> reader;  //!< @brief
 
  public:
     /**

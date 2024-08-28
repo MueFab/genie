@@ -6,7 +6,7 @@
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset.h"
 #include <utility>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace encapsulator {
 
 EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::core::MPEGMinorVersion version)
     : reader(input_file), mgb_file(&reader) {
-    if ((ghc::filesystem::exists(input_file + ".json") && ghc::filesystem::file_size(input_file + ".json"))) {
+    if ((std::filesystem::exists(input_file + ".json") && std::filesystem::file_size(input_file + ".json"))) {
         std::ifstream in_file(input_file + ".json");
         nlohmann::json my_json;
         in_file >> my_json;

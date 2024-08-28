@@ -2,7 +2,7 @@
 # Generic
 #==============================================================================
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 project("genie")
 
@@ -35,7 +35,7 @@ endif()
 # Compiler
 #==============================================================================
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
     #
@@ -110,17 +110,35 @@ if(${BUILD_TESTS})
     include(GoogleTest)
 endif()
 
+
 if(${GENIE_USE_OPENMP})
-    find_package(OpenMP REQUIRED)
-    include_directories(${OpenMP_CXX_INCLUDE_DIRS})
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
-    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+    if(APPLE)
+        # libomp 15.0+ from brew is keg-only, so have to search in other locations.
+        # See https://github.com/Homebrew/homebrew-core/issues/112107#issuecomment-1278042927.
+        # execute_process(COMMAND brew --prefix libomp
+        #        OUTPUT_VARIABLE HOMEBREW_LIBOMP_PREFIX
+        #        OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # set(OpenMP_C_FLAGS
+        #        "-Xpreprocessor -fopenmp -I${HOMEBREW_LIBOMP_PREFIX}/include")
+        # set(OpenMP_CXX_FLAGS
+        #        "-Xpreprocessor -fopenmp -I${HOMEBREW_LIBOMP_PREFIX}/include")
+        # set(OpenMP_C_LIB_NAMES omp)
+        # set(OpenMP_CXX_LIB_NAMES omp)
+        # set(OpenMP_omp_LIBRARY ${HOMEBREW_LIBOMP_PREFIX}/lib/libomp.dylib)
+        # find_package(OpenMP REQUIRED)
+        set(GENIE_USE_OPENMP OFF)
     else()
-        message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
+        find_package(OpenMP REQUIRED)
+        include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+        elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
+        elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+        else()
+            message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
+        endif()
     endif()
 endif()
 

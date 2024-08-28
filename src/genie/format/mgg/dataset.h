@@ -40,10 +40,10 @@ namespace mgg {
 class Dataset : public GenInfo {
  private:
     DatasetHeader header;                                  //!< @brief
-    boost::optional<DatasetMetadata> metadata;             //!< @brief
-    boost::optional<DatasetProtection> protection;         //!< @brief
+    std::optional<DatasetMetadata> metadata;             //!< @brief
+    std::optional<DatasetProtection> protection;         //!< @brief
     std::vector<DatasetParameterSet> parameterSets;        //!< @brief
-    boost::optional<MasterIndexTable> master_index_table;  //!< @brief
+    std::optional<MasterIndexTable> master_index_table;  //!< @brief
     std::vector<AccessUnit> access_units;                  //!< @brief
     std::vector<DescriptorStream> descriptor_streams;      //!< @brief
     core::MPEGMinorVersion version;                        //!< @brief

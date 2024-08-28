@@ -27,7 +27,7 @@ namespace encapsulator {
 class DecapsulatedDatasetGroup {
  private:
     uint64_t id{};                                                                                //!< @brief
-    boost::optional<genie::core::meta::DatasetGroup> meta_group;                                  //!< @brief
+    std::optional<genie::core::meta::DatasetGroup> meta_group;                                  //!< @brief
     std::map<uint8_t, genie::core::meta::Reference> meta_references;                              //!< @brief
     std::map<uint64_t, std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset>> data;  //!< @brief
 
@@ -36,7 +36,7 @@ class DecapsulatedDatasetGroup {
      * @param grp
      * @return
      */
-    static boost::optional<genie::core::meta::DatasetGroup> decapsulate_dataset_group(
+    static std::optional<genie::core::meta::DatasetGroup> decapsulate_dataset_group(
         genie::format::mgg::DatasetGroup* grp);
 
     /**
@@ -52,7 +52,7 @@ class DecapsulatedDatasetGroup {
      * @param au
      * @return
      */
-    static std::pair<genie::format::mgb::AccessUnit, boost::optional<genie::core::meta::AccessUnit>> decapsulate_AU(
+    static std::pair<genie::format::mgb::AccessUnit, std::optional<genie::core::meta::AccessUnit>> decapsulate_AU(
         genie::format::mgg::AccessUnit& au);
 
     /**
@@ -64,7 +64,7 @@ class DecapsulatedDatasetGroup {
      * @return
      */
     static std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> decapsulate_dataset(
-        genie::format::mgg::Dataset& dt, boost::optional<genie::core::meta::DatasetGroup>& meta_group,
+        genie::format::mgg::Dataset& dt, std::optional<genie::core::meta::DatasetGroup>& meta_group,
         std::map<uint8_t, genie::core::meta::Reference>& meta_references, genie::format::mgg::DatasetGroup* grp);
 
  public:

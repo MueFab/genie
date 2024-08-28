@@ -56,10 +56,10 @@ UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset
 
 void UnalignedAUIndex::write(genie::util::BitWriter& writer) const {
     writer.write(au_byte_offset, byte_offset_size);
-    if (ref_cfg != boost::none) {
+    if (ref_cfg != std::nullopt) {
         ref_cfg->write(writer);
     }
-    if (sig_cfg != boost::none) {
+    if (sig_cfg != std::nullopt) {
         sig_cfg->write(writer);
         writer.flush();
     }
@@ -90,7 +90,7 @@ UnalignedAUIndex::UnalignedAUIndex(uint64_t _au_byte_offset, uint8_t _byte_offse
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool UnalignedAUIndex::isReference() const { return ref_cfg != boost::none; }
+bool UnalignedAUIndex::isReference() const { return ref_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ void UnalignedAUIndex::setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg) { r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool UnalignedAUIndex::hasSignature() const { return sig_cfg != boost::none; }
+bool UnalignedAUIndex::hasSignature() const { return sig_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -115,7 +115,7 @@ class Context {
     bool adaptive_mode_flag{true};                      //!< @brief
     uint16_t num_contexts{16};                          //!< @brief
     std::vector<uint8_t> context_initialization_value;  //!< @brief
-    boost::optional<bool> share_subsym_ctx_flag;        //!< @brief
+    std::optional<bool> share_subsym_ctx_flag;        //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

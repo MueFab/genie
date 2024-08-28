@@ -34,7 +34,7 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
 
 core::GenSubIndex get_qv_steps(size_t i) {
     UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
-    return std::make_pair(core::GenDesc::QV, (uint16_t)i + 2);
+    return std::make_pair(core::GenDesc::QV, static_cast<uint16_t>(i + 2));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
