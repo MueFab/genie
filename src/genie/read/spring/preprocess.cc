@@ -51,9 +51,9 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
         temp_dir = working_dir + "/" + random_str;
-        if (!ghc::filesystem::exists(temp_dir)) break;
+        if (!std::filesystem::exists(temp_dir)) break;
     }
-    UTILS_DIE_IF(!ghc::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");
+    UTILS_DIE_IF(!std::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");
     std::cerr << "Temporary directory: " << temp_dir << "\n";
 
     outfileclean[0] = temp_dir + "/input_clean_1.dna";
@@ -187,14 +187,14 @@ Preprocessor::~Preprocessor() {
 
         for (int j = 0; j < 2; j++) {
             if (j == 1 && !cp.paired_end) continue;
-            ghc::filesystem::remove(outfileclean[j]);
-            ghc::filesystem::remove(outfileN[j]);
-            ghc::filesystem::remove(outfileorderN[j]);
-            if (cp.preserve_quality) ghc::filesystem::remove(outfilequality[j]);
+            std::filesystem::remove(outfileclean[j]);
+            std::filesystem::remove(outfileN[j]);
+            std::filesystem::remove(outfileorderN[j]);
+            if (cp.preserve_quality) std::filesystem::remove(outfilequality[j]);
         }
-        if (cp.preserve_id) ghc::filesystem::remove(outfileid);
+        if (cp.preserve_id) std::filesystem::remove(outfileid);
 
-        ghc::filesystem::remove(temp_dir);
+        std::filesystem::remove(temp_dir);
     }
 }
 

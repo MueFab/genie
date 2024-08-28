@@ -6,7 +6,7 @@
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
 #include <utility>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,12 +22,12 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
     std::vector<std::string> unknown_id;
     std::map<uint8_t, std::vector<std::string>> ret;
     for (auto& i : input_files) {
-        if (!ghc::filesystem::exists(i + ".json")) {
+        if (!std::filesystem::exists(i + ".json")) {
             unknown_id.emplace_back(i);
             continue;
         }
 
-        if ((ghc::filesystem::exists(i + ".json") && ghc::filesystem::file_size(i + ".json"))) {
+        if ((std::filesystem::exists(i + ".json") && std::filesystem::file_size(i + ".json"))) {
             std::ifstream in_file(i + ".json");
             nlohmann::json my_json;
             in_file >> my_json;

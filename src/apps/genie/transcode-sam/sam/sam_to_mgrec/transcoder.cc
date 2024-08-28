@@ -6,6 +6,7 @@
 
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -17,7 +18,6 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
 #include "boost/optional/optional.hpp"
-#include "filesystem/filesystem.hpp"
 #include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,18 +31,18 @@ namespace sam_to_mgrec {
 
 RefInfo::RefInfo(const std::string& fasta_name)
     : refMgr(genie::util::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
-    if (!ghc::filesystem::exists(fasta_name)) {
+    if (!std::filesystem::exists(fasta_name)) {
         return;
     }
 
     std::string fai_name = fasta_name.substr(0, fasta_name.find_last_of('.')) + ".fai";
     std::string sha_name = fasta_name.substr(0, fasta_name.find_last_of('.')) + ".sha256";
-    if (!ghc::filesystem::exists(fai_name)) {
+    if (!std::filesystem::exists(fai_name)) {
         std::ifstream fasta_in(fasta_name);
         std::ofstream fai_out(fai_name);
         genie::format::fasta::FastaReader::index(fasta_in, fai_out);
     }
-    if (!ghc::filesystem::exists(sha_name)) {
+    if (!std::filesystem::exists(sha_name)) {
         std::ifstream fasta_in(fasta_name);
         std::ifstream fai_in(fai_name);
         genie::format::fasta::FaiFile faifile(fai_in);

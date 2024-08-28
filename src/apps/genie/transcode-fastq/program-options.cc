@@ -5,13 +5,13 @@
  */
 
 #include "apps/genie/transcode-fastq/program-options.h"
+#include <filesystem>
 #include <iostream>
 #include <set>
 #include <string>
 #include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
-#include "filesystem/filesystem.hpp"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void validateInputFile(const std::string &file) {
     if (file.substr(0, 2) == "-.") {
         return;
     }
-    UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
+    UTILS_DIE_IF(!std::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
@@ -119,14 +119,14 @@ std::string random_string(size_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateWorkingDir(const std::string &dir) {
-    UTILS_DIE_IF(!ghc::filesystem::exists(dir), "Directory does not exist: " + dir);
-    UTILS_DIE_IF(!ghc::filesystem::is_directory(dir), "Is a file and not a directory: " + dir);
+    UTILS_DIE_IF(!std::filesystem::exists(dir), "Directory does not exist: " + dir);
+    UTILS_DIE_IF(!std::filesystem::is_directory(dir), "Is a file and not a directory: " + dir);
 
     std::string test_name;
     do {
         const size_t NAME_LENGTH = 16;
         test_name = dir + "/" + random_string(NAME_LENGTH) + ".test";
-    } while (ghc::filesystem::exists(test_name));
+    } while (std::filesystem::exists(test_name));
 
     {
         const std::string TEST_STRING = "test";
@@ -135,7 +135,7 @@ void validateWorkingDir(const std::string &dir) {
         UTILS_DIE_IF(!test_file, "Can't write to working directory. Insufficient permissions? " + dir);
     }
 
-    ghc::filesystem::remove(test_name);
+    std::filesystem::remove(test_name);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -144,9 +144,9 @@ void validateOutputFile(const std::string &file, bool forced) {
     if (file.substr(0, 2) == "-.") {
         return;
     }
-    UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
+    UTILS_DIE_IF(std::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
-    UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
+    UTILS_DIE_IF(std::filesystem::exists(file) && !std::filesystem::is_regular_file(file),
                  "Output file already existing, force flag set, but not a regular file. Genie won't overwrite folders "
                  "or special files: " +
                      file);
@@ -156,7 +156,7 @@ void validateOutputFile(const std::string &file, bool forced) {
         stream << TEST_STRING << std::endl;
         UTILS_DIE_IF(!stream, "Output file not accessible. Insufficient permissions? " + file);
     }
-    ghc::filesystem::remove(file);
+    std::filesystem::remove(file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -164,9 +164,9 @@ void validateOutputFile(const std::string &file, bool forced) {
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
-        inputFile = ghc::filesystem::canonical(inputFile).string();
+        inputFile = std::filesystem::canonical(inputFile).string();
         std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
-        std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+        std::cerr << "Input file: " << inputFile << " with size " << size_string(std::filesystem::file_size(inputFile))
                   << std::endl;
     } else {
         std::cerr << "Input file: stdin" << std::endl;
@@ -175,10 +175,10 @@ void ProgramOptions::validate() {
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
         if (inputSupFile.substr(0, 2) != "-.") {
-            inputSupFile = ghc::filesystem::canonical(inputSupFile).string();
+            inputSupFile = std::filesystem::canonical(inputSupFile).string();
             std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
             std::cerr << "Input supplementary file: " << inputSupFile << " with size "
-                      << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
+                      << size_string(std::filesystem::file_size(inputSupFile)) << std::endl;
         } else {
             std::cerr << "Input supplementary file: stdin" << std::endl;
         }
@@ -188,10 +188,10 @@ void ProgramOptions::validate() {
 
     validateOutputFile(outputFile, forceOverwrite);
     if (outputFile.substr(0, 2) != "-.") {
-        outputFile = ghc::filesystem::weakly_canonical(outputFile).string();
+        outputFile = std::filesystem::weakly_canonical(outputFile).string();
         std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
         std::cerr << "Output file: " << outputFile << " with "
-                  << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+                  << size_string(std::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {
         std::cerr << "Output file: stdout" << std::endl;
     }
@@ -199,10 +199,10 @@ void ProgramOptions::validate() {
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
         if (outputSupFile.substr(0, 2) != "-.") {
-            outputSupFile = ghc::filesystem::weakly_canonical(outputSupFile).string();
+            outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
             std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
             std::cerr << "Output supplementary file: " << outputSupFile << " with "
-                      << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
+                      << size_string(std::filesystem::space(parent_dir(outputSupFile)).available) << " available"
                       << std::endl;
         } else {
             std::cerr << "Output supplementary file: stdout" << std::endl;
