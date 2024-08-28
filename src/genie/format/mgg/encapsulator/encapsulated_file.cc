@@ -32,7 +32,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
             nlohmann::json my_json;
             in_file >> my_json;
             genie::core::meta::Dataset dataset(my_json);
-            if (dataset.getDataGroup() == boost::none) {
+            if (dataset.getDataGroup() == std::nullopt) {
                 unknown_id.emplace_back(i);
                 continue;
             }

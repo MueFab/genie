@@ -45,11 +45,11 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
         std::string tmp_str(4, '\0');
         reader.readBypass(tmp_str);
         if (tmp_str == "auin") {
-            UTILS_DIE_IF(au_information != boost::none, "AU-Inf already present");
-            UTILS_DIE_IF(au_protection != boost::none, "AU-Inf must be before AU-PR");
+            UTILS_DIE_IF(au_information != std::nullopt, "AU-Inf already present");
+            UTILS_DIE_IF(au_protection != std::nullopt, "AU-Inf must be before AU-PR");
             au_information = AUInformation(reader, version);
         } else if (tmp_str == "aupr") {
-            UTILS_DIE_IF(au_protection != boost::none, "AU-Pr already present");
+            UTILS_DIE_IF(au_protection != std::nullopt, "AU-Pr already present");
             au_protection = AUProtection(reader, version);
         } else {
             reader.setPos(tmp_pos);
@@ -78,11 +78,11 @@ const AccessUnitHeader& AccessUnit::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::hasInformation() const { return au_information != boost::none; }
+bool AccessUnit::hasInformation() const { return au_information != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::hasProtection() const { return au_protection != boost::none; }
+bool AccessUnit::hasProtection() const { return au_protection != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,10 +104,10 @@ void AccessUnit::setProtection(AUProtection au) { au_protection = std::move(au);
 
 void AccessUnit::box_write(genie::util::BitWriter& bitWriter) const {
     header.write(bitWriter);
-    if (au_information != boost::none) {
+    if (au_information != std::nullopt) {
         au_information->write(bitWriter);
     }
-    if (au_protection != boost::none) {
+    if (au_protection != std::nullopt) {
         au_protection->write(bitWriter);
     }
     for (const auto& b : blocks) {

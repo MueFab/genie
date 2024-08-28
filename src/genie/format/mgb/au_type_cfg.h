@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/format/mgb/extended_au.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -29,7 +29,7 @@ class AuTypeCfg {
     uint16_t sequence_ID;                     //!< @brief
     uint64_t AU_start_position;               //!< @brief
     uint64_t AU_end_position;                 //!< @brief
-    boost::optional<ExtendedAu> extended_AU;  //!< @brief
+    std::optional<ExtendedAu> extended_AU;  //!< @brief
 
     uint8_t posSize;  //!< @brief internal
 

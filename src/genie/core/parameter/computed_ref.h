@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/parameter/computed_ref_extended.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -39,7 +39,7 @@ class ComputedRef {
 
  private:
     Algorithm cr_alg_ID;                             //!< @brief
-    boost::optional<ComputedRefExtended> extension;  //!< @brief
+    std::optional<ComputedRefExtended> extension;  //!< @brief
 
  public:
     /**
