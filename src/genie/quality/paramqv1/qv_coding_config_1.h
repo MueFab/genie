@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/parameter/quality-values.h"
 #include "genie/quality/paramqv1/parameter_set.h"
@@ -115,8 +115,8 @@ class QualityValues1 : public core::parameter::QualityValues {
     bool equals(const QualityValues* qv) const override;
 
  private:
-    boost::optional<ParameterSet> parameter_set_qvps;  //!< @brief
-    boost::optional<QvpsPresetId> qvps_preset_ID;      //!< @brief
+    std::optional<ParameterSet> parameter_set_qvps;  //!< @brief
+    std::optional<QvpsPresetId> qvps_preset_ID;      //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -61,7 +61,7 @@ class DataUnitFactory {
      * @param bitReader
      * @return
      */
-    boost::optional<AccessUnit> read(util::BitReader& bitReader);
+    std::optional<AccessUnit> read(util::BitReader& bitReader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

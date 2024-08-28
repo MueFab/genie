@@ -42,7 +42,7 @@ class EncodingSet {
      * @brief
      */
     struct SignatureCfg {
-        boost::optional<uint8_t> signature_length;  //!< @brief
+        std::optional<uint8_t> signature_length;  //!< @brief
 
         /**
          * @brief
@@ -67,9 +67,9 @@ class EncodingSet {
     bool multiple_alignments_flag;                                  //!< @brief
     bool spliced_reads_flag;                                        //!< @brief
     uint32_t reserved{};                                            //!< @brief
-    boost::optional<SignatureCfg> signature_cfg;                    //!< @brief
+    std::optional<SignatureCfg> signature_cfg;                    //!< @brief
     std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;  //!< @brief
-    boost::optional<ComputedRef> parameter_set_crps;                //!< @brief
+    std::optional<ComputedRef> parameter_set_crps;                //!< @brief
 
     /**
      * @brief

@@ -23,7 +23,7 @@ bool UOptions::operator==(const UOptions& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UOptions::UOptions(uint64_t _reserved1, bool _reserved3)
-    : reserved1(_reserved1), u_signature(boost::none), reserved2(boost::none), reserved3(_reserved3) {}
+    : reserved1(_reserved1), u_signature(std::nullopt), reserved2(std::nullopt), reserved3(_reserved3) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ bool UOptions::getReserved3() const { return reserved3; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool UOptions::hasReserved2() const { return reserved2 != boost::none; }
+bool UOptions::hasReserved2() const { return reserved2 != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ uint8_t UOptions::getReserved2() const { return *reserved2; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool UOptions::hasSignature() const { return u_signature != boost::none; }
+bool UOptions::hasSignature() const { return u_signature != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

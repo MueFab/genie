@@ -62,7 +62,7 @@ void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
     writer.writeBypassBE(dataset_id);
     writer.writeBypassBE(parameter_set_ID);
     writer.writeBypassBE(parent_parameter_set_ID);
-    if (param_update != boost::none) {
+    if (param_update != std::nullopt) {
         param_update->write(writer);
     }
     params.write(writer);
@@ -101,7 +101,7 @@ uint8_t DatasetParameterSet::getParentParameterSetID() const { return parent_par
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetParameterSet::hasParameterUpdate() const { return param_update != boost::none; }
+bool DatasetParameterSet::hasParameterUpdate() const { return param_update != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

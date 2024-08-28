@@ -131,7 +131,7 @@ class Subsequence {
     nlohmann::json toJoson() const;
 
  private:
-    boost::optional<uint16_t> descriptor_subsequence_ID;  //!< @brief
+    std::optional<uint16_t> descriptor_subsequence_ID;  //!< @brief
     TransformedParameters transform_subseq_parameters;    //!< @brief
     std::vector<TransformedSubSeq> transformSubseq_cfgs;  //!< @brief
 };

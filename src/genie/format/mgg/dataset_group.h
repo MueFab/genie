@@ -11,7 +11,7 @@
 
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/format/mgg/dataset.h"
 #include "genie/format/mgg/dataset_group_header.h"
@@ -33,12 +33,12 @@ namespace mgg {
  */
 class DatasetGroup : public GenInfo {
  private:
-    boost::optional<DatasetGroupHeader> header;          //!< @brief
+    std::optional<DatasetGroupHeader> header;          //!< @brief
     std::vector<Reference> references;                   //!< @brief
     std::vector<ReferenceMetadata> reference_metadatas;  //!< @brief
-    boost::optional<LabelList> labels;                   //!< @brief
-    boost::optional<DatasetGroupMetadata> metadata;      //!< @brief
-    boost::optional<DatasetGroupProtection> protection;  //!< @brief
+    std::optional<LabelList> labels;                   //!< @brief
+    std::optional<DatasetGroupMetadata> metadata;      //!< @brief
+    std::optional<DatasetGroupProtection> protection;  //!< @brief
     std::vector<Dataset> dataset;                        //!< @brief
 
     core::MPEGMinorVersion version;  //!< @brief

@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgg/access_unit_header.h"
 #include "genie/format/mgg/au_information.h"
@@ -33,8 +33,8 @@ namespace mgg {
 class AccessUnit : public GenInfo {
  private:
     AccessUnitHeader header;                        //!< @brief
-    boost::optional<AUInformation> au_information;  //!< @brief
-    boost::optional<AUProtection> au_protection;    //!< @brief
+    std::optional<AUInformation> au_information;  //!< @brief
+    std::optional<AUProtection> au_protection;    //!< @brief
     std::vector<Block> blocks;                      //!< @brief
 
     core::MPEGMinorVersion version;  //!< @brief

@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "boost/variant/variant.hpp"
+#include <variant>
 #include "genie/core/constants.h"
 #include "genie/core/record/record.h"
 #include "genie/util/runtime-exception.h"
@@ -282,7 +282,7 @@ struct HexCode {
  */
 struct GenTag {
     char key[2];  //!< @brief
-    boost::variant<int32_t, std::string, uint8_t, int8_t, uint16_t, int16_t, uint32_t, HexCode, float, double>
+    std::variant<int32_t, std::string, uint8_t, int8_t, uint16_t, int16_t, uint32_t, HexCode, float, double>
         value;  //!< @brief
 };
 

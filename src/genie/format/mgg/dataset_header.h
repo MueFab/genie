@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/core/meta/blockheader.h"
 #include "genie/core/meta/blockheader/disabled.h"
@@ -47,8 +47,8 @@ class DatasetHeader : public GenInfo {
     bool non_overlapping_AU_range_flag;     //!< @brief
     bool pos_40_bits_flag;                  //!< @brief
 
-    boost::optional<dataset_header::BlockHeaderOnOptions> block_header_on;    //!< @brief
-    boost::optional<dataset_header::BlockHeaderOffOptions> block_header_off;  //!< @brief
+    std::optional<dataset_header::BlockHeaderOnOptions> block_header_on;    //!< @brief
+    std::optional<dataset_header::BlockHeaderOffOptions> block_header_off;  //!< @brief
 
     dataset_header::ReferenceOptions referenceOptions;  //!< @brief
 
@@ -59,9 +59,9 @@ class DatasetHeader : public GenInfo {
     core::AlphabetID alphabet_id;                             //!< @brief
 
     uint32_t num_U_access_units;                          //!< @brief
-    boost::optional<dataset_header::UOptions> u_options;  //!< @brief
+    std::optional<dataset_header::UOptions> u_options;  //!< @brief
 
-    std::vector<boost::optional<uint32_t>> thresholds;  //!< @brief
+    std::vector<std::optional<uint32_t>> thresholds;  //!< @brief
 
  public:
     /**
@@ -211,7 +211,7 @@ class DatasetHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<boost::optional<uint32_t>>& getRefSeqThresholds() const;
+    const std::vector<std::optional<uint32_t>>& getRefSeqThresholds() const;
 
     /**
      * @brief
@@ -262,7 +262,7 @@ class DatasetHeader : public GenInfo {
      * @param _threshold
      */
     void addRefSequence(uint8_t _reference_ID, uint16_t _seqID, uint32_t _blocks_num,
-                        boost::optional<uint32_t> _threshold);
+                        std::optional<uint32_t> _threshold);
 
     /**
      * @brief

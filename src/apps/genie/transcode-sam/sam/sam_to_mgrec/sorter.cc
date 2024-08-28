@@ -37,7 +37,7 @@ SubfileReader::~SubfileReader() {
 
 genie::core::record::Record SubfileReader::moveRecord() {
     UTILS_DIE_IF(!rec, "No record available.");
-    auto ret = std::move(rec.get());
+    auto ret = std::move(rec.value());
     if (good()) {
         rec = genie::core::record::Record(bitreader);
     } else {
@@ -48,7 +48,7 @@ genie::core::record::Record SubfileReader::moveRecord() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const boost::optional<genie::core::record::Record>& SubfileReader::getRecord() const { return rec; }
+const std::optional<genie::core::record::Record>& SubfileReader::getRecord() const { return rec; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
