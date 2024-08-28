@@ -20,10 +20,10 @@ stages:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -103,11 +103,11 @@ stages:
           artifactName: 'windows2022'
           architecture: '-A x64'
           binDir: 'bin/Release'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
@@ -162,10 +162,10 @@ stages:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           fileExt: '.exe'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          fileExt: '.exe'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -277,10 +277,10 @@ stages:
           imageName: 'windows-2022'
           artifactName: 'windows2022'
           binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+ #       windows2019:
+ #         imageName: 'windows-2019'
+ #         artifactName: 'windows2019'
+ #         binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -310,7 +310,7 @@ stages:
         git init
         git config user.email "mitogen-group@gmail.com"
         git config user.name "Azure test script"
-        git pull http://${USERNAME}:${PASSWORD}@mpegx.int-evry.fr/software/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
+        git pull https://${USERNAME}:${PASSWORD}@git.mpeg.expert/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
       displayName: 'Reference decoder checkout'
       env:
         USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)

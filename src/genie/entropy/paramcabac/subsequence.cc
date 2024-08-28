@@ -98,7 +98,7 @@ void Subsequence::write(util::BitWriter& writer) const {
 
 uint16_t Subsequence::getDescriptorSubsequenceID() const {
     UTILS_DIE_IF(!descriptor_subsequence_ID, "descriptor_subsequence_ID not present");
-    return descriptor_subsequence_ID.get();
+    return descriptor_subsequence_ID.value();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ const std::vector<TransformedSubSeq>& Subsequence::getTransformSubseqCfgs() cons
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Subsequence::getTokentypeFlag() const { return descriptor_subsequence_ID == boost::none; }
+bool Subsequence::getTokentypeFlag() const { return descriptor_subsequence_ID == std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -147,7 +147,7 @@ Subsequence::Subsequence(nlohmann::json j) {
 
 nlohmann::json Subsequence::toJoson() const {
     nlohmann::json ret;
-    if (descriptor_subsequence_ID != boost::none) {
+    if (descriptor_subsequence_ID != std::nullopt) {
         ret["descriptor_subsequence_ID"] = *descriptor_subsequence_ID;
     }
     ret["transform_subseq_parameters"] = transform_subseq_parameters.toJson();

@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/meta/access-unit.h"
 #include "genie/core/meta/blockheader.h"
 #include "genie/core/meta/blockheader/enabled.h"
@@ -34,8 +34,8 @@ namespace meta {
  */
 class Dataset {
  private:
-    boost::optional<DatasetGroup> dataset_group;       //!< @brief Optional information about dataset group
-    boost::optional<Reference> reference;              //!< @brief Optional information about reference
+    std::optional<DatasetGroup> dataset_group;       //!< @brief Optional information about dataset group
+    std::optional<Reference> reference;              //!< @brief Optional information about reference
     std::vector<Label> label_list;                     //!< @brief List of labels
     uint32_t version;                                  //!< @brief Current iteration of dataset
     std::unique_ptr<BlockHeader> headerCfg;            //!< @brief Configuration of block headers
@@ -93,25 +93,25 @@ class Dataset {
      * @brief Return dataset group information, if any
      * @return DatasetGroup information
      */
-    const boost::optional<DatasetGroup>& getDataGroup() const;
+    const std::optional<DatasetGroup>& getDataGroup() const;
 
     /**
      * @brief
      * @return
      */
-    boost::optional<DatasetGroup>& getDataGroup();
+    std::optional<DatasetGroup>& getDataGroup();
 
     /**
      * @brief Return reference information, if any
      * @return Reference information
      */
-    const boost::optional<Reference>& getReference() const;
+    const std::optional<Reference>& getReference() const;
 
     /**
      * @brief
      * @return
      */
-    boost::optional<Reference>& getReference();
+    std::optional<Reference>& getReference();
 
     /**
      * @brief Return list of labels

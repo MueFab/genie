@@ -115,7 +115,7 @@ nlohmann::json Context::toJson() const {
     if (!context_initialization_value.empty()) {
         ret["context_initialization_value"] = context_initialization_value;
     }
-    if (share_subsym_ctx_flag != boost::none) {
+    if (share_subsym_ctx_flag != std::nullopt) {
         ret["share_subsym_ctx_flag"] = *share_subsym_ctx_flag;
     }
     return ret;

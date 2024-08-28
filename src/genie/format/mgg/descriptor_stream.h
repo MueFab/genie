@@ -12,7 +12,7 @@
 #include <list>
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/format/mgg/block.h"
 #include "genie/format/mgg/descriptor_stream_header.h"
 #include "genie/format/mgg/descriptor_stream_protection.h"
@@ -33,7 +33,7 @@ namespace mgg {
 class DescriptorStream : public GenInfo {
  private:
     DescriptorStreamHeader header;                              //!< @brief
-    boost::optional<DescriptorStreamProtection> ds_protection;  //!< @brief
+    std::optional<DescriptorStreamProtection> ds_protection;  //!< @brief
     std::vector<core::Payload> payload;                         //!< @brief
 
  public:

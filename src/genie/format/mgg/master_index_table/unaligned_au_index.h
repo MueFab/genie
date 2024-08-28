@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/ref_cfg.h"
@@ -29,8 +29,8 @@ namespace master_index_table {
 class UnalignedAUIndex {
  private:
     uint64_t au_byte_offset;                                    //!< @brief
-    boost::optional<genie::format::mgb::RefCfg> ref_cfg;        //!< @brief
-    boost::optional<genie::format::mgb::SignatureCfg> sig_cfg;  //!< @brief
+    std::optional<genie::format::mgb::RefCfg> ref_cfg;        //!< @brief
+    std::optional<genie::format::mgb::SignatureCfg> sig_cfg;  //!< @brief
     std::vector<uint64_t> block_byte_offset;                    //!< @brief
 
     uint8_t byte_offset_size;  //!< @brief
