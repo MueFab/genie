@@ -9,10 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 #include "genie/core/read-decoder.h"
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"

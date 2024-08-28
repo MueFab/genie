@@ -4,7 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
 #include "apps/genie/run/main.h"
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -22,12 +24,11 @@
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default-setup.h"
+#include "genie/quality/calq/decoder.h"
+#include "genie/quality/calq/encoder.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/watch.h"
-
-// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
-#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -109,12 +110,12 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
     std::string fai = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "fai";
     std::string sha = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "sha256";
     auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
-    if (!ghc::filesystem::exists(fai)) {
+    if (!std::filesystem::exists(fai)) {
         std::cerr << "Indexing " << fastaFile << " ..." << std::endl;
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
     }
-    if (!ghc::filesystem::exists(sha)) {
+    if (!std::filesystem::exists(sha)) {
         std::cerr << "Calculaing hashes " << fastaFile << " ..." << std::endl;
         std::ofstream sha_file(sha);
         std::ifstream fai_file(fai);
@@ -136,7 +137,7 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                     std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     std::istream* in_ptr = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
         inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
@@ -156,7 +157,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     genie::core::ClassifierRegroup::RefMode mode;
     if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
@@ -169,7 +170,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         mode = genie::core::ClassifierRegroup::RefMode::FULL;
     }
     auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
-                                                   pOpts.rawReference);
+                                                   pOpts.rawReference, pOpts.rawStreams);
     if (file_extension(pOpts.inputFile) == "fasta") {
         addFasta(pOpts.inputFile, flow.get(), inputFiles);
     } else if (!pOpts.inputRefFile.empty()) {
@@ -189,12 +190,15 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     if (pOpts.qvMode == "none") {
         flow->setQVCoder(genie::util::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
     }
+    if (pOpts.qvMode == "calq") {
+        flow->setQVCoder(genie::util::make_unique<genie::quality::calq::Encoder>(), 0);
+    }
     if (pOpts.readNameMode == "none") {
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
     }
     if (pOpts.lowLatency) {
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 3);
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 4);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 3);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(pOpts.rawStreams), 4);
     }
     return flow;
 }
@@ -204,12 +208,12 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 64000;
+    constexpr size_t BLOCKSIZE = 128000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
 
     std::string json_uri_path = pOpts.inputRefFile;
-    if (ghc::filesystem::exists(pOpts.inputFile + ".json") && ghc::filesystem::file_size(pOpts.inputFile + ".json")) {
+    if (std::filesystem::exists(pOpts.inputFile + ".json") && std::filesystem::file_size(pOpts.inputFile + ".json")) {
         genie::core::meta::Dataset data(nlohmann::json::parse(std::ifstream(pOpts.inputFile + ".json")));
         if (data.getReference()) {
             std::string uri =
@@ -218,7 +222,7 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
             UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme, "Unknown URI scheme: " + uri);
             std::string path = uri.substr(scheme.length());
             std::cerr << "Extracted reference URI: " << uri << std::endl;
-            if (ghc::filesystem::exists(path)) {
+            if (std::filesystem::exists(path)) {
                 std::cerr << "Reference URI valid." << std::endl;
                 json_uri_path = path;
             } else {
@@ -231,12 +235,12 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
             std::string fai = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "fai";
             std::string sha = json_uri_path.substr(0, json_uri_path.find_last_of('.') + 1) + "sha256";
             auto fasta_file = genie::util::make_unique<std::ifstream>(json_uri_path);
-            if (!ghc::filesystem::exists(fai)) {
+            if (!std::filesystem::exists(fai)) {
                 std::cerr << "Indexing " << json_uri_path << " ..." << std::endl;
                 std::ofstream fai_file(fai);
                 genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
             }
-            if (!ghc::filesystem::exists(sha)) {
+            if (!std::filesystem::exists(sha)) {
                 std::cerr << "Calculating hashes " << json_uri_path << " ..." << std::endl;
                 std::ofstream sha_file(sha);
                 std::ifstream fai_file(fai);

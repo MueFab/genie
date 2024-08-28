@@ -68,8 +68,15 @@ if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; t
         || { echo 'Could not download sam file!' ; exit 1; }
     gzip -df /tmp/NA12878_S1_chr22_trunc.sam.gz
 
+    # Get sam file
+    curl -L \
+        https://seafile.cloud.uni-hannover.de/f/99a9c09bd5664cb8a785/?dl=1  \
+        --output /tmp/hg19_custom.fa.gz \
+        || { echo 'Could not download sam file!' ; exit 1; }
+    gzip -df /tmp/hg19_custom.fa.gz
+
     $git_root_dir/ci/sam_tools/sam_transcoder_test.sh "/tmp/NA12878_S1_chr22_trunc.sam"
-    $git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam"
+    $git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam" "/tmp/hg19_custom.fa"
 
     rm /tmp/NA12878_S1_chr22_trunc.sam
 

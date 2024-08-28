@@ -10,10 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
+
+#include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,17 +92,30 @@ class Context {
      */
     const std::vector<uint8_t>& getContextInitializationValue() const;
 
-    bool operator==(const Context& ctx) const {
-        return adaptive_mode_flag == ctx.adaptive_mode_flag && num_contexts == ctx.num_contexts &&
-               context_initialization_value == ctx.context_initialization_value &&
-               share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
-    }
+    /**
+     * @brief
+     * @param ctx
+     * @return
+     */
+    bool operator==(const Context& ctx) const;
+
+    /**
+     * @brief
+     * @param j
+     */
+    explicit Context(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJson() const;
 
  private:
-    bool adaptive_mode_flag : true;                     //!< @brief
-    uint16_t num_contexts : 16;                         //!< @brief
+    bool adaptive_mode_flag{true};                      //!< @brief
+    uint16_t num_contexts{16};                          //!< @brief
     std::vector<uint8_t> context_initialization_value;  //!< @brief
-    boost::optional<bool> share_subsym_ctx_flag;        //!< @brief
+    std::optional<bool> share_subsym_ctx_flag;        //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

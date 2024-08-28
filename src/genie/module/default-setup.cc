@@ -16,7 +16,7 @@
 #include "genie/entropy/gabac/encoder.h"
 #include "genie/name/tokenizer/decoder.h"
 #include "genie/name/tokenizer/encoder.h"
-#include "genie/quality/qvwriteout/decoder.h"
+#include "genie/quality/calq//decoder.h"
 #include "genie/quality/qvwriteout/encoder.h"
 #include "genie/read/localassembly/decoder.h"
 #include "genie/read/localassembly/encoder.h"
@@ -36,23 +36,27 @@ namespace module {
 
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
                                                            size_t blocksize,
-                                                           core::ClassifierRegroup::RefMode externalref, bool rawref) {
+                                                           core::ClassifierRegroup::RefMode externalref, bool rawref,
+                                                           bool writeRawStreams) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
     ret->setClassifier(
         genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
-    ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
+    ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>(writeRawStreams));
+    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(false, writeRawStreams));
+    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(writeRawStreams));
+    ret->addReadCoder(
+        genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false, writeRawStreams));
+    ret->addReadCoder(
+        genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().empty()) {
             return 2;
         }
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            if (chunk.isReferenceOnly()) {
+            if (chunk.isReferenceOnly() ||
+                chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
                 return 2;
             }
             if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {
@@ -75,7 +79,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Encoder>());
     ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
-    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Encoder>());
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Encoder>(writeRawStreams));
     ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
@@ -127,9 +131,9 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
         }
     });
 
-    ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Decoder>());
+    ret->addQVCoder(genie::util::make_unique<genie::quality::calq::Decoder>());
     ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>&,
-                          genie::core::AccessUnit::Descriptor&) -> size_t {
+                          const std::vector<uint64_t>&, genie::core::AccessUnit::Descriptor&) -> size_t {
         UTILS_DIE_IF(param.getMode() != 1, "Unsupported QV decoding mode");
         return 0;
     });

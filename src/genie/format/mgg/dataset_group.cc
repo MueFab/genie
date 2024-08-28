@@ -38,7 +38,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
     }
 
     std::cout << std::to_string(end_pos - reader.getPos()) << std::endl;
-    UTILS_DIE_IF(header == boost::none, "Datasetgroup without header");
+    UTILS_DIE_IF(header == std::nullopt, "Datasetgroup without header");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ const std::vector<ReferenceMetadata>& DatasetGroup::getReferenceMetadata() const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetGroup::hasLabelList() const { return labels != boost::none; }
+bool DatasetGroup::hasLabelList() const { return labels != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ const LabelList& DatasetGroup::getLabelList() const { return *labels; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetGroup::hasMetadata() const { return metadata != boost::none; }
+bool DatasetGroup::hasMetadata() const { return metadata != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ const DatasetGroupMetadata& DatasetGroup::getMetadata() const { return *metadata
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetGroup::hasProtection() const { return protection != boost::none; }
+bool DatasetGroup::hasProtection() const { return protection != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -118,13 +118,13 @@ void DatasetGroup::box_write(util::BitWriter& wr) const {
     for (const auto& r : reference_metadatas) {
         r.write(wr);
     }
-    if (labels != boost::none) {
+    if (labels != std::nullopt) {
         labels->write(wr);
     }
-    if (metadata != boost::none) {
+    if (metadata != std::nullopt) {
         metadata->write(wr);
     }
-    if (protection != boost::none) {
+    if (protection != std::nullopt) {
         protection->write(wr);
     }
     for (const auto& d : dataset) {
@@ -155,7 +155,7 @@ void DatasetGroup::setLabels(LabelList l) { labels = std::move(l); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::patchID(uint8_t groupID) {
-    if (header != boost::none) {
+    if (header != std::nullopt) {
         header->patchID(groupID);
     }
     for (auto& r : references) {
@@ -164,13 +164,13 @@ void DatasetGroup::patchID(uint8_t groupID) {
     for (auto& r : reference_metadatas) {
         r.patchID(groupID);
     }
-    if (labels != boost::none) {
+    if (labels != std::nullopt) {
         labels->patchID(groupID);
     }
-    if (metadata != boost::none) {
+    if (metadata != std::nullopt) {
         metadata->patchID(groupID);
     }
-    if (protection != boost::none) {
+    if (protection != std::nullopt) {
         protection->patchID(groupID);
     }
     for (auto& d : dataset) {
@@ -247,39 +247,39 @@ void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
     std::string tmp_str(4, '\0');
     reader.readBypass(tmp_str);
     if (tmp_str == "dghd") {
-        UTILS_DIE_IF(header != boost::none, "More than one header");
+        UTILS_DIE_IF(header != std::nullopt, "More than one header");
         UTILS_DIE_IF(!reference_metadatas.empty(), "Header must be before ref metadata");
-        UTILS_DIE_IF(labels != boost::none, "Header must be before labels");
-        UTILS_DIE_IF(metadata != boost::none, "Header must be before metadata");
-        UTILS_DIE_IF(protection != boost::none, "Header must be before protection");
+        UTILS_DIE_IF(labels != std::nullopt, "Header must be before labels");
+        UTILS_DIE_IF(metadata != std::nullopt, "Header must be before metadata");
+        UTILS_DIE_IF(protection != std::nullopt, "Header must be before protection");
         UTILS_DIE_IF(!dataset.empty(), "Header must be before dataset");
         header = DatasetGroupHeader(reader);
     } else if (tmp_str == "rfgn") {
         UTILS_DIE_IF(!reference_metadatas.empty(), "Reference must be before ref metadata");
-        UTILS_DIE_IF(labels != boost::none, "Reference must be before labels");
-        UTILS_DIE_IF(metadata != boost::none, "Reference must be before metadata");
-        UTILS_DIE_IF(protection != boost::none, "Reference must be before protection");
+        UTILS_DIE_IF(labels != std::nullopt, "Reference must be before labels");
+        UTILS_DIE_IF(metadata != std::nullopt, "Reference must be before metadata");
+        UTILS_DIE_IF(protection != std::nullopt, "Reference must be before protection");
         UTILS_DIE_IF(!dataset.empty(), "Reference must be before dataset");
         references.emplace_back(reader, version);
     } else if (tmp_str == "rfmd") {
-        UTILS_DIE_IF(labels != boost::none, "Ref metadata must be before labels");
-        UTILS_DIE_IF(metadata != boost::none, "Ref metadata must be before metadata");
-        UTILS_DIE_IF(protection != boost::none, "Ref metadata must be before protection");
+        UTILS_DIE_IF(labels != std::nullopt, "Ref metadata must be before labels");
+        UTILS_DIE_IF(metadata != std::nullopt, "Ref metadata must be before metadata");
+        UTILS_DIE_IF(protection != std::nullopt, "Ref metadata must be before protection");
         UTILS_DIE_IF(!dataset.empty(), "Ref metadata must be before dataset");
         reference_metadatas.emplace_back(reader);
     } else if (tmp_str == "labl") {
-        UTILS_DIE_IF(labels != boost::none, "Labels already present");
-        UTILS_DIE_IF(metadata != boost::none, "Labels must be before metadata");
-        UTILS_DIE_IF(protection != boost::none, "Labels must be before protection");
+        UTILS_DIE_IF(labels != std::nullopt, "Labels already present");
+        UTILS_DIE_IF(metadata != std::nullopt, "Labels must be before metadata");
+        UTILS_DIE_IF(protection != std::nullopt, "Labels must be before protection");
         UTILS_DIE_IF(!dataset.empty(), "Labels must be before dataset");
         labels.emplace(reader);
     } else if (tmp_str == "dgmd") {
-        UTILS_DIE_IF(metadata != boost::none, "Metadata already present");
-        UTILS_DIE_IF(protection != boost::none, "Metadata must be before protection");
+        UTILS_DIE_IF(metadata != std::nullopt, "Metadata already present");
+        UTILS_DIE_IF(protection != std::nullopt, "Metadata must be before protection");
         UTILS_DIE_IF(!dataset.empty(), "Metadata must be before dataset");
         metadata = DatasetGroupMetadata(reader, version);
     } else if (tmp_str == "dgpr") {
-        UTILS_DIE_IF(protection != boost::none, "Protection already present");
+        UTILS_DIE_IF(protection != std::nullopt, "Protection already present");
         UTILS_DIE_IF(!dataset.empty(), "Protection must be before dataset");
         protection = DatasetGroupProtection(reader, version);
     } else if (tmp_str == "dtcn") {

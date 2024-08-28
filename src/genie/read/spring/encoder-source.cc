@@ -7,7 +7,7 @@
 #include "genie/read/spring/encoder-source.h"
 #include <string>
 #include <utility>
-#include "filesystem/filesystem.hpp"
+#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ SpringSource::SpringSource(const std::string& temp_dir, const compression_params
         f_block_info.read(reinterpret_cast<char*>(&num_records_per_AU[0]), num_AUs * sizeof(uint32_t));
 
     f_block_info.close();
-    ghc::filesystem::remove(block_info_file);
+    std::filesystem::remove(block_info_file);
 
     // define descriptors corresponding to reads, ids and quality (so as to read them from file)
     read_desc_prefix = temp_dir + "/read_streams.";
@@ -67,18 +67,18 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
             } else {
                 filename = read_desc_prefix + std::to_string(auId) + "." + std::to_string(uint8_t(d.getID()));
             }
-            if (!ghc::filesystem::exists(filename)) {
+            if (!std::filesystem::exists(filename)) {
                 continue;
             }
-            if (!ghc::filesystem::file_size(filename)) {
-                ghc::filesystem::remove(filename);
+            if (!std::filesystem::file_size(filename)) {
+                std::filesystem::remove(filename);
                 continue;
             }
             std::ifstream input(filename, std::ios::binary);
             util::BitReader br(input);
-            d = core::AccessUnit::Descriptor(d.getID(), count, ghc::filesystem::file_size(filename), br);
+            d = core::AccessUnit::Descriptor(d.getID(), count, std::filesystem::file_size(filename), br);
             input.close();
-            ghc::filesystem::remove(filename);
+            std::filesystem::remove(filename);
         }
         auId++;
         sec = {size_t(id), au.getNumReads(), true};

@@ -23,7 +23,7 @@ Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsu
     : blockSize(_blockSize),
       reader(_file_1),
       writer(&_unsupported),
-      bufferedRecord(boost::none),
+      bufferedRecord(std::nullopt),
       checkSupport(_checkSupport) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,11 +43,11 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
     if (!checkSupport) {
         return true;
     }
-    if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+   /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
         rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
         discarded_missing_pair_U++;
         return false;
-    }
+    }*/
     for (const auto& a : rec.getAlignments()) {
         if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
             discarded_HM++;
@@ -85,12 +85,12 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         if (bufferedRecord) {
             chunk.setRefID(bufferedRecord->getAlignmentSharedData().getSeqID());
             seqid_valid = true;
-            if (isRecordSupported(bufferedRecord.get())) {
-                chunk.getData().emplace_back(std::move(bufferedRecord.get()));
+            if (isRecordSupported(bufferedRecord.value())) {
+                chunk.getData().emplace_back(std::move(bufferedRecord.value()));
             } else {
-                bufferedRecord.get().write(writer);
+                bufferedRecord.value().write(writer);
             }
-            bufferedRecord = boost::none;
+            bufferedRecord = std::nullopt;
             continue;
         }
         core::record::Record rec(reader);

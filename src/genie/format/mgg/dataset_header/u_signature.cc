@@ -19,7 +19,7 @@ bool USignature::operator==(const USignature& other) const { return const_length
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-USignature::USignature() : const_length(boost::none) {}
+USignature::USignature() : const_length(std::nullopt) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ void USignature::write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool USignature::isConstLength() const { return const_length != boost::none; }
+bool USignature::isConstLength() const { return const_length != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

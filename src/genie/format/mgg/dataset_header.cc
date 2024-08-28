@@ -63,20 +63,20 @@ uint8_t DatasetHeader::getPosBits() const { return pos_40_bits_flag ? 40 : 32; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetHeader::isBlockHeaderEnabled() const { return block_header_on != boost::none; }
+bool DatasetHeader::isBlockHeaderEnabled() const { return block_header_on != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetHeader::isMITEnabled() const { return block_header_off != boost::none || block_header_on->getMITFlag(); }
+bool DatasetHeader::isMITEnabled() const { return block_header_off != std::nullopt || block_header_on->getMITFlag(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DatasetHeader::isCCModeEnabled() const { return block_header_on != boost::none && block_header_on->getCCFlag(); }
+bool DatasetHeader::isCCModeEnabled() const { return block_header_on != std::nullopt && block_header_on->getCCFlag(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DatasetHeader::isOrderedBlockMode() const {
-    return block_header_off != boost::none && block_header_off->getOrderedBlocksFlag();
+    return block_header_off != std::nullopt && block_header_off->getOrderedBlocksFlag();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ const dataset_header::UOptions& DatasetHeader::getUOptions() const { return *u_o
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<boost::optional<uint32_t>>& DatasetHeader::getRefSeqThresholds() const { return thresholds; }
+const std::vector<std::optional<uint32_t>>& DatasetHeader::getRefSeqThresholds() const { return thresholds; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -169,7 +169,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
     }
     referenceOptions = dataset_header::ReferenceOptions(reader);
     dataset_type = reader.read<genie::core::parameter::DataUnit::DatasetType>(4);
-    if ((block_header_on != boost::none && block_header_on->getMITFlag()) || block_header_on == boost::none) {
+    if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
         auto num_classes = reader.read<uint8_t>(4);
         for (size_t i = 0; i < num_classes; ++i) {
             mit_configs.emplace_back(reader, block_header_flag);
@@ -187,7 +187,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         if (flag) {
             thresholds.emplace_back(reader.read<uint32_t>(31));
         } else {
-            thresholds.emplace_back(boost::none);
+            thresholds.emplace_back(std::nullopt);
         }
     }
     reader.flush();
@@ -206,15 +206,15 @@ void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
     writer.write(byte_offset_size_flag, 1);
     writer.write(non_overlapping_AU_range_flag, 1);
     writer.write(pos_40_bits_flag, 1);
-    writer.write(block_header_on != boost::none, 1);
-    if (block_header_on != boost::none) {
+    writer.write(block_header_on != std::nullopt, 1);
+    if (block_header_on != std::nullopt) {
         block_header_on->write(writer);
     } else {
         block_header_off->write(writer);
     }
     referenceOptions.write(writer);
     writer.write(static_cast<uint8_t>(dataset_type), 4);
-    if ((block_header_on != boost::none && block_header_on->getMITFlag()) || block_header_on == boost::none) {
+    if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
         writer.write(mit_configs.size(), 4);
         for (const auto& c : mit_configs) {
             c.write(writer);
@@ -227,8 +227,8 @@ void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
         u_options->write(writer);
     }
     for (const auto& t : thresholds) {
-        writer.write(t != boost::none, 1);
-        if (t != boost::none) {
+        writer.write(t != std::nullopt, 1);
+        if (t != std::nullopt) {
             writer.write(*t, 31);
         }
     }
@@ -238,8 +238,8 @@ void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetHeader::addRefSequence(uint8_t _reference_ID, uint16_t _seqID, uint32_t _blocks_num,
-                                   boost::optional<uint32_t> _threshold) {
-    UTILS_DIE_IF(_threshold == boost::none && thresholds.empty(), "First threshold must be supplied");
+                                   std::optional<uint32_t> _threshold) {
+    UTILS_DIE_IF(_threshold == std::nullopt && thresholds.empty(), "First threshold must be supplied");
     referenceOptions.addSeq(_reference_ID, _seqID, _blocks_num);
     thresholds.emplace_back(_threshold);
 }
@@ -255,11 +255,11 @@ void DatasetHeader::setUAUs(uint32_t _num_U_access_units, dataset_header::UOptio
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetHeader::addClassConfig(dataset_header::MITClassConfig config) {
-    UTILS_DIE_IF(block_header_on != boost::none && !block_header_on->getMITFlag(),
+    UTILS_DIE_IF(block_header_on != std::nullopt && !block_header_on->getMITFlag(),
                  "Adding classes without MIT has no effect");
-    UTILS_DIE_IF(config.getDescriptorIDs().empty() && block_header_off != boost::none,
+    UTILS_DIE_IF(config.getDescriptorIDs().empty() && block_header_off != std::nullopt,
                  "Descriptor streams not supplied (block_header_flag)");
-    if ((!config.getDescriptorIDs().empty() && block_header_off == boost::none)) {
+    if ((!config.getDescriptorIDs().empty() && block_header_off == std::nullopt)) {
         config = dataset_header::MITClassConfig(config.getClassID());
     }
     UTILS_DIE_IF(!mit_configs.empty() && mit_configs.back().getClassID() >= config.getClassID(),
@@ -271,14 +271,14 @@ void DatasetHeader::addClassConfig(dataset_header::MITClassConfig config) {
 
 void DatasetHeader::disableBlockHeader(dataset_header::BlockHeaderOffOptions opts) {
     UTILS_DIE_IF(!mit_configs.empty(), "Disabling block header after adding MIT information not supported.");
-    block_header_on = boost::none;
+    block_header_on = std::nullopt;
     block_header_off = opts;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetHeader::disableMIT() {
-    UTILS_DIE_IF(block_header_on == boost::none, "MIT can only be disabled when block headers are activated");
+    UTILS_DIE_IF(block_header_on == std::nullopt, "MIT can only be disabled when block headers are activated");
     block_header_on = dataset_header::BlockHeaderOnOptions(false, block_header_on->getCCFlag());
     mit_configs.clear();
 }
@@ -297,7 +297,7 @@ void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
-    if (block_header_on != boost::none) {
+    if (block_header_on != std::nullopt) {
         return genie::util::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
                                                                                  block_header_on->getCCFlag());
     } else {

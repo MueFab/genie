@@ -94,11 +94,24 @@ class Binarization {
      */
     uint8_t getNumBinarizationParams();
 
-    bool operator==(const Binarization& bin) const {
-        return binarization_ID == bin.binarization_ID && bypass_flag == bin.bypass_flag &&
-               cabac_binarization_parameters == bin.cabac_binarization_parameters &&
-               cabac_context_parameters == bin.cabac_context_parameters;
-    }
+    /**
+     * @brief
+     * @param bin
+     * @return
+     */
+    bool operator==(const Binarization& bin) const;
+
+    /**
+     * @brief
+     * @param j
+     */
+    explicit Binarization(nlohmann::json j);
+
+    /**
+     * @brief
+     * @return
+     */
+    nlohmann::json toJson() const;
 
  private:
     BinarizationParameters::BinarizationId binarization_ID;  //!< @brief

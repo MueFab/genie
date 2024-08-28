@@ -111,12 +111,13 @@ std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record:
     while (buf_max_size < (max_read_size * READS_PER_ASSEMBLY)) {
         buf_max_size *= 2;
     }
+    buf_max_size = std::min(buf_max_size, (1u << 24u) - 1u);
     return util::make_unique<LAEncodingState>(data, buf_max_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(bool _debug) : debug(_debug) {}
+Encoder::Encoder(bool _debug, bool _write_raw) : EncoderStub(_write_raw), debug(_debug) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

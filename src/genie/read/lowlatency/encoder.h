@@ -51,6 +51,12 @@ class Encoder : public core::ReadEncoder {
      */
     core::AccessUnit pack(const util::Section& id, uint8_t qv_depth,
                           std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const;
+
+    /**
+     * @brief
+     * @param write_raw
+     */
+    explicit Encoder(bool write_raw) : core::ReadEncoder(write_raw) {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

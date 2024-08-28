@@ -35,7 +35,7 @@ namespace sam_to_mgrec {
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"
 // #define PHASE1_BUFFER_SIZE 50000
-#define PHASE2_BUFFER_SIZE 500000
+#define PHASE2_BUFFER_SIZE 1000000
 
 /**
  * @brief

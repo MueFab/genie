@@ -66,12 +66,12 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
                     (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
-            std::get<1>(state).setRead1First(false);
+            std::get<1>(state).setRead1First(true);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
         case core::GenConst::PAIR_R2_UNPAIRED:
-            std::get<1>(state).setRead1First(true);
+            std::get<1>(state).setRead1First(false);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
@@ -82,9 +82,6 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
-    if (!std::get<1>(state).isRead1First()) {
-        std::get<1>(state).swapSegmentOrder();
-    }
     return std::get<1>(state);
 }
 
@@ -100,7 +97,7 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
         if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
             meta.num_segments = 2;
             const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
-            meta.first1 = SAME_REC_DATA & 1u;
+            meta.first1 = !(SAME_REC_DATA & 1u);
             const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
             meta.position[1] = meta.position[0] + DELTA;
         }
@@ -154,7 +151,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
     std::get<1>(ret) =
-        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "Genie", FLAGS);
+        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "", FLAGS);
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(ret).addSegment(std::move(segment));
@@ -254,6 +251,11 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
     auto startPos = cigar_extended.find_first_not_of(']');
     uint64_t cigarOffset = startPos == std::string::npos ? 0 : startPos;
     if (container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
+        for (auto &c : sequence) {
+            if (c == 0) {
+                c = getAlphabetProperties(core::AlphabetID::ACGTN).lut[container.pull(core::GenSub::UREADS)];
+            }
+        }
         return;
     }
     while (!container.pull(core::GenSub::MMPOS_TERMINATOR)) {

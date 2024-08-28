@@ -32,12 +32,14 @@ namespace spring {
  * @param entropy
  * @param params
  * @param stats
+ * @param write_raw
  */
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::NameSelector *name_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                                 bool write_raw);
 
 /**
  * @brief
@@ -69,13 +71,15 @@ void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> 
  * @param entropy
  * @param params
  * @param stats
+ * @param write_raw
  */
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const std::string &file_name, const compression_params &cp,
                             genie::core::ReadEncoder::NameSelector *name_coder,
                             genie::core::ReadEncoder::EntropySelector *entropy,
-                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
+                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                            bool write_raw);
 
 /**
  * @brief
@@ -92,6 +96,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
  * @param entropy
  * @param params
  * @param stats
+ * @param write_raw
  */
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality,
                                  const std::string &temp_dir, std::string *quality_array,
@@ -99,7 +104,8 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
                                  genie::core::ReadEncoder::EntropySelector *entropy,
-                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
+                                 std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
+                                 bool write_raw);
 
 /**
  * @brief
@@ -117,6 +123,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
  * @param entropy
  * @param params
  * @param stats
+ * @param write_raw
  */
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
@@ -124,7 +131,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       genie::core::ReadEncoder::QvSelector *qv_coder,
                       genie::core::ReadEncoder::NameSelector *name_coder,
                       genie::core::ReadEncoder::EntropySelector *entropy,
-                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats);
+                      std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats, bool write_raw);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

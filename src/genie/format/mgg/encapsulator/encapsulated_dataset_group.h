@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/format/mgg/dataset_group.h"
 #include "genie/format/mgg/dataset_group_metadata.h"
 #include "genie/format/mgg/dataset_group_protection.h"
@@ -32,12 +32,12 @@ namespace encapsulator {
  * @brief
  */
 struct EncapsulatedDatasetGroup {
-    boost::optional<genie::format::mgg::DatasetGroupMetadata> group_meta;          //!< @brief
-    boost::optional<genie::format::mgg::DatasetGroupProtection> group_protection;  //!< @brief
+    std::optional<genie::format::mgg::DatasetGroupMetadata> group_meta;          //!< @brief
+    std::optional<genie::format::mgg::DatasetGroupProtection> group_protection;  //!< @brief
     std::vector<genie::format::mgg::Reference> references;                         //!< @brief
     std::vector<genie::format::mgg::ReferenceMetadata> reference_meta;             //!< @brief
     std::vector<std::unique_ptr<EncapsulatedDataset>> datasets;                    //!< @brief
-    boost::optional<genie::format::mgg::LabelList> labelList;                      //!< @brief
+    std::optional<genie::format::mgg::LabelList> labelList;                      //!< @brief
 
     /**
      * @brief

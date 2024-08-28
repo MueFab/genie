@@ -7,6 +7,7 @@
 #include "genie/entropy/gabac/configuration.h"
 #include <utility>
 #include "genie/entropy/gabac/config-manual.h"
+#include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/gabac/streams.h"
 #include "genie/entropy/paramcabac/transformed-subseq.h"
@@ -106,6 +107,14 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
     }
     return nullstr;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(j) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+nlohmann::json EncodingConfiguration::toJson() const { return subseqCfg.toJoson(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

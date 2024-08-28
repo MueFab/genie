@@ -44,7 +44,7 @@ def sam_cmp(input_first, input_second):
                             f2 = f2 & ~0x20
 
                         # If unpaired record, no information about reverse complement of pair available
-                        if (split_1[7] == split_1[3] and (split_1[6] == "=" or split_1[2] == split_1[6])):
+                        if ((split_1[7] == split_1[3] and (split_1[6] == "=" or split_1[2] == split_1[6])) or split_1[8] == "0" or split_2[8] == "0"):
                             f1 = f1 & ~0x20
                             f2 = f2 & ~0x20
                         # If unmapped, no information about own reverse complement available
@@ -89,6 +89,8 @@ def sam_cmp(input_first, input_second):
                         print("> " + line, end='')
                         print("< " + line2, end='')
                         raise RuntimeError("Cmp error " + str(index))
+            if input_file_second.readline() != "":
+                raise RuntimeError("Number of records differ")
                 
 
 if __name__ == "__main__":

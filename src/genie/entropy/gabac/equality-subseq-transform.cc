@@ -87,14 +87,15 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
 
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     // Prepare internal and the output data structures
+    uint8_t wordsize = transformedSubseqs->front().getWordSize();
     transformedSubseqs->resize(2);
     (*transformedSubseqs)[0].swap(
         &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
 
-    flags->setWordSize(4);
-    rawValues->setWordSize(4);
+    flags->setWordSize(1);
+    rawValues->setWordSize(wordsize);
 
     if (rawValues->getWordSize() == 1) {
         transformEqualityCoding0(rawValues, flags);  // FIXME this might not be needed TBC

@@ -47,6 +47,7 @@ class Encoder : public core::EntropyEncoder {
 
  public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
+    bool writeOutStreams{};     //!< @brief writeout streams
 
     /**
      * @brief
@@ -54,6 +55,12 @@ class Encoder : public core::EntropyEncoder {
      * @return
      */
     EntropyCoded process(core::AccessUnit::Descriptor& desc) override;
+
+    /**
+     * @brief
+     * @param _writeOutStreams
+     */
+    explicit Encoder(bool _writeOutStreams);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -62,7 +69,7 @@ class Encoder : public core::EntropyEncoder {
 }  // namespace entropy
 }  // namespace genie
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------zzzz----------------------------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_ENTROPY_GABAC_ENCODER_H_
 

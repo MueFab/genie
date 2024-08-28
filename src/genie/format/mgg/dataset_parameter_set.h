@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
-#include "boost/optional/optional.hpp"
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgg/dataset_parameterset/update_info.h"
@@ -32,7 +32,7 @@ class DatasetParameterSet : public GenInfo {
     uint16_t dataset_id;                                             //!< @brief
     uint8_t parameter_set_ID;                                        //!< @brief
     uint8_t parent_parameter_set_ID;                                 //!< @brief
-    boost::optional<dataset_parameterset::UpdateInfo> param_update;  //!< @brief
+    std::optional<dataset_parameterset::UpdateInfo> param_update;  //!< @brief
     genie::core::parameter::EncodingSet params;                      //!< @brief
     core::MPEGMinorVersion version;                                  //!< @brief
 

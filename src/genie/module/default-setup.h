@@ -27,10 +27,12 @@ namespace module {
  * @param working_dir
  * @param externalref
  * @param rawref
+ * @param writeRawStreams
  * @return
  */
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t,
-                                                           core::ClassifierRegroup::RefMode externalref, bool rawref);
+                                                           core::ClassifierRegroup::RefMode externalref, bool rawref,
+                                                           bool writeRawStreams);
 
 /**
  * @brief

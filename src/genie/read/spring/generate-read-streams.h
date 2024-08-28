@@ -27,10 +27,11 @@ namespace spring {
  * @param cp
  * @param entropycoder
  * @param stats
+ * @param write_raw
  */
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                            core::ReadEncoder::EntropySelector *entropycoder,
-                           std::vector<core::parameter::EncodingSet> &, core::stats::PerfStats &stats);
+                           std::vector<core::parameter::EncodingSet> &, core::stats::PerfStats &stats, bool write_raw);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

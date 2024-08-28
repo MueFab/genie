@@ -9,6 +9,7 @@
 #include <iostream>
 #include <tuple>
 #include <utility>
+#include "genie/entropy/gabac/decode-desc-subseq.h"
 #include "genie/entropy/gabac/decode-transformed-subseq.h"
 #include "genie/entropy/gabac/mismatch-decoder.h"
 #include "genie/entropy/gabac/stream-handler.h"
@@ -47,32 +48,68 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     }
     int32_t typeNum = -1;
     for (size_t i = 0; i < num_tokentype_descriptors; ++i) {
-        const size_t READAHEAD = std::min<size_t>(11, remainingData.getRawSize() - offset - 1);
-        UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
-        util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
-                                              remainingData.getWordSize());
-        gabac::IBufferStream stream(&tmp);
-        util::BitReader reader(stream);
-
-        uint16_t type_id = reader.read<uint16_t>(4);
-        uint16_t method = reader.read<uint16_t>(4);
-
-        if (type_id == 0) typeNum++;
-        size_t mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);
-
-        UTILS_DIE_IF(method != 3, "Only CABAC0 supported");
-        offset++;
+        uint16_t type_id = 0;
+        uint16_t method = 0;
         uint64_t numSymbols = 0;
-        offset += gabac::StreamHandler::readU7(stream, numSymbols);
+        size_t mappedTypeId = 0;
+        {
+            const size_t READAHEAD = std::min<size_t>(11, remainingData.getRawSize() - offset - 1);
+            UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
+            util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
+                                                  remainingData.getWordSize());
+            gabac::IBufferStream stream(&tmp);
+            util::BitReader reader(stream);
 
-        tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset,
-                              remainingData.getRawSize() - offset, remainingData.getWordSize());
-        offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0),
-                                               (unsigned int)numSymbols, &tmp);
+            type_id = reader.read<uint16_t>(4);
+            method = reader.read<uint16_t>(4);
+            if (type_id == 0) typeNum++;
+            mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);
+
+            UTILS_DIE_IF(method != 3, "Only CABAC0 supported");
+            offset++;
+            offset += gabac::StreamHandler::readU7(stream, numSymbols);
+        }
+
+        std::vector<util::DataBlock> transformedSeqs;
+        for (size_t j = 0; j < conf0.getSubseqConfig().getNumTransformSubseqCfgs(); ++j) {
+            size_t payload_size = 0;
+            if (j < (conf0.getSubseqConfig().getNumTransformSubseqCfgs() - 1)) {
+                util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
+                                                      remainingData.getWordSize());
+                gabac::IBufferStream stream(&tmp);
+                util::BitReader reader(stream);
+                payload_size = reader.read<uint32_t>();
+                offset += 4;
+            } else {
+                payload_size = remainingData.getRawSize() - offset;
+            }
+            auto numTransformedSymbols = static_cast<uint32_t>(numSymbols);
+            if (payload_size > 0) {
+                if (conf0.getSubseqConfig().getNumTransformSubseqCfgs() > 1) {
+                    util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
+                                                          remainingData.getWordSize());
+                    gabac::IBufferStream stream(&tmp);
+                    util::BitReader reader(stream);
+                    numTransformedSymbols = reader.read<uint32_t>();
+                    offset += 4;
+                    payload_size -= 4;
+                }
+            }
+            auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
+                                       remainingData.getWordSize());
+            offset +=
+                gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
+                                             static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
+
+            transformedSeqs.emplace_back(std::move(tmp));
+        }
+
+        gabac::doInverseSubsequenceTransform(conf0.getSubseqConfig(), &transformedSeqs);
+
         while (ret.getSize() < mappedTypeId) {
             ret.add(core::AccessUnit::Subsequence(1, core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)ret.getSize()}));
         }
-        ret.add(core::AccessUnit::Subsequence(std::move(tmp),
+        ret.add(core::AccessUnit::Subsequence(std::move(transformedSeqs.front()),
                                               core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)mappedTypeId}));
     }
     return ret;
@@ -83,6 +120,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
                                                   core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
+    auto id = in.getID();
 
     if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
         in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
@@ -93,15 +131,18 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     util::DataBlock buffer = in.move();
     gabac::IBufferStream in_stream(&buffer, 0);
 
-    util::DataBlock tmp(0, 4);
+    uint8_t bytes = genie::core::range2bytes(core::getSubsequence(id).range);
+    util::DataBlock tmp(0, bytes);
     gabac::OBufferStream outbuffer(&tmp);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cerr;
     const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream,
+                                                   1,
                                                    nullptr,
                                                    &outbuffer,
+                                                   bytes,
                                                    GABAC_BLOCK_SIZE,
                                                    GABC_LOG_OUTPUT_STREAM,
                                                    gabac::IOConfiguration::LogLevel::LOG_TRACE};

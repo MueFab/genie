@@ -25,12 +25,12 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
     auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
     set.addCodeBook(std::move(codebook));
 
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_PRESENT));
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_CODEBOOK));
-    desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_STEPS_0));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_PRESENT));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_CODEBOOK));
+    desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_0));
     if (rec.getData().front().getClassID() == core::record::ClassType::CLASS_I ||
         rec.getData().front().getClassID() == core::record::ClassType::CLASS_HM) {
-        desc.add(core::AccessUnit::Subsequence(4, core::GenSub::QV_STEPS_1));
+        desc.add(core::AccessUnit::Subsequence(1, core::GenSub::QV_STEPS_1));
 
         codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
         set.addCodeBook(std::move(codebook));
@@ -82,7 +82,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     setUpParameters(rec, *param, desc);
 
     for (const auto& r : rec.getData()) {
-        auto& s_first = !r.isRead1First() && r.getSegments().size() == 2 ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_first = r.getSegments()[0];
 
         if (r.getAlignments().empty()) {
             encodeUnalignedSegment(s_first, desc);
@@ -94,7 +94,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
             continue;
         }
 
-        auto& s_second = r.isRead1First() ? r.getSegments()[1] : r.getSegments()[0];
+        auto& s_second = r.getSegments()[1];
 
         if (r.getClassID() == core::record::ClassType::CLASS_HM || r.getClassID() == core::record::ClassType::CLASS_U) {
             encodeUnalignedSegment(s_second, desc);

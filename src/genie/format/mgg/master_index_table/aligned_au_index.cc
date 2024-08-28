@@ -63,10 +63,10 @@ void AlignedAUIndex::write(genie::util::BitWriter& writer) const {
     writer.write(au_byte_offset, byte_offset_size);
     writer.write(au_start_position, position_size);
     writer.write(au_end_position, position_size);
-    if (ref_cfg != boost::none) {
+    if (ref_cfg != std::nullopt) {
         ref_cfg->write(writer);
     }
-    if (extended_cfg != boost::none) {
+    if (extended_cfg != std::nullopt) {
         extended_cfg->write(writer);
     }
     for (const auto& b : block_byte_offset) {
@@ -88,7 +88,7 @@ uint64_t AlignedAUIndex::getAUEndPos() const { return au_end_position; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AlignedAUIndex::isReference() const { return ref_cfg != boost::none; }
+bool AlignedAUIndex::isReference() const { return ref_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ const genie::format::mgb::ExtendedAu& AlignedAUIndex::getExtension() const { ret
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AlignedAUIndex::isExtended() const { return extended_cfg != boost::none; }
+bool AlignedAUIndex::isExtended() const { return extended_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

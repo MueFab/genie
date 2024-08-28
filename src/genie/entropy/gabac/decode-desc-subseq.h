@@ -10,6 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <vector>
+#include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +24,14 @@ namespace gabac {
 
 struct EncodingConfiguration;
 struct IOConfiguration;
+
+/**
+ * @brief
+ * @param subseqCfg
+ * @param transformedSubseqs
+ */
+void doInverseSubsequenceTransform(const paramcabac::Subsequence& subseqCfg,
+                                   std::vector<util::DataBlock>* const transformedSubseqs);
 
 /**
  * @brief
