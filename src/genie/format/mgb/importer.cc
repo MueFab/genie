@@ -29,7 +29,7 @@ Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::R
 
 bool Importer::pump(uint64_t& id, std::mutex&) {
     util::Watch watch;
-    boost::optional<mgb::AccessUnit> unit;
+    std::optional<mgb::AccessUnit> unit;
     util::Section sec{};
     {
         std::unique_lock<std::mutex> lock_guard(lock);
@@ -42,7 +42,7 @@ bool Importer::pump(uint64_t& id, std::mutex&) {
         id += unit->getHeader().getReadCount();
     }
 
-    flowOut(convertAU(std::move(unit.get())), sec);
+    flowOut(convertAU(std::move(unit.value())), sec);
     return true;
 }
 

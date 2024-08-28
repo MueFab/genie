@@ -101,11 +101,11 @@ nlohmann::json Dataset::toJson() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const boost::optional<DatasetGroup>& Dataset::getDataGroup() const { return dataset_group; }
+const std::optional<DatasetGroup>& Dataset::getDataGroup() const { return dataset_group; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const boost::optional<Reference>& Dataset::getReference() const { return reference; }
+const std::optional<Reference>& Dataset::getReference() const { return reference; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -176,11 +176,11 @@ void Dataset::setHeader(std::unique_ptr<BlockHeader> _hdr) { headerCfg = std::mo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-boost::optional<DatasetGroup>& Dataset::getDataGroup() { return dataset_group; }
+std::optional<DatasetGroup>& Dataset::getDataGroup() { return dataset_group; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-boost::optional<Reference>& Dataset::getReference() { return reference; }
+std::optional<Reference>& Dataset::getReference() { return reference; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

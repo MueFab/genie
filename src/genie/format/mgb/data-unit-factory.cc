@@ -29,7 +29,7 @@ const core::parameter::EncodingSet& DataUnitFactory::getParams(size_t id) const 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
+std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
     int i = 0;
     do {
@@ -37,7 +37,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
         size_t pos = bitReader.getPos();
         if (!bitReader.isGood()) {
             bitReader.clear();
-            return boost::none;
+            return std::nullopt;
         }
         switch (type) {
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE: {
