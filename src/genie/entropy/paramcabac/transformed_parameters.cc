@@ -25,7 +25,6 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
     transform_ID_subseq = reader.read<TransformIdSubseq>(8);
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
-            break;
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:

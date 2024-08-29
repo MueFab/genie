@@ -490,7 +490,7 @@ class AccessUnit {
      * @brief
      * @return
      */
-    uint16_t getReference();
+    [[nodiscard]] uint16_t getReference() const;
 
     /**
      * @brief

@@ -448,12 +448,9 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
-    for (const auto& c : seq) {
-        if (!alphabet.isIncluded(c)) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
+        return alphabet.isIncluded(c);
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

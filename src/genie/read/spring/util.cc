@@ -9,6 +9,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -51,14 +52,21 @@ std::string reverse_complement(const std::string &s, const int readlen) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
-    auto randchar = []() -> char {
-        const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
+    static const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    static const size_t max_index = sizeof(charset) - 1;
+
+    // Use a random device and a Mersenne Twister engine for better randomness
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> distribution(0, max_index - 1);
+
+    auto randchar = [&]() -> char {
+        return charset[distribution(generator)];
     };
+
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);
     return str;

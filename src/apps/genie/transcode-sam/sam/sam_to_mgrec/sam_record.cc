@@ -182,7 +182,7 @@ SamRecord::SamRecord(bam1_t* sam_alignment)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& SamRecord::getQname() { return qname; }
+const std::string& SamRecord::getQname() const { return qname; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -313,7 +313,7 @@ bool SamRecord::isReverse() const { return checkFlag(BAM_FREVERSE); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SamRecord::isPairOf(SamRecord& r) {
+bool SamRecord::isPairOf(SamRecord& r) const {
     /// Both must be paired-ended
     if (isPaired() != r.isPaired() || !isPaired()) {
         return false;

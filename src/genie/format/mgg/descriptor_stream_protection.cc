@@ -14,8 +14,8 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamProtection::DescriptorStreamProtection(std::string _DSProtectionValue)
-    : DSProtectionValue(std::move(_DSProtectionValue)) {}
+DescriptorStreamProtection::DescriptorStreamProtection(std::string _dSProtectionValue)
+    : DSProtectionValue(std::move(_dSProtectionValue)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
