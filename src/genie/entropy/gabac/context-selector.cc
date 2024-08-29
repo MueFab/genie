@@ -17,7 +17,7 @@ ContextSelector::ContextSelector(const paramcabac::StateVars& _stateVars) : stat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContextSelector::ContextSelector(const ContextSelector& src) : stateVars(src.stateVars) {}
+ContextSelector::ContextSelector(const ContextSelector& src) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

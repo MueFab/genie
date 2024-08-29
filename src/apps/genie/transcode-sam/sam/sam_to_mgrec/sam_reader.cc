@@ -34,10 +34,6 @@ SamReader::SamReader(const std::string& fpath)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamReader::SamReader(std::string& fpath) : SamReader(fpath) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 SamReader::~SamReader() {
     bam_destroy1(sam_alignment);
     bam_hdr_destroy(sam_header);

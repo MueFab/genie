@@ -162,18 +162,7 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamRecord::SamRecord()
-    :,
-      flag(0),
-      rid(0),
-      pos(0),
-      mapq(0),
-      ,
-      mate_rid(0),
-      mate_pos(0),
-      //      tlen(0),
-      ,
-{}
+SamRecord::SamRecord() : flag(0), rid(0), pos(0), mapq(0), mate_rid(0), mate_pos(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
