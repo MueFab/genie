@@ -33,7 +33,7 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
 void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current) {
     auto size = dictidx[1] - dictidx[0];
     if (size == 1) {  // just one read left in bin
-        empty_bin[startposidx] = 1;
+        empty_bin[startposidx] = true;
         return;  // need to keep one read to check during matching
     }
     int64_t pos = std::lower_bound(read_id + dictidx[0], read_id + dictidx[1], current) - (read_id + dictidx[0]);

@@ -129,7 +129,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) {
+uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(const uint64_t *depSymbol) {
     uint64_t symbolValue = 0;
     if (numDecodedSymbols < numEncodedSymbols) {
         // Decode subsymbols and merge them to construct the symbol
