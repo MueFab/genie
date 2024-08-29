@@ -39,8 +39,7 @@ typedef uint64_t (Reader:: *binFunc)(const std::vector<unsigned int>);
  * @param binID
  * @param symbolValue
  */
-void decodeSignFlag(Reader &reader, paramcabac::BinarizationParameters::BinarizationId binID,
-                    uint64_t &symbolValue);
+void decodeSignFlag(Reader &reader, paramcabac::BinarizationParameters::BinarizationId binID, uint64_t &symbolValue);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
