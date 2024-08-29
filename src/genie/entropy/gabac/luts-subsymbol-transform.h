@@ -65,7 +65,7 @@ class LUTsSubSymbolTransform {
      * @param _modeFlag
      */
     LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals, const paramcabac::StateVars& _stateVars,
-                           const uint8_t _numLuts, const uint8_t _numPrvs, const bool _modeFlag);
+                           uint8_t _numLuts, uint8_t _numPrvs, bool _modeFlag);
 
     /**
      * @brief
@@ -85,7 +85,7 @@ class LUTsSubSymbolTransform {
      * @param symbols
      * @param depSymbols
      */
-    void encodeLUTs(Writer& writer, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
+    void encodeLUTs(Writer& writer, util::DataBlock* symbols, util::DataBlock* depSymbols = nullptr);
 
     /**
      * @brief
@@ -94,7 +94,7 @@ class LUTsSubSymbolTransform {
      * @param prvIdx
      * @return
      */
-    uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
+    uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -103,7 +103,7 @@ class LUTsSubSymbolTransform {
      * @param prvIdx
      * @return
      */
-    uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
+    uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -112,8 +112,8 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                            const uint8_t prvIdx);
+    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
+                            uint8_t prvIdx);
 
     /**
      * @brief
@@ -122,8 +122,8 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                            const uint8_t prvIdx);
+    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
+                            uint8_t prvIdx);
 
     /**
      * @brief
@@ -132,8 +132,8 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                         const uint8_t prvIdx);
+    void transformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
+                         uint8_t prvIdx);
 
     /**
      * @brief
@@ -142,8 +142,8 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                         const uint8_t prvIdx);
+    void transformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
+                         uint8_t prvIdx);
 
  private:
     /**
@@ -172,7 +172,7 @@ class LUTsSubSymbolTransform {
      * @param symbols
      * @param depSymbols
      */
-    void buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
+    void buildLuts(util::DataBlock* symbols, util::DataBlock* depSymbols = nullptr);
 
     /**
      * @brief

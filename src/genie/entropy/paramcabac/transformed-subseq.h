@@ -41,16 +41,16 @@ class TransformedSubSeq {
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID, bool original = true,
-                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+                      Binarization&& _cabac_binarization, core::GenSubIndex _subsequence_ID, bool original = true,
+                      core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      * @brief
      * @param reader
      * @param _subsequence_ID
      * @param _alphabet_ID
      */
-    TransformedSubSeq(util::BitReader& reader, const core::GenSubIndex _subsequence_ID,
-                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+    TransformedSubSeq(util::BitReader& reader, core::GenSubIndex _subsequence_ID,
+                      core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     /**
      * @brief
@@ -97,7 +97,7 @@ class TransformedSubSeq {
      * @brief
      * @param _subsequence_ID
      */
-    void setSubsequenceID(const core::GenSubIndex _subsequence_ID);
+    void setSubsequenceID(core::GenSubIndex _subsequence_ID);
 
     /**
      * @brief

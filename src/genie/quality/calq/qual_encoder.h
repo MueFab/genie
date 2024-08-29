@@ -55,7 +55,7 @@ class QualEncoder {
  private:
     void quantizeUntil(uint64_t pos);
     void encodeRecords(std::vector<EncodingRecord> records);
-    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos);
+    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, uint64_t pos);
 
  private:
     // Sizes & counters
