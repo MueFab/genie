@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace localassembly {
+namespace genie::read::localassembly {
 
 /**
  * @brief
@@ -65,9 +63,7 @@ class Decoder : public basecoder::DecoderStub {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace localassembly
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::localassembly
 
 // ---------------------------------------------------------------------------------------------------------------------
 

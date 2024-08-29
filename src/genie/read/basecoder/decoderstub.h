@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace basecoder {
+namespace genie::read::basecoder {
 
 /**
  * @brief Common stub for all aligned record decoders
@@ -114,9 +112,7 @@ class DecoderStub : public core::ReadDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace basecoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::basecoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 #define MAX_NUM_TRANSPORT_SEQS 4  // put max 4 for now.
 
@@ -38,9 +36,9 @@ uint8_t getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize
 // ---------------------------------------------------------------------------------------------------------------------
 
 paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
-    const core::GenDesc genieDescID = (core::GenDesc)sub.first;
+    const auto genieDescID = (core::GenDesc)sub.first;
     const core::GenSubIndex genieSubseqID = sub;
-    const uint8_t subseqID = (uint8_t)sub.second;
+    const auto subseqID = (uint8_t)sub.second;
 
     // default values
     const core::AlphabetID alphaID = core::AlphabetID::ACGTN;
@@ -563,9 +561,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

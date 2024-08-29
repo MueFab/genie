@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <vector>
 #include <optional>
+#include <vector>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -72,25 +70,25 @@ class Context {
      * @brief
      * @return
      */
-    bool getAdaptiveModeFlag() const;
+    [[nodiscard]] bool getAdaptiveModeFlag() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getNumContexts() const;
+    [[nodiscard]] uint16_t getNumContexts() const;
 
     /**
      * @brief
      * @return
      */
-    bool getShareSubsymCtxFlag() const;
+    [[nodiscard]] bool getShareSubsymCtxFlag() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<uint8_t>& getContextInitializationValue() const;
+    [[nodiscard]] const std::vector<uint8_t>& getContextInitializationValue() const;
 
     /**
      * @brief
@@ -109,20 +107,18 @@ class Context {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
  private:
     bool adaptive_mode_flag{true};                      //!< @brief
     uint16_t num_contexts{16};                          //!< @brief
     std::vector<uint8_t> context_initialization_value;  //!< @brief
-    std::optional<bool> share_subsym_ctx_flag;        //!< @brief
+    std::optional<bool> share_subsym_ctx_flag;          //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

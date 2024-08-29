@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -50,7 +48,7 @@ class AccessUnitHeader : public GenInfo {
      * @brief
      * @return
      */
-    const genie::format::mgb::AUHeader& getHeader() const;
+    [[nodiscard]] const genie::format::mgb::AUHeader& getHeader() const;
 
     /**
      * @brief
@@ -89,14 +87,12 @@ class AccessUnitHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

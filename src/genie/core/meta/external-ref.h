@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Information needed to use an external reference - interface
@@ -53,7 +51,7 @@ class ExternalRef : public RefBase {
      * @brief Return URI to external reference
      * @return URI
      */
-    const std::string& getURI() const;
+    [[nodiscard]] const std::string& getURI() const;
 
     /**
      * @brief
@@ -65,32 +63,30 @@ class ExternalRef : public RefBase {
      * @brief Return active checksum algorithm
      * @return Checksum algorithm used
      */
-    ChecksumAlgorithm getChecksumAlgo() const;
+    [[nodiscard]] ChecksumAlgorithm getChecksumAlgo() const;
 
     /**
      * @brief Return reference type
      * @return Reference type
      */
-    ReferenceType getReferenceType() const;
+    [[nodiscard]] ReferenceType getReferenceType() const;
 
     /**
      * @brief Returns "external_ref"
      * @return "external_ref"
      */
-    const std::string& getKeyName() const override;
+    [[nodiscard]] const std::string& getKeyName() const override;
 
     /**
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

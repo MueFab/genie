@@ -14,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Represents an ISO compliant date and optionally time.
@@ -34,7 +33,7 @@ class Date {
      * @brief
      * @return True if the date actually exists (e.g. 30th of february would return false).
      */
-    bool checkValidity() const;
+    [[nodiscard]] bool checkValidity() const;
 
  public:
     /**
@@ -47,49 +46,49 @@ class Date {
      * @brief
      * @return Saved year.
      */
-    uint16_t getYear() const;
+    [[nodiscard]] uint16_t getYear() const;
 
     /**
      * @brief
      * @return Saved month.
      */
-    uint8_t getMonth() const;
+    [[nodiscard]] uint8_t getMonth() const;
 
     /**
      * @brief
      * @return Saved day.
      */
-    uint8_t getDay() const;
+    [[nodiscard]] uint8_t getDay() const;
 
     /**
      * @brief
      * @return True if the time variables are valid.
      */
-    bool isTimePresent() const;
+    [[nodiscard]] bool isTimePresent() const;
 
     /**
      * @brief
      * @return Hour.
      */
-    uint8_t getHour() const;
+    [[nodiscard]] uint8_t getHour() const;
 
     /**
      * @brief
      * @return Minute.
      */
-    uint8_t getMinute() const;
+    [[nodiscard]] uint8_t getMinute() const;
 
     /**
      * @brief
      * @return Second.
      */
-    uint8_t getSecond() const;
+    [[nodiscard]] uint8_t getSecond() const;
 
     /**
      * @brief
      * @return True if the year in this date is a leap year and february has 29 days instead of 28.
      */
-    bool leapYear() const;
+    [[nodiscard]] bool leapYear() const;
 
     /**
      * @brief Parse a date from string.
@@ -121,13 +120,12 @@ class Date {
      * @brief Converts the date object into a printable string.
      * @return Date string.
      */
-    std::string toString() const;
+    [[nodiscard]] std::string toString() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

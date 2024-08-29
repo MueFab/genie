@@ -13,9 +13,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -71,9 +69,7 @@ SoftclipSpreader::SoftclipSpreader(size_t max_prop, size_t min_hq_clips, bool is
       MIN_HQ_SOFTCLIPS(min_hq_clips),
       squashed(isSquashed) {}
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

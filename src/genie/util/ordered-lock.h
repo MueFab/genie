@@ -14,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Allows to synchronize concurrent threads that the execution order is enforced
@@ -51,8 +50,7 @@ class OrderedLock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Meta information for descriptor stream
@@ -43,19 +41,19 @@ class DescriptorStream {
      * @brief Get descriptor ID
      * @return Descriptor ID
      */
-    size_t getID() const;
+    [[nodiscard]] size_t getID() const;
 
     /**
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Return Part 3 protection information
      * @return Part 3 protection information
      */
-    const std::string& getProtection() const;
+    [[nodiscard]] const std::string& getProtection() const;
 
     /**
      * @brief
@@ -66,9 +64,7 @@ class DescriptorStream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

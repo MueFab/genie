@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/reference/location/external.h"
+#include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
 #include "genie/format/mgg/reference/location/external/mpeg.h"
 #include "genie/format/mgg/reference/location/external/raw.h"
@@ -13,11 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
+namespace genie::format::mgg::reference::location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -95,11 +91,7 @@ std::string& External::getURI() { return uri; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

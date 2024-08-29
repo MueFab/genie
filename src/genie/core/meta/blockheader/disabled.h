@@ -13,10 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace blockheader {
+namespace genie::core::meta::blockheader {
 
 /**
  * @brief Represents block continuity without block headers
@@ -42,21 +39,18 @@ class Disabled : public BlockHeader {
      * @brief Return ordered_blocks_flag
      * @return ordered_blocks_flag
      */
-    bool getOrderedFlag() const;
+    [[nodiscard]] bool getOrderedFlag() const;
 
     /**
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace blockheader
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::blockheader
 
 // ---------------------------------------------------------------------------------------------------------------------
 

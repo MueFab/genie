@@ -17,11 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
+namespace genie::format::mgg::reference::location {
 
 /**
  * @brief
@@ -75,7 +71,7 @@ class External : public Location {
      * @brief
      * @return
      */
-    const std::string& getURI() const;
+    [[nodiscard]] const std::string& getURI() const;
 
     /**
      * @brief
@@ -87,13 +83,13 @@ class External : public Location {
      * @brief
      * @return
      */
-    ChecksumAlgorithm getChecksumAlgorithm() const;
+    [[nodiscard]] ChecksumAlgorithm getChecksumAlgorithm() const;
 
     /**
      * @brief
      * @return
      */
-    RefType getReferenceType() const;
+    [[nodiscard]] RefType getReferenceType() const;
 
     /**
      * @brief
@@ -121,11 +117,7 @@ class External : public Location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location
 
 // ---------------------------------------------------------------------------------------------------------------------
 

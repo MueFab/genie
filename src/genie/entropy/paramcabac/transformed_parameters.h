@@ -10,8 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -72,25 +70,25 @@ class TransformedParameters {
      * @brief
      * @return
      */
-    size_t getNumStreams() const;
+    [[nodiscard]] size_t getNumStreams() const;
 
     /**
      * @brief
      * @return
      */
-    TransformIdSubseq getTransformIdSubseq() const;
+    [[nodiscard]] TransformIdSubseq getTransformIdSubseq() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getParam() const;
+    [[nodiscard]] uint16_t getParam() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<uint8_t> getMergeCodingShiftSizes() const;
+    [[nodiscard]] const std::vector<uint8_t> getMergeCodingShiftSizes() const;
 
     /**
      * @brief
@@ -109,7 +107,7 @@ class TransformedParameters {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief
@@ -118,18 +116,16 @@ class TransformedParameters {
     explicit TransformedParameters(const nlohmann::json &_json);
 
  private:
-    TransformIdSubseq transform_ID_subseq;               //!< @brief
+    TransformIdSubseq transform_ID_subseq;             //!< @brief
     std::optional<uint16_t> match_coding_buffer_size;  //!< @brief
     std::optional<uint8_t> rle_coding_guard;           //!< @brief
     std::optional<uint8_t> merge_coding_subseq_count;  //!< @brief
-    std::vector<uint8_t> merge_coding_shift_size;        //!< @brief
+    std::vector<uint8_t> merge_coding_shift_size;      //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,15 +5,12 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
-#include <utility>
 #include <filesystem>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -80,10 +77,7 @@ genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MPEGMinorVer
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

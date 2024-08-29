@@ -21,9 +21,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -32,7 +30,7 @@ class MggFile {
  private:
     std::vector<std::unique_ptr<Box>> boxes;  //!< @brief
     std::istream* file;                       //!< @brief
-    std::optional<util::BitReader> reader;  //!< @brief
+    std::optional<util::BitReader> reader;    //!< @brief
 
  public:
     /**
@@ -74,9 +72,7 @@ class MggFile {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

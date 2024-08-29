@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace basecoder {
+namespace genie::read::basecoder {
 
 /**
  * @brief Common stub for all aligned record encoders
@@ -62,7 +60,7 @@ class EncoderStub : public core::ReadEncoder {
      * @param data Chunk of data to initalize from
      * @return Allocated state
      */
-    virtual std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const = 0;
+    [[nodiscard]] virtual std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const = 0;
 
     /**
      * @brief Encode the base sequences of all record in a chunk
@@ -123,9 +121,7 @@ class EncoderStub : public core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace basecoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::basecoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 

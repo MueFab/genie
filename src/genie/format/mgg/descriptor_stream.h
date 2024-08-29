@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <list>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/format/mgg/block.h"
 #include "genie/format/mgg/descriptor_stream_header.h"
 #include "genie/format/mgg/descriptor_stream_protection.h"
@@ -23,18 +23,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
  */
 class DescriptorStream : public GenInfo {
  private:
-    DescriptorStreamHeader header;                              //!< @brief
+    DescriptorStreamHeader header;                            //!< @brief
     std::optional<DescriptorStreamProtection> ds_protection;  //!< @brief
-    std::vector<core::Payload> payload;                         //!< @brief
+    std::vector<core::Payload> payload;                       //!< @brief
 
  public:
     /**
@@ -69,7 +67,7 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /**
      * @brief
@@ -84,7 +82,7 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    const DescriptorStreamHeader& getHeader() const;
+    [[nodiscard]] const DescriptorStreamHeader& getHeader() const;
 
     /**
      * @brief
@@ -96,7 +94,7 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<core::Payload>& getPayloads() const;
+    [[nodiscard]] const std::vector<core::Payload>& getPayloads() const;
 
     /**
      * @brief
@@ -108,7 +106,7 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    const DescriptorStreamProtection& getProtection() const;
+    [[nodiscard]] const DescriptorStreamProtection& getProtection() const;
 
     /**
      * @brief
@@ -120,7 +118,7 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    bool hasProtection() const;
+    [[nodiscard]] bool hasProtection() const;
 
     /**
      * @brief
@@ -132,14 +130,12 @@ class DescriptorStream : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace localassembly {
+namespace genie::read::localassembly {
 
 /**
  * @brief Module using a local computed reference to encode records
@@ -77,7 +75,7 @@ class Encoder : public basecoder::EncoderStub {
      * @param data Chunk to create from
      * @return LAEncodingState
      */
-    std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
+    [[nodiscard]] std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
 
  public:
     /**
@@ -97,9 +95,7 @@ class Encoder : public basecoder::EncoderStub {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace localassembly
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::localassembly
 
 // ---------------------------------------------------------------------------------------------------------------------
 

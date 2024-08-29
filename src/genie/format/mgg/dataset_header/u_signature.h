@@ -15,10 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
@@ -62,21 +59,18 @@ class USignature {
      * @brief
      * @return
      */
-    bool isConstLength() const;
+    [[nodiscard]] bool isConstLength() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getConstLength() const;
+    [[nodiscard]] uint8_t getConstLength() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

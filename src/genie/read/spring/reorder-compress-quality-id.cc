@@ -26,9 +26,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +64,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         // smallest multiple of num_reads_per_block bigger than numreads/4
         // numreads/4 chosen so that these many qualities/ids can be stored in
         // memory without exceeding the RAM consumption of reordering stage
-        std::string *str_array = new std::string[str_array_size];
+        auto *str_array = new std::string[str_array_size];
         // array to load ids and/or qualities into
 
         if (preserve_quality) {
@@ -100,10 +98,10 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             // read block start and end into vector
             read_block_start_end(file_blocks_quality, block_start, block_end);
             // read order into order_array
-            uint32_t *order_array = new uint32_t[numreads];
+            auto *order_array = new uint32_t[numreads];
             generate_order(file_order_quality, order_array, numreads);
             uint64_t quality_array_size = numreads / 4 + 3 * num_reads_per_block;
-            std::string *quality_array = new std::string[quality_array_size];
+            auto *quality_array = new std::string[quality_array_size];
             // numreads/4 so that memory consumption isn't too high
             // 3*num_reads_per_block added to ensure that we are done in 4 passes
             // (needed because block sizes are not exactly equal to
@@ -120,7 +118,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         }
         if (preserve_id) {
             read_block_start_end(file_blocks_id, block_start, block_end);
-            std::string *id_array = new std::string[numreads / 2];
+            auto *id_array = new std::string[numreads / 2];
             std::ifstream f_id(file_id);
             for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
             reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, file_id, cp, name_coder,
@@ -184,7 +182,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
 #endif
     for (int64_t block_num = 0; block_num < static_cast<int64_t>(block_start.size()); block_num++) {
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
-        std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
+        auto *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
         for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
             f_order_id.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
@@ -341,7 +339,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 str_array[order_array[i] - start_read_bin] = temp_str;
         }
         f_in.close();
-        uint64_t blocks = uint64_t(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
+        auto blocks = uint64_t(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
 
         //
         // According to the execution profile, this is the 2nd hottest
@@ -374,7 +372,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             if (end_read_num >= num_reads_bin) {
                 end_read_num = num_reads_bin;
             }
-            uint32_t num_reads_block = (uint32_t)(end_read_num - start_read_num);
+            auto num_reads_block = (uint32_t)(end_read_num - start_read_num);
             std::string name =
                 file_name.substr(file_name.find_last_of('/') + 1) + "." + std::to_string(block_num_offset + block_num);
             if (mode == "id") {
@@ -457,9 +455,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

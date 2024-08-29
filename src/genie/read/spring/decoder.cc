@@ -25,9 +25,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -145,9 +143,9 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     while (true) {
                         bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
                         if (mmpos_flag == 1) break;
-                        uint32_t mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
+                        auto mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
                         abs_mmpos += mmpos;
-                        uint32_t mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
+                        auto mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
                         const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
@@ -433,7 +431,7 @@ void Decoder::flushIn(uint64_t& pos) {
             size_t maxBufferSize = 2000000000;  // roughly 2 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
-            kwaymergesort::KwayMergeSort* sorter =
+            auto* sorter =
                 new kwaymergesort::KwayMergeSort(file_unmatched_readnames_1, &fout_unmatched_readnames_1_sorted,
                                                  static_cast<int>(maxBufferSize), false, basedir);
             sorter->Sort();
@@ -557,15 +555,15 @@ void Decoder::flushIn(uint64_t& pos) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::skipIn(const util::Section& id) {
-    { util::OrderedSection sec(&lock, id); }
+    {
+        util::OrderedSection sec(&lock, id);
+    }
     skipOut(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

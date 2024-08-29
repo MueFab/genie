@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Utility class to measure time.
@@ -40,7 +39,7 @@ class Watch {
      * @brief
      * @return Elapsed time in all periods where the watch was active.
      */
-    double check() const;
+    [[nodiscard]] double check() const;
 
     /**
      * @brief Pause the current measurement, time elapsed until resume() is called won't be counted.
@@ -55,8 +54,7 @@ class Watch {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

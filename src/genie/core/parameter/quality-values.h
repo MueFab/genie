@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 /**
  * @brief
@@ -45,19 +43,19 @@ class QualityValues {
      * @brief
      * @return
      */
-    virtual std::unique_ptr<QualityValues> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<QualityValues> clone() const = 0;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getMode() const;
+    [[nodiscard]] uint8_t getMode() const;
 
     /**
      * @brief
      * @return
      */
-    virtual size_t getNumSubsequences() const = 0;
+    [[nodiscard]] virtual size_t getNumSubsequences() const = 0;
 
     /**
      * @brief
@@ -73,9 +71,7 @@ class QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 

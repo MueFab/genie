@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 /**
  * @brief
@@ -50,7 +48,7 @@ class ComputedRefExtended {
      * @brief
      * @return
      */
-    uint32_t getBufMaxSize() const;
+    [[nodiscard]] uint32_t getBufMaxSize() const;
 
     /**
      * @brief
@@ -61,9 +59,7 @@ class ComputedRefExtended {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 

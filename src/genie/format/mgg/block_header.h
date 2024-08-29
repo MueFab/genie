@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -55,31 +53,31 @@ class BlockHeader {
      * @brief
      * @return
      */
-    bool getReserved1() const;
+    [[nodiscard]] bool getReserved1() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReserved2() const;
+    [[nodiscard]] uint8_t getReserved2() const;
 
     /**
      * @brief
      * @return
      */
-    genie::core::GenDesc getDescriptorID() const;
+    [[nodiscard]] genie::core::GenDesc getDescriptorID() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getPayloadSize() const;
+    [[nodiscard]] uint32_t getPayloadSize() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    [[nodiscard]] uint64_t getLength() const;
 
     /**
      * @brief
@@ -90,9 +88,7 @@ class BlockHeader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

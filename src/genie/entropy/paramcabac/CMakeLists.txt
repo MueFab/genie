@@ -10,7 +10,7 @@ set(source_files
         state_vars.cc
         transformed-subseq.cc
         transformed_parameters.cc
-        )
+)
 
 add_library(genie-paramcabac ${source_files})
 

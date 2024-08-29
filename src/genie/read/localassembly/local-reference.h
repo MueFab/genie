@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace localassembly {
+namespace genie::read::localassembly {
 
 /**
  * @brief
@@ -102,7 +100,7 @@ class LocalReference {
      * @brief
      * @return
      */
-    uint64_t getWindowBorder() const;
+    [[nodiscard]] uint64_t getWindowBorder() const;
 
     /**
      * @brief
@@ -113,14 +111,12 @@ class LocalReference {
      * @brief
      * @return
      */
-    uint32_t getMaxBufferSize() const;
+    [[nodiscard]] uint32_t getMaxBufferSize() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace localassembly
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::localassembly
 
 // ---------------------------------------------------------------------------------------------------------------------
 

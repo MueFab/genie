@@ -14,10 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace desc_pres {
+namespace genie::core::parameter::desc_pres {
 
 /**
  * @brief
@@ -34,7 +31,7 @@ class Decoder {
      * @brief
      * @return
      */
-    virtual std::unique_ptr<Decoder> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Decoder> clone() const = 0;
 
     /**
      * @brief
@@ -51,7 +48,7 @@ class Decoder {
      * @brief
      * @return
      */
-    uint8_t getMode() const;
+    [[nodiscard]] uint8_t getMode() const;
 
     /**
      * @brief
@@ -66,10 +63,7 @@ class Decoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace desc_pres
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::desc_pres
 
 // ---------------------------------------------------------------------------------------------------------------------
 

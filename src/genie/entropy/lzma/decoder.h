@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace lzma {
+namespace genie::entropy::lzma {
 
 /**
  * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
@@ -40,9 +38,7 @@ class Decoder : public core::EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lzma
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::lzma
 
 // ---------------------------------------------------------------------------------------------------------------------
 

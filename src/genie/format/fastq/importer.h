@@ -23,9 +23,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fastq {
+namespace genie::format::fastq {
 
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
@@ -87,9 +85,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fastq
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fastq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

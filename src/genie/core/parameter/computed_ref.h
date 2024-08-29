@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 /**
  * @brief
@@ -38,7 +36,7 @@ class ComputedRef {
     };
 
  private:
-    Algorithm cr_alg_ID;                             //!< @brief
+    Algorithm cr_alg_ID;                           //!< @brief
     std::optional<ComputedRefExtended> extension;  //!< @brief
 
  public:
@@ -76,13 +74,13 @@ class ComputedRef {
      * @brief
      * @return
      */
-    const ComputedRefExtended &getExtension() const;
+    [[nodiscard]] const ComputedRefExtended &getExtension() const;
 
     /**
      * @brief
      * @return
      */
-    Algorithm getAlgorithm() const;
+    [[nodiscard]] Algorithm getAlgorithm() const;
 
     /**
      * @brief
@@ -93,9 +91,7 @@ class ComputedRef {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 

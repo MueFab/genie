@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace refcoder {
+namespace genie::read::refcoder {
 
 /**
  * @brief Module using a reference sequence to encode aligned reads
@@ -52,7 +50,7 @@ class Encoder : public basecoder::EncoderStub {
      * @param data Chunk of data to construct form
      * @return RefEncodingState
      */
-    std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
+    [[nodiscard]] std::unique_ptr<EncodingState> createState(const core::record::Chunk& data) const override;
 
  public:
     /**
@@ -64,9 +62,7 @@ class Encoder : public basecoder::EncoderStub {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace refcoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::refcoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 

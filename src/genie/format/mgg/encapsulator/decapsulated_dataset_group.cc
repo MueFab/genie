@@ -9,14 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other)  noexcept {
+DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other) noexcept {
     id = other.id;
     meta_group = std::move(other.meta_group);
     meta_references = std::move(other.meta_references);
@@ -121,7 +118,7 @@ DecapsulatedDatasetGroup::decapsulate_AU(genie::format::mgg::AccessUnit& au) {
         meta_au.setProtection(au.getProtection().decapsulate());
     }
     std::pair<genie::format::mgb::AccessUnit, std::optional<genie::core::meta::AccessUnit>> ret(au.decapsulate(),
-                                                                                                  std::nullopt);
+                                                                                                std::nullopt);
     if (has_meta) {
         ret.second = std::move(meta_au);
     }
@@ -185,10 +182,7 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

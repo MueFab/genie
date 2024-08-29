@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgg/access_unit_header.h"
 #include "genie/format/mgg/au_information.h"
@@ -23,19 +23,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
  */
 class AccessUnit : public GenInfo {
  private:
-    AccessUnitHeader header;                        //!< @brief
+    AccessUnitHeader header;                      //!< @brief
     std::optional<AUInformation> au_information;  //!< @brief
     std::optional<AUProtection> au_protection;    //!< @brief
-    std::vector<Block> blocks;                      //!< @brief
+    std::vector<Block> blocks;                    //!< @brief
 
     core::MPEGMinorVersion version;  //!< @brief
 
@@ -109,37 +107,37 @@ class AccessUnit : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<Block>& getBlocks() const;
+    [[nodiscard]] const std::vector<Block>& getBlocks() const;
 
     /**
      * @brief
      * @return
      */
-    const AccessUnitHeader& getHeader() const;
+    [[nodiscard]] const AccessUnitHeader& getHeader() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasInformation() const;
+    [[nodiscard]] bool hasInformation() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasProtection() const;
+    [[nodiscard]] bool hasProtection() const;
 
     /**
      * @brief
      * @return
      */
-    const AUInformation& getInformation() const;
+    [[nodiscard]] const AUInformation& getInformation() const;
 
     /**
      * @brief
      * @return
      */
-    const AUProtection& getProtection() const;
+    [[nodiscard]] const AUProtection& getProtection() const;
 
     /**
      * @brief
@@ -163,14 +161,12 @@ class AccessUnit : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

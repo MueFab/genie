@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace lzma {
+namespace genie::entropy::lzma {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +34,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                                             "-raw",
                                         subdesc.getRawSize());
 
-           // TODO(Fabian) std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
+            // TODO(Fabian) std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
 
             if (!std::get<1>(ret).get(id.second).isEmpty()) {
                 std::get<2>(ret).addInteger("size-zstd-total-comp", std::get<1>(ret).get(id.second).getRawSize());
@@ -62,9 +60,7 @@ Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lzma
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::lzma
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -69,25 +67,25 @@ class LabelRegion {
      * @brief
      * @return
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t getSeqID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<genie::core::record::ClassType>& getClassIDs() const;
+    [[nodiscard]] const std::vector<genie::core::record::ClassType>& getClassIDs() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getStartPos() const;
+    [[nodiscard]] uint64_t getStartPos() const;
 
     /**
      *
      * @return
      */
-    uint64_t getEndPos() const;
+    [[nodiscard]] uint64_t getEndPos() const;
 
     /**
      *
@@ -99,14 +97,12 @@ class LabelRegion {
      * @brief
      * @return
      */
-    uint64_t sizeInBits() const;
+    [[nodiscard]] uint64_t sizeInBits() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

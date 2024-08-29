@@ -24,8 +24,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief The basic interface for modules decoding the plain read data
@@ -90,8 +89,7 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Holds metadata associated with an access unit
@@ -64,19 +62,19 @@ class AccessUnit {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Get ID of associated access unit
      * @return AU ID
      */
-    size_t getID() const;
+    [[nodiscard]] size_t getID() const;
 
     /**
      * @brief Get MPEG-G Part 3 metadata
      * @return MPEG-G Part 3 metadata
      */
-    const std::string& getInformation() const;
+    [[nodiscard]] const std::string& getInformation() const;
 
     /**
      * @brief
@@ -88,7 +86,7 @@ class AccessUnit {
      * @brief MPEG-G Part 3 protection data
      * @return MPEG-G Part 3 protection data
      */
-    const std::string& getProtection() const;
+    [[nodiscard]] const std::string& getProtection() const;
 
     /**
      * @brief
@@ -99,9 +97,7 @@ class AccessUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

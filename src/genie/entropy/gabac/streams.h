@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief FILE* wrapper
@@ -86,7 +84,7 @@ class DataBlockBuffer : public std::streambuf {
      * @brief
      * @return
      */
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
  protected:
     /**
@@ -213,9 +211,7 @@ class NullStream : public std::ostream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

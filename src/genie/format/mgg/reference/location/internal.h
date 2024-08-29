@@ -17,11 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
+namespace genie::format::mgg::reference::location {
 
 /**
  * @brief
@@ -57,13 +53,13 @@ class Internal : public Location {
      * @brief
      * @return
      */
-    uint8_t getDatasetGroupID() const;
+    [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getDatasetID() const;
+    [[nodiscard]] uint16_t getDatasetID() const;
 
     /**
      * @brief
@@ -80,11 +76,7 @@ class Internal : public Location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location
 
 // ---------------------------------------------------------------------------------------------------------------------
 

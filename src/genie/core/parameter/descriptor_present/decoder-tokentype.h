@@ -13,10 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace desc_pres {
+namespace genie::core::parameter::desc_pres {
 
 /**
  * @brief
@@ -37,10 +34,7 @@ class DecoderTokentype : public Decoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace desc_pres
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::desc_pres
 
 // ---------------------------------------------------------------------------------------------------------------------
 

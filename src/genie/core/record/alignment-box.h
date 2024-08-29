@@ -22,9 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief ExternalAlignment
@@ -104,32 +102,30 @@ class AlignmentBox {
      * @brief
      * @return
      */
-    uint64_t getPosition() const;
+    [[nodiscard]] uint64_t getPosition() const;
 
     /**
      * @brief
      * @return
      */
-    const Alignment& getAlignment() const;
+    [[nodiscard]] const Alignment& getAlignment() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::unique_ptr<AlignmentSplit>>& getAlignmentSplits() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<AlignmentSplit>>& getAlignmentSplits() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getNumberOfTemplateSegments() const;
+    [[nodiscard]] uint8_t getNumberOfTemplateSegments() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

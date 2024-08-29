@@ -9,9 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -163,7 +161,7 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     if (shift > 0) shift -= 7;
 
     for (; shift >= 0; shift -= 7) {
-        uint8_t code = (uint8_t)(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
+        auto code = (uint8_t)(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
         bytes[c++] = code;
     }
 
@@ -198,9 +196,7 @@ size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

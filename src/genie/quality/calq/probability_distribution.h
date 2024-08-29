@@ -17,9 +17,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // Samples a probability distribution
 class ProbabilityDistribution {
@@ -39,26 +37,24 @@ class ProbabilityDistribution {
     void resetPdf();
 
     // Returns size of interval of valid values
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
     // Returns current count of value
-    size_t getCount(size_t value) const;
+    [[nodiscard]] size_t getCount(size_t value) const;
 
     // Returns current count of index (starting at zero)
     size_t operator[](size_t index) const;
 
     // Lowest possible value
-    size_t getRangeMin() const;
+    [[nodiscard]] size_t getRangeMin() const;
 
     // Greatest possible value
-    size_t getRangeMax() const;
+    [[nodiscard]] size_t getRangeMax() const;
 };
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

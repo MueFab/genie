@@ -11,22 +11,19 @@
 
 #include <cstdint>
 #include <vector>
-#include "genie/util/data-block.h"
 #include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct IOConfiguration;
 struct EncodingConfiguration;
 
-void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
-                            std::vector<util::DataBlock> *transformedSubseqs);
+void doSubsequenceTransform(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock>* transformedSubseqs);
 
 /**
  * @brief
@@ -38,9 +35,7 @@ uint64_t encodeDescSubsequence(const IOConfiguration& conf, const EncodingConfig
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

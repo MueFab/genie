@@ -11,7 +11,7 @@ set(source_files
         encoder.cc
         encoder-source.cc
         util.cc
-        )
+)
 
 add_library(genie-spring ${source_files})
 
