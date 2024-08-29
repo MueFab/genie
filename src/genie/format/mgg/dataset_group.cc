@@ -41,8 +41,8 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
-    : header(DatasetGroupHeader(_ID, _version)), version(_mpeg_version) {}
+DatasetGroup::DatasetGroup(uint8_t _id, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
+    : header(DatasetGroupHeader(_id, _version)), version(_mpeg_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

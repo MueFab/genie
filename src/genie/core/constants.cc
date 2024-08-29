@@ -406,12 +406,7 @@ const GenomicSubDescriptorProperties &GenomicDescriptorProperties::getSubSeq(uin
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Alphabet::isIncluded(char c) const {
-    for (const char &lc : lut) {
-        if (lc == c) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(lut.begin(), lut.end(), [c](char lc) { return lc == c; });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

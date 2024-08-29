@@ -48,7 +48,7 @@ class Haplotyper {
     const bool squashedActivity;
     double localDistortion;
 
-    size_t getQuantizerIndex(double activity);
+    [[nodiscard]] size_t getQuantizerIndex(double activity) const;
 
  public:
     // Init
@@ -66,7 +66,7 @@ class Haplotyper {
 
     double calcActivityScore(char ref, const std::string& seqPile, const std::string& qualPile, double heterozygosity);
 
-    std::vector<double> calcPriors(double hetero);
+    [[nodiscard]] std::vector<double> calcPriors(double hetero) const;
 };
 
 // -----------------------------------------------------------------------------

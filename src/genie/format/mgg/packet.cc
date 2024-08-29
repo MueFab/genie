@@ -18,7 +18,7 @@ Packet::Packet(PacketHeader _header, std::string _data) : header(_header), data(
 // ---------------------------------------------------------------------------------------------------------------------
 
 Packet::Packet(util::BitReader& reader) : header(reader) {
-    data.resize(header.getPacketSize() - header.getLength());
+    data.resize(header.getPacketSize() - genie::format::mgg::PacketHeader::getLength());
     reader.readBypass(data);
 }
 

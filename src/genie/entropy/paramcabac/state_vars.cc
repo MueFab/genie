@@ -50,12 +50,10 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
         numAlphaSpecial = 9;
     } else if (subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) {  // subseq 2
         numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
-    } else if (subsequence_ID == core::GenSub::UREADS) {  // ureads subseq 0
+    } else if ((subsequence_ID == core::GenSub::UREADS) || (subsequence_ID == core::GenSub::RFTT)) {  // ureads subseq 0
         numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
     } else if (subsequence_ID == core::GenSub::RTYPE) {  // rtype subseq 0
         numAlphaSpecial = 6;
-    } else if (subsequence_ID == core::GenSub::RFTT) {  // rftt subseq 0
-        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
     }
 
     return numAlphaSpecial;

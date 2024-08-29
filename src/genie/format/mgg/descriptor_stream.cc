@@ -151,12 +151,9 @@ bool DescriptorStream::isEmpty() const {
         return true;
     }
 
-    for (const auto& p : payload) {
-        if (p.getPayloadSize()) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(payload.begin(), payload.end(), [](const auto& p) {
+        return p.getPayloadSize() == 0;
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

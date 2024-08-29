@@ -143,7 +143,7 @@ class DataBlockBuffer : public std::streambuf {
      * @return
      */
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
-                     std::ios_base::openmode which = std::ios_base::in) override;
+                     std::ios_base::openmode which) override;
 
  private:
     util::DataBlock block;  //!< @brief

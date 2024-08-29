@@ -50,7 +50,7 @@ class bbhashdict {
      * @param dictidx
      * @param startposidx
      */
-    void findpos(int64_t *dictidx, const uint64_t &startposidx);
+    void findpos(int64_t *dictidx, const uint64_t &startposidx) const;
 
     /**
      * @brief
@@ -58,7 +58,7 @@ class bbhashdict {
      * @param startposidx
      * @param current
      */
-    void remove(int64_t *dictidx, const uint64_t &startposidx, int64_t current);
+    void remove(int64_t *dictidx, const uint64_t &startposidx, int64_t current) const;
 
     /**
      * @brief

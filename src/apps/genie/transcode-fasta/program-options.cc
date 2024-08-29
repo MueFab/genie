@@ -7,6 +7,7 @@
 #include "apps/genie/transcode-fasta/program-options.h"
 #include <filesystem>
 #include <iostream>
+#include <random>
 #include <set>
 #include <string>
 #include <thread>
@@ -93,16 +94,27 @@ void validateInputFile(const std::string &file) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
-    auto randchar = []() -> char {
-        const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
+    // Define the character set
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = sizeof(charset) - 1;
+
+    // Use a random device to seed the random number generator
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> distribution(0, max_index - 1);
+
+    // Lambda function to generate a random character
+    auto randchar = [&]() -> char {
+        return charset[distribution(generator)];
     };
+
+    // Generate the random string
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);
+
     return str;
 }
 

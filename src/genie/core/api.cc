@@ -107,7 +107,7 @@ std::vector<Records> GenieState::getDataBySimpleFilter(uint64_t datasetGroupID, 
     (void)datasetID;
     (void)filter;
     // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ std::vector<Records> GenieState::getDataByAdvancedFilter(uint64_t datasetGroupID
     (void)datasetID;
     (void)filter;
     // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uin
     (void)datasetID;
     (void)signature;
     // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const s
     (void)datasetGroupID;
     (void)labelID;
     // UTILS_DIE("Not implemented");
-    return std::vector<Records>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ std::vector<std::string> GenieState::getMetadataFields(uint64_t datasetGroupID, 
     (void)datasetGroupID;
     (void)datasetID;
     // UTILS_DIE("Not implemented");
-    return std::vector<std::string>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t dat
     (void)datasetID;
     (void)fieldName;
     // UTILS_DIE("Not implemented");
-    return std::string();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t dat
 std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
     (void)datasetGroupID;
     // UTILS_DIE("Not implemented");
-    return std::string();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ std::string GenieState::getDatasetProtection(uint64_t datasetGroupID, uint64_t d
     (void)datasetGroupID;
     (void)datasetID;
     // UTILS_DIE("Not implemented");
-    return std::string();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ std::vector<RegionProtection> GenieState::getDatasetRegionProtection(uint64_t da
     (void)startPos;
     (void)endPos;
     // UTILS_DIE("Not implemented");
-    return std::vector<RegionProtection>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ OutReference GenieState::getDatasetReference(uint64_t datasetGroupID, uint64_t d
     (void)datasetID;
     (void)includeSequences;
     // UTILS_DIE("Not implemented");
-    return OutReference();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(uint64_t da
     (void)startPos;
     (void)endPos;
     // UTILS_DIE("Not implemented");
-    return std::vector<SimpleSegmentStatistics>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ std::vector<AdvancedSegmentStatistics> GenieState::getAdvancedStatistics(uint64_
     (void)startPos;
     (void)endPos;
     // UTILS_DIE("Not implemented");
-    return std::vector<AdvancedSegmentStatistics>();
+    return {};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
