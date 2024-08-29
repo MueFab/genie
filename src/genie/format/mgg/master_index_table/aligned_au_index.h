@@ -108,13 +108,13 @@ class AlignedAUIndex {
      * @brief
      * @param _ref_cfg
      */
-    void setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg);
+    void setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg);
 
     /**
      * @brief
      * @param _ext_au
      */
-    void setExtended(genie::format::mgb::ExtendedAu _ext_au);
+    void setExtended(const genie::format::mgb::ExtendedAu& _ext_au);
 
     /**
      * @brief

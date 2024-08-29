@@ -110,7 +110,7 @@ class UnalignedAUIndex {
      * @brief
      * @param _ref_cfg
      */
-    void setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg);
+    void setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg);
 
     /**
      * @brief
@@ -128,7 +128,7 @@ class UnalignedAUIndex {
      * @brief
      * @param sigcfg
      */
-    void setSignatureInfo(genie::format::mgb::SignatureCfg sigcfg);
+    void setSignatureInfo(const genie::format::mgb::SignatureCfg& sigcfg);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

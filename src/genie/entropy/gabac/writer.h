@@ -37,7 +37,7 @@ class Writer {
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Writer(OBufferStream *constbitstream, bool bypassFlag = true, uint64_t numContexts = 0);
+    explicit Writer(OBufferStream* constbitstream, bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
      * @brief
@@ -64,84 +64,84 @@ class Writer {
      * @param input
      * @param binParams
      */
-    void writeAsBIbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsBIbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsBIcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsBIcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTUbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsTUbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTUcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsTUcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsEGbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsEGbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsEGcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsEGcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTEGbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsTEGbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTEGcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsTEGcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsSUTUbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsSUTUbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsSUTUcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsSUTUcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsDTUbypass(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsDTUbypass(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsDTUcabac(uint64_t input, std::vector<unsigned int> binParams);
+    void writeAsDTUcabac(uint64_t input, std::vector<unsigned int>& binParams);
 
     /**
      * @brief

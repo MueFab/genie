@@ -70,7 +70,7 @@ void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
 
 void DatasetParameterSet::addParameterUpdate(dataset_parameterset::UpdateInfo update) {
     if (version != core::MPEGMinorVersion::V1900) {
-        param_update = std::move(update);
+        param_update = update;
     }
 }
 

@@ -95,7 +95,7 @@ const genie::format::mgb::RefCfg& UnalignedAUIndex::getReferenceInfo() const { r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UnalignedAUIndex::setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
+void UnalignedAUIndex::setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ const genie::format::mgb::SignatureCfg& UnalignedAUIndex::getSignatureInfo() con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UnalignedAUIndex::setSignatureInfo(genie::format::mgb::SignatureCfg sigcfg) { sig_cfg = std::move(sigcfg); }
+void UnalignedAUIndex::setSignatureInfo(const genie::format::mgb::SignatureCfg& sigcfg) { sig_cfg = std::move(sigcfg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

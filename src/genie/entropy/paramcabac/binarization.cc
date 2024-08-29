@@ -23,9 +23,9 @@ Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_
                            BinarizationParameters&& _cabac_binarization_parameters, Context&& _cabac_Context_parameters)
     : binarization_ID(_binarization_ID),
       bypass_flag(_bypass_flag),
-      cabac_binarization_parameters(std::move(_cabac_binarization_parameters)) {
+      cabac_binarization_parameters(_cabac_binarization_parameters) {
     if (!bypass_flag) {
-        cabac_context_parameters = std::move(_cabac_Context_parameters);
+        cabac_context_parameters = _cabac_Context_parameters;
     }
 }
 
@@ -62,7 +62,7 @@ const Context& Binarization::getCabacContextParameters() const { return cabac_co
 
 void Binarization::setContextParameters(Context&& _cabac_context_parameters) {
     bypass_flag = false;
-    cabac_context_parameters = std::move(_cabac_context_parameters);
+    cabac_context_parameters = _cabac_context_parameters;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

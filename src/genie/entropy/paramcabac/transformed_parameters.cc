@@ -5,6 +5,8 @@
  */
 
 #include "genie/entropy/paramcabac/transformed_parameters.h"
+
+#include <utility>
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
@@ -113,7 +115,7 @@ const std::vector<uint8_t> TransformedParameters::getMergeCodingShiftSizes() con
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TransformedParameters::setMergeCodingShiftSizes(std::vector<uint8_t> mergeCodingshiftSizes) {
-    merge_coding_shift_size = mergeCodingshiftSizes;
+    merge_coding_shift_size = std::move(mergeCodingshiftSizes);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
