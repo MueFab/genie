@@ -192,7 +192,7 @@ class LUTsSubSymbolTransform {
      * @param codingSubsymSize
      * @param lut
      */
-    void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
+    static void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     const paramcabac::SupportValues supportVals;  //!< @brief
     const paramcabac::StateVars stateVars;        //!< @brief

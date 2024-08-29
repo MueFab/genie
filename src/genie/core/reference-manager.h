@@ -280,7 +280,7 @@ class ReferenceManager {
      * @param name
      * @return
      */
-    size_t getLength(const std::string& name);
+    [[nodiscard]] size_t getLength(const std::string& name) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

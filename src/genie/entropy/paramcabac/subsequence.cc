@@ -57,8 +57,6 @@ Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& re
             numSubseq = 1;
             break;
         case TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            numSubseq = 2;
-            break;
         case TransformedParameters::TransformIdSubseq::RLE_CODING:
             numSubseq = 2;
             break;

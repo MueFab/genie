@@ -223,7 +223,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) : combine_pairs(comb_p) {
+Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) : combine_pairs(comb_p), unmatched_record_index{} {
     basedir = working_dir;
 
     while (true) {

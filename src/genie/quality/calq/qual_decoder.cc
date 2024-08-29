@@ -94,7 +94,6 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                 qvciPos += opLen;
                 break;  // do nothing as these bases are not present
             case ']':
-                break;  // these have been clipped
             case '(':
             case '[':
                 break;  // ignore first clip char

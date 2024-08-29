@@ -85,12 +85,9 @@ size_t ReferenceManager::getChunkSize() { return CHUNK_SIZE; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ReferenceManager::ReferenceExcerpt::isEmpty() const {
-    for (const auto& p : data) {
-        if (isMapped(p)) {
-            return false;
-        }
-    }
-    return true;
+    return std::none_of(data.begin(), data.end(), [this](const auto& p) {
+        return isMapped(p);
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -328,7 +325,7 @@ std::vector<std::string> ReferenceManager::getSequences() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::getLength(const std::string& name) {
+size_t ReferenceManager::getLength(const std::string& name) const {
     auto cov = getCoverage(name);
 
     size_t ret = 0;

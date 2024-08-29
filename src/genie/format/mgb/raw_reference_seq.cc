@@ -51,7 +51,10 @@ RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerO
 // ---------------------------------------------------------------------------------------------------------------------
 
 RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence)
-    : sequence_ID(_sequence_ID), seq_start(_seq_start), ref_sequence(std::move(_ref_sequence)) {}
+    : sequence_ID(_sequence_ID),
+      seq_start(_seq_start),
+      seq_end(_seq_start + _ref_sequence.length()),
+      ref_sequence(std::move(_ref_sequence)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

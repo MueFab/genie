@@ -317,12 +317,7 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool AccessUnit::Descriptor::isEmpty() const {
-    for (const auto &d : subdesc) {
-        if (!d.isEmpty()) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(subdesc.begin(), subdesc.end(), [](const auto &d) { return d.isEmpty(); });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -377,7 +372,7 @@ void AccessUnit::setReference(uint16_t ref) { referenceSequence = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t AccessUnit::getReference() { return referenceSequence; }
+uint16_t AccessUnit::getReference() const { return referenceSequence; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

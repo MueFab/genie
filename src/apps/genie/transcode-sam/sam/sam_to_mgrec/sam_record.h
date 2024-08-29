@@ -116,7 +116,7 @@ class SamRecord {
      * @brief
      * @return
      */
-    const std::string& getQname();
+    [[nodiscard]] const std::string& getQname() const;
 
     /**
      * @brief
@@ -314,7 +314,7 @@ class SamRecord {
      * @param r
      * @return
      */
-    bool isPairOf(SamRecord& r);
+    bool isPairOf(SamRecord& r) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
