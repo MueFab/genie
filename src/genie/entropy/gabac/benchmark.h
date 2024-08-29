@@ -312,7 +312,7 @@ struct ResultTransformed {
      * @brief
      * @return
      */
-    std::string getCSVHeader();
+    static std::string getCSVHeader();
 };
 
 /**
