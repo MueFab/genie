@@ -97,10 +97,12 @@ bool TransformedSubSeq::operator==(const TransformedSubSeq& val) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSubSeq::TransformedSubSeq(nlohmann::json j) {
+TransformedSubSeq::TransformedSubSeq(nlohmann::json j, bool last_transformed) {
     transform_ID_subsym = j["transform_ID_subsym"];
     support_values = SupportValues(j["support_values"], transform_ID_subsym);
     cabac_binarization = Binarization(j["cabac_binarization"]);
+    state_vars.populate(transform_ID_subsym, support_values, cabac_binarization, subsequence_ID, alphabet_ID,
+                        last_transformed);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
