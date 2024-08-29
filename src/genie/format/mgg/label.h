@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -41,7 +39,7 @@ class Label : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -77,13 +75,13 @@ class Label : public GenInfo {
      *
      * @return
      */
-    const std::string& getLabelID() const;
+    [[nodiscard]] const std::string& getLabelID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<LabelDataset>& getDatasets() const;
+    [[nodiscard]] const std::vector<LabelDataset>& getDatasets() const;
 
     /**
      *
@@ -102,9 +100,7 @@ class Label : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

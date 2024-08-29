@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -69,25 +67,25 @@ class TransformedSubSeq {
      * @brief
      * @return
      */
-    SupportValues::TransformIdSubsym getTransformIDSubsym() const;
+    [[nodiscard]] SupportValues::TransformIdSubsym getTransformIDSubsym() const;
 
     /**
      * @brief
      * @return
      */
-    const SupportValues& getSupportValues() const;
+    [[nodiscard]] const SupportValues& getSupportValues() const;
 
     /**
      * @brief
      * @return
      */
-    const Binarization& getBinarization() const;
+    [[nodiscard]] const Binarization& getBinarization() const;
 
     /**
      * @brief
      * @return
      */
-    const StateVars& getStateVars() const;
+    [[nodiscard]] const StateVars& getStateVars() const;
 
     /**
      * @brief
@@ -105,7 +103,7 @@ class TransformedSubSeq {
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    [[nodiscard]] core::AlphabetID getAlphabetID() const;
 
     /**
      * @brief
@@ -130,7 +128,7 @@ class TransformedSubSeq {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
  private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< @brief
@@ -145,9 +143,7 @@ class TransformedSubSeq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

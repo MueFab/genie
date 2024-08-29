@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -56,20 +54,18 @@ class AlignmentSharedData {
      * @brief
      * @return
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t getSeqID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getAsDepth() const;
+    [[nodiscard]] uint8_t getAsDepth() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace lowlatency {
+namespace genie::read::lowlatency {
 
 /**
  * @brief
@@ -61,9 +59,7 @@ class Encoder : public core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lowlatency
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::lowlatency
 
 // ---------------------------------------------------------------------------------------------------------------------
 

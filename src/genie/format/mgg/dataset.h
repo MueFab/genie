@@ -30,23 +30,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
  */
 class Dataset : public GenInfo {
  private:
-    DatasetHeader header;                                  //!< @brief
+    DatasetHeader header;                                //!< @brief
     std::optional<DatasetMetadata> metadata;             //!< @brief
     std::optional<DatasetProtection> protection;         //!< @brief
-    std::vector<DatasetParameterSet> parameterSets;        //!< @brief
+    std::vector<DatasetParameterSet> parameterSets;      //!< @brief
     std::optional<MasterIndexTable> master_index_table;  //!< @brief
-    std::vector<AccessUnit> access_units;                  //!< @brief
-    std::vector<DescriptorStream> descriptor_streams;      //!< @brief
-    core::MPEGMinorVersion version;                        //!< @brief
+    std::vector<AccessUnit> access_units;                //!< @brief
+    std::vector<DescriptorStream> descriptor_streams;    //!< @brief
+    core::MPEGMinorVersion version;                      //!< @brief
 
     std::map<size_t, core::parameter::EncodingSet> encoding_sets;  //!< @brief
 
@@ -55,13 +53,13 @@ class Dataset : public GenInfo {
      * @brief
      * @return
      */
-    bool hasMetadata() const;
+    [[nodiscard]] bool hasMetadata() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasProtection() const;
+    [[nodiscard]] bool hasProtection() const;
 
     /**
      * @brief
@@ -128,7 +126,7 @@ class Dataset : public GenInfo {
      * @brief
      * @return
      */
-    const DatasetHeader& getHeader() const;
+    [[nodiscard]] const DatasetHeader& getHeader() const;
 
     /**
      * @brief
@@ -146,7 +144,7 @@ class Dataset : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -166,9 +164,7 @@ class Dataset : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

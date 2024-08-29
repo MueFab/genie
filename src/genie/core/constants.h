@@ -19,8 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -201,7 +200,7 @@ struct GenomicDescriptorProperties {
      * @param sub
      * @return
      */
-    const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
+    [[nodiscard]] const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
 };
 
 /**
@@ -217,7 +216,7 @@ struct Alphabet {
      * @param c
      * @return
      */
-    bool isIncluded(char c) const;
+    [[nodiscard]] bool isIncluded(char c) const;
 };
 
 /**
@@ -279,8 +278,7 @@ uint8_t range2bytes(std::pair<int64_t, int64_t> range);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

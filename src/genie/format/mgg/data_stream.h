@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -83,26 +81,24 @@ class DataStream {
      * @brief
      * @return
      */
-    Type getDataType() const;
+    [[nodiscard]] Type getDataType() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReserved() const;
+    [[nodiscard]] uint8_t getReserved() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getDataSID() const;
+    [[nodiscard]] uint16_t getDataSID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

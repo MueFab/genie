@@ -10,28 +10,25 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <fstream>
-#include <string>
 #include <optional>
+#include <string>
 #include "genie/core/record/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 /**
  * @brief
  */
 class SubfileReader {
  private:
-    std::ifstream reader;                              //!< @brief
-    genie::util::BitReader bitreader;                  //!< @brief
+    std::ifstream reader;                            //!< @brief
+    genie::util::BitReader bitreader;                //!< @brief
     std::optional<genie::core::record::Record> rec;  //!< @brief
-    std::string path;                                  //!< @brief
+    std::string path;                                //!< @brief
 
  public:
     /**
@@ -72,10 +69,7 @@ class SubfileReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 

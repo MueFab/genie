@@ -17,18 +17,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
  */
 class AuTypeCfg {
  private:
-    uint16_t sequence_ID;                     //!< @brief
-    uint64_t AU_start_position;               //!< @brief
-    uint64_t AU_end_position;                 //!< @brief
+    uint16_t sequence_ID;                   //!< @brief
+    uint64_t AU_start_position;             //!< @brief
+    uint64_t AU_end_position;               //!< @brief
     std::optional<ExtendedAu> extended_AU;  //!< @brief
 
     uint8_t posSize;  //!< @brief internal
@@ -79,19 +77,19 @@ class AuTypeCfg {
      * @brief
      * @return
      */
-    uint16_t getRefID() const;
+    [[nodiscard]] uint16_t getRefID() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getStartPos() const;
+    [[nodiscard]] uint64_t getStartPos() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getEndPos() const;
+    [[nodiscard]] uint64_t getEndPos() const;
 
     /**
      * @brief
@@ -102,9 +100,7 @@ class AuTypeCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

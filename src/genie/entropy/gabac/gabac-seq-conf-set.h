@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief Manages the current set of gabac configurations and handles the translation to MPEG-G P2 parameter sets.
@@ -65,7 +63,7 @@ class GabacSeqConfSet {
      * @param sub - identifies descriptor subseuqence
      * @return Gabac configuration
      */
-    const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
+    [[nodiscard]] const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
 
     /**
      * @brief
@@ -122,9 +120,7 @@ class GabacSeqConfSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

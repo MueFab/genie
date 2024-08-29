@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
@@ -42,19 +40,19 @@ class RefCfg {
      * @brief
      * @return
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t getSeqID() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getStart() const;
+    [[nodiscard]] uint64_t getStart() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getEnd() const;
+    [[nodiscard]] uint64_t getEnd() const;
 
     /**
      * @brief
@@ -92,9 +90,7 @@ class RefCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

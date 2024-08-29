@@ -14,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief Refers to a specific position in the genome
@@ -32,25 +31,25 @@ class Locus {
      * @brief Getter for reference name
      * @return refName
      */
-    const std::string& getRef() const;
+    [[nodiscard]] const std::string& getRef() const;
 
     /**
      * @brief Getter for starting position
      * @return start
      */
-    uint32_t getStart() const;
+    [[nodiscard]] uint32_t getStart() const;
 
     /**
      * @brief Getter for end position
      * @return end
      */
-    uint32_t getEnd() const;
+    [[nodiscard]] uint32_t getEnd() const;
 
     /**
      * @brief If the locus contains any exact position
      * @return If true, start and end are valid.
      */
-    bool positionPresent() const;
+    [[nodiscard]] bool positionPresent() const;
 
     /**
      * @brief Constructs a locus without a position [start - end] (sequence name only)
@@ -77,13 +76,12 @@ class Locus {
      * @brief Convert into string in format "sequenceName:start-pos" or "sequenceName"
      * @return Converted string
      */
-    std::string toString() const;
+    [[nodiscard]] std::string toString() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
+namespace genieapp::transcode_sam {
 
 /**
  * @brief
@@ -33,8 +32,7 @@ bool compare(const genie::core::record::Record& r1, const genie::core::record::R
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 

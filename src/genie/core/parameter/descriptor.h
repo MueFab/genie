@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 /**
  * @brief
@@ -35,7 +33,7 @@ class Descriptor {
      * @brief
      * @return
      */
-    virtual std::unique_ptr<Descriptor> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Descriptor> clone() const = 0;
 
     /**
      * @brief
@@ -67,7 +65,7 @@ class Descriptor {
      * @brief
      * @return
      */
-    uint8_t getPreset() const;
+    [[nodiscard]] uint8_t getPreset() const;
 
  protected:
     uint8_t dec_cfg_preset;  //!< @brief
@@ -75,9 +73,7 @@ class Descriptor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -22,9 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -142,26 +140,26 @@ class SearchSpace {
      * @brief
      * @return
      */
-    SearchSpaceIterator begin() const;
+    [[nodiscard]] SearchSpaceIterator begin() const;
 
     /**
      * @brief
      * @return
      */
-    SearchSpaceIterator end() const;
+    [[nodiscard]] SearchSpaceIterator end() const;
 
     /**
      * @brief
      * @return
      */
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
     /**
      * @brief
      * @param idx
      * @return
      */
-    TYPE getIndex(size_t idx) const;
+    [[nodiscard]] TYPE getIndex(size_t idx) const;
 
     /**
      * @brief
@@ -192,7 +190,7 @@ class ConfigSearchBinarization {
      * @param subsymsize
      * @return
      */
-    paramcabac::Binarization getBinarization(bool bypass, uint8_t outputbits, uint8_t subsymsize) const;
+    [[nodiscard]] paramcabac::Binarization getBinarization(bool bypass, uint8_t outputbits, uint8_t subsymsize) const;
 
     /**
      * @brief
@@ -242,7 +240,7 @@ class ConfigSearchTranformedSeq {
      * @brief
      * @return
      */
-    bool lutValid() const;
+    [[nodiscard]] bool lutValid() const;
 
     /**
      * @brief
@@ -260,7 +258,7 @@ class ConfigSearchTranformedSeq {
      * @brief
      * @return
      */
-    uint8_t getSplitRatio() const;
+    [[nodiscard]] uint8_t getSplitRatio() const;
 
  public:
     /**
@@ -307,7 +305,8 @@ struct ResultTransformed {
      * @param seq_id
      * @return
      */
-    std::string toCSV(const std::string& filename, size_t transform, size_t parameter, size_t seq_id) const;
+    [[nodiscard]] std::string toCSV(const std::string& filename, size_t transform, size_t parameter,
+                                    size_t seq_id) const;
 
     /**
      * @brief
@@ -328,7 +327,7 @@ struct ResultFull {
      * @brief
      * @return
      */
-    std::string toCSV(const std::string& filename) const;
+    [[nodiscard]] std::string toCSV(const std::string& filename) const;
 
     /**
      * @brief
@@ -379,7 +378,7 @@ class ConfigSearchTransformation {
      * @brief
      * @return
      */
-    int16_t getParameter() const;
+    [[nodiscard]] int16_t getParameter() const;
 
     /**
      * @brief
@@ -423,13 +422,13 @@ class ConfigSearch {
      * @brief
      * @return
      */
-    uint8_t getTransform() const;
+    [[nodiscard]] uint8_t getTransform() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getTransformParam() const;
+    [[nodiscard]] uint32_t getTransformParam() const;
 
     /**
      * @brief
@@ -466,9 +465,7 @@ class ConfigSearch {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

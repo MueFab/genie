@@ -18,10 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
+namespace genie::format::mgg::reference {
 
 /**
  * @brief
@@ -61,19 +58,19 @@ class Sequence {
      * @brief
      * @return
      */
-    const std::string& getName() const;
+    [[nodiscard]] const std::string& getName() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getLength() const;
+    [[nodiscard]] uint32_t getLength() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getID() const;
+    [[nodiscard]] uint16_t getID() const;
 
     /**
      * @brief
@@ -91,10 +88,7 @@ class Sequence {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference
 
 // ---------------------------------------------------------------------------------------------------------------------
 

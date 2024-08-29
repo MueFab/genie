@@ -11,17 +11,15 @@
 
 #include <cstdint>
 #include <sstream>
-#include <vector>
 #include <variant>
+#include <vector>
 #include "genie/core/access-unit.h"
 #include "genie/core/payload.h"
 #include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
@@ -40,13 +38,13 @@ class Block {
      * @brief
      * @return
      */
-    bool isLoaded() const;
+    [[nodiscard]] bool isLoaded() const;
 
     /**
      * @brief
      * @return
      */
-    bool isParsed() const;
+    [[nodiscard]] bool isParsed() const;
 
     /**
      * @brief
@@ -127,20 +125,18 @@ class Block {
      * @brief
      * @return
      */
-    uint8_t getDescriptorID() const;
+    [[nodiscard]] uint8_t getDescriptorID() const;
 
     /**
      * @brief
      * @return
      */
-    size_t getWrittenSize() const;
+    [[nodiscard]] size_t getWrittenSize() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@ project("genie-qvwriteout")
 set(source_files
         encoder.cc
         encoder-none.cc
-        )
+)
 
 add_library(genie-qvwriteout ${source_files})
 

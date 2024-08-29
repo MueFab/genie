@@ -18,8 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -36,20 +35,20 @@ class ReferenceCollection {
      * @param _end
      * @return
      */
-    std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
+    [[nodiscard]] std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
 
     /**
      * @brief
      * @param name
      * @return
      */
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
+    [[nodiscard]] std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
 
     /**
      * @brief
      * @return
      */
-    std::vector<std::string> getSequences() const;
+    [[nodiscard]] std::vector<std::string> getSequences() const;
 
     /**
      * @brief
@@ -66,8 +65,7 @@ class ReferenceCollection {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,17 +17,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -88,20 +84,6 @@ class Reader {
      * @return
      */
     uint64_t readAsEGcabac(const std::vector<unsigned int> binParams);
-
-    /**
-     * @brief
-     * @param binParams
-     * @return
-     */
-    uint64_t readAsSEGbypass(const std::vector<unsigned int> binParams);
-
-    /**
-     * @brief
-     * @param binParams
-     * @return
-     */
-    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
 
     /**
      * @brief
@@ -186,9 +168,7 @@ class Reader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

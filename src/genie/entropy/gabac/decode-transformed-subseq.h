@@ -16,24 +16,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
  * @brief
  */
-typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
+typedef uint64_t (Reader:: *binFunc)(const std::vector<unsigned int>);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,9 +75,7 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,10 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
@@ -67,21 +64,18 @@ class MITClassConfig {
      * @brief
      * @return
      */
-    genie::core::record::ClassType getClassID() const;
+    [[nodiscard]] genie::core::record::ClassType getClassID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<genie::core::GenDesc>& getDescriptorIDs() const;
+    [[nodiscard]] const std::vector<genie::core::GenDesc>& getDescriptorIDs() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -16,10 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace external_ref {
+namespace genie::core::meta::external_ref {
 
 /**
  * @brief Represents an external ref in MPEG-G format.
@@ -51,25 +48,25 @@ class MPEG : public ExternalRef {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 
     /**
      * @brief Return dataset group id in external file
      * @return Dataset group id in external file
      */
-    uint16_t getGroupID() const;
+    [[nodiscard]] uint16_t getGroupID() const;
 
     /**
      * @brief Return dataset ID in external file
      * @return Dataset ID in external file
      */
-    uint16_t getID() const;
+    [[nodiscard]] uint16_t getID() const;
 
     /**
      * @brief Return checksum of full reference
      * @return Checksum of full reference
      */
-    const std::string& getChecksum() const;
+    [[nodiscard]] const std::string& getChecksum() const;
 
     /**
      * @brief
@@ -81,15 +78,12 @@ class MPEG : public ExternalRef {
      * @brief
      * @return
      */
-    std::unique_ptr<RefBase> clone() const override;
+    [[nodiscard]] std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external_ref
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::external_ref
 
 // ---------------------------------------------------------------------------------------------------------------------
 

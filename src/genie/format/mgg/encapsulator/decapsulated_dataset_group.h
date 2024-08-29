@@ -16,10 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 /**
  * @brief
@@ -27,7 +24,7 @@ namespace encapsulator {
 class DecapsulatedDatasetGroup {
  private:
     uint64_t id{};                                                                                //!< @brief
-    std::optional<genie::core::meta::DatasetGroup> meta_group;                                  //!< @brief
+    std::optional<genie::core::meta::DatasetGroup> meta_group;                                    //!< @brief
     std::map<uint8_t, genie::core::meta::Reference> meta_references;                              //!< @brief
     std::map<uint64_t, std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset>> data;  //!< @brief
 
@@ -72,7 +69,7 @@ class DecapsulatedDatasetGroup {
      * @brief
      * @param other
      */
-    DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other)  noexcept;
+    DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other) noexcept;
 
     /**
      * @brief
@@ -84,13 +81,13 @@ class DecapsulatedDatasetGroup {
      * @brief
      * @return
      */
-    uint64_t getID() const;
+    [[nodiscard]] uint64_t getID() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasMetaGroup() const;
+    [[nodiscard]] bool hasMetaGroup() const;
 
     /**
      * @brief
@@ -113,10 +110,7 @@ class DecapsulatedDatasetGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 

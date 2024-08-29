@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace name {
-namespace tokenizer {
+namespace genie::name::tokenizer {
 
 /**
  * @brief
@@ -40,7 +38,7 @@ struct TokenState {
      * @brief
      * @return
      */
-    bool more() const;
+    [[nodiscard]] bool more() const;
 
     /**
      * @brief
@@ -122,9 +120,7 @@ struct TokenState {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace tokenizer
-}  // namespace name
-}  // namespace genie
+}  // namespace genie::name::tokenizer
 
 // ---------------------------------------------------------------------------------------------------------------------
 

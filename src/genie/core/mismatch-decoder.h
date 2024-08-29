@@ -14,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -38,19 +37,18 @@ class MismatchDecoder {
      * @brief
      * @return
      */
-    virtual bool dataLeft() const = 0;
+    [[nodiscard]] virtual bool dataLeft() const = 0;
 
     /**
      * @brief
      * @return
      */
-    virtual std::unique_ptr<MismatchDecoder> copy() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<MismatchDecoder> copy() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

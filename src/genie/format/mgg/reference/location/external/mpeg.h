@@ -16,12 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
-namespace external {
+namespace genie::format::mgg::reference::location::external {
 
 /**
  * @brief
@@ -78,25 +73,25 @@ class MPEG : public External {
      * @brief
      * @return
      */
-    uint8_t getExternalDatasetGroupID() const;
+    [[nodiscard]] uint8_t getExternalDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getExternalDatasetID() const;
+    [[nodiscard]] uint16_t getExternalDatasetID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getRefChecksum() const;
+    [[nodiscard]] const std::string& getRefChecksum() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::string>& getSeqChecksums() const;
+    [[nodiscard]] const std::vector<std::string>& getSeqChecksums() const;
 
     /**
      * @brief
@@ -119,12 +114,7 @@ class MPEG : public External {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location::external
 
 // ---------------------------------------------------------------------------------------------------------------------
 

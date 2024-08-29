@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
@@ -65,7 +63,7 @@ class RawReference : public core::parameter::DataUnit {
      * @brief
      * @return
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /**
      * @brief
@@ -90,13 +88,13 @@ class RawReference : public core::parameter::DataUnit {
      * @brief
      * @return
      */
-    std::vector<RawReferenceSequence>::const_iterator begin() const { return seqs.begin(); }
+    [[nodiscard]] std::vector<RawReferenceSequence>::const_iterator begin() const { return seqs.begin(); }
 
     /**
      * @brief
      * @return
      */
-    std::vector<RawReferenceSequence>::const_iterator end() const { return seqs.end(); }
+    [[nodiscard]] std::vector<RawReferenceSequence>::const_iterator end() const { return seqs.end(); }
 
     /**
      * @brief
@@ -107,9 +105,7 @@ class RawReference : public core::parameter::DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

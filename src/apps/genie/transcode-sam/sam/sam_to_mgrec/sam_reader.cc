@@ -16,10 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,9 +76,9 @@ bool SamReader::isReady() {
 
 bool SamReader::isValid() {
     /// Find out if records are sorted by query name
-    UTILS_DIE_IF(sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0 ||
-                     std::strcmp(header_info.s, "queryname") != 0,
-                 "Sam file must be ordered by read name! That ordering must be documented in the SAM header.");
+    UTILS_DIE_IF(
+        sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0 || std::strcmp(header_info.s, "queryname") != 0,
+        "Sam file must be ordered by read name! That ordering must be documented in the SAM header.");
 
     return true;
 }
@@ -122,10 +119,7 @@ int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

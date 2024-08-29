@@ -17,10 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_split {
+namespace genie::core::record::alignment_split {
 
 /**
  * @brief
@@ -42,13 +39,13 @@ class OtherRec : public AlignmentSplit {
      * @brief
      * @return
      */
-    uint64_t getNextPos() const;
+    [[nodiscard]] uint64_t getNextPos() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getNextSeq() const;
+    [[nodiscard]] uint16_t getNextSeq() const;
 
     /**
      * @brief
@@ -71,15 +68,12 @@ class OtherRec : public AlignmentSplit {
      * @brief
      * @return
      */
-    std::unique_ptr<AlignmentSplit> clone() const override;
+    [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_split
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -1,8 +1,8 @@
 /**
-* @file
-* @copyright This file is part of GENIE. See LICENSE and/or
-* https://github.com/mitogen/genie for more details.
-*/
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #ifndef SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
 #define SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_
@@ -22,9 +22,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 /**
  * Side information used to encode / decode quality values. It is not encoded
@@ -214,7 +212,7 @@ struct EncodingOptions {
     /**
      * Flag for unaligned
      */
-     bool hasUnaligned = false;
+    bool hasUnaligned = false;
 };
 
 // -----------------------------------------------------------------------------
@@ -277,15 +275,11 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
  * @param input Decoded quality values
  * @param output Encoded quality values
  */
-void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input,
-            DecodingBlock* output);
+void encodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input, DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
 
-
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

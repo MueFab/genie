@@ -16,8 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Controlled output to an std::ostream. Allows to write single bits.
@@ -76,13 +75,13 @@ class BitWriter {
      * @brief Reveals the already written number of bits.
      * @return m_bitsWritten is returned.
      */
-    uint64_t getBitsWritten() const;
+    [[nodiscard]] uint64_t getBitsWritten() const;
 
     /**
      * @brief
      * @return True if the stream position is aligned to a full byte.
      */
-    bool isAligned() const;
+    [[nodiscard]] bool isAligned() const;
 
     /**
      * @brief Write a full input stream to this output stream.
@@ -102,7 +101,7 @@ class BitWriter {
      * @brief
      * @return
      */
-    int64_t getPosition() const;
+    [[nodiscard]] int64_t getPosition() const;
 
     /**
      * @brief
@@ -122,8 +121,7 @@ class BitWriter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

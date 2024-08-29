@@ -14,17 +14,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -46,13 +42,13 @@ class BitInputStream {
      * @brief
      * @return
      */
-    unsigned int getNumBitsUntilByteAligned() const;
+    [[nodiscard]] unsigned int getNumBitsUntilByteAligned() const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumBytesRead() const;
+    [[nodiscard]] size_t getNumBytesRead() const;
 
     /**
      * @brief
@@ -90,9 +86,7 @@ class BitInputStream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -16,10 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_external {
+namespace genie::core::record::alignment_external {
 
 /**
  * @brief
@@ -41,15 +38,12 @@ class None : public AlignmentExternal {
      * @brief
      * @return
      */
-    std::unique_ptr<AlignmentExternal> clone() const override;
+    [[nodiscard]] std::unique_ptr<AlignmentExternal> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_external
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_external
 
 // ---------------------------------------------------------------------------------------------------------------------
 

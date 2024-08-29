@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Information baout internal references
@@ -33,13 +31,13 @@ class InternalRef : public RefBase {
      * @brief Return dataset group id
      * @return Dataset group id
      */
-    uint16_t getGroupID() const;
+    [[nodiscard]] uint16_t getGroupID() const;
 
     /**
      * @brief Return dataset id
      * @return Datset id
      */
-    uint16_t getID() const;
+    [[nodiscard]] uint16_t getID() const;
 
     /**
      * @brief Construct from json
@@ -58,26 +56,24 @@ class InternalRef : public RefBase {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 
     /**
      * @brief Returns "internal_ref"
      * @return "internal_ref"
      */
-    const std::string& getKeyName() const override;
+    [[nodiscard]] const std::string& getKeyName() const override;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<RefBase> clone() const override;
+    [[nodiscard]] std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,8 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -37,7 +36,7 @@ class ReferenceSource {
      * @brief
      * @return
      */
-    virtual genie::core::meta::Reference getMeta() const;
+    [[nodiscard]] virtual genie::core::meta::Reference getMeta() const;
 
     /**
      * @brief
@@ -47,8 +46,7 @@ class ReferenceSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

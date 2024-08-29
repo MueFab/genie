@@ -15,10 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
@@ -73,27 +70,24 @@ class ReferenceOptions {
      * @brief
      * @return
      */
-    const std::vector<uint16_t>& getSeqIDs() const;
+    [[nodiscard]] const std::vector<uint16_t>& getSeqIDs() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<uint32_t>& getSeqBlocks() const;
+    [[nodiscard]] const std::vector<uint32_t>& getSeqBlocks() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReferenceID() const;
+    [[nodiscard]] uint8_t getReferenceID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

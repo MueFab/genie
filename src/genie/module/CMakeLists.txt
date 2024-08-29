@@ -3,7 +3,7 @@ project("genie-module")
 set(source_files
         default-setup.cc
         manager.cc
-        )
+)
 
 add_library(genie-module ${source_files})
 

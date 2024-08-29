@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -69,31 +67,31 @@ class SupportValues {
      * @brief
      * @return
      */
-    uint8_t getOutputSymbolSize() const;
+    [[nodiscard]] uint8_t getOutputSymbolSize() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCodingSubsymSize() const;
+    [[nodiscard]] uint8_t getCodingSubsymSize() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCodingOrder() const;
+    [[nodiscard]] uint8_t getCodingOrder() const;
 
     /**
      * @brief
      * @return
      */
-    bool getShareSubsymLutFlag() const;
+    [[nodiscard]] bool getShareSubsymLutFlag() const;
 
     /**
      * @brief
      * @return
      */
-    bool getShareSubsymPrvFlag() const;
+    [[nodiscard]] bool getShareSubsymPrvFlag() const;
 
     /**
      * @brief
@@ -114,7 +112,7 @@ class SupportValues {
      * @param transformIdSubsym
      * @return
      */
-    nlohmann::json toJson(TransformIdSubsym transformIdSubsym) const;
+    [[nodiscard]] nlohmann::json toJson(TransformIdSubsym transformIdSubsym) const;
 
  private:
     uint8_t output_symbol_size;  //!< @brief
@@ -126,9 +124,7 @@ class SupportValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

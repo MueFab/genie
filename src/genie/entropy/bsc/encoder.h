@@ -16,16 +16,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace bsc {
+namespace genie::entropy::bsc {
 
 /**
  * @brief Module to compress raw access units into blockpayloads using GABAC
  */
 class Encoder : public core::EntropyEncoder {
  public:
-    bool writeOutStreams{};     //!< @brief writeout streams
+    bool writeOutStreams{};  //!< @brief writeout streams
 
     /**
      * @brief
@@ -43,9 +41,7 @@ class Encoder : public core::EntropyEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace bsc
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::bsc
 
 // ---------------------------------------------------------------------------------------------------------------------
 

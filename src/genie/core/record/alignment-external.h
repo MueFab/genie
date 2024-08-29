@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -58,7 +56,7 @@ class AlignmentExternal {
      * @brief
      * @return
      */
-    virtual std::unique_ptr<AlignmentExternal> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<AlignmentExternal> clone() const = 0;
 
  protected:
     Type moreAlignmentInfoType;  //!< @brief
@@ -66,9 +64,7 @@ class AlignmentExternal {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

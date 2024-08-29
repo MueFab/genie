@@ -20,8 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace gabac {
+namespace genieapp::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -78,8 +77,8 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
     if (config_path.empty()) {
         config =
             genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::getEncoderConfigManual(genieSubseqID));
-            //  std::ofstream tmp("./cfg.json");
-            //  tmp << config.toJson().dump(4);
+        //  std::ofstream tmp("./cfg.json");
+        //  tmp << config.toJson().dump(4);
     } else {
         std::ifstream t(config_path);
         std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
@@ -95,8 +94,7 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace genieapp
+}  // namespace genieapp::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

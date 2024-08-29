@@ -27,20 +27,18 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
  */
 class AUHeader {
  private:
-    uint32_t access_unit_ID;                         //!< @brief
-    uint8_t num_blocks;                              //!< @brief
-    uint8_t parameter_set_ID;                        //!< @brief
-    core::record::ClassType au_type;                 //!< @brief
-    uint32_t reads_count;                            //!< @brief
+    uint32_t access_unit_ID;                       //!< @brief
+    uint8_t num_blocks;                            //!< @brief
+    uint8_t parameter_set_ID;                      //!< @brief
+    core::record::ClassType au_type;               //!< @brief
+    uint32_t reads_count;                          //!< @brief
     std::optional<MmCfg> mm_cfg;                   //!< @brief
     std::optional<RefCfg> ref_cfg;                 //!< @brief
     std::optional<AuTypeCfg> au_Type_U_Cfg;        //!< @brief
@@ -65,7 +63,7 @@ class AUHeader {
      * @brief
      * @return
      */
-    uint32_t getNumBlocks() const;
+    [[nodiscard]] uint32_t getNumBlocks() const;
 
     /**
      * @brief
@@ -105,31 +103,31 @@ class AUHeader {
      * @brief
      * @return
      */
-    uint32_t getID() const;
+    [[nodiscard]] uint32_t getID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getParameterID() const;
+    [[nodiscard]] uint8_t getParameterID() const;
 
     /**
      * @brief
      * @return
      */
-    const AuTypeCfg &getAlignmentInfo() const;
+    [[nodiscard]] const AuTypeCfg &getAlignmentInfo() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getReadCount() const;
+    [[nodiscard]] uint32_t getReadCount() const;
 
     /**
      * @brief
      * @return
      */
-    core::record::ClassType getClass() const;
+    [[nodiscard]] core::record::ClassType getClass() const;
 
     /**
      * @brief
@@ -164,9 +162,7 @@ class AUHeader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

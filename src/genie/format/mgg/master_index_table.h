@@ -25,9 +25,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -46,8 +44,8 @@ class MasterIndexTable : public GenInfo {
      * @param total_size
      * @return
      */
-    std::vector<uint64_t> getDescriptorStreamOffsets(uint8_t class_index, uint8_t desc_index, bool isUnaligned,
-                                                     uint64_t total_size) const;
+    [[nodiscard]] std::vector<uint64_t> getDescriptorStreamOffsets(uint8_t class_index, uint8_t desc_index,
+                                                                   bool isUnaligned, uint64_t total_size) const;
 
     /**
      * @brief
@@ -60,13 +58,14 @@ class MasterIndexTable : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<std::vector<std::vector<master_index_table::AlignedAUIndex>>>& getAlignedAUs() const;
+    [[nodiscard]] const std::vector<std::vector<std::vector<master_index_table::AlignedAUIndex>>>& getAlignedAUs()
+        const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<master_index_table::UnalignedAUIndex>& getUnalignedAUs() const;
+    [[nodiscard]] const std::vector<master_index_table::UnalignedAUIndex>& getUnalignedAUs() const;
 
     /**
      * @brief
@@ -92,7 +91,7 @@ class MasterIndexTable : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -105,9 +104,7 @@ class MasterIndexTable : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

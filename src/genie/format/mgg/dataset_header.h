@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/core/constants.h"
 #include "genie/core/meta/blockheader.h"
 #include "genie/core/meta/blockheader/disabled.h"
@@ -30,9 +30,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -58,7 +56,7 @@ class DatasetHeader : public GenInfo {
     bool parameters_update_flag;                              //!< @brief
     core::AlphabetID alphabet_id;                             //!< @brief
 
-    uint32_t num_U_access_units;                          //!< @brief
+    uint32_t num_U_access_units;                        //!< @brief
     std::optional<dataset_header::UOptions> u_options;  //!< @brief
 
     std::vector<std::optional<uint32_t>> thresholds;  //!< @brief
@@ -103,121 +101,121 @@ class DatasetHeader : public GenInfo {
      * @brief
      * @return
      */
-    uint8_t getDatasetGroupID() const;
+    [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getDatasetID() const;
+    [[nodiscard]] uint16_t getDatasetID() const;
 
     /**
      * @brief
      * @return
      */
-    genie::core::MPEGMinorVersion getVersion() const;
+    [[nodiscard]] genie::core::MPEGMinorVersion getVersion() const;
 
     /**
      * @brief
      * @return
      */
-    bool getMultipleAlignmentFlag() const;
+    [[nodiscard]] bool getMultipleAlignmentFlag() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getByteOffsetSize() const;
+    [[nodiscard]] uint8_t getByteOffsetSize() const;
 
     /**
      * @brief
      * @return
      */
-    bool getNonOverlappingAURangeFlag() const;
+    [[nodiscard]] bool getNonOverlappingAURangeFlag() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getPosBits() const;
+    [[nodiscard]] uint8_t getPosBits() const;
 
     /**
      * @brief
      * @return
      */
-    bool isBlockHeaderEnabled() const;
+    [[nodiscard]] bool isBlockHeaderEnabled() const;
 
     /**
      * @brief
      * @return
      */
-    bool isMITEnabled() const;
+    [[nodiscard]] bool isMITEnabled() const;
 
     /**
      * @brief
      * @return
      */
-    bool isCCModeEnabled() const;
+    [[nodiscard]] bool isCCModeEnabled() const;
 
     /**
      * @brief
      * @return
      */
-    bool isOrderedBlockMode() const;
+    [[nodiscard]] bool isOrderedBlockMode() const;
 
     /**
      * @brief
      * @return
      */
-    const dataset_header::ReferenceOptions& getReferenceOptions() const;
+    [[nodiscard]] const dataset_header::ReferenceOptions& getReferenceOptions() const;
 
     /**
      * @brief
      * @return
      */
-    core::parameter::DataUnit::DatasetType getDatasetType() const;
+    [[nodiscard]] core::parameter::DataUnit::DatasetType getDatasetType() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<dataset_header::MITClassConfig>& getMITConfigs() const;
+    [[nodiscard]] const std::vector<dataset_header::MITClassConfig>& getMITConfigs() const;
 
     /**
      * @brief
      * @return
      */
-    bool getParameterUpdateFlag() const;
+    [[nodiscard]] bool getParameterUpdateFlag() const;
 
     /**
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    [[nodiscard]] core::AlphabetID getAlphabetID() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getNumUAccessUnits() const;
+    [[nodiscard]] uint32_t getNumUAccessUnits() const;
 
     /**
      * @brief
      * @return
      */
-    const dataset_header::UOptions& getUOptions() const;
+    [[nodiscard]] const dataset_header::UOptions& getUOptions() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::optional<uint32_t>>& getRefSeqThresholds() const;
+    [[nodiscard]] const std::vector<std::optional<uint32_t>>& getRefSeqThresholds() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -291,9 +289,7 @@ class DatasetHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

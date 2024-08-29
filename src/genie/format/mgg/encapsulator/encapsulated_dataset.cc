@@ -5,15 +5,12 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset.h"
-#include <utility>
 #include <filesystem>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,10 +45,7 @@ EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ set(source_files
         decoder.cc
         encoder.cc
         record_pileup.cc
-        )
+)
 
 add_library(genie-calq ${source_files})
 

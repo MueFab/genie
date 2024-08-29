@@ -14,9 +14,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -26,11 +24,11 @@ class Quantizer {
     explicit Quantizer(const std::map<int, int>& inverseLut);
     virtual ~Quantizer();
 
-    int valueToIndex(const int& value) const;
-    int indexToReconstructionValue(const int& index) const;
-    int valueToReconstructionValue(const int& value) const;
+    [[nodiscard]] int valueToIndex(const int& value) const;
+    [[nodiscard]] int indexToReconstructionValue(const int& index) const;
+    [[nodiscard]] int valueToReconstructionValue(const int& value) const;
 
-    const std::map<int, int>& inverseLut() const;
+    [[nodiscard]] const std::map<int, int>& inverseLut() const;
 
     void print() const;
 
@@ -42,9 +40,7 @@ class Quantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 
