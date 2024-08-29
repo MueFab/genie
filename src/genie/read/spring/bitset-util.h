@@ -116,7 +116,7 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
  * @param num_threads
  */
 template <size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, int numdict,
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths, int numdict,
                          const uint32_t &numreads, int bpb, const std::string &basedir, const int &num_threads);
 
 /**
@@ -138,7 +138,7 @@ void generatemasks(std::bitset<bitset_size> **mask, int max_readlen, int bpb);
  * @param basemask
  */
 template <size_t bitset_size>
-void chartobitset(char *s, int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask);
+void chartobitset(const char *s, int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

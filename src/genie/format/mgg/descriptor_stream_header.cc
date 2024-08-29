@@ -35,7 +35,7 @@ void DescriptorStreamHeader::addBlock() { num_blocks++; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader()
-    : DescriptorStreamHeader(0, genie::core::GenDesc(0), core::record::ClassType::NONE, 0) {}
+    : DescriptorStreamHeader(false, genie::core::GenDesc(0), core::record::ClassType::NONE, 0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
