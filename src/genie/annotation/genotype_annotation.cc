@@ -37,14 +37,13 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     for (auto i = 0u; i < recData.size(); ++i) {
         std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
 
-        for (auto formatdata : recData.at(i).genotypeDatablock.attributeData) {
+        for (auto& formatdata : recData.at(i).genotypeDatablock.attributeData) {
             auto& info = recData.at(i).genotypeDatablock.attributeInfo[formatdata.first];
             std::vector<uint32_t> arrayDims;
             arrayDims.push_back(std::min(likelihood_opt.block_size, static_cast<uint32_t>(rowsRead)));
             arrayDims.push_back(
                 recData.at(i).numSamples);  // static_cast<uint32_t>(formatdata.second.at(0).size()));  //
-            arrayDims.push_back(
-                recData.at(i).formatCount);  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
+            arrayDims.push_back(info.getArrayLength());  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
 
             attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
                                                     arrayDims);
