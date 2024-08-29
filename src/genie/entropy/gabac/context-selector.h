@@ -56,8 +56,8 @@ class ContextSelector {
      * @param codingOrder
      * @return
      */
-    unsigned int getContextIdxOrderGT0(uint8_t subsymIdx, uint8_t prvIdx,
-                                       const std::vector<Subsymbol>& subsymbols, uint8_t codingOrder);
+    unsigned int getContextIdxOrderGT0(uint8_t subsymIdx, uint8_t prvIdx, const std::vector<Subsymbol>& subsymbols,
+                                       uint8_t codingOrder);
 
  private:
     const paramcabac::StateVars stateVars;  //!< @brief

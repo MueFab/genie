@@ -151,8 +151,7 @@ void correct_order(uint32_t *order_s, const encoder_global &eg);
  * @return
  */
 template <size_t bitset_size>
-std::string bitsettostring(std::bitset<bitset_size> b, uint16_t readlen,
-                           const encoder_global_b<bitset_size> &egb);
+std::string bitsettostring(std::bitset<bitset_size> b, uint16_t readlen, const encoder_global_b<bitset_size> &egb);
 
 /**
  * @brief

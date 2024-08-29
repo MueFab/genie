@@ -319,23 +319,23 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     }
     // now put unmatched reads to chunks if combine_pairs is false
     if (!combine_pairs) {
-        for (size_t i = 0; i < unmatched_records[0].size(); ++i) {
+        for (auto& i : unmatched_records[0]) {
             chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[0][i].name), "", (uint8_t)0, true);
+                                         std::move(i.name), "", (uint8_t)0, true);
             // last parameter is read_1_first
-            core::record::Segment seg(std::move(unmatched_records[0][i].seq));
-            if (!unmatched_records[0][i].qv.empty()) {
-                seg.addQualities(std::move(unmatched_records[0][i].qv));
+            core::record::Segment seg(std::move(i.seq));
+            if (!i.qv.empty()) {
+                seg.addQualities(std::move(i.qv));
             }
             chunk.getData().back().addSegment(std::move(seg));
         }
-        for (size_t i = 0; i < unmatched_records[1].size(); ++i) {
+        for (auto& i : unmatched_records[1]) {
             chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[1][i].name), "", (uint8_t)0, false);
+                                         std::move(i.name), "", (uint8_t)0, false);
             // last parameter is read_1_first
-            core::record::Segment seg(std::move(unmatched_records[1][i].seq));
-            if (!unmatched_records[1][i].qv.empty()) {
-                seg.addQualities(std::move(unmatched_records[1][i].qv));
+            core::record::Segment seg(std::move(i.seq));
+            if (!i.qv.empty()) {
+                seg.addQualities(std::move(i.qv));
             }
             chunk.getData().back().addSegment(std::move(seg));
         }

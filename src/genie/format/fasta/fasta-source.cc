@@ -51,8 +51,9 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
     }
 
     auto string = refMgr->loadAt(seq, pos * genie::core::ReferenceManager::getChunkSize());
-    size_t actual_length =
-        loc_id.start == (accu_lengths[seq] - 1) ? refMgr->getLength(seq) % genie::core::ReferenceManager::getChunkSize() : string->length();
+    size_t actual_length = loc_id.start == (accu_lengths[seq] - 1)
+                               ? refMgr->getLength(seq) % genie::core::ReferenceManager::getChunkSize()
+                               : string->length();
 
     std::cerr << "Decompressing " << seq << " [" << pos * genie::core::ReferenceManager::getChunkSize() << ", "
               << pos * genie::core::ReferenceManager::getChunkSize() + actual_length << "]" << std::endl;
