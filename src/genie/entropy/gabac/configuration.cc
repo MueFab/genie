@@ -26,7 +26,7 @@ EncodingConfiguration::EncodingConfiguration(const core::GenSubIndex sub) { subs
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) { subseqCfg = std::move(_subseq); }
+EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) { subseqCfg = _subseq; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ const paramcabac::Subsequence& EncodingConfiguration::getSubseqConfig() const { 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncodingConfiguration::setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = std::move(_subseqCfg); }
+void EncodingConfiguration::setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = _subseqCfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(j) {}
+EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(std::move(j)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

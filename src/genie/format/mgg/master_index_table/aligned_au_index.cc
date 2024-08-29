@@ -93,11 +93,11 @@ const genie::format::mgb::RefCfg& AlignedAUIndex::getReferenceInfo() const { ret
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignedAUIndex::setReferenceInfo(genie::format::mgb::RefCfg _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
+void AlignedAUIndex::setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg) { ref_cfg = std::move(_ref_cfg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignedAUIndex::setExtended(genie::format::mgb::ExtendedAu _ext_au) { extended_cfg = std::move(_ext_au); }
+void AlignedAUIndex::setExtended(const genie::format::mgb::ExtendedAu& _ext_au) { extended_cfg = std::move(_ext_au); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
