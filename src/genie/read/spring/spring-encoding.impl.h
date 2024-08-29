@@ -299,7 +299,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     auto *file_len_seq_thr = new uint64_t[eg.num_thr];
     for (int tid = 0; tid < eg.num_thr; tid++) {
         std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
-        in_seq.seekg(0, in_seq.end);
+        in_seq.seekg(0, std::ifstream::end);
         file_len_seq_thr[tid] = in_seq.tellg();
         in_seq.close();
     }
