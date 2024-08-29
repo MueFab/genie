@@ -124,7 +124,7 @@ record::Chunk ClassifierRegroup::getChunk() {
         auto seqvec = refMgr->getSequences();
         while (true) {
             if (refModeFullSeqID != seqvec.size()) {
-                auto seq = seqvec.at(refModeFullSeqID);
+                const auto& seq = seqvec.at(refModeFullSeqID);
                 auto cov_vec = refMgr->getCoverage(seq);
                 auto cov = cov_vec.at(refModeFullCovID);
                 size_t chunkOffset = cov.first / genie::core::ReferenceManager::getChunkSize();
