@@ -14,6 +14,12 @@
 #include "genie/core/flowgraph-convert.h"
 #include "genie/entropy/gabac/decoder.h"
 #include "genie/entropy/gabac/encoder.h"
+#include "genie/entropy/lzma/decoder.h"
+#include "genie/entropy/lzma/encoder.h"
+#include "genie/entropy/zstd/decoder.h"
+#include "genie/entropy/zstd/encoder.h"
+#include "genie/entropy/bsc/decoder.h"
+#include "genie/entropy/bsc/encoder.h"
 #include "genie/name/tokenizer/decoder.h"
 #include "genie/name/tokenizer/encoder.h"
 #include "genie/quality/calq//decoder.h"
@@ -79,6 +85,9 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::lzma::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::zstd::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::bsc::Encoder>(writeRawStreams));
     ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
@@ -141,6 +150,9 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setNameSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Decoder>());
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::lzma::Decoder>());
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::zstd::Decoder>());
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::bsc::Decoder>());
     ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&,
                                     genie::core::AccessUnit::Descriptor&, bool) -> size_t { return 0; });
 
