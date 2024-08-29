@@ -148,6 +148,7 @@ nlohmann::json Subsequence::toJoson() const {
     }
     ret["transform_subseq_parameters"] = transform_subseq_parameters.toJson();
     std::vector<nlohmann::json> tmp;
+    tmp.reserve(transformSubseq_cfgs.size());
     for (const auto& a : transformSubseq_cfgs) {
         tmp.emplace_back(a.toJson());
     }

@@ -70,6 +70,7 @@ void FlowGraphConvert::setExporterSelector(const std::function<size_t(const geni
 
 void FlowGraphConvert::run() {
     std::vector<genie::util::OriginalSource*> imps;
+    imps.reserve(importers.size());
     for (auto& i : importers) {
         imps.emplace_back(i.get());
     }

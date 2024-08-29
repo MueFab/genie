@@ -541,6 +541,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
 
     std::vector<paramcabac::TransformedSubSeq> trnsfSubseqCfgs;
 
+    trnsfSubseqCfgs.reserve(numTrnsfSubseqs);
     for (size_t t = 0; t < numTrnsfSubseqs; t++) {
         trnsfSubseqCfgs.emplace_back(
             trnsfSubsymID[t],
