@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
@@ -49,7 +47,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @brief
      * @return
      */
-    size_t getPayloadSize() const;
+    [[nodiscard]] size_t getPayloadSize() const;
 
     /**
      * @brief
@@ -94,7 +92,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @brief
      * @return
      */
-    const AUHeader &getHeader() const;
+    [[nodiscard]] const AUHeader &getHeader() const;
 
     /**
      * @brief
@@ -120,9 +118,7 @@ class AccessUnit : public core::parameter::DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

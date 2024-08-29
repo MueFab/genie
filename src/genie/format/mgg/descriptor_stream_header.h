@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -35,25 +33,25 @@ class DescriptorStreamHeader : public GenInfo {
      * @brief
      * @return
      */
-    bool getReserved() const;
+    [[nodiscard]] bool getReserved() const;
 
     /**
      * @brief
      * @return
      */
-    genie::core::GenDesc getDescriptorID() const;
+    [[nodiscard]] genie::core::GenDesc getDescriptorID() const;
 
     /**
      * @brief
      * @return
      */
-    core::record::ClassType getClassType() const;
+    [[nodiscard]] core::record::ClassType getClassType() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getNumBlocks() const;
+    [[nodiscard]] uint32_t getNumBlocks() const;
 
     /**
      * @brief
@@ -91,7 +89,7 @@ class DescriptorStreamHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -103,9 +101,7 @@ class DescriptorStreamHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

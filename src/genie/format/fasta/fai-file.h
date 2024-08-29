@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 /**
  * @brief
@@ -69,27 +67,27 @@ class FaiFile {
      * @param position
      * @return
      */
-    uint64_t getFilePosition(const std::string& sequence, uint64_t position) const;
+    [[nodiscard]] uint64_t getFilePosition(const std::string& sequence, uint64_t position) const;
 
     /**
      * @brief
      * @return
      */
-    std::map<size_t, std::string> getSequences() const;
-
-    /**
-     * @brief
-     * @param seq
-     * @return
-     */
-    bool containsSequence(const std::string& seq) const;
+    [[nodiscard]] std::map<size_t, std::string> getSequences() const;
 
     /**
      * @brief
      * @param seq
      * @return
      */
-    uint64_t getLength(const std::string& seq) const;
+    [[nodiscard]] bool containsSequence(const std::string& seq) const;
+
+    /**
+     * @brief
+     * @param seq
+     * @return
+     */
+    [[nodiscard]] uint64_t getLength(const std::string& seq) const;
 
  private:
     std::map<std::string, FaiSequence> seqs;  //!< @brief
@@ -122,9 +120,7 @@ std::ostream& operator<<(std::ostream& stream, const FaiFile& file);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

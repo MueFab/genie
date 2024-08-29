@@ -14,10 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace blockheader {
+namespace genie::core::meta::blockheader {
 
 /**
  * @brief Represents block continuity with block headers
@@ -45,27 +42,24 @@ class Enabled : public BlockHeader {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 
     /**
      * @brief Return MIT_flag
      * @return MIT_flag
      */
-    bool getMITFlag() const;
+    [[nodiscard]] bool getMITFlag() const;
 
     /**
      * @brief Return CC_mode_flag
      * @return CC_mode_flag
      */
-    bool getCCFlag() const;
+    [[nodiscard]] bool getCCFlag() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace blockheader
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::blockheader
 
 // ---------------------------------------------------------------------------------------------------------------------
 

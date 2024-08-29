@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief Module to compress raw access units into blockpayloads using GABAC
@@ -65,9 +63,7 @@ class Encoder : public core::EntropyEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // -----------------------zzzz----------------------------------------------------------------------------------------------
 

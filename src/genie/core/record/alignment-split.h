@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -59,13 +57,13 @@ class AlignmentSplit {
      * @brief
      * @return
      */
-    virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
 
     /**
      * @brief
      * @return
      */
-    Type getType() const;
+    [[nodiscard]] Type getType() const;
 
  protected:
     Type split_alignment;  //!< @brief
@@ -73,9 +71,7 @@ class AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

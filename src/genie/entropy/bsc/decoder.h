@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace bsc {
+namespace genie::entropy::bsc {
 
 /**
  * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
@@ -40,9 +38,7 @@ class Decoder : public core::EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace bsc
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::bsc
 
 // ---------------------------------------------------------------------------------------------------------------------
 

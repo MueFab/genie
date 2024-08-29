@@ -11,20 +11,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool StateVars::operator==(const StateVars& bin) const {
-    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
-           numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
-           codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
+    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms && numCtxSubsym == bin.numCtxSubsym &&
+           cLengthBI == bin.cLengthBI && codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
            codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
-           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
-           codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
-           numCtxTotal == bin.numCtxTotal;
+           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] && codingSizeCtxOffset == bin.codingSizeCtxOffset &&
+           numCtxLuts == bin.numCtxLuts && numCtxTotal == bin.numCtxTotal;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -292,9 +288,7 @@ uint64_t StateVars::get2PowN(uint8_t N) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 /**
  * @brief
@@ -36,19 +34,19 @@ class RawReferenceSequence {
      * @brief
      * @return
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t getSeqID() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getStart() const;
+    [[nodiscard]] uint64_t getStart() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getEnd() const;
+    [[nodiscard]] uint64_t getEnd() const;
 
     /**
      * @brief
@@ -60,7 +58,7 @@ class RawReferenceSequence {
      * @brief
      * @return
      */
-    const std::string& getSequence() const;
+    [[nodiscard]] const std::string& getSequence() const;
 
     /**
      * @brief
@@ -87,7 +85,7 @@ class RawReferenceSequence {
      * @param s
      * @return
      */
-    bool isIdUnique(const RawReferenceSequence& s) const;
+    [[nodiscard]] bool isIdUnique(const RawReferenceSequence& s) const;
 
     /**
      * @brief
@@ -99,14 +97,12 @@ class RawReferenceSequence {
      * @brief
      * @return
      */
-    uint64_t getTotalSize() const;
+    [[nodiscard]] uint64_t getTotalSize() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 /**
  * @brief
@@ -37,7 +35,7 @@ class Sha256File {
  public:
     explicit Sha256File(std::istream& stream) { data = read(stream); }
 
-    const std::vector<std::pair<std::string, std::string>>& getData() const { return data; }
+    [[nodiscard]] const std::vector<std::pair<std::string, std::string>>& getData() const { return data; }
 
     /**
      * @brief
@@ -65,9 +63,7 @@ class Sha256File {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

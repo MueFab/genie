@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+namespace genie::quality::paramqv1 {
 
 /**
  * @brief
@@ -64,7 +62,7 @@ class QualityValues1 : public core::parameter::QualityValues {
      * @brief
      * @return
      */
-    std::unique_ptr<QualityValues> clone() const override;
+    [[nodiscard]] std::unique_ptr<QualityValues> clone() const override;
 
     /**
      * @brief
@@ -92,20 +90,20 @@ class QualityValues1 : public core::parameter::QualityValues {
      * @brief
      * @return
      */
-    size_t getNumberCodeBooks() const;
+    [[nodiscard]] size_t getNumberCodeBooks() const;
 
     /**
      * @brief
      * @param id
      * @return
      */
-    const Codebook& getCodebook(size_t id) const;
+    [[nodiscard]] const Codebook& getCodebook(size_t id) const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumSubsequences() const override;
+    [[nodiscard]] size_t getNumSubsequences() const override;
 
     /**
      * @brief
@@ -121,9 +119,7 @@ class QualityValues1 : public core::parameter::QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
 
 // ---------------------------------------------------------------------------------------------------------------------
 

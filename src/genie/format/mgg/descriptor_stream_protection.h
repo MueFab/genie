@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -49,13 +47,13 @@ class DescriptorStreamProtection : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getProtectionValue() const;
+    [[nodiscard]] const std::string& getProtectionValue() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -73,9 +71,7 @@ class DescriptorStreamProtection : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

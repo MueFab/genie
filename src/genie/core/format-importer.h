@@ -18,8 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
@@ -65,8 +64,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

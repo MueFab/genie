@@ -14,20 +14,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
  */
 class UOptions {
  private:
-    uint64_t reserved1;                       //!< @brief
+    uint64_t reserved1;                     //!< @brief
     std::optional<USignature> u_signature;  //!< @brief
     std::optional<uint8_t> reserved2;       //!< @brief
-    bool reserved3;                           //!< @brief
+    bool reserved3;                         //!< @brief
 
  public:
     /**
@@ -60,37 +57,37 @@ class UOptions {
      * @brief
      * @return
      */
-    uint64_t getReserved1() const;
+    [[nodiscard]] uint64_t getReserved1() const;
 
     /**
      * @brief
      * @return
      */
-    bool getReserved3() const;
+    [[nodiscard]] bool getReserved3() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasReserved2() const;
+    [[nodiscard]] bool hasReserved2() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReserved2() const;
+    [[nodiscard]] uint8_t getReserved2() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasSignature() const;
+    [[nodiscard]] bool hasSignature() const;
 
     /**
      * @brief
      * @return
      */
-    const USignature& getSignature() const;
+    [[nodiscard]] const USignature& getSignature() const;
 
     /**
      * @brief
@@ -107,10 +104,7 @@ class UOptions {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Region on the genome, spanning many loci
@@ -49,38 +47,36 @@ class Region {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Get sequence ID
      * @return Sequence ID
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t getSeqID() const;
 
     /**
      * @brief Get List of active record classes
      * @return List of record classes
      */
-    const std::vector<genie::core::record::ClassType>& getClasses() const;
+    [[nodiscard]] const std::vector<genie::core::record::ClassType>& getClasses() const;
 
     /**
      * @brief Return start locus
      * @return Start locus
      */
-    uint64_t getStartPos() const;
+    [[nodiscard]] uint64_t getStartPos() const;
 
     /**
      * @brief Return end locus
      * @return End locus
      */
-    uint64_t getEndPos() const;
+    [[nodiscard]] uint64_t getEndPos() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

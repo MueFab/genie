@@ -24,9 +24,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ class Haplotyper {
                size_t minHQSoftclip_streak, size_t filterCutOff, bool debug, bool squashed, FilterType filterType);
 
     // Returns offset between activity scores' position and front
-    size_t getOffset() const;
+    [[nodiscard]] size_t getOffset() const;
 
     // Pushes new activity score calculated using parameters and
     // returns filtered acticityscore for (pos-offset)
@@ -73,9 +71,7 @@ class Haplotyper {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

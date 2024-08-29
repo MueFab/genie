@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 /**
  * @brief
@@ -87,14 +85,14 @@ class DescriptorSubseqCfg {
      * @brief
      * @return
      */
-    const Descriptor& get() const;
+    [[nodiscard]] const Descriptor& get() const;
 
     /**
      * @brief
      * @param index
      * @return
      */
-    const Descriptor& getClassSpecific(uint8_t index) const;
+    [[nodiscard]] const Descriptor& getClassSpecific(uint8_t index) const;
 
     /**
      * @brief
@@ -106,7 +104,7 @@ class DescriptorSubseqCfg {
      * @brief
      * @return
      */
-    bool isClassSpecific() const;
+    [[nodiscard]] bool isClassSpecific() const;
 
     /**
      * @brief
@@ -127,7 +125,7 @@ class DescriptorSubseqCfg {
      * @param cfg
      * @return
      */
-    bool desc_comp(const DescriptorSubseqCfg& cfg) const;
+    [[nodiscard]] bool desc_comp(const DescriptorSubseqCfg& cfg) const;
 
     bool class_specific_dec_cfg_flag;                                    //!< @brief
     std::vector<std::unique_ptr<Descriptor>> descriptor_configurations;  //!< @brief
@@ -135,9 +133,7 @@ class DescriptorSubseqCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 

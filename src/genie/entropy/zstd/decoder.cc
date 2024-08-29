@@ -14,16 +14,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace zstd {
+namespace genie::entropy::zstd {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
     const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
-    (void) param;
-    (void) mmCoderEnabled;
+    (void)param;
+    (void)mmCoderEnabled;
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
@@ -58,9 +56,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace zstd
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::zstd
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

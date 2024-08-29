@@ -30,9 +30,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,14 +65,14 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
 
     // first find the seq
     uint64_t seq_start, seq_end;
-    if (data.flag_arr[start_read_num] == false) {
+    if (!data.flag_arr[start_read_num]) {
         seq_start = seq_end = 0;  // all reads unaligned
     } else {
         seq_end = seq_start = data.pos_arr[start_read_num];
         // find last read in AU that's aligned
         uint64_t i = start_read_num;
         for (; i < end_read_num; i++) {
-            if (data.flag_arr[i] == false) break;
+            if (!data.flag_arr[i]) break;
             seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
         }
     }
@@ -89,7 +87,7 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
-        if (data.flag_arr[i] == true) {
+        if (data.flag_arr[i]) {
             raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);          // rlen
             raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
@@ -151,7 +149,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               bool write_raw) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
-    uint64_t blocks = uint64_t(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
+    auto blocks = uint64_t(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
 
     params.resize(blocks);
 
@@ -193,7 +191,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     // write num blocks, reads per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
-    uint32_t num_blocks = (uint32_t)blocks;
+    auto num_blocks = (uint32_t)blocks;
     f_block_info.write(reinterpret_cast<char *>(&num_blocks), sizeof(uint32_t));
     f_block_info.write(reinterpret_cast<char *>(&num_reads_per_block[0]), num_blocks * sizeof(uint32_t));
 }
@@ -666,7 +664,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         uint32_t pair =
             (current < data.cp.num_reads / 2) ? (current + data.cp.num_reads / 2) : (current - data.cp.num_reads / 2);
 
-        if (data.flag_arr[current] == true) {
+        if (data.flag_arr[current]) {
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
@@ -681,7 +679,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         if ((bdata.block_num[current] == bdata.block_num[pair]) &&
             (bdata.genomic_record_index[current] == bdata.genomic_record_index[pair])) {
             // both reads in same record
-            if (data.flag_arr[current] == false) {
+            if (!data.flag_arr[current]) {
                 // Case 1: both unaligned
                 raw_au.get(core::GenSub::RTYPE).push(5);  // rtype
                 raw_au.get(core::GenSub::RLEN)
@@ -703,9 +701,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);     // rlen
                 raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                    // pair decoding case same_rec
-                bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
+                raw_au.get(core::GenSub::PAIR_SAME_REC).push(2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
@@ -749,7 +746,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             }
         } else {
             // only one read in genomic record
-            if (data.flag_arr[current] == true) {
+            if (data.flag_arr[current]) {
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
                 raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0) {
@@ -924,9 +921,7 @@ void generate_read_streams(const std::string &temp_dir, const compression_params
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

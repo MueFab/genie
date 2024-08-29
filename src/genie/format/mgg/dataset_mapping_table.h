@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -30,7 +28,7 @@ class DataSetMappingTable : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -42,13 +40,13 @@ class DataSetMappingTable : public GenInfo {
      * @brief
      * @return
      */
-    uint16_t getDatasetID() const;
+    [[nodiscard]] uint16_t getDatasetID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<DataStream>& getDataStreams() const;
+    [[nodiscard]] const std::vector<DataStream>& getDataStreams() const;
 
     /**
      * @brief
@@ -82,9 +80,7 @@ class DataSetMappingTable : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

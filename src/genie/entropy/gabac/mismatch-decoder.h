@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -45,19 +43,19 @@ class MismatchDecoder : public core::MismatchDecoder {
      * @brief Tells if there are more mismatches left in the data.
      * @return True if data left.
      */
-    bool dataLeft() const override;
+    [[nodiscard]] bool dataLeft() const override;
 
     /**
      * @brief get the total number of symbols in the subsequence.
      * @return number of symbols.
      */
-    uint64_t getSubseqSymbolsTotal() const;
+    [[nodiscard]] uint64_t getSubseqSymbolsTotal() const;
 
     /**
      * @brief Copies the object.
      * @return A copy of the full object state.
      */
-    std::unique_ptr<core::MismatchDecoder> copy() const override;
+    [[nodiscard]] std::unique_ptr<core::MismatchDecoder> copy() const override;
 
     /**
      * @brief
@@ -74,9 +72,7 @@ class MismatchDecoder : public core::MismatchDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

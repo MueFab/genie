@@ -4,16 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/master_index_table/aligned_au_index.h"
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace master_index_table {
+namespace genie::format::mgg::master_index_table {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -123,10 +120,7 @@ void AlignedAUIndex::addBlockOffset(uint64_t offset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace master_index_table
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::master_index_table
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

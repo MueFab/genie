@@ -23,7 +23,7 @@ namespace genie::entropy::lzma {
  */
 class Encoder : public core::EntropyEncoder {
  public:
-    bool writeOutStreams{};     //!< @brief writeout streams
+    bool writeOutStreams{};  //!< @brief writeout streams
 
     /**
      * @brief
@@ -42,8 +42,6 @@ class Encoder : public core::EntropyEncoder {
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::entropy::lzma
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -30,7 +28,7 @@ class FileHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -57,19 +55,19 @@ class FileHeader : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getMajorBrand() const;
+    [[nodiscard]] const std::string& getMajorBrand() const;
 
     /**
      * @brief
      * @return
      */
-    core::MPEGMinorVersion getMinorVersion() const;
+    [[nodiscard]] core::MPEGMinorVersion getMinorVersion() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::string>& getCompatibleBrands() const;
+    [[nodiscard]] const std::vector<std::string>& getCompatibleBrands() const;
 
     /**
      * @brief
@@ -100,9 +98,7 @@ class FileHeader : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

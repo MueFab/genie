@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,10 +39,10 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
 template <size_t bitset_size>
 void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, const int numdict,
                          const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads) {
-    std::bitset<bitset_size> *mask = new std::bitset<bitset_size>[numdict];
+    auto *mask = new std::bitset<bitset_size>[numdict];
     generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
     for (int j = 0; j < numdict; j++) {
-        uint64_t *ull = new uint64_t[numreads];
+        auto *ull = new uint64_t[numreads];
 
         //
         // It is not worth putting parallel region here.
@@ -259,9 +257,7 @@ void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

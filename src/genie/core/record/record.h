@@ -27,9 +27,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  *  @brief
@@ -137,19 +135,19 @@ class Record {
      * @brief
      * @return
      */
-    const std::vector<Segment>& getSegments() const;
+    [[nodiscard]] const std::vector<Segment>& getSegments() const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumberOfTemplateSegments() const;
+    [[nodiscard]] size_t getNumberOfTemplateSegments() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<AlignmentBox>& getAlignments() const;
+    [[nodiscard]] const std::vector<AlignmentBox>& getAlignments() const;
 
     /**
      * @brief
@@ -161,19 +159,19 @@ class Record {
      * @brief
      * @return
      */
-    uint8_t getFlags() const;
+    [[nodiscard]] uint8_t getFlags() const;
 
     /**
      * @brief
      * @return
      */
-    ClassType getClassID() const;
+    [[nodiscard]] ClassType getClassID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getName() const;
+    [[nodiscard]] const std::string& getName() const;
 
     /**
      * @brief
@@ -203,25 +201,25 @@ class Record {
      * @brief
      * @return
      */
-    const std::string& getGroup() const;
+    [[nodiscard]] const std::string& getGroup() const;
 
     /**
      * @brief
      * @return
      */
-    const AlignmentSharedData& getAlignmentSharedData() const;
+    [[nodiscard]] const AlignmentSharedData& getAlignmentSharedData() const;
 
     /**
      * @brief
      * @return
      */
-    const AlignmentExternal& getAlignmentExternal() const;
+    [[nodiscard]] const AlignmentExternal& getAlignmentExternal() const;
 
     /**
      * @brief
      * @return
      */
-    bool isRead1First() const;
+    [[nodiscard]] bool isRead1First() const;
 
     /**
      * @brief
@@ -236,7 +234,7 @@ class Record {
      * @param split
      * @return
      */
-    size_t getMappedLength(size_t alignment, size_t split) const;
+    [[nodiscard]] size_t getMappedLength(size_t alignment, size_t split) const;
 
     /**
      * @brief
@@ -249,7 +247,7 @@ class Record {
      * @brief
      * @return
      */
-    std::pair<size_t, size_t> getTemplatePosition() const;
+    [[nodiscard]] std::pair<size_t, size_t> getTemplatePosition() const;
 
     /**
      * @brief
@@ -257,13 +255,13 @@ class Record {
      * @param split
      * @return
      */
-    size_t getPosition(size_t alignment, size_t split) const;
+    [[nodiscard]] size_t getPosition(size_t alignment, size_t split) const;
 
     /**
      * @brief
      * @return
      */
-    bool getRead1First() const;
+    [[nodiscard]] bool getRead1First() const;
 
     /**
      * @brief
@@ -274,9 +272,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

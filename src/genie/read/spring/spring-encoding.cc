@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +128,7 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
         read_flag_N[order_s[eg.numreads_s + i]] = true;
     }
 
-    uint32_t *cumulative_N_reads = new uint32_t[eg.numreads + eg.numreads_s];
+    auto *cumulative_N_reads = new uint32_t[eg.numreads + eg.numreads_s];
     // number of reads occuring before pos in clean reads
     uint32_t pos_in_clean = 0, num_N_reads_till_now = 0;
     for (uint32_t i = 0; i < numreads_total; i++) {
@@ -168,9 +166,7 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <vector>
 #include <optional>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/extended_au.h"
@@ -18,22 +18,19 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace master_index_table {
+namespace genie::format::mgg::master_index_table {
 
 /**
  * @brief
  */
 class AlignedAUIndex {
  private:
-    uint64_t au_byte_offset;                                       //!< @brief
-    uint64_t au_start_position;                                    //!< @brief
-    uint64_t au_end_position;                                      //!< @brief
+    uint64_t au_byte_offset;                                     //!< @brief
+    uint64_t au_start_position;                                  //!< @brief
+    uint64_t au_end_position;                                    //!< @brief
     std::optional<genie::format::mgb::RefCfg> ref_cfg;           //!< @brief
     std::optional<genie::format::mgb::ExtendedAu> extended_cfg;  //!< @brief
-    std::vector<uint64_t> block_byte_offset;                       //!< @brief
+    std::vector<uint64_t> block_byte_offset;                     //!< @brief
 
     uint8_t byte_offset_size;  //!< @brief
     uint8_t position_size;     //!< @brief
@@ -81,31 +78,31 @@ class AlignedAUIndex {
      * @brief
      * @return
      */
-    uint64_t getByteOffset() const;
+    [[nodiscard]] uint64_t getByteOffset() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getAUStartPos() const;
+    [[nodiscard]] uint64_t getAUStartPos() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getAUEndPos() const;
+    [[nodiscard]] uint64_t getAUEndPos() const;
 
     /**
      * @brief
      * @return
      */
-    bool isReference() const;
+    [[nodiscard]] bool isReference() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::format::mgb::RefCfg& getReferenceInfo() const;
+    [[nodiscard]] const genie::format::mgb::RefCfg& getReferenceInfo() const;
 
     /**
      * @brief
@@ -123,19 +120,19 @@ class AlignedAUIndex {
      * @brief
      * @return
      */
-    const genie::format::mgb::ExtendedAu& getExtension() const;
+    [[nodiscard]] const genie::format::mgb::ExtendedAu& getExtension() const;
 
     /**
      * @brief
      * @return
      */
-    bool isExtended() const;
+    [[nodiscard]] bool isExtended() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<uint64_t>& getBlockOffsets() const;
+    [[nodiscard]] const std::vector<uint64_t>& getBlockOffsets() const;
 
     /**
      * @brief
@@ -146,10 +143,7 @@ class AlignedAUIndex {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace master_index_table
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::master_index_table
 
 // ---------------------------------------------------------------------------------------------------------------------
 

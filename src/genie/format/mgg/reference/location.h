@@ -23,10 +23,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
+namespace genie::format::mgg::reference {
 
 /**
  * @brief
@@ -59,7 +56,7 @@ class Location {
      * @brief
      * @return
      */
-    bool isExternal() const;
+    [[nodiscard]] bool isExternal() const;
 
     /**
      * @brief
@@ -95,10 +92,7 @@ class Location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference
 
 // ---------------------------------------------------------------------------------------------------------------------
 

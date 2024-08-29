@@ -9,11 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <filesystem>
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
-#include <filesystem>
 #include "genie/core/read-decoder.h"
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
@@ -22,9 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 /**
  * @brief
@@ -116,9 +114,7 @@ class Decoder : public genie::core::ReadDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 
