@@ -37,7 +37,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
         class_IDs.push_back(bitReader.read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(DescriptorSubseqCfg(num_classes, GenDesc(i), bitReader));
+        descriptors.emplace_back(num_classes, GenDesc(i), bitReader);
     }
     auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {

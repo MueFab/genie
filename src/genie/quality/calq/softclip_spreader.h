@@ -45,7 +45,7 @@ class SoftclipSpreader {
 
     // Squashes activity score between 0 and 1 using the unsquashed activity
     // score and an "anti score" measuring probability of no variant occurring
-    [[nodiscard]] double squash(double activity, double antiActivity) const;
+    [[nodiscard]] static double squash(double activity, double antiActivity);
 
  public:
     // Push an activity score and average number of softclips at that position

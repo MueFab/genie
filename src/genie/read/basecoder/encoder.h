@@ -136,7 +136,7 @@ class Encoder {
      * @brief
      * @param state
      */
-    void encodeSplice(CodingState &state);
+    static void encodeSplice(CodingState &state);
 
     /**
      * @brief
@@ -164,8 +164,8 @@ class Encoder {
      * @param rec
      * @return
      */
-    [[nodiscard]] const core::record::alignment_split::SameRec &extractPairedAlignment(
-        const core::record::Record &rec) const;
+    [[nodiscard]] static const core::record::alignment_split::SameRec &extractPairedAlignment(
+        const core::record::Record &rec);
 
  public:
     /**

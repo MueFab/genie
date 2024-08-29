@@ -26,12 +26,12 @@ namespace genie::quality::calq {
  */
 class Encoder : public core::QVEncoder {
  private:
-    void fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
-                            calq::SideInformation& sideInformation, calq::EncodingBlock& input);
+    static void fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
+                                   calq::SideInformation& sideInformation, calq::EncodingBlock& input);
     void encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                        core::AccessUnit::Descriptor& desc);
-    void addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
-                      calq::UniformMinMaxQuantizer& quantizer);
+    static void addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
+                             calq::UniformMinMaxQuantizer& quantizer);
     void encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                          core::AccessUnit::Descriptor& desc);
 

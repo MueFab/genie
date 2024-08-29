@@ -486,7 +486,7 @@ class GenieState {
      * @brief
      * @return
      */
-    Hierarchy getHierarchy();
+    static Hierarchy getHierarchy();
 
     /**
      * @brief
@@ -495,7 +495,8 @@ class GenieState {
      * @param filter
      * @return
      */
-    std::vector<Records> getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID, const SimpleFilter& filter);
+    static std::vector<Records> getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
+                                                      const SimpleFilter& filter);
 
     /**
      * @brief
@@ -504,8 +505,8 @@ class GenieState {
      * @param filter
      * @return
      */
-    std::vector<Records> getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                                 const AdvancedFilter& filter);
+    static std::vector<Records> getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
+                                                        const AdvancedFilter& filter);
 
     /**
      * @brief
@@ -514,7 +515,7 @@ class GenieState {
      * @param signature
      * @return
      */
-    std::vector<Records> getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID, const char* signature);
+    static std::vector<Records> getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID, const char* signature);
 
     /**
      * @brief
@@ -522,7 +523,7 @@ class GenieState {
      * @param labelID
      * @return
      */
-    std::vector<Records> getDataByLabel(uint64_t datasetGroupID, const std::string& labelID);
+    static std::vector<Records> getDataByLabel(uint64_t datasetGroupID, const std::string& labelID);
 
     /**
      * @brief
@@ -530,7 +531,7 @@ class GenieState {
      * @param datasetID
      * @return
      */
-    std::vector<std::string> getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID);
+    static std::vector<std::string> getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID);
 
     /**
      * @brief
@@ -539,14 +540,14 @@ class GenieState {
      * @param fieldName
      * @return
      */
-    std::string getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const std::string& fieldName);
+    static std::string getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const std::string& fieldName);
 
     /**
      * @brief
      * @param datasetGroupID
      * @return
      */
-    std::string getDatasetGroupProtection(uint64_t datasetGroupID);
+    static std::string getDatasetGroupProtection(uint64_t datasetGroupID);
 
     /**
      * @brief
@@ -554,7 +555,7 @@ class GenieState {
      * @param datasetID
      * @return
      */
-    std::string getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID);
+    static std::string getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID);
 
     /**
      * @brief
@@ -565,8 +566,9 @@ class GenieState {
      * @param endPos
      * @return
      */
-    std::vector<RegionProtection> getDatasetRegionProtection(uint64_t datasetGroupID, uint64_t datasetID,
-                                                             uint64_t sequenceID, uint64_t startPos, uint64_t endPos);
+    static std::vector<RegionProtection> getDatasetRegionProtection(uint64_t datasetGroupID, uint64_t datasetID,
+                                                                    uint64_t sequenceID, uint64_t startPos,
+                                                                    uint64_t endPos);
 
     /**
      * @brief
@@ -575,7 +577,7 @@ class GenieState {
      * @param includeSequences
      * @return
      */
-    OutReference getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences);
+    static OutReference getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences);
 
     /**
      * @brief
@@ -586,8 +588,9 @@ class GenieState {
      * @param endPos
      * @return
      */
-    std::vector<SimpleSegmentStatistics> getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                             uint64_t sequenceID, uint64_t startPos, uint64_t endPos);
+    static std::vector<SimpleSegmentStatistics> getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID,
+                                                                    uint64_t sequenceID, uint64_t startPos,
+                                                                    uint64_t endPos);
 
     /**
      * @brief
@@ -598,9 +601,9 @@ class GenieState {
      * @param endPos
      * @return
      */
-    std::vector<AdvancedSegmentStatistics> getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                 uint64_t sequenceID, uint64_t startPos,
-                                                                 uint64_t endPos);
+    static std::vector<AdvancedSegmentStatistics> getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID,
+                                                                        uint64_t sequenceID, uint64_t startPos,
+                                                                        uint64_t endPos);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
