@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 /**
  * @brief
@@ -48,20 +46,20 @@ class Manager : public core::ReferenceSource {
      * @brief
      * @return
      */
-    std::map<size_t, std::string> getSequences() const;
+    [[nodiscard]] std::map<size_t, std::string> getSequences() const;
 
     /**
      * @brief
      * @param seq
      * @return
      */
-    uint64_t getLength(const std::string& seq) const;
+    [[nodiscard]] uint64_t getLength(const std::string& seq) const;
 
     /**
      * @brief
      * @return
      */
-    genie::core::meta::Reference getMeta() const override;
+    [[nodiscard]] genie::core::meta::Reference getMeta() const override;
 
     /**
      * @brief
@@ -75,9 +73,7 @@ class Manager : public core::ReferenceSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

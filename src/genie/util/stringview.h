@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Represents a read-only section of a string.
@@ -51,23 +50,22 @@ struct StringView {
     /**
      * @return Pointer to the first character.
      */
-    const char* begin() const;
+    [[nodiscard]] const char* begin() const;
 
     /**
      * @return Pointer to the position after the last character.
      */
-    const char* end() const;
+    [[nodiscard]] const char* end() const;
 
     /**
      * @return Length of the string view.
      */
-    size_t length() const;
+    [[nodiscard]] size_t length() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -14,10 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
+namespace genie::format::mgg::reference {
 
 /**
  * @brief
@@ -60,27 +57,24 @@ class Version {
      * @brief
      * @return
      */
-    uint16_t getMajor() const;
+    [[nodiscard]] uint16_t getMajor() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getMinor() const;
+    [[nodiscard]] uint16_t getMinor() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getPatch() const;
+    [[nodiscard]] uint16_t getPatch() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference
 
 // ---------------------------------------------------------------------------------------------------------------------
 

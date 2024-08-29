@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -56,13 +54,13 @@ class Chunk {
      * @brief
      * @return
      */
-    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
+    [[nodiscard]] const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
 
     /**
      * @brief
      * @return
      */
-    const ReferenceManager::ReferenceExcerpt& getRef() const;
+    [[nodiscard]] const ReferenceManager::ReferenceExcerpt& getRef() const;
 
     /**
      * @brief
@@ -74,13 +72,13 @@ class Chunk {
      * @brief
      * @return
      */
-    size_t getRefID() const;
+    [[nodiscard]] size_t getRefID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<Record>& getData() const;
+    [[nodiscard]] const std::vector<Record>& getData() const;
 
     /**
      * @brief
@@ -98,7 +96,7 @@ class Chunk {
      * @brief
      * @return
      */
-    bool isReferenceOnly() const;
+    [[nodiscard]] bool isReferenceOnly() const;
 
     /**
      * @brief
@@ -109,9 +107,7 @@ class Chunk {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

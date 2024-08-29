@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 /**
  * @brief
@@ -48,14 +46,14 @@ class FastaReader {
      * @brief
      * @return
      */
-    std::map<size_t, std::string> getSequences() const;
+    [[nodiscard]] std::map<size_t, std::string> getSequences() const;
 
     /**
      * @brief
      * @param name
      * @return
      */
-    uint64_t getLength(const std::string& name) const;
+    [[nodiscard]] uint64_t getLength(const std::string& name) const;
 
     /**
      * @brief
@@ -70,7 +68,7 @@ class FastaReader {
      * @brief
      * @return
      */
-    core::meta::Reference getMeta() const;
+    [[nodiscard]] core::meta::Reference getMeta() const;
 
     /**
      * @brief
@@ -90,9 +88,7 @@ class FastaReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

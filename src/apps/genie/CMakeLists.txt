@@ -13,7 +13,7 @@ set(source_files
         gabac/program-options.cc
         capsulator/program-options.cc
         capsulator/main.cc
-        )
+)
 
 if (${GENIE_SAM_SUPPORT})
     set(source_files ${source_files}
@@ -32,7 +32,7 @@ if (${GENIE_SAM_SUPPORT})
             transcode-sam/sam/sam_to_mgrec/sam_reader.cc
             transcode-sam/sam/sam_to_mgrec/sam_group.h
             transcode-sam/sam/sam_to_mgrec/sam_group.cc
-            )
+    )
 endif ()
 
 add_executable(genie ${source_files})

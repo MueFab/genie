@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fastq {
+namespace genie::format::fastq {
 
 /**
  * @brief Module to export MPEG-G record to fastq files
@@ -61,9 +59,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fastq
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fastq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

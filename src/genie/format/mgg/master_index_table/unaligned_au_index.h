@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <vector>
 #include <optional>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/ref_cfg.h"
@@ -18,20 +18,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace master_index_table {
+namespace genie::format::mgg::master_index_table {
 
 /**
  * @brief
  */
 class UnalignedAUIndex {
  private:
-    uint64_t au_byte_offset;                                    //!< @brief
+    uint64_t au_byte_offset;                                  //!< @brief
     std::optional<genie::format::mgb::RefCfg> ref_cfg;        //!< @brief
     std::optional<genie::format::mgb::SignatureCfg> sig_cfg;  //!< @brief
-    std::vector<uint64_t> block_byte_offset;                    //!< @brief
+    std::vector<uint64_t> block_byte_offset;                  //!< @brief
 
     uint8_t byte_offset_size;  //!< @brief
     uint8_t position_size;     //!< @brief
@@ -49,7 +46,7 @@ class UnalignedAUIndex {
      * @brief
      * @return
      */
-    const std::vector<uint64_t>& getBlockOffsets() const;
+    [[nodiscard]] const std::vector<uint64_t>& getBlockOffsets() const;
 
     /**
      * @brief
@@ -79,7 +76,7 @@ class UnalignedAUIndex {
      * @brief
      * @return
      */
-    uint64_t getAUOffset() const;
+    [[nodiscard]] uint64_t getAUOffset() const;
 
     /**
      * @brief
@@ -101,13 +98,13 @@ class UnalignedAUIndex {
      * @brief
      * @return
      */
-    bool isReference() const;
+    [[nodiscard]] bool isReference() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::format::mgb::RefCfg& getReferenceInfo() const;
+    [[nodiscard]] const genie::format::mgb::RefCfg& getReferenceInfo() const;
 
     /**
      * @brief
@@ -119,13 +116,13 @@ class UnalignedAUIndex {
      * @brief
      * @return
      */
-    bool hasSignature() const;
+    [[nodiscard]] bool hasSignature() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::format::mgb::SignatureCfg& getSignatureInfo() const;
+    [[nodiscard]] const genie::format::mgb::SignatureCfg& getSignatureInfo() const;
 
     /**
      * @brief
@@ -136,10 +133,7 @@ class UnalignedAUIndex {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace master_index_table
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::master_index_table
 
 // ---------------------------------------------------------------------------------------------------------------------
 

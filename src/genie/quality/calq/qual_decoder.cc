@@ -8,7 +8,6 @@
 
 // -----------------------------------------------------------------------------
 
-
 #include <vector>
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/calq/error_exception_reporter.h"
@@ -16,9 +15,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -54,7 +51,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
 
     for (size_t cigarIdx = 0; cigarIdx < cigarLen; cigarIdx++) {
         if (isdigit(samRecord.cigar[cigarIdx])) {
-            opLen = opLen * 10 +  static_cast<size_t>(samRecord.cigar[cigarIdx]) - static_cast<size_t>('0');
+            opLen = opLen * 10 + static_cast<size_t>(samRecord.cigar[cigarIdx]) - static_cast<size_t>('0');
             continue;
         }
 
@@ -111,9 +108,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

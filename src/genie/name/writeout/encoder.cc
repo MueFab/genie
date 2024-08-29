@@ -9,9 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace name {
-namespace writeout {
+namespace genie::name::writeout {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +22,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Encoder::proces
 
     for (const auto& r : recs.getData()) {
         for (auto& c : r.getName()) {
-                subseq.push(c);
+            subseq.push(c);
         }
         subseq.push('\0');
     }
@@ -34,9 +32,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Encoder::proces
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace writeout
-}  // namespace name
-}  // namespace genie
+}  // namespace genie::name::writeout
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

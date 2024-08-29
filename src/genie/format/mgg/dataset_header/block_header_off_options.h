@@ -14,10 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
@@ -50,7 +47,7 @@ struct BlockHeaderOffOptions {
      * @brief
      * @return
      */
-    bool getOrderedBlocksFlag() const;
+    [[nodiscard]] bool getOrderedBlocksFlag() const;
 
     /**
      * @brief
@@ -61,10 +58,7 @@ struct BlockHeaderOffOptions {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

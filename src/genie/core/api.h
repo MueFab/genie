@@ -12,17 +12,15 @@
 #include <array>
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/record/record.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace api {
+namespace genie::core::api {
 
 /**
  * @brief
@@ -33,7 +31,7 @@ class ExceptionPartiallyAuthorized : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -45,7 +43,7 @@ class ExceptionNotAuthorized : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -57,7 +55,7 @@ class ExceptionVerificationFailed : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -69,7 +67,7 @@ class ExceptionDecryptionFailed : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -81,7 +79,7 @@ class ExceptionDatasetGroupNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -93,7 +91,7 @@ class ExceptionDatasetNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -105,7 +103,7 @@ class ExceptionAccessUnitNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -117,7 +115,7 @@ class ExceptionReferenceNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -129,7 +127,7 @@ class ExceptionSequenceNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -141,7 +139,7 @@ class ExceptionMetadataFieldNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -153,7 +151,7 @@ class ExceptionMetadataInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -165,7 +163,7 @@ class ExceptionReferenceInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -177,7 +175,7 @@ class ExceptionParameterInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -189,7 +187,7 @@ class ExceptionBitstreamInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    [[nodiscard]] std::string msg() const override;
 };
 
 /**
@@ -607,9 +605,7 @@ class GenieState {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace api
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::api
 
 // ---------------------------------------------------------------------------------------------------------------------
 

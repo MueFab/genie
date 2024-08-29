@@ -4,18 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/master_index_table/unaligned_au_index.h"
+#include <utility>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace master_index_table {
+namespace genie::format::mgg::master_index_table {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -114,10 +111,7 @@ void UnalignedAUIndex::setSignatureInfo(genie::format::mgb::SignatureCfg sigcfg)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace master_index_table
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::master_index_table
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

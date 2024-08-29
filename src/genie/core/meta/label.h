@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Label metadata
@@ -44,7 +42,7 @@ class Label {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Apply label to a new region of the genome
@@ -56,20 +54,18 @@ class Label {
      * @brief Return the name of the label
      * @return label id
      */
-    const std::string& getID() const;
+    [[nodiscard]] const std::string& getID() const;
 
     /**
      * @brief Return the list of active region on the genome
      * @return Active regions of this label
      */
-    const std::vector<Region>& getRegions() const;
+    [[nodiscard]] const std::vector<Region>& getRegions() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

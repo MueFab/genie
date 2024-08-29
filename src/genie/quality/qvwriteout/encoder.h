@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace qvwriteout {
+namespace genie::quality::qvwriteout {
 
 /**
  * @brief
@@ -62,9 +60,7 @@ class Encoder : public core::QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace qvwriteout
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::qvwriteout
 
 // ---------------------------------------------------------------------------------------------------------------------
 

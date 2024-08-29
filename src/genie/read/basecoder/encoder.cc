@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace basecoder {
+namespace genie::read::basecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +41,7 @@ Encoder::Encoder(uint64_t startingMappingPos)
 void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     // TODO(Fabian): Splices
     const auto &ALIGNMENT =
-        rec.getAlignments().front();  // TODO(Fabian): Multiple alignments. Currently only 1 supported
+        rec.getAlignments().front();            // TODO(Fabian): Multiple alignments. Currently only 1 supported
     const auto &RECORD = rec.getSegments()[0];  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
@@ -396,9 +394,7 @@ void Encoder::encodeSplice(Encoder::CodingState &state) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace basecoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::basecoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

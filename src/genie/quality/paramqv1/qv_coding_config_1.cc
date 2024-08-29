@@ -5,18 +5,16 @@
  */
 
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include <cassert>
 #include <utility>
 #include <vector>
-#include <cassert>
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+namespace genie::quality::paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -160,9 +158,7 @@ bool QualityValues1::equals(const QualityValues* qv) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

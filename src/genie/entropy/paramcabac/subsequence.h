@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -78,38 +76,38 @@ class Subsequence {
      * @brief
      * @return
      */
-    uint16_t getDescriptorSubsequenceID() const;
+    [[nodiscard]] uint16_t getDescriptorSubsequenceID() const;
 
     /**
      * @brief
      * @return
      */
-    const TransformedParameters& getTransformParameters() const;
+    [[nodiscard]] const TransformedParameters& getTransformParameters() const;
 
     /**
      * @brief
      * @param index
      * @return
      */
-    const TransformedSubSeq& getTransformSubseqCfg(uint8_t index) const;
+    [[nodiscard]] const TransformedSubSeq& getTransformSubseqCfg(uint8_t index) const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumTransformSubseqCfgs() const;
+    [[nodiscard]] size_t getNumTransformSubseqCfgs() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<TransformedSubSeq>& getTransformSubseqCfgs() const;
+    [[nodiscard]] const std::vector<TransformedSubSeq>& getTransformSubseqCfgs() const;
 
     /**
      * @brief
      * @return
      */
-    bool getTokentypeFlag() const;
+    [[nodiscard]] bool getTokentypeFlag() const;
 
     /**
      * @brief
@@ -128,19 +126,17 @@ class Subsequence {
      * @brief
      * @return
      */
-    nlohmann::json toJoson() const;
+    [[nodiscard]] nlohmann::json toJoson() const;
 
  private:
-    std::optional<uint16_t> descriptor_subsequence_ID;  //!< @brief
+    std::optional<uint16_t> descriptor_subsequence_ID;    //!< @brief
     TransformedParameters transform_subseq_parameters;    //!< @brief
     std::vector<TransformedSubSeq> transformSubseq_cfgs;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

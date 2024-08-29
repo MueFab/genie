@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -44,20 +42,18 @@ class Offset {
      * @brief
      * @return
      */
-    const std::string& getSubkey() const;
+    [[nodiscard]] const std::string& getSubkey() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getOffset() const;
+    [[nodiscard]] uint64_t getOffset() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

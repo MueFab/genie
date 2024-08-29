@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief A general exception.
@@ -42,13 +41,13 @@ class Exception : public std::exception {
      * @brief
      * @return The internal message.
      */
-    virtual std::string msg() const;
+    [[nodiscard]] virtual std::string msg() const;
 
     /**
      * @brief
      * @return The internal message as a c string.
      */
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 
  protected:
     std::string msg_;  //!< @brief The exception message.
@@ -56,8 +55,7 @@ class Exception : public std::exception {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

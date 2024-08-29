@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Reference sequence information
@@ -52,32 +50,30 @@ class Sequence {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Get Name of Sequence
      * @return Name
      */
-    const std::string& getName() const;
+    [[nodiscard]] const std::string& getName() const;
 
     /**
      * @brief Get length of sequence
      * @return Length
      */
-    uint64_t getLength() const;
+    [[nodiscard]] uint64_t getLength() const;
 
     /**
      * @brief Get Sequence ID
      * @return ID
      */
-    uint16_t getID() const;
+    [[nodiscard]] uint16_t getID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

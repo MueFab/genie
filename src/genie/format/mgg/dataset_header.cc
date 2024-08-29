@@ -12,9 +12,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 bool DatasetHeader::operator==(const GenInfo& info) const {
     if (!GenInfo::operator==(info)) {
@@ -314,9 +312,7 @@ void DatasetHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -11,16 +11,14 @@
 
 #include <limits>
 #include <string>
-#include <vector>
 #include <utility>
-#include "genie/quality/calq/calq_coder.h"
+#include <vector>
 #include "genie/core/record/record.h"
+#include "genie/quality/calq/calq_coder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 /**
  * @brief
@@ -55,13 +53,13 @@ class RecordPileup {
      *
      * @return
      */
-    uint64_t getMinPos() const;
+    [[nodiscard]] uint64_t getMinPos() const;
 
     /**
      *
      * @return
      */
-    uint64_t getMaxPos() const;
+    [[nodiscard]] uint64_t getMaxPos() const;
 
     /**
      *
@@ -109,9 +107,7 @@ class RecordPileup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

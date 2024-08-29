@@ -4,18 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
-namespace external {
+namespace genie::format::mgg::reference::location::external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -85,12 +80,7 @@ void Fasta::addChecksum(std::string checksum) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location::external
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

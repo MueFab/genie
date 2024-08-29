@@ -16,8 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -38,7 +37,7 @@ class FlowGraph {
      * @brief
      * @return
      */
-    virtual core::meta::Dataset getMeta() const;
+    [[nodiscard]] virtual core::meta::Dataset getMeta() const;
 
     /**
      * @brief
@@ -54,8 +53,7 @@ class FlowGraph {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

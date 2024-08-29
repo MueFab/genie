@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/format/mgg/dataset_group.h"
 #include "genie/format/mgg/dataset_group_metadata.h"
 #include "genie/format/mgg/dataset_group_protection.h"
@@ -23,10 +23,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 /**
  * @brief
@@ -34,9 +31,9 @@ namespace encapsulator {
 struct EncapsulatedDatasetGroup {
     std::optional<genie::format::mgg::DatasetGroupMetadata> group_meta;          //!< @brief
     std::optional<genie::format::mgg::DatasetGroupProtection> group_protection;  //!< @brief
-    std::vector<genie::format::mgg::Reference> references;                         //!< @brief
-    std::vector<genie::format::mgg::ReferenceMetadata> reference_meta;             //!< @brief
-    std::vector<std::unique_ptr<EncapsulatedDataset>> datasets;                    //!< @brief
+    std::vector<genie::format::mgg::Reference> references;                       //!< @brief
+    std::vector<genie::format::mgg::ReferenceMetadata> reference_meta;           //!< @brief
+    std::vector<std::unique_ptr<EncapsulatedDataset>> datasets;                  //!< @brief
     std::optional<genie::format::mgg::LabelList> labelList;                      //!< @brief
 
     /**
@@ -79,10 +76,7 @@ struct EncapsulatedDatasetGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 

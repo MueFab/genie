@@ -18,8 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +38,7 @@ class DataBlock {
      * @brief Get lg base 2 of the size of one symbol in bytes
      * @return lg2 bytes of one symbol
      */
-    uint8_t getLgWordSize() const;
+    [[nodiscard]] uint8_t getLgWordSize() const;
 
     /**
      * @brief Sets the size of one symbol, changing the number of elments
@@ -59,25 +58,25 @@ class DataBlock {
      * before promoting it back to int.  Ergo, just leave the return type
      * of the word size as int.
      */
-    uint8_t getWordSize() const;
+    [[nodiscard]] uint8_t getWordSize() const;
 
     /**
      * @brief multiply by size of one symbol in bytes
      * @return multiply arg by size of one symbol
      */
-    uint64_t mulByWordSize(uint64_t val) const;
+    [[nodiscard]] uint64_t mulByWordSize(uint64_t val) const;
 
     /**
      * @brief divide by size of one symbol in bytes
      * @return divide arg by size of one symbol
      */
-    uint64_t divByWordSize(uint64_t val) const;
+    [[nodiscard]] uint64_t divByWordSize(uint64_t val) const;
 
     /**
      * @brief modulo divide by size of one symbol in bytes
      * @return modulo divide arg by size of one symbol
      */
-    uint64_t modByWordSize(uint64_t val) const;
+    [[nodiscard]] uint64_t modByWordSize(uint64_t val) const;
 
     /**
      * @brief Creates a blockStepper for this DataBlock.
@@ -88,7 +87,7 @@ class DataBlock {
      * which should not be possible.
      * @return BlockStepper
      */
-    BlockStepper getReader() const;
+    [[nodiscard]] BlockStepper getReader() const;
 
     /**
      * @brief Compare data and word size
@@ -109,13 +108,13 @@ class DataBlock {
      * @param index Position of symbol in block
      * @return Symbol widened to 64 bits
      */
-    uint64_t get(size_t index) const;
+    [[nodiscard]] uint64_t get(size_t index) const;
 
     /**
      * @brief Calculates the biggest possible word size for this block
      * @return Maximum
      */
-    uint8_t getMaxWordSize() const;
+    [[nodiscard]] uint8_t getMaxWordSize() const;
 
     /**
      * @brief Pack symbol into stream.
@@ -231,7 +230,7 @@ class DataBlock {
          * @brief Return index
          * @return Saved index
          */
-        size_t getOffset() const;
+        [[nodiscard]] size_t getOffset() const;
 
         /**
          * @brief Dereference to Proxy object
@@ -267,7 +266,7 @@ class DataBlock {
      * @brief Get number of elements
      * @return Size of data blocks in elements
      */
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
     /**
      * @brief Reserve more memory without expanding the actual data. Similar to
@@ -298,13 +297,13 @@ class DataBlock {
      * @brief Check if there are elements in the block.
      * @return True if no elements
      */
-    bool empty() const;
+    [[nodiscard]] bool empty() const;
 
     /**
      * @brief Begin const iterator
      * @return Const iterator to first element.
      */
-    ConstIterator begin() const;
+    [[nodiscard]] ConstIterator begin() const;
 
     /**
      * @brief Begin iterator
@@ -316,7 +315,7 @@ class DataBlock {
      * @brief End const iterator
      * @return Const iterator to behind the last element.
      */
-    ConstIterator end() const;
+    [[nodiscard]] ConstIterator end() const;
 
     /**
      * @brief End iterator
@@ -340,7 +339,7 @@ class DataBlock {
      * @brief Get raw const pointer to memory block
      * @return Pointer
      */
-    const void *getData() const;
+    [[nodiscard]] const void *getData() const;
 
     /**
      * @brief Get raw pointer to memory block
@@ -353,7 +352,7 @@ class DataBlock {
      * wordsize * numberOfElements
      * @return Data size in bytes
      */
-    size_t getRawSize() const;
+    [[nodiscard]] size_t getRawSize() const;
 
     /**
      * @brief Swap the contents of two data blocks without copying of data.
@@ -412,8 +411,7 @@ class DataBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

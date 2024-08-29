@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -69,7 +67,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      * @param index
      * @return
      */
-    const Subsequence &getSubsequenceCfg(uint8_t index) const;
+    [[nodiscard]] const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     /**
      * @brief
@@ -82,7 +80,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      * @brief
      * @return
      */
-    std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
+    [[nodiscard]] std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     /**
      * @brief
@@ -103,7 +101,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      * @brief
      * @return
      */
-    uint8_t getRleGuardTokentype() const;
+    [[nodiscard]] uint8_t getRleGuardTokentype() const;
 };
 
 /**
@@ -156,7 +154,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      * @param index
      * @return
      */
-    const Subsequence &getSubsequenceCfg(uint8_t index) const;
+    [[nodiscard]] const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     /**
      * @brief
@@ -169,7 +167,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      * @brief
      * @return
      */
-    std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
+    [[nodiscard]] std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     /**
      * @brief
@@ -189,9 +187,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

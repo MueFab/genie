@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -56,7 +54,7 @@ class TransformedSymbolsDecoder {
      * @brief
      * @return the number of symbols available.
      */
-    size_t symbolsAvail() const;
+    [[nodiscard]] size_t symbolsAvail() const;
 
  private:
     /**
@@ -104,9 +102,7 @@ class TransformedSymbolsDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

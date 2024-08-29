@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -60,19 +58,19 @@ class Alignment {
      * @brief
      * @return
      */
-    const std::vector<int32_t>& getMappingScores() const;
+    [[nodiscard]] const std::vector<int32_t>& getMappingScores() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getECigar() const;
+    [[nodiscard]] const std::string& getECigar() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getRComp() const;
+    [[nodiscard]] uint8_t getRComp() const;
 
     /**
      * @brief
@@ -83,9 +81,7 @@ class Alignment {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

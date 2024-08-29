@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -68,25 +66,25 @@ class Binarization {
      * @brief
      * @return
      */
-    BinarizationParameters::BinarizationId getBinarizationID() const;
+    [[nodiscard]] BinarizationParameters::BinarizationId getBinarizationID() const;
 
     /**
      * @brief
      * @return
      */
-    bool getBypassFlag() const;
+    [[nodiscard]] bool getBypassFlag() const;
 
     /**
      * @brief
      * @return
      */
-    const BinarizationParameters& getCabacBinarizationParameters() const;
+    [[nodiscard]] const BinarizationParameters& getCabacBinarizationParameters() const;
 
     /**
      * @brief
      * @return
      */
-    const Context& getCabacContextParameters() const;
+    [[nodiscard]] const Context& getCabacContextParameters() const;
 
     /**
      * @brief
@@ -111,7 +109,7 @@ class Binarization {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
  private:
     BinarizationParameters::BinarizationId binarization_ID;  //!< @brief
@@ -122,9 +120,7 @@ class Binarization {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

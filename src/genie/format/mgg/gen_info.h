@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -41,7 +39,7 @@ class GenInfo : public Box {
      * @brief
      * @return
      */
-    virtual const std::string& getKey() const = 0;
+    [[nodiscard]] virtual const std::string& getKey() const = 0;
 
     /**
      * @brief
@@ -59,9 +57,7 @@ class GenInfo : public Box {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

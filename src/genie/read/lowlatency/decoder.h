@@ -9,16 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
 #include <limits>
+#include <string>
 #include "genie/core/read-decoder.h"
 #include "genie/core/ref-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace lowlatency {
+namespace genie::read::lowlatency {
 
 /**
  * @brief
@@ -50,9 +48,7 @@ class Decoder : public core::ReadDecoder, public core::RefDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lowlatency
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::lowlatency
 
 // ---------------------------------------------------------------------------------------------------------------------
 
