@@ -34,7 +34,7 @@ SamReader::SamReader(const std::string& fpath)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamReader::SamReader(std::string& fpath) : SamReader(fpath.c_str()) {}
+SamReader::SamReader(std::string& fpath) : SamReader(fpath) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

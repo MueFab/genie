@@ -44,7 +44,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
     bool paired_end = cp.paired_end;
     uint32_t num_reads_per_block = cp.num_reads_per_block;
 
-    std::string basedir = temp_dir;
+    const std::string& basedir = temp_dir;
 
     std::string file_order = basedir + "/read_order.bin";
     std::string file_id = basedir + "/id_1";

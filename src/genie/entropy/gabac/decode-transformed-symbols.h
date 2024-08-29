@@ -36,7 +36,7 @@ class TransformedSymbolsDecoder {
      * @brief
      * @param trnsfSubseqDecoder
      */
-    explicit TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
+    TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
 
     /**
      * @brief

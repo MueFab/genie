@@ -247,7 +247,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 1) {}
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
