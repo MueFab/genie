@@ -29,7 +29,7 @@ Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFla
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
                          bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
-    : descriptor_subsequence_ID(), transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
+    : descriptor_subsequence_ID(), transform_subseq_parameters(_transform_subseq_parameters) {
     if (!_tokentypeFlag) {
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
     }
@@ -77,7 +77,7 @@ Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& re
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Subsequence::setTransformSubseqCfg(size_t index, TransformedSubSeq&& _transformSubseq_cfg) {
-    transformSubseq_cfgs[index] = std::move(_transformSubseq_cfg);
+    transformSubseq_cfgs[index] = _transformSubseq_cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

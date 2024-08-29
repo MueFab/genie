@@ -39,7 +39,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = std::move(cfg);
+    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderTokenType::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = std::move(cfg);
+    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
