@@ -78,9 +78,9 @@ uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
-                         const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                         const core::AlphabetID alphabet_ID, bool original) {
+void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
+                         const SupportValues& support_values, const Binarization& cabac_binarization,
+                         const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID, bool original) {
     const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
     const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
     const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();

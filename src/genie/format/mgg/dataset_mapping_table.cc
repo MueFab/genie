@@ -38,7 +38,7 @@ const std::vector<DataStream>& DataSetMappingTable::getDataStreams() const { ret
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataSetMappingTable::addDataStream(DataStream d) { streams.emplace_back(std::move(d)); }
+void DataSetMappingTable::addDataStream(DataStream d) { streams.emplace_back(d); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

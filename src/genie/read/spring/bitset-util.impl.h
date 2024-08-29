@@ -37,8 +37,9 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths, const int numdict,
-                         const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads) {
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths,
+                         const int numdict, const uint32_t &numreads, const int bpb, const std::string &basedir,
+                         const int &num_threads) {
     auto *mask = new std::bitset<bitset_size>[numdict];
     generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
     for (int j = 0; j < numdict; j++) {
