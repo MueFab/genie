@@ -108,7 +108,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         uint64_t ull;
         uint64_t abs_pos = 0;  // absolute position in reference (total length
         // of all contigs till now)
-        bool flag = 0;
+        bool flag = false;
         // flag to check if match was found or not
         std::string current, ref;
         std::bitset<bitset_size> forward_bitset, reverse_bitset, b;
@@ -202,15 +202,15 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 read_lock[rid].set();
 #endif
                                                 if (remainingreads[rid]) {
-                                                    remainingreads[rid] = 0;
-                                                    flag = 1;
+                                                    remainingreads[rid] = false;
+                                                    flag = true;
                                                 }
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].unset();
 #endif
                                             }
                                             if (flag == 1) {  // match found
-                                                flag = 0;
+                                                flag = false;
                                                 list_size++;
                                                 char l_rc = rev ? 'r' : 'd';
                                                 int64_t pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;

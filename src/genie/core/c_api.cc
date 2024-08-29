@@ -133,7 +133,7 @@ genie_ReturnCode genie_getDatasetReference(uint64_t datasetGroupID, uint64_t dat
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie_ReturnCode genie_getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
-                                           uint64_t startPos, uint64_t endPos, uint64_t* maxSegments,
+                                           uint64_t startPos, uint64_t endPos, const uint64_t* maxSegments,
                                            genie_SimpleSegmentStatistics** outputStatistics) {
     (void)datasetGroupID;
     (void)datasetID;
@@ -148,7 +148,7 @@ genie_ReturnCode genie_getSimpleStatistics(uint64_t datasetGroupID, uint64_t dat
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie_ReturnCode genie_getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
-                                             uint64_t startPos, uint64_t endPos, uint64_t* maxSegments,
+                                             uint64_t startPos, uint64_t endPos, const uint64_t* maxSegments,
                                              genie_AdvancedSegmentStatistics** outputStatistics) {
     (void)datasetGroupID;
     (void)datasetID;

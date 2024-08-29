@@ -209,7 +209,7 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
     int64_t dictidx[2];  // to store the start and end index (end not inclusive)
     // in the dict read_id array
     uint64_t startposidx;  // index in startpos
-    bool flag = 0;
+    bool flag = false;
     for (int l = 0; l < rg.numdict; l++) {
         // check if dictionary index is within bound
         if (!rev) {
@@ -252,9 +252,9 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
                     read_lock[reorder_lock_idx(rid)].set();
 #endif
                     if (remainingreads[rid]) {
-                        remainingreads[rid] = 0;
+                        remainingreads[rid] = false;
                         k = rid;
-                        flag = 1;
+                        flag = true;
                     }
 #ifdef GENIE_USE_OPENMP
                     read_lock[reorder_lock_idx(rid)].unset();
@@ -337,7 +337,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
         int64_t dictidx[2];  // to store the start and end index (end not inclusive)
         // in the dict read_id array
         uint64_t startposidx;  // index in startpos
-        bool flag = 0, done = 0, prev_unmatched = false, left_search_start = false, left_search = false;
+        bool flag = false, done = false, prev_unmatched = false, left_search_start = false, left_search = false;
         // left_search_start - true when left search is starting (to avoid double
         // deletion of first read)
         // left_search - true during left search - needed so that we know when to
@@ -364,7 +364,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
             } else if (remainingreads[current] == 0) {
                 done = true;
             } else {
-                remainingreads[current] = 0;
+                remainingreads[current] = false;
                 unmatched[tid]++;
             }
             firstread += rg.numreads / rg.num_thr;  // spread out first read equally
@@ -410,7 +410,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
             } else {
                 left_search_start = false;
             }
-            flag = 0;
+            flag = false;
             uint32_t k;
             if (!stop_searching) {
                 for (int shift = 0; shift < rg.maxshift; shift++) {
@@ -515,8 +515,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                             if (remainingreads[j]) {  // checking again inside critical block
                                 current = j;
                                 remainingpos = j - 1;
-                                remainingreads[j] = 0;
-                                flag = 1;
+                                remainingreads[j] = false;
+                                flag = true;
                                 unmatched[tid]++;
                             }
 #ifdef GENIE_USE_OPENMP
@@ -529,7 +529,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                         if (prev_unmatched == true) {  // last read was singleton, write it now
                             foutorder_s.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                         }
-                        done = 1;  // no reads left
+                        done = true;  // no reads left
                     } else {
                         updaterefcount<bitset_size>(read[current], ref, revref, count, true, false, 0,
                                                     read_lengths[current], ref_len, rg);
