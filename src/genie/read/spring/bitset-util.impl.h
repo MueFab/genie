@@ -31,7 +31,6 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
     for (int j = 0; j < numdict; j++) mask1[j].reset();
     for (int j = 0; j < numdict; j++)
         for (int i = bpb * dict[j].start; i < bpb * (dict[j].end + 1); i++) mask1[j][i] = 1;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -229,7 +228,6 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const
         }  // parallel for end
     }
     delete[] mask;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -244,7 +242,6 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
             for (int k = bpb * i; k < bpb * max_readlen - bpb * j; k++) mask[i][j][k] = 1;
         }
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -253,7 +250,6 @@ template <size_t bitset_size>
 void chartobitset(const char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
     b.reset();
     for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

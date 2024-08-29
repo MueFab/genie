@@ -73,10 +73,10 @@ class bbhashdict {
      * @brief
      */
     ~bbhashdict() {
-        if (startpos != nullptr) delete[] startpos;
-        if (read_id != nullptr) delete[] read_id;
-        if (empty_bin != nullptr) delete[] empty_bin;
-        if (bphf != nullptr) delete bphf;
+        delete[] startpos;
+        delete[] read_id;
+        delete[] empty_bin;
+        delete bphf;
     }
 };
 

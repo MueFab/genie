@@ -93,7 +93,7 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
                 // Encoding
                 trnsfSubseqPayloadSize =
                     gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i), &(transformedSubseqs[i]),
-                                                 (dependency.size()) ? &dependency : nullptr);
+                                                 (!dependency.empty()) ? &dependency : nullptr);
             }
 
             if (i < (numTrnsfSubseqs - 1)) {
