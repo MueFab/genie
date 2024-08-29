@@ -411,7 +411,6 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     std::cerr << "Encoding done:\n";
     std::cerr << matched_s << " singleton reads were aligned\n";
     std::cerr << matched_N << " reads with N were aligned\n";
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -458,7 +457,6 @@ void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'G'] = '1';
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'C'] = '2';
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'T'] = '3';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

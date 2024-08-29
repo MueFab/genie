@@ -141,8 +141,6 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
         r.inc();
     }
-
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

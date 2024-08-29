@@ -24,8 +24,7 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
         // number of reads left)
         dictidx[1] = dictidx[0] + read_id[endidx - 2];
     else
-        dictidx[1] = endidx;  // no read deleted
-    return;
+        dictidx[1] = endidx;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +47,6 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
     } else {                                         // more than two reads have been deleted
         read_id[endidx - 2]--;
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

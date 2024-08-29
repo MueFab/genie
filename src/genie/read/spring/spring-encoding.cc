@@ -93,7 +93,6 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
         f_RC << (*current_contig_it).RC;
     }
     abs_pos += ref.size();
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -161,7 +160,6 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
     remove(eg.infile_order_N.c_str());
     delete[] read_flag_N;
     delete[] cumulative_N_reads;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

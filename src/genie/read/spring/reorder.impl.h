@@ -50,7 +50,6 @@ void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
         }
     }
     s[readlen] = '\0';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -68,7 +67,6 @@ void setglobalarrays(reorder_global<bitset_size> &rg) {
         rg.basemask[i][(uint8_t)'T'][2 * i] = 1;
         rg.basemask[i][(uint8_t)'T'][2 * i + 1] = 1;
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -659,7 +657,6 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
     }
     fout_s.close();
     foutorder_s.close();
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
