@@ -319,6 +319,7 @@ std::vector<std::pair<size_t, size_t>> ReferenceManager::getCoverage(const std::
 
 std::vector<std::string> ReferenceManager::getSequences() const {
     std::vector<std::string> ret;
+    ret.reserve(indices.size());
     for (const auto& i : indices) {
         ret.push_back(i.second);
     }
