@@ -48,84 +48,84 @@ class Reader {
      * @param binParams
      * @return
      */
-    uint64_t readAsBIbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsBIbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsBIcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsBIcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTUbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTUcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsEGbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsEGbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsEGcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsEGcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTEGbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsTEGbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTEGcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsTEGcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSUTUbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsSUTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSUTUcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsSUTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsDTUbypass(std::vector<unsigned int>& binParams);
+    uint64_t readAsDTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsDTUcabac(std::vector<unsigned int>& binParams);
+    uint64_t readAsDTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief

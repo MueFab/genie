@@ -58,25 +58,7 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &src)
-    : numEncodedSymbols(src.numEncodedSymbols),
-      numDecodedSymbols(src.numDecodedSymbols),
-      outputSymbolSize(src.outputSymbolSize),
-      codingSubsymSize(src.codingSubsymSize),
-      codingOrder(src.codingOrder),
-      subsymMask(src.subsymMask),
-      numSubSyms(src.numSubSyms),
-      numLuts(src.numLuts),
-      numPrvs(src.numPrvs),
-      reader(src.reader),
-      ctxSelector(src.ctxSelector),
-      invLutsSubsymTrnsfm(src.invLutsSubsymTrnsfm),
-      diffEnabled(src.diffEnabled),
-      customCmaxTU(src.customCmaxTU),
-      defaultCmax(src.defaultCmax),
-      binID(src.binID),
-      binParams(src.binParams),
-      binarizor(src.binarizor) {}
+TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &src) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

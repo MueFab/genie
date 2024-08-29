@@ -14,7 +14,7 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-Exception::Exception(std::string  msg) : msg_(std::move(msg)) {}
+Exception::Exception(std::string msg) : msg_(std::move(msg)) {}
 
 // -----------------------------------------------------------------------------
 

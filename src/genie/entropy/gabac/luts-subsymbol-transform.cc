@@ -39,14 +39,7 @@ LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src)
-    : supportVals(src.supportVals),
-      stateVars(src.stateVars),
-      numLuts(src.numLuts),
-      numPrvs(src.numPrvs),
-      encodingModeFlag(src.encodingModeFlag),
-      lutsO1(src.lutsO1),
-      lutsO2(src.lutsO2) {}
+LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
