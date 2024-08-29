@@ -37,7 +37,6 @@ std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
 void reverse_complement(const char *s, char *s1, const int readlen) {
     for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
     s1[readlen] = '\0';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -90,7 +89,6 @@ void write_dna_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -147,7 +145,6 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -43,8 +43,8 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
       binarizor(getBinarizorReader(outputSymbolSize, trnsfSubseqConf.getBinarization().getBypassFlag(), binID,
                                    trnsfSubseqConf.getBinarization().getCabacBinarizationParameters(),
                                    trnsfSubseqConf.getStateVars(), binParams)) {
-    if (bitstream == nullptr || bitstream->size() <= 0) return;  // Simple return as bitstream can be empty
-    if (numEncodedSymbols <= 0) return;                          // Simple return as numEncodedSymbols can be zero
+    if (bitstream == nullptr || bitstream->empty()) return;  // Simple return as bitstream can be empty
+    if (numEncodedSymbols <= 0) return;                      // Simple return as numEncodedSymbols can be zero
 
     reader.start();
 

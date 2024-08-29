@@ -96,9 +96,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     out.annotateNumSymbols(num_symbols);
     out.set(std::move(outblock));
 
-    if (bufferDependencyStream != nullptr) {
-        delete bufferDependencyStream;
-    }
+    delete bufferDependencyStream;
 
     return out;
 }

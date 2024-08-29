@@ -219,7 +219,6 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 matched_records[1].push_back(unmatched_same_au[1][record_index_for_sorting[i].second]);
         }
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
