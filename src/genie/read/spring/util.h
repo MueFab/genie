@@ -47,7 +47,7 @@ struct compression_params {
  * @param s1
  * @param readlen
  */
-void reverse_complement(char *s, char *s1, int readlen);
+void reverse_complement(const char *s, char *s1, int readlen);
 
 /**
  * @brief

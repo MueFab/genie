@@ -68,7 +68,7 @@ class TransformedSymbolsDecoder {
      * @param depSymbol
      * @return
      */
-    uint64_t decodeNextSymbolOrder1(uint64_t *depSymbol);
+    uint64_t decodeNextSymbolOrder1(const uint64_t *depSymbol);
 
     /**
      * @brief

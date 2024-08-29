@@ -37,7 +37,7 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, const int numdict,
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths, const int numdict,
                          const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads) {
     auto *mask = new std::bitset<bitset_size>[numdict];
     generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
@@ -249,7 +249,7 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
-void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
+void chartobitset(const char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
     b.reset();
     for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
     return;
