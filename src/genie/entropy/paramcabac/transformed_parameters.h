@@ -88,7 +88,7 @@ class TransformedParameters {
      * @brief
      * @return
      */
-    [[nodiscard]] const std::vector<uint8_t> getMergeCodingShiftSizes() const;
+    [[nodiscard]] std::vector<uint8_t> getMergeCodingShiftSizes() const;
 
     /**
      * @brief

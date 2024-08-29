@@ -27,7 +27,7 @@ class Exception : public std::exception {
     /**
      * Create new exception
      */
-    explicit Exception(const std::string& msg);
+    explicit Exception(std::string  msg);
 
     /**
      * @param e Copy
