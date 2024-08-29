@@ -19,8 +19,8 @@ bool SignatureCfg::operator==(const SignatureCfg& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, uint8_t _base_bits)
-    : U_signature_size(_U_signature_size ? std::optional<uint8_t>(_U_signature_size)
+SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _u_signature_size, uint8_t _base_bits)
+    : U_signature_size(_u_signature_size ? std::optional<uint8_t>(_u_signature_size)
                                          : std::optional<uint8_t>(std::nullopt)),
       base_bits(_base_bits) {
     auto num_signatures = reader.read<uint16_t>();
@@ -38,7 +38,7 @@ SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _U_signature_size, u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SignatureCfg::addSignature(uint64_t _U_cluster_signature, uint8_t length) {
+void SignatureCfg::addSignature(uint64_t _u_cluster_signature, uint8_t length) {
     if (U_cluster_signature.empty()) {
         U_signature_size = length;
     } else {
@@ -47,7 +47,7 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature, uint8_t length) {
         }
     }
     U_cluster_signature_length.emplace_back(length);
-    U_cluster_signature.emplace_back(_U_cluster_signature);
+    U_cluster_signature.emplace_back(_u_cluster_signature);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -339,7 +339,7 @@ std::string ResultFull::toCSV(const std::string& filename) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ResultFull::getCSVHeader() {
+std::string ResultFull::getCSVHeader() const {
     std::string desc;
     desc += "File;Compressed size;Compression time;Transformation;TransformationParam;";
     for (size_t i = 0; i < config.getTransformSubseqCfgs().size(); ++i) {
@@ -596,7 +596,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
         result_current.config = cfg;
 
         if (new_file) {
-            results_file << result_current.getCSVHeader() << std::endl;
+            results_file << genie::entropy::gabac::ResultTransformed::getCSVHeader() << std::endl;
             new_file = false;
         }
         results_file << result_current.toCSV(filename, transformation, transformation_param, sequence_id) << std::endl;

@@ -150,7 +150,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
     outbuffer.flush(&tmp);
-    return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
+    return {std::move(tmp), in.getID()};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

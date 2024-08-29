@@ -172,7 +172,6 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 quantizerIndicesIdx += opLen;
                 break;  // do nothing as these bases are not present
             case ']':
-                break;  // these have been clipped
             case '(':
             case '[':
                 break;  // ignore first clip char

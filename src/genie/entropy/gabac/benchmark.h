@@ -333,7 +333,7 @@ struct ResultFull {
      * @brief
      * @return
      */
-    std::string getCSVHeader();
+    [[nodiscard]] std::string getCSVHeader() const;
 };
 
 /**
