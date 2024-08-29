@@ -107,8 +107,8 @@ void setglobalarrays(reorder_global<bitset_size> &rg);
  */
 template <size_t bitset_size>
 void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref, std::bitset<bitset_size> &revref,
-                    int **count, bool resetcount, bool rev, int shift, uint16_t cur_readlen,
-                    int &ref_len, const reorder_global<bitset_size> &rg);
+                    int **count, bool resetcount, bool rev, int shift, uint16_t cur_readlen, int &ref_len,
+                    const reorder_global<bitset_size> &rg);
 
 /**
  * @brief

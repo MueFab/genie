@@ -550,16 +550,16 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
 
     std::vector<size_t> sam_hdr_to_fasta_lut;
     if (!options.no_ref) {
-        for (size_t i = 0; i < refs.size(); ++i) {
+        for (const auto& ref : refs) {
             bool found = false;
             for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
-                if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
+                if (ref.first == refinf.getMgr()->getSequences().at(j)) {
                     sam_hdr_to_fasta_lut.push_back(j);
                     found = true;
                     break;
                 }
             }
-            UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
+            UTILS_DIE_IF(!found, "Did not find ref " + ref.first);
         }
     } else {
         for (size_t i = 0; i < refs.size(); ++i) {

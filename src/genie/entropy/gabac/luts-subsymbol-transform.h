@@ -112,8 +112,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
-                            uint8_t prvIdx);
+    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -122,8 +121,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
-                            uint8_t prvIdx);
+    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -132,8 +130,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
-                         uint8_t prvIdx);
+    void transformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -142,8 +139,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx,
-                         uint8_t prvIdx);
+    void transformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
  private:
     /**

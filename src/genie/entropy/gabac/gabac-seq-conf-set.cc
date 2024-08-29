@@ -21,8 +21,8 @@ GabacSeqConfSet::GabacSeqConfSet() {
     for (const auto &desc : core::getDescriptors()) {
         conf.emplace_back();
         const core::GenomicDescriptorProperties &descProp = getDescriptor(desc.id);
-        for (size_t i = 0; i < descProp.subseqs.size(); ++i) {
-            conf.back().emplace_back(getEncoderConfigManual(descProp.subseqs[i].id));
+        for (const auto &subseq : descProp.subseqs) {
+            conf.back().emplace_back(getEncoderConfigManual(subseq.id));
         }
     }
 }
