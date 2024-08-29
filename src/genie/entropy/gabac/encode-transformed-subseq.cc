@@ -19,7 +19,7 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef void (Writer:: *binFunc)(uint64_t, const std::vector<unsigned int>&);
+typedef void (Writer:: *binFunc)(uint64_t, const std::vector<unsigned int> &);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
