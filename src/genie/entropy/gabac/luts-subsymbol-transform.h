@@ -147,7 +147,7 @@ class LUTsSubSymbolTransform {
      * @param numAlphaSubsym
      * @return
      */
-    inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
+    static inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
 
     /**
      * @brief
@@ -174,7 +174,7 @@ class LUTsSubSymbolTransform {
      * @brief
      * @param lutRow
      */
-    void sortLutRow(LutRow& lutRow);
+    static void sortLutRow(LutRow& lutRow);
 
     /**
      * @brief
@@ -183,7 +183,7 @@ class LUTsSubSymbolTransform {
      * @param codingSubsymSize
      * @param lut
      */
-    void decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
+    static void decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     /**
      * @brief

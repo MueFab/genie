@@ -15,7 +15,7 @@ namespace genie::format::mgg::encapsulator {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
-    const std::vector<std::string>& input_files) const {
+    const std::vector<std::string>& input_files) {
     std::vector<std::string> unknown_id;
     std::map<uint8_t, std::vector<std::string>> ret;
     for (auto& i : input_files) {

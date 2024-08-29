@@ -78,7 +78,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(const core::record::Record &rec) const {
+const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(const core::record::Record &rec) {
     // TODO(Fabian): More than 2 split alignments (even supported by standard?)
     // TODO(Fabian): Multialignments
     const auto SAME_REC = core::record::AlignmentSplit::Type::SAME_REC;

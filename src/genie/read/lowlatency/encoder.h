@@ -47,8 +47,8 @@ class Encoder : public core::ReadEncoder {
      * @param state
      * @return
      */
-    core::AccessUnit pack(const util::Section& id, uint8_t qv_depth,
-                          std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const;
+    static core::AccessUnit pack(const util::Section& id, uint8_t qv_depth,
+                                 std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state);
 
     /**
      * @brief
