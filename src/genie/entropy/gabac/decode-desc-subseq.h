@@ -29,7 +29,7 @@ struct IOConfiguration;
  * @param transformedSubseqs
  */
 void doInverseSubsequenceTransform(const paramcabac::Subsequence& subseqCfg,
-                                   std::vector<util::DataBlock>* const transformedSubseqs);
+                                   std::vector<util::DataBlock>* transformedSubseqs);
 
 /**
  * @brief

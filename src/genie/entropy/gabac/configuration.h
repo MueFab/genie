@@ -42,7 +42,7 @@ struct EncodingConfiguration {
      * @brief Create default config for a given descriptor subsequence
      * @param sub descriptor subsequence index.
      */
-    explicit EncodingConfiguration(const core::GenSubIndex sub);
+    explicit EncodingConfiguration(core::GenSubIndex sub);
 
     /**
      * @brief Create config from subseq

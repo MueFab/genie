@@ -38,7 +38,7 @@ namespace genie::entropy::gabac {
  * @return
  */
 size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, util::DataBlock* symbols,
-                             util::DataBlock* const depSymbols = nullptr,
+                             util::DataBlock* depSymbols = nullptr,
                              size_t maxsize = std::numeric_limits<size_t>::max());
 
 // ---------------------------------------------------------------------------------------------------------------------
