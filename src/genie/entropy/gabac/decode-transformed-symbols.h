@@ -30,7 +30,7 @@ class TransformedSymbolsDecoder {
      * @param numEncodedSymbols
      */
     explicit TransformedSymbolsDecoder(util::DataBlock *bitstream, const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                       const unsigned int numEncodedSymbols);
+                                       unsigned int numEncodedSymbols);
 
     /**
      * @brief

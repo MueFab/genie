@@ -39,7 +39,7 @@ typedef uint64_t (Reader:: *binFunc)(const std::vector<unsigned int>);
  * @param binID
  * @param symbolValue
  */
-void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+void decodeSignFlag(Reader &reader, paramcabac::BinarizationParameters::BinarizationId binID,
                     uint64_t &symbolValue);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,8 +54,8 @@ void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::Bi
  * @param binParams
  * @return
  */
-binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag,
-                           const paramcabac::BinarizationParameters::BinarizationId binID,
+binFunc getBinarizorReader(uint8_t outputSymbolSize, bool bypassFlag,
+                           paramcabac::BinarizationParameters::BinarizationId binID,
                            const paramcabac::BinarizationParameters &binarzationParams,
                            const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams);
 
@@ -70,8 +70,8 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
  * @param depSymbols
  * @return
  */
-size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock *bitstream, uint8_t wordsize, util::DataBlock *const depSymbols = nullptr);
+size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, unsigned int numEncodedSymbols,
+                             util::DataBlock *bitstream, uint8_t wordsize, util::DataBlock *depSymbols = nullptr);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
