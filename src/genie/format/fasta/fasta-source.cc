@@ -20,7 +20,7 @@ FastaSource::FastaSource(std::ostream* _outfile, core::ReferenceManager* _refMgr
     auto seqs = refMgr->getSequences();
     size_t pos = 0;
     for (const auto& s : seqs) {
-        pos += (refMgr->getLength(s) - 1) / refMgr->getChunkSize() + 1;
+        pos += (refMgr->getLength(s) - 1) / genie::core::ReferenceManager::getChunkSize() + 1;
         accu_lengths[s] = pos;
     }
 }
@@ -50,12 +50,12 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
         pos_old = s.second;
     }
 
-    auto string = refMgr->loadAt(seq, pos * refMgr->getChunkSize());
+    auto string = refMgr->loadAt(seq, pos * genie::core::ReferenceManager::getChunkSize());
     size_t actual_length =
-        loc_id.start == (accu_lengths[seq] - 1) ? refMgr->getLength(seq) % refMgr->getChunkSize() : string->length();
+        loc_id.start == (accu_lengths[seq] - 1) ? refMgr->getLength(seq) % genie::core::ReferenceManager::getChunkSize() : string->length();
 
-    std::cerr << "Decompressing " << seq << " [" << pos * refMgr->getChunkSize() << ", "
-              << pos * refMgr->getChunkSize() + actual_length << "]" << std::endl;
+    std::cerr << "Decompressing " << seq << " [" << pos * genie::core::ReferenceManager::getChunkSize() << ", "
+              << pos * genie::core::ReferenceManager::getChunkSize() + actual_length << "]" << std::endl;
 
     util::OrderedSection outSec(&outlock, loc_id);
     if (pos == 0) {

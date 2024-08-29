@@ -129,9 +129,9 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::readStreamSize(std::istream &input) {
-    input.seekg(0, input.end);
+    input.seekg(0, std::istream::end);
     size_t length = input.tellg();
-    input.seekg(0, input.beg);
+    input.seekg(0, std::istream::beg);
 
     return length;
 }

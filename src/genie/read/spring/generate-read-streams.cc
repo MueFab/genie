@@ -220,7 +220,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // read streams for aligned reads
     std::ifstream f_seq(file_seq);
-    f_seq.seekg(0, f_seq.end);
+    f_seq.seekg(0, std::ifstream::end);
     uint64_t seq_len = f_seq.tellg();
     data->seq.resize(seq_len);
     f_seq.seekg(0);
@@ -232,9 +232,9 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::ifstream f_noise(file_noise);
     std::ifstream f_noisepos(file_noisepos, std::ios::binary);
     std::ifstream f_pos(file_pos, std::ios::binary);
-    f_noisepos.seekg(0, f_noisepos.end);
+    f_noisepos.seekg(0, std::ifstream::end);
     uint64_t noise_array_size = f_noisepos.tellg() / 2;
-    f_noisepos.seekg(0, f_noisepos.beg);
+    f_noisepos.seekg(0, std::ifstream::beg);
     // divide by 2 because we have 2 bytes per noise
     data->noise_arr = std::vector<char>(noise_array_size);
     data->noisepos_arr = std::vector<uint16_t>(noise_array_size);
@@ -357,7 +357,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // read streams for aligned reads
     std::ifstream f_seq(file_seq);
-    f_seq.seekg(0, f_seq.end);
+    f_seq.seekg(0, std::ifstream::end);
     uint64_t seq_len = f_seq.tellg();
     data->seq.resize(seq_len);
     f_seq.seekg(0);
@@ -370,9 +370,9 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::ifstream f_noise(file_noise);
     std::ifstream f_noisepos(file_noisepos, std::ios::binary);
     std::ifstream f_pos(file_pos, std::ios::binary);
-    f_noisepos.seekg(0, f_noisepos.end);
+    f_noisepos.seekg(0, std::ifstream::end);
     uint64_t noise_array_size = f_noisepos.tellg() / 2;
-    f_noisepos.seekg(0, f_noisepos.beg);
+    f_noisepos.seekg(0, std::ifstream::beg);
     // divide by 2 because we have 2 bytes per noise
     data->noise_arr = std::vector<char>(noise_array_size);
     data->noisepos_arr = std::vector<uint16_t>(noise_array_size);
