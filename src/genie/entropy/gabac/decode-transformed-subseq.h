@@ -29,7 +29,7 @@ namespace genie::entropy::gabac {
 /**
  * @brief
  */
-typedef uint64_t (Reader:: *binFunc)(const std::vector<unsigned int>&);
+typedef uint64_t (Reader:: *binFunc)(const std::vector<unsigned int> &);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
