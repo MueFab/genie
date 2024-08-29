@@ -16,9 +16,7 @@ static std::unique_ptr<LogConfiguration> currentConfig;
 
 // -----------------------------------------------------------------------------
 
-void setLogging(const LogConfiguration& c) {
-    currentConfig = std::make_unique<LogConfiguration>(c);
-}
+void setLogging(const LogConfiguration& c) { currentConfig = std::make_unique<LogConfiguration>(c); }
 
 // -----------------------------------------------------------------------------
 
