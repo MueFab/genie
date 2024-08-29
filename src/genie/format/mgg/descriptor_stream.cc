@@ -137,6 +137,7 @@ DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core:
 
 std::vector<format::mgb::Block> DescriptorStream::decapsulate() {
     std::vector<format::mgb::Block> ret;
+    ret.reserve(payload.size());
     for (auto& p : payload) {
         ret.emplace_back(header.getDescriptorID(), std::move(p));
     }

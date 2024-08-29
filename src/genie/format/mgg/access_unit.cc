@@ -148,6 +148,7 @@ AUProtection& AccessUnit::getProtection() { return *au_protection; }
 
 format::mgb::AccessUnit AccessUnit::decapsulate() {
     std::vector<format::mgb::Block> newBlocks;
+    newBlocks.reserve(blocks.size());
     for (auto& b : blocks) {
         newBlocks.emplace_back(b.decapsulate());
     }
