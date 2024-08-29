@@ -30,8 +30,8 @@ struct EncapsulatedFile {
      * @param input_files
      * @return
      */
-    [[nodiscard]] std::map<uint8_t, std::vector<std::string>> groupInputFiles(
-        const std::vector<std::string>& input_files) const;
+    [[nodiscard]] static std::map<uint8_t, std::vector<std::string>> groupInputFiles(
+        const std::vector<std::string>& input_files);
 
     /**
      * @brief

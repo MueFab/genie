@@ -36,7 +36,7 @@ void MgbFile::write(genie::util::BitWriter& writer) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void MgbFile::addUnit(std::unique_ptr<genie::core::parameter::DataUnit> unit) {
-    units.emplace_back(std::make_pair(0, std::move(unit)));
+    units.emplace_back(0, std::move(unit));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -56,15 +56,14 @@ MgbFile::MgbFile(std::istream* _file) : file(_file), reader(genie::util::make_un
         switch (unit_type) {
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto set = util::make_unique<core::parameter::ParameterSet>(*reader);
-                parameterSets.emplace(std::make_pair(set->getID(), set->getEncodingSet()));
-                units.emplace_back(std::make_pair(pos, std::move(set)));
+                parameterSets.emplace(set->getID(), set->getEncodingSet());
+                units.emplace_back(pos, std::move(set));
             } break;
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT:
-                units.emplace_back(
-                    std::make_pair(pos, util::make_unique<format::mgb::AccessUnit>(parameterSets, *reader)));
+                units.emplace_back(pos, util::make_unique<format::mgb::AccessUnit>(parameterSets, *reader));
                 break;
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE:
-                units.emplace_back(std::make_pair(pos, util::make_unique<format::mgb::RawReference>(*reader)));
+                units.emplace_back(pos, util::make_unique<format::mgb::RawReference>(*reader));
                 break;
             default:
                 UTILS_DIE("Unknown data unit");
@@ -240,7 +239,7 @@ std::vector<Block> MgbFile::extractDescriptor(core::record::ClassType type, core
                 }
             }
             if (!found) {
-                ret.emplace_back(Block(uint8_t(descriptor), core::AccessUnit::Descriptor(descriptor)));
+                ret.emplace_back(uint8_t(descriptor), core::AccessUnit::Descriptor(descriptor));
             }
         }
     }

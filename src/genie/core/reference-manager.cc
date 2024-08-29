@@ -19,19 +19,19 @@ const uint64_t ReferenceManager::CHUNK_SIZE = 1 * 1024 * 1024;  //!
 
 void ReferenceManager::touch(const std::string& name, size_t num) {
     if (cacheInfo.size() < cacheSize) {
-        cacheInfo.push_front(std::make_pair(name, num));
+        cacheInfo.emplace_front(name, num);
         return;
     }
 
     for (auto it = cacheInfo.begin(); it != cacheInfo.end(); ++it) {
         if (it->first == name && it->second == num) {
             cacheInfo.erase(it);
-            cacheInfo.push_front(std::make_pair(name, num));
+            cacheInfo.emplace_front(name, num);
             return;
         }
     }
 
-    cacheInfo.push_front(std::make_pair(name, num));
+    cacheInfo.emplace_front(name, num);
     auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
     cacheInfo.pop_back();
 

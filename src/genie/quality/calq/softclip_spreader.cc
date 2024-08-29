@@ -17,9 +17,7 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-double SoftclipSpreader::squash(double activity, double antiActivity) const {
-    return activity / (activity + antiActivity);
-}
+double SoftclipSpreader::squash(double activity, double antiActivity) { return activity / (activity + antiActivity); }
 
 // -----------------------------------------------------------------------------
 

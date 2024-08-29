@@ -77,7 +77,7 @@ class BlockHeader {
      * @brief
      * @return
      */
-    [[nodiscard]] uint64_t getLength() const;
+    [[nodiscard]] static uint64_t getLength();
 
     /**
      * @brief

@@ -143,7 +143,7 @@ void EncapsulatedDatasetGroup::mergeLabels() {
     for (auto& d : datasets) {
         for (auto& l : d->meta.getLabels()) {
             for (auto& s : d->datasets) {
-                labels[l.getID()].emplace_back(genie::format::mgg::LabelDataset(s.getHeader().getDatasetID(), l));
+                labels[l.getID()].emplace_back(s.getHeader().getDatasetID(), l);
             }
         }
     }
