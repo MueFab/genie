@@ -55,9 +55,9 @@ class StateVars {
      * @param alphabet_ID
      * @param original
      */
-    void populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
-                  const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                  const core::AlphabetID alphabet_ID, bool original = true);
+    void populate(SupportValues::TransformIdSubsym transform_ID_subsym, SupportValues support_values,
+                  Binarization cabac_binarization, core::GenSubIndex subsequence_ID,
+                  core::AlphabetID alphabet_ID, bool original = true);
 
     /**
      * @brief
@@ -120,15 +120,15 @@ class StateVars {
      * @param trnsfSubsymID
      * @return
      */
-    [[nodiscard]] uint8_t getNumLuts(const uint8_t codingOrder, const bool shareSubsymLutFlag,
-                                     const SupportValues::TransformIdSubsym trnsfSubsymID) const;
+    [[nodiscard]] uint8_t getNumLuts(uint8_t codingOrder, bool shareSubsymLutFlag,
+                                     SupportValues::TransformIdSubsym trnsfSubsymID) const;
 
     /**
      * @brief
      * @param shareSubsymPrvFlag
      * @return
      */
-    [[nodiscard]] uint8_t getNumPrvs(const bool shareSubsymPrvFlag) const;
+    [[nodiscard]] uint8_t getNumPrvs(bool shareSubsymPrvFlag) const;
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
@@ -140,7 +140,7 @@ class StateVars {
      * @param alphabet_ID
      * @return
      */
-    static uint64_t getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID);
+    static uint64_t getNumAlphaSpecial(core::GenSubIndex subsequence_ID, core::AlphabetID alphabet_ID);
 
     /**
      * @brief

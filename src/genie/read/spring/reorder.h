@@ -81,7 +81,7 @@ struct reorder_global {
  * @param rg
  */
 template <size_t bitset_size>
-void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen, const reorder_global<bitset_size> &rg);
+void bitsettostring(std::bitset<bitset_size> b, char *s, uint16_t readlen, const reorder_global<bitset_size> &rg);
 
 /**
  * @brief
@@ -107,7 +107,7 @@ void setglobalarrays(reorder_global<bitset_size> &rg);
  */
 template <size_t bitset_size>
 void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref, std::bitset<bitset_size> &revref,
-                    int **count, const bool resetcount, const bool rev, const int shift, const uint16_t cur_readlen,
+                    int **count, bool resetcount, bool rev, int shift, uint16_t cur_readlen,
                     int &ref_len, const reorder_global<bitset_size> &rg);
 
 /**
@@ -144,7 +144,7 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
                   omp_lock *dict_lock, omp_lock *read_lock,
 #endif
                   std::bitset<bitset_size> **mask, uint16_t *read_lengths, bool *remainingreads,
-                  std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t &k, const bool rev, const int shift,
+                  std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t &k, bool rev, int shift,
                   const int &ref_len, const reorder_global<bitset_size> &rg);
 
 /**
