@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ uint64_t MismatchDecoder::getSubseqSymbolsTotal() const { return numSubseqSymbol
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::MismatchDecoder> MismatchDecoder::copy() const {
-    return util::make_unique<MismatchDecoder>(*this);
+    return std::make_unique<MismatchDecoder>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

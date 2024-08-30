@@ -117,7 +117,7 @@ void MPEG::addChecksum(std::string checksum) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::meta::RefBase> MPEG::decapsulate() {
-    auto ret = genie::util::make_unique<genie::core::meta::external_ref::MPEG>(
+    auto ret = std::make_unique<genie::core::meta::external_ref::MPEG>(
         std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()),
         external_dataset_group_id, external_dataset_id, std::move(ref_checksum));
     return ret;

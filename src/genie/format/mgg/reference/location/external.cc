@@ -29,13 +29,13 @@ std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint
     auto _ref_type = reader.readBypassBE<RefType>();
     switch (_ref_type) {
         case RefType::MPEGG_REF:
-            return genie::util::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
+            return std::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
                                                             seq_count, _version);
         case RefType::RAW_REF:
-            return genie::util::make_unique<external::Raw>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
+            return std::make_unique<external::Raw>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
                                                            seq_count);
         case RefType::FASTA_REF:
-            return genie::util::make_unique<external::Fasta>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
+            return std::make_unique<external::Fasta>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
                                                              seq_count);
         default:
             UTILS_DIE("Unknown ref type");

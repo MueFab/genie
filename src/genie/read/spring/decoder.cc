@@ -148,12 +148,17 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         auto mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
-                        const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
+                        uint64_t mmtype_1 = 0;
+                        if (au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()) {
+                            mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
                                                   ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
                                                         .getMismatchDecoder()
                                                         ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
                                                                              .inverseLut[cur_read[i][abs_mmpos]])
                                                   : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                        } else {
+                            mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
+                        }
                         cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
                         abs_mmpos++;
                     }
@@ -223,7 +228,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) : combine_pairs(comb_p), unmatched_record_index{} {
+Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
+    : combine_pairs(comb_p), unmatched_record_index{} {
     basedir = working_dir;
 
     while (true) {
@@ -554,9 +560,7 @@ void Decoder::flushIn(uint64_t& pos) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::skipIn(const util::Section& id) {
-    {
-        util::OrderedSection sec(&lock, id);
-    }
+    { util::OrderedSection sec(&lock, id); }
     skipOut(id);
 }
 

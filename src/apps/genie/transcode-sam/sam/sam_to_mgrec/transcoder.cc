@@ -27,7 +27,7 @@ namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 // ---------------------------------------------------------------------------------------------------------------------
 
 RefInfo::RefInfo(const std::string& fasta_name)
-    : refMgr(genie::util::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
+    : refMgr(std::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
     if (!std::filesystem::exists(fasta_name)) {
         return;
     }
@@ -47,11 +47,11 @@ RefInfo::RefInfo(const std::string& fasta_name)
         genie::format::fasta::FastaReader::hash(faifile, fai_in, sha_out);
     }
 
-    fastaFile = genie::util::make_unique<std::ifstream>(fasta_name);
-    faiFile = genie::util::make_unique<std::ifstream>(fai_name);
-    shaFile = genie::util::make_unique<std::ifstream>(sha_name);
+    fastaFile = std::make_unique<std::ifstream>(fasta_name);
+    faiFile = std::make_unique<std::ifstream>(fai_name);
+    shaFile = std::make_unique<std::ifstream>(sha_name);
 
-    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
+    fastaMgr = std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
                                                                        fasta_name);
     valid = true;
 }
@@ -118,10 +118,10 @@ std::vector<genie::core::record::Record> splitRecord(genie::core::record::Record
             genie::core::record::AlignmentBox box2(input.getAlignments().front().getPosition() + split.getDelta(),
                                                    genie::core::record::Alignment(split.getAlignment()));
 
-            box.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+            box.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 box2.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
-            box2.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+            box2.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 box.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
             ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(), genie::core::record::AlignmentBox(box));
@@ -526,7 +526,7 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                     alg.addMappingScore(s);
                 }
 
-                newBox.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(
+                newBox.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::SameRec>(
                     split.getDelta(), std::move(alg)));
             } else {
                 newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
@@ -567,7 +567,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::unique_ptr<std::ostream> total_output;
     std::ostream* out_stream = &std::cout;
     if (options.outputFile.substr(0, 2) != "-.") {
-        total_output = genie::util::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
+        total_output = std::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
         out_stream = total_output.get();
     }
     genie::util::BitWriter total_output_writer(out_stream);
@@ -580,7 +580,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
     for (int i = 0; i < num_chunks; ++i) {
         readers.emplace_back(
-            genie::util::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
+            std::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;

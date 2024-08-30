@@ -6,9 +6,10 @@
 
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
 #include <utility>
+#include <memory>
 #include "genie/core/parameter/descriptor_present/decoder.h"
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,14 +54,14 @@ void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenc
 
 void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSet) const {
     for (const auto &desc : core::getDescriptors()) {
-        auto descriptor_configuration = util::make_unique<core::parameter::desc_pres::DescriptorPresent>();
+        auto descriptor_configuration = std::make_unique<core::parameter::desc_pres::DescriptorPresent>();
 
         if (desc.id == core::GenDesc::RNAME || desc.id == core::GenDesc::MSAR) {
-            auto decoder_config = util::make_unique<paramcabac::DecoderTokenType>();
+            auto decoder_config = std::make_unique<paramcabac::DecoderTokenType>();
             fillDecoder(desc, *decoder_config);
             descriptor_configuration->setDecoder(std::move(decoder_config));
         } else {
-            auto decoder_config = util::make_unique<paramcabac::DecoderRegular>(desc.id);
+            auto decoder_config = std::make_unique<paramcabac::DecoderRegular>(desc.id);
             fillDecoder(desc, *decoder_config);
             descriptor_configuration->setDecoder(std::move(decoder_config));
         }
@@ -75,14 +76,14 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacSeqConfSet::storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) const {
-    auto descriptor_configuration = util::make_unique<core::parameter::desc_pres::DescriptorPresent>();
+    auto descriptor_configuration = std::make_unique<core::parameter::desc_pres::DescriptorPresent>();
 
     if (desc == core::GenDesc::RNAME || desc == core::GenDesc::MSAR) {
-        auto decoder_config = util::make_unique<paramcabac::DecoderTokenType>();
+        auto decoder_config = std::make_unique<paramcabac::DecoderTokenType>();
         fillDecoder(core::getDescriptor(desc), *decoder_config);
         descriptor_configuration->setDecoder(std::move(decoder_config));
     } else {
-        auto decoder_config = util::make_unique<paramcabac::DecoderRegular>(desc);
+        auto decoder_config = std::make_unique<paramcabac::DecoderRegular>(desc);
         fillDecoder(core::getDescriptor(desc), *decoder_config);
         descriptor_configuration->setDecoder(std::move(decoder_config));
     }

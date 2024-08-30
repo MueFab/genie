@@ -7,6 +7,7 @@
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
 #include <filesystem>
 #include <utility>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,10 +68,10 @@ EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, 
 
 genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MPEGMinorVersion version) {
     genie::format::mgg::MggFile ret;
-    ret.addBox(genie::util::make_unique<genie::format::mgg::FileHeader>(version));
+    ret.addBox(std::make_unique<genie::format::mgg::FileHeader>(version));
 
     for (auto& g : groups) {
-        ret.addBox(genie::util::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
+        ret.addBox(std::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
     }
     return ret;
 }
