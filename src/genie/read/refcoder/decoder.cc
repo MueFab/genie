@@ -41,7 +41,7 @@ std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::Segmen
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<basecoder::DecoderStub::DecodingState> Decoder::createDecodingState(core::AccessUnit& t) {
-    return util::make_unique<RefDecodingState>(t);
+    return std::make_unique<RefDecodingState>(t);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

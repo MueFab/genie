@@ -24,7 +24,7 @@ Factory<T>* IndustrialPark::findAndCreate() {
     auto type = std::type_index(typeid(T));
     auto it = factories.find(type);
     if (it == factories.end()) {
-        factories.insert(std::make_pair(type, util::make_unique<Factory<T>>()));
+        factories.insert(std::make_pair(type, std::make_unique<Factory<T>>()));
         it = factories.find(type);
     }
     return reinterpret_cast<Factory<T>*>(it->second.get());

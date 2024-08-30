@@ -13,7 +13,7 @@
 #include "genie/core/meta/external-ref/mpeg.h"
 #include "genie/core/meta/external-ref/raw.h"
 #include "genie/core/meta/internal-ref.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,20 +48,20 @@ Reference::Reference(const nlohmann::json& json)
         auto type = static_cast<ExternalRef::ReferenceType>(json["external_ref"]["reference_type"]);
         switch (type) {
             case ExternalRef::ReferenceType::FASTA_REF:
-                ref = genie::util::make_unique<external_ref::Fasta>(json["external_ref"]);
+                ref = std::make_unique<external_ref::Fasta>(json["external_ref"]);
                 break;
             case ExternalRef::ReferenceType::MPEGG_REF:
-                ref = genie::util::make_unique<external_ref::MPEG>(json["external_ref"]);
+                ref = std::make_unique<external_ref::MPEG>(json["external_ref"]);
                 break;
             case ExternalRef::ReferenceType::RAW_REF:
-                ref = genie::util::make_unique<external_ref::Raw>(json["external_ref"]);
+                ref = std::make_unique<external_ref::Raw>(json["external_ref"]);
                 break;
             default:
                 UTILS_DIE("Unknown external reference type.");
         }
 
     } else {
-        ref = genie::util::make_unique<InternalRef>(json["internal_ref"]);
+        ref = std::make_unique<InternalRef>(json["internal_ref"]);
     }
 }
 

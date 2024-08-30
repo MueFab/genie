@@ -8,7 +8,7 @@
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ int64_t SameRec::getDelta() const { return delta; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> SameRec::clone() const {
-    auto ret = util::make_unique<SameRec>();
+    auto ret = std::make_unique<SameRec>();
     ret->delta = this->delta;
     ret->alignment = this->alignment;
     return ret;

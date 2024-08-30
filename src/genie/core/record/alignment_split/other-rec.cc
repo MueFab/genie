@@ -8,7 +8,7 @@
 #include <memory>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ void OtherRec::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> OtherRec::clone() const {
-    auto ret = util::make_unique<OtherRec>();
+    auto ret = std::make_unique<OtherRec>();
     ret->split_pos = this->split_pos;
     ret->split_seq_ID = this->split_seq_ID;
     return ret;

@@ -6,7 +6,6 @@
 
 #include "genie/core/record/alignment_split/unpaired.h"
 #include <memory>
-#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +22,7 @@ void Unpaired::write(util::BitWriter &writer) const { AlignmentSplit::write(writ
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> Unpaired::clone() const {
-    auto ret = util::make_unique<Unpaired>();
+    auto ret = std::make_unique<Unpaired>();
     ret->split_alignment = this->split_alignment;
     return ret;
 }

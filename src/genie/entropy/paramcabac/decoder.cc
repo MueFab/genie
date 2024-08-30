@@ -51,7 +51,7 @@ const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() const {
-    return util::make_unique<DecoderRegular>(*this);
+    return std::make_unique<DecoderRegular>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descripto
 
 std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc,
                                                                                    util::BitReader &reader) {
-    return util::make_unique<DecoderRegular>(desc, reader);
+    return std::make_unique<DecoderRegular>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ const Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderTokenType::clone() const {
-    return util::make_unique<DecoderTokenType>(*this);
+    return std::make_unique<DecoderTokenType>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descrip
 
 std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(genie::core::GenDesc desc,
                                                                                        util::BitReader &reader) {
-    return util::make_unique<DecoderTokenType>(desc, reader);
+    return std::make_unique<DecoderTokenType>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

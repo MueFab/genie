@@ -6,7 +6,7 @@
 
 #include "genie/core/record/alignment_external/none.h"
 #include <memory>
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ void None::write(util::BitWriter &writer) const { AlignmentExternal::write(write
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentExternal> None::clone() const {
-    auto ret = util::make_unique<None>();
+    auto ret = std::make_unique<None>();
     return ret;
 }
 

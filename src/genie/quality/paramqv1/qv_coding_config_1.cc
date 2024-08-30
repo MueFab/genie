@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ void QualityValues1::write(util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
-    auto ret = util::make_unique<QualityValues1>(
+    auto ret = std::make_unique<QualityValues1>(
         qvps_preset_ID ? qvps_preset_ID.value() : QualityValues1::QvpsPresetId ::ASCII, qv_reverse_flag);
     if (parameter_set_qvps) {
         auto qvps = parameter_set_qvps;
@@ -76,7 +76,7 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
 
 std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(genie::core::GenDesc desc,
                                                                       util::BitReader& reader) {
-    return util::make_unique<QualityValues1>(desc, reader);
+    return std::make_unique<QualityValues1>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(core::record::ClassType type) {
-    auto ret = util::make_unique<paramqv1::QualityValues1>(QvpsPresetId::ASCII, false);
+    auto ret = std::make_unique<paramqv1::QualityValues1>(QvpsPresetId::ASCII, false);
     ParameterSet set;
 
     auto codebook = QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);

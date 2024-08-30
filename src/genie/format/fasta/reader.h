@@ -16,7 +16,7 @@
 #include "genie/core/meta/reference.h"
 #include "genie/format/fasta/fai-file.h"
 #include "genie/format/fasta/sha256File.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

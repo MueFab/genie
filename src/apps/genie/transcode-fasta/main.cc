@@ -7,6 +7,7 @@
 #define NOMINMAX
 #include "apps/genie/transcode-fasta/main.h"
 #include <filesystem>
+#include <memory>
 #include <string>
 #include <utility>
 #include "apps/genie/transcode-fasta/program-options.h"
@@ -60,11 +61,11 @@ int main(int argc, char* argv[]) {
         genie::format::fasta::FastaReader::hash(faifile, fai_in, sha_out);
     }
 
-    auto fastaFile = genie::util::make_unique<std::ifstream>(pOpts.inputFile);
-    auto faiFile = genie::util::make_unique<std::ifstream>(fai_name);
-    auto shaFile = genie::util::make_unique<std::ifstream>(sha_name);
-    auto refMgr = genie::util::make_unique<genie::core::ReferenceManager>(4);
-    auto fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
+    auto fastaFile = std::make_unique<std::ifstream>(pOpts.inputFile);
+    auto faiFile = std::make_unique<std::ifstream>(fai_name);
+    auto shaFile = std::make_unique<std::ifstream>(sha_name);
+    auto refMgr = std::make_unique<genie::core::ReferenceManager>(4);
+    auto fastaMgr = std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
                                                                             refMgr.get(), pOpts.inputFile);
     genie::format::mgb::RawReference raw_ref(true);
     for (uint16_t i = 0; i < static_cast<uint16_t>(refMgr->getSequences().size()); ++i) {

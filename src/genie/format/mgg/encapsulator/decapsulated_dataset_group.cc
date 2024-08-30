@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/encapsulator/decapsulated_dataset_group.h"
+#include <memory>
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -152,11 +153,11 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
         }
     }
     for (auto& p : dt.getParameterSets()) {
-        mgb_file.addUnit(genie::util::make_unique<genie::core::parameter::ParameterSet>(p.descapsulate()));
+        mgb_file.addUnit(std::make_unique<genie::core::parameter::ParameterSet>(p.descapsulate()));
     }
     for (auto& au : dt.getAccessUnits()) {
         auto decap_au = decapsulate_AU(au);
-        mgb_file.addUnit(genie::util::make_unique<genie::format::mgb::AccessUnit>(std::move(decap_au.first)));
+        mgb_file.addUnit(std::make_unique<genie::format::mgb::AccessUnit>(std::move(decap_au.first)));
         if (decap_au.second != std::nullopt) {
             meta.addAccessUnit(std::move(*decap_au.second));
         }
