@@ -21,6 +21,9 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
     std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;
     util::Watch watch;
     std::string cur_name;
+    if (desc.isEmpty()) {
+        return ret;
+    }
     while (!desc.get(0).end()) {
         auto cur_char = desc.get(0).pull();
         if (cur_char == '\0') {

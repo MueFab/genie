@@ -10,7 +10,7 @@
 #include "genie/core/global-cfg.h"
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ DescriptorPresent::DescriptorPresent() : Descriptor(PRESENT), decoder_configurat
 
 DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(PRESENT) {
     auto mode = reader.read<uint8_t>();
-    if (desc == GenDesc::MSAR || desc == GenDesc::RNAME) {
+    if ((desc == GenDesc::MSAR || desc == GenDesc::RNAME) && mode == 0) {
         decoder_configuration =
             GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, desc, reader);
     } else {
@@ -45,7 +45,7 @@ bool DescriptorPresent::equals(const Descriptor *desc) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Descriptor> DescriptorPresent::clone() const {
-    auto ret = util::make_unique<DescriptorPresent>();
+    auto ret = std::make_unique<DescriptorPresent>();
     ret->dec_cfg_preset = dec_cfg_preset;
     ret->decoder_configuration = decoder_configuration->clone();
     return ret;

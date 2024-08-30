@@ -7,6 +7,7 @@
 #include "genie/format/mgg/encapsulator/encapsulated_dataset_group.h"
 #include <map>
 #include <utility>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -166,7 +167,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
                                                    genie::core::MPEGMinorVersion version) {
     datasets.reserve(input_files.size());
     for (const auto& i : input_files) {
-        datasets.emplace_back(genie::util::make_unique<EncapsulatedDataset>(i, version));
+        datasets.emplace_back(std::make_unique<EncapsulatedDataset>(i, version));
     }
     size_t index = 0;
     for (auto& d : datasets) {

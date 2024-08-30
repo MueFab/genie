@@ -110,7 +110,7 @@ std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record:
         buf_max_size *= 2;
     }
     buf_max_size = std::min(buf_max_size, (1u << 24u) - 1u);
-    return util::make_unique<LAEncodingState>(data, buf_max_size);
+    return std::make_unique<LAEncodingState>(data, buf_max_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

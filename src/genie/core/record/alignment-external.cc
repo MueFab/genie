@@ -9,7 +9,7 @@
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,9 +30,9 @@ std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &r
     Type type = reader.readBypassBE<Type>();
     switch (type) {
         case Type::NONE:
-            return util::make_unique<alignment_external::None>();
+            return std::make_unique<alignment_external::None>();
         case Type::OTHER_REC:
-            return util::make_unique<alignment_external::OtherRec>(reader);
+            return std::make_unique<alignment_external::OtherRec>(reader);
         default:
             UTILS_DIE("Unknown MoreAlignmentInfoType");
     }

@@ -7,6 +7,7 @@
 #include "genie/entropy/gabac/decoder.h"
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <tuple>
 #include <utility>
 #include "genie/entropy/gabac/decode-desc-subseq.h"
@@ -121,7 +122,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     auto id = in.getID();
 
     if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
-        in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
+        in.attachMismatchDecoder(std::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
 

@@ -11,7 +11,7 @@
 
 #include "genie/core/access-unit.h"
 #include "genie/core/entropy-encoder.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

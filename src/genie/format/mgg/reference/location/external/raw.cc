@@ -15,7 +15,7 @@ namespace genie::format::mgg::reference::location::external {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::meta::RefBase> Raw::decapsulate() {
-    auto ret = genie::util::make_unique<genie::core::meta::external_ref::Raw>(
+    auto ret = std::make_unique<genie::core::meta::external_ref::Raw>(
         std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
 
     for (auto& s : seq_checksums) {

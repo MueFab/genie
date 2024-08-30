@@ -45,7 +45,7 @@ MgbFile::MgbFile() : file(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgbFile::MgbFile(std::istream* _file) : file(_file), reader(genie::util::make_unique<genie::util::BitReader>(*file)) {
+MgbFile::MgbFile(std::istream* _file) : file(_file), reader(std::make_unique<genie::util::BitReader>(*file)) {
     while (true) {
         uint64_t pos = reader->getPos();
         auto unit_type = reader->readBypassBE<core::parameter::DataUnit::DataUnitType>();
@@ -55,15 +55,15 @@ MgbFile::MgbFile(std::istream* _file) : file(_file), reader(genie::util::make_un
 
         switch (unit_type) {
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
-                auto set = util::make_unique<core::parameter::ParameterSet>(*reader);
+                auto set = std::make_unique<core::parameter::ParameterSet>(*reader);
                 parameterSets.emplace(set->getID(), set->getEncodingSet());
                 units.emplace_back(pos, std::move(set));
             } break;
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT:
-                units.emplace_back(pos, util::make_unique<format::mgb::AccessUnit>(parameterSets, *reader));
+                units.emplace_back(pos, std::make_unique<format::mgb::AccessUnit>(parameterSets, *reader));
                 break;
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE:
-                units.emplace_back(pos, util::make_unique<format::mgb::RawReference>(*reader));
+                units.emplace_back(pos, std::make_unique<format::mgb::RawReference>(*reader));
                 break;
             default:
                 UTILS_DIE("Unknown data unit");

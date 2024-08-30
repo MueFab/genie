@@ -36,7 +36,7 @@ genie::core::RefDecoder* FlowGraphDecode::getRefDecoder() { return refDecoder; }
 
 FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) {
     readSelector.setDrain(&exporterSelector);
-    refMgr = genie::util::make_unique<ReferenceManager>(16);
+    refMgr = std::make_unique<ReferenceManager>(16);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
