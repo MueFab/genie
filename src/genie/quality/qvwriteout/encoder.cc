@@ -6,6 +6,7 @@
 
 #include "genie/quality/qvwriteout/encoder.h"
 #include <string>
+#include <memory>
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/util/watch.h"
@@ -74,7 +75,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     util::Watch watch;
-    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    auto param = std::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
     setUpParameters(rec, *param, desc);

@@ -6,6 +6,7 @@
 
 #include "genie/name/writeout/encoder.h"
 #include <tuple>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +27,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Encoder::proces
         }
         subseq.push('\0');
     }
+    std::get<0>(ret).add(std::move(subseq));
     std::get<1>(ret).addDouble("time-namewriteout", watch.check());
     return ret;
 }

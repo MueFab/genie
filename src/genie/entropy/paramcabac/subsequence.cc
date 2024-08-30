@@ -7,7 +7,7 @@
 #include "genie/entropy/paramcabac/subsequence.h"
 #include <utility>
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

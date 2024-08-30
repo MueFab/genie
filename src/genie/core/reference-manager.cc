@@ -243,7 +243,7 @@ void ReferenceManager::addRef(size_t index, std::unique_ptr<Reference> ref) {
     auto sequence = data.find(ref->getName());
     size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
     for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
-        data[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
+        data[ref->getName()].push_back(std::make_unique<CacheLine>());
     }
     mgr.registerRef(std::move(ref));
 }

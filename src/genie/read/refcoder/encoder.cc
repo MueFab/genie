@@ -46,7 +46,7 @@ std::pair<std::string, std::string> Encoder::getReferences(const core::record::R
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record::Chunk& data) const {
-    return util::make_unique<RefEncodingState>(data);
+    return std::make_unique<RefEncodingState>(data);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

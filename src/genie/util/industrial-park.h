@@ -16,7 +16,7 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/factory.h"
 #include "genie/util/generic-factory.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

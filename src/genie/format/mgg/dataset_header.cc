@@ -296,10 +296,10 @@ void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
 
 std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
     if (block_header_on != std::nullopt) {
-        return genie::util::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
+        return std::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
                                                                                  block_header_on->getCCFlag());
     } else {
-        return genie::util::make_unique<genie::core::meta::blockheader::Disabled>(
+        return std::make_unique<genie::core::meta::blockheader::Disabled>(
             block_header_off->getOrderedBlocksFlag());
     }
 }

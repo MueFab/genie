@@ -50,7 +50,7 @@ void Internal::write(genie::util::BitWriter& writer) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::meta::RefBase> Internal::decapsulate() {
-    auto ret = genie::util::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
+    auto ret = std::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
     return ret;
 }
 
