@@ -7,6 +7,8 @@
 #ifndef SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
 #define SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <memory>
 #include <vector>
 #include "genie/core/constants.h"
@@ -14,7 +16,13 @@
 #include "genie/entropy/zstd/subsequence.h"
 #include "genie/util/bitreader.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie::entropy::zstd {
+
+/**
+ *
+ */
 class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
  protected:
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< @brief
@@ -27,10 +35,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      * @param dec
      * @return
      */
-    bool equals(const Decoder *dec) const override {
-        return core::parameter::desc_pres::Decoder::equals(dec) &&
-               dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
-    }
+    bool equals(const Decoder *dec) const override;
 
     /**
      * @brief
@@ -92,6 +97,14 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      */
     void write(util::BitWriter &writer) const override;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace genie::entropy::zstd
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
