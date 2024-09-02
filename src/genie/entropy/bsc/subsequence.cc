@@ -1,47 +1,34 @@
 /**
- * @file
+* @file
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_LZMA_DECODER_H_
-#define SRC_GENIE_ENTROPY_LZMA_DECODER_H_
+#include "genie/entropy/bsc/subsequence.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <tuple>
-#include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-decoder.h"
+namespace genie::entropy::bsc {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::entropy::lzma {
-
-/**
- * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
- */
-class Decoder : public core::EntropyDecoder {
- public:
-    /**
-     * @brief
-     * @param param
-     * @param d
-     * @param mmCoderEnabled
-     * @return
-     */
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d,
-        bool mmCoderEnabled) override;
-};
+Subsequence::Subsequence(uint8_t _output_symbol_size) : output_symbol_size(_output_symbol_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::entropy::lzma
+uint8_t Subsequence::getOutputSymbolSize() const { return output_symbol_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_LZMA_DECODER_H_
+void Subsequence::write(util::BitWriter &writer) const { writer.write(output_symbol_size, 6); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Subsequence::operator==(const Subsequence &rhs) const { return output_symbol_size == rhs.output_symbol_size; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace genie::entropy::bsc
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

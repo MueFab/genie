@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
-#define SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
+#ifndef SRC_GENIE_ENTROPY_BSC_PARAM_DECODER_H_
+#define SRC_GENIE_ENTROPY_BSC_PARAM_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,12 +13,12 @@
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
-#include "genie/entropy/zstd/subsequence.h"
+#include "genie/entropy/bsc/subsequence.h"
 #include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie::entropy::zstd {
+namespace genie::entropy::bsc {
 
 /**
  *
@@ -28,7 +28,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< @brief
 
  public:
-    static const uint8_t MODE_ZSTD = 2;  //!< @brief
+    static const uint8_t MODE_BSC = 3;  //!< @brief
 
     /**
      * @brief
@@ -100,11 +100,11 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::entropy::zstd
+}  // namespace genie::entropy::bsc
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_ZSTD_PARAM_DECODER_H_
+#endif  // SRC_GENIE_ENTROPY_BSC_PARAM_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

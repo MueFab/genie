@@ -44,6 +44,8 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
     return {std::move(out), data.getID()};
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
     const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
     (void)param;
@@ -66,17 +68,14 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
         }
         if (!subseq.isEmpty()) {
             std::get<1>(desc).addInteger("size-zstd-total-comp", subseq.getRawSize());
-            std::get<1>(desc).addInteger("size-zstd-" + subseq_name +
-                                             "-comp",
-                                         subseq.getRawSize());
+            std::get<1>(desc).addInteger("size-zstd-" + subseq_name + "-comp", subseq.getRawSize());
         }
 
         std::get<0>(desc).set(d_id.second, decompress(std::move(subseq)));
 
         if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
             std::get<1>(desc).addInteger("size-zstd-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
-            std::get<1>(desc).addInteger("size-zstd-" + subseq_name +
-                                             "-raw",
+            std::get<1>(desc).addInteger("size-zstd-" + subseq_name + "-raw",
                                          std::get<0>(desc).get(d_id.second).getRawSize());
         }
     }

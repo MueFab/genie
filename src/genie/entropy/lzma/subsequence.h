@@ -1,38 +1,53 @@
 /**
- * @file
+* @file
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ENTROPY_LZMA_DECODER_H_
-#define SRC_GENIE_ENTROPY_LZMA_DECODER_H_
+#ifndef SRC_GENIE_ENTROPY_LZMA_SUBSEQUENCE_H_
+#define SRC_GENIE_ENTROPY_LZMA_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <tuple>
-#include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-decoder.h"
+#include <cstdint>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::entropy::lzma {
 
 /**
- * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
+ * @brief
  */
-class Decoder : public core::EntropyDecoder {
+class Subsequence {
  public:
     /**
-     * @brief
-     * @param param
-     * @param d
-     * @param mmCoderEnabled
+     *
+     * @param _output_symbol_size
+     */
+    explicit Subsequence(uint8_t _output_symbol_size);
+
+    /**
+     *
      * @return
      */
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d,
-        bool mmCoderEnabled) override;
+    [[nodiscard]] uint8_t getOutputSymbolSize() const;
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(util::BitWriter &writer) const;
+
+    /**
+     * @brief
+     * @param rhs
+     * @return
+     */
+    bool operator==(const Subsequence &rhs) const;
+
+ private:
+    uint8_t output_symbol_size;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -41,7 +56,7 @@ class Decoder : public core::EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ENTROPY_LZMA_DECODER_H_
+#endif  // SRC_GENIE_ENTROPY_LZMA_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
