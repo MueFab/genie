@@ -11,7 +11,7 @@
 
 #include "genie/core/access-unit.h"
 #include "genie/core/entropy-encoder.h"
-
+#include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class Encoder : public core::EntropyEncoder {
      * @param desc
      * @return
      */
-    EntropyCoded process(core::AccessUnit::Descriptor& desc) override;
+    EntropyCoded process(core::AccessUnit::Descriptor &desc) override;
 
     /**
      * @brief
