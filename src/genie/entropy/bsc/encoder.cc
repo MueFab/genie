@@ -33,6 +33,8 @@ void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_confi
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) {
     auto descriptor_configuration = std::make_unique<core::parameter::desc_pres::DescriptorPresent>();
 
@@ -43,6 +45,8 @@ void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &p
     parameterSet = core::parameter::DescriptorSubseqCfg();
     parameterSet.set(std::move(descriptor_configuration));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence &&in) {
     size_t num_symbols = in.getNumSymbols();
@@ -62,6 +66,8 @@ core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence &&in) {
     out.set(std::move(output_buffer));
     return out;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor &desc) {
     EntropyCoded ret;

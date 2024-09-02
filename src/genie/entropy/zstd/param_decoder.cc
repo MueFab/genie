@@ -1,5 +1,5 @@
 /**
-* @file
+ * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
@@ -69,4 +69,17 @@ void DecoderRegular::write(util::BitWriter &writer) const {
         i.write(writer);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DecoderRegular::equals(const Decoder *dec) const {
+    return core::parameter::desc_pres::Decoder::equals(dec) &&
+           dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace genie::entropy::zstd
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
