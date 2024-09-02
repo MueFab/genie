@@ -16,10 +16,10 @@ stages:
 #          imageName: 'macos-11'
 #          artifactName: 'macos1100'
 #          binDir: 'bin'
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          binDir: 'bin/Debug'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          binDir: 'bin/Debug'
 #        windows2019:
 #          imageName: 'windows-2019'
 #          artifactName: 'windows2019'
@@ -98,11 +98,11 @@ stages:
 #          artifactName: 'macos1100'
 #          architecture: ''
 #          binDir: 'bin'
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
 #        windows2019:
 #          imageName: 'windows-2019'
 #          artifactName: 'windows2019'
@@ -158,10 +158,10 @@ stages:
 #          imageName: 'macos-11'
 #          artifactName: 'macos1100'
 #          fileExt: ''
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          fileExt: '.exe'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          fileExt: '.exe'
 #        windows2019:
 #          imageName: 'windows-2019'
 #          artifactName: 'windows2019'
@@ -273,10 +273,10 @@ stages:
 #          imageName: 'macos-11'
 #          artifactName: 'macos1100'
 #          fileExt: ''
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          binDir: 'bin/Debug'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          binDir: 'bin/Debug'
  #       windows2019:
  #         imageName: 'windows-2019'
  #         artifactName: 'windows2019'
