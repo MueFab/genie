@@ -67,6 +67,8 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
     return {std::move(out), data.getID()};
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
     const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
     (void)param;

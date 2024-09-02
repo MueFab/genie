@@ -7,7 +7,10 @@
 #include "genie/entropy/lzma/param_decoder.h"
 #include <memory>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie::entropy::lzma {
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_LZMA) {}
@@ -69,4 +72,17 @@ void DecoderRegular::write(util::BitWriter &writer) const {
         i.write(writer);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DecoderRegular::equals(const Decoder *dec) const {
+    return core::parameter::desc_pres::Decoder::equals(dec) &&
+           dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace genie::entropy::lzma
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
