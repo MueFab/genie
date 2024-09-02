@@ -270,7 +270,7 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
                           .getMismatchDecoder()
                           ->decodeMismatch(
                               getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
-                    : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                    : container.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
