@@ -3,8 +3,8 @@ project("genie-zstd")
 set(source_files
         decoder.cc
         encoder.cc
-        param_decoder.cpp
-        subsequence.cpp)
+        param_decoder.cc
+        subsequence.cc)
 
 if (${GABAC_BUILD_SHARED_LIB})
     add_library(genie-zstd SHARED ${source_files})
