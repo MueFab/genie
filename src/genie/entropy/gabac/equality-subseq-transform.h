@@ -14,27 +14,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
  * @param transformedSubseqs
  */
-void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs);
+void transformEqualityCoding(std::vector<util::DataBlock> *transformedSubseqs);
 
 /**
  * @brief
  * @param transformedSubseqs
  */
-void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs);
+void inverseTransformEqualityCoding(std::vector<util::DataBlock> *transformedSubseqs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

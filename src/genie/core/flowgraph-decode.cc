@@ -12,8 +12,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +36,7 @@ genie::core::RefDecoder* FlowGraphDecode::getRefDecoder() { return refDecoder; }
 
 FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) {
     readSelector.setDrain(&exporterSelector);
-    refMgr = genie::util::make_unique<ReferenceManager>(16);
+    refMgr = std::make_unique<ReferenceManager>(16);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -177,6 +176,7 @@ void FlowGraphDecode::setQVCoder(std::unique_ptr<genie::core::QVDecoder> dat, si
 
 void FlowGraphDecode::run() {
     std::vector<genie::util::OriginalSource*> imps;
+    imps.reserve(importers.size());
     for (auto& i : importers) {
         imps.emplace_back(i.get());
     }
@@ -196,8 +196,7 @@ core::stats::PerfStats FlowGraphDecode::getStats() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

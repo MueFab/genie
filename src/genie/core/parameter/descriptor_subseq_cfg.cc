@@ -7,19 +7,17 @@
 #include "genie/core/parameter/descriptor_subseq_cfg.h"
 #include <utility>
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorSubseqCfg::DescriptorSubseqCfg() : class_specific_dec_cfg_flag(false), descriptor_configurations(0) {
-    descriptor_configurations.push_back(util::make_unique<desc_pres::DescriptorPresent>());
+    descriptor_configurations.push_back(std::make_unique<desc_pres::DescriptorPresent>());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,9 +143,7 @@ bool DescriptorSubseqCfg::desc_comp(const DescriptorSubseqCfg& cfg) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

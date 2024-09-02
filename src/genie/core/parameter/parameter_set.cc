@@ -12,9 +12,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
+namespace genie::core::parameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +37,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
         class_IDs.push_back(bitReader.read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(DescriptorSubseqCfg(num_classes, GenDesc(i), bitReader));
+        descriptors.emplace_back(num_classes, GenDesc(i), bitReader);
     }
     auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
@@ -476,9 +474,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ParameterSet::operator==(const ParameterSet &pset) const {
-    return set == pset.set;
-}
+bool ParameterSet::operator==(const ParameterSet &pset) const { return set == pset.set; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -520,9 +516,7 @@ void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

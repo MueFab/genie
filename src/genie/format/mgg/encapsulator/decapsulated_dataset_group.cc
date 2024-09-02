@@ -5,18 +5,16 @@
  */
 
 #include "genie/format/mgg/encapsulator/decapsulated_dataset_group.h"
+#include <memory>
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other)  noexcept {
+DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& other) noexcept {
     id = other.id;
     meta_group = std::move(other.meta_group);
     meta_references = std::move(other.meta_references);
@@ -90,7 +88,7 @@ std::map<uint8_t, genie::core::meta::Reference> DecapsulatedDatasetGroup::decaps
     std::map<uint8_t, std::string> ref_metadata;
 
     for (auto& m : grp->getReferenceMetadata()) {
-        ref_metadata.emplace(std::make_pair(m.getReferenceID(), m.decapsulate()));
+        ref_metadata.emplace(m.getReferenceID(), m.decapsulate());
     }
 
     std::map<uint8_t, genie::core::meta::Reference> references;
@@ -101,7 +99,7 @@ std::map<uint8_t, genie::core::meta::Reference> DecapsulatedDatasetGroup::decaps
         if (it != ref_metadata.end()) {
             meta = std::move(it->second);
         }
-        references.emplace(std::make_pair(m.getReferenceID(), m.decapsulate(std::move(meta))));
+        references.emplace(m.getReferenceID(), m.decapsulate(std::move(meta)));
     }
     return references;
 }
@@ -121,7 +119,7 @@ DecapsulatedDatasetGroup::decapsulate_AU(genie::format::mgg::AccessUnit& au) {
         meta_au.setProtection(au.getProtection().decapsulate());
     }
     std::pair<genie::format::mgb::AccessUnit, std::optional<genie::core::meta::AccessUnit>> ret(au.decapsulate(),
-                                                                                                  std::nullopt);
+                                                                                                std::nullopt);
     if (has_meta) {
         ret.second = std::move(meta_au);
     }
@@ -155,11 +153,11 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
         }
     }
     for (auto& p : dt.getParameterSets()) {
-        mgb_file.addUnit(genie::util::make_unique<genie::core::parameter::ParameterSet>(p.descapsulate()));
+        mgb_file.addUnit(std::make_unique<genie::core::parameter::ParameterSet>(p.descapsulate()));
     }
     for (auto& au : dt.getAccessUnits()) {
         auto decap_au = decapsulate_AU(au);
-        mgb_file.addUnit(genie::util::make_unique<genie::format::mgb::AccessUnit>(std::move(decap_au.first)));
+        mgb_file.addUnit(std::make_unique<genie::format::mgb::AccessUnit>(std::move(decap_au.first)));
         if (decap_au.second != std::nullopt) {
             meta.addAccessUnit(std::move(*decap_au.second));
         }
@@ -185,10 +183,7 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

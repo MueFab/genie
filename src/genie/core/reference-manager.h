@@ -19,12 +19,11 @@
 #include <vector>
 #include "genie/core/meta/reference.h"
 #include "genie/core/reference-collection.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -102,7 +101,7 @@ class ReferenceManager {
          * @brief
          * @return
          */
-        bool isEmpty() const;
+        [[nodiscard]] bool isEmpty() const;
 
         /**
          * @brief
@@ -114,26 +113,26 @@ class ReferenceManager {
          * @brief
          * @return
          */
-        size_t getGlobalStart() const;
+        [[nodiscard]] size_t getGlobalStart() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getGlobalEnd() const;
+        [[nodiscard]] size_t getGlobalEnd() const;
 
         /**
          * @brief
          * @return
          */
-        const std::string& getRefName() const;
+        [[nodiscard]] const std::string& getRefName() const;
 
         /**
          * @brief
          * @param pos
          * @return
          */
-        std::shared_ptr<const std::string> getChunkAt(size_t pos) const;
+        [[nodiscard]] std::shared_ptr<const std::string> getChunkAt(size_t pos) const;
 
         /**
          * @brief
@@ -179,7 +178,7 @@ class ReferenceManager {
          * @param pos
          * @return
          */
-        bool isMapped(size_t pos) const;
+        [[nodiscard]] bool isMapped(size_t pos) const;
 
         /**
          * @brief
@@ -209,20 +208,20 @@ class ReferenceManager {
              * @brief
              * @return
              */
-            bool end() const;
+            [[nodiscard]] bool end() const;
 
             /**
              * @brief
              * @return
              */
-            char get() const;
+            [[nodiscard]] char get() const;
         };
 
         /**
          * @brief
          * @return
          */
-        Stepper getStepper() const;
+        [[nodiscard]] Stepper getStepper() const;
 
         /**
          * @brief
@@ -230,7 +229,7 @@ class ReferenceManager {
          * @param end
          * @return
          */
-        std::string getString(size_t start, size_t end) const;
+        [[nodiscard]] std::string getString(size_t start, size_t end) const;
     };
 
     /**
@@ -268,26 +267,25 @@ class ReferenceManager {
      * @param name
      * @return
      */
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
+    [[nodiscard]] std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
 
     /**
      * @brief
      * @return
      */
-    std::vector<std::string> getSequences() const;
+    [[nodiscard]] std::vector<std::string> getSequences() const;
 
     /**
      * @brief
      * @param name
      * @return
      */
-    size_t getLength(const std::string& name);
+    [[nodiscard]] size_t getLength(const std::string& name) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -48,7 +46,7 @@ class ContextSelector {
      * @param subsymIdx
      * @return
      */
-    unsigned int getContextIdxOrder0(const uint8_t subsymIdx);
+    unsigned int getContextIdxOrder0(uint8_t subsymIdx);
 
     /**
      * @brief
@@ -58,8 +56,8 @@ class ContextSelector {
      * @param codingOrder
      * @return
      */
-    unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx, const uint8_t prvIdx,
-                                       const std::vector<Subsymbol>& subsymbols, const uint8_t codingOrder);
+    unsigned int getContextIdxOrderGT0(uint8_t subsymIdx, uint8_t prvIdx, const std::vector<Subsymbol>& subsymbols,
+                                       uint8_t codingOrder);
 
  private:
     const paramcabac::StateVars stateVars;  //!< @brief
@@ -67,9 +65,7 @@ class ContextSelector {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

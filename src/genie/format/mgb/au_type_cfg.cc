@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,10 +32,10 @@ void AuTypeCfg::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AuTypeCfg::AuTypeCfg(uint16_t _sequence_ID, uint64_t _AU_start_position, uint64_t _AU_end_position, uint8_t _posSize)
+AuTypeCfg::AuTypeCfg(uint16_t _sequence_ID, uint64_t _aU_start_position, uint64_t _aU_end_position, uint8_t _posSize)
     : sequence_ID(_sequence_ID),
-      AU_start_position(_AU_start_position),
-      AU_end_position(_AU_end_position),
+      AU_start_position(_aU_start_position),
+      AU_end_position(_aU_end_position),
       posSize(_posSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -73,9 +71,7 @@ uint64_t AuTypeCfg::getEndPos() const { return AU_end_position; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

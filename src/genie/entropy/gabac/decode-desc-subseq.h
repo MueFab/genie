@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +29,7 @@ struct IOConfiguration;
  * @param transformedSubseqs
  */
 void doInverseSubsequenceTransform(const paramcabac::Subsequence& subseqCfg,
-                                   std::vector<util::DataBlock>* const transformedSubseqs);
+                                   std::vector<util::DataBlock>* transformedSubseqs);
 
 /**
  * @brief
@@ -43,9 +41,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration& ioConf, const EncodingConf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

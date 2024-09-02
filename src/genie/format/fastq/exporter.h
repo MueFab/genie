@@ -14,15 +14,13 @@
 #include "genie/core/record/chunk.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/drain.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/ordered-lock.h"
 #include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fastq {
+namespace genie::format::fastq {
 
 /**
  * @brief Module to export MPEG-G record to fastq files
@@ -61,9 +59,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fastq
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fastq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -9,9 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +17,7 @@ ContextSelector::ContextSelector(const paramcabac::StateVars& _stateVars) : stat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ContextSelector::ContextSelector(const ContextSelector& src) : stateVars(src.stateVars) {}
+ContextSelector::ContextSelector(const ContextSelector& src) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -44,9 +42,7 @@ unsigned int ContextSelector::getContextIdxOrderGT0(const uint8_t subsymIdx, con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -26,9 +26,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief Specifies which gabac transformations to execute
@@ -44,7 +42,7 @@ struct EncodingConfiguration {
      * @brief Create default config for a given descriptor subsequence
      * @param sub descriptor subsequence index.
      */
-    explicit EncodingConfiguration(const core::GenSubIndex sub);
+    explicit EncodingConfiguration(core::GenSubIndex sub);
 
     /**
      * @brief Create config from subseq
@@ -74,13 +72,13 @@ struct EncodingConfiguration {
      * @brief
      * @return
      */
-    uint8_t getSubseqWordSize() const;
+    [[nodiscard]] uint8_t getSubseqWordSize() const;
 
     /**
      * @brief
      * @return
      */
-    const paramcabac::Subsequence& getSubseqConfig() const;
+    [[nodiscard]] const paramcabac::Subsequence& getSubseqConfig() const;
 
     /**
      * @brief
@@ -98,7 +96,7 @@ struct EncodingConfiguration {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
  private:
     paramcabac::Subsequence subseqCfg;  //!< @brief
@@ -138,7 +136,7 @@ struct IOConfiguration {
      * @return The appropriate stream
      * Usage: log(LogLevel::LOG_FATAL) << "N=NP" << std::endl;
      */
-    std::ostream& log(const LogLevel& l) const;
+    [[nodiscard]] std::ostream& log(const LogLevel& l) const;
 
     /**
      * @brief Check if all streams are open and working
@@ -148,9 +146,7 @@ struct IOConfiguration {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

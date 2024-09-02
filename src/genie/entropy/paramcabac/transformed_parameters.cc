@@ -5,15 +5,15 @@
  */
 
 #include "genie/entropy/paramcabac/transformed_parameters.h"
+
+#include <utility>
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,6 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
     transform_ID_subseq = reader.read<TransformIdSubseq>(8);
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
-            break;
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:
@@ -110,12 +109,12 @@ uint16_t TransformedParameters::getParam() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t> TransformedParameters::getMergeCodingShiftSizes() const { return merge_coding_shift_size; }
+std::vector<uint8_t> TransformedParameters::getMergeCodingShiftSizes() const { return merge_coding_shift_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TransformedParameters::setMergeCodingShiftSizes(std::vector<uint8_t> mergeCodingshiftSizes) {
-    merge_coding_shift_size = mergeCodingshiftSizes;
+    merge_coding_shift_size = std::move(mergeCodingshiftSizes);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -188,9 +187,7 @@ TransformedParameters::TransformedParameters(const nlohmann::json &_json) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

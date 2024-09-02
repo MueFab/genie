@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Reference metadata
@@ -84,13 +82,13 @@ class Reference {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Return sequence name
      * @return Sequence name
      */
-    const std::string& getName() const;
+    [[nodiscard]] const std::string& getName() const;
 
     /**
      * @brief
@@ -102,25 +100,25 @@ class Reference {
      * @brief Return major version level
      * @return Major version
      */
-    uint32_t getMajorVersion() const;
+    [[nodiscard]] uint32_t getMajorVersion() const;
 
     /**
      * @brief Return minor version level
      * @return Minor version level
      */
-    uint32_t getMinorVersion() const;
+    [[nodiscard]] uint32_t getMinorVersion() const;
 
     /**
      * @brief Return patch version level
      * @return Patch version level
      */
-    uint32_t getPatchVersion() const;
+    [[nodiscard]] uint32_t getPatchVersion() const;
 
     /**
      * @brief Return list of reference sequences
      * @return Information about all reference sequences
      */
-    const std::vector<Sequence>& getSequences() const;
+    [[nodiscard]] const std::vector<Sequence>& getSequences() const;
 
     /**
      * @brief
@@ -138,7 +136,7 @@ class Reference {
      * @brief Get reference type specific information
      * @return Reference type specific information
      */
-    const RefBase& getBase() const;
+    [[nodiscard]] const RefBase& getBase() const;
 
     /**
      * @brief Get reference type specific information
@@ -150,7 +148,7 @@ class Reference {
      * @brief Return MPEG-G part 3 meta information
      * @return MPEG-G part 3 meta information
      */
-    const std::string& getInformation() const;
+    [[nodiscard]] const std::string& getInformation() const;
 
     /**
      * @brief
@@ -161,9 +159,7 @@ class Reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

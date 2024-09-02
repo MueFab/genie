@@ -11,9 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -139,6 +137,7 @@ DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core:
 
 std::vector<format::mgb::Block> DescriptorStream::decapsulate() {
     std::vector<format::mgb::Block> ret;
+    ret.reserve(payload.size());
     for (auto& p : payload) {
         ret.emplace_back(header.getDescriptorID(), std::move(p));
     }
@@ -152,12 +151,9 @@ bool DescriptorStream::isEmpty() const {
         return true;
     }
 
-    for (const auto& p : payload) {
-        if (p.getPayloadSize()) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(payload.begin(), payload.end(), [](const auto& p) {
+        return p.getPayloadSize() == 0;
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,9 +162,7 @@ DescriptorStreamProtection& DescriptorStream::getProtection() { return *ds_prote
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

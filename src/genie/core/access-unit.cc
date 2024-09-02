@@ -11,8 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -248,7 +247,8 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 1) {}
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id)
+    : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -317,12 +317,7 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool AccessUnit::Descriptor::isEmpty() const {
-    for (const auto &d : subdesc) {
-        if (!d.isEmpty()) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(subdesc.begin(), subdesc.end(), [](const auto &d) { return d.isEmpty(); });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -377,7 +372,7 @@ void AccessUnit::setReference(uint16_t ref) { referenceSequence = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t AccessUnit::getReference() { return referenceSequence; }
+uint16_t AccessUnit::getReference() const { return referenceSequence; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -457,8 +452,7 @@ void AccessUnit::setReferenceOnly(bool ref) { referenceOnly = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

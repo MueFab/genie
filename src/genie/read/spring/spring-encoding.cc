@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -95,7 +93,6 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
         f_RC << (*current_contig_it).RC;
     }
     abs_pos += ref.size();
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -130,7 +127,7 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
         read_flag_N[order_s[eg.numreads_s + i]] = true;
     }
 
-    uint32_t *cumulative_N_reads = new uint32_t[eg.numreads + eg.numreads_s];
+    auto *cumulative_N_reads = new uint32_t[eg.numreads + eg.numreads_s];
     // number of reads occuring before pos in clean reads
     uint32_t pos_in_clean = 0, num_N_reads_till_now = 0;
     for (uint32_t i = 0; i < numreads_total; i++) {
@@ -163,14 +160,11 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
     remove(eg.infile_order_N.c_str());
     delete[] read_flag_N;
     delete[] cumulative_N_reads;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

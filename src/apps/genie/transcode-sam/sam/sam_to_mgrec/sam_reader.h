@@ -18,10 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 /**
  * @brief
@@ -41,12 +38,6 @@ class SamReader {
      * @param fpath
      */
     explicit SamReader(const std::string& fpath);
-
-    /**
-     * @brief
-     * @param fpath
-     */
-    explicit SamReader(std::string& fpath);
 
     /**
      * @brief
@@ -81,10 +72,7 @@ class SamReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 

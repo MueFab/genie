@@ -16,13 +16,12 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/factory.h"
 #include "genie/util/generic-factory.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief
@@ -90,8 +89,7 @@ class IndustrialPark {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

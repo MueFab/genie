@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace localassembly {
+namespace genie::read::localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +35,7 @@ std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::Segmen
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<basecoder::DecoderStub::DecodingState> Decoder::createDecodingState(core::AccessUnit& t) {
-    return util::make_unique<LADecodingState>(t);
+    return std::make_unique<LADecodingState>(t);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -53,9 +51,7 @@ Decoder::LADecodingState::LADecodingState(core::AccessUnit& t_data)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace localassembly
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::localassembly
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

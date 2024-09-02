@@ -17,10 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 /**
  * @brief
@@ -33,7 +30,8 @@ struct EncapsulatedFile {
      * @param input_files
      * @return
      */
-    std::map<uint8_t, std::vector<std::string>> groupInputFiles(const std::vector<std::string>& input_files) const;
+    [[nodiscard]] static std::map<uint8_t, std::vector<std::string>> groupInputFiles(
+        const std::vector<std::string>& input_files);
 
     /**
      * @brief
@@ -52,10 +50,7 @@ struct EncapsulatedFile {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 

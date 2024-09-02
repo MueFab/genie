@@ -8,9 +8,7 @@
 
 #include <memory>
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -18,9 +16,7 @@ static std::unique_ptr<LogConfiguration> currentConfig;
 
 // -----------------------------------------------------------------------------
 
-void setLogging(const LogConfiguration& c) {
-    currentConfig = std::unique_ptr<LogConfiguration>(new LogConfiguration(c));
-}
+void setLogging(const LogConfiguration& c) { currentConfig = std::make_unique<LogConfiguration>(c); }
 
 // -----------------------------------------------------------------------------
 
@@ -54,9 +50,7 @@ LogConfiguration getStandard() {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

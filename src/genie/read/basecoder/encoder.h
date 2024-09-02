@@ -22,9 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace basecoder {
+namespace genie::read::basecoder {
 
 /**
  * @brief
@@ -138,7 +136,7 @@ class Encoder {
      * @brief
      * @param state
      */
-    void encodeSplice(CodingState &state);
+    static void encodeSplice(CodingState &state);
 
     /**
      * @brief
@@ -166,7 +164,8 @@ class Encoder {
      * @param rec
      * @return
      */
-    const core::record::alignment_split::SameRec &extractPairedAlignment(const core::record::Record &rec) const;
+    [[nodiscard]] static const core::record::alignment_split::SameRec &extractPairedAlignment(
+        const core::record::Record &rec);
 
  public:
     /**
@@ -192,9 +191,7 @@ class Encoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace basecoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::basecoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 

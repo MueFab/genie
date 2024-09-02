@@ -15,10 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace parameter {
-namespace desc_pres {
+namespace genie::core::parameter::desc_pres {
 
 /**
  * @brief
@@ -53,7 +50,7 @@ class DescriptorPresent : public Descriptor {
      * @brief
      * @return
      */
-    std::unique_ptr<Descriptor> clone() const override;
+    [[nodiscard]] std::unique_ptr<Descriptor> clone() const override;
 
     /**
      * @brief
@@ -71,15 +68,12 @@ class DescriptorPresent : public Descriptor {
      * @brief
      * @return
      */
-    const Decoder &getDecoder() const;
+    [[nodiscard]] const Decoder &getDecoder() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace desc_pres
-}  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::parameter::desc_pres
 
 // ---------------------------------------------------------------------------------------------------------------------
 

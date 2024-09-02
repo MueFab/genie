@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+namespace genie::quality::paramqv1 {
 
 /**
  * @brief
@@ -63,7 +61,7 @@ class Codebook {
      * @brief
      * @return
      */
-    const std::vector<uint8_t> &getEntries() const;
+    [[nodiscard]] const std::vector<uint8_t> &getEntries() const;
 
     /**
      * @brief
@@ -74,9 +72,7 @@ class Codebook {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
 
 // ---------------------------------------------------------------------------------------------------------------------
 

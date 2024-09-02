@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Information about a dataset group
@@ -44,19 +42,19 @@ class DatasetGroup {
      * @brief Return dataset group ID
      * @return dataset group ID
      */
-    uint16_t getID() const;
+    [[nodiscard]] uint16_t getID() const;
 
     /**
      * @brief Return current iteration version
      * @return Current version
      */
-    uint8_t getVersion() const;
+    [[nodiscard]] uint8_t getVersion() const;
 
     /**
      * @brief Return MPEG-G part 3 meta information
      * @return MPEG-G part 3 meta information
      */
-    const std::string& getInformation() const;
+    [[nodiscard]] const std::string& getInformation() const;
 
     /**
      * @brief
@@ -74,7 +72,7 @@ class DatasetGroup {
      * @brief Return MPEG-G part 3 meta information
      * @return MPEG-G part 3 protection information
      */
-    const std::string& getProtection() const;
+    [[nodiscard]] const std::string& getProtection() const;
 
     /**
      * @brief Construct from raw values
@@ -95,14 +93,12 @@ class DatasetGroup {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

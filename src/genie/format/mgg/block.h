@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -68,13 +66,13 @@ class Block : public Box {
      * @brief
      * @return
      */
-    uint32_t getPayloadSize() const;
+    [[nodiscard]] uint32_t getPayloadSize() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::util::DataBlock& getPayload() const;
+    [[nodiscard]] const genie::util::DataBlock& getPayload() const;
 
     /**
      * @brief
@@ -92,7 +90,7 @@ class Block : public Box {
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    [[nodiscard]] uint64_t getLength() const;
 
     /**
      * @brief
@@ -104,14 +102,12 @@ class Block : public Box {
      * @brief
      * @return
      */
-    genie::core::GenDesc getDescID() const;
+    [[nodiscard]] genie::core::GenDesc getDescID() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

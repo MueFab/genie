@@ -14,10 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 /**
  * @brief
@@ -58,21 +55,18 @@ class BlockHeaderOnOptions {
      * @brief
      * @return
      */
-    bool getMITFlag() const;
+    [[nodiscard]] bool getMITFlag() const;
 
     /**
      * @brief
      * @return
      */
-    bool getCCFlag() const;
+    [[nodiscard]] bool getCCFlag() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 

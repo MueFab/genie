@@ -4,20 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/descriptor_stream_protection.h"
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamProtection::DescriptorStreamProtection(std::string _DSProtectionValue)
-    : DSProtectionValue(std::move(_DSProtectionValue)) {}
+DescriptorStreamProtection::DescriptorStreamProtection(std::string _dSProtectionValue)
+    : DSProtectionValue(std::move(_dSProtectionValue)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -62,9 +60,7 @@ std::string DescriptorStreamProtection::decapsulate() { return std::move(DSProte
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

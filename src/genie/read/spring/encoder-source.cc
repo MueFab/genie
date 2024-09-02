@@ -5,21 +5,19 @@
  */
 
 #include "genie/read/spring/encoder-source.h"
+#include <filesystem>
 #include <string>
 #include <utility>
-#include <filesystem>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 SpringSource::SpringSource(const std::string& temp_dir, const compression_params& cp,
                            std::vector<core::parameter::EncodingSet>& p, core::stats::PerfStats s)
-    : params(p), stats(std::move(s)) {
+    : num_AUs(0), params(p), stats(std::move(s)) {
     auId = 0;
     // read info about number of blocks (AUs) and the number of reads and records in those
     const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -96,9 +94,7 @@ void SpringSource::flushIn(uint64_t& pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

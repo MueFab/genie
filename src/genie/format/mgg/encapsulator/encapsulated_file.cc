@@ -5,20 +5,18 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
-#include <utility>
 #include <filesystem>
+#include <utility>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
-    const std::vector<std::string>& input_files) const {
+    const std::vector<std::string>& input_files) {
     std::vector<std::string> unknown_id;
     std::map<uint8_t, std::vector<std::string>> ret;
     for (auto& i : input_files) {
@@ -70,20 +68,17 @@ EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, 
 
 genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MPEGMinorVersion version) {
     genie::format::mgg::MggFile ret;
-    ret.addBox(genie::util::make_unique<genie::format::mgg::FileHeader>(version));
+    ret.addBox(std::make_unique<genie::format::mgg::FileHeader>(version));
 
     for (auto& g : groups) {
-        ret.addBox(genie::util::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
+        ret.addBox(std::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
     }
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

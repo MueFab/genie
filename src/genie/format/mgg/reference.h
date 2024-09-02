@@ -22,9 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -104,37 +102,37 @@ class Reference : public GenInfo {
      * @brief
      * @return
      */
-    uint8_t getDatasetGroupID() const;
+    [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReferenceID() const;
+    [[nodiscard]] uint8_t getReferenceID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getReferenceName() const;
+    [[nodiscard]] const std::string& getReferenceName() const;
 
     /**
      * @brief
      * @return
      */
-    const reference::Version& getRefVersion() const;
+    [[nodiscard]] const reference::Version& getRefVersion() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<reference::Sequence>& getSequences() const;
+    [[nodiscard]] const std::vector<reference::Sequence>& getSequences() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -147,7 +145,7 @@ class Reference : public GenInfo {
      * @brief
      * @return
      */
-    const reference::Location& getLocation() const;
+    [[nodiscard]] const reference::Location& getLocation() const;
 
     /**
      * @brief
@@ -166,9 +164,7 @@ class Reference : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

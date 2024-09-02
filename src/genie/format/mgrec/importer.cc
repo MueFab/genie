@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgrec {
+namespace genie::format::mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,11 +41,11 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
     if (!checkSupport) {
         return true;
     }
-   /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
-        rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
-        discarded_missing_pair_U++;
-        return false;
-    }*/
+    /* if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+         rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
+         discarded_missing_pair_U++;
+         return false;
+     }*/
     for (const auto& a : rec.getAlignments()) {
         if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
             discarded_HM++;
@@ -145,9 +143,7 @@ void Importer::flushIn(uint64_t& pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgrec
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

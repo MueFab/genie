@@ -30,9 +30,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 /**
  * @brief
@@ -153,8 +151,7 @@ void correct_order(uint32_t *order_s, const encoder_global &eg);
  * @return
  */
 template <size_t bitset_size>
-std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
-                           const encoder_global_b<bitset_size> &egb);
+std::string bitsettostring(std::bitset<bitset_size> b, uint16_t readlen, const encoder_global_b<bitset_size> &egb);
 
 /**
  * @brief
@@ -203,9 +200,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

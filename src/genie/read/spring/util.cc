@@ -9,15 +9,14 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,10 +35,9 @@ std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void reverse_complement(char *s, char *s1, const int readlen) {
+void reverse_complement(const char *s, char *s1, const int readlen) {
     for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
     s1[readlen] = '\0';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,14 +52,21 @@ std::string reverse_complement(const std::string &s, const int readlen) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
-    auto randchar = []() -> char {
-        const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
+    static const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    static const size_t max_index = sizeof(charset) - 1;
+
+    // Use a random device and a Mersenne Twister engine for better randomness
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> distribution(0, max_index - 1);
+
+    auto randchar = [&]() -> char {
+        return charset[distribution(generator)];
     };
+
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);
     return str;
@@ -92,7 +97,6 @@ void write_dna_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -149,7 +153,6 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     fout.write(reinterpret_cast<char *>(&bitarray[0]), pos_in_bitarray);
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -182,9 +185,7 @@ void read_dnaN_from_bits(std::string &read, std::ifstream &fin) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

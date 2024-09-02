@@ -6,6 +6,7 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
@@ -14,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 using ClassType = core::record::ClassType;
 
@@ -182,7 +181,7 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
     util::Watch watch;
-    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    auto param = std::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
     const ClassType& classType = chunk.getData()[0].getClassID();
@@ -201,9 +200,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

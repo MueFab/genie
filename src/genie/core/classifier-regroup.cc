@@ -17,8 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,8 +57,8 @@ bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
 void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
     if (!data.getRef().isEmpty()) {
         if (refMode == RefMode::RELEVANT) {
-            for (size_t i = data.getRef().getGlobalStart() / refMgr->getChunkSize();
-                 i <= (data.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+            for (size_t i = data.getRef().getGlobalStart() / genie::core::ReferenceManager::getChunkSize();
+                 i <= (data.getRef().getGlobalEnd() - 1) / genie::core::ReferenceManager::getChunkSize(); ++i) {
                 if (isWritten(data.getRef().getRefName(), i)) {
                     continue;
                 }
@@ -67,7 +66,8 @@ void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
 
                 if (rawRefMode) {
                     size_t length = refMgr->getLength(data.getRef().getRefName());
-                    data.addRefToWrite(i * refMgr->getChunkSize(), std::min((i + 1) * refMgr->getChunkSize(), length));
+                    data.addRefToWrite(i * genie::core::ReferenceManager::getChunkSize(),
+                                       std::min((i + 1) * genie::core::ReferenceManager::getChunkSize(), length));
                 } else {
                     size_t length = refMgr->getLength(data.getRef().getRefName());
                     core::record::Chunk refChunk;
@@ -75,9 +75,9 @@ void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
                     refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
                     refChunk.getRef() = data.getRef();
                     core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
-                    std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
-                    if ((i + 1) * refMgr->getChunkSize() > length) {
-                        seq = seq.substr(0, length - i * refMgr->getChunkSize());
+                    std::string seq = *data.getRef().getChunkAt(i * genie::core::ReferenceManager::getChunkSize());
+                    if ((i + 1) * genie::core::ReferenceManager::getChunkSize() > length) {
+                        seq = seq.substr(0, length - i * genie::core::ReferenceManager::getChunkSize());
                     }
                     core::record::Segment segment(std::move(seq));
                     rec.addSegment(std::move(segment));
@@ -124,47 +124,59 @@ record::Chunk ClassifierRegroup::getChunk() {
         auto seqvec = refMgr->getSequences();
         while (true) {
             if (refModeFullSeqID != seqvec.size()) {
-                auto seq = seqvec.at(refModeFullSeqID);
+                const auto& seq = seqvec.at(refModeFullSeqID);
                 auto cov_vec = refMgr->getCoverage(seq);
                 auto cov = cov_vec.at(refModeFullCovID);
-                size_t chunkOffset = cov.first / refMgr->getChunkSize();
+                size_t chunkOffset = cov.first / genie::core::ReferenceManager::getChunkSize();
 
                 if (!isWritten(seq, chunkOffset + refModeFullChunkID)) {
                     core::record::Chunk refChunk;
 
                     std::cerr << "Writing ref " << seq << " ["
-                              << std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize())
+                              << std::max(cov.first, (chunkOffset + refModeFullChunkID) *
+                                                         genie::core::ReferenceManager::getChunkSize())
                               << ", "
-                              << std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize())
+                              << std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
+                                                          genie::core::ReferenceManager::getChunkSize())
                               << "]" << std::endl;
 
                     if (rawRefMode) {
-                        refChunk.addRefToWrite(
-                            std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
-                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
-                        refChunk.getRef() = refMgr->load(
-                            seq, std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
-                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
+                        refChunk.addRefToWrite(std::max(cov.first, (chunkOffset + refModeFullChunkID) *
+                                                                       genie::core::ReferenceManager::getChunkSize()),
+                                               std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
+                                                                        genie::core::ReferenceManager::getChunkSize()));
+                        refChunk.getRef() =
+                            refMgr->load(seq,
+                                         std::max(cov.first, (chunkOffset + refModeFullChunkID) *
+                                                                 genie::core::ReferenceManager::getChunkSize()),
+                                         std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
+                                                                  genie::core::ReferenceManager::getChunkSize()));
                         refChunk.setRefID(refMgr->ref2ID(seq));
                     } else {
                         refChunk.setReferenceOnly(true);
                         refChunk.setRefID(refMgr->ref2ID(seq));
-                        refChunk.getRef() = refMgr->load(
-                            seq, std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
-                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
+                        refChunk.getRef() =
+                            refMgr->load(seq,
+                                         std::max(cov.first, (chunkOffset + refModeFullChunkID) *
+                                                                 genie::core::ReferenceManager::getChunkSize()),
+                                         std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
+                                                                  genie::core::ReferenceManager::getChunkSize()));
                         core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
-                        std::string ref_seq =
-                            *refChunk.getRef().getChunkAt((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
+                        std::string ref_seq = *refChunk.getRef().getChunkAt(
+                            (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize());
                         if (ref_seq.empty()) {
                             std::cerr << "empty" << std::endl;
                         }
-                        if (cov.first > (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()) {
-                            ref_seq =
-                                ref_seq.substr(cov.first - (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
+                        if (cov.first >
+                            (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize()) {
+                            ref_seq = ref_seq.substr(cov.first - (chunkOffset + refModeFullChunkID) *
+                                                                     genie::core::ReferenceManager::getChunkSize());
                         }
-                        if (cov.second < (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()) {
+                        if (cov.second <
+                            (chunkOffset + refModeFullChunkID + 1) * genie::core::ReferenceManager::getChunkSize()) {
                             ref_seq = ref_seq.substr(
-                                0, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize() - cov.second);
+                                0, (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize() -
+                                       cov.second);
                         }
                         core::record::Segment segment(std::move(ref_seq));
                         rec.addSegment(std::move(segment));
@@ -172,7 +184,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     }
 
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / refMgr->getChunkSize())) {
+                    if (refModeFullChunkID > ((cov.second - 1) / genie::core::ReferenceManager::getChunkSize())) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }
@@ -184,7 +196,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     return refChunk;
                 } else {
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / refMgr->getChunkSize())) {
+                    if (refModeFullChunkID > ((cov.second - 1) / genie::core::ReferenceManager::getChunkSize())) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }
@@ -321,8 +333,7 @@ void ClassifierRegroup::flush() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

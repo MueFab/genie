@@ -22,15 +22,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 RefInfo::RefInfo(const std::string& fasta_name)
-    : refMgr(genie::util::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
+    : refMgr(std::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
     if (!std::filesystem::exists(fasta_name)) {
         return;
     }
@@ -50,11 +47,11 @@ RefInfo::RefInfo(const std::string& fasta_name)
         genie::format::fasta::FastaReader::hash(faifile, fai_in, sha_out);
     }
 
-    fastaFile = genie::util::make_unique<std::ifstream>(fasta_name);
-    faiFile = genie::util::make_unique<std::ifstream>(fai_name);
-    shaFile = genie::util::make_unique<std::ifstream>(sha_name);
+    fastaFile = std::make_unique<std::ifstream>(fasta_name);
+    faiFile = std::make_unique<std::ifstream>(fai_name);
+    shaFile = std::make_unique<std::ifstream>(sha_name);
 
-    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
+    fastaMgr = std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
                                                                        fasta_name);
     valid = true;
 }
@@ -121,10 +118,10 @@ std::vector<genie::core::record::Record> splitRecord(genie::core::record::Record
             genie::core::record::AlignmentBox box2(input.getAlignments().front().getPosition() + split.getDelta(),
                                                    genie::core::record::Alignment(split.getAlignment()));
 
-            box.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+            box.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 box2.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
-            box2.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+            box2.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 box.getPosition(), input.getAlignmentSharedData().getSeqID()));
 
             ret.back().addAlignment(input.getAlignmentSharedData().getSeqID(), genie::core::record::AlignmentBox(box));
@@ -451,12 +448,9 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
-    for (const auto& c : seq) {
-        if (!alphabet.isIncluded(c)) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
+        return alphabet.isIncluded(c);
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -532,7 +526,7 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                     alg.addMappingScore(s);
                 }
 
-                newBox.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(
+                newBox.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::SameRec>(
                     split.getDelta(), std::move(alg)));
             } else {
                 newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
@@ -553,16 +547,16 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
 
     std::vector<size_t> sam_hdr_to_fasta_lut;
     if (!options.no_ref) {
-        for (size_t i = 0; i < refs.size(); ++i) {
+        for (const auto& ref : refs) {
             bool found = false;
             for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
-                if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
+                if (ref.first == refinf.getMgr()->getSequences().at(j)) {
                     sam_hdr_to_fasta_lut.push_back(j);
                     found = true;
                     break;
                 }
             }
-            UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
+            UTILS_DIE_IF(!found, "Did not find ref " + ref.first);
         }
     } else {
         for (size_t i = 0; i < refs.size(); ++i) {
@@ -573,7 +567,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::unique_ptr<std::ostream> total_output;
     std::ostream* out_stream = &std::cout;
     if (options.outputFile.substr(0, 2) != "-.") {
-        total_output = genie::util::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
+        total_output = std::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
         out_stream = total_output.get();
     }
     genie::util::BitWriter total_output_writer(out_stream);
@@ -586,7 +580,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
     for (int i = 0; i < num_chunks; ++i) {
         readers.emplace_back(
-            genie::util::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
+            std::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;
@@ -963,10 +957,7 @@ void transcode_mpg2sam(Config& options) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

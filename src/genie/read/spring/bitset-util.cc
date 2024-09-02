@@ -9,13 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
+void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) const {
     dictidx[0] = startpos[startposidx];
     auto endidx = startpos[startposidx + 1];
     if (read_id[endidx - 1] == MAX_NUM_READS)  // means exactly one read has been removed
@@ -26,16 +24,15 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
         // number of reads left)
         dictidx[1] = dictidx[0] + read_id[endidx - 2];
     else
-        dictidx[1] = endidx;  // no read deleted
-    return;
+        dictidx[1] = endidx;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current) {
+void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current) const {
     auto size = dictidx[1] - dictidx[0];
     if (size == 1) {  // just one read left in bin
-        empty_bin[startposidx] = 1;
+        empty_bin[startposidx] = true;
         return;  // need to keep one read to check during matching
     }
     int64_t pos = std::lower_bound(read_id + dictidx[0], read_id + dictidx[1], current) - (read_id + dictidx[0]);
@@ -50,14 +47,11 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
     } else {                                         // more than two reads have been deleted
         read_id[endidx - 2]--;
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

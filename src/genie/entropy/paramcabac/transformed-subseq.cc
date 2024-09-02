@@ -7,13 +7,11 @@
 #include "genie/entropy/paramcabac/transformed-subseq.h"
 #include <utility>
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,8 +26,8 @@ TransformedSubSeq::TransformedSubSeq(SupportValues::TransformIdSubsym _transform
                                      const core::GenSubIndex _subsequence_ID, bool original,
                                      const core::AlphabetID _alphabet_ID)
     : transform_ID_subsym(_transform_ID_subsym),
-      support_values(std::move(_support_values)),
-      cabac_binarization(std::move(_cabac_binarization)),
+      support_values(_support_values),
+      cabac_binarization(_cabac_binarization),
       subsequence_ID(_subsequence_ID),
       alphabet_ID(_alphabet_ID) {
     state_vars.populate(transform_ID_subsym, support_values, cabac_binarization, subsequence_ID, alphabet_ID, original);
@@ -117,9 +115,7 @@ nlohmann::json TransformedSubSeq::toJson() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

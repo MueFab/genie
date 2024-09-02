@@ -19,10 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 /**
  * @brief Helping structure to sort the records
@@ -60,8 +57,8 @@ class SamRecordGroup {
      * @param other_r
      * @param force_split
      */
-    void addAlignment(genie::core::record::Record& rec, SamRecord* r1, SamRecord* r2, bool paired_end,
-                      bool force_split = false);
+    static void addAlignment(genie::core::record::Record& rec, SamRecord* r1, SamRecord* r2, bool paired_end,
+                             bool force_split = false);
 
     /**
      * @brief
@@ -138,7 +135,7 @@ class SamRecordGroup {
      * @param rec
      * @param r1
      */
-    void addSegment(genie::core::record::Record& rec, SamRecord* r1);
+    static void addSegment(genie::core::record::Record& rec, SamRecord* r1);
 
  public:
     /**
@@ -175,10 +172,7 @@ class SamRecordGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 

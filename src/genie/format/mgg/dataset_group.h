@@ -9,9 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/core/constants.h"
 #include "genie/format/mgg/dataset.h"
 #include "genie/format/mgg/dataset_group_header.h"
@@ -24,21 +24,19 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
  */
 class DatasetGroup : public GenInfo {
  private:
-    std::optional<DatasetGroupHeader> header;          //!< @brief
+    std::optional<DatasetGroupHeader> header;            //!< @brief
     std::vector<Reference> references;                   //!< @brief
     std::vector<ReferenceMetadata> reference_metadatas;  //!< @brief
-    std::optional<LabelList> labels;                   //!< @brief
-    std::optional<DatasetGroupMetadata> metadata;      //!< @brief
-    std::optional<DatasetGroupProtection> protection;  //!< @brief
+    std::optional<LabelList> labels;                     //!< @brief
+    std::optional<DatasetGroupMetadata> metadata;        //!< @brief
+    std::optional<DatasetGroupProtection> protection;    //!< @brief
     std::vector<Dataset> dataset;                        //!< @brief
 
     core::MPEGMinorVersion version;  //!< @brief
@@ -119,13 +117,13 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    const DatasetGroupHeader& getHeader() const;
+    [[nodiscard]] const DatasetGroupHeader& getHeader() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<Reference>& getReferences() const;
+    [[nodiscard]] const std::vector<Reference>& getReferences() const;
 
     /**
      * @brief
@@ -137,7 +135,7 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<ReferenceMetadata>& getReferenceMetadata() const;
+    [[nodiscard]] const std::vector<ReferenceMetadata>& getReferenceMetadata() const;
 
     /**
      * @brief
@@ -149,13 +147,13 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    bool hasLabelList() const;
+    [[nodiscard]] bool hasLabelList() const;
 
     /**
      * @brief
      * @return
      */
-    const LabelList& getLabelList() const;
+    [[nodiscard]] const LabelList& getLabelList() const;
 
     /**
      * @brief
@@ -167,13 +165,13 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    bool hasMetadata() const;
+    [[nodiscard]] bool hasMetadata() const;
 
     /**
      * @brief
      * @return
      */
-    const DatasetGroupMetadata& getMetadata() const;
+    [[nodiscard]] const DatasetGroupMetadata& getMetadata() const;
 
     /**
      * @brief
@@ -185,13 +183,13 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    bool hasProtection() const;
+    [[nodiscard]] bool hasProtection() const;
 
     /**
      * @brief
      * @return
      */
-    const DatasetGroupProtection& getProtection() const;
+    [[nodiscard]] const DatasetGroupProtection& getProtection() const;
 
     /**
      * @brief
@@ -215,7 +213,7 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    const std::vector<Dataset>& getDatasets() const;
+    [[nodiscard]] const std::vector<Dataset>& getDatasets() const;
 
     /**
      * @brief
@@ -227,7 +225,7 @@ class DatasetGroup : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -253,9 +251,7 @@ class DatasetGroup : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,10 +7,10 @@
 #define NOMINMAX
 #include "genie/entropy/gabac/benchmark.h"
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include <filesystem>
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
@@ -18,9 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -341,7 +339,7 @@ std::string ResultFull::toCSV(const std::string& filename) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ResultFull::getCSVHeader() {
+std::string ResultFull::getCSVHeader() const {
     std::string desc;
     desc += "File;Compressed size;Compression time;Transformation;TransformationParam;";
     for (size_t i = 0; i < config.getTransformSubseqCfgs().size(); ++i) {
@@ -376,7 +374,7 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         timer.reset();
         auto cfg = config.createConfig(desc, core::getDescriptor(desc.first).tokentype);
         gabac::doSubsequenceTransform(cfg, &transformedSubseqs);
-        size_t total_time = static_cast<size_t>(timer.check() * 1000);
+        auto total_time = static_cast<size_t>(timer.check() * 1000);
         std::vector<ResultTransformed> trans_results;
 
         // Optimze transformed sequences independently
@@ -584,7 +582,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
         auto time = size_t(watch.check() * 1000);  // Milliseconds
         auto size = input.getRawSize();
 
-        float newscore = static_cast<float>(timeweight * time + (1.0 - timeweight) * size);
+        auto newscore = static_cast<float>(timeweight * time + (1.0 - timeweight) * size);
         if (newscore < score) {
             // Found new bets score
             score = newscore;
@@ -598,7 +596,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
         result_current.config = cfg;
 
         if (new_file) {
-            results_file << result_current.getCSVHeader() << std::endl;
+            results_file << genie::entropy::gabac::ResultTransformed::getCSVHeader() << std::endl;
             new_file = false;
         }
         results_file << result_current.toCSV(filename, transformation, transformation_param, sequence_id) << std::endl;
@@ -608,9 +606,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

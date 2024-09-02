@@ -3,7 +3,7 @@ project("genie-module")
 set(source_files
         default-setup.cc
         manager.cc
-        )
+)
 
 add_library(genie-module ${source_files})
 
@@ -21,6 +21,9 @@ target_link_libraries(genie-module PUBLIC genie-localassembly)
 target_link_libraries(genie-module PUBLIC genie-lowlatency)
 #target_link_libraries(genie-module PUBLIC genie-mgg)
 target_link_libraries(genie-module PUBLIC genie-gabac)
+target_link_libraries(genie-module PUBLIC genie-zstd)
+target_link_libraries(genie-module PUBLIC genie-lzma)
+target_link_libraries(genie-module PUBLIC genie-bsc)
 target_link_libraries(genie-module PUBLIC genie-spring)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)

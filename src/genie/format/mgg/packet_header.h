@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -34,31 +32,31 @@ class PacketHeader {
      * @brief
      * @return
      */
-    uint16_t getSID() const;
+    [[nodiscard]] uint16_t getSID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getReserved() const;
+    [[nodiscard]] uint8_t getReserved() const;
 
     /**
      * @brief
      * @return
      */
-    bool getMarkerBit() const;
+    [[nodiscard]] bool getMarkerBit() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getSequenceNumber() const;
+    [[nodiscard]] uint8_t getSequenceNumber() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getPacketSize() const;
+    [[nodiscard]] uint16_t getPacketSize() const;
 
     /**
      * @brief
@@ -86,14 +84,12 @@ class PacketHeader {
      * @brief
      * @return
      */
-    uint64_t getLength() const;
+    [[nodiscard]] static uint64_t getLength();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

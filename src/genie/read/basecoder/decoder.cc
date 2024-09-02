@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace basecoder {
+namespace genie::read::basecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,39 +39,33 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
             break;
         case core::GenConst::PAIR_R1_SPLIT:
             std::get<1>(state).setRead1First(false);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R1_SPLIT), ref));
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
+                container.pull(core::GenSub::PAIR_R1_SPLIT), ref));
             break;
         case core::GenConst::PAIR_R2_SPLIT:
             std::get<1>(state).setRead1First(true);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R2_SPLIT), ref));
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
+                container.pull(core::GenSub::PAIR_R2_SPLIT), ref));
             break;
         case core::GenConst::PAIR_R1_DIFF_REF:
             std::get<1>(state).setRead1First(false);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R1_DIFF_POS),
-                    (uint16_t)container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
+                container.pull(core::GenSub::PAIR_R1_DIFF_POS),
+                (uint16_t)container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R2_DIFF_REF:
             std::get<1>(state).setRead1First(true);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R2_DIFF_POS),
-                    (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
+                container.pull(core::GenSub::PAIR_R2_DIFF_POS),
+                (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
             std::get<1>(state).setRead1First(true);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
         case core::GenConst::PAIR_R2_UNPAIRED:
             std::get<1>(state).setRead1First(false);
-            std::get<0>(state).addAlignmentSplit(
-                genie::util::make_unique<genie::core::record::alignment_split::Unpaired>());
+            std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::Unpaired>());
             break;
     }
     for (size_t i = 1; i < sequences.size(); ++i) {
@@ -217,7 +209,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
     alignment.addMappingScore(MSCORE);
     std::get<0>(state).addAlignmentSplit(
-        genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
+        std::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(state).addSegment(std::move(segment));
@@ -272,7 +264,9 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
                           .getMismatchDecoder()
                           ->decodeMismatch(
                               getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
-                    : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                    : (container.get(core::GenSub::MMTYPE_SUBSTITUTION).end()
+                           ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
+                           : container.get(core::GenSub::MMTYPE_SUBSTITUTION).pull());
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
@@ -353,9 +347,7 @@ void Decoder::clear() { this->container.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace basecoder
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::basecoder
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

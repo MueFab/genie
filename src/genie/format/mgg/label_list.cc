@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,6 +80,7 @@ void LabelList::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
 
 std::vector<genie::core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
     std::vector<genie::core::meta::Label> ret;
+    ret.reserve(labels.size());
     for (auto& l : labels) {
         ret.emplace_back(l.decapsulate(dataset));
     }
@@ -107,7 +106,7 @@ void LabelList::read_box(util::BitReader& reader, bool in_offset) {
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
         reader.readBypass(tmp_str);
-        uint64_t offset = reader.readBypassBE<uint64_t>();
+        auto offset = reader.readBypassBE<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             read_box(reader, in_offset);
             return;
@@ -123,9 +122,7 @@ void LabelList::read_box(util::BitReader& reader, bool in_offset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

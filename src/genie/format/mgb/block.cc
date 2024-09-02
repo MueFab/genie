@@ -12,20 +12,19 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
-    : descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {
+    : descriptor_ID(_descriptor_ID), block_payload_size(0), count(0), payload(std::move(_payload)) {
     count = static_cast<uint8_t>(std::get<core::AccessUnit::Descriptor>(payload).getSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block() : descriptor_ID(0), block_payload_size(0), payload(core::AccessUnit::Descriptor(core::GenDesc(0))) {}
+Block::Block()
+    : descriptor_ID(0), block_payload_size(0), count(0), payload(core::AccessUnit::Descriptor(core::GenDesc(0))) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -167,9 +166,7 @@ core::Payload &Block::getPayloadUnparsed() { return std::get<core::Payload>(payl
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

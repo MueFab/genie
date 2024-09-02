@@ -9,9 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +22,7 @@ uint32_t Block::getPayloadSize() const { return header.getPayloadSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Block::getLength() const {
-    uint64_t len = header.getLength() + header.getPayloadSize();
+    uint64_t len = genie::format::mgg::BlockHeader::getLength() + header.getPayloadSize();
 
     /// block_payload[] u(8)
     //    len += block_payload.size() * sizeof(uint8_t);
@@ -84,9 +82,7 @@ format::mgb::Block Block::decapsulate() { return {header.getDescriptorID(), move
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,18 +31,18 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
     for (int j = 0; j < numdict; j++) mask1[j].reset();
     for (int j = 0; j < numdict; j++)
         for (int i = bpb * dict[j].start; i < bpb * (dict[j].end + 1); i++) mask1[j][i] = 1;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, const int numdict,
-                         const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads) {
-    std::bitset<bitset_size> *mask = new std::bitset<bitset_size>[numdict];
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths,
+                         const int numdict, const uint32_t &numreads, const int bpb, const std::string &basedir,
+                         const int &num_threads) {
+    auto *mask = new std::bitset<bitset_size>[numdict];
     generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
     for (int j = 0; j < numdict; j++) {
-        uint64_t *ull = new uint64_t[numreads];
+        auto *ull = new uint64_t[numreads];
 
         //
         // It is not worth putting parallel region here.
@@ -230,7 +228,6 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
         }  // parallel for end
     }
     delete[] mask;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -245,23 +242,19 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
             for (int k = bpb * i; k < bpb * max_readlen - bpb * j; k++) mask[i][j][k] = 1;
         }
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
-void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
+void chartobitset(const char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
     b.reset();
     for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

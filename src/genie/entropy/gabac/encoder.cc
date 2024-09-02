@@ -10,14 +10,12 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "genie/util/make-unique.h"
+
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -98,9 +96,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     out.annotateNumSymbols(num_symbols);
     out.set(std::move(outblock));
 
-    if (bufferDependencyStream != nullptr) {
-        delete bufferDependencyStream;
-    }
+    delete bufferDependencyStream;
 
     return out;
 }
@@ -169,9 +165,7 @@ Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

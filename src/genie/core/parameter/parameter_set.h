@@ -23,8 +23,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,37 +66,37 @@ class EncodingSet {
     bool multiple_alignments_flag;                                  //!< @brief
     bool spliced_reads_flag;                                        //!< @brief
     uint32_t reserved{};                                            //!< @brief
-    std::optional<SignatureCfg> signature_cfg;                    //!< @brief
+    std::optional<SignatureCfg> signature_cfg;                      //!< @brief
     std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;  //!< @brief
-    std::optional<ComputedRef> parameter_set_crps;                //!< @brief
+    std::optional<ComputedRef> parameter_set_crps;                  //!< @brief
 
     /**
      * @brief
      * @param ps
      * @return
      */
-    bool qual_cmp(const EncodingSet &ps) const;
+    [[nodiscard]] bool qual_cmp(const EncodingSet &ps) const;
 
  public:
-    AlphabetID getAlphabetID() const { return alphabet_ID; }
+    [[nodiscard]] AlphabetID getAlphabetID() const { return alphabet_ID; }
 
     /**
      * @brief
      * @return
      */
-    const ComputedRef &getComputedRef() const;
+    [[nodiscard]] const ComputedRef &getComputedRef() const;
 
     /**
      * @brief
      * @return
      */
-    bool isComputedReference() const;
+    [[nodiscard]] bool isComputedReference() const;
 
     /**
      * @brief
      * @return
      */
-    size_t getNumberTemplateSegments() const;
+    [[nodiscard]] size_t getNumberTemplateSegments() const;
 
     /**
      * @brief
@@ -124,7 +123,7 @@ class EncodingSet {
      * @param index
      * @return
      */
-    const DescriptorSubseqCfg &getDescriptor(GenDesc index) const;
+    [[nodiscard]] const DescriptorSubseqCfg &getDescriptor(GenDesc index) const;
 
     /**
      * @brief
@@ -136,25 +135,25 @@ class EncodingSet {
      * @brief
      * @return
      */
-    DataUnit::DatasetType getDatasetType() const;
+    [[nodiscard]] DataUnit::DatasetType getDatasetType() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getPosSize() const;
+    [[nodiscard]] uint8_t getPosSize() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasMultipleAlignments() const;
+    [[nodiscard]] bool hasMultipleAlignments() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getReadLength() const;
+    [[nodiscard]] uint32_t getReadLength() const;
 
     /**
      * @brief
@@ -187,7 +186,7 @@ class EncodingSet {
      * @param type
      * @return
      */
-    const QualityValues &getQVConfig(record::ClassType type) const;
+    [[nodiscard]] const QualityValues &getQVConfig(record::ClassType type) const;
 
     /**
      * @brief
@@ -211,19 +210,19 @@ class EncodingSet {
      * @brief
      * @return
      */
-    bool isSignatureActivated() const;
+    [[nodiscard]] bool isSignatureActivated() const;
 
     /**
      * @brief
      * @return
      */
-    bool isSignatureConstLength() const;
+    [[nodiscard]] bool isSignatureConstLength() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getSignatureConstLength() const;
+    [[nodiscard]] uint8_t getSignatureConstLength() const;
 
     /**
      * @brief
@@ -336,13 +335,13 @@ class ParameterSet : public DataUnit {
      * @brief
      * @return
      */
-    uint8_t getParentID() const;
+    [[nodiscard]] uint8_t getParentID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getID() const;
+    [[nodiscard]] uint8_t getID() const;
 
     /**
      * @brief
@@ -354,13 +353,13 @@ class ParameterSet : public DataUnit {
      * @brief
      * @return
      */
-    const EncodingSet &getEncodingSet() const { return set; }
+    [[nodiscard]] const EncodingSet &getEncodingSet() const { return set; }
 
     /**
      * @brief
      * @return
      */
-    virtual uint64_t getLength() const;
+    [[nodiscard]] virtual uint64_t getLength() const;
 
     /**
      * @brief
@@ -378,8 +377,7 @@ class ParameterSet : public DataUnit {
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace parameter
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

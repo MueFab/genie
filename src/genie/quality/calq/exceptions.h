@@ -15,9 +15,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -29,7 +27,7 @@ class Exception : public std::exception {
     /**
      * Create new exception
      */
-    explicit Exception(const std::string& msg);
+    explicit Exception(std::string msg);
 
     /**
      * @param e Copy
@@ -44,12 +42,12 @@ class Exception : public std::exception {
     /**
      * @return Get message
      */
-    virtual std::string getMessage() const;
+    [[nodiscard]] virtual std::string getMessage() const;
 
     /**
      * Get message
      */
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 
  protected:
     std::string msg_;
@@ -71,9 +69,7 @@ class ErrorException : public Exception {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

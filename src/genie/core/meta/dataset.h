@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include "genie/core/meta/access-unit.h"
 #include "genie/core/meta/blockheader.h"
 #include "genie/core/meta/blockheader/enabled.h"
@@ -20,22 +20,20 @@
 #include "genie/core/meta/descriptor-stream.h"
 #include "genie/core/meta/label.h"
 #include "genie/core/meta/reference.h"
-#include "genie/util/make-unique.h"
+
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Metadata collection for a whole dataset
  */
 class Dataset {
  private:
-    std::optional<DatasetGroup> dataset_group;       //!< @brief Optional information about dataset group
-    std::optional<Reference> reference;              //!< @brief Optional information about reference
+    std::optional<DatasetGroup> dataset_group;         //!< @brief Optional information about dataset group
+    std::optional<Reference> reference;                //!< @brief Optional information about reference
     std::vector<Label> label_list;                     //!< @brief List of labels
     uint32_t version;                                  //!< @brief Current iteration of dataset
     std::unique_ptr<BlockHeader> headerCfg;            //!< @brief Configuration of block headers
@@ -87,13 +85,13 @@ class Dataset {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
     /**
      * @brief Return dataset group information, if any
      * @return DatasetGroup information
      */
-    const std::optional<DatasetGroup>& getDataGroup() const;
+    [[nodiscard]] const std::optional<DatasetGroup>& getDataGroup() const;
 
     /**
      * @brief
@@ -105,7 +103,7 @@ class Dataset {
      * @brief Return reference information, if any
      * @return Reference information
      */
-    const std::optional<Reference>& getReference() const;
+    [[nodiscard]] const std::optional<Reference>& getReference() const;
 
     /**
      * @brief
@@ -117,7 +115,7 @@ class Dataset {
      * @brief Return list of labels
      * @return List of labels
      */
-    const std::vector<Label>& getLabels() const;
+    [[nodiscard]] const std::vector<Label>& getLabels() const;
 
     /**
      * @brief
@@ -129,19 +127,19 @@ class Dataset {
      * @brief Return current version iteration
      * @return Version iteration
      */
-    uint32_t getVersion() const;
+    [[nodiscard]] uint32_t getVersion() const;
 
     /**
      * @brief Return block header config
      * @return Block header config
      */
-    const BlockHeader& getHeader() const;
+    [[nodiscard]] const BlockHeader& getHeader() const;
 
     /**
      * @brief Return MPEG-G Part 3 meta information
      * @return MPEG-G Part 3 meta information
      */
-    const std::string& getInformation() const;
+    [[nodiscard]] const std::string& getInformation() const;
 
     /**
      * @brief
@@ -153,7 +151,7 @@ class Dataset {
      * @brief Return MPEG-G Part 3 protection information
      * @return MPEG-G Part 3 protection information
      */
-    const std::string& getProtection() const;
+    [[nodiscard]] const std::string& getProtection() const;
 
     /**
      * @brief
@@ -165,7 +163,7 @@ class Dataset {
      * @brief Return list of access unit meta information blocks
      * @return AU meta information blocks
      */
-    const std::vector<AccessUnit>& getAUs() const;
+    [[nodiscard]] const std::vector<AccessUnit>& getAUs() const;
 
     /**
      * @brief
@@ -177,7 +175,7 @@ class Dataset {
      * @brief Return list of descriptor stream meta information blocks
      * @return Descriptor stream blocks
      */
-    const std::vector<DescriptorStream>& getDSs() const;
+    [[nodiscard]] const std::vector<DescriptorStream>& getDSs() const;
 
     /**
      * @brief
@@ -218,9 +216,7 @@ class Dataset {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

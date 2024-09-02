@@ -15,8 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -43,7 +42,7 @@ class Payload {
      * @brief
      * @return
      */
-    uint64_t getPayloadSize() const;
+    [[nodiscard]] uint64_t getPayloadSize() const;
 
     /**
      * @brief
@@ -59,13 +58,13 @@ class Payload {
      * @brief
      * @return
      */
-    bool isPayloadLoaded() const;
+    [[nodiscard]] bool isPayloadLoaded() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::util::DataBlock& getPayload() const;
+    [[nodiscard]] const genie::util::DataBlock& getPayload() const;
 
     /**
      * @brief
@@ -102,8 +101,7 @@ class Payload {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

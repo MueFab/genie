@@ -7,13 +7,11 @@
 #include "genie/format/mgg/encapsulator/encapsulated_dataset_group.h"
 #include <map>
 #include <utility>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -146,7 +144,7 @@ void EncapsulatedDatasetGroup::mergeLabels() {
     for (auto& d : datasets) {
         for (auto& l : d->meta.getLabels()) {
             for (auto& s : d->datasets) {
-                labels[l.getID()].emplace_back(genie::format::mgg::LabelDataset(s.getHeader().getDatasetID(), l));
+                labels[l.getID()].emplace_back(s.getHeader().getDatasetID(), l);
             }
         }
     }
@@ -169,7 +167,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
                                                    genie::core::MPEGMinorVersion version) {
     datasets.reserve(input_files.size());
     for (const auto& i : input_files) {
-        datasets.emplace_back(genie::util::make_unique<EncapsulatedDataset>(i, version));
+        datasets.emplace_back(std::make_unique<EncapsulatedDataset>(i, version));
     }
     size_t index = 0;
     for (auto& d : datasets) {
@@ -216,10 +214,7 @@ genie::format::mgg::DatasetGroup EncapsulatedDatasetGroup::assemble(genie::core:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

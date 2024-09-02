@@ -24,9 +24,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,21 +36,21 @@ typedef boomphf::mphf<uint64_t, hasher_t> boophf_t;
  */
 class bbhashdict {
  public:
-    boophf_t *bphf;          //!< @brief
-    int start;               //!< @brief
-    int end;                 //!< @brief
-    uint32_t numkeys;        //!< @brief
-    uint32_t dict_numreads;  //!< number of reads in this dict (for variable length)
-    uint32_t *startpos;      //!< @brief
-    uint32_t *read_id;       //!< @brief
-    bool *empty_bin = NULL;  //!< @brief
+    boophf_t *bphf;             //!< @brief
+    int start;                  //!< @brief
+    int end;                    //!< @brief
+    uint32_t numkeys;           //!< @brief
+    uint32_t dict_numreads;     //!< number of reads in this dict (for variable length)
+    uint32_t *startpos;         //!< @brief
+    uint32_t *read_id;          //!< @brief
+    bool *empty_bin = nullptr;  //!< @brief
 
     /**
      * @brief
      * @param dictidx
      * @param startposidx
      */
-    void findpos(int64_t *dictidx, const uint64_t &startposidx);
+    void findpos(int64_t *dictidx, const uint64_t &startposidx) const;
 
     /**
      * @brief
@@ -60,25 +58,25 @@ class bbhashdict {
      * @param startposidx
      * @param current
      */
-    void remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current);
+    void remove(int64_t *dictidx, const uint64_t &startposidx, int64_t current) const;
 
     /**
      * @brief
      */
     bbhashdict() {
-        bphf = NULL;
-        startpos = NULL;
-        read_id = NULL;
+        bphf = nullptr;
+        startpos = nullptr;
+        read_id = nullptr;
     }
 
     /**
      * @brief
      */
     ~bbhashdict() {
-        if (startpos != NULL) delete[] startpos;
-        if (read_id != NULL) delete[] read_id;
-        if (empty_bin != NULL) delete[] empty_bin;
-        if (bphf != NULL) delete bphf;
+        delete[] startpos;
+        delete[] read_id;
+        delete[] empty_bin;
+        delete bphf;
     }
 };
 
@@ -91,7 +89,7 @@ class bbhashdict {
  * @param basemask
  */
 template <size_t bitset_size>
-void stringtobitset(const std::string &s, const uint16_t readlen, std::bitset<bitset_size> &b,
+void stringtobitset(const std::string &s, uint16_t readlen, std::bitset<bitset_size> &b,
                     std::bitset<bitset_size> **basemask);
 
 /**
@@ -118,8 +116,8 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
  * @param num_threads
  */
 template <size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, const int numdict,
-                         const uint32_t &numreads, const int bpb, const std::string &basedir, const int &num_threads);
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const uint16_t *read_lengths, int numdict,
+                         const uint32_t &numreads, int bpb, const std::string &basedir, const int &num_threads);
 
 /**
  * @brief
@@ -129,7 +127,7 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
  * @param bpb
  */
 template <size_t bitset_size>
-void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const int bpb);
+void generatemasks(std::bitset<bitset_size> **mask, int max_readlen, int bpb);
 
 /**
  * @brief
@@ -140,13 +138,11 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
  * @param basemask
  */
 template <size_t bitset_size>
-void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask);
+void chartobitset(const char *s, int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,15 +62,15 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     static const int thresh_s = THRESH_ENCODER;
     static const int maxsearch = MAX_SEARCH_ENCODER;
 #ifdef GENIE_USE_OPENMP
-    omp_lock *read_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
-    omp_lock *dict_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
+    auto *read_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
+    auto *dict_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
 #endif
     bool *remainingreads = new bool[eg.numreads_s + eg.numreads_N];
     std::fill(remainingreads, remainingreads + eg.numreads_s + eg.numreads_N, 1);
 
-    std::bitset<bitset_size> *mask1 = new std::bitset<bitset_size>[eg.numdict_s];
+    auto *mask1 = new std::bitset<bitset_size>[eg.numdict_s];
     generateindexmasks<bitset_size>(mask1, dict, eg.numdict_s, 3);
-    std::bitset<bitset_size> **mask = new std::bitset<bitset_size> *[eg.max_readlen];
+    auto **mask = new std::bitset<bitset_size> *[eg.max_readlen];
     for (int i = 0; i < eg.max_readlen; i++) mask[i] = new std::bitset<bitset_size>[eg.max_readlen];
     generatemasks<bitset_size>(mask, eg.max_readlen, 3);
 
@@ -110,7 +108,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         uint64_t ull;
         uint64_t abs_pos = 0;  // absolute position in reference (total length
         // of all contigs till now)
-        bool flag = 0;
+        bool flag = false;
         // flag to check if match was found or not
         std::string current, ref;
         std::bitset<bitset_size> forward_bitset, reverse_bitset, b;
@@ -121,7 +119,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         uint32_t ord = 0, list_size = 0;  // list_size variable introduced because
         // list::size() was running very slowly
         // on UIUC machine
-        std::list<uint32_t> *deleted_rids = new std::list<uint32_t>[eg.numdict_s];
+        auto *deleted_rids = new std::list<uint32_t>[eg.numdict_s];
         bool done = false;
         while (!done) {
             if (!(in_flag >> c)) done = true;
@@ -166,13 +164,13 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     startposidx = dict[l].bphf->lookup(ull);
                                     if (startposidx >= dict[l].numkeys)  // not found
                                         continue;
-                                        // check if any other thread is modifying same dictpos
+                                    // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
                                     if (!dict_lock[startposidx].test()) continue;
 #else
-                                        // if we are single-threaded we do not need to continue
-                                        // because nobody else could possibly try to modify the same
-                                        // dictpos
+                                    // if we are single-threaded we do not need to continue
+                                    // because nobody else could possibly try to modify the same
+                                    // dictpos
 #endif
                                     dict[l].findpos(dictidx, startposidx);
                                     if (dict[l].empty_bin[startposidx]) {  // bin is empty
@@ -204,15 +202,15 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 read_lock[rid].set();
 #endif
                                                 if (remainingreads[rid]) {
-                                                    remainingreads[rid] = 0;
-                                                    flag = 1;
+                                                    remainingreads[rid] = false;
+                                                    flag = true;
                                                 }
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].unset();
 #endif
                                             }
                                             if (flag == 1) {  // match found
-                                                flag = 0;
+                                                flag = false;
                                                 list_size++;
                                                 char l_rc = rev ? 'r' : 'd';
                                                 int64_t pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
@@ -246,7 +244,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 continue;
                                             }
 #else
-                                            // nothing to be done
+                                        // nothing to be done
 #endif
                                             dict[l1].findpos(dictidx, startposidx);
                                             dict[l1].remove(dictidx, startposidx, *it);
@@ -267,7 +265,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     egb.basemask[0][(uint8_t)chartorevchar[(uint8_t)ref[j + eg.max_readlen]]];
                             }
                         }  // end for
-                    }      // end if
+                    }  // end if
                     // sort contig according to pos
                     current_contig.sort([](const contig_reads &ar, const contig_reads &br) { return ar.pos < br.pos; });
                     writecontig(ref, current_contig, f_seq, f_pos, f_noise, f_noisepos, f_order, f_RC, f_readlength,
@@ -298,10 +296,10 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         delete[] deleted_rids;
     }  // end omp parallel
 
-    uint64_t *file_len_seq_thr = new uint64_t[eg.num_thr];
+    auto *file_len_seq_thr = new uint64_t[eg.num_thr];
     for (int tid = 0; tid < eg.num_thr; tid++) {
         std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
-        in_seq.seekg(0, in_seq.end);
+        in_seq.seekg(0, std::ifstream::end);
         file_len_seq_thr[tid] = in_seq.tellg();
         in_seq.close();
     }
@@ -413,7 +411,6 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     std::cerr << "Encoding done:\n";
     std::cerr << matched_s << " singleton reads were aligned\n";
     std::cerr << matched_N << " reads with N were aligned\n";
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -460,7 +457,6 @@ void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'G'] = '1';
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'C'] = '2';
     eg.enc_noise[(uint8_t)'N'][(uint8_t)'T'] = '3';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -499,8 +495,8 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
 
 template <size_t bitset_size>
 void encoder_main(const std::string &temp_dir, const compression_params &cp) {
-    encoder_global_b<bitset_size> *egb_ptr = new encoder_global_b<bitset_size>(cp.max_readlen);
-    encoder_global *eg_ptr = new encoder_global;
+    auto *egb_ptr = new encoder_global_b<bitset_size>(cp.max_readlen);
+    auto *eg_ptr = new encoder_global;
     encoder_global_b<bitset_size> &egb = *egb_ptr;
     encoder_global &eg = *eg_ptr;
 
@@ -524,14 +520,14 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
 
     getDataParams(eg, cp);  // populate numreads
     setglobalarrays<bitset_size>(eg, egb);
-    std::bitset<bitset_size> *read = new std::bitset<bitset_size>[eg.numreads_s + eg.numreads_N];
-    uint32_t *order_s = new uint32_t[eg.numreads_s + eg.numreads_N];
-    uint16_t *read_lengths_s = new uint16_t[eg.numreads_s + eg.numreads_N];
+    auto *read = new std::bitset<bitset_size>[eg.numreads_s + eg.numreads_N];
+    auto *order_s = new uint32_t[eg.numreads_s + eg.numreads_N];
+    auto *read_lengths_s = new uint16_t[eg.numreads_s + eg.numreads_N];
     readsingletons<bitset_size>(read, order_s, read_lengths_s, eg, egb);
     remove(eg.infile_N.c_str());
     correct_order(order_s, eg);
 
-    bbhashdict *dict = new bbhashdict[eg.numdict_s];
+    auto *dict = new bbhashdict[eg.numdict_s];
     if (eg.max_readlen > 50) {
         dict[0].start = 0;
         dict[0].end = 20;
@@ -559,9 +555,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

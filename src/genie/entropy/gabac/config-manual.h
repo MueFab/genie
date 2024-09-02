@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,13 +26,11 @@ namespace gabac {
  * @param sub
  * @return
  */
-genie::entropy::paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub);
+genie::entropy::paramcabac::Subsequence getEncoderConfigManual(core::GenSubIndex sub);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

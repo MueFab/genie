@@ -22,8 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -87,7 +86,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        MismatchDecoder* getMismatchDecoder() const;
+        [[nodiscard]] MismatchDecoder* getMismatchDecoder() const;
 
         /**
          * @brief
@@ -124,13 +123,13 @@ class AccessUnit {
          * @brief
          * @return
          */
-        uint64_t get(size_t lookahead = 0) const;
+        [[nodiscard]] uint64_t get(size_t lookahead = 0) const;
 
         /**
          * @brief
          * @return
          */
-        bool end() const;
+        [[nodiscard]] bool end() const;
 
         /**
          * @brief
@@ -141,7 +140,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        GenSubIndex getID() const;
+        [[nodiscard]] GenSubIndex getID() const;
 
         /**
          * @brief
@@ -153,7 +152,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        size_t getNumSymbols() const;
+        [[nodiscard]] size_t getNumSymbols() const;
 
         /**
          * @brief
@@ -165,13 +164,13 @@ class AccessUnit {
          * @brief
          * @return
          */
-        bool isEmpty() const;
+        [[nodiscard]] bool isEmpty() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getRawSize() const;
+        [[nodiscard]] size_t getRawSize() const;
 
         /**
          * @brief
@@ -240,7 +239,7 @@ class AccessUnit {
          * @param sub
          * @return
          */
-        const Subsequence& get(uint16_t sub) const;
+        [[nodiscard]] const Subsequence& get(uint16_t sub) const;
 
         /**
          * @brief
@@ -254,7 +253,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        GenDesc getID() const;
+        [[nodiscard]] GenDesc getID() const;
 
         /**
          * @brief
@@ -291,25 +290,25 @@ class AccessUnit {
          * @brief
          * @return
          */
-        const Subsequence* begin() const;
+        [[nodiscard]] const Subsequence* begin() const;
 
         /**
          * @brief
          * @return
          */
-        const Subsequence* end() const;
+        [[nodiscard]] const Subsequence* end() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getSize() const;
+        [[nodiscard]] size_t getSize() const;
 
         /**
          * @brief
          * @return
          */
-        size_t getWrittenSize() const;
+        [[nodiscard]] size_t getWrittenSize() const;
 
         /**
          * @brief
@@ -330,7 +329,7 @@ class AccessUnit {
          * @brief
          * @return
          */
-        bool isEmpty() const;
+        [[nodiscard]] bool isEmpty() const;
 
         /**
          * @brief
@@ -343,7 +342,7 @@ class AccessUnit {
      * @param sub
      * @return
      */
-    const Subsequence& get(GenSubIndex sub) const;
+    [[nodiscard]] const Subsequence& get(GenSubIndex sub) const;
 
     /**
      * @brief
@@ -364,7 +363,7 @@ class AccessUnit {
      * @param desc
      * @return
      */
-    const Descriptor& get(GenDesc desc) const;
+    [[nodiscard]] const Descriptor& get(GenDesc desc) const;
 
     /**
      * @brief
@@ -433,7 +432,7 @@ class AccessUnit {
      * @brief
      * @return
      */
-    const parameter::EncodingSet& getParameters() const;
+    [[nodiscard]] const parameter::EncodingSet& getParameters() const;
 
     /**
      * @brief
@@ -451,7 +450,7 @@ class AccessUnit {
      * @brief
      * @return
      */
-    size_t getNumReads() const;
+    [[nodiscard]] size_t getNumReads() const;
 
     /**
      * @brief
@@ -463,7 +462,7 @@ class AccessUnit {
      * @brief
      * @return
      */
-    record::ClassType getClassType() const;
+    [[nodiscard]] record::ClassType getClassType() const;
 
     /**
      * @brief
@@ -491,7 +490,7 @@ class AccessUnit {
      * @brief
      * @return
      */
-    uint16_t getReference();
+    [[nodiscard]] uint16_t getReference() const;
 
     /**
      * @brief
@@ -509,13 +508,13 @@ class AccessUnit {
      * @brief
      * @return
      */
-    uint64_t getMaxPos() const;
+    [[nodiscard]] uint64_t getMaxPos() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getMinPos() const;
+    [[nodiscard]] uint64_t getMinPos() const;
 
     /**
      * @brief
@@ -533,13 +532,13 @@ class AccessUnit {
      * @brief
      * @return
      */
-    const Descriptor* begin() const;
+    [[nodiscard]] const Descriptor* begin() const;
 
     /**
      * @brief
      * @return
      */
-    const Descriptor* end() const;
+    [[nodiscard]] const Descriptor* end() const;
 
     /**
      * @brief
@@ -565,19 +564,19 @@ class AccessUnit {
      * @brief
      * @return
      */
-    const ReferenceManager::ReferenceExcerpt& getReferenceExcerpt() const;
+    [[nodiscard]] const ReferenceManager::ReferenceExcerpt& getReferenceExcerpt() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
+    [[nodiscard]] const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
 
     /**
      * @brief
      * @return
      */
-    bool isReferenceOnly() const;
+    [[nodiscard]] bool isReferenceOnly() const;
 
     /**
      * @brief
@@ -604,8 +603,7 @@ class AccessUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -25,9 +25,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -145,17 +143,22 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     while (true) {
                         bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
                         if (mmpos_flag == 1) break;
-                        uint32_t mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
+                        auto mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
                         abs_mmpos += mmpos;
-                        uint32_t mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
+                        auto mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
-                        const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
+                        uint64_t mmtype_1 = 0;
+                        if (au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()) {
+                            mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
                                                   ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
                                                         .getMismatchDecoder()
                                                         ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
                                                                              .inverseLut[cur_read[i][abs_mmpos]])
                                                   : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                        } else {
+                            mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
+                        }
                         cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
                         abs_mmpos++;
                     }
@@ -221,12 +224,12 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 matched_records[1].push_back(unmatched_same_au[1][record_index_for_sorting[i].second]);
         }
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) : combine_pairs(comb_p) {
+Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
+    : combine_pairs(comb_p), unmatched_record_index{} {
     basedir = working_dir;
 
     while (true) {
@@ -321,23 +324,23 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     }
     // now put unmatched reads to chunks if combine_pairs is false
     if (!combine_pairs) {
-        for (size_t i = 0; i < unmatched_records[0].size(); ++i) {
+        for (auto& i : unmatched_records[0]) {
             chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[0][i].name), "", (uint8_t)0, true);
+                                         std::move(i.name), "", (uint8_t)0, true);
             // last parameter is read_1_first
-            core::record::Segment seg(std::move(unmatched_records[0][i].seq));
-            if (!unmatched_records[0][i].qv.empty()) {
-                seg.addQualities(std::move(unmatched_records[0][i].qv));
+            core::record::Segment seg(std::move(i.seq));
+            if (!i.qv.empty()) {
+                seg.addQualities(std::move(i.qv));
             }
             chunk.getData().back().addSegment(std::move(seg));
         }
-        for (size_t i = 0; i < unmatched_records[1].size(); ++i) {
+        for (auto& i : unmatched_records[1]) {
             chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[1][i].name), "", (uint8_t)0, false);
+                                         std::move(i.name), "", (uint8_t)0, false);
             // last parameter is read_1_first
-            core::record::Segment seg(std::move(unmatched_records[1][i].seq));
-            if (!unmatched_records[1][i].qv.empty()) {
-                seg.addQualities(std::move(unmatched_records[1][i].qv));
+            core::record::Segment seg(std::move(i.seq));
+            if (!i.qv.empty()) {
+                seg.addQualities(std::move(i.qv));
             }
             chunk.getData().back().addSegment(std::move(seg));
         }
@@ -433,7 +436,7 @@ void Decoder::flushIn(uint64_t& pos) {
             size_t maxBufferSize = 2000000000;  // roughly 2 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
-            kwaymergesort::KwayMergeSort* sorter =
+            auto* sorter =
                 new kwaymergesort::KwayMergeSort(file_unmatched_readnames_1, &fout_unmatched_readnames_1_sorted,
                                                  static_cast<int>(maxBufferSize), false, basedir);
             sorter->Sort();
@@ -563,9 +566,7 @@ void Decoder::skipIn(const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

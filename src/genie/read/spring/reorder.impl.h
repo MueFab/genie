@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +50,6 @@ void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
         }
     }
     s[readlen] = '\0';
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -70,7 +67,6 @@ void setglobalarrays(reorder_global<bitset_size> &rg) {
         rg.basemask[i][(uint8_t)'T'][2 * i] = 1;
         rg.basemask[i][(uint8_t)'T'][2 * i + 1] = 1;
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -85,14 +81,14 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
     auto chartoint = [](uint8_t a) { return (a & 0x06) >> 1; };  // inverse of above
     char s[MAX_READ_LEN + 1], s1[MAX_READ_LEN + 1], *current;
     bitsettostring<bitset_size>(cur, s, cur_readlen, rg);
-    if (rev == false) {
+    if (!rev) {
         current = s;
     } else {
         reverse_complement(s, s1, cur_readlen);
         current = s1;
     }
 
-    if (resetcount == true) {  // resetcount - unmatched read so start over
+    if (resetcount) {  // resetcount - unmatched read so start over
         std::fill(count[0], count[0] + rg.max_readlen, 0);
         std::fill(count[1], count[1] + rg.max_readlen, 0);
         std::fill(count[2], count[2] + rg.max_readlen, 0);
@@ -168,8 +164,6 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
     char revcurrent[MAX_READ_LEN + 1];
     reverse_complement(current, revcurrent, ref_len);
     chartobitset<bitset_size>(revcurrent, ref_len, revref, rg.basemask);
-
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -194,7 +188,6 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
         f.close();
         remove(rg.infile[1].c_str());
     }
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -214,7 +207,7 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
     int64_t dictidx[2];  // to store the start and end index (end not inclusive)
     // in the dict read_id array
     uint64_t startposidx;  // index in startpos
-    bool flag = 0;
+    bool flag = false;
     for (int l = 0; l < rg.numdict; l++) {
         // check if dictionary index is within bound
         if (!rev) {
@@ -227,7 +220,7 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
         startposidx = dict[l].bphf->lookup(ull);
         if (startposidx >= dict[l].numkeys)  // not found
             continue;
-            // check if any other thread is modifying same dictpos
+        // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
         dict_lock[reorder_lock_idx(startposidx)].set();
 #endif
@@ -257,9 +250,9 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
                     read_lock[reorder_lock_idx(rid)].set();
 #endif
                     if (remainingreads[rid]) {
-                        remainingreads[rid] = 0;
+                        remainingreads[rid] = false;
                         k = rid;
-                        flag = 1;
+                        flag = true;
                     }
 #ifdef GENIE_USE_OPENMP
                     read_lock[reorder_lock_idx(rid)].unset();
@@ -283,13 +276,13 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
              const reorder_global<bitset_size> &rg) {
 #ifdef GENIE_USE_OPENMP
     const uint32_t num_locks = NUM_LOCKS_REORDER;  // limits on number of locks (power of 2 for fast mod)
-    omp_lock *dict_lock = new omp_lock[num_locks];
-    omp_lock *read_lock = new omp_lock[num_locks];
+    auto *dict_lock = new omp_lock[num_locks];
+    auto *read_lock = new omp_lock[num_locks];
 #endif
-    std::bitset<bitset_size> **mask = new std::bitset<bitset_size> *[rg.max_readlen];
+    auto **mask = new std::bitset<bitset_size> *[rg.max_readlen];
     for (int i = 0; i < rg.max_readlen; i++) mask[i] = new std::bitset<bitset_size>[rg.max_readlen];
     generatemasks<bitset_size>(mask, rg.max_readlen, 2);
-    std::bitset<bitset_size> *mask1 = new std::bitset<bitset_size>[rg.numdict];
+    auto *mask1 = new std::bitset<bitset_size>[rg.numdict];
     generateindexmasks<bitset_size>(mask1, dict, rg.numdict, 2);
     bool *remainingreads = new bool[rg.numreads];
     std::fill(remainingreads, remainingreads + rg.numreads, 1);
@@ -308,7 +301,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
     // parallel regions.
     //
     uint32_t firstread = 0;
-    uint32_t *unmatched = new uint32_t[rg.num_thr];
+    auto *unmatched = new uint32_t[rg.num_thr];
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(rg.num_thr)
 #endif
@@ -316,7 +309,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
 #ifdef GENIE_USE_OPENMP
         int tid = omp_get_thread_num();
 #else
-        int tid = 0;       // set thread ID to zero if not using OpenMP
+        int tid = 0;  // set thread ID to zero if not using OpenMP
 #endif
         std::string tid_str = std::to_string(tid);
         std::ofstream foutRC(rg.outfileRC + '.' + tid_str, std::ofstream::out);
@@ -342,7 +335,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
         int64_t dictidx[2];  // to store the start and end index (end not inclusive)
         // in the dict read_id array
         uint64_t startposidx;  // index in startpos
-        bool flag = 0, done = 0, prev_unmatched = false, left_search_start = false, left_search = false;
+        bool flag = false, done = false, prev_unmatched = false, left_search_start = false, left_search = false;
         // left_search_start - true when left search is starting (to avoid double
         // deletion of first read)
         // left_search - true during left search - needed so that we know when to
@@ -369,7 +362,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
             } else if (remainingreads[current] == 0) {
                 done = true;
             } else {
-                remainingreads[current] = 0;
+                remainingreads[current] = false;
                 unmatched[tid]++;
             }
             firstread += rg.numreads / rg.num_thr;  // spread out first read equally
@@ -415,7 +408,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
             } else {
                 left_search_start = false;
             }
-            flag = 0;
+            flag = false;
             uint32_t k;
             if (!stop_searching) {
                 for (int shift = 0; shift < rg.maxshift; shift++) {
@@ -520,8 +513,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                             if (remainingreads[j]) {  // checking again inside critical block
                                 current = j;
                                 remainingpos = j - 1;
-                                remainingreads[j] = 0;
-                                flag = 1;
+                                remainingreads[j] = false;
+                                flag = true;
                                 unmatched[tid]++;
                             }
 #ifdef GENIE_USE_OPENMP
@@ -534,7 +527,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                         if (prev_unmatched == true) {  // last read was singleton, write it now
                             foutorder_s.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                         }
-                        done = 1;  // no reads left
+                        done = true;  // no reads left
                     } else {
                         updaterefcount<bitset_size>(read[current], ref, revref, count, true, false, 0,
                                                     read_lengths[current], ref_len, rg);
@@ -571,7 +564,6 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
     delete[] mask;
     delete[] mask1;
     delete[] unmatched;
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -665,14 +657,13 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
     }
     fout_s.close();
     foutorder_s.close();
-    return;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void reorder_main(const std::string &temp_dir, const compression_params &cp) {
-    reorder_global<bitset_size> *rg_pointer = new reorder_global<bitset_size>(cp.max_readlen);
+    auto *rg_pointer = new reorder_global<bitset_size>(cp.max_readlen);
     reorder_global<bitset_size> &rg = *rg_pointer;
     rg.basedir = temp_dir;
     rg.infile[0] = rg.basedir + "/input_clean_1.dna";
@@ -688,7 +679,7 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     rg.num_thr = cp.num_thr;
     rg.paired_end = cp.paired_end;
     rg.maxshift = rg.max_readlen / 2;
-    bbhashdict *dict = new bbhashdict[rg.numdict];
+    auto *dict = new bbhashdict[rg.numdict];
     dict[0].start = rg.max_readlen > 100 ? rg.max_readlen / 2 - 32 : rg.max_readlen / 2 - rg.max_readlen * 32 / 100;
     dict[0].end = rg.max_readlen / 2 - 1;
     dict[1].start = rg.max_readlen / 2;
@@ -700,8 +691,8 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     rg.numreads_array[1] = cp.num_reads_clean[1];
 
     setglobalarrays(rg);
-    std::bitset<bitset_size> *read = new std::bitset<bitset_size>[rg.numreads];
-    uint16_t *read_lengths = new uint16_t[rg.numreads];
+    auto *read = new std::bitset<bitset_size>[rg.numreads];
+    auto *read_lengths = new uint16_t[rg.numreads];
     std::cerr << "Reading file\n";
     readDnaFile<bitset_size>(read, read_lengths, rg);
     if (rg.numreads > 0) {
@@ -721,9 +712,7 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

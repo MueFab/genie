@@ -15,8 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Wrapper around an input stream to read data bit by bit instead of byte aligned.
@@ -33,19 +32,19 @@ class BitReader {
      * @brief
      * @return Total number of bits read since the BitReader has been created.
      */
-    uint64_t getBitsRead() const;
+    [[nodiscard]] uint64_t getBitsRead() const;
 
     /**
      * @brief
      * @return True if the position of the bitstream is aligned to a full byte.
      */
-    bool isAligned() const;
+    [[nodiscard]] bool isAligned() const;
 
     /**
      * @brief
      * @return Returns the position in the input stream.
      */
-    int64_t getPos() const;
+    [[nodiscard]] int64_t getPos() const;
 
     /**
      * @brief Sets the input stream position.
@@ -120,7 +119,7 @@ class BitReader {
      * @brief
      * @return True if there are no problems so far reading data.
      */
-    bool isGood() const;
+    [[nodiscard]] bool isGood() const;
 
     /**
      * @brief Skips a number of bytes
@@ -149,8 +148,7 @@ class BitReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

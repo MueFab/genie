@@ -11,20 +11,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool StateVars::operator==(const StateVars& bin) const {
-    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
-           numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
-           codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
+    return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms && numCtxSubsym == bin.numCtxSubsym &&
+           cLengthBI == bin.cLengthBI && codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
            codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
-           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
-           codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
-           numCtxTotal == bin.numCtxTotal;
+           codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] && codingSizeCtxOffset == bin.codingSizeCtxOffset &&
+           numCtxLuts == bin.numCtxLuts && numCtxTotal == bin.numCtxTotal;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -54,12 +50,10 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
         numAlphaSpecial = 9;
     } else if (subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) {  // subseq 2
         numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
-    } else if (subsequence_ID == core::GenSub::UREADS) {  // ureads subseq 0
+    } else if ((subsequence_ID == core::GenSub::UREADS) || (subsequence_ID == core::GenSub::RFTT)) {  // ureads subseq 0
         numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
     } else if (subsequence_ID == core::GenSub::RTYPE) {  // rtype subseq 0
         numAlphaSpecial = 6;
-    } else if (subsequence_ID == core::GenSub::RFTT) {  // rftt subseq 0
-        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
     }
 
     return numAlphaSpecial;
@@ -82,9 +76,9 @@ uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
-                         const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                         const core::AlphabetID alphabet_ID, bool original) {
+void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
+                         const SupportValues& support_values, const Binarization& cabac_binarization,
+                         const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID, bool original) {
     const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
     const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
     const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();
@@ -292,9 +286,7 @@ uint64_t StateVars::get2PowN(uint8_t N) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +114,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                     // Decoding
                     subseqPayloadSizeUsed += (uint64_t)gabac::decodeTransformSubseq(
                         subseqCfg.getTransformSubseqCfg((uint8_t)i), (unsigned int)numtrnsfSymbols,
-                        &decodedTransformedSubseq, wordsize, (dependency.size()) ? &dependency : nullptr);
+                        &decodedTransformedSubseq, wordsize, (!dependency.empty()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
             }
@@ -132,9 +130,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

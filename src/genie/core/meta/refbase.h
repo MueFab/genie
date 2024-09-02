@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Base class for reference information (internal and external)
@@ -44,26 +42,24 @@ class RefBase {
      * @brief Convert to json
      * @return Json representation
      */
-    virtual nlohmann::json toJson() const = 0;
+    [[nodiscard]] virtual nlohmann::json toJson() const = 0;
 
     /**
      * @brief Get Json Key of this base (internal vs external ref)
      * @return Json key
      */
-    virtual const std::string& getKeyName() const = 0;
+    [[nodiscard]] virtual const std::string& getKeyName() const = 0;
 
     /**
      * @brief
      * @return
      */
-    virtual std::unique_ptr<RefBase> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<RefBase> clone() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

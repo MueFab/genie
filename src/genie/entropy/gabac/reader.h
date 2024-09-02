@@ -17,17 +17,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -40,7 +36,7 @@ class Reader {
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
+    explicit Reader(util::DataBlock* bitstream, bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
      * @brief
@@ -52,105 +48,91 @@ class Reader {
      * @param binParams
      * @return
      */
-    uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsBIbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsBIcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsBIcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTUbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTUcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsEGbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsEGbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsEGcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsEGcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSEGbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsTEGbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsTEGcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTEGbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsSUTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsSUTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSUTUbypass(const std::vector<unsigned int> binParams);
+    uint64_t readAsDTUbypass(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param binParams
      * @return
      */
-    uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams);
-
-    /**
-     * @brief
-     * @param binParams
-     * @return
-     */
-    uint64_t readAsDTUbypass(const std::vector<unsigned int> binParams);
-
-    /**
-     * @brief
-     * @param binParams
-     * @return
-     */
-    uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams);
+    uint64_t readAsDTUcabac(const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param codingSubsymSize
      * @return
      */
-    uint64_t readLutSymbol(const uint8_t codingSubsymSize);
+    uint64_t readLutSymbol(uint8_t codingSubsymSize);
 
     /**
      * @brief
@@ -186,9 +168,7 @@ class Reader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

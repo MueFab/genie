@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief A handle to quickly iterate over a DataBlock.
@@ -36,7 +35,7 @@ struct BlockStepper {
      * @brief
      * @return True, if the current position is not yet the end position.
      */
-    bool isValid() const;
+    [[nodiscard]] bool isValid() const;
 
     /**
      * @brief Increment by one element.
@@ -47,7 +46,7 @@ struct BlockStepper {
      * @brief
      * @return The current element.
      */
-    uint64_t get() const;
+    [[nodiscard]] uint64_t get() const;
 
     /**
      * @brief Set the current element to a new value.
@@ -58,8 +57,7 @@ struct BlockStepper {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

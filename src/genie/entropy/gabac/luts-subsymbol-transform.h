@@ -17,17 +17,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -69,7 +65,7 @@ class LUTsSubSymbolTransform {
      * @param _modeFlag
      */
     LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals, const paramcabac::StateVars& _stateVars,
-                           const uint8_t _numLuts, const uint8_t _numPrvs, const bool _modeFlag);
+                           uint8_t _numLuts, uint8_t _numPrvs, bool _modeFlag);
 
     /**
      * @brief
@@ -89,7 +85,7 @@ class LUTsSubSymbolTransform {
      * @param symbols
      * @param depSymbols
      */
-    void encodeLUTs(Writer& writer, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
+    void encodeLUTs(Writer& writer, util::DataBlock* symbols, util::DataBlock* depSymbols = nullptr);
 
     /**
      * @brief
@@ -98,7 +94,7 @@ class LUTsSubSymbolTransform {
      * @param prvIdx
      * @return
      */
-    uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
+    uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -107,7 +103,7 @@ class LUTsSubSymbolTransform {
      * @param prvIdx
      * @return
      */
-    uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx, const uint8_t prvIdx);
+    uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -116,8 +112,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                            const uint8_t prvIdx);
+    void invTransformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -126,8 +121,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                            const uint8_t prvIdx);
+    void invTransformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -136,8 +130,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                         const uint8_t prvIdx);
+    void transformOrder2(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     /**
      * @brief
@@ -146,8 +139,7 @@ class LUTsSubSymbolTransform {
      * @param lutIdx
      * @param prvIdx
      */
-    void transformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
-                         const uint8_t prvIdx);
+    void transformOrder1(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
  private:
     /**
@@ -155,7 +147,7 @@ class LUTsSubSymbolTransform {
      * @param numAlphaSubsym
      * @return
      */
-    inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
+    static inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
 
     /**
      * @brief
@@ -176,13 +168,13 @@ class LUTsSubSymbolTransform {
      * @param symbols
      * @param depSymbols
      */
-    void buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
+    void buildLuts(util::DataBlock* symbols, util::DataBlock* depSymbols = nullptr);
 
     /**
      * @brief
      * @param lutRow
      */
-    void sortLutRow(LutRow& lutRow);
+    static void sortLutRow(LutRow& lutRow);
 
     /**
      * @brief
@@ -191,7 +183,7 @@ class LUTsSubSymbolTransform {
      * @param codingSubsymSize
      * @param lut
      */
-    void decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
+    static void decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     /**
      * @brief
@@ -200,7 +192,7 @@ class LUTsSubSymbolTransform {
      * @param codingSubsymSize
      * @param lut
      */
-    void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
+    static void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     const paramcabac::SupportValues supportVals;  //!< @brief
     const paramcabac::StateVars stateVars;        //!< @brief
@@ -214,9 +206,7 @@ class LUTsSubSymbolTransform {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

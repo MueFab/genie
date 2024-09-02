@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DatasetParameterSet::operator==(const GenInfo& info) const {
@@ -72,7 +70,7 @@ void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
 
 void DatasetParameterSet::addParameterUpdate(dataset_parameterset::UpdateInfo update) {
     if (version != core::MPEGMinorVersion::V1900) {
-        param_update = std::move(update);
+        param_update = update;
     }
 }
 
@@ -137,9 +135,7 @@ genie::core::parameter::ParameterSet DatasetParameterSet::descapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

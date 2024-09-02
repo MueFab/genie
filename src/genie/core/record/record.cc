@@ -14,14 +14,12 @@
 #include "genie/core/record/segment.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::
       qv_depth(0),
       read_name(std::move(_read_name)),
       flags(_flags),
-      moreAlignmentInfo(util::make_unique<alignment_external::None>()) {}
+      moreAlignmentInfo(std::make_unique<alignment_external::None>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -337,9 +335,7 @@ void Record::setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_align
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

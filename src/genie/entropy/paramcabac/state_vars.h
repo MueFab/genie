@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -57,9 +55,9 @@ class StateVars {
      * @param alphabet_ID
      * @param original
      */
-    void populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
-                  const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
-                  const core::AlphabetID alphabet_ID, bool original = true);
+    void populate(SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues& support_values,
+                  const Binarization& cabac_binarization, core::GenSubIndex subsequence_ID,
+                  core::AlphabetID alphabet_ID, bool original = true);
 
     /**
      * @brief
@@ -70,50 +68,50 @@ class StateVars {
      * @brief
      * @return
      */
-    uint32_t getNumSubsymbols() const;
+    [[nodiscard]] uint32_t getNumSubsymbols() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getNumAlphaSubsymbol() const;
+    [[nodiscard]] uint64_t getNumAlphaSubsymbol() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getNumCtxPerSubsymbol() const;
+    [[nodiscard]] uint32_t getNumCtxPerSubsymbol() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getCLengthBI() const;
+    [[nodiscard]] uint32_t getCLengthBI() const;
 
     /**
      * @brief
      * @param index
      * @return
      */
-    uint64_t getCodingOrderCtxOffset(uint8_t index) const;
+    [[nodiscard]] uint64_t getCodingOrderCtxOffset(uint8_t index) const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getCodingSizeCtxOffset() const;
+    [[nodiscard]] uint64_t getCodingSizeCtxOffset() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getNumCtxLUTs() const;
+    [[nodiscard]] uint32_t getNumCtxLUTs() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getNumCtxTotal() const;
+    [[nodiscard]] uint64_t getNumCtxTotal() const;
 
     /**
      * @brief
@@ -122,15 +120,15 @@ class StateVars {
      * @param trnsfSubsymID
      * @return
      */
-    uint8_t getNumLuts(const uint8_t codingOrder, const bool shareSubsymLutFlag,
-                       const SupportValues::TransformIdSubsym trnsfSubsymID) const;
+    [[nodiscard]] uint8_t getNumLuts(uint8_t codingOrder, bool shareSubsymLutFlag,
+                                     SupportValues::TransformIdSubsym trnsfSubsymID) const;
 
     /**
      * @brief
      * @param shareSubsymPrvFlag
      * @return
      */
-    uint8_t getNumPrvs(const bool shareSubsymPrvFlag) const;
+    [[nodiscard]] uint8_t getNumPrvs(bool shareSubsymPrvFlag) const;
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
@@ -142,7 +140,7 @@ class StateVars {
      * @param alphabet_ID
      * @return
      */
-    static uint64_t getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID);
+    static uint64_t getNumAlphaSpecial(core::GenSubIndex subsequence_ID, core::AlphabetID alphabet_ID);
 
     /**
      * @brief
@@ -176,9 +174,7 @@ class StateVars {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

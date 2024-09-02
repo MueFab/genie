@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -37,13 +35,13 @@ class ContextModel {
      * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
-    unsigned char getState() const;
+    [[nodiscard]] unsigned char getState() const;
 
     /**
      * @brief
      * @note Inline definition for performance as suggested by NCSA
      */
-    unsigned char getMps() const;
+    [[nodiscard]] unsigned char getMps() const;
 
     /**
      * @brief
@@ -85,9 +83,7 @@ inline void ContextModel::updateMps() { m_state = cabactables::nextStateMps[m_st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

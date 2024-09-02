@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace stats {
+namespace genie::core::stats {
 
 /**
  * @brief
@@ -48,7 +46,7 @@ class PerfStats {
          * @brief
          * @return
          */
-        double avg() const;
+        [[nodiscard]] double avg() const;
     };
 
     /**
@@ -82,13 +80,13 @@ class PerfStats {
      * @brief
      * @return
      */
-    std::map<std::string, Stat>::const_iterator begin() const;
+    [[nodiscard]] std::map<std::string, Stat>::const_iterator begin() const;
 
     /**
      * @brief
      * @return
      */
-    std::map<std::string, Stat>::const_iterator end() const;
+    [[nodiscard]] std::map<std::string, Stat>::const_iterator end() const;
 
     /**
      * @brief
@@ -100,7 +98,7 @@ class PerfStats {
      * @brief
      * @return
      */
-    bool isActive() const;
+    [[nodiscard]] bool isActive() const;
 
  private:
     bool active{true};                 //!< @brief
@@ -117,9 +115,7 @@ std::ostream& operator<<(std::ostream& stream, const PerfStats& stats);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace stats
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::stats
 
 // ---------------------------------------------------------------------------------------------------------------------
 

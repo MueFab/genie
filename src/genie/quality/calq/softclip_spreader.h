@@ -22,9 +22,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // Detects areas with high-quality-softclips and spreads their activity score
 class SoftclipSpreader {
@@ -47,7 +45,7 @@ class SoftclipSpreader {
 
     // Squashes activity score between 0 and 1 using the unsquashed activity
     // score and an "anti score" measuring probability of no variant occurring
-    double squash(double activity, double antiActivity) const;
+    [[nodiscard]] static double squash(double activity, double antiActivity);
 
  public:
     // Push an activity score and average number of softclips at that position
@@ -56,16 +54,14 @@ class SoftclipSpreader {
     double push(double score, size_t softclips);
 
     // Delay between push of score and processed output
-    size_t getOffset() const;
+    [[nodiscard]] size_t getOffset() const;
 
     SoftclipSpreader(size_t max_prop, size_t min_hq_clips, bool isSquashed);
 };
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

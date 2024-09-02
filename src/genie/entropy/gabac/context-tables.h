@@ -15,10 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
-namespace contexttables {
+namespace genie::entropy::gabac::contexttables {
 
 /**
  * @brief
@@ -29,10 +26,7 @@ std::vector<ContextModel> buildContextTable(uint64_t numContexts);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contexttables
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac::contexttables
 
 // ---------------------------------------------------------------------------------------------------------------------
 

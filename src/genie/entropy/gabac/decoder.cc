@@ -7,6 +7,7 @@
 #include "genie/entropy/gabac/decoder.h"
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <tuple>
 #include <utility>
 #include "genie/entropy/gabac/decode-desc-subseq.h"
@@ -18,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -123,7 +122,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     auto id = in.getID();
 
     if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
-        in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
+        in.attachMismatchDecoder(std::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
 
@@ -152,7 +151,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
     outbuffer.flush(&tmp);
-    return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
+    return {std::move(tmp), in.getID()};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -223,9 +222,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

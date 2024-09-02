@@ -13,15 +13,11 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-double SoftclipSpreader::squash(double activity, double antiActivity) const {
-    return activity / (activity + antiActivity);
-}
+double SoftclipSpreader::squash(double activity, double antiActivity) { return activity / (activity + antiActivity); }
 
 // -----------------------------------------------------------------------------
 
@@ -71,9 +67,7 @@ SoftclipSpreader::SoftclipSpreader(size_t max_prop, size_t min_hq_clips, bool is
       MIN_HQ_SOFTCLIPS(min_hq_clips),
       squashed(isSquashed) {}
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
