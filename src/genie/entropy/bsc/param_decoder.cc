@@ -4,17 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/entropy/zstd/param_decoder.h"
+#include "genie/entropy/bsc/param_decoder.h"
 #include <memory>
 
-namespace genie::entropy::zstd {
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_ZSTD) {}
+namespace genie::entropy::bsc {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres::DecoderRegular(MODE_ZSTD) {
+DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_BSC) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres::DecoderRegular(MODE_BSC) {
     for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         auto bits_p2 = genie::core::range2bytes(core::getDescriptor(desc).subseqs[i].range);
         descriptor_subsequence_cfgs.emplace_back(bits_p2);
@@ -24,7 +27,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres:
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader &reader)
-    : core::parameter::desc_pres::DecoderRegular(MODE_ZSTD) {
+    : core::parameter::desc_pres::DecoderRegular(MODE_BSC) {
     uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(reader.read<uint8_t>(6));
@@ -69,4 +72,17 @@ void DecoderRegular::write(util::BitWriter &writer) const {
         i.write(writer);
     }
 }
-}  // namespace genie::entropy::zstd
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DecoderRegular::equals(const Decoder *dec) const {
+    return core::parameter::desc_pres::Decoder::equals(dec) &&
+           dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace genie::entropy::bsc
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
