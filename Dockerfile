@@ -20,7 +20,8 @@ RUN apk add --no-cache \
     libbz2 \
     autoconf \
     automake \
-    libtool 
+    libtool  \
+    zstd-dev
 
 RUN git clone https://github.com/samtools/htslib.git \
     && cd htslib \
@@ -33,6 +34,15 @@ RUN git clone https://github.com/samtools/htslib.git \
     && cd .. \
     && rm -rf ./htslib \
     && mkdir /genie
+
+# Install and build libbsc
+RUN git clone https://github.com/IlyaGrebnov/libbsc.git \
+    && cd libbsc \
+    && sed -i 's/clang++/g++/g' makefile \
+    && make -j \
+    && make install \
+    && cd .. \
+    && rm -rf ./libbsc
 
 # Copy the CMake project files into /genie
 COPY ./src /genie/src
