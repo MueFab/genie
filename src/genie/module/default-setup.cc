@@ -85,13 +85,13 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
     ret->addNameCoder(std::make_unique<genie::name::tokenizer::Encoder>());
     ret->addNameCoder(std::make_unique<genie::name::writeout::Encoder>());
-    ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 1; });
+    ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
     ret->addEntropyCoder(std::make_unique<genie::entropy::gabac::Encoder>(writeRawStreams));
     ret->addEntropyCoder(std::make_unique<genie::entropy::lzma::Encoder>(writeRawStreams));
     ret->addEntropyCoder(std::make_unique<genie::entropy::zstd::Encoder>(writeRawStreams));
     ret->addEntropyCoder(std::make_unique<genie::entropy::bsc::Encoder>(writeRawStreams));
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 2; });
+    ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
 
