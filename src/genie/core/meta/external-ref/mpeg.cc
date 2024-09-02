@@ -10,10 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace external_ref {
+namespace genie::core::meta::external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,17 +57,14 @@ std::string& MPEG::getChecksum() { return ref_checksum; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<RefBase> MPEG::clone() const {
-    auto ret = genie::util::make_unique<MPEG>(getURI(), getChecksumAlgo(), external_dataset_group_id,
+    auto ret = std::make_unique<MPEG>(getURI(), getChecksumAlgo(), external_dataset_group_id,
                                               external_dataset_id, ref_checksum);
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external_ref
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::external_ref
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -14,13 +14,10 @@
 #include "genie/core/access-unit.h"
 #include "genie/core/entropy-decoder.h"
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
-#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
@@ -51,9 +48,7 @@ class Decoder : public core::EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

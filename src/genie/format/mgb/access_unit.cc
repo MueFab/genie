@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -78,7 +76,7 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &par
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
     uint64_t bitreader_pos = bitReader.getBitsRead() / 8 - 1;
     bitReader.read_b(3);
-    uint32_t du_size = bitReader.read<uint32_t>(29);
+    auto du_size = bitReader.read<uint32_t>(29);
 
     header = AUHeader(bitReader, parameterSets);
 
@@ -274,9 +272,7 @@ AccessUnit::AccessUnit(AUHeader h, std::vector<Block> b)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

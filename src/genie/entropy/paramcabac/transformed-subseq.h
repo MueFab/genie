@@ -15,13 +15,11 @@
 #include "genie/entropy/paramcabac/state_vars.h"
 #include "genie/entropy/paramcabac/support_values.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 /**
  * @brief
@@ -43,16 +41,16 @@ class TransformedSubSeq {
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID, bool original = true,
-                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+                      Binarization&& _cabac_binarization, core::GenSubIndex _subsequence_ID, bool original = true,
+                      core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      * @brief
      * @param reader
      * @param _subsequence_ID
      * @param _alphabet_ID
      */
-    TransformedSubSeq(util::BitReader& reader, const core::GenSubIndex _subsequence_ID,
-                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+    TransformedSubSeq(util::BitReader& reader, core::GenSubIndex _subsequence_ID,
+                      core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     /**
      * @brief
@@ -69,25 +67,25 @@ class TransformedSubSeq {
      * @brief
      * @return
      */
-    SupportValues::TransformIdSubsym getTransformIDSubsym() const;
+    [[nodiscard]] SupportValues::TransformIdSubsym getTransformIDSubsym() const;
 
     /**
      * @brief
      * @return
      */
-    const SupportValues& getSupportValues() const;
+    [[nodiscard]] const SupportValues& getSupportValues() const;
 
     /**
      * @brief
      * @return
      */
-    const Binarization& getBinarization() const;
+    [[nodiscard]] const Binarization& getBinarization() const;
 
     /**
      * @brief
      * @return
      */
-    const StateVars& getStateVars() const;
+    [[nodiscard]] const StateVars& getStateVars() const;
 
     /**
      * @brief
@@ -99,13 +97,13 @@ class TransformedSubSeq {
      * @brief
      * @param _subsequence_ID
      */
-    void setSubsequenceID(const core::GenSubIndex _subsequence_ID);
+    void setSubsequenceID(core::GenSubIndex _subsequence_ID);
 
     /**
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    [[nodiscard]] core::AlphabetID getAlphabetID() const;
 
     /**
      * @brief
@@ -130,7 +128,7 @@ class TransformedSubSeq {
      * @brief
      * @return
      */
-    nlohmann::json toJson() const;
+    [[nodiscard]] nlohmann::json toJson() const;
 
  private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< @brief
@@ -145,9 +143,7 @@ class TransformedSubSeq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

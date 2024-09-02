@@ -21,8 +21,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -208,13 +207,12 @@ class FlowGraphEncode : public FlowGraph {
      * @brief
      * @return
      */
-    core::meta::Dataset getMeta() const override;
+    [[nodiscard]] core::meta::Dataset getMeta() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

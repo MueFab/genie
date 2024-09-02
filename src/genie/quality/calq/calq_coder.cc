@@ -20,9 +20,8 @@
 #include "genie/quality/calq/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
-namespace genie {
-namespace quality {
-namespace calq {
+
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -89,9 +88,7 @@ void decode(const DecodingOptions&, const SideInformation& sideInformation, cons
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include <cassert>
 #include <filesystem>
 #include <fstream>
+#include <random>
 #include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
@@ -15,10 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +27,10 @@ Config::Config(int argc, char *argv[])
       inputFile(),
       outputFile(),
       forceOverwrite(false),
-      help(false) {
+      help(false),
+      no_ref(false),
+      clean(false),
+      num_threads(1) {
     processCommandLine(argc, argv);
 }
 
@@ -158,16 +159,25 @@ std::string parent_dir(const std::string &path) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
-    auto randchar = []() -> char {
-        const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
-    };
+    // Define the character set
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = sizeof(charset) - 1;
+
+    // Use a random device to seed the random number generator
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> distribution(0, max_index - 1);
+
+    // Lambda function to generate a random character
+    auto randchar = [&]() -> char { return charset[distribution(generator)]; };
+
+    // Generate the random string
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);
+
     return str;
 }
 
@@ -254,10 +264,7 @@ void Config::validate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

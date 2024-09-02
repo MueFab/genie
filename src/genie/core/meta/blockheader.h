@@ -12,9 +12,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 /**
  * @brief Block header presence interface
@@ -46,20 +44,18 @@ class BlockHeader {
      * @brief Convert to json
      * @return Json representation
      */
-    virtual nlohmann::json toJson() const = 0;
+    [[nodiscard]] virtual nlohmann::json toJson() const = 0;
 
     /**
      * @brief Return block header mode
      * @return Block header mode
      */
-    HeaderType getType() const;
+    [[nodiscard]] HeaderType getType() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 

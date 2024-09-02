@@ -15,19 +15,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_parameterset {
+namespace genie::format::mgg::dataset_parameterset {
 
 /**
  * @brief
  */
 class UpdateInfo {
  private:
-    bool multiple_alignment_flag;             //!< @brief
-    bool pos_40_bits_flag;                    //!< @brief
-    core::AlphabetID alphabetId;              //!< @brief
+    bool multiple_alignment_flag;           //!< @brief
+    bool pos_40_bits_flag;                  //!< @brief
+    core::AlphabetID alphabetId;            //!< @brief
     std::optional<USignature> u_signature;  //!< @brief
 
  public:
@@ -68,39 +65,36 @@ class UpdateInfo {
      * @brief
      * @return
      */
-    bool getMultipleAlignmentFlag() const;
+    [[nodiscard]] bool getMultipleAlignmentFlag() const;
 
     /**
      * @brief
      * @return
      */
-    bool getPos40BitsFlag() const;
+    [[nodiscard]] bool getPos40BitsFlag() const;
 
     /**
      * @brief
      * @return
      */
-    core::AlphabetID getAlphabetID() const;
+    [[nodiscard]] core::AlphabetID getAlphabetID() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasUSignature() const;
+    [[nodiscard]] bool hasUSignature() const;
 
     /**
      * @brief
      * @return
      */
-    const USignature& getUSignature() const;
+    [[nodiscard]] const USignature& getUSignature() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_parameterset
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_parameterset
 
 // ---------------------------------------------------------------------------------------------------------------------
 

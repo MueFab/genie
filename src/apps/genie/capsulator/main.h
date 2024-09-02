@@ -9,8 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace capsulator {
+namespace genieapp::capsulator {
 
 /**
  *
@@ -20,8 +19,7 @@ namespace capsulator {
  */
 int main(int argc, char* argv[]);
 
-}  // namespace capsulator
-}  // namespace genieapp
+}  // namespace genieapp::capsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 

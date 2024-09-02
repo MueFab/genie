@@ -13,15 +13,12 @@
 #include <string>
 #include <vector>
 #include "genie/core/meta/external-ref.h"
-#include "genie/util/make-unique.h"
+
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace external_ref {
+namespace genie::core::meta::external_ref {
 
 /**
  * @brief Represents a reference in fasta format.
@@ -48,7 +45,7 @@ class Fasta : public ExternalRef {
      * @brief Get Checksums of sequences
      * @return Sequence checksums
      */
-    const std::vector<std::string>& getChecksums() const;
+    [[nodiscard]] const std::vector<std::string>& getChecksums() const;
 
     /**
      * @brief
@@ -66,21 +63,18 @@ class Fasta : public ExternalRef {
      * @brief Convert to json
      * @return Json representation
      */
-    nlohmann::json toJson() const override;
+    [[nodiscard]] nlohmann::json toJson() const override;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<RefBase> clone() const override;
+    [[nodiscard]] std::unique_ptr<RefBase> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external_ref
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::external_ref
 
 // ---------------------------------------------------------------------------------------------------------------------
 

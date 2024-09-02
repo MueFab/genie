@@ -11,9 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +39,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = std::move(cfg);
+    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() const {
-    return util::make_unique<DecoderRegular>(*this);
+    return std::make_unique<DecoderRegular>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,7 +62,7 @@ Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descripto
 
 std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc,
                                                                                    util::BitReader &reader) {
-    return util::make_unique<DecoderRegular>(desc, reader);
+    return std::make_unique<DecoderRegular>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -100,7 +98,7 @@ DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderTokenType::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = std::move(cfg);
+    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +110,7 @@ const Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderTokenType::clone() const {
-    return util::make_unique<DecoderTokenType>(*this);
+    return std::make_unique<DecoderTokenType>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -123,7 +121,7 @@ Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descrip
 
 std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(genie::core::GenDesc desc,
                                                                                        util::BitReader &reader) {
-    return util::make_unique<DecoderTokenType>(desc, reader);
+    return std::make_unique<DecoderTokenType>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -140,9 +138,7 @@ void DecoderTokenType::write(util::BitWriter &writer) const {
 
 uint8_t DecoderTokenType::getRleGuardTokentype() const { return rle_guard_tokentype; }
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

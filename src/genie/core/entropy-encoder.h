@@ -16,8 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief Interface for entropy coders. They convert raw access units to access unit payloads
@@ -42,8 +41,7 @@ class EntropyEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

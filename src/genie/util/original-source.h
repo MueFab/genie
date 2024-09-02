@@ -14,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
  * @brief Implementing this interface signals the ability to introduce new data into the application without any input
@@ -43,8 +42,7 @@ class OriginalSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

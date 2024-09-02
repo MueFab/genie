@@ -6,18 +6,17 @@
 
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include <utility>
+#include <memory>
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace qvwriteout {
+namespace genie::quality::qvwriteout {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
-    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    auto param = std::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
     return std::make_tuple(std::move(param), std::move(desc), core::stats::PerfStats());
@@ -25,9 +24,7 @@ core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace qvwriteout
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::qvwriteout
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

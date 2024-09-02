@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,8 +41,8 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(uint8_t _ID, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
-    : header(DatasetGroupHeader(_ID, _version)), version(_mpeg_version) {}
+DatasetGroup::DatasetGroup(uint8_t _id, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
+    : header(DatasetGroupHeader(_id, _version)), version(_mpeg_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -287,7 +285,7 @@ void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
         reader.readBypass(tmp_str);
-        uint64_t offset = reader.readBypassBE<uint64_t>();
+        auto offset = reader.readBypassBE<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             return;
         }
@@ -302,9 +300,7 @@ void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

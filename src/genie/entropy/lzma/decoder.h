@@ -4,42 +4,45 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_UTIL_MAKE_UNIQUE_IMPL_H_
-#define SRC_GENIE_UTIL_MAKE_UNIQUE_IMPL_H_
+#ifndef SRC_GENIE_ENTROPY_LZMA_DECODER_H_
+#define SRC_GENIE_ENTROPY_LZMA_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <utility>
+#include <tuple>
+#include <vector>
+#include "genie/core/access-unit.h"
+#include "genie/core/entropy-decoder.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::entropy::lzma {
+
+/**
+ * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
+ */
+class Decoder : public core::EntropyDecoder {
+ public:
+    /**
+     * @brief
+     * @param param
+     * @param d
+     * @param mmCoderEnabled
+     * @return
+     */
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
+        const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d,
+        bool mmCoderEnabled) override;
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-template <class T, class... Args>
-typename Unique_if<T>::Single_object make_unique(Args &&...args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
+}  // namespace genie::entropy::lzma
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-template <class T>
-typename Unique_if<T>::Unknown_bound make_unique(size_t n) {
-    typedef typename std::remove_extent<T>::type U;
-    return std::unique_ptr<T>(new U[n]());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace util
-}  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // SRC_GENIE_UTIL_MAKE_UNIQUE_IMPL_H_
+#endif  // SRC_GENIE_ENTROPY_LZMA_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

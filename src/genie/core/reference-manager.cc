@@ -9,8 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,19 +19,19 @@ const uint64_t ReferenceManager::CHUNK_SIZE = 1 * 1024 * 1024;  //!
 
 void ReferenceManager::touch(const std::string& name, size_t num) {
     if (cacheInfo.size() < cacheSize) {
-        cacheInfo.push_front(std::make_pair(name, num));
+        cacheInfo.emplace_front(name, num);
         return;
     }
 
     for (auto it = cacheInfo.begin(); it != cacheInfo.end(); ++it) {
         if (it->first == name && it->second == num) {
             cacheInfo.erase(it);
-            cacheInfo.push_front(std::make_pair(name, num));
+            cacheInfo.emplace_front(name, num);
             return;
         }
     }
 
-    cacheInfo.push_front(std::make_pair(name, num));
+    cacheInfo.emplace_front(name, num);
     auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
     cacheInfo.pop_back();
 
@@ -86,12 +85,9 @@ size_t ReferenceManager::getChunkSize() { return CHUNK_SIZE; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ReferenceManager::ReferenceExcerpt::isEmpty() const {
-    for (const auto& p : data) {
-        if (isMapped(p)) {
-            return false;
-        }
-    }
-    return true;
+    return std::none_of(data.begin(), data.end(), [this](const auto& p) {
+        return isMapped(p);
+    });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -247,7 +243,7 @@ void ReferenceManager::addRef(size_t index, std::unique_ptr<Reference> ref) {
     auto sequence = data.find(ref->getName());
     size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
     for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
-        data[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
+        data[ref->getName()].push_back(std::make_unique<CacheLine>());
     }
     mgr.registerRef(std::move(ref));
 }
@@ -320,6 +316,7 @@ std::vector<std::pair<size_t, size_t>> ReferenceManager::getCoverage(const std::
 
 std::vector<std::string> ReferenceManager::getSequences() const {
     std::vector<std::string> ret;
+    ret.reserve(indices.size());
     for (const auto& i : indices) {
         ret.push_back(i.second);
     }
@@ -328,7 +325,7 @@ std::vector<std::string> ReferenceManager::getSequences() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ReferenceManager::getLength(const std::string& name) {
+size_t ReferenceManager::getLength(const std::string& name) const {
     auto cov = getCoverage(name);
 
     size_t ret = 0;
@@ -340,8 +337,7 @@ size_t ReferenceManager::getLength(const std::string& name) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

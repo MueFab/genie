@@ -18,17 +18,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 class DataBlock;
 }
-}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -41,7 +37,7 @@ class Writer {
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Writer(OBufferStream *constbitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
+    explicit Writer(OBufferStream* constbitstream, bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
      * @brief
@@ -68,91 +64,91 @@ class Writer {
      * @param input
      * @param binParams
      */
-    void writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsBIbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsTUbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsEGbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param binParams
      */
-    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
+    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int>& binParams);
 
     /**
      * @brief
      * @param input
      * @param codingSubsymSize
      */
-    void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
+    void writeLutSymbol(uint64_t input, uint8_t codingSubsymSize);
 
     /**
      * @brief
@@ -173,9 +169,7 @@ class Writer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

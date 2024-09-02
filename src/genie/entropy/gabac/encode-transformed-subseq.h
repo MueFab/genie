@@ -18,20 +18,16 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 class DataBlock;
-}
-}  // namespace genie
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -42,14 +38,12 @@ namespace gabac {
  * @return
  */
 size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, util::DataBlock* symbols,
-                             util::DataBlock* const depSymbols = nullptr,
+                             util::DataBlock* depSymbols = nullptr,
                              size_t maxsize = std::numeric_limits<size_t>::max());
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

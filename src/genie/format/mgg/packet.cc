@@ -9,9 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +18,7 @@ Packet::Packet(PacketHeader _header, std::string _data) : header(_header), data(
 // ---------------------------------------------------------------------------------------------------------------------
 
 Packet::Packet(util::BitReader& reader) : header(reader) {
-    data.resize(header.getPacketSize() - header.getLength());
+    data.resize(header.getPacketSize() - genie::format::mgg::PacketHeader::getLength());
     reader.readBypass(data);
 }
 
@@ -41,9 +39,7 @@ const std::string& Packet::getData() const { return data; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

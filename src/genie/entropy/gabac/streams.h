@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief FILE* wrapper
@@ -86,7 +84,7 @@ class DataBlockBuffer : public std::streambuf {
      * @brief
      * @return
      */
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
  protected:
     /**
@@ -145,7 +143,7 @@ class DataBlockBuffer : public std::streambuf {
      * @return
      */
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
-                     std::ios_base::openmode which = std::ios_base::in) override;
+                     std::ios_base::openmode which) override;
 
  private:
     util::DataBlock block;  //!< @brief
@@ -213,9 +211,7 @@ class NullStream : public std::ostream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

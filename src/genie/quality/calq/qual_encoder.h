@@ -24,9 +24,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -52,12 +50,12 @@ class QualEncoder {
     ~QualEncoder();
     void addMappedRecordToBlock(EncodingRecord& record);
     void finishBlock();
-    size_t nrMappedRecords() const;
+    [[nodiscard]] size_t nrMappedRecords() const;
 
  private:
     void quantizeUntil(uint64_t pos);
     void encodeRecords(std::vector<EncodingRecord> records);
-    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos);
+    void encodeMappedQual(const std::string& qvalues, const std::string& cigar, uint64_t pos);
 
  private:
     // Sizes & counters
@@ -85,9 +83,7 @@ class QualEncoder {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

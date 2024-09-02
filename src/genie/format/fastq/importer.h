@@ -15,7 +15,7 @@
 #include "genie/core/format-importer.h"
 #include "genie/core/record/record.h"
 #include "genie/core/stats/perf-stats.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/ordered-lock.h"
 #include "genie/util/original-source.h"
 #include "genie/util/runtime-exception.h"
@@ -23,9 +23,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fastq {
+namespace genie::format::fastq {
 
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
@@ -87,9 +85,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fastq
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fastq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

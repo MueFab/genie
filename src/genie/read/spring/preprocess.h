@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
 #include <filesystem>
+#include <string>
 #include "genie/core/record/chunk.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"
@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 /**
  * @brief
@@ -92,9 +90,7 @@ struct Preprocessor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

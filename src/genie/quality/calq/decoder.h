@@ -20,24 +20,22 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 /**
  * @brief
  */
 class Decoder : public core::QVDecoder {
  private:
-    bool isAligned(const core::AccessUnit::Descriptor& desc);
-    std::vector<std::string> decodeAligned(const quality::paramqv1::QualityValues1& param,
+    static bool isAligned(const core::AccessUnit::Descriptor& desc);
+    static std::vector<std::string> decodeAligned(const quality::paramqv1::QualityValues1& param,
                                            const std::vector<std::string>& ecigar_vec,
                                            const std::vector<uint64_t>& positions, core::AccessUnit::Descriptor& desc);
-    std::vector<std::string> decodeUnaligned(const quality::paramqv1::QualityValues1& param,
-                                             const std::vector<std::string>& ecigar_vec,
-                                             core::AccessUnit::Descriptor& desc);
-    void fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
-                   const quality::paramqv1::QualityValues1& param);
+    static std::vector<std::string> decodeUnaligned(const quality::paramqv1::QualityValues1& param,
+                                                    const std::vector<std::string>& ecigar_vec,
+                                                    core::AccessUnit::Descriptor& desc);
+    static void fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
+                          const quality::paramqv1::QualityValues1& param);
 
  public:
     /**
@@ -55,9 +53,7 @@ class Decoder : public core::QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // ---------------------------------------------------------------------------------------------------------------------
 

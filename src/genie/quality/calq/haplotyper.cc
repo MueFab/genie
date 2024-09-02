@@ -21,9 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -76,7 +74,7 @@ double log10sum(double a, double b) {
 // -----------------------------------------------------------------------------
 
 // Calc priors like in GATK
-std::vector<double> Haplotyper::calcPriors(double hetero) {
+std::vector<double> Haplotyper::calcPriors(double hetero) const {
     hetero = log10(hetero);
     std::vector<double> result(polyploidy + 1, hetero);
     double sum = -std::numeric_limits<double>::infinity();
@@ -213,16 +211,14 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
 
 // -----------------------------------------------------------------------------
 
-size_t Haplotyper::getQuantizerIndex(double activity) {
+size_t Haplotyper::getQuantizerIndex(double activity) const {
     return static_cast<size_t>(
         std::min(std::floor((activity / localDistortion) * nr_quantizers), static_cast<double>(nr_quantizers - 1)));
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

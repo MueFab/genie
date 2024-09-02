@@ -6,10 +6,7 @@
 
 #include "genie/format/mgg/dataset_header/block_header_on_options.h"
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace dataset_header {
+namespace genie::format::mgg::dataset_header {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,10 +43,7 @@ bool BlockHeaderOnOptions::getCCFlag() const { return cc_mode_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace dataset_header
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::dataset_header
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

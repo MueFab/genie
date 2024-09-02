@@ -8,14 +8,11 @@
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_split {
+namespace genie::core::record::alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +49,7 @@ int64_t SameRec::getDelta() const { return delta; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> SameRec::clone() const {
-    auto ret = util::make_unique<SameRec>();
+    auto ret = std::make_unique<SameRec>();
     ret->delta = this->delta;
     ret->alignment = this->alignment;
     return ret;
@@ -60,10 +57,7 @@ std::unique_ptr<AlignmentSplit> SameRec::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_split
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

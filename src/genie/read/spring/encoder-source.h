@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 /**
  * @brief
@@ -68,9 +66,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

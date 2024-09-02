@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace paramcabac {
+namespace genie::entropy::paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -78,25 +76,25 @@ class BinarizationParameters {
      * @brief
      * @return
      */
-    uint8_t getCMax() const;
+    [[nodiscard]] uint8_t getCMax() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCMaxTeg() const;
+    [[nodiscard]] uint8_t getCMaxTeg() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getCMaxDtu() const;
+    [[nodiscard]] uint8_t getCMaxDtu() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getSplitUnitSize() const;
+    [[nodiscard]] uint8_t getSplitUnitSize() const;
 
     /**
      * @brief
@@ -124,7 +122,7 @@ class BinarizationParameters {
      * @param binID
      * @return
      */
-    nlohmann::json toJson(BinarizationId binID) const;
+    [[nodiscard]] nlohmann::json toJson(BinarizationId binID) const;
 
  private:
     uint8_t cmax;             //!< @brief
@@ -137,9 +135,7 @@ class BinarizationParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramcabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::paramcabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

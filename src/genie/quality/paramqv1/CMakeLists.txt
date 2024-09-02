@@ -4,7 +4,7 @@ set(source_files
         codebook.cc
         parameter_set.cc
         qv_coding_config_1.cc
-        )
+)
 
 add_library(genie-paramqv1 ${source_files})
 

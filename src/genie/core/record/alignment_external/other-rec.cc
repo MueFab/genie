@@ -8,14 +8,11 @@
 #include <memory>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_external {
+namespace genie::core::record::alignment_external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +49,7 @@ void OtherRec::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentExternal> OtherRec::clone() const {
-    auto ret = util::make_unique<OtherRec>();
+    auto ret = std::make_unique<OtherRec>();
     ret->next_pos = this->next_pos;
     ret->next_seq_ID = this->next_seq_ID;
     return ret;
@@ -60,10 +57,7 @@ std::unique_ptr<AlignmentExternal> OtherRec::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_external
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_external
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,11 +8,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
+namespace genie::format::mgg::reference::location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -54,17 +50,13 @@ void Internal::write(genie::util::BitWriter& writer) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::meta::RefBase> Internal::decapsulate() {
-    auto ret = genie::util::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
+    auto ret = std::make_unique<genie::core::meta::InternalRef>(internal_dataset_group_id, internal_dataset_id);
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

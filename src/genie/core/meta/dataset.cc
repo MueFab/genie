@@ -11,14 +11,12 @@
 #include <vector>
 #include "blockheader/disabled.h"
 #include "blockheader/enabled.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
+namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,9 +48,9 @@ Dataset::Dataset(const nlohmann::json& json)
     }
     // Presence of MIT and CC_mode flags signals blockheader_flag == true
     if (json.contains("MIT_flag") && json.contains("CC_mode_flag") && !json.contains("ordered_blocks_flag")) {
-        headerCfg = genie::util::make_unique<blockheader::Enabled>(json);
+        headerCfg = std::make_unique<blockheader::Enabled>(json);
     } else if (!json.contains("MIT_flag") && !json.contains("CC_mode_flag") && json.contains("ordered_blocks_flag")) {
-        headerCfg = genie::util::make_unique<blockheader::Disabled>(json);
+        headerCfg = std::make_unique<blockheader::Disabled>(json);
     } else {
         UTILS_DIE("Could not infer block header mode.");
     }
@@ -167,7 +165,7 @@ void Dataset::setProtection(std::string prot) { DT_protection_value = std::move(
 
 Dataset::Dataset() {
     version = 0;
-    headerCfg = genie::util::make_unique<blockheader::Enabled>(false, false);
+    headerCfg = std::make_unique<blockheader::Enabled>(false, false);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -204,9 +202,7 @@ std::vector<DescriptorStream>& Dataset::getDSs() { return descriptor_streams; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

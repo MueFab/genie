@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
@@ -20,10 +21,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,12 +63,12 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
             r_avail->mate_rid == -1) {
             // Case 1: Paired SAM record is missing, switch to unpaired.
             // TODO(fabian): Maybe still preserve pairing information?
-            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::Unpaired>();
+            auto splitAlign = std::make_unique<genie::core::record::alignment_split::Unpaired>();
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         } else {
             // Case 2: Paired SAM record is mapped to other reference sequence, no way to check if data is actually
             // there
-            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
+            auto splitAlign = std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 r_avail->mate_pos, r_avail->mate_rid);
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
@@ -79,7 +77,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
         // Both SAM records are available
         if (force_split) {  // TODO(fabian): Split automatically if delta > 32767
             // Case 1: split into two MPEG records
-            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos() - 1,
+            auto splitAlign = std::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos() - 1,
                                                                                                        r2->getRID());
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
@@ -90,7 +88,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 
             auto delta = r2->getPos() - r1->getPos();
             auto splitAlign =
-                genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta, std::move(alignment2));
+                std::make_unique<genie::core::record::alignment_split::SameRec>(delta, std::move(alignment2));
 
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
@@ -445,10 +443,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

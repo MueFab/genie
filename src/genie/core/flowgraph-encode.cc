@@ -11,8 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +27,7 @@ ReferenceManager& FlowGraphEncode::getRefMgr() { return *refMgr; }
 
 FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) {
     readSelector.setDrain(&exporterSelector);
-    refMgr = genie::util::make_unique<ReferenceManager>(16);
+    refMgr = std::make_unique<ReferenceManager>(16);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -175,6 +174,7 @@ void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie
 
 void FlowGraphEncode::run() {
     std::vector<genie::util::OriginalSource*> imps;
+    imps.reserve(importers.size());
     for (auto& i : importers) {
         imps.emplace_back(i.get());
     }
@@ -199,7 +199,7 @@ core::stats::PerfStats FlowGraphEncode::getStats() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::meta::Dataset FlowGraphEncode::getMeta() const {
-    core::meta::Dataset ret = {0, genie::util::make_unique<genie::core::meta::blockheader::Enabled>(false, false), "",
+    core::meta::Dataset ret = {0, std::make_unique<genie::core::meta::blockheader::Enabled>(false, false), "",
                                ""};
     if (!refSources.empty()) {
         ret.setReference(this->refSources.front()->getMeta());
@@ -209,8 +209,7 @@ core::meta::Dataset FlowGraphEncode::getMeta() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -6,15 +6,15 @@
 
 #include "genie/quality/calq/exceptions.h"
 
-// -----------------------------------------------------------------------------
-
-namespace genie {
-namespace quality {
-namespace calq {
+#include <utility>
 
 // -----------------------------------------------------------------------------
 
-Exception::Exception(const std::string& msg) : msg_(msg) {}
+namespace genie::quality::calq {
+
+// -----------------------------------------------------------------------------
+
+Exception::Exception(std::string msg) : msg_(std::move(msg)) {}
 
 // -----------------------------------------------------------------------------
 
@@ -34,9 +34,7 @@ const char* Exception::what() const noexcept { return msg_.c_str(); }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

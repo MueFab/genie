@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -36,7 +34,7 @@ class DatasetGroupProtection : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
@@ -64,13 +62,13 @@ class DatasetGroupProtection : public GenInfo {
      * @brief
      * @return
      */
-    uint8_t getDatasetGroupID() const;
+    [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getProtection() const;
+    [[nodiscard]] const std::string& getProtection() const;
 
     /**
      * @brief
@@ -92,9 +90,7 @@ class DatasetGroupProtection : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

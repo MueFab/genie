@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace lowlatency {
+namespace genie::read::lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +90,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
-                               std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
+                               std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) {
     core::parameter::DataUnit::DatasetType dataType = state.refOnly
                                                           ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                           : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
@@ -113,9 +111,7 @@ core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lowlatency
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::lowlatency
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

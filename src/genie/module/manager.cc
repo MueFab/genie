@@ -5,6 +5,8 @@
  */
 
 #include "genie/module/manager.h"
+
+#include "genie/entropy/zstd/param_decoder.h"
 #include "genie/core/global-cfg.h"
 #include "genie/core/parameter/quality-values.h"
 #include "genie/entropy/paramcabac/decoder.h"
@@ -12,8 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace module {
+namespace genie::module {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +22,8 @@ void detect() {
     auto& indPark = core::GlobalCfg::getSingleton().getIndustrialPark();
     indPark.registerConstructor<core::parameter::desc_pres::DecoderRegular>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
+    indPark.registerConstructor<core::parameter::desc_pres::DecoderRegular>(
+        entropy::zstd::DecoderRegular::MODE_ZSTD, &entropy::zstd::DecoderRegular::create);
     indPark.registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
     indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
@@ -29,8 +32,7 @@ void detect() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace module
-}  // namespace genie
+}  // namespace genie::module
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

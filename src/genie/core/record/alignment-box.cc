@@ -9,13 +9,11 @@
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -115,9 +113,7 @@ AlignmentBox& AlignmentBox::operator=(AlignmentBox&& container) noexcept {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

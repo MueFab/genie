@@ -11,10 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace meta {
-namespace external_ref {
+namespace genie::core::meta::external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -57,7 +54,7 @@ std::vector<std::string>& Fasta::getChecksums() { return ref_type_other_checksum
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<RefBase> Fasta::clone() const {
-    auto ret = genie::util::make_unique<Fasta>(getURI(), getChecksumAlgo());
+    auto ret = std::make_unique<Fasta>(getURI(), getChecksumAlgo());
     for (auto& c : ref_type_other_checksums) {
         ret->addChecksum(c);
     }
@@ -66,10 +63,7 @@ std::unique_ptr<RefBase> Fasta::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external_ref
-}  // namespace meta
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::meta::external_ref
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

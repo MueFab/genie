@@ -20,9 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgrec {
+namespace genie::format::mgrec {
 
 /**
  * @brief
@@ -40,7 +38,7 @@ class Importer : public core::FormatImporter {
     size_t missing_additional_alignments{};  //!< @brief
 
     std::optional<core::record::Record> bufferedRecord;  //!< @brief
-    bool checkSupport;                                     //!< @brief
+    bool checkSupport;                                   //!< @brief
 
     bool isRecordSupported(const core::record::Record& rec);  //!< @brief
 
@@ -75,9 +73,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgrec
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 

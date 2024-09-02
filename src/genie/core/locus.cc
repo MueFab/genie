@@ -11,8 +11,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +50,7 @@ Locus Locus::fromString(const std::string& string) {
     } else if (tok.size() == NUM_START_END) {
         auto pos = util::tokenize(tok.back(), '-');  // Sequence + position
         UTILS_DIE_IF(pos.size() != NUM_START_END, "Invalid locus");
-        return Locus(tok.front(), static_cast<uint32_t>(std::stoi(pos[0])), static_cast<uint32_t>(std::stoi(pos[1])));
+        return {tok.front(), static_cast<uint32_t>(std::stoi(pos[0])), static_cast<uint32_t>(std::stoi(pos[1]))};
     } else {
         UTILS_DIE("Invalid locus");
     }
@@ -65,8 +64,7 @@ std::string Locus::toString() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

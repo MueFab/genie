@@ -13,9 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +49,7 @@ std::vector<std::unique_ptr<core::Reference>> Manager::generateRefHandles() {
     std::vector<std::unique_ptr<core::Reference>> ret;
     for (const auto& s : seqs) {
         size_t length = getLength(s.second);
-        ret.emplace_back(util::make_unique<Reference>(s.second, length, this));
+        ret.emplace_back(std::make_unique<Reference>(s.second, length, this));
     }
     return ret;
 }
@@ -62,9 +60,7 @@ genie::core::meta::Reference Manager::getMeta() const { return reader.getMeta();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

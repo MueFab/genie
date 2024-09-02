@@ -16,17 +16,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
  * @param subseqCfg
  * @param transformedSubseqs
  */
-void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
-                          std::vector<util::DataBlock>* const transformedSubseqs);
+void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock>* transformedSubseqs);
 
 /**
  * @brief
@@ -34,13 +31,11 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
  * @param transformedSubseqs
  */
 void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
-                                 std::vector<util::DataBlock>* const transformedSubseqs);
+                                 std::vector<util::DataBlock>* transformedSubseqs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

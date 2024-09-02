@@ -4,23 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/reference/location/external/raw.h"
+#include <utility>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace reference {
-namespace location {
-namespace external {
+namespace genie::format::mgg::reference::location::external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::meta::RefBase> Raw::decapsulate() {
-    auto ret = genie::util::make_unique<genie::core::meta::external_ref::Raw>(
+    auto ret = std::make_unique<genie::core::meta::external_ref::Raw>(
         std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
 
     for (auto& s : seq_checksums) {
@@ -84,12 +79,7 @@ void Raw::addChecksum(std::string checksum) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace external
-}  // namespace location
-}  // namespace reference
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::reference::location::external
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -20,9 +20,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -58,9 +56,7 @@ class ErrorExceptionReporter {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

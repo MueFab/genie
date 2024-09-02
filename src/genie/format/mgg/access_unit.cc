@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -150,6 +148,7 @@ AUProtection& AccessUnit::getProtection() { return *au_protection; }
 
 format::mgb::AccessUnit AccessUnit::decapsulate() {
     std::vector<format::mgb::Block> newBlocks;
+    newBlocks.reserve(blocks.size());
     for (auto& b : blocks) {
         newBlocks.emplace_back(b.decapsulate());
     }
@@ -167,9 +166,7 @@ AccessUnit::AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

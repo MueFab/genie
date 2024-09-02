@@ -15,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
                     uint64_t &symbolValue) {
@@ -411,9 +409,7 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

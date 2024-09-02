@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -53,20 +51,18 @@ class Packet : public Box {
      * @brief
      * @return
      */
-    const PacketHeader& getHeader() const;
+    [[nodiscard]] const PacketHeader& getHeader() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getData() const;
+    [[nodiscard]] const std::string& getData() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

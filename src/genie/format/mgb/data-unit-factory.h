@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,13 +46,13 @@ class DataUnitFactory {
      * @param id
      * @return
      */
-    const core::parameter::EncodingSet& getParams(size_t id) const;
+    [[nodiscard]] const core::parameter::EncodingSet& getParams(size_t id) const;
 
     /**
      * @brief
      * @return
      */
-    const std::map<size_t, core::parameter::EncodingSet>& getParams() const;
+    [[nodiscard]] const std::map<size_t, core::parameter::EncodingSet>& getParams() const;
 
     /**
      * @brief
@@ -66,9 +64,7 @@ class DataUnitFactory {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 

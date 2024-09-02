@@ -19,9 +19,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -174,7 +172,6 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 quantizerIndicesIdx += opLen;
                 break;  // do nothing as these bases are not present
             case ']':
-                break;  // these have been clipped
             case '(':
             case '[':
                 break;  // ignore first clip char
@@ -187,9 +184,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

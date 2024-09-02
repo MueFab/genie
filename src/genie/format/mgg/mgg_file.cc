@@ -10,9 +10,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,11 +24,11 @@ MggFile::MggFile(std::istream* _file) : file(_file), reader(*file) {
         UTILS_DIE_IF(boxes.empty() && boxname != "flhd", "No file header found");
         UTILS_DIE_IF(!boxes.empty() && boxname == "flhd", "Multiple file headers found");
         if (boxname == "flhd") {
-            boxes.emplace_back(genie::util::make_unique<genie::format::mgg::FileHeader>(*reader));
+            boxes.emplace_back(std::make_unique<genie::format::mgg::FileHeader>(*reader));
         } else if (boxname == "dgcn") {
             const auto& hdr = dynamic_cast<const genie::format::mgg::FileHeader&>(*boxes.front());
             boxes.emplace_back(
-                genie::util::make_unique<genie::format::mgg::DatasetGroup>(*reader, hdr.getMinorVersion()));
+                std::make_unique<genie::format::mgg::DatasetGroup>(*reader, hdr.getMinorVersion()));
         } else {
             std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
             break;
@@ -70,9 +68,7 @@ void MggFile::print_debug(std::ostream& output, uint8_t max_depth) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -17,9 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -54,13 +52,13 @@ class Segment {
      * @brief
      * @return
      */
-    const std::string& getSequence() const;
+    [[nodiscard]] const std::string& getSequence() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::string>& getQualities() const;
+    [[nodiscard]] const std::vector<std::string>& getQualities() const;
 
     /**
      * @brief
@@ -77,9 +75,7 @@ class Segment {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

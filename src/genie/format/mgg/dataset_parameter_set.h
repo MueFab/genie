@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
 #include <optional>
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgg/dataset_parameterset/update_info.h"
@@ -19,22 +19,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
  */
 class DatasetParameterSet : public GenInfo {
  private:
-    uint8_t dataset_group_id;                                        //!< @brief
-    uint16_t dataset_id;                                             //!< @brief
-    uint8_t parameter_set_ID;                                        //!< @brief
-    uint8_t parent_parameter_set_ID;                                 //!< @brief
+    uint8_t dataset_group_id;                                      //!< @brief
+    uint16_t dataset_id;                                           //!< @brief
+    uint8_t parameter_set_ID;                                      //!< @brief
+    uint8_t parent_parameter_set_ID;                               //!< @brief
     std::optional<dataset_parameterset::UpdateInfo> param_update;  //!< @brief
-    genie::core::parameter::EncodingSet params;                      //!< @brief
-    core::MPEGMinorVersion version;                                  //!< @brief
+    genie::core::parameter::EncodingSet params;                    //!< @brief
+    core::MPEGMinorVersion version;                                //!< @brief
 
  public:
     /**
@@ -104,49 +102,49 @@ class DatasetParameterSet : public GenInfo {
      * @brief
      * @return
      */
-    const std::string& getKey() const override;
+    [[nodiscard]] const std::string& getKey() const override;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getDatasetGroupID() const;
+    [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getDatasetID() const;
+    [[nodiscard]] uint16_t getDatasetID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getParameterSetID() const;
+    [[nodiscard]] uint8_t getParameterSetID() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getParentParameterSetID() const;
+    [[nodiscard]] uint8_t getParentParameterSetID() const;
 
     /**
      * @brief
      * @return
      */
-    bool hasParameterUpdate() const;
+    [[nodiscard]] bool hasParameterUpdate() const;
 
     /**
      * @brief
      * @return
      */
-    const dataset_parameterset::UpdateInfo& getParameterUpdate() const;
+    [[nodiscard]] const dataset_parameterset::UpdateInfo& getParameterUpdate() const;
 
     /**
      * @brief
      * @return
      */
-    const genie::core::parameter::EncodingSet& getEncodingSet() const;
+    [[nodiscard]] const genie::core::parameter::EncodingSet& getEncodingSet() const;
 
     /**
      * @brief
@@ -157,9 +155,7 @@ class DatasetParameterSet : public GenInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

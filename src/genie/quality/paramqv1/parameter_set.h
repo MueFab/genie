@@ -14,13 +14,11 @@
 #include <vector>
 #include "genie/quality/paramqv1/codebook.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace paramqv1 {
+namespace genie::quality::paramqv1 {
 
 /**
  * @brief
@@ -52,7 +50,7 @@ class ParameterSet {
      * @brief
      * @return
      */
-    const std::vector<Codebook> &getCodebooks() const;
+    [[nodiscard]] const std::vector<Codebook> &getCodebooks() const;
 
     /**
      * @brief
@@ -74,9 +72,7 @@ class ParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace paramqv1
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::paramqv1
 
 // ---------------------------------------------------------------------------------------------------------------------
 

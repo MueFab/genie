@@ -19,9 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,18 +80,18 @@ class omp_lock {
     /**
      * @brief
      */
-    void set(void) { omp_set_lock(&lck); }
+    void set() { omp_set_lock(&lck); }
 
     /**
      * @brief
      */
-    void unset(void) { omp_unset_lock(&lck); }
+    void unset() { omp_unset_lock(&lck); }
 
     /**
      * @brief
      * @return
      */
-    int test(void) { return omp_test_lock(&lck); }
+    int test() { return omp_test_lock(&lck); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -102,9 +100,7 @@ class omp_lock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

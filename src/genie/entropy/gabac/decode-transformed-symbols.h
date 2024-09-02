@@ -16,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 /**
  * @brief
@@ -32,13 +30,13 @@ class TransformedSymbolsDecoder {
      * @param numEncodedSymbols
      */
     explicit TransformedSymbolsDecoder(util::DataBlock *bitstream, const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                       const unsigned int numEncodedSymbols);
+                                       unsigned int numEncodedSymbols);
 
     /**
      * @brief
      * @param trnsfSubseqDecoder
      */
-    explicit TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
+    TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
 
     /**
      * @brief
@@ -56,7 +54,7 @@ class TransformedSymbolsDecoder {
      * @brief
      * @return the number of symbols available.
      */
-    size_t symbolsAvail() const;
+    [[nodiscard]] size_t symbolsAvail() const;
 
  private:
     /**
@@ -70,7 +68,7 @@ class TransformedSymbolsDecoder {
      * @param depSymbol
      * @return
      */
-    uint64_t decodeNextSymbolOrder1(uint64_t *depSymbol);
+    uint64_t decodeNextSymbolOrder1(const uint64_t *depSymbol);
 
     /**
      * @brief
@@ -104,9 +102,7 @@ class TransformedSymbolsDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 

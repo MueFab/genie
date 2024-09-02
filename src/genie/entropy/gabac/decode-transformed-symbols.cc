@@ -12,9 +12,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace gabac {
+namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,8 +43,8 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
       binarizor(getBinarizorReader(outputSymbolSize, trnsfSubseqConf.getBinarization().getBypassFlag(), binID,
                                    trnsfSubseqConf.getBinarization().getCabacBinarizationParameters(),
                                    trnsfSubseqConf.getStateVars(), binParams)) {
-    if (bitstream == nullptr || bitstream->size() <= 0) return;  // Simple return as bitstream can be empty
-    if (numEncodedSymbols <= 0) return;                          // Simple return as numEncodedSymbols can be zero
+    if (bitstream == nullptr || bitstream->empty()) return;  // Simple return as bitstream can be empty
+    if (numEncodedSymbols <= 0) return;                      // Simple return as numEncodedSymbols can be zero
 
     reader.start();
 
@@ -60,25 +58,7 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &src)
-    : numEncodedSymbols(src.numEncodedSymbols),
-      numDecodedSymbols(src.numDecodedSymbols),
-      outputSymbolSize(src.outputSymbolSize),
-      codingSubsymSize(src.codingSubsymSize),
-      codingOrder(src.codingOrder),
-      subsymMask(src.subsymMask),
-      numSubSyms(src.numSubSyms),
-      numLuts(src.numLuts),
-      numPrvs(src.numPrvs),
-      reader(src.reader),
-      ctxSelector(src.ctxSelector),
-      invLutsSubsymTrnsfm(src.invLutsSubsymTrnsfm),
-      diffEnabled(src.diffEnabled),
-      customCmaxTU(src.customCmaxTU),
-      defaultCmax(src.defaultCmax),
-      binID(src.binID),
-      binParams(src.binParams),
-      binarizor(src.binarizor) {}
+TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &src) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -131,7 +111,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) {
+uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(const uint64_t *depSymbol) {
     uint64_t symbolValue = 0;
     if (numDecodedSymbols < numEncodedSymbols) {
         // Decode subsymbols and merge them to construct the symbol
@@ -220,9 +200,7 @@ size_t TransformedSymbolsDecoder::symbolsAvail() const { return numEncodedSymbol
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
-}  // namespace genie
+}  // namespace genie::entropy::gabac
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

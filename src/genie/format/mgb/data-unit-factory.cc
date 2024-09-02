@@ -7,6 +7,7 @@
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
 #include <string>
+#include <memory>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
@@ -14,9 +15,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgb {
+namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +48,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
                     refmgr->addRef(i++,
-                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                   std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
@@ -70,7 +69,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
                     refmgr->addRef(i++,
-                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                   std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());
                 } else {
@@ -103,9 +102,7 @@ const std::map<size_t, core::parameter::EncodingSet>& DataUnitFactory::getParams
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgb
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

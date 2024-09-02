@@ -16,14 +16,12 @@
 #include "genie/format/mgg/dataset_group.h"
 #include "genie/format/mgg/file_header.h"
 #include "genie/util/bitreader.h"
-#include "genie/util/make-unique.h"
+
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
+namespace genie::format::mgg {
 
 /**
  * @brief
@@ -32,7 +30,7 @@ class MggFile {
  private:
     std::vector<std::unique_ptr<Box>> boxes;  //!< @brief
     std::istream* file;                       //!< @brief
-    std::optional<util::BitReader> reader;  //!< @brief
+    std::optional<util::BitReader> reader;    //!< @brief
 
  public:
     /**
@@ -74,9 +72,7 @@ class MggFile {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -16,8 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -33,19 +32,19 @@ class Reference {
      * @brief
      * @return
      */
-    const std::string& getName() const;
+    [[nodiscard]] const std::string& getName() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getStart() const;
+    [[nodiscard]] uint64_t getStart() const;
 
     /**
      * @brief
      * @return
      */
-    uint64_t getEnd() const;
+    [[nodiscard]] uint64_t getEnd() const;
 
     /**
      * @brief
@@ -71,8 +70,7 @@ class Reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 

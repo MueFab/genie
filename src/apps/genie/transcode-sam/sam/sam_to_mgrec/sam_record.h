@@ -21,10 +21,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
-namespace sam {
-namespace sam_to_mgrec {
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 /**
  * @brief
@@ -119,7 +116,7 @@ class SamRecord {
      * @brief
      * @return
      */
-    const std::string& getQname();
+    [[nodiscard]] const std::string& getQname() const;
 
     /**
      * @brief
@@ -131,31 +128,31 @@ class SamRecord {
      * @brief
      * @return
      */
-    uint16_t getFlag() const;
+    [[nodiscard]] uint16_t getFlag() const;
 
     /**
      * @brief
      * @return
      */
-    int32_t getRID() const;
+    [[nodiscard]] int32_t getRID() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getPos() const;
+    [[nodiscard]] uint32_t getPos() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getMapq() const;
+    [[nodiscard]] uint8_t getMapq() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getCigar() const;
+    [[nodiscard]] const std::string& getCigar() const;
 
     /**
      * @brief
@@ -167,25 +164,25 @@ class SamRecord {
      * @brief
      * @return
      */
-    std::string getECigar() const;
+    [[nodiscard]] std::string getECigar() const;
 
     /**
      * @brief
      * @return
      */
-    int32_t getMRID() const;
+    [[nodiscard]] int32_t getMRID() const;
 
     /**
      * @brief
      * @return
      */
-    uint32_t getMPos() const;
+    [[nodiscard]] uint32_t getMPos() const;
 
     /**
      * @brief
      * @return
      */
-    const std::string& getSeq() const;
+    [[nodiscard]] const std::string& getSeq() const;
 
     /**
      * @brief
@@ -209,7 +206,7 @@ class SamRecord {
      * @brief
      * @return
      */
-    const std::string& getQual() const;
+    [[nodiscard]] const std::string& getQual() const;
 
     /**
      * @brief
@@ -228,68 +225,68 @@ class SamRecord {
      * @param _flag
      * @return
      */
-    bool checkFlag(uint16_t _flag) const;
+    [[nodiscard]] bool checkFlag(uint16_t _flag) const;
 
     /**
      * @brief
      * @param _flag
      * @return
      */
-    bool checkNFlag(uint16_t _flag) const;
+    [[nodiscard]] bool checkNFlag(uint16_t _flag) const;
 
     /**
      * @brief
      * @return
      */
-    bool isUnmapped() const;
+    [[nodiscard]] bool isUnmapped() const;
 
     /**
      * @brief
      * @return
      */
-    bool isMateUnmapped() const;
+    [[nodiscard]] bool isMateUnmapped() const;
 
     /**
      * @brief
      * @return
      */
-    bool isPrimary() const;
+    [[nodiscard]] bool isPrimary() const;
 
     /**
      * @brief
      * @return
      */
-    bool isSecondary() const;
+    [[nodiscard]] bool isSecondary() const;
 
     /**
      * @brief
      * @return
      */
-    bool isDuplicates() const;
+    [[nodiscard]] bool isDuplicates() const;
 
     /**
      * @brief
      * @return
      */
-    bool isSupplementary() const;
+    [[nodiscard]] bool isSupplementary() const;
 
     /**
      * @brief
      * @return
      */
-    bool isPaired() const;
+    [[nodiscard]] bool isPaired() const;
 
     /**
      * @brief
      * @return
      */
-    bool isRead1() const;
+    [[nodiscard]] bool isRead1() const;
 
     /**
      * @brief
      * @return
      */
-    bool isRead2() const;
+    [[nodiscard]] bool isRead2() const;
 
     /**
      * @brief SamRecord are correctly oriented with respect to one another,
@@ -298,34 +295,31 @@ class SamRecord {
      * This includes that the reads are mapped to the same chromosomes.
      * @return
      */
-    bool isProperlyPaired() const;
+    [[nodiscard]] bool isProperlyPaired() const;
 
     /**
      * @brief
      * @return
      */
-    bool isPairedAndBothMapped() const;
+    [[nodiscard]] bool isPairedAndBothMapped() const;
 
     /**
      * @brief
      * @return
      */
-    bool isReverse() const;
+    [[nodiscard]] bool isReverse() const;
 
     /**
      * @brief
      * @param r
      * @return
      */
-    bool isPairOf(SamRecord& r);
+    bool isPairOf(SamRecord& r) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace sam_to_mgrec
-}  // namespace sam
-}  // namespace transcode_sam
-}  // namespace genieapp
+}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 

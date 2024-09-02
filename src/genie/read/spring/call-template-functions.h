@@ -14,9 +14,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace read {
-namespace spring {
+namespace genie::read::spring {
 
 /**
  * @brief
@@ -34,9 +32,7 @@ void call_encoder(const std::string &temp_dir, compression_params &cp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace spring
-}  // namespace read
-}  // namespace genie
+}  // namespace genie::read::spring
 
 // ---------------------------------------------------------------------------------------------------------------------
 

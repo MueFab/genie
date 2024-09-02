@@ -7,6 +7,7 @@
 #include "genie/format/fasta/reader.h"
 #include <algorithm>
 #include <istream>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -15,9 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace fasta {
+namespace genie::format::fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,7 +110,7 @@ void FastaReader::hash(const FaiFile& fai, std::istream& fasta, std::ostream& ha
 
 core::meta::Reference FastaReader::getMeta() const {
     std::string basename = path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1);
-    auto f = genie::util::make_unique<core::meta::external_ref::Fasta>(
+    auto f = std::make_unique<core::meta::external_ref::Fasta>(
         "file://" + path, core::meta::ExternalRef::ChecksumAlgorithm::SHA256);
 
     size_t id = 0;
@@ -126,9 +125,7 @@ core::meta::Reference FastaReader::getMeta() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::fasta
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

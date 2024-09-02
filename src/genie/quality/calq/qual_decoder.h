@@ -12,8 +12,8 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -21,9 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie {
-namespace quality {
-namespace calq {
+namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
@@ -61,9 +59,7 @@ class QualDecoder {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace calq
-}  // namespace quality
-}  // namespace genie
+}  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
 

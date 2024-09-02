@@ -17,10 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace format {
-namespace mgg {
-namespace encapsulator {
+namespace genie::format::mgg::encapsulator {
 
 /**
  * @brief
@@ -45,10 +42,7 @@ class DecapsulatedFile {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace encapsulator
-}  // namespace mgg
-}  // namespace format
-}  // namespace genie
+}  // namespace genie::format::mgg::encapsulator
 
 // ---------------------------------------------------------------------------------------------------------------------
 

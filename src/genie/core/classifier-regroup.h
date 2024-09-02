@@ -18,8 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
 /**
  * @brief
@@ -56,14 +55,14 @@ class ClassifierRegroup : public Classifier {
      * @param end
      * @return
      */
-    bool isCovered(size_t start, size_t end) const;
+    [[nodiscard]] bool isCovered(size_t start, size_t end) const;
 
     /**
      * @brief
      * @param r
      * @return
      */
-    bool isCovered(const core::record::Record& r) const;
+    [[nodiscard]] bool isCovered(const core::record::Record& r) const;
 
     /**
      * @brief
@@ -109,8 +108,7 @@ class ClassifierRegroup : public Classifier {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
 // ---------------------------------------------------------------------------------------------------------------------
 
