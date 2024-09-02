@@ -14,7 +14,6 @@
 #include "genie/core/access-unit.h"
 #include "genie/core/entropy-decoder.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::entropy::bsc {
