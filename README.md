@@ -3,6 +3,8 @@
 Open Source MPEG-G Codec
 
 [![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/muefab.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build?definitionId=4&view=branches)
+![Static Badge](https://img.shields.io/badge/License-BSD%203%E2%80%93Clause-blue?style=flat&link=https%3A%2F%2Fgithub.com%2FMueFab%2Fgenie%2Fblob%2Fmain%2FLICENSE)
+![Static Badge](https://img.shields.io/badge/Paper-Communications%20Biology-orange?style=flat&link=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42003-024-06249-8)
 
 ---
 
