@@ -374,8 +374,14 @@ stages:
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
       displayName: 'Download binaries'
-    - bash: echo "Not yet implemented"
-      displayName: 'Build debian package'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'DockerHub'
+        repository: 'genie'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.SourceBranchName)
 #  - job: 'OSX'
 #    strategy:
  #     matrix:
