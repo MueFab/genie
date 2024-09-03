@@ -379,7 +379,7 @@ stages:
         containerRegistry: 'DockerHub'
         repository: 'genie'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
+        Dockerfile: './Dockerfile'
         tags: |
           $(Build.SourceBranchName)
 #  - job: 'OSX'
