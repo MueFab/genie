@@ -381,6 +381,7 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           $(Build.SourceBranchName)
+          $(Build.SourceBranchName == 'main' && echo 'latest')
 #  - job: 'OSX'
 #    strategy:
  #     matrix:
