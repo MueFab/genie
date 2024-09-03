@@ -1,10 +1,12 @@
-# Genie
+<p align="center">
+<img src="https://raw.githubusercontent.com/MueFab/genie/docker/data/Genie_Logo.png" style="display:block; width: 70%; margin-left:auto; margin-right:auto" />
+</p>
 
-Open Source MPEG-G Codec
+---
 
 [![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/muefab.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build?definitionId=4&view=branches)
 
----
+# Open Source MPEG-G Codec
 
 ## Usage Policy
 
