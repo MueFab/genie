@@ -1,3 +1,11 @@
+trigger:
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - '*'
+
 stages:
 - stage: 'Building'
   jobs:
@@ -58,6 +66,7 @@ stages:
     - bash: |
         git clone https://github.com/IlyaGrebnov/libbsc.git 
         cd libbsc 
+        git checkout tags/v3.3.4
         sed -i 's/clang++/g++/g' makefile 
         make -j 
         sudo make install
@@ -141,6 +150,7 @@ stages:
     - bash: |
         git clone https://github.com/IlyaGrebnov/libbsc.git 
         cd libbsc 
+        git checkout tags/v3.3.4
         sed -i 's/clang++/g++/g' makefile 
         make -j 
         sudo make install
@@ -360,7 +370,7 @@ stages:
 
 - stage: 'Deployment'
   jobs:
-  - job: 'Debian'
+  - job: 'Docker'
     strategy:
       matrix:
         ubuntu2204:
@@ -370,12 +380,27 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - checkout: none
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-    - bash: echo "Not yet implemented"
-      displayName: 'Build debian package'
+ #   - download: current
+ #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+ #     displayName: 'Download binaries'
+    - task: Docker@2
+      condition: and(ne(variables['Build.SourceBranchName'], 'main'), ne(variables['Build.SourceBranchName'], 'merge'))
+      inputs:
+        containerRegistry: 'DockerHub'
+        repository: 'muefab/genie'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.SourceBranchName)
+    - task: Docker@2
+      condition: and(eq(variables['Build.SourceBranchName'], 'main'), ne(variables['Build.SourceBranchName'], 'merge'))
+      inputs:
+        containerRegistry: 'DockerHub'
+        repository: 'muefab/genie'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          latest
 #  - job: 'OSX'
 #    strategy:
  #     matrix:
