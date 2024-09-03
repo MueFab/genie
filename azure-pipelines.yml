@@ -370,7 +370,7 @@ stages:
 
 - stage: 'Deployment'
   jobs:
-  - job: 'Debian'
+  - job: 'Docker'
     strategy:
       matrix:
         ubuntu2204:
@@ -380,10 +380,11 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
+ #   - download: current
+ #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+ #     displayName: 'Download binaries'
     - task: Docker@2
+      condition: ne(variables['Build.SourceBranchName'], 'main')
       inputs:
         containerRegistry: 'DockerHub'
         repository: 'muefab/genie'
@@ -391,7 +392,15 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           $(Build.SourceBranchName)
-          $(Build.SourceBranchName == 'main' && echo 'latest')
+    - task: Docker@2
+      condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
+      inputs:
+        containerRegistry: 'DockerHub'
+        repository: 'muefab/genie'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          latest
 #  - job: 'OSX'
 #    strategy:
  #     matrix:
