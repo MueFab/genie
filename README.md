@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/MueFab/genie/docker/data/Genie_Logo.png" style="display:block; width: 70%; margin-left:auto; margin-right:auto" />
+<img src="https://raw.githubusercontent.com/MueFab/genie/develop/data/Genie_Logo.png" style="display:block; width: 70%; margin-left:auto; margin-right:auto" />
 </p>
 
 ---
