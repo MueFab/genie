@@ -376,7 +376,7 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'DockerHub'
-        repository: 'genie'
+        repository: 'muefab/genie'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         tags: |
