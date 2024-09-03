@@ -58,6 +58,7 @@ stages:
     - bash: |
         git clone https://github.com/IlyaGrebnov/libbsc.git 
         cd libbsc 
+        git checkout tags/v3.3.4
         sed -i 's/clang++/g++/g' makefile 
         make -j 
         sudo make install
@@ -141,6 +142,7 @@ stages:
     - bash: |
         git clone https://github.com/IlyaGrebnov/libbsc.git 
         cd libbsc 
+        git checkout tags/v3.3.4
         sed -i 's/clang++/g++/g' makefile 
         make -j 
         sudo make install
