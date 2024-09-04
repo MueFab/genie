@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::ofstream outfile(pOpts.outputFile);
-    genie::util::BitWriter bw(&outfile);
+    genie::util::BitWriter bw(outfile);
     raw_ref.write(bw);
 
     return 0;

@@ -44,7 +44,7 @@ void encapsulate(ProgramOptions& options) {
     auto mgg_file = input_file.assemble(version);
 
     std::ofstream outstream(options.outputFile);
-    genie::util::BitWriter writer(&outstream);
+    genie::util::BitWriter writer(outstream);
 
     mgg_file.print_debug(std::cerr, 100);
 
@@ -66,7 +66,7 @@ void decapsulate(ProgramOptions& options) {
             json_file.write(meta_json.data(), meta_json.length());
 
             std::ofstream mgb_output_file(local_output_prefix + ".mgb");
-            genie::util::BitWriter mgb_output_writer(&mgb_output_file);
+            genie::util::BitWriter mgb_output_writer(mgb_output_file);
             dt.second.first.write(mgb_output_writer);
         }
     }

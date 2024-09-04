@@ -233,7 +233,7 @@ size_t AccessUnit::Subsequence::getRawSize() const { return data.getRawSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
-    writer.writeBypass(data.getData(), data.getRawSize());
+    writer.writeAlignedBytes(data.getData(), data.getRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.readBypass(reinterpret_cast<char *>(data.getData()), size);
+    reader.readAlignedBytes(reinterpret_cast<char *>(data.getData()), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -285,7 +285,7 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
     }
     for (size_t i = 0; i < subdesc.size(); ++i) {
         if (i < (subdesc.size() - 1)) {
-            writer.write(subdesc[i].getRawSize(), 32);
+            writer.writeBits(subdesc[i].getRawSize(), 32);
         }
         subdesc[i].write(writer);
     }

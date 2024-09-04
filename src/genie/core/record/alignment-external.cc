@@ -22,12 +22,12 @@ AlignmentExternal::AlignmentExternal(Type _moreAlignmentInfoType) : moreAlignmen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentExternal::write(util::BitWriter &writer) const { writer.writeBypassBE(moreAlignmentInfoType); }
+void AlignmentExternal::write(util::BitWriter &writer) const { writer.writeAlignedInt(moreAlignmentInfoType); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &reader) {
-    Type type = reader.readBypassBE<Type>();
+    Type type = reader.readAlignedInt<Type>();
     switch (type) {
         case Type::NONE:
             return std::make_unique<alignment_external::None>();

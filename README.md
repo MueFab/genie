@@ -2,15 +2,18 @@
 <img src="https://raw.githubusercontent.com/MueFab/genie/develop/data/Genie_Logo.png" style="display:block; width: 70%; margin-left:auto; margin-right:auto" />
 </p>
 
----
-
+<div align="center">
+   
 [![Build Status](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_apis/build/status/muefab.genie?branchName=develop)](https://dev.azure.com/fabianmuentefering/fabianmuentefering/_build?definitionId=4&view=branches)
 [![Static Badge](https://img.shields.io/badge/License-BSD%203%E2%80%93Clause-blue?style=flat&link=https%3A%2F%2Fgithub.com%2FMueFab%2Fgenie%2Fblob%2Fmain%2FLICENSE)](https://github.com/MueFab/genie/blob/develop/LICENSE)
 [![Static Badge](https://img.shields.io/badge/Paper-Communications%20Biology-orange?style=flat&link=https%3A%2F%2Fwww.nature.com%2Farticles%2Fs42003-024-06249-8)](https://www.nature.com/articles/s42003-024-06249-8)
 [![Static Badge](https://img.shields.io/badge/Docker%20Hub-Images-purple?style=flat&logo=docker)](https://hub.docker.com/r/muefab/genie)
 
+</div>
 
-# Open Source MPEG-G Codec
+<h1 align="center"> Open Source MPEG-G Codec </h1>
+
+---
 
 ## Usage Policy
 
@@ -114,3 +117,4 @@ Fabian Müntefering <[muenteferi@tnt.uni-hannover.de](mailto:muenteferi@tnt.uni-
 Mikel Hernaez <[mhernaez@unav.es](mailto:mhernaez@unav.es)>
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
+

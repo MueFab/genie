@@ -20,11 +20,11 @@ DescriptorStreamProtection::DescriptorStreamProtection(std::string _dSProtection
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamProtection::DescriptorStreamProtection(genie::util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     DSProtectionValue.resize(length);
-    reader.readBypass(DSProtectionValue);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    reader.readAlignedBytes(DSProtectionValue.data(), DSProtectionValue.length());
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const std::string& DescriptorStreamProtection::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorStreamProtection::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeBypass(DSProtectionValue.data(), DSProtectionValue.size());
+    bitWriter.writeAlignedBytes(DSProtectionValue.data(), DSProtectionValue.size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

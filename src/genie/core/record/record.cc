@@ -61,21 +61,21 @@ Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record(util::BitReader &reader)
-    : number_of_template_segments(reader.readBypassBE<uint8_t>()),
-      reads(reader.readBypassBE<uint8_t>()),
-      alignmentInfo(reader.readBypassBE<uint16_t>()),
-      class_ID(reader.readBypassBE<ClassType>()),
-      read_group(reader.readBypassBE<uint8_t>(), 0),
-      read_1_first(reader.readBypassBE<uint8_t>()),
+    : number_of_template_segments(reader.readAlignedInt<uint8_t>()),
+      reads(reader.readAlignedInt<uint8_t>()),
+      alignmentInfo(reader.readAlignedInt<uint16_t>()),
+      class_ID(reader.readAlignedInt<ClassType>()),
+      read_group(reader.readAlignedInt<uint8_t>(), 0),
+      read_1_first(reader.readAlignedInt<uint8_t>()),
       sharedAlignmentInfo(!alignmentInfo.empty() ? AlignmentSharedData(reader) : AlignmentSharedData()) {
     std::vector<uint32_t> readSizes(reads.size());
     for (auto &s : readSizes) {
-        s = reader.readBypassBE<uint32_t, 3>();
+        s = reader.readAlignedInt<uint32_t, 3>();
     }
-    qv_depth = reader.readBypassBE<uint8_t>();
-    read_name.resize(reader.readBypassBE<uint8_t>());
-    reader.readBypass(&read_name[0], read_name.size());
-    reader.readBypass(&read_group[0], read_group.size());
+    qv_depth = reader.readAlignedInt<uint8_t>();
+    read_name.resize(reader.readAlignedInt<uint8_t>());
+    reader.readAlignedBytes(&read_name[0], read_name.size());
+    reader.readAlignedBytes(&read_group[0], read_group.size());
 
     size_t index = 0;
     for (auto &r : reads) {
@@ -85,7 +85,7 @@ Record::Record(util::BitReader &reader)
     for (auto &a : alignmentInfo) {
         a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
     }
-    flags = reader.readBypassBE<uint8_t>();
+    flags = reader.readAlignedInt<uint8_t>();
     moreAlignmentInfo = AlignmentExternal::factory(reader);
 }
 
@@ -190,29 +190,29 @@ const std::vector<AlignmentBox> &Record::getAlignments() const { return alignmen
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(number_of_template_segments);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(reads.size()));
-    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
-    writer.writeBypassBE(class_ID);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_group.length()));
-    writer.writeBypassBE(read_1_first);
+    writer.writeAlignedInt(number_of_template_segments);
+    writer.writeAlignedInt<uint8_t>(static_cast<uint8_t>(reads.size()));
+    writer.writeAlignedInt<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
+    writer.writeAlignedInt(class_ID);
+    writer.writeAlignedInt<uint8_t>(static_cast<uint8_t>(read_group.length()));
+    writer.writeAlignedInt(read_1_first);
     if (!alignmentInfo.empty()) {
         sharedAlignmentInfo.write(writer);
     }
     for (const auto &a : reads) {
-        writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
+        writer.writeAlignedInt<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
     }
-    writer.writeBypassBE(qv_depth);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
-    writer.writeBypass(read_name.data(), read_name.length());
-    writer.writeBypass(read_group.data(), read_group.length());
+    writer.writeAlignedInt(qv_depth);
+    writer.writeAlignedInt<uint8_t>(static_cast<uint8_t>(read_name.length()));
+    writer.writeAlignedBytes(read_name.data(), read_name.length());
+    writer.writeAlignedBytes(read_group.data(), read_group.length());
     for (const auto &r : reads) {
         r.write(writer);
     }
     for (const auto &a : alignmentInfo) {
         a.write(writer);
     }
-    writer.writeBypassBE(flags);
+    writer.writeAlignedInt(flags);
     moreAlignmentInfo->write(writer);
 }
 

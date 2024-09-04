@@ -645,7 +645,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
         fout_s << fin_s.rdbuf();  // write entire file
         foutorder_s << finorder_s.rdbuf();
 
-        // clear error flags which occur on rdbuffing empty file
+        // clearStreamState error flags which occur on rdbuffing empty file
         fout_s.clear();
         foutorder_s.clear();
 

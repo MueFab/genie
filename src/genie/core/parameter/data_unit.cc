@@ -16,7 +16,7 @@ DataUnit::DataUnit(const DataUnitType &t) : data_unit_type(t) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataUnit::write(util::BitWriter &writer) const { writer.write(uint64_t(data_unit_type), 8); }
+void DataUnit::write(util::BitWriter &writer) const { writer.writeBits(uint64_t(data_unit_type), 8); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

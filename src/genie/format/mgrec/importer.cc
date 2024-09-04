@@ -20,7 +20,7 @@ namespace genie::format::mgrec {
 Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, bool _checkSupport)
     : blockSize(_blockSize),
       reader(_file_1),
-      writer(&_unsupported),
+      writer(_unsupported),
       bufferedRecord(std::nullopt),
       checkSupport(_checkSupport) {}
 
@@ -92,7 +92,7 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
             continue;
         }
         core::record::Record rec(reader);
-        if (!reader.isGood()) {
+        if (!reader.isStreamGood()) {
             break;
         }
 
@@ -118,7 +118,7 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         missing_additional_alignments += c.getAlignments().empty() ? 0 : c.getAlignments().size() - 1;
     }
     _classifier->add(std::move(chunk));
-    return reader.isGood() || bufferedRecord;
+    return reader.isStreamGood() || bufferedRecord;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

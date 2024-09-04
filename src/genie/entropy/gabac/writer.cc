@@ -23,7 +23,7 @@ namespace genie::entropy::gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Writer::Writer(OBufferStream* const bitstream, const bool bypassFlag, uint64_t numContexts)
-    : m_bitOutputStream(bitstream),
+    : m_bitOutputStream(*bitstream),
       m_binaryArithmeticEncoder(m_bitOutputStream),
       m_bypassFlag(bypassFlag),
       m_numContexts(numContexts) {

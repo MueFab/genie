@@ -41,10 +41,10 @@ RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerO
     seq_end = reader.read<uint64_t>(40);
     if (!headerOnly) {
         ref_sequence.resize(seq_end - seq_start + 1);
-        reader.readBypass(&ref_sequence[0], seq_end - seq_start + 1);
+        reader.readAlignedBytes(&ref_sequence[0], seq_end - seq_start + 1);
     } else {
-        UTILS_DIE_IF(!reader.isAligned(), "Bitreader not aligned");
-        reader.skip(seq_end - seq_start + 1);
+        UTILS_DIE_IF(!reader.isByteAligned(), "Bitreader not aligned");
+        reader.skipAlignedBytes(seq_end - seq_start + 1);
     }
 }
 
@@ -59,10 +59,10 @@ RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_
 // ---------------------------------------------------------------------------------------------------------------------
 
 void RawReferenceSequence::write(util::BitWriter& writer) const {
-    writer.write(sequence_ID, 16);
-    writer.write(seq_start, 40);
-    writer.write(seq_start + ref_sequence.length() - 1, 40);
-    writer.writeBypass(ref_sequence.data(), ref_sequence.length());
+    writer.writeBits(sequence_ID, 16);
+    writer.writeBits(seq_start, 40);
+    writer.writeBits(seq_start + ref_sequence.length() - 1, 40);
+    writer.writeAlignedBytes(ref_sequence.data(), ref_sequence.length());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

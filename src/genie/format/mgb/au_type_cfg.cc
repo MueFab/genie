@@ -22,9 +22,9 @@ bool AuTypeCfg::operator==(const AuTypeCfg &other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AuTypeCfg::write(util::BitWriter &writer) const {
-    writer.write(sequence_ID, 16);
-    writer.write(AU_start_position, posSize);
-    writer.write(AU_end_position, posSize);
+    writer.writeBits(sequence_ID, 16);
+    writer.writeBits(AU_start_position, posSize);
+    writer.writeBits(AU_end_position, posSize);
     if (extended_AU) {
         extended_AU->write(writer);
     }

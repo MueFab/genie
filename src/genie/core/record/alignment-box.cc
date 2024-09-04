@@ -18,7 +18,7 @@ namespace genie::core::record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentBox::write(util::BitWriter& writer) const {
-    writer.writeBypassBE<uint64_t, 5>(mapping_pos);
+    writer.writeAlignedInt<uint64_t, 5>(mapping_pos);
     alignment.write(writer);
     for (const auto& a : splitAlignmentInfo) {
         a->write(writer);
@@ -30,7 +30,7 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
                            util::BitReader& reader)
     : splitAlignmentInfo(type == ClassType::CLASS_HM ? 0 : number_of_template_segments - 1) {
-    mapping_pos = reader.readBypassBE<uint64_t, 5>();
+    mapping_pos = reader.readAlignedInt<uint64_t, 5>();
     alignment = Alignment(as_depth, reader);
 
     if (type == ClassType::CLASS_HM) {

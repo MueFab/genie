@@ -47,9 +47,9 @@ MgbFile::MgbFile() : file(nullptr) {}
 
 MgbFile::MgbFile(std::istream* _file) : file(_file), reader(std::make_unique<genie::util::BitReader>(*file)) {
     while (true) {
-        uint64_t pos = reader->getPos();
-        auto unit_type = reader->readBypassBE<core::parameter::DataUnit::DataUnitType>();
-        if (!reader->isGood()) {
+        uint64_t pos = reader->getStreamPosition();
+        auto unit_type = reader->readAlignedInt<core::parameter::DataUnit::DataUnitType>();
+        if (!reader->isStreamGood()) {
             break;
         }
 

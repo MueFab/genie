@@ -12,7 +12,7 @@ namespace genie::core::parameter::desc_pres {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::write(util::BitWriter& writer) const { writer.write(encoding_mode_ID, 8); }
+void Decoder::write(util::BitWriter& writer) const { writer.writeBits(encoding_mode_ID, 8); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -46,29 +46,29 @@ FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPE
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0'), minor_version() {
-    auto start_pos = bitreader.getPos() - 4;
-    auto length = bitreader.readBypassBE<uint64_t>();
+    auto start_pos = bitreader.getStreamPosition() - 4;
+    auto length = bitreader.readAlignedInt<uint64_t>();
     auto num_compatible_brands = (length - 22) / 4;
-    bitreader.readBypass(major_brand);
+    bitreader.readAlignedBytes(major_brand.data(), major_brand.length());
     UTILS_DIE_IF(major_brand != "MPEG-G", "Not an MPEG-G file");
     std::string tmp(4, '\0');
-    bitreader.readBypass(tmp);
+    bitreader.readAlignedBytes(tmp.data(), tmp.length());
     minor_version = core::getMPEGVersion(tmp);
     compatible_brands.resize(num_compatible_brands, std::string(4, '\0'));
     for (auto& b : compatible_brands) {
-        bitreader.readBypass(b);
+        bitreader.readAlignedBytes(b.data(), b.length());
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FileHeader::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeBypass(major_brand.data(), major_brand.length());
+    bitWriter.writeAlignedBytes(major_brand.data(), major_brand.length());
     auto tmp = core::getMPEGVersionString(minor_version);
-    bitWriter.writeBypass(tmp.data(), tmp.length());
+    bitWriter.writeAlignedBytes(tmp.data(), tmp.length());
     for (auto& b : compatible_brands) {
-        bitWriter.writeBypass(b.data(), b.length());
+        bitWriter.writeAlignedBytes(b.data(), b.length());
     }
 }
 

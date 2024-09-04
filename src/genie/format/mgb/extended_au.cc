@@ -20,8 +20,8 @@ bool ExtendedAu::operator==(const ExtendedAu& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ExtendedAu::write(util::BitWriter& writer) const {
-    writer.write(extended_AU_start_position, posSize);
-    writer.write(extended_AU_end_position, posSize);
+    writer.writeBits(extended_AU_start_position, posSize);
+    writer.writeBits(extended_AU_end_position, posSize);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

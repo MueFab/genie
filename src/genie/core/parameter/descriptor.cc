@@ -19,8 +19,7 @@ bool Descriptor::equals(const Descriptor *desc) const { return dec_cfg_preset ==
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Descriptor::write(util::BitWriter &writer) const {
-    writer.write(uint8_t(dec_cfg_preset), 8);
+void Descriptor::write(util::BitWriter &writer) const { writer.writeBits(uint8_t(dec_cfg_preset), 8);
 }
 std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &reader) {
     auto preset = reader.read<uint8_t>();

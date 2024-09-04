@@ -27,15 +27,16 @@ bool DatasetGroup::operator==(const GenInfo& info) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     auto end_pos = start_pos + static_cast<int64_t>(length);
-    while (reader.getPos() != end_pos) {
-        UTILS_DIE_IF(reader.getPos() > end_pos, "Read " + std::to_string(reader.getPos() - end_pos) + " bytes too far");
+    while (reader.getStreamPosition() != end_pos) {
+        UTILS_DIE_IF(reader.getStreamPosition() > end_pos,
+                     "Read " + std::to_string(reader.getStreamPosition() - end_pos) + " bytes too far");
         read_box(reader, false);
     }
 
-    std::cout << std::to_string(end_pos - reader.getPos()) << std::endl;
+    std::cout << std::to_string(end_pos - reader.getStreamPosition()) << std::endl;
     UTILS_DIE_IF(header == std::nullopt, "Datasetgroup without header");
 }
 
@@ -243,7 +244,7 @@ void DatasetGroup::print_debug(std::ostream& output, uint8_t depth, uint8_t max_
 
 void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
     std::string tmp_str(4, '\0');
-    reader.readBypass(tmp_str);
+    reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
     if (tmp_str == "dghd") {
         UTILS_DIE_IF(header != std::nullopt, "More than one header");
         UTILS_DIE_IF(!reference_metadatas.empty(), "Header must be before ref metadata");
@@ -284,15 +285,15 @@ void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
         dataset.emplace_back(reader, version);
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
-        reader.readBypass(tmp_str);
-        auto offset = reader.readBypassBE<uint64_t>();
+        reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
+        auto offset = reader.readAlignedInt<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             return;
         }
-        auto pos_save = reader.getPos();
-        reader.setPos(offset);
+        auto pos_save = reader.getStreamPosition();
+        reader.setStreamPosition(offset);
         read_box(reader, true);
-        reader.setPos(pos_save);
+        reader.setStreamPosition(pos_save);
     } else {
         UTILS_DIE("Unknown box");
     }

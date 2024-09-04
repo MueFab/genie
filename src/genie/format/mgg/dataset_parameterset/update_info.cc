@@ -31,20 +31,20 @@ UpdateInfo::UpdateInfo(genie::util::BitReader& reader) {
     if (reader.read<bool>(1)) {
         u_signature = USignature(reader);
     }
-    reader.flush();
+    reader.flushHeldBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void UpdateInfo::write(genie::util::BitWriter& writer) const {
-    writer.write(multiple_alignment_flag, 1);
-    writer.write(pos_40_bits_flag, 1);
-    writer.write(static_cast<uint8_t>(alphabetId), 8);
-    writer.write(u_signature != std::nullopt, 1);
+    writer.writeBits(multiple_alignment_flag, 1);
+    writer.writeBits(pos_40_bits_flag, 1);
+    writer.writeBits(static_cast<uint8_t>(alphabetId), 8);
+    writer.writeBits(u_signature != std::nullopt, 1);
     if (u_signature != std::nullopt) {
         u_signature->write(writer);
     }
-    writer.flush();
+    writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

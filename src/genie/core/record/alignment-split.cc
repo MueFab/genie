@@ -23,12 +23,12 @@ AlignmentSplit::AlignmentSplit(Type _split_alignment) : split_alignment(_split_a
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeBypassBE(split_alignment); }
+void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeAlignedInt(split_alignment); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
-    Type type = reader.readBypassBE<Type>();
+    Type type = reader.readAlignedInt<Type>();
     switch (type) {
         case Type::SAME_REC:
             return std::make_unique<alignment_split::SameRec>(as_depth, reader);

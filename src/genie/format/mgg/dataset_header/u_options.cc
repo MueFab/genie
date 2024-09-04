@@ -41,16 +41,16 @@ UOptions::UOptions(genie::util::BitReader& reader) : reserved3(false) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void UOptions::write(genie::util::BitWriter& writer) const {
-    writer.write(reserved1, 62);
-    writer.write(hasSignature(), 1);
+    writer.writeBits(reserved1, 62);
+    writer.writeBits(hasSignature(), 1);
     if (hasSignature()) {
         u_signature->write(writer);
     }
-    writer.write(hasReserved2(), 1);
+    writer.writeBits(hasReserved2(), 1);
     if (hasReserved2()) {
-        writer.write(getReserved2(), 8);
+        writer.writeBits(getReserved2(), 8);
     }
-    writer.write(reserved3, 1);
+    writer.writeBits(reserved3, 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -26,7 +26,7 @@ SubfileReader::SubfileReader(const std::string& fpath)
 // ---------------------------------------------------------------------------------------------------------------------
 
 SubfileReader::~SubfileReader() {
-    bitreader.flush();
+    bitreader.flushHeldBits();
     reader.close();
 }
 
