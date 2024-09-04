@@ -5,7 +5,6 @@ trigger:
   tags:
     include:
       - '*'
-
 stages:
 - stage: 'Building'
   jobs:
@@ -16,22 +15,6 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           binDir: 'bin'
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
-#          binDir: 'bin'
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          binDir: 'bin'
-#        windows2022:
-#          imageName: 'windows-2022'
-#          artifactName: 'windows2022'
-#          binDir: 'bin/Debug'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -108,26 +91,6 @@ stages:
           artifactName: 'ubuntu2204'
           architecture: ''
           binDir: 'bin'
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
-#          architecture: ''
-#          binDir: 'bin'
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          architecture: ''
-#          binDir: 'bin'
-#        windows2022:
-#          imageName: 'windows-2022'
-#          artifactName: 'windows2022'
-#          architecture: '-A x64'
-#          binDir: 'bin/Release'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          architecture: '-A x64'
-#          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
@@ -180,22 +143,6 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           fileExt: ''
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
-#          fileExt: ''
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          fileExt: ''
-#        windows2022:
-#          imageName: 'windows-2022'
-#          artifactName: 'windows2022'
-#          fileExt: '.exe'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -246,48 +193,6 @@ stages:
         testResultsFiles: 'cmake-build-debug/bin/gabac_test.xml'
         testRunTitle: 'gabac-$(artifactName)-$(Build.SourceVersion)'
 
-
-#  - job: 'Memory'
-#    strategy:
-#      matrix:
-#        ubuntu2204:
-#          imageName: 'ubuntu-22.04'
-#          artifactName: 'ubuntu2204'
-#          fileExt: ''
-#    pool:
-#      vmImage: $(imageName)
-#    steps:
-#    - bash: |
-#          sudo apt-get install valgrind
-#      displayName: 'Installation prerequisites (Linux)'
-#      condition: eq( variables['Agent.OS'], 'Linux' )
-
-#    - bash: |
-#        git clone https://github.com/samtools/htslib.git
-#        cd htslib
-#        git checkout tags/1.12
-#        git submodule update --init --recursive
-#        autoreconf -i
-#        ./configure
-#        make -j
-#        sudo make install
-#      displayName: 'Install HTSLib (Unix)'
-#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-#    - download: current
-#      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-#      displayName: 'Download binaries'
-
-#    - bash: |
-#        mkdir cmake-build-release
-#        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
-#        chmod +x cmake-build-release/bin/*
-#      displayName: 'Copy binaries'
-
-#    - bash: ci/memory_test.sh
-#      displayName: 'Genie run memory tests'
-
-
   - job: 'Conformance_Roundtrip'
     strategy:
       matrix:
@@ -295,22 +200,6 @@ stages:
           imageName: 'ubuntu-22.04'
           artifactName: 'ubuntu2204'
           fileExt: ''
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
-#          fileExt: ''
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          fileExt: ''
-#        windows2022:
-#          imageName: 'windows-2022'
-#          artifactName: 'windows2022'
-#          binDir: 'bin/Debug'
- #       windows2019:
- #         imageName: 'windows-2019'
- #         artifactName: 'windows2019'
- #         binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -380,18 +269,17 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
- #   - download: current
- #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
- #     displayName: 'Download binaries'
     - task: Docker@2
-      condition: and(ne(variables['Build.SourceBranchName'], 'main'), ne(variables['Build.SourceBranchName'], 'merge'))
+      condition: and(eq(variables['Build.SourceBranchName'], 'develop'), ne(variables['Build.SourceBranchName'], 'merge'))
       inputs:
         containerRegistry: 'DockerHub'
         repository: 'muefab/genie'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         tags: |
-          $(Build.SourceBranchName)
+          develop
+    
+    # Build and push for the master branch
     - task: Docker@2
       condition: and(eq(variables['Build.SourceBranchName'], 'main'), ne(variables['Build.SourceBranchName'], 'merge'))
       inputs:
@@ -401,23 +289,14 @@ stages:
         Dockerfile: '**/Dockerfile'
         tags: |
           latest
-#  - job: 'OSX'
-#    strategy:
- #     matrix:
- #       macos1200:
- #         imageName: 'macos-12'
- #         artifactName: 'macos1200'
- #         fileExt: ''
- #       macos1100:
- #         imageName: 'macos-11'
- #         artifactName: 'macos1100'
- #         fileExt: ''
- #   pool:
- #     vmImage: $(imageName)
- #   steps:
- #   - checkout: none
- #   - download: current
- #     artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
- #     displayName: 'Download binaries'
- #   - bash: echo "Not yet implemented"
- #     displayName: 'Build OSX dmg'
+    
+    # Build and push for Git tags
+    - task: Docker@2
+      condition: and(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), ne(variables['Build.SourceBranchName'], 'merge'))
+      inputs:
+        containerRegistry: 'DockerHub'
+        repository: 'muefab/genie'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.SourceBranchName)
