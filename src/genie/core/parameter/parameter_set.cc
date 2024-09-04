@@ -27,7 +27,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     alphabet_ID = bitReader.read<AlphabetID>();
     read_length = bitReader.read<uint32_t>(24);
     number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
-    bitReader.read_b(6);
+    bitReader.readBits(6);
     max_au_data_unit_size = bitReader.read<uint32_t>(29);
     pos_40_bits_flag = bitReader.read<bool>(1);
     qv_depth = bitReader.read<uint8_t>(3);
@@ -72,7 +72,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     if (crps_flag) {
         parameter_set_crps = ComputedRef(bitReader);
     }
-    bitReader.flush();
+    bitReader.flushHeldBits();
 }
 
 //------------------------------------------------------------------------------------------------------------------
@@ -119,35 +119,35 @@ EncodingSet::EncodingSet()
 
 void ParameterSet::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
-    writer.write(0, 10);  // reserved
+    writer.writeBits(0, 10);  // reserved
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
-    tmp_writer.write(parameter_set_ID, 8);
-    tmp_writer.write(parent_parameter_set_ID, 8);
+    util::BitWriter tmp_writer(ss);
+    tmp_writer.writeBits(parameter_set_ID, 8);
+    tmp_writer.writeBits(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
-    tmp_writer.flush();
-    uint64_t bits = tmp_writer.getBitsWritten();
+    tmp_writer.flushBits();
+    uint64_t bits = tmp_writer.getTotalBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
     uint64_t bytes = bits / 8 + ((bits % 8) ? 1 : 0);
 
     // Now size is known, write to final destination
-    writer.write(bytes, 22);
-    writer.writeBypass(&ss);
+    writer.writeBits(bytes, 22);
+    writer.writeAlignedStream(ss);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ParameterSet::getLength() const {
     std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
-    tmp_writer.write(parameter_set_ID, 8);
-    tmp_writer.write(parent_parameter_set_ID, 8);
+    util::BitWriter tmp_writer(ss);
+    tmp_writer.writeBits(parameter_set_ID, 8);
+    tmp_writer.writeBits(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
 
-    uint64_t len = tmp_writer.getBitsWritten() / 8;
+    uint64_t len = tmp_writer.getTotalBitsWritten() / 8;
 
     return len;
 }
@@ -180,47 +180,47 @@ void EncodingSet::setSignatureLength(uint8_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncodingSet::write(util::BitWriter &writer) const {
-    writer.write(uint8_t(dataset_type), 4);
-    writer.write(uint8_t(alphabet_ID), 8);
-    writer.write(read_length, 24);
-    writer.write(number_of_template_segments_minus1, 2);
-    writer.write(0, 6);  // reserved_2
-    writer.write(max_au_data_unit_size, 29);
-    writer.write(static_cast<uint8_t>(pos_40_bits_flag), 1);
-    writer.write(qv_depth, 3);
-    writer.write(as_depth, 3);
-    writer.write(class_IDs.size(), 4);  // num_classes
+    writer.writeBits(uint8_t(dataset_type), 4);
+    writer.writeBits(uint8_t(alphabet_ID), 8);
+    writer.writeBits(read_length, 24);
+    writer.writeBits(number_of_template_segments_minus1, 2);
+    writer.writeBits(0, 6);  // reserved_2
+    writer.writeBits(max_au_data_unit_size, 29);
+    writer.writeBits(static_cast<uint8_t>(pos_40_bits_flag), 1);
+    writer.writeBits(qv_depth, 3);
+    writer.writeBits(as_depth, 3);
+    writer.writeBits(class_IDs.size(), 4);  // num_classes
     for (auto &i : class_IDs) {
-        writer.write(uint8_t(i), 4);
+        writer.writeBits(uint8_t(i), 4);
     }
     for (auto &i : descriptors) {
         i.write(writer);
     }
-    writer.write(rgroup_IDs.size(), 16);  // num_groups
+    writer.writeBits(rgroup_IDs.size(), 16);  // num_groups
     for (auto &i : rgroup_IDs) {
         for (auto &j : i) {
-            writer.write(static_cast<uint8_t>(j), 8);
+            writer.writeBits(static_cast<uint8_t>(j), 8);
         }
-        writer.write('\0', 8);  // NULL termination
+        writer.writeBits('\0', 8);  // NULL termination
     }
-    writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
-    writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
-    writer.write(reserved, 30);
-    writer.write(signature_cfg != std::nullopt, 1);
+    writer.writeBits(static_cast<uint8_t>(multiple_alignments_flag), 1);
+    writer.writeBits(static_cast<uint8_t>(spliced_reads_flag), 1);
+    writer.writeBits(reserved, 30);
+    writer.writeBits(signature_cfg != std::nullopt, 1);
     if (signature_cfg != std::nullopt) {
-        writer.write(signature_cfg->signature_length != std::nullopt, 1);
+        writer.writeBits(signature_cfg->signature_length != std::nullopt, 1);
         if (signature_cfg->signature_length != std::nullopt) {
-            writer.write(*signature_cfg->signature_length, 8);
+            writer.writeBits(*signature_cfg->signature_length, 8);
         }
     }
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
-    writer.write(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
+    writer.writeBits(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
     if (parameter_set_crps) {
         parameter_set_crps->write(writer);
     }
-    writer.flush();
+    writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

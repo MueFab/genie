@@ -60,10 +60,10 @@ AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(genie::format::mgb::AUHe
 AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
                                    const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit)
     : mit_flag(mit) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

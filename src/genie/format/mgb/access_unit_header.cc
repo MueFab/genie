@@ -22,11 +22,11 @@ bool AUHeader::operator==(const AUHeader &other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AUHeader::write(genie::util::BitWriter &writer, bool write_signatures) const {
-    writer.write(access_unit_ID, 32);
-    writer.write(num_blocks, 8);
-    writer.write(parameter_set_ID, 8);
-    writer.write(uint8_t(au_type), 4);
-    writer.write(reads_count, 32);
+    writer.writeBits(access_unit_ID, 32);
+    writer.writeBits(num_blocks, 8);
+    writer.writeBits(parameter_set_ID, 8);
+    writer.writeBits(uint8_t(au_type), 4);
+    writer.writeBits(reads_count, 32);
     if (mm_cfg) {
         mm_cfg->write(writer);
     }
@@ -41,7 +41,7 @@ void AUHeader::write(genie::util::BitWriter &writer, bool write_signatures) cons
             signature_config->write(writer);
         }
     }
-    writer.flush();
+    writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ void AUHeader::blockAdded() { num_blocks++; }
 
 AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
                    bool read_signatures) {
-    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
+    UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
     access_unit_ID = bitReader.read<uint32_t>();
     num_blocks = bitReader.read<uint8_t>();
     parameter_set_ID = bitReader.read<uint8_t>();
@@ -85,8 +85,8 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
             }
         }
     }
-    bitReader.flush();
-    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
+    bitReader.flushHeldBits();
+    UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

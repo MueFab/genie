@@ -73,18 +73,18 @@ size_t AccessUnit::getPayloadSize() const { return payloadbytes; }
 AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets, util::BitReader &bitReader,
                        bool lazyPayload)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
-    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
-    uint64_t bitreader_pos = bitReader.getBitsRead() / 8 - 1;
-    bitReader.read_b(3);
+    UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
+    uint64_t bitreader_pos = bitReader.getTotalBitsRead() / 8 - 1;
+    bitReader.readBits(3);
     auto du_size = bitReader.read<uint32_t>(29);
 
     header = AUHeader(bitReader, parameterSets);
 
-    uint64_t bytesRead = (bitReader.getBitsRead() / 8 - bitreader_pos);
+    uint64_t bytesRead = (bitReader.getTotalBitsRead() / 8 - bitreader_pos);
     payloadbytes = du_size - bytesRead;
     qv_payloads = parameterSets.at(header.getParameterID()).getQVConfig(header.getClass()).getNumSubsequences();
 
-    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
+    UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
 
     if (!lazyPayload) {
         loadPayload(bitReader);
@@ -189,14 +189,14 @@ core::record::ClassType AUHeader::getClass() const { return au_type; }
 
 void AccessUnit::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
-    writer.write(0, 3);
+    writer.writeBits(0, 3);
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
+    util::BitWriter tmp_writer(ss);
     header.write(tmp_writer, true);
-    tmp_writer.flush();
-    uint64_t bits = tmp_writer.getBitsWritten();
+    tmp_writer.flushBits();
+    uint64_t bits = tmp_writer.getTotalBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
     uint64_t bytes = bits / 8;
@@ -206,8 +206,8 @@ void AccessUnit::write(util::BitWriter &writer) const {
     }
 
     // Now size is known, write to final destination
-    writer.write(bytes, 29);
-    writer.writeBypass(&ss);
+    writer.writeBits(bytes, 29);
+    writer.writeAlignedStream(ss);
     for (auto &i : blocks) {
         i.write(writer);
     }

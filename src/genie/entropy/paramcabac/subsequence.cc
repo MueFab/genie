@@ -82,7 +82,7 @@ void Subsequence::setTransformSubseqCfg(size_t index, TransformedSubSeq&& _trans
 
 void Subsequence::write(util::BitWriter& writer) const {
     if (descriptor_subsequence_ID) {
-        writer.write(*descriptor_subsequence_ID, 10);
+        writer.writeBits(*descriptor_subsequence_ID, 10);
     }
     transform_subseq_parameters.write(writer);
     for (auto& i : transformSubseq_cfgs) {

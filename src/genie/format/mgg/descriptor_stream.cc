@@ -31,18 +31,18 @@ DescriptorStream::DescriptorStream(DescriptorStreamHeader _header) : header(std:
 
 DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
                                    const std::vector<dataset_header::MITClassConfig>& configs) {
-    auto start_pos = reader.getPos() - 4;
+    auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.read<uint64_t>();
     std::string tmp(4, '\0');
-    reader.readBypass(tmp);
+    reader.readAlignedBytes(tmp.data(), tmp.length());
     UTILS_DIE_IF(tmp != "dshd", "Descriptor stream without header");
     header = DescriptorStreamHeader(reader);
 
-    reader.readBypass(tmp);
+    reader.readAlignedBytes(tmp.data(), tmp.length());
     if (tmp == "dspr") {
         ds_protection = DescriptorStreamProtection(reader);
     } else {
-        reader.setPos(reader.getPos() - 4);
+        reader.setStreamPosition(reader.getStreamPosition() - 4);
     }
 
     uint8_t class_index = 0;
@@ -68,13 +68,13 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
 
     auto payloadSizes = table.getDescriptorStreamOffsets(class_index, descriptor_index,
                                                          header.getClassType() == core::record::ClassType::CLASS_U,
-                                                         length - (reader.getPos() - start_pos));
+                                                         length - (reader.getStreamPosition() - start_pos));
     UTILS_DIE_IF(payloadSizes.size() < header.getNumBlocks(), "DS payload sizes not available");
     for (size_t i = 0; i < header.getNumBlocks(); ++i) {
         payload.emplace_back(reader, payloadSizes[i]);
     }
 
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

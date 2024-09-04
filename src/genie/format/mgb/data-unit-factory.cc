@@ -33,9 +33,9 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     int i = 0;
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
-        size_t pos = bitReader.getPos();
-        if (!bitReader.isGood()) {
-            bitReader.clear();
+        size_t pos = bitReader.getStreamPosition();
+        if (!bitReader.isStreamGood()) {
+            bitReader.clearStreamState();
             return std::nullopt;
         }
         switch (type) {
@@ -71,7 +71,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     refmgr->addRef(i++,
                                    std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
-                    bitReader.skip(ret.getPayloadSize());
+                    bitReader.skipAlignedBytes(ret.getPayloadSize());
                 } else {
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
@@ -84,7 +84,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                         ret.debugPrint(parameters.at(ret.getHeader().getParameterID()));
                         return ret;
                     } else {
-                        bitReader.skip(ret.getPayloadSize());
+                        bitReader.skipAlignedBytes(ret.getPayloadSize());
                     }
                 }
                 break;

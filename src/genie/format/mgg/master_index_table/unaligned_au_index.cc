@@ -39,7 +39,7 @@ UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset
     } else if (signature_flag) {
         sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
                                                    core::getAlphabetProperties(alphabet).base_bits);
-        reader.flush();
+        reader.flushHeldBits();
     }
     if (!block_header_flag) {
         for (const auto& d : descriptors) {
@@ -52,16 +52,16 @@ UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset
 // ---------------------------------------------------------------------------------------------------------------------
 
 void UnalignedAUIndex::write(genie::util::BitWriter& writer) const {
-    writer.write(au_byte_offset, byte_offset_size);
+    writer.writeBits(au_byte_offset, byte_offset_size);
     if (ref_cfg != std::nullopt) {
         ref_cfg->write(writer);
     }
     if (sig_cfg != std::nullopt) {
         sig_cfg->write(writer);
-        writer.flush();
+        writer.flushBits();
     }
     for (const auto& b : block_byte_offset) {
-        writer.write(b, byte_offset_size);
+        writer.writeBits(b, byte_offset_size);
     }
 }
 

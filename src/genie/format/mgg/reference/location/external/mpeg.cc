@@ -32,15 +32,15 @@ MPEG::MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MPEGMi
     : External(reader),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
-    external_dataset_group_id = reader.readBypassBE<uint8_t>();
-    external_dataset_id = reader.readBypassBE<uint16_t>();
+    external_dataset_group_id = reader.readAlignedInt<uint8_t>();
+    external_dataset_id = reader.readAlignedInt<uint16_t>();
     if (version == core::MPEGMinorVersion::V1900) {
-        reader.readBypass(ref_checksum);
+        reader.readAlignedBytes(ref_checksum.data(), ref_checksum.size());
     } else {
         ref_checksum.clear();
         for (size_t i = 0; i < seq_count; ++i) {
             seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
+            reader.readAlignedBytes(seq_checksums.back().data(), seq_checksums.back().size());
         }
     }
 }
@@ -52,15 +52,15 @@ MPEG::MPEG(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, 
     : External(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
-    external_dataset_group_id = reader.readBypassBE<uint8_t>();
-    external_dataset_id = reader.readBypassBE<uint16_t>();
+    external_dataset_group_id = reader.readAlignedInt<uint8_t>();
+    external_dataset_id = reader.readAlignedInt<uint16_t>();
     if (version == core::MPEGMinorVersion::V1900) {
-        reader.readBypass(ref_checksum);
+        reader.readAlignedBytes(ref_checksum.data(), ref_checksum.length());
     } else {
         ref_checksum.clear();
         for (size_t i = 0; i < seq_count; ++i) {
             seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
-            reader.readBypass(seq_checksums.back());
+            reader.readAlignedBytes(seq_checksums.back().data(), seq_checksums.back().length());
         }
     }
 }
@@ -93,13 +93,13 @@ void MPEG::addSeqChecksum(std::string checksum) {
 
 void MPEG::write(genie::util::BitWriter& writer) {
     External::write(writer);
-    writer.writeBypassBE(external_dataset_group_id);
-    writer.writeBypassBE(external_dataset_id);
+    writer.writeAlignedInt(external_dataset_group_id);
+    writer.writeAlignedInt(external_dataset_id);
     if (version == core::MPEGMinorVersion::V1900) {
-        writer.writeBypass(ref_checksum.data(), ref_checksum.length());
+        writer.writeAlignedBytes(ref_checksum.data(), ref_checksum.length());
     } else {
         for (const auto& s : seq_checksums) {
-            writer.writeBypass(s.data(), s.length());
+            writer.writeAlignedBytes(s.data(), s.length());
         }
     }
 }

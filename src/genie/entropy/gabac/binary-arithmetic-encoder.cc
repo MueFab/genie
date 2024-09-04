@@ -118,8 +118,8 @@ void BinaryArithmeticEncoder::encodeBinTrm(unsigned int bin) {
 void BinaryArithmeticEncoder::flush() {
     encodeBinTrm(1);
     finish();
-    m_bitOutputStream.write(1, 1);
-    m_bitOutputStream.flush();
+    m_bitOutputStream.writeBits(1, 1);
+    m_bitOutputStream.flushBits();
     start();
 }
 
@@ -137,22 +137,22 @@ void BinaryArithmeticEncoder::start() {
 
 void BinaryArithmeticEncoder::finish() {
     if ((m_low >> (32u - m_numBitsLeft)) > 0) {
-        m_bitOutputStream.write((m_bufferedByte + 1), 8);
+        m_bitOutputStream.writeBits((m_bufferedByte + 1), 8);
         while (m_numBufferedBytes > 1) {
-            m_bitOutputStream.write(0x00, 8);
+            m_bitOutputStream.writeBits(0x00, 8);
             m_numBufferedBytes -= 1;
         }
         m_low -= (1u << (32u - m_numBitsLeft));
     } else {
         if (m_numBufferedBytes > 0) {
-            m_bitOutputStream.write(m_bufferedByte, 8);
+            m_bitOutputStream.writeBits(m_bufferedByte, 8);
         }
         while (m_numBufferedBytes > 1) {
-            m_bitOutputStream.write(0xff, 8);
+            m_bitOutputStream.writeBits(0xff, 8);
             m_numBufferedBytes -= 1;
         }
     }
-    m_bitOutputStream.write(m_low >> 8u, uint8_t(24u - m_numBitsLeft));
+    m_bitOutputStream.writeBits(m_low >> 8u, uint8_t(24u - m_numBitsLeft));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -169,11 +169,11 @@ void BinaryArithmeticEncoder::writeOut() {
             unsigned char byte = m_bufferedByte + carry;
 
             m_bufferedByte = static_cast<unsigned char>(leadByte & 0xffu);
-            m_bitOutputStream.write(byte, 8);
+            m_bitOutputStream.writeBits(byte, 8);
 
             byte = static_cast<unsigned char>(0xff) + carry;
             while (m_numBufferedBytes > 1) {
-                m_bitOutputStream.write(byte, 8);
+                m_bitOutputStream.writeBits(byte, 8);
                 m_numBufferedBytes -= 1;
             }
         } else {

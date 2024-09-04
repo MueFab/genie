@@ -53,9 +53,9 @@ void RawReference::write(util::BitWriter &writer) const {
             size += i.getTotalSize();
         }
         size += (8 + 64 + 16) / 8;  // data_unit_type, data_unit_size, seq_count
-        writer.write(size, 64);
+        writer.writeBits(size, 64);
     }
-    writer.write(seqs.size(), 16);
+    writer.writeBits(seqs.size(), 16);
 
     for (auto &i : seqs) {
         i.write(writer);

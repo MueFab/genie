@@ -20,8 +20,8 @@ bool MmCfg::operator==(const MmCfg &other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void MmCfg::write(util::BitWriter &writer) const {
-    writer.write(mm_threshold, 16);
-    writer.write(mm_count, 32);
+    writer.writeBits(mm_threshold, 16);
+    writer.writeBits(mm_count, 32);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

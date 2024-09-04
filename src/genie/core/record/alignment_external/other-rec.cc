@@ -23,8 +23,8 @@ OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)
 
 OtherRec::OtherRec(util::BitReader &reader)
     : AlignmentExternal(AlignmentExternal::Type::OTHER_REC),
-      next_pos(reader.readBypassBE<uint64_t, 5>()),
-      next_seq_ID(reader.readBypassBE<uint16_t>()) {}
+      next_pos(reader.readAlignedInt<uint64_t, 5>()),
+      next_seq_ID(reader.readAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,8 +42,8 @@ uint16_t OtherRec::getNextSeq() const { return next_seq_ID; }
 
 void OtherRec::write(util::BitWriter &writer) const {
     AlignmentExternal::write(writer);
-    writer.writeBypassBE<uint64_t, 5>(next_pos);
-    writer.writeBypassBE(next_seq_ID);
+    writer.writeAlignedInt<uint64_t, 5>(next_pos);
+    writer.writeAlignedInt(next_seq_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

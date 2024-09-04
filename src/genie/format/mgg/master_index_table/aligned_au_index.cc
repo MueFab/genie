@@ -57,9 +57,9 @@ AlignedAUIndex::AlignedAUIndex(genie::util::BitReader& reader, uint8_t _byte_off
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignedAUIndex::write(genie::util::BitWriter& writer) const {
-    writer.write(au_byte_offset, byte_offset_size);
-    writer.write(au_start_position, position_size);
-    writer.write(au_end_position, position_size);
+    writer.writeBits(au_byte_offset, byte_offset_size);
+    writer.writeBits(au_start_position, position_size);
+    writer.writeBits(au_end_position, position_size);
     if (ref_cfg != std::nullopt) {
         ref_cfg->write(writer);
     }
@@ -67,7 +67,7 @@ void AlignedAUIndex::write(genie::util::BitWriter& writer) const {
         extended_cfg->write(writer);
     }
     for (const auto& b : block_byte_offset) {
-        writer.write(b, byte_offset_size);
+        writer.writeBits(b, byte_offset_size);
     }
 }
 

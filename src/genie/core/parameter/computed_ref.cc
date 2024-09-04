@@ -55,7 +55,7 @@ ComputedRef::Algorithm ComputedRef::getAlgorithm() const { return cr_alg_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ComputedRef::write(util::BitWriter &writer) const {
-    writer.write(uint8_t(cr_alg_ID), 8);
+    writer.writeBits(uint8_t(cr_alg_ID), 8);
     if (extension) {
         extension->write(writer);
     }

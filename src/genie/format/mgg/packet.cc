@@ -19,14 +19,14 @@ Packet::Packet(PacketHeader _header, std::string _data) : header(_header), data(
 
 Packet::Packet(util::BitReader& reader) : header(reader) {
     data.resize(header.getPacketSize() - genie::format::mgg::PacketHeader::getLength());
-    reader.readBypass(data);
+    reader.readAlignedBytes(data.data(), data.length());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Packet::write(util::BitWriter& writer) const {
     header.write(writer);
-    writer.writeBypass(data.data(), data.size());
+    writer.writeAlignedBytes(data.data(), data.size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

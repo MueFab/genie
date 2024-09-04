@@ -306,13 +306,13 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
         {
             std::string fpath = tmp_path + "/" + std::to_string(this_chunk) + PHASE1_EXT;
             std::ofstream output_file(fpath, std::ios::trunc | std::ios::binary);
-            genie::util::BitWriter bwriter(&output_file);
+            genie::util::BitWriter bwriter(output_file);
 
             for (auto& r : output_buffer) {
                 r.write(bwriter);
             }
 
-            bwriter.flush();
+            bwriter.flushBits();
         }
 
         {
@@ -570,7 +570,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         total_output = std::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
         out_stream = total_output.get();
     }
-    genie::util::BitWriter total_output_writer(out_stream);
+    genie::util::BitWriter total_output_writer(*out_stream);
 
     std::vector<std::unique_ptr<SubfileReader>> readers;
     readers.reserve(num_chunks);
@@ -624,7 +624,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
         }
     }
 
-    total_output_writer.flush();
+    total_output_writer.flushBits();
     out_stream->flush();
 
     std::cerr << "Finished merging!" << std::endl;
@@ -884,7 +884,7 @@ void transcode_mpg2sam(Config& options) {
         *output_file << "@SQ\tSN:" << s << "\tLN:" << std::to_string(refinf.getMgr()->getLength(s)) << std::endl;
     }
 
-    while (reader.isGood()) {
+    while (reader.isStreamGood()) {
         genie::core::record::Record record(reader);
         // One line per segment and alignment
         for (size_t s = 0; s < record.getSegments().size(); ++s) {

@@ -28,8 +28,8 @@ uint32_t ComputedRefExtended::getBufMaxSize() const { return cr_buf_max_size; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ComputedRefExtended::write(util::BitWriter& writer) const {
-    writer.write(cr_pad_size, 8);
-    writer.write(cr_buf_max_size, 24);
+    writer.writeBits(cr_pad_size, 8);
+    writer.writeBits(cr_buf_max_size, 24);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

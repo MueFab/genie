@@ -22,7 +22,7 @@ const std::string& DataSetMappingTable::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DataSetMappingTable::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeBypassBE(dataset_id);
+    bitWriter.writeAlignedInt(dataset_id);
     for (const auto& s : streams) {
         s.write(bitWriter);
     }
@@ -47,14 +47,14 @@ DataSetMappingTable::DataSetMappingTable(uint16_t _dataset_id) : dataset_id(_dat
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    dataset_id = reader.readBypassBE<uint16_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
+    dataset_id = reader.readAlignedInt<uint16_t>();
     size_t num_data_streams = (length - 14) / 3;
     for (size_t i = 0; i < num_data_streams; ++i) {
         streams.emplace_back(reader);
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

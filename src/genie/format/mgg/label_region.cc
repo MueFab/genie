@@ -61,21 +61,21 @@ uint64_t LabelRegion::getEndPos() const { return end_pos; }
 
 void LabelRegion::write(util::BitWriter& bit_writer) const {
     // seq_ID u(16)
-    bit_writer.write(seq_ID, 16);
+    bit_writer.writeBits(seq_ID, 16);
 
     // num_classes u(8)
-    bit_writer.write(class_IDs.size(), 4);
+    bit_writer.writeBits(class_IDs.size(), 4);
 
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
-        bit_writer.write(static_cast<uint8_t>(class_ID), 4);
+        bit_writer.writeBits(static_cast<uint8_t>(class_ID), 4);
     }
 
     // start_pos u(40)
-    bit_writer.write(start_pos, 40);
+    bit_writer.writeBits(start_pos, 40);
 
     // end_pos u(40)
-    bit_writer.write(end_pos, 40);
+    bit_writer.writeBits(end_pos, 40);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

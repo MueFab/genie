@@ -52,18 +52,18 @@ std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
     std::string ret;
     {
         std::lock_guard<std::mutex> f_lock(this->lock);
-        size_t oldPos = reader.getPos();
+        size_t oldPos = reader.getStreamPosition();
 
         if (raw) {
-            reader.setPos(f_pos + start);
+            reader.setStreamPosition(f_pos + start);
             ret.resize(end - start);
-            reader.readBypass(&ret[0], ret.length());
+            reader.readAlignedBytes(&ret[0], ret.length());
         } else {
-            reader.setPos(f_pos);
+            reader.setStreamPosition(f_pos);
             au = AccessUnit(factory.getParams(), reader, false);
         }
 
-        reader.setPos(oldPos);
+        reader.setStreamPosition(oldPos);
     }
 
     if (!raw) {

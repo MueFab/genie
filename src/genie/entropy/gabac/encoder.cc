@@ -24,7 +24,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
     auto desc = std::move(in);
     util::DataBlock block(0, 1);
     gabac::OBufferStream stream(&block);
-    util::BitWriter writer(&stream);
+    util::BitWriter writer(stream);
     size_t num_streams = 0;
     for (const auto &subsequence : desc) {
         if (subsequence.getNumSymbols()) {
@@ -39,13 +39,13 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
         return ret_empty;
     }
 
-    writer.write(desc.begin()->getNumSymbols(), 32);
-    writer.write(num_streams, 16);
+    writer.writeBits(desc.begin()->getNumSymbols(), 32);
+    writer.writeBits(num_streams, 16);
 
     for (auto &subsequence : desc) {
         if (subsequence.getNumSymbols()) {
-            writer.write(subsequence.getID().second & 0xfu, 4);
-            writer.write(3, 4);
+            writer.writeBits(subsequence.getID().second & 0xfu, 4);
+            writer.writeBits(3, 4);
             compress(conf0, std::move(subsequence)).write(writer);
         }
     }

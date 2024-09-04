@@ -64,10 +64,10 @@ uint64_t LabelDataset::getBitLength() const {
 
 void LabelDataset::write(util::BitWriter& bit_writer) const {
     // dataset_IDs u(16)
-    bit_writer.write(dataset_ID, 16);
+    bit_writer.writeBits(dataset_ID, 16);
 
     // num_regions u(8)
-    bit_writer.write(dataset_regions.size(), 8);
+    bit_writer.writeBits(dataset_regions.size(), 8);
 
     /// data encapsulated in Class dataset_region
     for (auto& ds_reg : dataset_regions) {
