@@ -13,7 +13,7 @@
 #include "genie/core/format-importer.h"
 #include "genie/core/record/chunk.h"
 #include "genie/core/stats/perf-stats.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 #include "genie/util/ordered-lock.h"
 #include "genie/util/original-source.h"
 #include "genie/util/source.h"

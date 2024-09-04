@@ -25,7 +25,7 @@ Label::Label(std::string _label_ID) : label_ID(std::move(_label_ID)) {}
 Label::Label(util::BitReader& reader) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
-    reader.readAlignedStringTerminated(label_ID);
+    label_ID = reader.readAlignedStringTerminated();
     auto num_datasets = reader.read<uint16_t>();
 
     for (size_t i = 0; i < num_datasets; ++i) {

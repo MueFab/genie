@@ -12,8 +12,8 @@
 #include <string>
 #include "genie/format/mgg/box.h"
 #include "genie/format/mgg/packet_header.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@
 #include "genie/core/record/record.h"
 #include "genie/name/tokenizer/tokenizer.h"
 #include "genie/util/data-block.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

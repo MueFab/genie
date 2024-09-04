@@ -1,5 +1,5 @@
 /**
- * @file bitwriter.h
+ * @file bit-writer.h
  *
  * @copyright This file is part of GENIE.
  * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
@@ -15,8 +15,8 @@
  * the output stream position.
  */
 
-#ifndef SRC_GENIE_UTIL_BITWRITER_H_
-#define SRC_GENIE_UTIL_BITWRITER_H_
+#ifndef SRC_GENIE_UTIL_BIT_WRITER_H_
+#define SRC_GENIE_UTIL_BIT_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@
 namespace genie::util {
 
 /**
- * @brief Controlled output to an std::ostream. Allows to write single bits.
+ * @brief Controlled output to a std::ostream. Allows to write single bits.
  */
 class BitWriter {
  private:
@@ -73,7 +73,7 @@ class BitWriter {
      *
      * This method checks if there are any bits currently held (i.e., if numHeldBits is greater than 0).
      * If there are held bits, it writes these bits to the stream by calling the writeBits method.
-     * Afterwards, it resets the held bits (heldBits) and the count of held bits (numHeldBits) to 0.
+     * Afterward, it resets the held bits (heldBits) and the count of held bits (numHeldBits) to 0.
      */
     void flushBits();
 
@@ -177,7 +177,7 @@ class BitWriter {
      *
      * @param pos The position to which the stream should be moved.
      */
-    void setStreamPosition(int64_t pos);
+    void setStreamPosition(int64_t pos) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -186,11 +186,11 @@ class BitWriter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/bitwriter.impl.h"
+#include "genie/util/bit-writer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITWRITER_H_
+#endif  // SRC_GENIE_UTIL_BIT_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

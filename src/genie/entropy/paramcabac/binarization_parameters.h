@@ -10,8 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------

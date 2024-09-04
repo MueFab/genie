@@ -11,7 +11,7 @@
 
 #include <memory>
 #include "genie/core/record/alignment-split.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

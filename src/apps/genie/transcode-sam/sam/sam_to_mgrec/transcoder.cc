@@ -364,10 +364,10 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options,
 
 std::string patch_ecigar(const std::string& ref, const std::string& seq, const std::string& ecigar) {
     std::string fixedCigar;
-    auto classChecker = [&](uint8_t cigar, const genie::util::StringView& _bs,
-                            const genie::util::StringView& _rs) -> bool {
-        auto bs = _bs.deploy(seq.data());
-        auto rs = _rs.deploy(ref.data());
+    auto classChecker = [&](uint8_t cigar, const std::pair<size_t, size_t>& _bs,
+                            const std::pair<size_t, size_t>& _rs) -> bool {
+        auto bs = std::string_view(seq).substr(_bs.first, _bs.second);
+        auto rs = std::string_view(ref).substr(_rs.first, _rs.second);
         auto length = std::max(bs.length(), rs.length());
         switch (cigar) {
             case '+':

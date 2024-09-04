@@ -6,7 +6,7 @@
 
 #include "genie/format/mgb/raw_reference_seq.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

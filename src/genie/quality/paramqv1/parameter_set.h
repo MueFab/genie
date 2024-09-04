@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 #include "genie/quality/paramqv1/codebook.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

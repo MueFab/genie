@@ -13,8 +13,8 @@
 #include <utility>
 #include "genie/core/constants.h"
 #include "genie/core/meta/sequence.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

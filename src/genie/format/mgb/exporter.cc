@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 #include "genie/format/mgb/raw_reference.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

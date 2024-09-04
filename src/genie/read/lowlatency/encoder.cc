@@ -9,7 +9,7 @@
 #include <utility>
 #include "genie/name/tokenizer/decoder.h"
 #include "genie/name/tokenizer/encoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
