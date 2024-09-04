@@ -11,21 +11,21 @@
 
 TEST(BitWriter, write) {  // NOLINT(cert-err58-cpp)
     std::stringstream str;
-    genie::util::BitWriter bitOutputStream(&str);
-    EXPECT_NO_THROW(bitOutputStream.write(0xFF, 8));
-    EXPECT_NO_THROW(bitOutputStream.write(0xFF, 16));
-    EXPECT_NO_THROW(bitOutputStream.write(0xFF, 32));
-    EXPECT_NO_THROW(bitOutputStream.write(0xFF, 2));
+    genie::util::BitWriter bitOutputStream(str);
+    EXPECT_NO_THROW(bitOutputStream.writeBits(0xFF, 8));
+    EXPECT_NO_THROW(bitOutputStream.writeBits(0xFF, 16));
+    EXPECT_NO_THROW(bitOutputStream.writeBits(0xFF, 32));
+    EXPECT_NO_THROW(bitOutputStream.writeBits(0xFF, 2));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(BitWriter, writeAlignZero) {  // NOLINT(cert-err58-cpp)
     std::stringstream str;
-    genie::util::BitWriter bitOutputStream(&str);
-    bitOutputStream.write(0xFF, 2);
-    EXPECT_NO_THROW(bitOutputStream.flush());
-    EXPECT_NO_THROW(bitOutputStream.flush());
+    genie::util::BitWriter bitOutputStream(str);
+    bitOutputStream.writeBits(0xFF, 2);
+    EXPECT_NO_THROW(bitOutputStream.flushBits());
+    EXPECT_NO_THROW(bitOutputStream.flushBits());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

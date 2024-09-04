@@ -89,8 +89,8 @@ bool Location::isExternal() const { return external_ref_flag; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Location::write(genie::util::BitWriter& writer) {
-    writer.write(reserved, 7);
-    writer.write(external_ref_flag, 1);
+    writer.writeBits(reserved, 7);
+    writer.writeBits(external_ref_flag, 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

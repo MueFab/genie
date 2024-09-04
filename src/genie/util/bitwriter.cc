@@ -1,7 +1,19 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @file bitwriter.cc
+ *
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
+ *
+ * @brief Implementation of the BitWriter utility class for writing bits to a stream.
+ *
+ * This file contains the implementation of the BitWriter class, which provides methods
+ * to write bits and bytes to an output stream. It supports both non-aligned and byte-aligned
+ * writing operations.
+ *
+ * @details The BitWriter class offers functionalities like writing a specific number of bits,
+ * flushing bits, checking byte alignment, writing bytes, writing aligned streams, and manipulating
+ * the output stream position. The class ensures efficient bit-level writing, while also handling
+ * any buffered bits that cannot yet be written out as full bytes.
  */
 
 #include "genie/util/bitwriter.h"
@@ -14,161 +26,122 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BitWriter::BitWriter(std::ostream *str) : stream(str), m_heldBits(0), m_numHeldBits(0), m_bitsWritten(0) {}
+constexpr uint8_t BITS_PER_BYTE = 8u;
+constexpr uint8_t BYTE_MASK = 0xffu;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BitWriter::~BitWriter() { flush(); }
+BitWriter::BitWriter(std::ostream &str) : stream(str), heldBits(0), numHeldBits(0), totalBitsWritten(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void BitWriter::writeOut(uint8_t byte) {
-    stream->write(reinterpret_cast<char *>(&byte), 1);
-    m_bitsWritten += 8;
-}
+BitWriter::~BitWriter() { flushBits(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::write(uint64_t bits, uint8_t numBits) {
-    // Any modulo-8 remainder of numTotalBits cannot be written this time,
-    // and will be held until next time
-    uint8_t numTotalBits = numBits + m_numHeldBits;
-    auto numNextHeldBits = uint8_t(numTotalBits % 8);
-
-    // Next steps: form a byte-ALIGNED word by concatenating any held bits
-    // with the new bits, discarding the bits that will form the nextheldBits
-
-    // Determine the nextHeldBits
-    auto nextHeldBits = static_cast<uint8_t>((bits << (8u - numNextHeldBits)) & static_cast<uint8_t>(0xff));
-    if (numTotalBits < 8) {
-        // Insufficient bits accumulated to write out, append nextHeldBits to
-        // current heldBits
-        m_heldBits |= nextHeldBits;
-        m_numHeldBits = numNextHeldBits;
-
-        return;
-    }
-
-    // topword serves to justify heldBits to align with the MSB of bits
-    uint64_t topword = uint64_t(numBits - numNextHeldBits) & uint64_t(~((1u << 3u) - 1u));
-    uint64_t writeBits = (m_heldBits << topword);
-    writeBits |= (bits >> numNextHeldBits);
-
-    // Write everything
-    // 1 byte / L1 is the most common case, check for it first
-    if ((numTotalBits >> 3u) == 1) {
-        goto L1;
-    } else if ((numTotalBits >> 3u) == 2) {
-        goto L2;
-    } else if ((numTotalBits >> 3u) == 3) {
-        goto L3;
-    } else if ((numTotalBits >> 3u) == 4) {
-        goto L4;
-    } else if ((numTotalBits >> 3u) == 5) {
-        goto L5;
-    } else if ((numTotalBits >> 3u) == 6) {
-        goto L6;
-    } else if ((numTotalBits >> 3u) == 7) {
-        goto L7;
-    } else if ((numTotalBits >> 3u) != 8) {
-        goto L0;
-    }
-
-    writeOut(static_cast<uint8_t>((writeBits >> 56u) & 0xffu));
+inline void BitWriter::writeAlignedBytes(uint64_t writeBits, uint8_t numBytes) {
+    if (numBytes == 1) goto L1;
+    if (numBytes == 2) goto L2;
+    if (numBytes == 3) goto L3;
+    if (numBytes == 4) goto L4;
+    if (numBytes == 5) goto L5;
+    if (numBytes == 6) goto L6;
+    if (numBytes == 7) goto L7;
+    if (numBytes != 8) goto L0;
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 7) & BYTE_MASK));
 L7:
-    writeOut(static_cast<uint8_t>((writeBits >> 48u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 6) & BYTE_MASK));
 L6:
-    writeOut(static_cast<uint8_t>((writeBits >> 40u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 5) & BYTE_MASK));
 L5:
-    writeOut(static_cast<uint8_t>((writeBits >> 32u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 4) & BYTE_MASK));
 L4:
-    writeOut(static_cast<uint8_t>((writeBits >> 24u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 3) & BYTE_MASK));
 L3:
-    writeOut(static_cast<uint8_t>((writeBits >> 16u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE * 2) & BYTE_MASK));
 L2:
-    writeOut(static_cast<uint8_t>((writeBits >> 8u) & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>((writeBits >> BITS_PER_BYTE) & BYTE_MASK));
 L1:
-    writeOut(static_cast<uint8_t>(writeBits & 0xffu));
+    writeAlignedByte(static_cast<uint8_t>(writeBits & BYTE_MASK));
 L0:
-
-    // Update output bitstream state
-    m_heldBits = nextHeldBits;
-    m_numHeldBits = numNextHeldBits;
+    return;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+void BitWriter::writeBits(uint64_t value, uint8_t bits) {
+    uint8_t numTotalBits = bits + numHeldBits;
+    auto nextHeldBitCount = uint8_t(numTotalBits % BITS_PER_BYTE);
+    auto newHeldBits = static_cast<uint8_t>((value << (BITS_PER_BYTE - nextHeldBitCount)) & BYTE_MASK);
 
-void BitWriter::write(const std::string &string) {
-    for (const auto &a : string) {
-        write(uint8_t(a), 8);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BitWriter::write(std::istream *in) {
-    while (true) {
-        char byte = 0;
-        in->read(&byte, 1);
-        if (!*in) {
-            break;
-        }
-        write(uint8_t(byte), 8);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BitWriter::flush() {
-    if (m_numHeldBits == 0) {
+    if (numTotalBits < BITS_PER_BYTE) {
+        heldBits |= newHeldBits;
+        numHeldBits = nextHeldBitCount;
         return;
     }
 
-    write(m_heldBits, uint8_t(8 - m_numHeldBits));
-    m_heldBits = 0x00;
-    m_numHeldBits = 0;
+    uint64_t topword = uint64_t(bits - nextHeldBitCount) & uint64_t(~((1u << 3u) - 1u));
+    uint64_t writeBits = (heldBits << topword) | (value >> nextHeldBitCount);
+
+    uint8_t numBytesToWrite = numTotalBits / BITS_PER_BYTE;
+    writeAlignedBytes(writeBits, numBytesToWrite);
+
+    heldBits = newHeldBits;
+    numHeldBits = nextHeldBitCount;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitWriter::getBitsWritten() const { return m_bitsWritten + m_numHeldBits; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool BitWriter::isAligned() const { return m_numHeldBits == 0; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BitWriter::writeBypass(std::istream *in) {
-    if (!isAligned()) {
-        UTILS_DIE("Writer not aligned when it should be");
+void BitWriter::flushBits() {
+    if (numHeldBits == 0) {
+        return;
     }
+    writeBits(heldBits, uint8_t(BITS_PER_BYTE - numHeldBits));
+    heldBits = 0x00;
+    numHeldBits = 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t BitWriter::getTotalBitsWritten() const { return totalBitsWritten + numHeldBits; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool BitWriter::isByteAligned() const { return numHeldBits == 0; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline void BitWriter::writeAlignedByte(uint8_t byte) {
+    stream.write(reinterpret_cast<char *>(&byte), 1);
+    totalBitsWritten += BITS_PER_BYTE;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BitWriter::writeAlignedBytes(const void *in, size_t size) {
+    this->totalBitsWritten += size * BITS_PER_BYTE;
+    UTILS_DIE_IF(!isByteAligned(), "Writer not aligned when it should be");
+    stream.write(reinterpret_cast<const char *>(in), size);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BitWriter::writeAlignedStream(std::istream &in) {
+    UTILS_DIE_IF(!isByteAligned(), "Writer not aligned when it should be");
     const size_t BUFFERSIZE = 100;
     char byte[BUFFERSIZE];
     do {
-        in->read(byte, BUFFERSIZE);
-        stream->write(byte, in->gcount());
-        this->m_bitsWritten += in->gcount() * 8;
-    } while (in->gcount() == BUFFERSIZE);
+        in.read(byte, BUFFERSIZE);
+        stream.write(byte, in.gcount());
+        this->totalBitsWritten += in.gcount() * BITS_PER_BYTE;
+    } while (in.gcount() == BUFFERSIZE);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::writeBypass(const void *in, size_t size) {
-    this->m_bitsWritten += size * 8;
-    if (!isAligned()) {
-        UTILS_DIE("Writer not aligned when it should be");
-    }
-    stream->write(reinterpret_cast<const char *>(in), size);
-}
+int64_t BitWriter::getStreamPosition() const { return stream.tellp(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t BitWriter::getPosition() const { return stream->tellp(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BitWriter::setPosition(int64_t pos) { stream->seekp(pos, std::ios::beg); }
+void BitWriter::setStreamPosition(int64_t pos) { stream.seekp(pos, std::ios::beg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

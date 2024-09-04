@@ -216,7 +216,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         params[block_num].setDescriptor(core::GenDesc::RNAME, std::move(std::get<0>(encoded)));
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
         std::ofstream outfile(file_to_save_streams, std::ios::binary);
-        util::BitWriter bw(&outfile);
+        util::BitWriter bw(outfile);
         std::get<1>(encoded).write(bw);
 
         f_order_id.close();
@@ -301,7 +301,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             params[block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
             std::ofstream out(file_to_save_streams, std::ios::binary);
-            util::BitWriter bw(&out);
+            util::BitWriter bw(out);
             std::get<1>(encoded).write(bw);
         }
         start_block_num = end_block_num;
@@ -407,7 +407,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                                                                    std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
-                util::BitWriter bw(&out);
+                util::BitWriter bw(out);
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
                 genie::core::record::Chunk chunk;
@@ -442,7 +442,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 params[block_num_offset + block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
                 std::ofstream out(file_to_save_streams, std::ios::binary);
-                util::BitWriter bw(&out);
+                util::BitWriter bw(out);
                 std::get<1>(encoded).write(bw);
             }
         }  // omp parallel

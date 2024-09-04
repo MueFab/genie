@@ -29,8 +29,8 @@ BlockHeaderOnOptions::BlockHeaderOnOptions(genie::util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BlockHeaderOnOptions::write(genie::util::BitWriter& writer) const {
-    writer.write(mit_flag, 1);
-    writer.write(cc_mode_flag, 1);
+    writer.writeBits(mit_flag, 1);
+    writer.writeBits(cc_mode_flag, 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

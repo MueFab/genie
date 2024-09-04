@@ -68,8 +68,8 @@ void Binarization::setContextParameters(Context&& _cabac_context_parameters) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Binarization::write(util::BitWriter& writer) const {
-    writer.write(uint8_t(binarization_ID), 5);
-    writer.write(bypass_flag, 1);
+    writer.writeBits(uint8_t(binarization_ID), 5);
+    writer.writeBits(bypass_flag, 1);
     cabac_binarization_parameters.write(binarization_ID, writer);
     if (!bypass_flag) {
         cabac_context_parameters.write(writer);

@@ -24,9 +24,9 @@ const size_t External::checksum_sizes[] = {128 / 8, 256 / 8};
 std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
                                             genie::core::MPEGMinorVersion _version) {
     std::string _ref_uri;
-    reader.readBypass_null_terminated(_ref_uri);
-    auto _checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();
-    auto _ref_type = reader.readBypassBE<RefType>();
+    reader.readAlignedStringTerminated(_ref_uri);
+    auto _checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
+    auto _ref_type = reader.readAlignedInt<RefType>();
     switch (_ref_type) {
         case RefType::MPEGG_REF:
             return std::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
@@ -50,17 +50,17 @@ External::External(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, 
 // ---------------------------------------------------------------------------------------------------------------------
 
 External::External(genie::util::BitReader& reader) : Location(reader) {
-    reader.readBypass_null_terminated(uri);
-    checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();
-    reference_type = reader.readBypassBE<RefType>();
+    reader.readAlignedStringTerminated(uri);
+    checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
+    reference_type = reader.readAlignedInt<RefType>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 External::External(genie::util::BitReader& reader, uint8_t _reserved) : Location(_reserved, true) {
-    reader.readBypass_null_terminated(uri);
-    checksum_algo = reader.readBypassBE<ChecksumAlgorithm>();
-    reference_type = reader.readBypassBE<RefType>();
+    reader.readAlignedStringTerminated(uri);
+    checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
+    reference_type = reader.readAlignedInt<RefType>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,10 +79,10 @@ External::RefType External::getReferenceType() const { return reference_type; }
 
 void External::write(genie::util::BitWriter& writer) {
     Location::write(writer);
-    writer.writeBypass(uri.data(), uri.length());
-    writer.writeBypassBE('\0');
-    writer.writeBypassBE(checksum_algo);
-    writer.writeBypassBE(reference_type);
+    writer.writeAlignedBytes(uri.data(), uri.length());
+    writer.writeAlignedInt('\0');
+    writer.writeAlignedInt(checksum_algo);
+    writer.writeAlignedInt(reference_type);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

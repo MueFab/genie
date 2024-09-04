@@ -34,10 +34,10 @@ uint64_t BlockHeader::getLength() { return 1 + 4; }  /// 1 + 7 + 3 + 29}
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BlockHeader::write(genie::util::BitWriter& writer) const {
-    writer.write(reserved1, 1);
-    writer.write(static_cast<uint8_t>(descriptor_ID), 7);
-    writer.write(reserved2, 3);
-    writer.write(block_payload_size, 29);
+    writer.writeBits(reserved1, 1);
+    writer.writeBits(static_cast<uint8_t>(descriptor_ID), 7);
+    writer.writeBits(reserved2, 3);
+    writer.writeBits(block_payload_size, 29);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

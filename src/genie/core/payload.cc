@@ -14,12 +14,12 @@ namespace genie::core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
-    auto pos = reader.getPos();
-    reader.setPos(payloadPosition);
+    auto pos = reader.getStreamPosition();
+    reader.setStreamPosition(payloadPosition);
     genie::util::DataBlock tmp;
     tmp.resize(payloadSize);
-    reader.readBypass(tmp.getData(), payloadSize);
-    reader.setPos(pos);
+    reader.readAlignedBytes(tmp.getData(), payloadSize);
+    reader.setStreamPosition(pos);
     return tmp;
 }
 
@@ -76,10 +76,10 @@ Payload::Payload(genie::util::DataBlock payload)
 Payload::Payload(util::BitReader& reader, uint64_t size)
     : block_payload(),
       payloadLoaded(false),
-      payloadPosition(reader.getPos()),
+      payloadPosition(reader.getStreamPosition()),
       payloadSize(size),
       internal_reader(&reader) {
-    reader.skip(size);
+    reader.skipAlignedBytes(size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -87,9 +87,9 @@ Payload::Payload(util::BitReader& reader, uint64_t size)
 void Payload::write(genie::util::BitWriter& writer) const {
     if (!isPayloadLoaded() && internal_reader) {
         auto tmp = _internal_loadPayload(*internal_reader);
-        writer.writeBypass(tmp.getData(), tmp.getRawSize());
+        writer.writeAlignedBytes(tmp.getData(), tmp.getRawSize());
     } else {
-        writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
+        writer.writeAlignedBytes(block_payload.getData(), block_payload.getRawSize());
     }
 }
 

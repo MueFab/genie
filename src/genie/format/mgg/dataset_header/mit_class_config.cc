@@ -35,11 +35,11 @@ MITClassConfig::MITClassConfig(genie::util::BitReader& reader, bool block_header
 // ---------------------------------------------------------------------------------------------------------------------
 
 void MITClassConfig::write(genie::util::BitWriter& writer) const {
-    writer.write(static_cast<uint8_t>(id), 4);
+    writer.writeBits(static_cast<uint8_t>(id), 4);
     if (!descriptor_ids.empty()) {
-        writer.write(descriptor_ids.size(), 5);
+        writer.writeBits(descriptor_ids.size(), 5);
         for (const auto& d : descriptor_ids) {
-            writer.write(static_cast<uint8_t>(d), 7);
+            writer.writeBits(static_cast<uint8_t>(d), 7);
         }
     }
 }

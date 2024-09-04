@@ -23,19 +23,19 @@ Label::Label(std::string _label_ID) : label_ID(std::move(_label_ID)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 Label::Label(util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    reader.readBypass_null_terminated(label_ID);
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
+    reader.readAlignedStringTerminated(label_ID);
     auto num_datasets = reader.read<uint16_t>();
 
     for (size_t i = 0; i < num_datasets; ++i) {
         dataset_infos.emplace_back(reader);
     }
-    reader.flush();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()),
+    reader.flushHeldBits();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()),
                  "Invalid length: start_pos " + std::to_string(start_pos) + "; length " + std::to_string(length) +
                      "; position should be " + std::to_string(start_pos + length) + "; position is " +
-                     std::to_string(reader.getPos()));
+                     std::to_string(reader.getStreamPosition()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -49,11 +49,11 @@ const std::string& Label::getLabelID() const { return label_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Label::box_write(util::BitWriter& bit_writer) const {
-    bit_writer.writeBypass(label_ID.data(), label_ID.length());
-    bit_writer.writeBypassBE('\0');
+    bit_writer.writeAlignedBytes(label_ID.data(), label_ID.length());
+    bit_writer.writeAlignedInt('\0');
 
     // num_datasets u(16)
-    bit_writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(dataset_infos.size()));
+    bit_writer.writeAlignedInt<uint16_t>(static_cast<uint16_t>(dataset_infos.size()));
 
     // data encapsulated in Class dataset_info
     for (auto& ds_info : dataset_infos) {
@@ -61,7 +61,7 @@ void Label::box_write(util::BitWriter& bit_writer) const {
     }
 
     // aligned to byte
-    bit_writer.flush();
+    bit_writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

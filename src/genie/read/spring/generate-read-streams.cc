@@ -179,7 +179,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                 continue;
             }
             std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
-            util::BitWriter bw(&out);
+            util::BitWriter bw(out);
             d.write(bw);
         }
     }  // end omp parallel for
@@ -543,7 +543,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
         }
         if (num_records_current_block == data.cp.num_reads_per_block || i == data.cp.num_reads - 1) {
             // block done
-            // put in the reads in to_push_at_end_of_block vector and clear the vector
+            // put in the reads in to_push_at_end_of_block vector and clearStreamState the vector
             for (uint32_t j : to_push_at_end_of_block) {
                 bdata->block_num[j] = current_block_num;
                 bdata->genomic_record_index[j] = num_records_current_block++;
@@ -882,7 +882,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
                 continue;
             }
             std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
-            util::BitWriter bw(&out);
+            util::BitWriter bw(out);
             d.write(bw);
         }
     }  // end omp parallel

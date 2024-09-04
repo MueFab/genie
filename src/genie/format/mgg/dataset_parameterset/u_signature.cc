@@ -41,9 +41,9 @@ void USignature::setConstLength(uint8_t length) { u_signature_length = length; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void USignature::write(genie::util::BitWriter& writer) const {
-    writer.write(u_signature_length != std::nullopt, 1);
+    writer.writeBits(u_signature_length != std::nullopt, 1);
     if (u_signature_length != std::nullopt) {
-        writer.write(*u_signature_length, 8);
+        writer.writeBits(*u_signature_length, 8);
     }
 }
 

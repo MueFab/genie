@@ -35,16 +35,16 @@ const std::string& DatasetGroupProtection::getKey() const {
 DatasetGroupProtection::DatasetGroupProtection(genie::util::BitReader& bitreader,
                                                genie::core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = bitreader.getPos() - 4;
-    auto length = bitreader.readBypassBE<uint64_t>();
+    auto start_pos = bitreader.getStreamPosition() - 4;
+    auto length = bitreader.readAlignedInt<uint64_t>();
     auto protection_length = length - GenInfo::getHeaderLength();
     if (version != genie::core::MPEGMinorVersion::V1900) {
-        dataset_group_id = bitreader.readBypassBE<uint8_t>();
+        dataset_group_id = bitreader.readAlignedInt<uint8_t>();
         protection_length -= sizeof(uint8_t);
     }
     dg_protection_value.resize(protection_length);
-    bitreader.readBypass(dg_protection_value);
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
+    bitreader.readAlignedBytes(dg_protection_value.data(), dg_protection_value.length());
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -57,9 +57,9 @@ DatasetGroupProtection::DatasetGroupProtection(uint8_t _dataset_group_id, std::s
 
 void DatasetGroupProtection::box_write(genie::util::BitWriter& bitWriter) const {
     if (version != genie::core::MPEGMinorVersion::V1900) {
-        bitWriter.writeBypassBE(dataset_group_id);
+        bitWriter.writeAlignedInt(dataset_group_id);
     }
-    bitWriter.writeBypass(dg_protection_value.data(), dg_protection_value.length());
+    bitWriter.writeAlignedBytes(dg_protection_value.data(), dg_protection_value.length());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

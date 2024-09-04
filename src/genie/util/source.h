@@ -38,8 +38,8 @@ class Source {
     void flushOut(uint64_t& pos);
 
     /**
-     * @brief Propagates skip signal to drain set before.
-     * @param id Section to skip.
+     * @brief Propagates skipAlignedBytes signal to drain set before.
+     * @param id Section to skipAlignedBytes.
      */
     void skipOut(const Section& id);
 

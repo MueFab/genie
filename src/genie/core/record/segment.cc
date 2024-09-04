@@ -26,9 +26,9 @@ Segment::Segment(std::string&& _sequence) : sequence(std::move(_sequence)), qual
 
 Segment::Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader)
     : sequence(length, 0), quality_values(qv_depth, std::string(length, 0)) {
-    reader.readBypass(&this->sequence[0], length);
+    reader.readAlignedBytes(&this->sequence[0], length);
     for (auto& q : quality_values) {
-        reader.readBypass(&q[0], q.length());
+        reader.readAlignedBytes(&q[0], q.length());
     }
 }
 
@@ -55,9 +55,9 @@ void Segment::addQualities(std::string&& qv) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Segment::write(util::BitWriter& writer) const {
-    writer.writeBypass(this->sequence.data(), this->sequence.length());
+    writer.writeAlignedBytes(this->sequence.data(), this->sequence.length());
     for (const auto& a : this->quality_values) {
-        writer.writeBypass(a.data(), a.length());
+        writer.writeAlignedBytes(a.data(), a.length());
     }
 }
 

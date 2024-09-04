@@ -29,9 +29,9 @@ Block::Block()
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUnit::Descriptor()) {
-    reader.read_b(1);
+    reader.readBits(1);
     descriptor_ID = reader.read<uint8_t>(7);
-    reader.read_b(3);
+    reader.readBits(3);
     block_payload_size = reader.read<uint32_t>(29);
 
     /*   for(size_t i = 0; i < block_payload_size; ++i) {
@@ -44,24 +44,24 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
     // payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
     payload = core::Payload(reader, block_payload_size);
 
-    reader.flush();
+    reader.flushHeldBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Block::write(util::BitWriter &writer) const {
-    writer.write(0, 1);
-    writer.write(descriptor_ID, 7);
-    writer.write(0, 3);
+    writer.writeBits(0, 1);
+    writer.writeBits(descriptor_ID, 7);
+    writer.writeBits(0, 3);
 
     if (std::holds_alternative<genie::core::Payload>(payload)) {
-        writer.write(std::get<core::Payload>(payload).getPayloadSize(), 29);
+        writer.writeBits(std::get<core::Payload>(payload).getPayloadSize(), 29);
         std::get<core::Payload>(payload).write(writer);
     } else {
-        writer.write(std::get<core::AccessUnit::Descriptor>(payload).getWrittenSize(), 29);
+        writer.writeBits(std::get<core::AccessUnit::Descriptor>(payload).getWrittenSize(), 29);
         std::get<core::AccessUnit::Descriptor>(payload).write(writer);
     }
-    writer.flush();
+    writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ void Block::pack() {
         return;
     }
     std::stringstream ss;
-    util::BitWriter writer(&ss);
+    util::BitWriter writer(ss);
 
     std::get<core::AccessUnit::Descriptor>(payload).write(writer);
 

@@ -37,9 +37,9 @@ void Codebook::addEntry(uint8_t entry) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Codebook::write(util::BitWriter& writer) const {
-    writer.write(qv_recon.size(), 8);
+    writer.writeBits(qv_recon.size(), 8);
     for (const auto& v : qv_recon) {
-        writer.write(v, 8);
+        writer.writeBits(v, 8);
     }
 }
 

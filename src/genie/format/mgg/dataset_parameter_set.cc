@@ -40,26 +40,26 @@ DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _da
 DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version,
                                          bool parameters_update_flag)
     : version(_version) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    dataset_group_id = reader.readBypassBE<uint8_t>();
-    dataset_id = reader.readBypassBE<uint16_t>();
-    parameter_set_ID = reader.readBypassBE<uint8_t>();
-    parent_parameter_set_ID = reader.readBypassBE<uint8_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
+    dataset_group_id = reader.readAlignedInt<uint8_t>();
+    dataset_id = reader.readAlignedInt<uint16_t>();
+    parameter_set_ID = reader.readAlignedInt<uint8_t>();
+    parent_parameter_set_ID = reader.readAlignedInt<uint8_t>();
     if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
         param_update = dataset_parameterset::UpdateInfo(reader);
     }
     params = genie::core::parameter::EncodingSet(reader);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE(dataset_group_id);
-    writer.writeBypassBE(dataset_id);
-    writer.writeBypassBE(parameter_set_ID);
-    writer.writeBypassBE(parent_parameter_set_ID);
+    writer.writeAlignedInt(dataset_group_id);
+    writer.writeAlignedInt(dataset_id);
+    writer.writeAlignedInt(parameter_set_ID);
+    writer.writeAlignedInt(parent_parameter_set_ID);
     if (param_update != std::nullopt) {
         param_update->write(writer);
     }

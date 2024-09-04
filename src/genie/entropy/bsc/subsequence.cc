@@ -20,7 +20,7 @@ uint8_t Subsequence::getOutputSymbolSize() const { return output_symbol_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Subsequence::write(util::BitWriter &writer) const { writer.write(output_symbol_size, 6); }
+void Subsequence::write(util::BitWriter &writer) const { writer.writeBits(output_symbol_size, 6); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -19,17 +19,17 @@ LabelList::LabelList(uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 LabelList::LabelList(util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     // ID u(8)
-    dataset_group_ID = reader.readBypassBE<uint8_t>();
+    dataset_group_ID = reader.readAlignedInt<uint8_t>();
     // num_labels u(16)
-    auto num_labels = reader.readBypassBE<uint16_t>();
+    auto num_labels = reader.readAlignedInt<uint16_t>();
 
     for (size_t i = 0; i < num_labels; ++i) {
         read_box(reader, false);
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,8 +43,8 @@ const std::vector<Label>& LabelList::getLabels() const { return labels; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LabelList::box_write(util::BitWriter& bit_writer) const {
-    bit_writer.writeBypassBE<uint8_t>(dataset_group_ID);
-    bit_writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(labels.size()));
+    bit_writer.writeAlignedInt<uint8_t>(dataset_group_ID);
+    bit_writer.writeAlignedInt<uint16_t>(static_cast<uint16_t>(labels.size()));
     // data encapsulated in Class Label
     for (auto& label : labels) {
         label.write(bit_writer);
@@ -100,21 +100,21 @@ void LabelList::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
 
 void LabelList::read_box(util::BitReader& reader, bool in_offset) {
     std::string tmp_str(4, '\0');
-    reader.readBypass(tmp_str);
+    reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
     if (tmp_str == "lbll") {
         labels.emplace_back(reader);
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
-        reader.readBypass(tmp_str);
-        auto offset = reader.readBypassBE<uint64_t>();
+        reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
+        auto offset = reader.readAlignedInt<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             read_box(reader, in_offset);
             return;
         }
-        auto pos_save = reader.getPos();
-        reader.setPos(offset);
+        auto pos_save = reader.getStreamPosition();
+        reader.setStreamPosition(offset);
         read_box(reader, true);
-        reader.setPos(pos_save);
+        reader.setStreamPosition(pos_save);
     } else {
         UTILS_DIE("Unknown box");
     }

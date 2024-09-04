@@ -64,7 +64,7 @@ std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::crea
 
 void DecoderRegular::write(util::BitWriter &writer) const {
     core::parameter::desc_pres::Decoder::write(writer);
-    writer.write(descriptor_subsequence_cfgs.size() - 1, 8);
+    writer.writeBits(descriptor_subsequence_cfgs.size() - 1, 8);
     for (auto &i : descriptor_subsequence_cfgs) {
         i.write(writer);
     }

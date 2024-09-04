@@ -30,19 +30,19 @@ bool Reference::operator==(const GenInfo& info) const {
 
 Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    dataset_group_ID = reader.readBypassBE<uint8_t>();
-    reference_ID = reader.readBypassBE<uint8_t>();
-    reader.readBypass_null_terminated(reference_name);
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
+    dataset_group_ID = reader.readAlignedInt<uint8_t>();
+    reference_ID = reader.readAlignedInt<uint8_t>();
+    reader.readAlignedStringTerminated(reference_name);
     ref_version = reference::Version(reader);
-    auto seq_count = reader.readBypassBE<uint16_t>();
+    auto seq_count = reader.readAlignedInt<uint16_t>();
     for (size_t i = 0; i < seq_count; ++i) {
         sequences.emplace_back(reader, version);
     }
 
     reference_location = reference::Location::factory(reader, seq_count, _version);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -99,12 +99,12 @@ const reference::Location& Reference::getLocation() const { return *reference_lo
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Reference::box_write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE(dataset_group_ID);
-    writer.writeBypassBE(reference_ID);
-    writer.writeBypass(reference_name.data(), reference_name.length());
-    writer.writeBypassBE<uint8_t>(0);
+    writer.writeAlignedInt(dataset_group_ID);
+    writer.writeAlignedInt(reference_ID);
+    writer.writeAlignedBytes(reference_name.data(), reference_name.length());
+    writer.writeAlignedInt<uint8_t>(0);
     ref_version.write(writer);
-    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(sequences.size()));
+    writer.writeAlignedInt<uint16_t>(static_cast<uint16_t>(sequences.size()));
     for (const auto& s : sequences) {
         s.write(writer);
     }

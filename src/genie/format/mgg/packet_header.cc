@@ -53,11 +53,11 @@ PacketHeader::PacketHeader(util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void PacketHeader::write(util::BitWriter& writer) const {
-    writer.write(sid, 13);
-    writer.write(reserved, 3);
-    writer.write(marker_bit, 1);
-    writer.write(sequence_number, 8);
-    writer.write(packet_size, 15);
+    writer.writeBits(sid, 13);
+    writer.writeBits(reserved, 3);
+    writer.writeBits(marker_bit, 1);
+    writer.writeBits(sequence_number, 8);
+    writer.writeBits(packet_size, 15);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

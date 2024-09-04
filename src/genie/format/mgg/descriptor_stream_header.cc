@@ -46,24 +46,24 @@ DescriptorStreamHeader::DescriptorStreamHeader(bool _reserved, genie::core::GenD
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.write(reserved, 1);
-    bitWriter.write(static_cast<uint8_t>(descriptor_id), 7);
-    bitWriter.write(static_cast<uint8_t>(class_id), 4);
-    bitWriter.write(num_blocks, 32);
-    bitWriter.flush();
+    bitWriter.writeBits(reserved, 1);
+    bitWriter.writeBits(static_cast<uint8_t>(descriptor_id), 7);
+    bitWriter.writeBits(static_cast<uint8_t>(class_id), 4);
+    bitWriter.writeBits(num_blocks, 32);
+    bitWriter.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     reserved = reader.read<bool>(1);
     descriptor_id = reader.read<genie::core::GenDesc>(7);
     class_id = reader.read<core::record::ClassType>(4);
     num_blocks = reader.read<uint32_t>(32);
-    reader.flush();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    reader.flushHeldBits();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

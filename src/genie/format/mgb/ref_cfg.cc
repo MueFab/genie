@@ -33,9 +33,9 @@ uint64_t RefCfg::getEnd() const { return ref_end_position; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void RefCfg::write(util::BitWriter &writer) const {
-    writer.write(ref_sequence_ID, 16);
-    writer.write(ref_start_position, posSize);
-    writer.write(ref_end_position, posSize);
+    writer.writeBits(ref_sequence_ID, 16);
+    writer.writeBits(ref_start_position, posSize);
+    writer.writeBits(ref_end_position, posSize);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

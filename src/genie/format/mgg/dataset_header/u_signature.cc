@@ -34,9 +34,9 @@ USignature::USignature(genie::util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void USignature::write(genie::util::BitWriter& writer) const {
-    writer.write(isConstLength(), 1);
+    writer.writeBits(isConstLength(), 1);
     if (isConstLength()) {
-        writer.write(getConstLength(), 8);
+        writer.writeBits(getConstLength(), 8);
     }
 }
 
