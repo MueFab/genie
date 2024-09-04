@@ -15,7 +15,7 @@
 #include "genie/read/spring/generate-read-streams.h"
 #include "genie/read/spring/reorder-compress-quality-id.h"
 #include "genie/util/thread-manager.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

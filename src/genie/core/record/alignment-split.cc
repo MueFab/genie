@@ -8,8 +8,8 @@
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 #include "genie/util/runtime-exception.h"
 

@@ -14,7 +14,7 @@
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/parameter/quality-values.h"
 #include "genie/quality/paramqv1/parameter_set.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

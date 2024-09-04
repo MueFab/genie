@@ -11,6 +11,7 @@
 
 #include <cctype>
 #include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +44,8 @@ void CigarTokenizer::tokenize(const std::string& cigar, const CigarFormatInfo& f
             pos_ref += size * format.lut_step_ref[c];
         }
 
-        if (!lambda(c, util::StringView(old_pos_bases, pos_bases), util::StringView(old_pos_ref, pos_ref))) {
+        if (!lambda(c, std::make_pair(old_pos_bases, pos_bases - old_pos_bases),
+                    std::make_pair(old_pos_ref, pos_ref - old_pos_ref))) {
             return;
         }
 

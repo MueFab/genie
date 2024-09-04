@@ -14,7 +14,7 @@
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/state_vars.h"
 #include "genie/entropy/paramcabac/support_values.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

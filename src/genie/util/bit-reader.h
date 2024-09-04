@@ -1,5 +1,5 @@
 /**
- * @file bitreader.h
+ * @file bit-reader.h
  *
  * @copyright This file is part of GENIE.
  * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
@@ -15,8 +15,8 @@
  * and manipulating the input stream position.
  */
 
-#ifndef SRC_GENIE_UTIL_BITREADER_H_
-#define SRC_GENIE_UTIL_BITREADER_H_
+#ifndef SRC_GENIE_UTIL_BIT_READER_H_
+#define SRC_GENIE_UTIL_BIT_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -44,13 +44,13 @@ class BitReader {
      * This function reads the required number of aligned bytes (based on the specified
      * number of bits) from the bit stream and constructs a 64-bit word. The number of
      * bytes to be loaded is determined by `numBits`, which is the number of bits to be
-     * loaded. The function efficiently handles loading between 1 to 8 bytes.
+     * loaded. The function efficiently handles loading between 1 and 8 bytes.
      *
      * @param numBits The number of bits to be loaded into the word. Valid values range
      *                from 1 to 64.
      * @return A 64-bit word containing the loaded bits from the stream.
      */
-    inline uint64_t loadAlignedWord(uint8_t numBits);
+    [[nodiscard]] inline uint64_t loadAlignedWord(uint8_t numBits) const;
 
  public:
     /**
@@ -144,20 +144,20 @@ class BitReader {
      * This function reads a single byte from the associated input stream,
      * ensuring that the read is byte-aligned.
      *
-     * @return The byte read from the stream as a uint64_t value.
+     * @return The byte read from the stream as an uint64_t value.
      */
-    uint64_t readAlignedByte();
+    [[nodiscard]] uint64_t readAlignedByte() const;
 
     /**
-     * @brief Reads a null-terminated string from the input stream, aligned to byte boundaries.
+     * @brief Reads a string from the input stream, where the string is terminated by a null character (\0).
      *
-     * This function reads characters one by one from the associated input stream
-     * until it encounters a null character (0). The read characters are appended to
-     * the provided string reference. It assumes that the input stream is byte aligned.
+     * @return The string read from the input stream.
      *
-     * @param str Reference to a string where the read characters will be stored.
+     * This function reads characters from the input stream until a null character is encountered. The characters are
+     * stored in a string and the length of the string is multiplied by BITS_PER_BYTE to update the total number of bits
+     * read.
      */
-    void readAlignedStringTerminated(std::string &str);
+    [[nodiscard]] std::string readAlignedStringTerminated();
 
     /**
      * @brief Reads a specified number of bytes from the input stream without considering the bit alignment.
@@ -180,7 +180,7 @@ class BitReader {
      *
      * @param bytes The number of bytes to skip.
      */
-    void skipAlignedBytes(size_t bytes);
+    void skipAlignedBytes(size_t bytes) const;
 
     /**
      * @brief Reads an aligned big-endian value from the input stream.
@@ -223,7 +223,7 @@ class BitReader {
      * This function will clear any error flags that may have been
      * set on the input stream associated with the BitReader.
      */
-    void clearStreamState();
+    void clearStreamState() const;
 
     /**
      * @brief Checks the state of the input stream.
@@ -243,11 +243,11 @@ class BitReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/bitreader.impl.h"
+#include "genie/util/bit-reader.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITREADER_H_
+#endif  // SRC_GENIE_UTIL_BIT_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

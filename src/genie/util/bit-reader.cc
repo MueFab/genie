@@ -1,5 +1,5 @@
 /**
- * @file bitreader.cc
+ * @file bit-reader.cc
  *
  * @copyright This file is part of GENIE.
  * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
@@ -15,7 +15,7 @@
  * and manipulating the input stream position.
  */
 
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,10 +33,11 @@ BitReader::BitReader(std::istream &_istream) : inputStream(_istream), heldBits(0
 
 // Non Byte-Aligned reading --------------------------------------------------------------------------------------------
 
-inline uint64_t BitReader::loadAlignedWord(uint8_t numBits) {
+inline uint64_t BitReader::loadAlignedWord(const uint8_t numBits) const {
     // NOTE: This unrolling is the result of profiling, do not change.
     uint64_t alignedWord = 0;
-    auto numBytesToLoad = uint8_t(((numBits - 1) >> 3) + 1);
+    const auto numBitsMinusOne = static_cast<uint8_t>(numBits - 1);
+    const auto numBytesToLoad = static_cast<uint8_t>((numBitsMinusOne >> 3) + 1);
 
     if (numBytesToLoad == 1) goto L1;
     if (numBytesToLoad == 2) goto L2;
@@ -46,21 +47,21 @@ inline uint64_t BitReader::loadAlignedWord(uint8_t numBits) {
     if (numBytesToLoad == 6) goto L6;
     if (numBytesToLoad == 7) goto L7;
     if (numBytesToLoad != 8) goto L0;
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 7);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 7;
 L7:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 6);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 6;
 L6:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 5);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 5;
 L5:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 4);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 4;
 L4:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 3);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 3;
 L3:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE * 2);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE * 2;
 L2:
-    alignedWord |= (readAlignedByte() << BITS_PER_BYTE);
+    alignedWord |= readAlignedByte() << BITS_PER_BYTE;
 L1:
-    alignedWord |= (readAlignedByte());
+    alignedWord |= readAlignedByte();
 L0:
     return alignedWord;
 }
@@ -71,8 +72,8 @@ uint64_t BitReader::readBits(uint8_t numBits) {
     totalBitsRead += numBits;
     uint64_t resultBits;
     if (numBits <= numHeldBits) {
-        resultBits = heldBits >> uint8_t(numHeldBits - numBits);
-        resultBits &= ~(uint64_t(BYTE_MASK) << numBits);
+        resultBits = heldBits >> static_cast<uint8_t>(numHeldBits - numBits);
+        resultBits &= ~(static_cast<uint64_t>(BYTE_MASK) << numBits);
         numHeldBits -= numBits;
         return resultBits;
     }
@@ -81,8 +82,8 @@ uint64_t BitReader::readBits(uint8_t numBits) {
     resultBits = heldBits & ~(BYTE_MASK << numHeldBits);
     resultBits <<= numBits;
 
-    uint64_t alignedWord = loadAlignedWord(numBits);
-    auto numNextHeldBits = uint8_t(((BITS_PER_BYTE * 8) - numBits) % BITS_PER_BYTE);
+    const uint64_t alignedWord = loadAlignedWord(numBits);
+    const auto numNextHeldBits = static_cast<uint8_t>((BITS_PER_BYTE * 8 - numBits) % BITS_PER_BYTE);
     resultBits |= alignedWord >> numNextHeldBits;
 
     numHeldBits = numNextHeldBits;
@@ -97,10 +98,10 @@ uint64_t BitReader::getTotalBitsRead() const { return totalBitsRead; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t BitReader::flushHeldBits() {
-    auto ret = heldBits;
-    heldBits = 0;
     totalBitsRead += numHeldBits;
     numHeldBits = 0;
+    const auto ret = heldBits;
+    heldBits = 0;
     return ret;
 }
 
@@ -110,7 +111,7 @@ bool BitReader::isByteAligned() const { return !numHeldBits; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::readAlignedByte() {
+uint64_t BitReader::readAlignedByte() const {
     char c = 0;
     inputStream.read(&c, 1);
     return static_cast<uint8_t>(c);
@@ -118,25 +119,26 @@ uint64_t BitReader::readAlignedByte() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::readAlignedStringTerminated(std::string &str) {
-    str.clear();
+std::string BitReader::readAlignedStringTerminated() {
+    std::string result;
     char c;
     while ((c = readAlignedInt<char>()) != '\0') {
-        str.push_back(c);
+        result.push_back(c);
     }
-    totalBitsRead += str.length() * BITS_PER_BYTE;
+    totalBitsRead += result.length() * BITS_PER_BYTE;
+    return result;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::readAlignedBytes(void *in, size_t size) {
+void BitReader::readAlignedBytes(void *in, const size_t size) {
     totalBitsRead += size * BITS_PER_BYTE;
-    inputStream.read(reinterpret_cast<char *>(in), static_cast<std::streamsize>(size));
+    inputStream.read(static_cast<char *>(in), static_cast<std::streamsize>(size));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::skipAlignedBytes(size_t bytes) {
+void BitReader::skipAlignedBytes(const size_t bytes) const {
     inputStream.seekg(static_cast<std::istream::off_type>(bytes), std::ios_base::cur);
 }
 
@@ -146,11 +148,11 @@ int64_t BitReader::getStreamPosition() const { return inputStream.tellg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::setStreamPosition(int64_t pos) const { inputStream.seekg(pos, std::ios_base::beg); }
+void BitReader::setStreamPosition(const int64_t pos) const { inputStream.seekg(pos, std::ios_base::beg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::clearStreamState() { inputStream.clear(); }
+void BitReader::clearStreamState() const { inputStream.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

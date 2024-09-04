@@ -14,7 +14,7 @@
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
 #include "genie/entropy/gabac/gabac.h"
 
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

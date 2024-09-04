@@ -34,7 +34,7 @@ Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _ver
     auto length = reader.readAlignedInt<uint64_t>();
     dataset_group_ID = reader.readAlignedInt<uint8_t>();
     reference_ID = reader.readAlignedInt<uint8_t>();
-    reader.readAlignedStringTerminated(reference_name);
+    reference_name = reader.readAlignedStringTerminated();
     ref_version = reference::Version(reader);
     auto seq_count = reader.readAlignedInt<uint16_t>();
     for (size_t i = 0; i < seq_count; ++i) {

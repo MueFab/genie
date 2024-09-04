@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/format/mgg/gen_info.h"
 #include "genie/format/mgg/label.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

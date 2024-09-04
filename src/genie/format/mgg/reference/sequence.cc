@@ -37,7 +37,7 @@ uint16_t Sequence::getID() const { return sequence_id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version) : version(_version) {
-    reader.readAlignedStringTerminated(name);
+    name = reader.readAlignedStringTerminated();
     if (version != genie::core::MPEGMinorVersion::V1900) {
         sequence_length = reader.readAlignedInt<uint32_t>();
         sequence_id = reader.readAlignedInt<uint16_t>();
