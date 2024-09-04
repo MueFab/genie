@@ -281,7 +281,7 @@ stages:
     
     # Build and push for the master branch
     - task: Docker@2
-      condition: and(eq(variables['Build.SourceBranchName'], 'master'), ne(variables['Build.SourceBranchName'], 'merge'))
+      condition: and(eq(variables['Build.SourceBranchName'], 'main'), ne(variables['Build.SourceBranchName'], 'merge'))
       inputs:
         containerRegistry: 'DockerHub'
         repository: 'muefab/genie'
