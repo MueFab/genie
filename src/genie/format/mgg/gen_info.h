@@ -11,7 +11,7 @@
 
 #include <string>
 #include "genie/format/mgg/box.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

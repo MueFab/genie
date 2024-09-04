@@ -13,7 +13,7 @@
 #include <map>
 #include <memory>
 #include <typeindex>
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 #include "genie/util/factory.h"
 #include "genie/util/generic-factory.h"
 

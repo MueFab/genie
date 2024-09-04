@@ -5,7 +5,7 @@
  */
 
 #include "genie/entropy/paramcabac/context.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

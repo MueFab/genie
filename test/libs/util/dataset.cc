@@ -6,8 +6,8 @@
 #include <fstream>
 #include <genie/format/mpegg_p1/dataset/dataset.h>
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
+#include <genie/util/bit-reader.h>
+#include <genie/util/bit-writer.h>
 
 TEST(dataset, roundtrip) {  // NOLINT(cert-err-cpp)
 

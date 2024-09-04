@@ -15,7 +15,6 @@
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/calq/uniform_min_max_quantizer.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
-#include "genie/util/stringview.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

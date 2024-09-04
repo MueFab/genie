@@ -14,7 +14,7 @@
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

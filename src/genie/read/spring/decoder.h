@@ -18,7 +18,7 @@
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

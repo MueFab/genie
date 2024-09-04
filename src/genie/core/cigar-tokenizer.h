@@ -11,7 +11,6 @@
 
 #include <string>
 #include "genie/core/constants.h"
-#include "genie/util/stringview.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

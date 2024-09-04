@@ -8,7 +8,7 @@
 #include <utility>
 #include "genie/core/record/class-type.h"
 #include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

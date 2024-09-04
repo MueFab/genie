@@ -11,7 +11,7 @@
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/calq/encoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

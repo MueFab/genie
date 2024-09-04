@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 #include "genie/util/data-block.h"
 #include "genie/util/runtime-exception.h"
 

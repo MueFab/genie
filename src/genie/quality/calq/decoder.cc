@@ -5,6 +5,7 @@
  */
 
 #include "genie/quality/calq/decoder.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,16 +50,16 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
 
     for (const auto& ecigar : ecigar_vec) {
         qv.emplace_back();
-        core::CigarTokenizer::tokenize(
-            ecigar, core::getECigarInfo(),
-            [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
-                (void)cigar;
-                for (size_t i = 0; i < bs.length(); ++i) {
-                    auto index = (uint8_t)desc.get((uint16_t)(2)).pull();
-                    qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
-                }
-                return true;
-            });
+        core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(),
+                                       [&qv, &desc, &param_casted](uint8_t cigar, const std::pair<size_t, size_t>& bs,
+                                                                   const std::pair<size_t, size_t>&) -> bool {
+                                           (void)cigar;
+                                           for (size_t i = 0; i < bs.second; ++i) {
+                                               auto index = (uint8_t)desc.get((uint16_t)(2)).pull();
+                                               qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
+                                           }
+                                           return true;
+                                       });
     }
     return qv;
 }

@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

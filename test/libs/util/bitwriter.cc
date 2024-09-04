@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/bitwriter.h>
+#include <genie/util/bit-writer.h>
 #include <gtest/gtest.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -111,7 +111,9 @@ size_t AccessUnit::Subsequence::getNumSymbols() const { return data.size(); }
 
 uint64_t AccessUnit::Subsequence::pull() {
     if (end()) {
-        UTILS_DIE("Tried to read descriptor that has already ended");
+        UTILS_DIE("Tried to read descriptor that has already ended: " +
+                  std::to_string(static_cast<uint8_t>(this->getID().first)) + ", " +
+                  std::to_string(this->getID().second));
     }
     return data.get(position++);
 }

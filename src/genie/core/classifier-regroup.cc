@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/constants.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/watch.h>
+#include <genie/util/stop-watch.h>
 #include <gtest/gtest.h>
 #include <thread>
 

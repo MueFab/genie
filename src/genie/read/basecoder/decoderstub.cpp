@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -15,7 +15,7 @@
 #include <vector>
 #include "genie/core/access-unit.h"
 #include "genie/core/payload.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
