@@ -146,12 +146,12 @@ DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, ge
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
-    group_ID = reader.readBypassBE<uint8_t>();
-    ID = reader.readBypassBE<uint16_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
+    group_ID = reader.readAlignedInt<uint8_t>();
+    ID = reader.readAlignedInt<uint16_t>();
     std::string versionString(4, '\0');
-    reader.readBypass(versionString);
+    reader.readAlignedBytes(versionString.data(), versionString.length());
     version = core::getMPEGVersion(versionString);
     UTILS_DIE_IF(version == core::MPEGMinorVersion::UNKNOWN, "Unknown MPEG version");
 
@@ -188,49 +188,49 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
             thresholds.emplace_back(std::nullopt);
         }
     }
-    reader.flush();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    reader.flushHeldBits();
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE<uint8_t>(group_ID);
-    writer.writeBypassBE<uint16_t>(ID);
+    writer.writeAlignedInt<uint8_t>(group_ID);
+    writer.writeAlignedInt<uint16_t>(ID);
     const auto& v_string = genie::core::getMPEGVersionString(version);
-    writer.writeBypass(v_string.data(), v_string.length());
+    writer.writeAlignedBytes(v_string.data(), v_string.length());
 
-    writer.write(multiple_alignment_flag, 1);
-    writer.write(byte_offset_size_flag, 1);
-    writer.write(non_overlapping_AU_range_flag, 1);
-    writer.write(pos_40_bits_flag, 1);
-    writer.write(block_header_on != std::nullopt, 1);
+    writer.writeBits(multiple_alignment_flag, 1);
+    writer.writeBits(byte_offset_size_flag, 1);
+    writer.writeBits(non_overlapping_AU_range_flag, 1);
+    writer.writeBits(pos_40_bits_flag, 1);
+    writer.writeBits(block_header_on != std::nullopt, 1);
     if (block_header_on != std::nullopt) {
         block_header_on->write(writer);
     } else {
         block_header_off->write(writer);
     }
     referenceOptions.write(writer);
-    writer.write(static_cast<uint8_t>(dataset_type), 4);
+    writer.writeBits(static_cast<uint8_t>(dataset_type), 4);
     if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
-        writer.write(mit_configs.size(), 4);
+        writer.writeBits(mit_configs.size(), 4);
         for (const auto& c : mit_configs) {
             c.write(writer);
         }
     }
-    writer.write(parameters_update_flag, 1);
-    writer.write(static_cast<uint8_t>(alphabet_id), 7);
-    writer.write(num_U_access_units, 32);
+    writer.writeBits(parameters_update_flag, 1);
+    writer.writeBits(static_cast<uint8_t>(alphabet_id), 7);
+    writer.writeBits(num_U_access_units, 32);
     if (num_U_access_units) {
         u_options->write(writer);
     }
     for (const auto& t : thresholds) {
-        writer.write(t != std::nullopt, 1);
+        writer.writeBits(t != std::nullopt, 1);
         if (t != std::nullopt) {
-            writer.write(*t, 31);
+            writer.writeBits(*t, 31);
         }
     }
-    writer.flush();
+    writer.flushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

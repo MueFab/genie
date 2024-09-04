@@ -23,14 +23,14 @@ AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentSharedData::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(seq_ID);
-    writer.writeBypassBE(as_depth);
+    writer.writeAlignedInt(seq_ID);
+    writer.writeAlignedInt(as_depth);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AlignmentSharedData::AlignmentSharedData(util::BitReader &reader)
-    : seq_ID(reader.readBypassBE<uint16_t>()), as_depth(reader.readBypassBE<uint8_t>()) {}
+    : seq_ID(reader.readAlignedInt<uint16_t>()), as_depth(reader.readAlignedInt<uint8_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

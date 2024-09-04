@@ -17,8 +17,8 @@ namespace genie::format::mgg {
 MggFile::MggFile(std::istream* _file) : file(_file), reader(*file) {
     while (true) {
         std::string boxname(4, '\0');
-        reader->readBypass(boxname);
-        if (!reader->isGood()) {
+        reader->readAlignedBytes(boxname.data(), boxname.length());
+        if (!reader->isStreamGood()) {
             break;
         }
         UTILS_DIE_IF(boxes.empty() && boxname != "flhd", "No file header found");

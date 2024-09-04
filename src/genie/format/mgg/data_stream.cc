@@ -32,9 +32,9 @@ DataStream::DataStream(util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DataStream::write(util::BitWriter& writer) const {
-    writer.write(static_cast<uint8_t>(data_type), 8);
-    writer.write(reserved, 3);
-    writer.write(data_SID, 13);
+    writer.writeBits(static_cast<uint8_t>(data_type), 8);
+    writer.writeBits(reserved, 3);
+    writer.writeBits(data_SID, 13);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

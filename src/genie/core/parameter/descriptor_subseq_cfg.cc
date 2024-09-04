@@ -115,7 +115,7 @@ bool DescriptorSubseqCfg::isClassSpecific() const { return class_specific_dec_cf
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorSubseqCfg::write(util::BitWriter& writer) const {
-    writer.write(static_cast<uint8_t>(class_specific_dec_cfg_flag), 1);
+    writer.writeBits(static_cast<uint8_t>(class_specific_dec_cfg_flag), 1);
     for (auto& i : descriptor_configurations) {
         i->write(writer);
     }

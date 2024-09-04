@@ -53,12 +53,12 @@ void SignatureCfg::addSignature(uint64_t _u_cluster_signature, uint8_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SignatureCfg::write(util::BitWriter& writer) const {
-    writer.write(U_cluster_signature.size(), 16);
+    writer.writeBits(U_cluster_signature.size(), 16);
     for (size_t i = 0; i < U_cluster_signature.size(); ++i) {
         if (U_signature_size != std::nullopt) {
-            writer.write(U_cluster_signature[i], base_bits * *U_signature_size);
+            writer.writeBits(U_cluster_signature[i], base_bits * *U_signature_size);
         } else {
-            writer.write(U_cluster_signature[i], base_bits * U_cluster_signature_length[i]);
+            writer.writeBits(U_cluster_signature[i], base_bits * U_cluster_signature_length[i]);
         }
     }
 }

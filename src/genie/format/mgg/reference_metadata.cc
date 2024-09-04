@@ -41,22 +41,22 @@ ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _referen
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
-    auto start_pos = bitreader.getPos() - 4;
-    auto length = bitreader.readBypassBE<uint64_t>();
+    auto start_pos = bitreader.getStreamPosition() - 4;
+    auto length = bitreader.readAlignedInt<uint64_t>();
     auto len_value = (length - sizeof(uint8_t) * 2);
     reference_metadata_value.resize(len_value);
-    dataset_group_id = bitreader.readBypassBE<uint8_t>();
-    reference_id = bitreader.readBypassBE<uint8_t>();
-    bitreader.readBypass(reference_metadata_value);
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getPos()), "Invalid length");
+    dataset_group_id = bitreader.readAlignedInt<uint8_t>();
+    reference_id = bitreader.readAlignedInt<uint8_t>();
+    bitreader.readAlignedBytes(reference_metadata_value.data(), reference_metadata_value.length());
+    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceMetadata::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeBypassBE<uint8_t>(dataset_group_id);
-    bitWriter.writeBypassBE<uint8_t>(reference_id);
-    bitWriter.writeBypass(reference_metadata_value.data(), reference_metadata_value.length());
+    bitWriter.writeAlignedInt<uint8_t>(dataset_group_id);
+    bitWriter.writeAlignedInt<uint8_t>(reference_id);
+    bitWriter.writeAlignedBytes(reference_metadata_value.data(), reference_metadata_value.length());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

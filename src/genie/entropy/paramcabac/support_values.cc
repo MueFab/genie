@@ -44,14 +44,14 @@ SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReade
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SupportValues::write(TransformIdSubsym transformIdSubsym, util::BitWriter &writer) const {
-    writer.write(output_symbol_size, 6);
-    writer.write(coding_subsym_size, 6);
-    writer.write(coding_order, 2);
+    writer.writeBits(output_symbol_size, 6);
+    writer.writeBits(coding_subsym_size, 6);
+    writer.writeBits(coding_order, 2);
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            writer.write(share_subsym_lut_flag, 1);
+            writer.writeBits(share_subsym_lut_flag, 1);
         }
-        writer.write(share_subsym_prv_flag, 1);
+        writer.writeBits(share_subsym_prv_flag, 1);
     }
 }
 

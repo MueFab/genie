@@ -23,8 +23,8 @@ OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
 
 OtherRec::OtherRec(util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
-      split_pos(reader.readBypassBE<uint64_t, 5>()),
-      split_seq_ID(reader.readBypassBE<uint16_t>()) {}
+      split_pos(reader.readAlignedInt<uint64_t, 5>()),
+      split_seq_ID(reader.readAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,8 +42,8 @@ uint16_t OtherRec::getNextSeq() const { return split_seq_ID; }
 
 void OtherRec::write(util::BitWriter &writer) const {
     AlignmentSplit::write(writer);
-    writer.writeBypassBE<uint64_t, 5>(split_pos);
-    writer.writeBypassBE(split_seq_ID);
+    writer.writeAlignedInt<uint64_t, 5>(split_pos);
+    writer.writeAlignedInt(split_seq_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

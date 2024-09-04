@@ -38,18 +38,18 @@ ReferenceOptions::ReferenceOptions(genie::util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceOptions::write(genie::util::BitWriter& writer) const {
-    writer.write(seq_ID.size(), 16);
+    writer.writeBits(seq_ID.size(), 16);
     if (seq_ID.empty()) {
         return;
     }
-    writer.write(reference_ID, 8);
+    writer.writeBits(reference_ID, 8);
 
     for (auto& i : seq_ID) {
-        writer.write(i, 16);
+        writer.writeBits(i, 16);
     }
 
     for (auto& b : seq_blocks) {
-        writer.write(b, 32);
+        writer.writeBits(b, 32);
     }
 }
 

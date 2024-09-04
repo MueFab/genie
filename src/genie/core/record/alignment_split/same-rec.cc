@@ -27,14 +27,14 @@ SameRec::SameRec(int64_t _delta, Alignment _alignment)
 
 SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
-      delta(reader.readBypassBE<int64_t, 6>()),
+      delta(reader.readAlignedInt<int64_t, 6>()),
       alignment(as_depth, reader) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SameRec::write(util::BitWriter &writer) const {
     AlignmentSplit::write(writer);
-    writer.writeBypassBE<int64_t, 6>(delta);
+    writer.writeAlignedInt<int64_t, 6>(delta);
     alignment.write(writer);
 }
 

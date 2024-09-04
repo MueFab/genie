@@ -13,16 +13,16 @@ namespace genie::format::mgg {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Offset::Offset(util::BitReader& bitReader) : subkey(4, '\0') {
-    bitReader.readBypass(subkey);
-    offset = bitReader.readBypassBE<uint64_t>();
+    bitReader.readAlignedBytes(subkey.data(), subkey.length());
+    offset = bitReader.readAlignedInt<uint64_t>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Offset::write(util::BitWriter& writer) const {
-    writer.writeBypass("offs", 4);
-    writer.writeBypass(subkey.data(), 4);
-    writer.writeBypassBE(offset);
+    writer.writeAlignedBytes("offs", 4);
+    writer.writeAlignedBytes(subkey.data(), 4);
+    writer.writeAlignedInt(offset);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

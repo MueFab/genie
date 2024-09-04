@@ -32,16 +32,16 @@ AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : he
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
                        bool mit, bool block_header, core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     std::string tmp(4, '\0');
-    reader.readBypass(tmp);
+    reader.readAlignedBytes(tmp.data(), tmp.length());
     UTILS_DIE_IF(tmp != "auhd", "Access unit without header");
     header = AccessUnitHeader(reader, parameterSets, mit);
     do {
-        auto tmp_pos = reader.getPos();
+        auto tmp_pos = reader.getStreamPosition();
         std::string tmp_str(4, '\0');
-        reader.readBypass(tmp_str);
+        reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
         if (tmp_str == "auin") {
             UTILS_DIE_IF(au_information != std::nullopt, "AU-Inf already present");
             UTILS_DIE_IF(au_protection != std::nullopt, "AU-Inf must be before AU-PR");
@@ -50,7 +50,7 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
             UTILS_DIE_IF(au_protection != std::nullopt, "AU-Pr already present");
             au_protection = AUProtection(reader, version);
         } else {
-            reader.setPos(tmp_pos);
+            reader.setStreamPosition(tmp_pos);
             break;
         }
     } while (true);
@@ -59,7 +59,7 @@ AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::par
             blocks.emplace_back(reader);
         }
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

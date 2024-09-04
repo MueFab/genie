@@ -320,15 +320,15 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         f_seq << in_seq.rdbuf();
         f_seq.clear();
         f_order << in_order.rdbuf();
-        f_order.clear();  // clear error flag in case in_order is empty
+        f_order.clear();  // clearStreamState error flag in case in_order is empty
         f_noisepos << in_noisepos.rdbuf();
-        f_noisepos.clear();  // clear error flag in case in_noisepos is empty
+        f_noisepos.clear();  // clearStreamState error flag in case in_noisepos is empty
         f_noise << in_noise.rdbuf();
-        f_noise.clear();  // clear error flag in case in_noise is empty
+        f_noise.clear();  // clearStreamState error flag in case in_noise is empty
         f_readlength << in_readlength.rdbuf();
-        f_readlength.clear();  // clear error flag in case in_readlength is empty
+        f_readlength.clear();  // clearStreamState error flag in case in_readlength is empty
         f_RC << in_RC.rdbuf();
-        f_RC.clear();  // clear error flag in case in_RC is empty
+        f_RC.clear();  // clearStreamState error flag in case in_RC is empty
 
         remove((eg.outfile_seq + '.' + std::to_string(tid)).c_str());
         remove((eg.infile_order + '.' + std::to_string(tid)).c_str());

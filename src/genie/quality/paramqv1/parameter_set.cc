@@ -23,7 +23,7 @@ void ParameterSet::addCodeBook(Codebook &&book) { qv_codebooks.emplace_back(std:
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::write(util::BitWriter &writer) const {
-    writer.write(qv_codebooks.size(), 4);
+    writer.writeBits(qv_codebooks.size(), 4);
     for (const auto &q : qv_codebooks) {
         q.write(writer);
     }

@@ -39,17 +39,17 @@ const std::string& DatasetGroupHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
-    auto start_pos = reader.getPos() - 4;
-    auto length = reader.readBypassBE<uint64_t>();
+    auto start_pos = reader.getStreamPosition() - 4;
+    auto length = reader.readAlignedInt<uint64_t>();
     auto num_datasets = (length - 14) / 2;
     dataset_IDs.resize(num_datasets);
-    ID = reader.readBypassBE<uint8_t>();
-    version = reader.readBypassBE<uint8_t>();
+    ID = reader.readAlignedInt<uint8_t>();
+    version = reader.readAlignedInt<uint8_t>();
     for (auto& d : dataset_IDs) {
-        d = reader.readBypassBE<uint16_t>();
+        d = reader.readAlignedInt<uint16_t>();
     }
 
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getPos()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -75,10 +75,10 @@ void DatasetGroupHeader::addDatasetID(uint8_t _id) { dataset_IDs.emplace_back(_i
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroupHeader::box_write(genie::util::BitWriter& writer) const {
-    writer.writeBypassBE<uint8_t>(ID);
-    writer.writeBypassBE<uint8_t>(version);
+    writer.writeAlignedInt<uint8_t>(ID);
+    writer.writeAlignedInt<uint8_t>(version);
     for (auto& d : dataset_IDs) {
-        writer.writeBypassBE<uint16_t>(d);
+        writer.writeAlignedInt<uint16_t>(d);
     }
 }
 

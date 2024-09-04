@@ -84,10 +84,10 @@ unsigned int BitInputStream::read(unsigned int numBits) {
         return bits;
     }
 
-    // More bits requested than currently held, flush all heldBits to bits
+    // More bits requested than currently held, flushHeldBits all heldBits to bits
     numBits -= m_numHeldBits;
     bits = m_heldBits & ~(0xffu << m_numHeldBits);
-    // bits = static_cast<uint64_t>(m_heldBits & ~(0xffu << m_numHeldBits));
+    // bits = static_cast<uint64_t>(heldBits & ~(0xffu << numHeldBits));
     bits <<= numBits;  // make room for the bits to come
 
     // Read in more bytes to satisfy the request

@@ -37,21 +37,21 @@ uint16_t Sequence::getID() const { return sequence_id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version) : version(_version) {
-    reader.readBypass_null_terminated(name);
+    reader.readAlignedStringTerminated(name);
     if (version != genie::core::MPEGMinorVersion::V1900) {
-        sequence_length = reader.readBypassBE<uint32_t>();
-        sequence_id = reader.readBypassBE<uint16_t>();
+        sequence_length = reader.readAlignedInt<uint32_t>();
+        sequence_id = reader.readAlignedInt<uint16_t>();
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Sequence::write(genie::util::BitWriter& writer) const {
-    writer.writeBypass(name.data(), name.length());
-    writer.writeBypassBE<uint8_t>('\0');
+    writer.writeAlignedBytes(name.data(), name.length());
+    writer.writeAlignedInt<uint8_t>('\0');
     if (version != genie::core::MPEGMinorVersion::V1900) {
-        writer.writeBypassBE(sequence_length);
-        writer.writeBypassBE(sequence_id);
+        writer.writeAlignedInt(sequence_length);
+        writer.writeAlignedInt(sequence_id);
     }
 }
 
