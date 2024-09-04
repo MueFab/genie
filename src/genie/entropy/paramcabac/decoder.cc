@@ -7,7 +7,7 @@
 #include "genie/entropy/paramcabac/decoder.h"
 #include <memory>
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

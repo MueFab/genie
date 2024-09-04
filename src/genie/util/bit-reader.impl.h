@@ -1,5 +1,5 @@
 /**
- * @file bitreader.impl.h
+ * @file bit-reader.impl.h
  *
  * @copyright This file is part of GENIE.
  * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
@@ -17,8 +17,8 @@
  * compilers.
  */
 
-#ifndef SRC_GENIE_UTIL_BITREADER_IMPL_H_
-#define SRC_GENIE_UTIL_BITREADER_IMPL_H_
+#ifndef SRC_GENIE_UTIL_BIT_READER_IMPL_H_
+#define SRC_GENIE_UTIL_BIT_READER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ T BitReader::readAlignedInt() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_BITREADER_IMPL_H_
+#endif  // SRC_GENIE_UTIL_BIT_READER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

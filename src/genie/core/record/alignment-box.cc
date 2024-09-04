@@ -7,8 +7,8 @@
 #include "genie/core/record/alignment-box.h"
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 #include <cassert>
 #include <utility>
 #include <vector>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 #include "genie/util/runtime-exception.h"
 

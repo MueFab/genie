@@ -13,7 +13,7 @@
 #include "genie/core/name-decoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/read/basecoder/decoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

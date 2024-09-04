@@ -1,13 +1,10 @@
 project("util-tests")
 
 set(source_files
-        date.cc
         watch.cc
         bitwriter.cc
         bitroundtrip.cc
         helpers.cc
-#        sam-file-reader-test.cc
-        stringview.cc
         string-helpers.cc
         thread-manager.cc
 )

@@ -15,7 +15,7 @@
 #include "genie/entropy/gabac/mismatch-decoder.h"
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

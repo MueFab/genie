@@ -8,7 +8,7 @@
 #include <memory>
 #include <sstream>
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

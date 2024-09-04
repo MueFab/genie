@@ -14,7 +14,7 @@
 #include "genie/core/constants.h"
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/entropy/lzma/subsequence.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,8 +17,8 @@
 #include "genie/core/meta/external-ref/mpeg.h"
 #include "genie/core/meta/external-ref/raw.h"
 #include "genie/core/meta/internal-ref.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 
 // ---------------------------------------------------------------------------------------------------------------------

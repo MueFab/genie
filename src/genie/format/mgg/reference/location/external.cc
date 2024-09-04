@@ -23,11 +23,9 @@ const size_t External::checksum_sizes[] = {128 / 8, 256 / 8};
 
 std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
                                             genie::core::MPEGMinorVersion _version) {
-    std::string _ref_uri;
-    reader.readAlignedStringTerminated(_ref_uri);
+    std::string _ref_uri = reader.readAlignedStringTerminated();
     auto _checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
-    auto _ref_type = reader.readAlignedInt<RefType>();
-    switch (_ref_type) {
+    switch (reader.readAlignedInt<RefType>()) {
         case RefType::MPEGG_REF:
             return std::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
                                                             seq_count, _version);
@@ -50,7 +48,7 @@ External::External(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, 
 // ---------------------------------------------------------------------------------------------------------------------
 
 External::External(genie::util::BitReader& reader) : Location(reader) {
-    reader.readAlignedStringTerminated(uri);
+    uri = reader.readAlignedStringTerminated();
     checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     reference_type = reader.readAlignedInt<RefType>();
 }
@@ -58,7 +56,7 @@ External::External(genie::util::BitReader& reader) : Location(reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 External::External(genie::util::BitReader& reader, uint8_t _reserved) : Location(_reserved, true) {
-    reader.readAlignedStringTerminated(uri);
+    uri = reader.readAlignedStringTerminated();
     checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     reference_type = reader.readAlignedInt<RefType>();
 }

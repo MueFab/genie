@@ -12,8 +12,8 @@
 #include <memory>
 #include "genie/core/meta/refbase.h"
 #include "genie/format/mgg/reference/location.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

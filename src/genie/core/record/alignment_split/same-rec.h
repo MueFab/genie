@@ -13,8 +13,8 @@
 #include <memory>
 #include "genie/core/record/alignment-split.h"
 #include "genie/core/record/alignment.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

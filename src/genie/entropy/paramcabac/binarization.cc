@@ -6,7 +6,7 @@
 
 #include "genie/entropy/paramcabac/binarization.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

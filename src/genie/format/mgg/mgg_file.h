@@ -15,7 +15,7 @@
 #include "genie/format/mgg/box.h"
 #include "genie/format/mgg/dataset_group.h"
 #include "genie/format/mgg/file_header.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 
 #include "genie/util/runtime-exception.h"
 

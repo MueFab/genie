@@ -7,7 +7,7 @@
 #include "genie/format/mgb/raw_reference.h"
 #include <sstream>
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 #include "genie/util/runtime-exception.h"
 

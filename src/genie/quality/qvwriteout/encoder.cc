@@ -9,7 +9,7 @@
 #include <memory>
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,8 +45,8 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
     for (const auto& q : s.getQualities()) {
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
-            [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
-                auto qvs = bs.deploy(q.data());
+            [&desc, &q](uint8_t cigar, const std::pair<size_t, size_t>& bs, const std::pair<size_t, size_t>&) -> bool {
+                auto qvs =  std::string_view(q).substr(bs.first, bs.second);
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
                                            core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
                                        ? 2

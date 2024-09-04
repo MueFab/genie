@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 
-#include "genie/util/watch.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

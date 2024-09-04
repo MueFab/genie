@@ -18,7 +18,7 @@
 #include "genie/format/mgg/reference/location.h"
 #include "genie/format/mgg/reference/sequence.h"
 #include "genie/format/mgg/reference/version.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit-reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

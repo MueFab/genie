@@ -7,8 +7,8 @@
 #include "genie/core/record/alignment-external.h"
 #include "genie/core/record/alignment_external/none.h"
 #include "genie/core/record/alignment_external/other-rec.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-reader.h"
+#include "genie/util/bit-writer.h"
 
 #include "genie/util/runtime-exception.h"
 

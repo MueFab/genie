@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/raw_reference_seq.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
