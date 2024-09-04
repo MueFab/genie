@@ -68,7 +68,7 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
 
         // add LINK_ID default values
         for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
-            char val = static_cast<char>(0xFF);
+            const char val = '\xFF';
             descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
         }
 
