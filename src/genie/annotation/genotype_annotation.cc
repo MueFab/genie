@@ -40,7 +40,7 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
         for (auto& formatdata : recData.at(i).genotypeDatablock.attributeData) {
             auto& info = recData.at(i).genotypeDatablock.attributeInfo[formatdata.first];
             std::vector<uint32_t> arrayDims;
-            arrayDims.push_back(std::min(likelihood_opt.block_size, static_cast<uint32_t>(rowsRead)));
+            arrayDims.push_back(static_cast < uint32_t>(formatdata.second.size()));
             arrayDims.push_back(
                 recData.at(i).numSamples);  // static_cast<uint32_t>(formatdata.second.at(0).size()));  //
             arrayDims.push_back(info.getArrayLength());  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
@@ -67,7 +67,7 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
         }
 
         // add LINK_ID default values
-        for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
+         for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
             char val = static_cast<char>(0xFF);
             descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
         }
@@ -108,9 +108,9 @@ size_t GenotypeAnnotation::readBlocks(std::ifstream& inputfile, const uint32_t& 
 
         std::map<std::string, genie::core::record::format_field> formatList;
         //  uint16_t attributeId = 0;
-        for (auto& hortile : horizontalTiles) {
-            for (auto& rec : hortile) {
-                for (auto& field : rec.getFormats()) {
+        for (const auto& hortile : horizontalTiles) {
+            for (const auto& rec : hortile) {
+                for (const auto& field : rec.getFormats()) {
                     if (formatList[field.getFormat()].getFormat() == "") {
                         formatList[field.getFormat()] = field;
                         genie::core::ArrayType convertArray;
@@ -129,7 +129,7 @@ size_t GenotypeAnnotation::readBlocks(std::ifstream& inputfile, const uint32_t& 
         for (auto& hortile : horizontalTiles) {
             for (auto& rec : hortile) {
                 auto formats = rec.getFormats();
-                for (auto& availableFormats : formatList) {
+                for (const auto& availableFormats : formatList) {
                     bool available = false;
                     for (auto& currentFormat : formats)
                         if (currentFormat.getFormat() == availableFormats.first) {
