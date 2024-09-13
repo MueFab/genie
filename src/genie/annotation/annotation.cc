@@ -74,7 +74,7 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
     genie::core::record::variant_site::Record recs;
     while (recs.read(bitreader)) {
         infoTag = recs.getInfoTag();
-        for (auto tag : infoTag) {
+        for (const auto& tag : infoTag) {
             InfoField infoField(tag.tag, tag.type, static_cast<uint8_t>(tag.values.size()));
             genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.tag.size()), tag.tag, tag.type,
                                                                 static_cast<uint8_t>(tag.values.size()), tag.values};
@@ -83,18 +83,18 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
         }
     }
     readForTags.close();
-    for (auto info : infoTags)
+    for (const auto& info : infoTags)
         infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
 }
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 10000;
+    uint64_t defaultTileSize = 4;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
 
-    for (auto infoField : infoFields) attributeInfo[infoField.ID] = infoField;
+    for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
     descrList.push_back(genie::core::AnnotDesc::SEQUENCEID);
     descrList.push_back(genie::core::AnnotDesc::STARTPOS);
