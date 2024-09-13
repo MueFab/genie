@@ -248,7 +248,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
 
     // add LINK_ID default values
     for (auto i = 0u; i < BLOCK_SIZE && i < recs.size(); ++i) {
-        char val = static_cast<char>(0xFF);
+        const char val = '\xFF';
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
