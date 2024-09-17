@@ -38,12 +38,19 @@ class GenotypeAnnotation {
  public:
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
+    void setTileSize(uint32_t _defaultTileSizeHeight, uint32_t _defaultTileSizeWidth) {
+        defaultTileSizeHeight = _defaultTileSizeHeight;
+        defaultTileSizeWidth = _defaultTileSizeWidth;
+    } 
 
     DataUnits parseGenotype(std::ifstream& inputfile);
     void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
 
  private:
     typedef std::vector<genie::core::record::VariantGenotype> Tile;  // one tile contains a number of records
+
+    uint32_t defaultTileSizeHeight;
+    uint32_t defaultTileSizeWidth;
 
     genie::likelihood::EncodingOptions likelihood_opt{200, true};
     genie::genotype::EncodingOptions genotype_opt{200,                                          // block size

@@ -29,6 +29,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 
     if (recType == RecType::GENO_FILE) {
         genotypeAnnotation.setCompressors(compressors);
+        genotypeAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         DataUnits dataunits = genotypeAnnotation.parseGenotype(inputfile);
         annotationParameterSet = dataunits.annotationParameterSet;
         annotationAccessUnit = dataunits.annotationAccessUnit;
@@ -89,8 +90,8 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 4;
-    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
+  //  uint64_t defaultTileSize = defia;
+    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSizeHeight);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
 
@@ -111,8 +112,8 @@ void Annotation::parseSite(std::ifstream& inputfile) {
     descrList.push_back(genie::core::AnnotDesc::ALTERN);
     descrList.push_back(genie::core::AnnotDesc::FILTER);
     genie::variant_site::ParameterSetComposer encodeParameters;
-    annotationParameterSet = encodeParameters.setParameterSet(
-        descrList, parser.getAttributes().getInfo(), compressors.getCompressorParameters(), defaultTileSize, AT_ID);
+    annotationParameterSet = encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
+                                         compressors.getCompressorParameters(), defaultTileSizeHeight, AT_ID);
 
     genie::variant_site::AccessUnitComposer accessUnit;
     accessUnit.setCompressors(compressors);

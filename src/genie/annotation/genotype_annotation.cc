@@ -11,9 +11,9 @@ namespace annotation {
 
 DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     DataUnits dataunits;
-    const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
-    const uint32_t defaultTileWidth = 3000;
-    likelihood_opt.block_size = defaultTileSize;
+  //  const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
+  //  const uint32_t defaultTileWidth = 500;
+    likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
 
     constexpr uint8_t AT_ID = 1;
     constexpr uint8_t AG_class = 0;
@@ -23,27 +23,28 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     std::vector<RecData> recData;
 
     size_t rowsRead =
-        readBlocks(inputfile, defaultTileSize, defaultTileWidth, genotypeParameters, likelihoodParameters, recData);
+        readBlocks(inputfile, defaultTileSizeHeight, defaultTileSizeWidth, genotypeParameters, likelihoodParameters, recData);
 
     genie::genotype::ParameterSetComposer parameterSetComposer;
     parameterSetComposer.setGenotypeParameters(genotypeParameters);
     parameterSetComposer.setLikelihoodParameters(likelihoodParameters);
     parameterSetComposer.setCompressors(compressors);
     dataunits.annotationParameterSet =
-        parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, defaultTileSize);
+        parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, defaultTileSizeHeight);
 
     dataunits.annotationAccessUnit.resize(recData.size());
-
+    size_t linkIdRowCnt = 0;
     for (auto i = 0u; i < recData.size(); ++i) {
         std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
 
         for (auto& formatdata : recData.at(i).genotypeDatablock.attributeData) {
             auto& info = recData.at(i).genotypeDatablock.attributeInfo[formatdata.first];
             std::vector<uint32_t> arrayDims;
-            arrayDims.push_back(static_cast < uint32_t>(formatdata.second.size()));
+            arrayDims.push_back(static_cast<uint32_t>(formatdata.second.size()));
             arrayDims.push_back(
                 recData.at(i).numSamples);  // static_cast<uint32_t>(formatdata.second.at(0).size()));  //
-            arrayDims.push_back(info.getArrayLength());  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
+            arrayDims.push_back(
+                info.getArrayLength());  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
 
             attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
                                                     arrayDims);
@@ -67,7 +68,7 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
         }
 
         // add LINK_ID default values
-        for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
+        for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < rowsRead; ++j, ++linkIdRowCnt) {
             const char val = '\xFF';
             descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
         }

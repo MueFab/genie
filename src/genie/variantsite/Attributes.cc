@@ -31,7 +31,9 @@ void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
         rowInTile++;
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {
+        typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
         writers.back().flush();
+
         std::vector<uint32_t> arrayDims;
         arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));

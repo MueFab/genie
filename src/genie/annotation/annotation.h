@@ -38,6 +38,11 @@ enum class RecType { SITE_FILE = 0, GENO_FILE };
 class Annotation {
  public:
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
+    void setTileSize(uint32_t _defaultTileSizeHeight, uint32_t _defaultTileSizeWidth) {
+        defaultTileSizeHeight = _defaultTileSizeHeight;
+        defaultTileSizeWidth = _defaultTileSizeWidth;
+    } 
+
     void setInfoFields(std::string jsonFileName);
     void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
@@ -61,6 +66,8 @@ class Annotation {
 
     GenotypeAnnotation genotypeAnnotation;
 
+    uint32_t defaultTileSizeHeight;
+    uint32_t defaultTileSizeWidth;
     void parseSite(std::ifstream& inputfile);
 };
 
