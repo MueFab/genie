@@ -59,6 +59,8 @@ TEST_P(SiteConformanceTest, SiteConformancetests) {  // NOLINT(cert-err58-cpp)
     genie::annotation::Annotation annotationGenerator;
 
     annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(1000, 3000);
+
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, filepath, filepath + "_output");
 }
 
