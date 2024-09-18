@@ -97,6 +97,8 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
 
     genie::annotation::Annotation annotationGenerator;
     annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(BLOCK_SIZE, 3000);
+
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, gitRootDir + testparams.filepath + ".geno",

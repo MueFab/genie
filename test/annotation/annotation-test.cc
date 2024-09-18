@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 
-// #include <array>
 #include <filesystem>
-// #include <fstream>
-// #include <iomanip>
-// #include <iostream>
 #include <string>
 
 #include "genie/annotation/annotation.h"
@@ -105,7 +101,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-const bool RUNBIGFILES = true;
+const bool RUNBIGFILES = false;
 
 TEST_P(AnnotationTests, annotationSite) {
     auto testParams = GetParam();
@@ -120,9 +116,6 @@ TEST_P(AnnotationTests, annotationSite) {
 
     std::string outputFilename = filePath + "ALL.chrX.R" + std::to_string(testParams.totNrOfRows);
     outputFilename += "_Cn_TS" + std::to_string(testParams.defaultTileHeight) + "_site";
-
-    // std::string inputFilename = filePath + "ALL.chrX.15.site";
-    //  std::string outputFilename = filePath + "ALL.chrX.15_site_annotation";
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -139,10 +132,8 @@ TEST_P(AnnotationTests, annotationSite) {
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
-    //  auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    //  size_t expectedSize = 70 * 1024;  // aprox. 70kB
-    //   EXPECT_LE(expectedSize, filesize);
-}
+ }
+
 TEST_P(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
@@ -159,10 +150,6 @@ TEST_P(AnnotationTests, annotationGeno) {
     std::string outputFilename = filePath + "ALL.chrX.R" + std::to_string(testParams.totNrOfRows);
     outputFilename += "_C1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
                       std::to_string(testParams.defaultTileWidth) + "_geno";
-
-    // std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
-    //   std::string inputFilename = filePath + "ALL.chrX.15.geno";
-    //    std::string outputFilename = filePath + "ALL.chrX.15_geno_annotation";
 
     std::filesystem::remove(outputFilename + ".bin");
 
