@@ -5,6 +5,7 @@
  */
 
 #include "genie/entropy/paramcabac/binarization_parameters.h"
+#include <vector>
 #include "genie/util/bit-writer.h"
 #include "genie/util/runtime-exception.h"
 

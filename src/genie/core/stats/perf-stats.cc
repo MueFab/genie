@@ -7,7 +7,9 @@
 #include "genie/core/stats/perf-stats.h"
 #include <algorithm>
 #include <iomanip>
+#include <map>
 #include <ostream>
+#include <string>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

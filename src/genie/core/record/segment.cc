@@ -5,7 +5,9 @@
  */
 
 #include "genie/core/record/segment.h"
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
 #include "genie/util/runtime-exception.h"

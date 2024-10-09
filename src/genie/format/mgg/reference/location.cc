@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/reference/location.h"
+#include <memory>
 #include <utility>
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/external/fasta.h"
@@ -63,8 +64,8 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<gen
         return ret;
     } else if (dynamic_cast<genie::core::meta::InternalRef*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::InternalRef*>(base.get());
-        return std::make_unique<location::Internal>(static_cast<uint8_t>(0),
-                                                            static_cast<uint8_t>(ref->getGroupID()), ref->getID());
+        return std::make_unique<location::Internal>(static_cast<uint8_t>(0), static_cast<uint8_t>(ref->getGroupID()),
+                                                    ref->getID());
     } else {
         UTILS_DIE("Unknown reference location type");
     }

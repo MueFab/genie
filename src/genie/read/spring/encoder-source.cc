@@ -5,9 +5,10 @@
  */
 
 #include "genie/read/spring/encoder-source.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

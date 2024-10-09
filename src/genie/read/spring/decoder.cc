@@ -151,11 +151,11 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         uint64_t mmtype_1 = 0;
                         if (au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()) {
                             mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                                  ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                                                        .getMismatchDecoder()
-                                                        ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
-                                                                             .inverseLut[cur_read[i][abs_mmpos]])
-                                                  : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                                           ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
+                                                 .getMismatchDecoder()
+                                                 ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                                      .inverseLut[cur_read[i][abs_mmpos]])
+                                           : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
                         } else {
                             mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
                         }
@@ -560,7 +560,9 @@ void Decoder::flushIn(uint64_t& pos) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::skipIn(const util::Section& id) {
-    { util::OrderedSection sec(&lock, id); }
+    {
+        util::OrderedSection sec(&lock, id);
+    }
     skipOut(id);
 }
 

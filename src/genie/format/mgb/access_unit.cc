@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/util/bit-writer.h"
 #include "genie/util/data-block.h"

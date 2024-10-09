@@ -5,11 +5,10 @@
  */
 
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
-#include <utility>
 #include <memory>
+#include <utility>
 #include "genie/core/parameter/descriptor_present/decoder.h"
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
