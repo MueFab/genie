@@ -74,7 +74,6 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
 
         switch (comp.getAlgorithmIDs().at(i)) {
             case genie::core::AlgoID::BSC: {
-                genie::entropy::bsc::BSCParameters parameters;
                 genie::entropy::bsc::BSCEncoder encoder;
                 encoder.encode(intermediateIn, intermediateOut);
                 break;

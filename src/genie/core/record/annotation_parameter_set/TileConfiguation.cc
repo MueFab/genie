@@ -23,23 +23,35 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
-TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, bool twoDimensional,
-                                     uint64_t defaultTileSize)
+
+    TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class, uint64_t defaultTileSize)
+    : TileConfiguration(AT_coord_size, AG_class, {defaultTileSize, 0}) {
+    two_dimensional = false;
+    }
+
+
+
+
+TileConfiguration::TileConfiguration(uint8_t AT_coord_size, uint8_t AG_class,
+                                     std::vector<uint64_t> defaultTileSize)
     : AT_coord_size(AT_coord_size),
       AG_class(AG_class),
       attribute_contiguity(false),
-      two_dimensional(twoDimensional),
       column_major_tile_order(false),
       symmetry_mode(0),
       symmetry_minor_diagonal(false),
       attribute_dependent_tiles(false),
-      default_tile_structure{AT_coord_size, two_dimensional, defaultTileSize},
+      default_tile_structure{AT_coord_size, defaultTileSize},
       n_add_tile_structures(0),
       n_attributes{},
       attribute_ID{},
       n_descriptors{},
       descriptor_ID{},
       additional_tile_structure{} {
+        if (defaultTileSize.at(1) == 0)
+            two_dimensional = false;
+        else
+            two_dimensional = true;
     if (!this->two_dimensional) {
         this->column_major_tile_order = false;
         this->symmetry_mode = 0;
@@ -73,7 +85,7 @@ TileConfiguration::TileConfiguration(uint8_t AT_coord_size)
       symmetry_mode(0),
       symmetry_minor_diagonal(false),
       attribute_dependent_tiles(false),
-      default_tile_structure{AT_coord_size, two_dimensional, 0},
+      default_tile_structure{AT_coord_size, 0},
       n_add_tile_structures(0),
       n_attributes{},
       attribute_ID{},

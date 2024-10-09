@@ -101,7 +101,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-const bool RUNBIGFILES = false;
+const bool RUNBIGFILES = true;
 
 TEST_P(AnnotationTests, annotationSite) {
     auto testParams = GetParam();
@@ -144,11 +144,12 @@ TEST_P(AnnotationTests, annotationGeno) {
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
 
+    auto inputfilesize = std::filesystem::file_size(inputFilename);
     if constexpr (!RUNBIGFILES)
-        if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
+        if (inputfilesize > 50 * 1024*1024) return;
 
-    std::string outputFilename = filePath + "ALL.chrX.R" + std::to_string(testParams.totNrOfRows);
-    outputFilename += "_C1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
+    std::string outputFilename = filePath + "ALL.chrX.RC" + std::to_string(testParams.totNrOfRows);
+    outputFilename += "-1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
                       std::to_string(testParams.defaultTileWidth) + "_geno";
 
     std::filesystem::remove(outputFilename + ".bin");
@@ -204,6 +205,8 @@ INSTANTIATE_TEST_SUITE_P(
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u)
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4, 546u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)
 
                           ));

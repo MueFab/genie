@@ -8,13 +8,10 @@
 #define SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/arrayType.h"
@@ -48,13 +45,15 @@ class AccessUnitComposer {
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
                        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
                        uint8_t AT_ID, uint64_t _rowIndex);
-    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
-        std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
-        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
-        const core::record::annotation_parameter_set::Record& annotationParameterSet,
-        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
-        uint8_t AT_ID, uint64_t _rowIndex, uint64_t _colIndex);
+ 
+       void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+                       std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
+                       std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
+                       const core::record::annotation_parameter_set::Record& annotationParameterSet,
+                       core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
+                       uint8_t AT_ID, uint64_t _rowIndex, uint64_t _colIndex);
 
+    
  private:
     genie::annotation::Compressor compressors;
   //  core::record::annotation_parameter_set::Record& annotationParameterSet;
