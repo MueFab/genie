@@ -5,7 +5,10 @@
  */
 
 #include "genie/core/meta/external-ref/raw.h"
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"
 

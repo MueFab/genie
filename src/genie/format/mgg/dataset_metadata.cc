@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/dataset_metadata.h"
+#include <string>
 #include <utility>
 #include "genie/util/runtime-exception.h"
 

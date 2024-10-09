@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <vector>
 #include "genie/core/record/alignment-box.h"
 #include "genie/core/record/alignment-shared-data.h"
 #include "genie/core/record/alignment_external/none.h"

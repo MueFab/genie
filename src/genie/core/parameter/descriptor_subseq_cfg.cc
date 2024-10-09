@@ -5,6 +5,7 @@
  */
 
 #include "genie/core/parameter/descriptor_subseq_cfg.h"
+#include <memory>
 #include <utility>
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 

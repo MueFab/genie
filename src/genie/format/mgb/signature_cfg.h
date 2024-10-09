@@ -15,7 +15,6 @@
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::mgb {

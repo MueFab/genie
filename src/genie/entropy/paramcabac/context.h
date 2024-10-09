@@ -14,7 +14,6 @@
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
 
-
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------

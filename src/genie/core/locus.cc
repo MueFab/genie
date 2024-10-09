@@ -5,6 +5,7 @@
  */
 
 #include "genie/core/locus.h"
+#include <string>
 #include <utility>
 #include "genie/util/runtime-exception.h"
 #include "genie/util/string-helpers.h"

@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/mgg/dataset_mapping_table_list.h"
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

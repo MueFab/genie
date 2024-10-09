@@ -5,7 +5,8 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_dataset.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
+#include <string>
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------

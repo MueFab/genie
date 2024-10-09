@@ -6,6 +6,7 @@
 
 #include "genie/format/mgg/master_index_table/unaligned_au_index.h"
 #include <utility>
+#include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/util/runtime-exception.h"

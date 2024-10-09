@@ -28,11 +28,11 @@ class Encoder : public core::QVEncoder {
     static void fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
                                    calq::SideInformation& sideInformation, calq::EncodingBlock& input);
     static void encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
-                       core::AccessUnit::Descriptor& desc);
+                              core::AccessUnit::Descriptor& desc);
     static void addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
                              calq::UniformMinMaxQuantizer& quantizer);
     static void encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
-                         core::AccessUnit::Descriptor& desc);
+                                core::AccessUnit::Descriptor& desc);
 
  public:
     /**

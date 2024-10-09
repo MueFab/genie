@@ -7,7 +7,9 @@
 #include "genie/core/reference-collection.h"
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
