@@ -42,8 +42,14 @@ std::string parent_dir(const std::string &path) {
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
-    app.add_option("-i,--input-file", inputFile, "Input file (mgrec or mgb)\n")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "Output file (mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (fastq or mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (fastq or mgrec or mgb)\n")->mandatory(true);
+
+    inputSupFile = "";
+    app.add_option("--input-suppl-file", inputSupFile, "Paired input fastq file\n");
+
+    outputSupFile = "";
+    app.add_option("--output-suppl-file", outputSupFile, "Paired output fastq file\n");
 
     inputRefFile = "";
     app.add_option("-r,--input-ref-file", inputRefFile,
@@ -167,14 +173,12 @@ std::string random_string(size_t length) {
     const size_t max_index = sizeof(charset) - 1;
 
     // Initialize random number generator
-    std::random_device rd;  // Seed generator
+    std::random_device rd;         // Seed generator
     std::mt19937 generator(rd());  // Mersenne Twister engine
     std::uniform_int_distribution<> distribution(0, max_index - 1);
 
     // Lambda function to generate a random character
-    auto randchar = [&]() -> char {
-        return charset[distribution(generator)];
-    };
+    auto randchar = [&]() -> char { return charset[distribution(generator)]; };
 
     // Generate the random string
     std::string str(length, 0);
