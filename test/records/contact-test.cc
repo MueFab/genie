@@ -10,7 +10,6 @@
 #include "genie/core/record/contact/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
 #include "helpers.h"
 
 void check_row_col_uniqueness(

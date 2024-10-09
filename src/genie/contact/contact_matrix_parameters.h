@@ -83,6 +83,7 @@ class ContactMatrixParameters {
     // Length of samples_info is num_samples with type uint8_t
     // key of the sample_infos equals to SampleInformation.ID
     std::unordered_map<uint16_t, SampleInformation> sample_infos;
+
     // Length of chr_infos is num_chrs with type uint8_t
     // key of the chr_infos equals to ChromosomeInformation.ID
     std::unordered_map<uint8_t, ChromosomeInformation> chr_infos;
@@ -133,7 +134,7 @@ class ContactMatrixParameters {
      *
      * @param reader The bit reader to read from.
      */
-    ContactMatrixParameters(util::BitReader& reader);
+    explicit ContactMatrixParameters(util::BitReader& reader);
 
     /**
      * @brief Gets the number of samples.
