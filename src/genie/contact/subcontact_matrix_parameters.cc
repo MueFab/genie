@@ -72,17 +72,16 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
 
 SubcontactMatrixParameters::SubcontactMatrixParameters(
     util::BitReader& reader,
-    ContactMatrixParameters& params
-)
+    ContactMatrixParameters& cm_params)
     : parameter_set_ID(reader.readBypassBE<uint8_t>()),
       chr1_ID(reader.readBypassBE<uint8_t>()),
       chr2_ID(reader.readBypassBE<uint8_t>())
 {
 
-    auto ntiles_in_row = params.getNumTiles(chr1_ID, 1);
+    auto ntiles_in_row = cm_params.getNumTiles(chr1_ID, 1);
     tile_parameters.resize(ntiles_in_row);
 
-    auto ntiles_in_col = params.getNumTiles(chr2_ID, 1);
+    auto ntiles_in_col = cm_params.getNumTiles(chr2_ID, 1);
     for (auto &v: tile_parameters)
         v.resize(ntiles_in_col);
 

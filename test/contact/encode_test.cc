@@ -802,6 +802,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
@@ -843,6 +845,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -850,6 +854,25 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
         scm_payload.write(bitwriter);
+
+        {
+            std::string out_path = gitRootDir + "/tmp/encoded/contact/IntraSCM_Raw_SingleTile/";
+            {
+                std::ofstream tmp_writer(out_path + "case01-scm_payload.bin", std::ios::binary);
+                genie::util::BitWriter tmp_bitwriter(&tmp_writer);
+                scm_payload.write(tmp_bitwriter);
+            }
+            {
+                std::ofstream tmp_writer(out_path + "case01-scm_param.bin", std::ios::binary);
+                genie::util::BitWriter tmp_bitwriter(&tmp_writer);
+                scm_param.write(tmp_bitwriter);
+            }
+            {
+                std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
+                genie::core::Writer tmp_corewriter(&tmp_writer);
+                cm_param.write(tmp_corewriter);
+            }
+        }
 
         ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
         ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
@@ -906,6 +929,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
@@ -947,6 +972,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1021,12 +1048,16 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         RECS.pop_back();
     }
 
+    ASSERT_EQ(RECS.size(), 1);
+
     // Case 01
     {
         auto REMOVE_UNALIGNED_REGION = false;
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 1u;
@@ -1068,6 +1099,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1135,6 +1168,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 1u;
@@ -1176,6 +1211,257 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.mcool-all-250000-21_21.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    std::vector<genie::core::record::ContactRecord> RECS;
+
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
+
+        while (bitreader.isGood()){
+            RECS.emplace_back(bitreader);
+        }
+
+        // TODO (Yeremia): Temporary fix as the number of records exceeded by 1
+        RECS.pop_back();
+    }
+
+    ASSERT_EQ(RECS.size(), 1);
+
+    // Case 01
+    {
+        auto REMOVE_UNALIGNED_REGION = false;
+        auto TRANSFORM_MASK = false;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // Case 02
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = false;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1286,6 +1572,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 5u;
@@ -1328,6 +1616,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1397,6 +1687,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 5u;
@@ -1439,6 +1731,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1530,6 +1824,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
@@ -1571,6 +1867,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1638,6 +1936,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
@@ -1670,8 +1970,19 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
 
         auto& REC = RECS.front();
         auto rec = genie::core::record::ContactRecord(REC);
-        genie::contact::encode_scm(cm_param, rec, scm_param, scm_payload, REMOVE_UNALIGNED_REGION, TRANSFORM_MASK,
-                                   ENA_DIAG_TRANSFORM, ENA_BINARIZATION, CODEC_ID);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
@@ -1770,6 +2081,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 5u;
@@ -1812,6 +2125,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -1960,6 +2275,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 5u;
@@ -2002,6 +2319,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -2094,6 +2413,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 1u;
@@ -2135,6 +2456,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -2203,6 +2526,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 1u;
@@ -2244,6 +2569,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -2354,6 +2681,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 5u;
@@ -2396,6 +2725,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 
@@ -2519,6 +2850,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto TRANSFORM_MASK = false;
         auto ENA_DIAG_TRANSFORM = true;
         auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 150u;
         auto MULT = 5u;
@@ -2561,6 +2894,8 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             TRANSFORM_MASK,
             ENA_DIAG_TRANSFORM,
             ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
             CODEC_ID
         );
 

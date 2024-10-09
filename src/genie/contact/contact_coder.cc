@@ -1185,6 +1185,8 @@ void encode_scm(
     bool transform_mask,
     bool ena_diag_transform,
     bool ena_binarization,
+    bool norm_as_weight,
+    bool multiplicative_norm,
     core::AlgoID codec_ID
 ) {
 
@@ -1388,6 +1390,31 @@ void encode_scm(
                 ContactMatrixTilePayload tile_payload(core::AlgoID::JBIG, 0, 0, std::move(codec_payload));
             }
 
+        }
+    }
+
+    // Compression of balanced matrix can be done only for intra SCM
+    if (is_intra_scm){
+        // Weight computation
+        if (norm_as_weight){
+            // argwhere row_ids equal to col_ids
+            auto main_diag_positions = xt::argwhere(xt::equal(row_ids, col_ids));
+            int num_norms = rec.getNumNormCounts();
+            for (auto i_norm = 0; i_norm < num_norms; i_norm++){
+                DoubleVecDtype norm_counts = xt::adapt(rec.getNormCounts()[i_norm], {num_entries});
+                auto norm_main_diag_counts = xt::view(norm_counts, main_diag_positions);
+                auto weights = xt::view(norm_counts, main_diag_positions) / xt::view(counts, main_diag_positions);
+
+                auto weights_shape = weights.shape();
+//                auto main_diag_positions_shape = main_diag_positions.shape();
+                if (multiplicative_norm){
+                    auto y = 10;
+                } else {
+                    UTILS_DIE("Not yet implemented!");
+                }
+            }
+        } else {
+            UTILS_DIE("Normalized matrix is not yet implemented!");
         }
     }
 }

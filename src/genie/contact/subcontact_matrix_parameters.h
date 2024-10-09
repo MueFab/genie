@@ -95,8 +95,7 @@ class SubcontactMatrixParameters {
 
     SubcontactMatrixParameters(
         util::BitReader& reader,
-        ContactMatrixParameters& params
-    );
+        ContactMatrixParameters& cm_params);
 
     // Constructor using operator=
     SubcontactMatrixParameters& operator=(

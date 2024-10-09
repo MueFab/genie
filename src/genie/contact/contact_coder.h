@@ -20,6 +20,8 @@
 #include "subcontact_matrix_parameters.h"
 #include "subcontact_matrix_payload.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace contact {
 
@@ -520,6 +522,8 @@ void encode_scm(
     bool transform_mask=true,
     bool ena_diag_transform=true,
     bool ena_binarization=true,
+    bool norm_as_weight=true,
+    bool multiplicative_norm=true,
     core::AlgoID codec_ID=core::AlgoID::JBIG
 );
 
@@ -559,7 +563,11 @@ void encode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}
-}
+}  // namespace contact
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #endif  // GENIE_CONTACT_CONTACT_CODER_H
+
+// ---------------------------------------------------------------------------------------------------------------------

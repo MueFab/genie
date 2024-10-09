@@ -24,6 +24,7 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+//TODO(yeremia): Docstring
 class ContactMatrixBinPayload {
  private:
     uint16_t sample_ID;
