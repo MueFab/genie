@@ -6,6 +6,7 @@
 
 #include "genie/entropy/gabac/configuration.h"
 #include <utility>
+#include <vector>
 #include "genie/entropy/gabac/config-manual.h"
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <string>
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 

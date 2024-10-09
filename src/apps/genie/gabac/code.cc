@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <string>
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"

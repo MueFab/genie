@@ -24,7 +24,6 @@
 #include "genie/format/mgb/signature_cfg.h"
 #include "genie/util/bit-writer.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::mgb {

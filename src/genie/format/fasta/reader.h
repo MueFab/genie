@@ -17,7 +17,6 @@
 #include "genie/format/fasta/fai-file.h"
 #include "genie/format/fasta/sha256File.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::fasta {

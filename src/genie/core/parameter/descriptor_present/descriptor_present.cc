@@ -11,7 +11,6 @@
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core::parameter::desc_pres {

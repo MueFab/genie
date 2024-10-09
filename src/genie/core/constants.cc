@@ -7,7 +7,9 @@
 #include "genie/core/constants.h"
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/core/record/class-type.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

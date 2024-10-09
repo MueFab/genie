@@ -7,7 +7,9 @@
 #include "genie/format/mgg/dataset.h"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

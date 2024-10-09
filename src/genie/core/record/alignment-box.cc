@@ -6,10 +6,10 @@
 
 #include "genie/core/record/alignment-box.h"
 #include <utility>
+#include <vector>
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

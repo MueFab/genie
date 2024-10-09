@@ -6,7 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/capsulator/main.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <map>

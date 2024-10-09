@@ -6,8 +6,9 @@
 
 #include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
-#include <string>
+#include <map>
 #include <memory>
+#include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
@@ -47,9 +48,8 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(i++,
-                                   std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
-                                                                     ref.getEnd() + 1, importer, pos, true));
+                    refmgr->addRef(i++, std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                                                         ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
                 break;
@@ -68,9 +68,8 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(i++,
-                                   std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
-                                                                     ref.getEnd() + 1, importer, pos, false));
+                    refmgr->addRef(i++, std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                                                         ref.getEnd() + 1, importer, pos, false));
                     bitReader.skipAlignedBytes(ret.getPayloadSize());
                 } else {
                     if (!referenceOnly) {

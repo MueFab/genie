@@ -5,9 +5,12 @@
  */
 
 #include "genie/format/mgg/encapsulator/encapsulated_file.h"
-#include <filesystem>
-#include <utility>
+#include <filesystem>  // NOLINT
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

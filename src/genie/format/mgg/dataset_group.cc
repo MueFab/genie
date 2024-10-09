@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/dataset_group.h"
+#include <iostream>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

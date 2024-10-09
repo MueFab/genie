@@ -7,7 +7,6 @@
 #include "genie/core/record/alignment_external/none.h"
 #include <memory>
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core::record::alignment_external {

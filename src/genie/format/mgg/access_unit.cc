@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/access_unit.h"
+#include <map>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

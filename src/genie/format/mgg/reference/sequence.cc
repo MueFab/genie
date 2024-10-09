@@ -5,6 +5,8 @@
  */
 
 #include "genie/format/mgg/reference/sequence.h"
+#include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

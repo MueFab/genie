@@ -6,6 +6,7 @@
 
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include <cassert>
+#include <memory>
 #include <utility>
 #include <vector>
 #include "genie/util/bit-writer.h"
