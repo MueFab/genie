@@ -5,6 +5,7 @@
  */
 
 #include "genie/quality/paramqv1/codebook.h"
+#include <vector>
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
 #include "genie/util/runtime-exception.h"

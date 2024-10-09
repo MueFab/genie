@@ -6,14 +6,17 @@
 
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
@@ -51,8 +54,8 @@ RefInfo::RefInfo(const std::string& fasta_name)
     faiFile = std::make_unique<std::ifstream>(fai_name);
     shaFile = std::make_unique<std::ifstream>(sha_name);
 
-    fastaMgr = std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(),
-                                                                       fasta_name);
+    fastaMgr =
+        std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(), fasta_name);
     valid = true;
 }
 
@@ -448,9 +451,7 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
-    return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
-        return alphabet.isIncluded(c);
-    });
+    return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) { return alphabet.isIncluded(c); });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -526,8 +527,8 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                     alg.addMappingScore(s);
                 }
 
-                newBox.addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::SameRec>(
-                    split.getDelta(), std::move(alg)));
+                newBox.addAlignmentSplit(
+                    std::make_unique<genie::core::record::alignment_split::SameRec>(split.getDelta(), std::move(alg)));
             } else {
                 newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
             }

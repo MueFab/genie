@@ -7,7 +7,9 @@
 #include "genie/format/mgg/descriptor_stream.h"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -151,9 +153,7 @@ bool DescriptorStream::isEmpty() const {
         return true;
     }
 
-    return std::all_of(payload.begin(), payload.end(), [](const auto& p) {
-        return p.getPayloadSize() == 0;
-    });
+    return std::all_of(payload.begin(), payload.end(), [](const auto& p) { return p.getPayloadSize() == 0; });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
