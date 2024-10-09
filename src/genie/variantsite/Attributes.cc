@@ -20,20 +20,22 @@ namespace variant_site {
 void AttributeTile::write(std::vector<std::vector<uint8_t>> value) {
     AddFirst();
     genie::core::ArrayType arraytype;
-    for (auto onearray : value) {
+    for (const auto& onearray : value) {
         arraytype.toFile(info.getAttributeType(), onearray, writers.back());
     }
 
     typedTiles.back().writeElement(value);
 
     if (rowsPerTile == 0) {
-    } else if (rowInTile < rowsPerTile - 1) {
+    } else if (rowInTile < (rowsPerTile-1)) {
         rowInTile++;
         typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile));
     } else {
+        typedTiles.back().setArrayDim0(static_cast<uint32_t>(rowInTile + 1));
         writers.back().flush();
+
         std::vector<uint32_t> arrayDims;
-        arrayDims.push_back(static_cast<uint32_t>(rowInTile));
+        arrayDims.push_back(static_cast<uint32_t>(rowInTile+1));
         for (uint8_t i = 1; i < info.getArrayLength(); ++i) arrayDims.push_back(static_cast<uint32_t>(2));
         typedTiles.emplace_back(info.getAttributeType(), info.getArrayLength(), arrayDims);
         tiles.emplace_back("");
@@ -58,7 +60,7 @@ std::vector<std::stringstream> AttributeTile::convertTilesToTypedData() {
     core::DataType TypeId = info.getAttributeType();
     uint8_t numArrayDims = info.getArrayLength();
     std::vector<uint32_t> arrayDims;
-    arrayDims.push_back(static_cast<uint32_t>(rowsPerTile));
+    arrayDims.push_back(static_cast<uint32_t>(rowInTile));
     for (uint8_t i = 1; i < numArrayDims; ++i) arrayDims.push_back(static_cast<uint32_t>(2));
 
     for (auto& tile : tiles) {
@@ -89,7 +91,7 @@ void AttributeTile::AddFirst() {
 AttributeTile& AttributeTile::operator=(const AttributeTile& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
-    rowInTile = 0;
+    rowInTile = other.rowInTile;
     tiles.clear();
     writers.clear();
     return *this;
@@ -98,7 +100,7 @@ AttributeTile& AttributeTile::operator=(const AttributeTile& other) {
 AttributeTile::AttributeTile(const AttributeTile& other) {
     info = other.info;
     rowsPerTile = other.rowsPerTile;
-    rowInTile = 0;
+    rowInTile = other.rowInTile;
     tiles.clear();
     writers.clear();
 }
@@ -111,27 +113,25 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
 void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)//, std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
 {
     size_t index = 0;
-    for (auto& tag : tags) {
+    for (const auto& tag : tags) {
         attributeTiles[tag.tag].write(tag.values);// infoValues.at(index));
         attrWritten[tag.tag] = true;
         index++;
     }
-    for (auto isWritten : attrWritten) {
+    for (const auto& isWritten : attrWritten) {
         if (!isWritten.second) {
             attributeTiles[isWritten.first].writeMissing();
         }
         attrWritten[isWritten.first] = false;
     }
-    auto temp = attributeTiles["AC"].getCurrentsize();
-    if (temp == 0) ++temp;
 }
 
 void Attributes::add(std::map<std::string, genie::core::record::variant_site::Info_tag> tags, std::map<std::string, std::vector<std::vector<uint8_t>>> infoValues) {
-    for (auto& tag : tags) {
+    for (const auto& tag : tags) {
         attributeTiles[tag.first].write(infoValues[tag.first]);
         attrWritten[tag.first] = true;
     }
-    for (auto isWritten : attrWritten) {
+    for (const auto& isWritten : attrWritten) {
         if (!isWritten.second) {
             attributeTiles[isWritten.first].writeMissing();
         }

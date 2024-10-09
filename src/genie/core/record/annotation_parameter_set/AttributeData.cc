@@ -10,12 +10,12 @@
 #include <string>
 #include <utility>
 
+#include "genie/core/arrayType.h"
+#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/make-unique.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/core/arrayType.h"
-#include "genie/core/record/annotation_parameter_set/AttributeData.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,6 @@ AttributeData::AttributeData(const AttributeData& other) {
     attributeArrayDims = other.attributeArrayDims;
     attributeID = other.attributeID;
 }
-
 
 }  // namespace annotation_parameter_set
 }  // namespace record

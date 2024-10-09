@@ -8,13 +8,10 @@
 #define SRC_GENIE_GENOTYPE_PARAMETERSETCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include <cstdint>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "genie/core/arrayType.h"
@@ -43,7 +40,7 @@ class ParameterSetComposer {
  public:
     genie::core::record::annotation_parameter_set::Record Build(
         uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-        uint64_t defaultTileSize = 100);
+        std::vector<uint64_t> defaultTileSize = {200, 3000});
 
     void setGenotypeParameters(genie::genotype::GenotypeParameters _parameters) { genotypeParameters = _parameters; }
 

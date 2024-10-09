@@ -70,9 +70,11 @@ void TypedData::convertToTypedData(std::vector<std::vector<CustomType>> matrix) 
 }
 
 void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomType>>> matrix) {
-    UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements [0]!");
-    //UTILS_DIE_IF(array_dims[1] != matrix.at(0).size(), "matrix size does not match n_elements [1]!");
-    //UTILS_DIE_IF(array_dims[2] != matrix.at(0).at(0).size(), "matrix size does not match n_elements [2]!");
+    UTILS_DIE_IF(array_dims[0] != matrix.size(), "matrix size does not match n_elements [0]!"+std::to_string(array_dims[0]));
+    UTILS_DIE_IF(array_dims[1] != matrix.at(0).size(),
+                 "matrix size does not match n_elements [1]!" + std::to_string(array_dims[1]));
+    UTILS_DIE_IF(array_dims[2] != matrix.at(0).at(0).size(),
+                 "matrix size does not match n_elements [2]!" + std::to_string(array_dims[2]));
 
     uint64_t n_elements = 1;
     for (uint8_t i = 0; i < num_array_dims; ++i) {
