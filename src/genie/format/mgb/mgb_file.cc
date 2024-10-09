@@ -6,6 +6,10 @@
 
 #include "genie/format/mgb/mgb_file.h"
 #include <algorithm>
+#include <memory>
+#include <set>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

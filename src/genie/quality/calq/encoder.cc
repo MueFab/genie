@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/quality/calq/encoder.h"
+#include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <memory>
-
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/encoder.h"
 #include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

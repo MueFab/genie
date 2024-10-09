@@ -6,7 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/transcode-fastq/main.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
 #include <string>

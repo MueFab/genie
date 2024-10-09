@@ -163,12 +163,12 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg& cfg,
                                     genie::core::AccessUnit::Descriptor&, bool) -> size_t {
         UTILS_DIE_IF(cfg.isClassSpecific(), "Class-specific entropy decoding not supported");
-        auto *desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent*>(&cfg.get());
+        auto* desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent*>(&cfg.get());
         UTILS_DIE_IF(desc == nullptr, "Decoder configuration not present");
-        if (dynamic_cast<const core::parameter::desc_pres::DecoderTokentype*> (&desc->getDecoder() ) != nullptr) {
+        if (dynamic_cast<const core::parameter::desc_pres::DecoderTokentype*>(&desc->getDecoder()) != nullptr) {
             return 0;
         }
-        auto *decoder = dynamic_cast<const core::parameter::desc_pres::DecoderRegular*>(&desc->getDecoder());
+        auto* decoder = dynamic_cast<const core::parameter::desc_pres::DecoderRegular*>(&desc->getDecoder());
         UTILS_DIE_IF(decoder == nullptr, "Unknown decoder configuration");
         UTILS_DIE_IF(decoder->getMode() > 3, "Unknown entropy decoder: " + std::to_string(decoder->getMode()));
         return decoder->getMode();

@@ -5,6 +5,7 @@
  */
 
 #include "genie/entropy/gabac/reader.h"
+#include <vector>
 #include "genie/entropy/gabac/context-tables.h"
 
 //

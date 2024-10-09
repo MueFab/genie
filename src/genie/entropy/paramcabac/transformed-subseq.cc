@@ -8,7 +8,6 @@
 #include <utility>
 #include "genie/util/bit-writer.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::entropy::paramcabac {

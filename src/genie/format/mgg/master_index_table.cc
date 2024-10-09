@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/master_index_table.h"
+#include <algorithm>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

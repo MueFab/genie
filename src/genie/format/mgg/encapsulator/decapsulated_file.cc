@@ -5,6 +5,9 @@
  */
 
 #include "genie/format/mgg/encapsulator/decapsulated_file.h"
+#include <iostream>
+#include <string>
+#include <vector>
 #include "genie/format/mgg/mgg_file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

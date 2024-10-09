@@ -5,7 +5,11 @@
  */
 
 #include "genie/core/reference-manager.h"
+#include <algorithm>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -85,9 +89,7 @@ size_t ReferenceManager::getChunkSize() { return CHUNK_SIZE; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ReferenceManager::ReferenceExcerpt::isEmpty() const {
-    return std::none_of(data.begin(), data.end(), [this](const auto& p) {
-        return isMapped(p);
-    });
+    return std::none_of(data.begin(), data.end(), [this](const auto& p) { return isMapped(p); });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

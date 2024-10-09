@@ -5,7 +5,7 @@
  */
 
 #include "apps/genie/run/program-options.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <random>
 #include <set>
@@ -167,14 +167,12 @@ std::string random_string(size_t length) {
     const size_t max_index = sizeof(charset) - 1;
 
     // Initialize random number generator
-    std::random_device rd;  // Seed generator
+    std::random_device rd;         // Seed generator
     std::mt19937 generator(rd());  // Mersenne Twister engine
     std::uniform_int_distribution<> distribution(0, max_index - 1);
 
     // Lambda function to generate a random character
-    auto randchar = [&]() -> char {
-        return charset[distribution(generator)];
-    };
+    auto randchar = [&]() -> char { return charset[distribution(generator)]; };
 
     // Generate the random string
     std::string str(length, 0);

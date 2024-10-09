@@ -6,7 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/transcode-fasta/main.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <memory>
 #include <string>
 #include <utility>
@@ -65,8 +65,8 @@ int main(int argc, char* argv[]) {
     auto faiFile = std::make_unique<std::ifstream>(fai_name);
     auto shaFile = std::make_unique<std::ifstream>(sha_name);
     auto refMgr = std::make_unique<genie::core::ReferenceManager>(4);
-    auto fastaMgr = std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile,
-                                                                            refMgr.get(), pOpts.inputFile);
+    auto fastaMgr =
+        std::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, *shaFile, refMgr.get(), pOpts.inputFile);
     genie::format::mgb::RawReference raw_ref(true);
     for (uint16_t i = 0; i < static_cast<uint16_t>(refMgr->getSequences().size()); ++i) {
         auto name = refMgr->ID2Ref(i);

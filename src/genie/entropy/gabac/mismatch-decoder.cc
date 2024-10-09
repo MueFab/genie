@@ -12,7 +12,6 @@
 #include <vector>
 #include "genie/entropy/gabac/stream-handler.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::entropy::gabac {

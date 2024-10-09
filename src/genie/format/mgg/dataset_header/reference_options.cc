@@ -6,6 +6,7 @@
 
 #include "genie/format/mgg/dataset_header/reference_options.h"
 #include <limits>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
