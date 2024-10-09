@@ -5,7 +5,9 @@
  */
 
 #include "genie/name/tokenizer/token.h"
+#include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

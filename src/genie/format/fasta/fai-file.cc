@@ -6,7 +6,9 @@
 
 #include "genie/format/fasta/fai-file.h"
 #include <istream>
+#include <map>
 #include <ostream>
+#include <string>
 #include <utility>
 #include "genie/util/runtime-exception.h"
 

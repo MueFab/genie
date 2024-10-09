@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cmath>
 #include <limits>
+#include <vector>
 #include "genie/entropy/gabac/context-tables.h"
 //
 // #include binary-arithmetic-decoder.cc from here instead of compiling it

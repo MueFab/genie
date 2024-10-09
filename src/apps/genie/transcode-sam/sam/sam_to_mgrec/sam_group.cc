@@ -13,7 +13,9 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <utility>
+#include <vector>
 #include "apps/genie/transcode-sam/utils.h"
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
@@ -68,8 +70,8 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
         } else {
             // Case 2: Paired SAM record is mapped to other reference sequence, no way to check if data is actually
             // there
-            auto splitAlign = std::make_unique<genie::core::record::alignment_split::OtherRec>(
-                r_avail->mate_pos, r_avail->mate_rid);
+            auto splitAlign =
+                std::make_unique<genie::core::record::alignment_split::OtherRec>(r_avail->mate_pos, r_avail->mate_rid);
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
 
@@ -77,8 +79,8 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
         // Both SAM records are available
         if (force_split) {  // TODO(fabian): Split automatically if delta > 32767
             // Case 1: split into two MPEG records
-            auto splitAlign = std::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos() - 1,
-                                                                                                       r2->getRID());
+            auto splitAlign =
+                std::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos() - 1, r2->getRID());
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
         } else {

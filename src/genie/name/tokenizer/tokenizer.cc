@@ -5,7 +5,10 @@
  */
 
 #include "genie/name/tokenizer/tokenizer.h"
+#include <limits>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/core/access-unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

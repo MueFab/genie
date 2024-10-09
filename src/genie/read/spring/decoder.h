@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <limits>
 #include <map>
 #include <string>

@@ -10,6 +10,7 @@
 #include <memory>
 #include <tuple>
 #include <utility>
+#include <vector>
 #include "genie/entropy/gabac/decode-desc-subseq.h"
 #include "genie/entropy/gabac/decode-transformed-subseq.h"
 #include "genie/entropy/gabac/mismatch-decoder.h"

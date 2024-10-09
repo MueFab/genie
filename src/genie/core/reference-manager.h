@@ -20,7 +20,6 @@
 #include "genie/core/meta/reference.h"
 #include "genie/core/reference-collection.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core {

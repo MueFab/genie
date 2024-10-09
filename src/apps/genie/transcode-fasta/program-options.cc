@@ -5,7 +5,7 @@
  */
 
 #include "apps/genie/transcode-fasta/program-options.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <random>
 #include <set>
@@ -107,9 +107,7 @@ std::string random_string(size_t length) {
     std::uniform_int_distribution<> distribution(0, max_index - 1);
 
     // Lambda function to generate a random character
-    auto randchar = [&]() -> char {
-        return charset[distribution(generator)];
-    };
+    auto randchar = [&]() -> char { return charset[distribution(generator)]; };
 
     // Generate the random string
     std::string str(length, 0);

@@ -5,7 +5,10 @@
  */
 
 #include "genie/format/mgg/reference/location/external/fasta.h"
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

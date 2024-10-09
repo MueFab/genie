@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/mgg/label.h"
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

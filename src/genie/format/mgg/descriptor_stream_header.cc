@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgg/descriptor_stream_header.h"
+#include <string>
 #include <utility>
 #include "genie/util/runtime-exception.h"
 
