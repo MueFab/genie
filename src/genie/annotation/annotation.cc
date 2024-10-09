@@ -90,7 +90,6 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-  //  uint64_t defaultTileSize = defia;
     genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSizeHeight);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;

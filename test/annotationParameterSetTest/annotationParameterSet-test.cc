@@ -159,7 +159,7 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
 
         genie::core::record::annotation_parameter_set::TileConfiguration tile_configuration(
-            AT_coord_size, AG_class, attribute_contiguity, two_dimensional, column_major_tile_order, symmetry_mode,
+            AT_coord_size, AG_class, attribute_contiguity, (AG_class==0? true:false),column_major_tile_order, symmetry_mode,
             symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures,
             n_attributes, attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 

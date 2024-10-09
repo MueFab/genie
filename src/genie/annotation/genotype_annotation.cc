@@ -11,8 +11,6 @@ namespace annotation {
 
 DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     DataUnits dataunits;
-  //  const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
-  //  const uint32_t defaultTileWidth = 500;
     likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
 
     constexpr uint8_t AT_ID = 1;
@@ -29,8 +27,8 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
     parameterSetComposer.setGenotypeParameters(genotypeParameters);
     parameterSetComposer.setLikelihoodParameters(likelihoodParameters);
     parameterSetComposer.setCompressors(compressors);
-    dataunits.annotationParameterSet =
-        parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, defaultTileSizeHeight);
+    dataunits.annotationParameterSet = parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo,
+                                                                  {defaultTileSizeHeight, defaultTileSizeWidth});
 
     dataunits.annotationAccessUnit.resize(recData.size());
     size_t linkIdRowCnt = 0;
@@ -78,7 +76,7 @@ DataUnits GenotypeAnnotation::parseGenotype(std::ifstream& inputfile) {
         accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream,
                                          recData.at(i).genotypeDatablock.attributeInfo,
                                          dataunits.annotationParameterSet, dataunits.annotationAccessUnit.at(i),
-                                         AG_class, AT_ID, recData.at(i).rowStart);
+                                         AG_class, AT_ID, recData.at(i).rowStart, recData.at(i).colStart);
     }
     return dataunits;
 }

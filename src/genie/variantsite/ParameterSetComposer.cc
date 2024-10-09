@@ -60,11 +60,10 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     core::record::annotation_parameter_set::ParameterSettings defaultset;
     defaultset.ATCoordSize = 3;
     defaultset.AG_class = 1;
-    bool two_dimensional = false;
     defaultset.AT_ID = _AT_ID;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
-        defaultset.ATCoordSize, defaultset.AG_class, two_dimensional, defaultTileSize);
+        defaultset.ATCoordSize, defaultset.AG_class, defaultTileSize);
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
     genie::core::AlgoID encoding_mode_ID = genie::core::AlgoID::BSC;
 
@@ -173,7 +172,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
     std::vector<genie::core::record::annotation_parameter_set::TileConfiguration> tile_configurations;
 
     genie::core::record::annotation_parameter_set::TileConfiguration tileConfiguration(
-        defaultset.ATCoordSize, defaultset.AG_class, defaultset.tileParameterSettings.twoDimensional, defaultTileSize);
+        defaultset.ATCoordSize, defaultset.AG_class, defaultTileSize);
 
     tile_configurations.push_back(tileConfiguration);
 

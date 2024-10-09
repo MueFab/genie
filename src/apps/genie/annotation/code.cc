@@ -210,7 +210,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genotypeParameterSet.setGenotypeParameters(genotypeParameters);
     genotypeParameterSet.setLikelihoodParameters(std::get<genie::likelihood::LikelihoodParameters>(likelihoodData));
     genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, recs.size());
+        genotypeParameterSet.Build(AT_ID, datablock.attributeInfo, {recs.size(), 3000});
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
 

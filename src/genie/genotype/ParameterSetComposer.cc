@@ -20,7 +20,7 @@ namespace genie {
 namespace genotype {
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Build(
     uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
-    uint64_t defaultTileSize) {
+    std::vector<uint64_t> defaultTileSize) {
     parameter_set_ID = 1;
     AT_ID = _AT_ID;
     AT_alphabet_ID = genie::core::AlphabetID::ACGTN;
@@ -31,7 +31,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
     n_tiles = 1;
     AG_class = 0;
 
-    tile_configuration.emplace_back(AT_coord_size, AG_class, two_dimensional, defaultTileSize);
+    tile_configuration.emplace_back(AT_coord_size, AG_class, defaultTileSize);
 
     //-------------------
     genie::entropy::lzma::LZMAParameters lzmaParameters;
