@@ -52,7 +52,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
         UTILS_DIE_IF(n_alleles_per_sample == 0, "Invalid n_alleles_per_sample!");
 
         alleles.resize(sample_count, std::vector<int8_t>(n_alleles_per_sample));
-        phasings.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample - 1));
+        if (n_alleles_per_sample > 1) phasings.resize(sample_count, std::vector<uint8_t>(n_alleles_per_sample - 1));
 
         for (auto& alleles_sample : alleles) {
             for (auto& allele : alleles_sample) {
@@ -158,8 +158,7 @@ bool VariantGenotype::getLinkedRecord() const { return static_cast<bool>(link_re
 
 const LinkRecord& VariantGenotype::getLinkRecord() const { return link_record.value(); }
 
- const std::vector<format_field>& VariantGenotype::getFormats() const { 
-    return format; }
+const std::vector<format_field>& VariantGenotype::getFormats() const { return format; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -174,18 +173,18 @@ const LinkRecord& VariantGenotype::getLinkRecord() const { return link_record.va
 // ---------------------------------------------------------------------------------------------------------------------
 
 format_field::format_field(util::BitReader& bitreader, uint32_t _sample_count) : sample_count(_sample_count) {
-    format.resize(bitreader.read<uint8_t>());// static_cast<uint8_t>(bitreader.read_b(8)));
+    format.resize(bitreader.read<uint8_t>());  // static_cast<uint8_t>(bitreader.read_b(8)));
     for (char& c : format) c = static_cast<char>(bitreader.read_b(8));
     type = static_cast<core::DataType>(bitreader.read_b(8));
     core::ArrayType arrayType;
 
-    arrayLength = bitreader.read<uint8_t>();// static_cast<uint8_t>(bitreader.read_b(8));
+    arrayLength = bitreader.read<uint8_t>();  // static_cast<uint8_t>(bitreader.read_b(8));
     value.resize(sample_count, std::vector<std::vector<uint8_t>>(arrayLength, std::vector<uint8_t>(0)));
     for (auto& formatArray : value) {
         for (auto& oneValue : formatArray) {
-             oneValue = arrayType.toArray(type, bitreader);
-         //   oneValue = temp;
-         //   for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
+            oneValue = arrayType.toArray(type, bitreader);
+            //   oneValue = temp;
+            //   for (auto i = temp.size(); i > 0; --i) oneValue.at(i - 1) = temp.at(temp.size() - i);
         }
     }
 }

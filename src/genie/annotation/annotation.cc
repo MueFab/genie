@@ -7,6 +7,7 @@
 
 #include <codecs/include/mpegg-codecs.h>
 #include "annotation.h"
+#include "genie/core/arrayType.h"
 #include "genie/util/runtime-exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,13 +24,20 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
     if (!inputfile.is_open())  // failed
         return;
 
-    // read file - determine type?
+    // read file - determine type
+
+
     if (recType == RecType::GENO_FILE) {
-        parseGenotype(inputfile);
+        genotypeAnnotation.setCompressors(compressors);
+        genotypeAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
+        DataUnits dataunits = genotypeAnnotation.parseGenotype(inputfile);
+        annotationParameterSet = dataunits.annotationParameterSet;
+        annotationAccessUnit = dataunits.annotationAccessUnit;
 
     } else {
         parseInfoTags(recordInputFileName);
         parseSite(inputfile);
+
     }
     if (inputfile.is_open()) inputfile.close();
 
@@ -67,7 +75,7 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
     genie::core::record::variant_site::Record recs;
     while (recs.read(bitreader)) {
         infoTag = recs.getInfoTag();
-        for (auto tag : infoTag) {
+        for (const auto& tag : infoTag) {
             InfoField infoField(tag.tag, tag.type, static_cast<uint8_t>(tag.values.size()));
             genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.tag.size()), tag.tag, tag.type,
                                                                 static_cast<uint8_t>(tag.values.size()), tag.values};
@@ -76,185 +84,17 @@ void Annotation::parseInfoTags(std::string& recordInputFileName) {
         }
     }
     readForTags.close();
-    for (auto info : infoTags)
+    for (const auto& info : infoTags)
         infoFields.emplace_back(info.second.info_tag, info.second.info_type, info.second.info_array_len);
-}
-
-void Annotation::parseGenotype(std::ifstream& inputfile) {
-    const uint32_t defaultTileSize = genotype_opt.block_size;  //    10000;
-    const uint32_t defaultTileWidth = 3000;
-    genotype_opt.block_size = defaultTileSize;
-    likelihood_opt.block_size = defaultTileSize;
-    uint8_t AT_ID = 1;
-    uint8_t AG_class = 0;
-
-    genie::genotype::GenotypeParameters genotypeParameters;
-    genie::likelihood::LikelihoodParameters likelihoodParameters;
-    std::vector<RecData> recData;
-    size_t rowsRead = 0;
-    rowsRead =
-        readBlocks(inputfile, defaultTileSize, defaultTileWidth, genotypeParameters, likelihoodParameters, recData);
-    //--------------------------------------------------
-
-    genie::genotype::ParameterSetComposer parameterSetComposer;
-    {
-        parameterSetComposer.setGenotypeParameters(genotypeParameters);
-        parameterSetComposer.setLikelihoodParameters(likelihoodParameters);
-        parameterSetComposer.setCompressors(compressors);
-        annotationParameterSet =
-            parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo, defaultTileSize);
-    }
-    annotationAccessUnit.resize(recData.size());
-    for (auto i = 0u; i < recData.size(); ++i) {
-        std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
-
-        for (auto formatdata : recData.at(i).genotypeDatablock.attributeData) {
-            auto& info = recData.at(i).genotypeDatablock.attributeInfo[formatdata.first];
-            std::vector<uint32_t> arrayDims;
-            arrayDims.push_back(std::min(likelihood_opt.block_size, static_cast<uint32_t>(rowsRead)));
-            arrayDims.push_back(
-                recData.at(i).numSamples);  // static_cast<uint32_t>(formatdata.second.at(0).size()));  //
-            arrayDims.push_back(
-                recData.at(i).formatCount);  // static_cast<uint32_t>(formatdata.second.at(0).at(0).size()));  //
-
-            attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
-                                                    arrayDims);
-            attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
-        }
-
-        std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-        descriptorStream[genie::core::AnnotDesc::GENOTYPE];
-        {
-            genie::genotype::GenotypePayload genotypePayload(recData.at(i).genotypeDatablock, genotypeParameters);
-            genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-            genotypePayload.write(writer);
-        }
-
-        if (recData.at(i).likelihoodDatablock.nrows > 0 && recData.at(i).likelihoodDatablock.ncols > 0) {
-            descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-            genie::likelihood::LikelihoodPayload likelihoodPayload(likelihoodParameters,
-                                                                   recData.at(i).likelihoodDatablock);
-            genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-            likelihoodPayload.write(writer);
-        }
-
-        // add LINK_ID default values
-        for (auto j = 0u; i < genotype_opt.block_size && j < defaultTileSize && j < rowsRead; ++j) {
-            char val = static_cast<char>(0xFF);
-            descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
-        }
-
-        accessUnitcomposer.setCompressors(compressors);
-        accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream,
-                                         recData.at(i).genotypeDatablock.attributeInfo, annotationParameterSet,
-                                         annotationAccessUnit.at(i), AG_class, AT_ID, recData.at(i).rowStart);
-    }
-}
-
-size_t Annotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize, const uint32_t& colTilesize,
-                              genie::genotype::GenotypeParameters& genotypeParameters,
-                              genie::likelihood::LikelihoodParameters& likelihoodParameters,
-                              std::vector<RecData>& recData) {
-    genie::util::BitReader bitreader(inputfile);
-    size_t TotalnumberOfRows = 0;
-    bool start = true;
-    std::vector<uint32_t> colTilesPerRow;
-    uint32_t _rowStart = 0;
-    (void)rowTileSize;
-    while (bitreader.isGood()) {  //&& TotalnumberOfRows < 100) {
-        uint32_t rowCount = 0;
-        std::vector<std::vector<genie::core::record::VariantGenotype>> recsTiled;
-        {
-            while (bitreader.isGood() && rowCount < rowTileSize) {  // && rowCount < 100) {
-                genie::core::record::VariantGenotype varGenoType(bitreader);
-                auto recSplitOverCols = splitOnRows(varGenoType, colTilesize);
-                colTilesPerRow.push_back((uint32_t)recSplitOverCols.size());
-                if (recsTiled.size() == 0) recsTiled.resize(recSplitOverCols.size());
-
-                for (auto i = 0u; i < recSplitOverCols.size(); ++i)
-                    recsTiled.at(i).emplace_back(recSplitOverCols.at(i));
-                rowCount++;
-            }
-            rowCount--;
-        }
-
-        if (recsTiled.back().at(0).getNumSamples() == 0) recsTiled.pop_back();
-        if (recsTiled.size() == 0 || recsTiled.at(0).empty()) return TotalnumberOfRows;
-        if (recsTiled.back().back().getNumSamples() == 0) {
-            recsTiled.back().pop_back();
-            rowCount--;
-        }
-
-        uint32_t _colStart = 0;
-        for (auto& recs : recsTiled) {
-            std::tuple<genie::genotype::GenotypeParameters, genie::genotype::EncodingBlock> genotypeData;
-            { genotypeData = genie::genotype::encode_block(genotype_opt, recs); }
-            std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingBlock> likelihoodData =
-                genie::likelihood::encode_block(likelihood_opt, recs);
-
-            uint32_t _numSamples = recs.front().getNumSamples();
-            uint8_t _formatCount = recs.front().getFormatCount();
-            recData.emplace_back(_rowStart, _colStart, std::get<genie::genotype::EncodingBlock>(genotypeData),
-                                 std::get<genie::likelihood::EncodingBlock>(likelihoodData), _numSamples, _formatCount);
-
-            if (start) {
-                genotypeParameters = std::get<genie::genotype::GenotypeParameters>(genotypeData);
-                likelihoodParameters = std::get<genie::likelihood::LikelihoodParameters>(likelihoodData);
-                start = false;
-            }
-            _colStart++;
-        }
-        _rowStart++;
-        TotalnumberOfRows += (rowCount + 1);
-    }
-    return TotalnumberOfRows;
-}
-
-std::vector<genie::core::record::VariantGenotype> Annotation::splitOnRows(genie::core::record::VariantGenotype& rec,
-                                                                          uint32_t colWidth) {
-    std::vector<genie::core::record::VariantGenotype> splitRecs;
-
-    if (rec.getNumSamples() <= colWidth) {
-        splitRecs.push_back(rec);
-    } else {
-        auto likelihoods = rec.getLikelihoods();
-        auto phasings = rec.getPhasing();
-        auto alleles = rec.getAlleles();
-
-        auto totSampleSize = rec.getNumSamples();
-
-        for (uint32_t colpos = 0; colpos < totSampleSize; colpos += colWidth) {
-            genie::core::record::VariantGenotype variantGenotype(rec.getVariantIndex(), rec.getStartSampleIndex());
-            uint32_t subSampleSize = std::min(colWidth, (totSampleSize - colpos));
-            auto LiklihoodStart = likelihoods.begin() + colpos;
-            auto LiklihoodEnd = likelihoods.begin() + colpos + subSampleSize;
-            auto phasingStart = phasings.begin() + colpos;
-            auto phasingEnd = phasings.begin() + colpos + subSampleSize;
-            auto allelesStart = alleles.begin() + colpos;
-            auto allelesEnd = alleles.begin() + colpos + subSampleSize;
-
-            std::vector<std::vector<uint32_t>> subLikelihoods(LiklihoodStart, LiklihoodEnd);
-            std::vector<std::vector<uint8_t>> subPhasings(phasingStart, phasingEnd);
-            std::vector<std::vector<int8_t>> subAlleles(allelesStart, allelesEnd);
-
-            variantGenotype.setLikelihood(subLikelihoods);
-            variantGenotype.setPhasings(subPhasings);
-            variantGenotype.setAlleles(subAlleles);
-            variantGenotype.setNumberOfSamples(subSampleSize);
-            splitRecs.push_back(variantGenotype);
-        }
-    }
-    return splitRecs;
 }
 
 void Annotation::parseSite(std::ifstream& inputfile) {
     std::vector<genie::core::AnnotDesc> descrList;
-    uint64_t defaultTileSize = 1000;
-    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSize);
+    genie::variant_site::VariantSiteParser parser(inputfile, infoFields, defaultTileSizeHeight);
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
 
-    for (auto infoField : infoFields) attributeInfo[infoField.ID] = infoField;
+    for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
     descrList.push_back(genie::core::AnnotDesc::SEQUENCEID);
     descrList.push_back(genie::core::AnnotDesc::STARTPOS);
@@ -271,8 +111,8 @@ void Annotation::parseSite(std::ifstream& inputfile) {
     descrList.push_back(genie::core::AnnotDesc::ALTERN);
     descrList.push_back(genie::core::AnnotDesc::FILTER);
     genie::variant_site::ParameterSetComposer encodeParameters;
-    annotationParameterSet = encodeParameters.setParameterSet(
-        descrList, parser.getAttributes().getInfo(), compressors.getCompressorParameters(), defaultTileSize, AT_ID);
+    annotationParameterSet = encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
+                                         compressors.getCompressorParameters(), defaultTileSizeHeight, AT_ID);
 
     genie::variant_site::AccessUnitComposer accessUnit;
     accessUnit.setCompressors(compressors);
@@ -294,7 +134,7 @@ void Annotation::parseSite(std::ifstream& inputfile) {
 
         accessUnit.setAccessUnit(desc, attr, parser.getAttributes().getInfo(), annotationParameterSet,
                                  annotationAccessUnit.at(i), AG_class, AT_ID, rowIndex);
-        rowIndex ++;
+        rowIndex++;
     }
 }
 

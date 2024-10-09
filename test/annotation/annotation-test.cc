@@ -1,15 +1,26 @@
 #include <gtest/gtest.h>
 
-#include <array>
 #include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
+#include <string>
 
 #include "genie/annotation/annotation.h"
 #include "helpers.h"
 
-class AnnotationTests : public ::testing::Test {
+struct TestDetails {
+    TestDetails(std::string genoin, std::string sitein, uint64_t totRows, uint32_t tileHeigth, uint32_t tileWidth)
+        : genofile_in(genoin),
+          sitefile_in(sitein),
+          totNrOfRows(totRows),
+          defaultTileHeight(tileHeigth),
+          defaultTileWidth(tileWidth) {}
+    std::string genofile_in;
+    std::string sitefile_in;
+    uint64_t totNrOfRows;
+    uint32_t defaultTileHeight;
+    uint32_t defaultTileWidth;
+};
+
+class AnnotationTests : public ::testing::TestWithParam<TestDetails> {
  protected:
     // Do any necessary setup for your tests here
     AnnotationTests() = default;
@@ -90,48 +101,67 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-TEST_F(AnnotationTests, annotationSite) {
+const bool RUNBIGFILES = true;
+
+TEST_P(AnnotationTests, annotationSite) {
+    auto testParams = GetParam();
+
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
-    std::string inputFilename = filePath + "ALL.chrX.10000.site";
-    std::string outputFilename = filePath + "ALL.chrX.10000_site_annotation";
+    std::string inputFilename = filePath + testParams.sitefile_in;  // "ALL.chrX.10000.site";
+
+    ASSERT_TRUE(std::filesystem::exists(inputFilename));
+    if constexpr (!RUNBIGFILES)
+        if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
+
+    std::string outputFilename = filePath + "ALL.chrX.R" + std::to_string(testParams.totNrOfRows);
+    outputFilename += "_Cn_TS" + std::to_string(testParams.defaultTileHeight) + "_site";
 
     std::filesystem::remove(outputFilename + ".bin");
 
     genie::annotation::Annotation annotationGenerator;
-    std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
-    std::string set2 = "compressor 1 1 ZSTD";  // {8 16777216 3 0 2 32}";
-    std::string set3 = "compressor 2 0 LZMA {8}";
-    std::string set4 = "compressor 3 0 BSC {16 128 1 1}";
+    std::string comment = "# with parameters";
+    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
+    std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set2 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
 
     annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(testParams.defaultTileHeight, testParams.defaultTileWidth);
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
-    auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 70 * 1024;  // aprox. 70kB
-    EXPECT_LE(expectedSize, filesize);
-}
-TEST_F(AnnotationTests, annotationGeno) {
+ }
+
+TEST_P(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::string filePath = gitRootDir + "/data/";
-    //  std::string inputFilename = filePath + "ALL.chrX.10000.geno";
-    //  std::string outputFilename = filePath + "ALL.chrX.10000_geno_annotation";
-    std::string inputFilename = filePath + "records/ALL.chrX.5000.vcf.geno";
-    std::string outputFilename = filePath + "records/ALL.chrX.5000.vcf_annotation";
+    std::string filePath = gitRootDir + "/data/records/";
+
+    auto testParams = GetParam();
+
+    std::string inputFilename = filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
+
+    ASSERT_TRUE(std::filesystem::exists(inputFilename));
+
+    auto inputfilesize = std::filesystem::file_size(inputFilename);
+    if constexpr (!RUNBIGFILES)
+        if (inputfilesize > 50 * 1024*1024) return;
+
+    std::string outputFilename = filePath + "ALL.chrX.RC" + std::to_string(testParams.totNrOfRows);
+    outputFilename += "-1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
+                      std::to_string(testParams.defaultTileWidth) + "_geno";
 
     std::filesystem::remove(outputFilename + ".bin");
 
-    std::string set1 = "compressor 1 0 BSC";
-    std::string set2 = "compressor 1 1 LZMA {8 16777216 3 0 2 32}";
-    std::string set3 = "compressor 2 0 ZSTD";
-    std::string set4 = "compressor 3 0 BSC";
+    std::string comment = "# with parameters";
+    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
+    std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set3 << '\n' << set4 << '\n';
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
 
-    uint32_t BLOCK_SIZE = 10000;
+    uint32_t BLOCK_SIZE = testParams.defaultTileHeight;
     bool TRANSFORM_MODE = true;
 
     genie::likelihood::EncodingOptions likelihood_opt = {
@@ -155,6 +185,7 @@ TEST_F(AnnotationTests, annotationGeno) {
     annotationGenerator.setLikelihoodOptions(likelihood_opt);
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(testParams.defaultTileHeight, testParams.defaultTileWidth);
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
@@ -163,3 +194,19 @@ TEST_F(AnnotationTests, annotationGeno) {
     size_t expectedSize = 4 * 1024;  // at least 4kB
     EXPECT_LE(expectedSize, filesize);
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    testoutputs, AnnotationTests,
+    ::testing::Values(TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 10000u, 3000u),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 10000, 500u),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 950u, 500u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4, 546u),
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)
+
+                          ));

@@ -16,11 +16,11 @@
 #include <utility>
 #include <vector>
 
+#include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/core/arrayType.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,8 @@ class AttributeData {
  public:
     AttributeData();
     AttributeData(uint8_t length, std::string name, uint16_t attributeID);
-    AttributeData(uint8_t length, std::string name, genie::core::DataType type, uint8_t arrayLength, uint16_t attributeID);
+    AttributeData(uint8_t length, std::string name, genie::core::DataType type, uint8_t arrayLength,
+                  uint16_t attributeID);
 
     AttributeData& operator=(const AttributeData& other);
 
@@ -55,7 +56,6 @@ class AttributeData {
     genie::core::DataType attributeType;
     uint8_t attributeArrayDims;
 };
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

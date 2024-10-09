@@ -52,19 +52,23 @@ TileStructure::TileStructure(util::BitReader& reader, uint8_t ATCoordSize, bool 
     : ATCoordSize(ATCoordSize), two_dimensional(two_dimensional) {
     read(reader);
 }
-TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, uint64_t defaultTileSize)
+
+TileStructure::TileStructure(uint8_t ATCoordSize, uint64_t defaultTileSize)
+    : TileStructure(ATCoordSize, {defaultTileSize, 0}) {}
+
+TileStructure::TileStructure(uint8_t ATCoordSize, std::vector<uint64_t> defaultTileSize)
+
     : variable_size_tiles(false),
       n_tiles(1),
       start_index{},
       end_index{},
-      tile_size{defaultTileSize},
+      tile_size(defaultTileSize),
       ATCoordSize(ATCoordSize),
       two_dimensional(two_dimensional) {
-    if (two_dimensional) {
-        tile_size.resize(2);
-        tile_size.at(0) = defaultTileSize;
-        tile_size.at(1) = 3000;
-    }
+    if (defaultTileSize.at(1) == 0)
+        two_dimensional = false;
+    else
+        two_dimensional = true;
 }
 
 TileStructure::TileStructure(uint8_t ATCoordSize, bool two_dimensional, bool variable_size_tiles, uint64_t n_tiles,
@@ -119,6 +123,7 @@ void TileStructure::write(core::Writer& writer) const {
     writer.write_reserved(7);
     writer.write(variable_size_tiles, 1);
     writer.write(n_tiles, coordSizeInBits(ATCoordSize));
+
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
         for (uint64_t i = 0; i < n_tiles; ++i)

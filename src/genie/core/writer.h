@@ -22,6 +22,7 @@ class Writer {
     bool writingLog;
     bool getWriteSize;
     size_t writeBitSize;
+    const char endVal = '\n';
 
  public:
     Writer() : logwriter(nullptr), writingLog(false), getWriteSize(true), writeBitSize(0) {}
@@ -37,7 +38,8 @@ class Writer {
         if (getWriteSize) {
             writeBitSize += bits;
         } else if (reserved) {
-            if (!writingLog) write(value, bits);
+            if (!writingLog)
+                write(value, bits);
         } else {
             write(value, bits);
         }
@@ -52,7 +54,7 @@ class Writer {
         if (getWriteSize) {
             writeBitSize += bits;
         } else if (writingLog) {
-            *logwriter << std::to_string(value) << ",";
+            *logwriter << std::to_string(value) << endVal;
         } else if (bits > 0) {
             binwriter.write(value, bits);
         }
@@ -67,9 +69,9 @@ class Writer {
             writeBitSize += str.size() * 8;
         } else if (writingLog) {
             if (str.empty())
-                *logwriter << '"' << '"' << ",";
+                *logwriter << '"' << '"' << endVal;
             else
-                *logwriter << '"' << str << '"' << ",";
+                *logwriter << '"' << str << '"' << endVal;
         } else {
             if (!str.empty()) binwriter.write(str);
         }

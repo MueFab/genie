@@ -4,6 +4,7 @@ project("genie-annotation")
 
 set(source_files
         annotation.cc
+		genotype_annotation.cc
         JsonAttributeParser.cc
         Compressors.cc
 )
