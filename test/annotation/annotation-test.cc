@@ -197,16 +197,15 @@ TEST_P(AnnotationTests, annotationGeno) {
 
 INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
-    ::testing::Values(TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 10000u, 3000u),
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 10000, 500u),
-                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 950u, 500u),
+    ::testing::Values(TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 10000u, 3000u),
+                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
+                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
+                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 10000, 500u),
+                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 500u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4, 546u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)
-
-                          ));
+                         ));

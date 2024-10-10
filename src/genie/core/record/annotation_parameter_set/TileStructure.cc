@@ -63,8 +63,7 @@ TileStructure::TileStructure(uint8_t ATCoordSize, std::vector<uint64_t> defaultT
       start_index{},
       end_index{},
       tile_size(defaultTileSize),
-      ATCoordSize(ATCoordSize),
-      two_dimensional(two_dimensional) {
+      ATCoordSize(ATCoordSize) {
     if (defaultTileSize.at(1) == 0)
         two_dimensional = false;
     else
