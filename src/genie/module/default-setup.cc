@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/module/default-setup.h"
@@ -101,7 +101,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir,
-                                                           bool combinePairsFlag, size_t) {
+                                                           bool combinePairsFlag) {
     std::unique_ptr<core::FlowGraphDecode> ret = std::make_unique<core::FlowGraphDecode>(threads);
 
     ret->addReadCoder(std::make_unique<genie::read::refcoder::Decoder>());

@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_UTIL_SELECTOR_TAIL_IMPL_H_
@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <utility>
+#include "genie/util/selector-tail.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,13 +26,6 @@ SelectorTail<Tout>::SelectorTail() : modNum(0), position(0) {}
 template <typename Tout>
 void SelectorTail<Tout>::addMod() {
     modNum++;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename Tout>
-void SelectorTail<Tout>::setNum(size_t num) {
-    modNum = num;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

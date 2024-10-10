@@ -1,10 +1,11 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/util/string-helpers.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -83,10 +84,10 @@ std::string fromHex(const std::string &hex) {
     bool step = false;
     for (const auto &c : hex) {
         if (!step) {
-            buffer = (lut[c] & 0xf) << 4;
+            buffer = static_cast<char>((static_cast<uint8_t>(lut[c]) & 0xf) << 4);
             step = true;
         } else {
-            buffer |= (lut[c] & 0xf);
+            buffer = static_cast<char>(static_cast<uint8_t>(buffer) | (static_cast<uint8_t>(lut[c]) & 0xf));
             ret += buffer;
             step = false;
         }

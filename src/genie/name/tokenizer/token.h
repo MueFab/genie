@@ -1,7 +1,19 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @file token.h
+ *
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ *
+ * @brief Declaration of token structures and enumerations for name tokenization in the GENIE framework.
+ *
+ * This file contains the declarations of various token-related structures and enumerations used in the GENIE framework.
+ * It provides the `Tokens` enumeration, which defines different token types, and the `SingleToken` structure, which
+ * represents individual tokens with their associated parameters. The file also includes utility functions for working
+ * with tokens, such as retrieving token metadata and generating patches between token sequences.
+ *
+ * @details The tokens defined in this file are used for encoding and decoding genomic record names in the GENIE
+ * framework. They enable efficient representation of name changes and allow for both direct encoding and differential
+ * encoding relative to previous records.
  */
 
 #ifndef SRC_GENIE_NAME_TOKENIZER_TOKEN_H_
@@ -19,77 +31,99 @@ namespace genie::name::tokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-constexpr uint8_t TYPE_SEQ = 0;  //!< @brief
+constexpr uint8_t TYPE_SEQ = 0;  //!< @brief Constant representing a sequence type for encoding.
 
 /**
- * @brief
+ * @brief Enumeration of token types used for name encoding and decoding.
+ *
+ * The `Tokens` enumeration defines the various types of tokens used in the GENIE framework
+ * for representing different segments of a genomic record name. These tokens can represent
+ * direct strings, numeric values, characters, and delta-encoded differences.
  */
 enum class Tokens : uint8_t {
-    DUP = 0,
-    DIFF = 1,
-    STRING = 2,
-    CHAR = 3,
-    DIGITS = 4,
-    DELTA = 5,
-    DIGITS0 = 6,
-    DELTA0 = 7,
-    MATCH = 8,
-    DZLEN = 9,
-    END = 10,
-    NONE = 11
+    DUP = 0,      //!< @brief Duplicate token indicating repetition of a previous pattern.
+    DIFF = 1,     //!< @brief Difference token indicating changes relative to a previous token.
+    STRING = 2,   //!< @brief A literal string token.
+    CHAR = 3,     //!< @brief A single character token.
+    DIGITS = 4,   //!< @brief Numeric digits token.
+    DELTA = 5,    //!< @brief Delta-encoded numeric value.
+    DIGITS0 = 6,  //!< @brief Numeric digits token with leading zeros.
+    DELTA0 = 7,   //!< @brief Delta-encoded numeric value with leading zeros.
+    MATCH = 8,    //!< @brief Match token indicating alignment with a previous sequence.
+    DZLEN = 9,    //!< @brief Delta-encoded zero-length value.
+    END = 10,     //!< @brief End-of-sequence token.
+    NONE = 11     //!< @brief No-operation token.
 };
 
 /**
- * @brief
+ * @brief Stores metadata for each type of token.
+ *
+ * The `TokenInfo` structure provides metadata about each token type, including its name
+ * and any associated sequence parameters. It is used for debugging and descriptive purposes.
  */
 struct TokenInfo {
-    std::string name;  //!< @brief
-    int8_t paramSeq;   //!< @brief
+    std::string name;  //!< @brief The name of the token type.
+    int8_t paramSeq;   //!< @brief Indicates the presence of a sequence parameter (if applicable).
 };
 
 /**
- * @brief
+ * @brief Represents a single token with its type and associated parameters.
+ *
+ * The `SingleToken` structure encapsulates an individual token, storing its type,
+ * an optional numeric parameter, and an optional string parameter. It supports comparison
+ * operations for equality and inequality, making it suitable for use in differential encoding.
  */
 struct SingleToken {
-    Tokens token;             //!< @brief
-    uint32_t param;           //!< @brief
-    std::string paramString;  //!< @brief
+    Tokens token;             //!< @brief The type of the token.
+    uint32_t param;           //!< @brief Optional numeric parameter associated with the token.
+    std::string paramString;  //!< @brief Optional string parameter associated with the token.
 
     /**
-     * @brief
-     * @param t
-     * @param p
-     * @param ps
+     * @brief Constructs a `SingleToken` object with the specified type, parameter, and string value.
+     *
+     * @param t The type of the token.
+     * @param p The numeric parameter associated with the token.
+     * @param ps The string parameter associated with the token.
      */
     SingleToken(Tokens t, uint32_t p, std::string ps);
 
     /**
-     * @brief
-     * @param t
-     * @return
+     * @brief Compares two `SingleToken` objects for equality.
+     *
+     * @param t The other `SingleToken` to compare with.
+     * @return True if the tokens are equal, false otherwise.
      */
     bool operator==(const SingleToken& t) const;
 
     /**
-     * @brief
-     * @param t
-     * @return
+     * @brief Compares two `SingleToken` objects for inequality.
+     *
+     * @param t The other `SingleToken` to compare with.
+     * @return True if the tokens are not equal, false otherwise.
      */
     bool operator!=(const SingleToken& t) const;
 };
 
 /**
- * @brief
- * @param t
- * @return
+ * @brief Retrieves metadata for a given token type.
+ *
+ * This function returns a `TokenInfo` structure containing metadata such as the name
+ * and parameter sequence type for the specified token.
+ *
+ * @param t The token type to retrieve metadata for.
+ * @return The `TokenInfo` structure associated with the token type.
  */
 const TokenInfo& getTokenInfo(Tokens t);
 
 /**
- * @brief
- * @param oldString
- * @param newString
- * @return
+ * @brief Generates a differential patch between two token sequences.
+ *
+ * This function compares an old and a new token sequence and generates a patch
+ * representing the changes needed to transform the old sequence into the new one.
+ *
+ * @param oldString The old token sequence.
+ * @param newString The new token sequence.
+ * @return A vector of `SingleToken` objects representing the patch.
  */
 std::vector<SingleToken> patch(const std::vector<SingleToken>& oldString, const std::vector<SingleToken>& newString);
 

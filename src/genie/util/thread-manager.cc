@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/util/thread-manager.h"
@@ -15,14 +15,7 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-thread_local size_t ThreadManager::threadID;
-thread_local size_t ThreadManager::threadNum;
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ThreadManager::action(size_t id) {
-    ThreadManager::threadID = id;
-    ThreadManager::threadNum = threads.size();
+void ThreadManager::action(size_t) {
     try {
         for (const auto& s : source) {
             while (!stopFlag && s->pump(counter, lock)) {

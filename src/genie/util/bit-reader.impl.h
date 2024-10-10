@@ -2,7 +2,7 @@
  * @file bit-reader.impl.h
  *
  * @copyright This file is part of GENIE.
- * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  *
  * @brief Implementation details of the BitReader utility class for reading bits from a stream.
  *

@@ -1,7 +1,7 @@
 /**
  * @file stop-watch.h
  * @copyright This file is part of GENIE.
- * See LICENSE and/or https://github.com/mitogen/genie for more details.
+ * See LICENSE and/or https://github.com/MueFab/genie for more details.
  *
  * @brief Declaration of the Watch utility class for measuring elapsed time.
  *

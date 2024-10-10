@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #define NOMINMAX
@@ -206,9 +206,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 128000;
-    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
-                                                   pOpts.combinePairsFlag, BLOCKSIZE);
+    auto flow =
+        genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, pOpts.combinePairsFlag);
 
     std::string json_uri_path = pOpts.inputRefFile;
     if (std::filesystem::exists(pOpts.inputFile + ".json") && std::filesystem::file_size(pOpts.inputFile + ".json")) {

@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_UTIL_INDUSTRIAL_PARK_IMPL_H_
@@ -46,21 +46,6 @@ template <typename T>
 void IndustrialPark::registerConstructor(
     uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
     findAndCreate<T>()->registerType(id, constructor);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-uint8_t IndustrialPark::registerConstructor(
-    const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
-    return findAndCreate<T>()->registerType(constructor);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-void IndustrialPark::unregisterConstructor(uint8_t id) {
-    findAndFail<T>()->unregisterType(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

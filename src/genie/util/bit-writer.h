@@ -2,7 +2,7 @@
  * @file bit-writer.h
  *
  * @copyright This file is part of GENIE.
- * See LICENSE and/or visit https://github.com/mitogen/genie for more details.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  *
  * @brief Declaration of the BitWriter utility class for writing bits to a stream.
  *
