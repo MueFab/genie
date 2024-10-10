@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_UTIL_DATA_BLOCK_IMPL_H_
@@ -14,10 +14,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::util {
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-inline uint8_t DataBlock::getLgWordSize() const { return lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -216,7 +212,7 @@ inline DataBlock::IteratorCore<T> &DataBlock::IteratorCore<T>::operator--() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(int) {
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
@@ -225,7 +221,7 @@ inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(i
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(int) {
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
@@ -242,7 +238,7 @@ inline size_t DataBlock::IteratorCore<T>::getOffset() const {
 
 template <typename T>
 inline DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const {
-    return {stream, position};
+    return DataBlock::ProxyCore<T>(stream, position);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -273,7 +269,7 @@ void DataBlock::insert(const IT1 &pos, const IT2 &start, const IT2 &end) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-DataBlock::DataBlock(std::vector<T> *vec) {
+DataBlock::DataBlock(std::vector<T> *vec) : lgWordSize(0) {
     setWordSize(sizeof(T));
     size_t size = vec->size() * sizeof(T);
     this->data.resize(size);

@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_UTIL_SELECTOR_HEAD_IMPL_H_
@@ -90,7 +90,6 @@ void SelectorHead<Tin>::skipIn(const Section& id) {
             first = false;
         } else {
             Section locID = id;
-            locID.strongSkip = false;
             m->skipIn(locID);
         }
     }

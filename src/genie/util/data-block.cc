@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/util/data-block.h"
@@ -49,10 +49,6 @@ void util::DataBlock::reserve(size_t size) { data.reserve(static_cast<size_t>(mu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::shrink_to_fit() { data.shrink_to_fit(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -74,9 +70,9 @@ void util::DataBlock::swap(util::DataBlock *const d) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(size_t size, uint8_t wsize) : lgWordSize(0) {
-    setWordSize(wsize);
-    data.resize(size * wsize);
+DataBlock::DataBlock(size_t size, uint8_t word_size) : lgWordSize(0) {
+    setWordSize(word_size);
+    data.resize(size * word_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -101,20 +97,6 @@ DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) : lgWordS
     this->data.resize(s);
     this->data.shrink_to_fit();
     std::memcpy(this->data.data(), d, s);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t util::DataBlock::getMaxWordSize() const {
-    uint8_t w = 1;
-    while (w != 8) {
-        w *= 2;
-        if (getRawSize() % w) {
-            w /= 2;
-            break;
-        }
-    }
-    return w;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * https://github.com/MueFab/genie for more details.
  */
 #ifndef SRC_GENIE_CORE_META_DATASET_GROUP_H_
 #define SRC_GENIE_CORE_META_DATASET_GROUP_H_
