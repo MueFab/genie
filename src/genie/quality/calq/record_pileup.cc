@@ -101,7 +101,7 @@ void RecordPileup::addRecord(EncodingRecord &r) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
-    UTILS_DIE_IF((pos < this->minPos || pos > this->maxPos), "Position out of range");
+    UTILS_DIE_IF(pos < this->minPos || pos > this->maxPos, "Position out of range");
 
     std::string seqs, quals;
 
@@ -111,7 +111,7 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
             const auto &seq = preprocessed_sequences[i][read_i];
             const auto &qual = preprocessed_qvalues[i][read_i];
 
-            if ((pos < pos_read) || (pos > pos_read + seq.size() - 1)) {
+            if (pos < pos_read || pos > pos_read + seq.size() - 1) {
                 continue;
             }
 

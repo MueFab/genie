@@ -98,7 +98,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
                 subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
             }
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -120,11 +120,11 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(const uint64_t *depSy
         uint32_t oss = outputSymbolSize;
         std::vector<Subsymbol> subsymbols(numSubSyms);
         for (uint8_t s = 0; s < numSubSyms; s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+            const uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             if (depSymbol) {
-                depSubsymValue = (*depSymbol >> (oss -= codingSubsymSize)) & subsymMask;
+                depSubsymValue = *depSymbol >> (oss -= codingSubsymSize) & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
@@ -145,7 +145,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(const uint64_t *depSy
 
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -164,8 +164,8 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
         // Decode subsymbols and merge them to construct the symbol
         std::vector<Subsymbol> subsymbols(numSubSyms);
         for (uint8_t s = 0; s < numSubSyms; s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+            const uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             subsymbols[s].subsymIdx = s;
             binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
@@ -185,7 +185,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
             subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);

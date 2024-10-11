@@ -352,8 +352,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
         util::OrderedSection sec(&lock, id);
         if (cp.paired_end && combine_pairs) {
             for (int j = 0; j < 2; j++) {
-                std::ostream& tmpout = (j == 0) ? fout_unmatched1 : fout_unmatched2;
-                std::ostream& tmpoutreadnames = (j == 0) ? fout_unmatched_readnames_1 : fout_unmatched_readnames_2;
+                std::ostream& tmpout = j == 0 ? fout_unmatched1 : fout_unmatched2;
+                std::ostream& tmpoutreadnames = j == 0 ? fout_unmatched_readnames_1 : fout_unmatched_readnames_2;
                 for (auto& fastqRecord : unmatched_records[j]) {
                     tmpout << fastqRecord.name << "\n";
                     tmpout << fastqRecord.seq << "\n";

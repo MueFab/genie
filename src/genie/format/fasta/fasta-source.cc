@@ -52,7 +52,7 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
     }
 
     auto string = refMgr->loadAt(seq, pos * core::ReferenceManager::getChunkSize());
-    size_t actual_length = loc_id.start == (accu_lengths[seq] - 1)
+    size_t actual_length = loc_id.start == accu_lengths[seq] - 1
                                ? refMgr->getLength(seq) % core::ReferenceManager::getChunkSize()
                                : string->length();
 

@@ -28,8 +28,8 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     (*transformedSubseqs)[0].clear();
     transformedSubseqs->resize(2);
 
-    util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    util::DataBlock *const lengths = &(*transformedSubseqs)[0];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
     lengths->setWordSize(1);
     rawValues->setWordSize(wordsize);
 
@@ -90,8 +90,8 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(guard > 0);
 
     // Prepare internal and the output data structures
-    util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    util::DataBlock *const lengths = &(*transformedSubseqs)[0];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
     util::DataBlock symbols(0, (rawValues->getWordSize()));
 
     util::BlockStepper rVal = rawValues->getReader();

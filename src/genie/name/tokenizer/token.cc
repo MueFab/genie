@@ -25,7 +25,7 @@ bool SingleToken::operator==(const SingleToken& t) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SingleToken::operator!=(const SingleToken& t) const { return !((*this) == t); }
+bool SingleToken::operator!=(const SingleToken& t) const { return !(*this == t); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

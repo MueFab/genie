@@ -130,7 +130,7 @@ const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
-    uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
+    uint16_t s_id = pos << 4u | _type & 0xfu;
     while (subdesc.size() <= s_id) {
         subdesc.emplace_back(static_cast<uint8_t>(4), GenSubIndex(getID(), static_cast<uint16_t>(subdesc.size())));
     }
@@ -291,7 +291,7 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
         return;
     }
     for (size_t i = 0; i < subdesc.size(); ++i) {
-        if (i < (subdesc.size() - 1)) {
+        if (i < subdesc.size() - 1) {
             writer.writeBits(subdesc[i].getRawSize(), 32);
         }
         subdesc[i].write(writer);
@@ -307,9 +307,9 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
-        if (i < (count - 1)) {
+        if (i < count - 1) {
             s = reader.read<size_t>(32);
-            remainingSize -= (s + 4);
+            remainingSize -= s + 4;
         } else {
             s = remainingSize;
         }

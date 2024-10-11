@@ -260,7 +260,7 @@ void DatasetHeader::addClassConfig(dataset_header::MITClassConfig config) {
                  "Adding classes without MIT has no effect");
     UTILS_DIE_IF(config.getDescriptorIDs().empty() && block_header_off != std::nullopt,
                  "Descriptor streams not supplied (block_header_flag)");
-    if ((!config.getDescriptorIDs().empty() && block_header_off == std::nullopt)) {
+    if (!config.getDescriptorIDs().empty() && block_header_off == std::nullopt) {
         config = dataset_header::MITClassConfig(config.getClassID());
     }
     UTILS_DIE_IF(!mit_configs.empty() && mit_configs.back().getClassID() >= config.getClassID(),

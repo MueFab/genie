@@ -388,7 +388,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 auto name_raw = name_coder->process(chunk);
                 stat_vec[block_num].add(std::get<1>(name_raw));
 
-                if (write_raw && (block_num_offset + block_num) < 10) {
+                if (write_raw && block_num_offset + block_num < 10) {
                     for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<0>(name_raw).getSize()); ++i) {
                         if (std::get<0>(name_raw).get(i).isEmpty()) {
                             continue;
@@ -423,7 +423,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 stat_vec[block_num].add(std::get<2>(qv_str));
                 params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
 
-                if (write_raw && (block_num_offset + block_num) < 10) {
+                if (write_raw && block_num_offset + block_num < 10) {
                     for (uint16_t i = 0; i < static_cast<uint16_t>(std::get<1>(qv_str).getSize()); ++i) {
                         if (std::get<1>(qv_str).get(i).isEmpty()) {
                             continue;

@@ -33,13 +33,13 @@ void encode(const EncodingOptions& opt, const SideInformation& sideInformation, 
     for (auto const& samRecord : input.qvalues) {
         for (auto const& read : samRecord) {
             for (auto const& q : read) {
-                if ((static_cast<int>(q) - opt.qualityValueOffset) < opt.qualityValueMin) {
+                if (static_cast<int>(q) - opt.qualityValueOffset < opt.qualityValueMin) {
                     throwErrorException("Quality value too small");
                 }
-                if ((static_cast<int>(q) - opt.qualityValueOffset) > opt.qualityValueMax) {
+                if (static_cast<int>(q) - opt.qualityValueOffset > opt.qualityValueMax) {
                     throwErrorException("Quality value too large");
                 }
-                pdf.addToPdf((static_cast<size_t>(q) - opt.qualityValueOffset));
+                pdf.addToPdf(static_cast<size_t>(q) - opt.qualityValueOffset);
             }
         }
     }

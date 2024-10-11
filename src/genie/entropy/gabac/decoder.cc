@@ -63,7 +63,7 @@ core::AccessUnit::Descriptor decompressTokens(const EncodingConfiguration& conf0
             type_id = reader.read<uint16_t>(4);
             method = reader.read<uint16_t>(4);
             if (type_id == 0) typeNum++;
-            mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);
+            mappedTypeId = typeNum << 4u | type_id & 0xfu;
 
             UTILS_DIE_IF(method != 3, "Only CABAC0 supported");
             offset++;
@@ -73,7 +73,7 @@ core::AccessUnit::Descriptor decompressTokens(const EncodingConfiguration& conf0
         std::vector<util::DataBlock> transformedSeqs;
         for (size_t j = 0; j < conf0.getSubseqConfig().getNumTransformSubseqCfgs(); ++j) {
             size_t payload_size = 0;
-            if (j < (conf0.getSubseqConfig().getNumTransformSubseqCfgs() - 1)) {
+            if (j < conf0.getSubseqConfig().getNumTransformSubseqCfgs() - 1) {
                 util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
                                                       remainingData.getWordSize());
                 IBufferStream stream(&tmp);

@@ -81,7 +81,7 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &par
 
     header = AUHeader(bitReader, parameterSets);
 
-    uint64_t bytesRead = (bitReader.getTotalBitsRead() / 8 - bitreader_pos);
+    uint64_t bytesRead = bitReader.getTotalBitsRead() / 8 - bitreader_pos;
     payloadbytes = du_size - bytesRead;
     qv_payloads = parameterSets.at(header.getParameterID()).getQVConfig(header.getClass()).getNumSubsequences();
 

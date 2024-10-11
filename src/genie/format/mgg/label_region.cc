@@ -15,7 +15,7 @@ namespace genie::format::mgg {
 // ---------------------------------------------------------------------------------------------------------------------
 
 LabelRegion::LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
-    : seq_ID((_seq_ID)), class_IDs(), start_pos(_start_pos), end_pos(_end_pos) {}
+    : seq_ID(_seq_ID), class_IDs(), start_pos(_start_pos), end_pos(_end_pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

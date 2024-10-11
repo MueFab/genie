@@ -49,7 +49,7 @@ void ReferenceManager::validateRefID(size_t id) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
     for (size_t i = 0; i <= id; ++i) {
         auto s = std::to_string(i);
-        data[std::string(s.size() < 3 ? (3 - s.size()) : 0, '0') + s];
+        data[std::string(s.size() < 3 ? 3 - s.size() : 0, '0') + s];
     }
 }
 
@@ -145,7 +145,7 @@ ReferenceManager::ReferenceExcerpt::ReferenceExcerpt(std::string name, size_t st
     : ref_name(std::move(name)),
       global_start(start),
       global_end(end),
-      data(((global_end - 1) / CHUNK_SIZE) - (global_start / CHUNK_SIZE) + 1, undef_page()) {}
+      data((global_end - 1) / CHUNK_SIZE - global_start / CHUNK_SIZE + 1, undef_page()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

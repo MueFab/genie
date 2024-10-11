@@ -87,7 +87,7 @@ std::string fromHex(const std::string &hex) {
             buffer = static_cast<char>((static_cast<uint8_t>(lut[c]) & 0xf) << 4);
             step = true;
         } else {
-            buffer = static_cast<char>(static_cast<uint8_t>(buffer) | (static_cast<uint8_t>(lut[c]) & 0xf));
+            buffer = static_cast<char>(static_cast<uint8_t>(buffer) | static_cast<uint8_t>(lut[c]) & 0xf);
             ret += buffer;
             step = false;
         }

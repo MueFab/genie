@@ -254,11 +254,11 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
         return;
     }
     while (!container.pull(core::GenSub::MMPOS_TERMINATOR)) {
-        mismatchPosition += container.pull((core::GenSub::MMPOS_POSITION)) + 1;
+        mismatchPosition += container.pull(core::GenSub::MMPOS_POSITION) + 1;
         const auto POSITION = mismatchPosition - 1 + clip_offset;
         const auto TYPE = container.get(core::GenSub::MMTYPE_TYPE).isEmpty()
                               ? core::GenConst::MMTYPE_SUBSTITUTION
-                              : container.pull((core::GenSub::MMTYPE_TYPE));
+                              : container.pull(core::GenSub::MMTYPE_TYPE);
         if (TYPE == core::GenConst::MMTYPE_SUBSTITUTION) {
             const auto SUBSTITUTION =
                 container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder() &&
@@ -267,14 +267,14 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
                           .getMismatchDecoder()
                           ->decodeMismatch(
                               getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
-                    : (container.get(core::GenSub::MMTYPE_SUBSTITUTION).end()
-                           ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
-                           : container.get(core::GenSub::MMTYPE_SUBSTITUTION).pull());
+                    : container.get(core::GenSub::MMTYPE_SUBSTITUTION).end()
+                    ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
+                    : container.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
         } else if (TYPE == core::GenConst::MMTYPE_INSERTION) {
-            const auto INSERTION = container.pull((core::GenSub::MMTYPE_INSERTION));
+            const auto INSERTION = container.pull(core::GenSub::MMTYPE_INSERTION);
             const auto INSERTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[INSERTION];
             sequence.insert(POSITION, 1, INSERTION_CHAR);
             cigar_extended.insert(POSITION + cigarOffset, 1, '+');

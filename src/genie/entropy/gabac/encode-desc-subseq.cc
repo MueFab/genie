@@ -92,11 +92,11 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
             if (numtrnsfSymbols > 0) {
                 // Encoding
                 trnsfSubseqPayloadSize = encodeTransformSubseq(
-                    subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)), &(transformedSubseqs[i]),
-                    (!dependency.empty()) ? &dependency : nullptr);
+                    subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)), &transformedSubseqs[i],
+                    !dependency.empty() ? &dependency : nullptr);
             }
 
-            if (i < (numTrnsfSubseqs - 1)) {
+            if (i < numTrnsfSubseqs - 1) {
                 subseqPayloadSize += StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize + 4, 4);
             }
 

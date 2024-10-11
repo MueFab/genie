@@ -179,8 +179,8 @@ genie::core::record::Record stripAdditionalAlignments(genie::core::record::Recor
 
 bool isECigarSupported(const std::string& ecigar) {
     // Splices not supported
-    if ((ecigar.find_first_of('*') != std::string::npos) || (ecigar.find_first_of('/') != std::string::npos) ||
-        (ecigar.find_first_of('%') != std::string::npos)) {
+    if (ecigar.find_first_of('*') != std::string::npos || ecigar.find_first_of('/') != std::string::npos ||
+        ecigar.find_first_of('%') != std::string::npos) {
         return false;
     }
     return true;
@@ -709,7 +709,7 @@ std::string eCigar2Cigar(const std::string& ecigar) {
     size_t matchCount = 0;
     std::string number_buffer;
     for (const auto& c : ecigar) {
-        if ((c == '[') || (c == '(')) {
+        if (c == '[' || c == '(') {
             continue;
         }
         if (std::isdigit(c)) {
@@ -751,12 +751,12 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
     }
     // This read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) && (s == 1))) {
+        (record.getClassID() == genie::core::record::ClassType::CLASS_HM && s == 1)) {
         flags |= 0x4;
     }
     // Paired read is unmapped
     if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) && (s == 0))) {
+        (record.getClassID() == genie::core::record::ClassType::CLASS_HM && s == 0)) {
         flags |= 0x8;
     }
     // First or second read?
@@ -822,7 +822,7 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
                           ? genie::core::record::AlignmentSplit::Type::UNPAIRED
                           : record.getAlignments()[0].getAlignmentSplits().front()->getType();
     if ((s == 1 && split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
-        (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
+        split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED) {
         // Paired read is first read
         pnext = std::to_string(record.getAlignments()[0].getPosition() + 1);
         tlen += record.getAlignments()[0].getPosition() + 1;

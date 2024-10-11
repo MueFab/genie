@@ -26,7 +26,7 @@ size_t StreamHandler::readUInt(std::istream &input, uint64_t &retVal, size_t num
     retVal = 0;
     size_t c = 0;  // counter
     while (numBytes-- > 0) {
-        retVal = (retVal << 8) | bytes[c++];
+        retVal = retVal << 8 | bytes[c++];
     }
 
     return c;
@@ -44,7 +44,7 @@ size_t StreamHandler::readU7(std::istream &input, uint64_t &retVal) {
         c++;
 
         input.read(reinterpret_cast<char *>(&byte), 1);
-        retVal = (retVal << 7) | (byte & 0x7F);
+        retVal = retVal << 7 | byte & 0x7F;
     } while ((byte & 0x80) != 0);
 
     return c;
@@ -142,7 +142,7 @@ size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t num
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
     size_t c = 0;  // counter
     while (numBytes-- > 0) {
-        bytes[c++] = (value >> (numBytes * 8)) & 0xFF;
+        bytes[c++] = value >> numBytes * 8 & 0xFF;
     }
     output.write(reinterpret_cast<char *>(bytes), c);
 
@@ -156,12 +156,12 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     size_t c = 0;  // counter
     int shift;
     const int inputMaxSize = sizeof(value) * 8;
-    for (shift = 0; (shift < inputMaxSize) && ((value >> shift) != 0); shift += 7) {
+    for (shift = 0; shift < inputMaxSize && value >> shift != 0; shift += 7) {
     }
     if (shift > 0) shift -= 7;
 
     for (; shift >= 0; shift -= 7) {
-        auto code = static_cast<uint8_t>(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
+        auto code = static_cast<uint8_t>(value >> shift & 0x7F | (shift > 0 ? 0x80 : 0x00));
         bytes[c++] = code;
     }
 
@@ -174,7 +174,7 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
 
 size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, uint64_t numSymbols) {
     size_t streamSize = 0;
-    uint64_t payloadSize = buffer->getRawSize() + ((numSymbols) ? 4 : 0);
+    uint64_t payloadSize = buffer->getRawSize() + (numSymbols ? 4 : 0);
     streamSize += writeUInt(output, payloadSize, 4);
     if (payloadSize >= 4) {
         streamSize += writeUInt(output, numSymbols, 4);

@@ -50,7 +50,7 @@ void Segment::addQualities(std::string&& qv) {
     // quality_values[rSeq][qs] array shall be a c(read_len[rSeg]), otherwise quality_values[rSeq][qs] shall be a
     // c(1) string containing only one character corresponding to ASCII code 0
     static const std::string NO_QUAL("\0", 1);
-    UTILS_DIE_IF(!((qv == NO_QUAL) || (qv.length() == sequence.length())), "QV and sequence lengths do not match");
+    UTILS_DIE_IF(!(qv == NO_QUAL || qv.length() == sequence.length()), "QV and sequence lengths do not match");
     quality_values.emplace_back(std::move(qv));
 }
 

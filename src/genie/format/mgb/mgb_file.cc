@@ -316,7 +316,7 @@ std::vector<uint8_t> MgbFile::collect_param_ids(bool multipleAlignments, bool po
     std::vector<uint8_t> ret;
     for (auto& parameterSet : parameterSets) {
         if (parameterSet.second.hasMultipleAlignments() == multipleAlignments &&
-            (parameterSet.second.getPosSize() == 40) == pos40 && parameterSet.second.getDatasetType() == dataset_type &&
+            parameterSet.second.getPosSize() == 40 == pos40 && parameterSet.second.getDatasetType() == dataset_type &&
             parameterSet.second.getAlphabetID() == alphabet) {
             ret.emplace_back(static_cast<uint8_t>(parameterSet.first));
         }

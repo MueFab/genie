@@ -31,7 +31,7 @@ GaussKernel::GaussKernel(double sigma) : SIGMA(sigma), INV_SQRT_SIGMA_2PI(1.0 / 
 double GaussKernel::calcValue(size_t pos, size_t size) const {
     const double MEAN = std::floor((size - 1) / 2.0);
     double exponent = (pos - MEAN) / SIGMA;
-    exponent = exponent * exponent * (-0.5);
+    exponent = exponent * exponent * -0.5;
     return INV_SQRT_SIGMA_2PI * std::pow(EULER, exponent);
 }
 
@@ -100,7 +100,7 @@ RectangleKernel::RectangleKernel(double size) : SIZE(size) {}
 
 double RectangleKernel::calcValue(size_t pos, size_t size) const {
     const double MEAN = std::floor((size - 1) / 2.0);
-    return (pos - MEAN) <= SIZE ? 1.0 : 0.0;
+    return pos - MEAN <= SIZE ? 1.0 : 0.0;
 }
 
 // -----------------------------------------------------------------------------

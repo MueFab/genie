@@ -90,7 +90,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
 
     size_t rec_index = 0;
     for (auto &rec : data.getData()) {
-        UTILS_DIE_IF(rec.getSegments().size() != (static_cast<size_t>(cp.paired_end + 1)),
+        UTILS_DIE_IF(rec.getSegments().size() != static_cast<size_t>(cp.paired_end + 1),
                      "Number of segments differs between global assembly data chunks.");
         size_t seg_index = 0;
         for (auto &seq : rec.getSegments()) {

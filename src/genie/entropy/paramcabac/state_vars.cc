@@ -41,17 +41,17 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
     uint64_t numAlphaSpecial = 0;
     if (subsequence_ID == core::GenSub::MMTYPE_TYPE) {  // mmtype subseq 0
         numAlphaSpecial = 3;
-    } else if ((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION)  // mmtype subseq 1
-               || (subsequence_ID == core::GenSub::MMTYPE_INSERTION)  // mmtype subseq 2
+    } else if (subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION  // mmtype subseq 1
+               || subsequence_ID == core::GenSub::MMTYPE_INSERTION  // mmtype subseq 2
     ) {
-        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+        numAlphaSpecial = alphabet_ID == core::AlphabetID::ACGTN ? 5 : 16;
     }
     if (subsequence_ID == core::GenSub::CLIPS_TYPE) {  // mmtype subseq 1
         numAlphaSpecial = 9;
     } else if (subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) {  // subseq 2
-        numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
-    } else if ((subsequence_ID == core::GenSub::UREADS) || (subsequence_ID == core::GenSub::RFTT)) {  // ureads subseq 0
-        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN ? 5 : 16) + 1;
+    } else if (subsequence_ID == core::GenSub::UREADS || subsequence_ID == core::GenSub::RFTT) {  // ureads subseq 0
+        numAlphaSpecial = alphabet_ID == core::AlphabetID::ACGTN ? 5 : 16;
     } else if (subsequence_ID == core::GenSub::RTYPE) {  // rtype subseq 0
         numAlphaSpecial = 6;
     }
@@ -63,15 +63,15 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
 
 uint8_t StateVars::getNumLuts(const uint8_t codingOrder, const bool shareSubsymLutFlag,
                               const SupportValues::TransformIdSubsym trnsfSubsymID) const {
-    return (codingOrder > 0 && trnsfSubsymID == SupportValues::TransformIdSubsym::LUT_TRANSFORM)
-               ? ((shareSubsymLutFlag) ? 1 : static_cast<uint8_t>(numSubsyms))
+    return codingOrder > 0 && trnsfSubsymID == SupportValues::TransformIdSubsym::LUT_TRANSFORM
+               ? (shareSubsymLutFlag ? 1 : static_cast<uint8_t>(numSubsyms))
                : 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
-    return (shareSubsymPrvFlag) ? 1 : static_cast<uint8_t>(numSubsyms);
+    return shareSubsymPrvFlag ? 1 : static_cast<uint8_t>(numSubsyms);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -142,25 +142,25 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 break;
             case BinarizationParameters::BinarizationId::SUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-                numCtxSubsym = (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
-                               ((1 << (outputSymbolSize % splitUnitSize)) - 1);
+                numCtxSubsym = outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
+                               ((1 << outputSymbolSize % splitUnitSize) - 1);
             } break;
             case BinarizationParameters::BinarizationId::SSUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-                numCtxSubsym = (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
-                               ((1 << (outputSymbolSize % splitUnitSize)) - 1) + 1;
+                numCtxSubsym = outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
+                               ((1 << outputSymbolSize % splitUnitSize) - 1) + 1;
             } break;
             case BinarizationParameters::BinarizationId::DTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
-                               (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
-                               ((1 << (outputSymbolSize % splitUnitSize)) - 1);
+                               outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
+                               ((1 << outputSymbolSize % splitUnitSize) - 1);
             } break;
             case BinarizationParameters::BinarizationId::SDTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
-                               (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
-                               ((1 << (outputSymbolSize % splitUnitSize)) - 1) + 1;
+                               outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
+                               ((1 << outputSymbolSize % splitUnitSize) - 1) + 1;
             } break;
         }
 
@@ -183,13 +183,13 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
         if (transform_ID_subsym == SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
             if ((binarization_ID >= BinarizationParameters::BinarizationId::SUTU &&
                  binarization_ID <= BinarizationParameters::BinarizationId::SDTU) ||
-                codingOrder == 0 || (1u << codingSubsymSize) > MAX_LUT_SIZE) {
+                codingOrder == 0 || 1u << codingSubsymSize > MAX_LUT_SIZE) {
                 UTILS_THROW_RUNTIME_EXCEPTION(
                     "LUT_TRANSFORM not supported with given configuration: coding_order = 0, binarization_ID = " +
                     std::to_string(static_cast<uint8_t>(binarization_ID)) +
                     ", coding_subsym_size = " + std::to_string(codingSubsymSize));
             } else {
-                numCtxLuts = (codingSubsymSize / 2) * ((1 << 2) - 1) + ((1 << (codingSubsymSize % 2)) - 1);
+                numCtxLuts = codingSubsymSize / 2 * ((1 << 2) - 1) + ((1 << codingSubsymSize % 2) - 1);
             }
         }
 
@@ -245,7 +245,7 @@ uint64_t StateVars::getNumCtxTotal() const { return numCtxTotal; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return (sizeInBits / 8) + ((sizeInBits % 8) ? 1 : 0); }
+uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return sizeInBits / 8 + (sizeInBits % 8 ? 1 : 0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

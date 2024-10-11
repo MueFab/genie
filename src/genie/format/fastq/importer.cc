@@ -85,7 +85,7 @@ std::vector<std::array<std::string, Importer::LINES_PER_RECORD>> Importer::readD
     std::vector<std::array<std::string, LINES_PER_RECORD>> data(_file_list.size());
     for (size_t cur_file = 0; cur_file < _file_list.size(); ++cur_file) {
         for (size_t cur_line = 0; cur_line < LINES_PER_RECORD; ++cur_line) {
-            if (!std::getline(*(_file_list[cur_file]), data[cur_file][cur_line])) {
+            if (!std::getline(*_file_list[cur_file], data[cur_file][cur_line])) {
                 data.clear();
                 return data;
             }

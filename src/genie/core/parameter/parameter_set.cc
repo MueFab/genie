@@ -132,7 +132,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
     uint64_t bits = tmp_writer.getTotalBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
-    uint64_t bytes = bits / 8 + ((bits % 8) ? 1 : 0);
+    uint64_t bytes = bits / 8 + (bits % 8 ? 1 : 0);
 
     // Now size is known, write to final destination
     writer.writeBits(bytes, 22);
@@ -394,7 +394,7 @@ EncodingSet::EncodingSet(EncodingSet &&other) noexcept
 const QualityValues &EncodingSet::getQVConfig(record::ClassType type) const {
     for (size_t i = 0; i < class_IDs.size(); ++i) {
         if (class_IDs[i] == type) {
-            return *(qv_coding_configs[i]);
+            return *qv_coding_configs[i];
         }
     }
     UTILS_DIE("No matching qv config " + std::to_string(static_cast<int>(type)) + " in parameter set");
@@ -435,7 +435,7 @@ bool EncodingSet::qual_cmp(const EncodingSet &ps) const {
         return false;
     }
     for (size_t i = 0; i < ps.qv_coding_configs.size(); ++i) {
-        if (!(qv_coding_configs[i]->equals(ps.qv_coding_configs[i].get()))) {
+        if (!qv_coding_configs[i]->equals(ps.qv_coding_configs[i].get())) {
             return false;
         }
     }

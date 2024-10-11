@@ -78,7 +78,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
-        bits = m_heldBits >> (m_numHeldBits - numBits);
+        bits = m_heldBits >> m_numHeldBits - numBits;
         bits &= ~(0xffu << numBits);
         m_numHeldBits -= numBits;
         return bits;
@@ -91,7 +91,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     bits <<= numBits;  // make room for the bits to come
 
     // Read in more bytes to satisfy the request
-    unsigned int numBytesToLoad = ((numBits - 1u) >> 3u) + 1;
+    unsigned int numBytesToLoad = (numBits - 1u >> 3u) + 1;
     unsigned int alignedWord = 0;
     // uint64_t alignedWord = 0;
     if (numBytesToLoad == 1) {
@@ -104,13 +104,13 @@ unsigned int BitInputStream::read(unsigned int numBits) {
         goto L0;
     }
 
-    alignedWord |= (readIn(&m_reader) << 24u);
+    alignedWord |= readIn(&m_reader) << 24u;
 L3:
-    alignedWord |= (readIn(&m_reader) << 16u);
+    alignedWord |= readIn(&m_reader) << 16u;
 L2:
-    alignedWord |= (readIn(&m_reader) << 8u);
+    alignedWord |= readIn(&m_reader) << 8u;
 L1:
-    alignedWord |= (readIn(&m_reader));
+    alignedWord |= readIn(&m_reader);
 L0:
 
     // Resolve remainder bits
