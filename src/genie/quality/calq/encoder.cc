@@ -31,7 +31,7 @@ paramqv1::Codebook codebookFromVector(const std::vector<unsigned char>& vec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::GenSubIndex get_qv_steps(size_t i) {
+core::GenSubIndex get_qv_steps(const size_t i) {
     UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
     return std::make_pair(core::GenDesc::QV, static_cast<uint16_t>(i + 2));
 }
@@ -141,7 +141,7 @@ void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Des
 
     for (const auto& q : s.getQualities()) {
         for (const auto& c : q) {
-            auto index = static_cast<uint8_t>(quantizer.valueToIndex(c));
+            const auto index = static_cast<uint8_t>(quantizer.valueToIndex(c));
             subsequence.push(index);
         }
     }
@@ -180,7 +180,7 @@ void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::Qualit
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& chunk) {
-    util::Watch watch;
+    const util::Watch watch;
     auto param = std::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 

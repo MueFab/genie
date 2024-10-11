@@ -12,7 +12,7 @@ namespace genie::core::parameter::desc_pres {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular(uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {}
+DecoderRegular::DecoderRegular(const uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

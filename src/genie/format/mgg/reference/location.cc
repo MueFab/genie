@@ -22,10 +22,10 @@ namespace genie::format::mgg::reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Location> Location::factory(util::BitReader& reader, size_t seq_count,
-                                            core::MPEGMinorVersion _version) {
+std::unique_ptr<Location> Location::factory(util::BitReader& reader, const size_t seq_count,
+                                            const core::MPEGMinorVersion _version) {
     auto _reserved = reader.read<uint8_t>(7);
-    bool _external_ref_flag = reader.read<bool>(1);
+    const bool _external_ref_flag = reader.read<bool>(1);
     if (!_external_ref_flag) {
         return std::make_unique<location::Internal>(reader, _reserved);
     } else {
@@ -38,32 +38,32 @@ std::unique_ptr<Location> Location::factory(util::BitReader& reader, size_t seq_
 std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<core::meta::RefBase> base,
                                                              core::MPEGMinorVersion _version) {
     if (dynamic_cast<core::meta::external_ref::MPEG*>(base.get()) != nullptr) {
-        auto ref = dynamic_cast<core::meta::external_ref::MPEG*>(base.get());
+        const auto ref = dynamic_cast<core::meta::external_ref::MPEG*>(base.get());
         auto ret = std::make_unique<location::external::MPEG>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
             static_cast<location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()),
             static_cast<uint8_t>(ref->getGroupID()), ref->getID(), std::move(ref->getChecksum()), _version);
         return ret;
     } else if (dynamic_cast<core::meta::external_ref::Fasta*>(base.get()) != nullptr) {
-        auto ref = dynamic_cast<core::meta::external_ref::Fasta*>(base.get());
+        const auto ref = dynamic_cast<core::meta::external_ref::Fasta*>(base.get());
         auto ret = std::make_unique<location::external::Fasta>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
             static_cast<location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()));
-        for (auto& s : ref->getChecksums()) {
+        for (const auto& s : ref->getChecksums()) {
             ret->addChecksum(s);
         }
         return ret;
     } else if (dynamic_cast<core::meta::external_ref::Raw*>(base.get()) != nullptr) {
-        auto ref = dynamic_cast<core::meta::external_ref::Raw*>(base.get());
+        const auto ref = dynamic_cast<core::meta::external_ref::Raw*>(base.get());
         auto ret = std::make_unique<location::external::Raw>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
             static_cast<location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()));
-        for (auto& s : ref->getChecksums()) {
+        for (const auto& s : ref->getChecksums()) {
             ret->addChecksum(s);
         }
         return ret;
     } else if (dynamic_cast<core::meta::InternalRef*>(base.get()) != nullptr) {
-        auto ref = dynamic_cast<core::meta::InternalRef*>(base.get());
+        const auto ref = dynamic_cast<core::meta::InternalRef*>(base.get());
         return std::make_unique<location::Internal>(static_cast<uint8_t>(0), static_cast<uint8_t>(ref->getGroupID()),
                                                     ref->getID());
     } else {
@@ -73,7 +73,7 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<cor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Location::Location(uint8_t _reserved, bool _external_ref_flag)
+Location::Location(const uint8_t _reserved, const bool _external_ref_flag)
     : reserved(_reserved), external_ref_flag(_external_ref_flag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

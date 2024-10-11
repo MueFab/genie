@@ -22,7 +22,7 @@ namespace genie::entropy::lzma {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
-    auto id = data.getID();
+    const auto id = data.getID();
 
     uint8_t bytes = core::range2bytes(getSubsequence(id).range);
     if (id.first == core::GenDesc::RNAME) {
@@ -44,7 +44,7 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
         strm.next_out = static_cast<uint8_t*>(out.getData()) + strm.total_out;
         strm.avail_out = outCapacity - strm.total_out;
 
-        auto ret = lzma_code(&strm, LZMA_FINISH);
+        const auto ret = lzma_code(&strm, LZMA_FINISH);
 
         if (ret == LZMA_STREAM_END) {
             // Finished decompressing
@@ -70,17 +70,17 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
-    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
+    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, const bool mmCoderEnabled) {
     (void)param;
     (void)mmCoderEnabled;
-    util::Watch watch;
+    const util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
     for (auto& subseq : std::get<0>(desc)) {
         if (subseq.isEmpty()) {
             continue;
         }
-        auto d_id = subseq.getID();
+        const auto d_id = subseq.getID();
 
         auto subseq_name = std::string();
         if (getDescriptor(std::get<0>(desc).getID()).tokentype) {

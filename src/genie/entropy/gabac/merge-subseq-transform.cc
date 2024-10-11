@@ -48,7 +48,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     // split
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = symbols.get(i);
-        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, symbols.getWordSize());
+        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, symbols.getWordSize());
 
         bool isNegative = false;
         if (signedSymbolValue < 0) {
@@ -59,7 +59,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
             uint64_t trnsfSymbol = symbolValue >> subseqShiftSizes[ts] & trnsSubseqMasks[ts];
             if (isNegative && trnsfSymbol != 0) {
-                int64_t trnsfSymbolSigned = -static_cast<int64_t>(trnsfSymbol);
+                const int64_t trnsfSymbolSigned = -static_cast<int64_t>(trnsfSymbol);
                 trnsfSymbol = static_cast<uint64_t>(trnsfSymbolSigned);
                 isNegative = false;
             }
@@ -101,7 +101,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         }
 
         if (isNegative) {
-            int64_t symbolValueSigned = -static_cast<int64_t>(symbolValue);
+            const int64_t symbolValueSigned = -static_cast<int64_t>(symbolValue);
             symbolValue = static_cast<uint64_t>(symbolValueSigned);
         }
 

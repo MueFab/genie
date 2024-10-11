@@ -31,7 +31,7 @@ UniformQuantizer::UniformQuantizer(const int& valueMin, const int& valueMax, con
     }
 
     // Compute the step size
-    auto stepSize =
+    const auto stepSize =
         static_cast<int>(floor(static_cast<double>(valueMax - valueMin) / static_cast<double>(nrSteps)));
 
     // Compute the borders and the representative values

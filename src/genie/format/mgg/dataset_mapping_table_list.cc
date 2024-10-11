@@ -33,15 +33,15 @@ const std::string& DataSetMappingTableList::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataSetMappingTableList::DataSetMappingTableList(uint8_t _ds_group_id) : dataset_group_ID(_ds_group_id) {}
+DataSetMappingTableList::DataSetMappingTableList(const uint8_t _ds_group_id) : dataset_group_ID(_ds_group_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     dataset_group_ID = reader.readAlignedInt<uint8_t>();
-    size_t num_SIDs = (length - 13) / 2;
+    const size_t num_SIDs = (length - 13) / 2;
     for (size_t i = 0; i < num_SIDs; ++i) {
         dataset_mapping_table_SID.emplace_back(reader.readAlignedInt<uint16_t>());
     }

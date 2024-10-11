@@ -22,7 +22,7 @@ namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Config::Config(int argc, char *argv[])
+Config::Config(const int argc, char *argv[])
     : verbosity_level(0),
       tmp_dir_path(),
       fasta_file_path(),
@@ -42,7 +42,7 @@ Config::~Config() = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Config::processCommandLine(int argc, char *argv[]) {
+void Config::processCommandLine(const int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
     app.add_option("--ref", fasta_file_path, "Path to fasta reference file\n");
@@ -88,7 +88,7 @@ void validateInputFile(const std::string &file) {
         return;
     }
     UTILS_DIE_IF(!std::filesystem::exists(file), "Input file does not exist: " + file);
-    std::ifstream stream(file);
+    const std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
@@ -96,13 +96,13 @@ void validateInputFile(const std::string &file) {
 
 void validateReference(const std::string &file) {
     UTILS_DIE_IF(!std::filesystem::exists(file), "Reference file does not exist: " + file);
-    std::ifstream stream(file);
+    const std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void validateOutputFile(const std::string &file, bool forced) {
+void validateOutputFile(const std::string &file, const bool forced) {
     if (file.substr(0, 2) == "-.") {
         return;
     }
@@ -123,7 +123,7 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string size_string(std::uintmax_t f_size) {
+std::string size_string(const std::uintmax_t f_size) {
     size_t exponent = 0;
     auto size = static_cast<double>(f_size);
     while (size / 1024.0 > 1.0) {
@@ -145,7 +145,7 @@ std::string size_string(std::uintmax_t f_size) {
 std::string parent_dir(const std::string &path) {
     std::string ret;
 
-    auto pos = path.find_last_of('/');
+    const auto pos = path.find_last_of('/');
     if (pos == std::string::npos) {
         ret = ".";
     } else {
@@ -160,7 +160,7 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string random_string(size_t length) {
+std::string random_string(const size_t length) {
     // Define the character set
     const char charset[] =
         "0123456789"

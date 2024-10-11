@@ -51,10 +51,10 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
         pos_old = s.second;
     }
 
-    auto string = refMgr->loadAt(seq, pos * core::ReferenceManager::getChunkSize());
-    size_t actual_length = loc_id.start == accu_lengths[seq] - 1
-                               ? refMgr->getLength(seq) % core::ReferenceManager::getChunkSize()
-                               : string->length();
+    const auto string = refMgr->loadAt(seq, pos * core::ReferenceManager::getChunkSize());
+    const size_t actual_length = loc_id.start == accu_lengths[seq] - 1
+                                     ? refMgr->getLength(seq) % core::ReferenceManager::getChunkSize()
+                                     : string->length();
 
     std::cerr << "Decompressing " << seq << " [" << pos * core::ReferenceManager::getChunkSize() << ", "
               << pos * core::ReferenceManager::getChunkSize() + actual_length << "]" << std::endl;
@@ -71,7 +71,7 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
     }
     size_t s_pos = 0;
     while (true) {
-        size_t length = std::min(50 - line_length, actual_length - s_pos);
+        const size_t length = std::min(50 - line_length, actual_length - s_pos);
         outfile->write(&(*string)[s_pos], length);
         s_pos += length;
         line_length += length;

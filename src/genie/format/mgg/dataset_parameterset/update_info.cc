@@ -19,7 +19,8 @@ bool UpdateInfo::operator==(const UpdateInfo& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UpdateInfo::UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, core::AlphabetID _alphabetId)
+UpdateInfo::UpdateInfo(const bool _multiple_alignment_flag, const bool _pos_40_bits_flag,
+                       const core::AlphabetID _alphabetId)
     : multiple_alignment_flag(_multiple_alignment_flag), pos_40_bits_flag(_pos_40_bits_flag), alphabetId(_alphabetId) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

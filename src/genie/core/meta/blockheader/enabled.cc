@@ -12,7 +12,7 @@ namespace genie::core::meta::blockheader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Enabled::Enabled(bool mit, bool cc) : BlockHeader(HeaderType::ENABLED), MIT_flag(mit), CC_mode_flag(cc) {}
+Enabled::Enabled(const bool mit, const bool cc) : BlockHeader(HeaderType::ENABLED), MIT_flag(mit), CC_mode_flag(cc) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

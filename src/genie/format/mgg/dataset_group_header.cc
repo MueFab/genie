@@ -29,7 +29,7 @@ DatasetGroupHeader::DatasetGroupHeader() : DatasetGroupHeader(0, 0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupHeader::DatasetGroupHeader(uint8_t _id, uint8_t _version) : ID(_id), version(_version) {}
+DatasetGroupHeader::DatasetGroupHeader(const uint8_t _id, const uint8_t _version) : ID(_id), version(_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,9 +41,9 @@ const std::string& DatasetGroupHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroupHeader::DatasetGroupHeader(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    auto num_datasets = (length - 14) / 2;
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
+    const auto num_datasets = (length - 14) / 2;
     dataset_IDs.resize(num_datasets);
     ID = reader.readAlignedInt<uint8_t>();
     version = reader.readAlignedInt<uint8_t>();
@@ -60,7 +60,7 @@ uint8_t DatasetGroupHeader::getID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupHeader::setID(uint8_t _id) { ID = _id; }
+void DatasetGroupHeader::setID(const uint8_t _id) { ID = _id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -86,11 +86,11 @@ void DatasetGroupHeader::box_write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupHeader::patchID(uint8_t groupID) { ID = groupID; }
+void DatasetGroupHeader::patchID(const uint8_t groupID) { ID = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void DatasetGroupHeader::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Dataset Group Header");
     print_offset(output, depth + 1, max_depth, "ID: " + std::to_string(ID));
     print_offset(output, depth + 1, max_depth, "Version: " + std::to_string(version));

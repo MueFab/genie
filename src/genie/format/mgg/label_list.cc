@@ -16,17 +16,17 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LabelList::LabelList(uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
+LabelList::LabelList(const uint8_t _ds_group_ID) : dataset_group_ID(_ds_group_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 LabelList::LabelList(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     // ID u(8)
     dataset_group_ID = reader.readAlignedInt<uint8_t>();
     // num_labels u(16)
-    auto num_labels = reader.readAlignedInt<uint16_t>();
+    const auto num_labels = reader.readAlignedInt<uint16_t>();
 
     for (size_t i = 0; i < num_labels; ++i) {
         read_box(reader, false);
@@ -76,11 +76,11 @@ void LabelList::addLabel(Label l) { labels.emplace_back(std::move(l)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelList::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
+void LabelList::patchID(const uint8_t groupID) { dataset_group_ID = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
+std::vector<core::meta::Label> LabelList::decapsulate(const uint16_t dataset) {
     std::vector<core::meta::Label> ret;
     ret.reserve(labels.size());
     for (auto& l : labels) {
@@ -91,7 +91,7 @@ std::vector<core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelList::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void LabelList::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Label list");
     for (const auto& l : labels) {
         l.print_debug(output, depth + 1, max_depth);
@@ -100,7 +100,7 @@ void LabelList::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelList::read_box(util::BitReader& reader, bool in_offset) {
+void LabelList::read_box(util::BitReader& reader, const bool in_offset) {
     std::string tmp_str(4, '\0');
     reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
     if (tmp_str == "lbll") {
@@ -108,12 +108,12 @@ void LabelList::read_box(util::BitReader& reader, bool in_offset) {
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
         reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
-        auto offset = reader.readAlignedInt<uint64_t>();
+        const auto offset = reader.readAlignedInt<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             read_box(reader, in_offset);
             return;
         }
-        auto pos_save = reader.getStreamPosition();
+        const auto pos_save = reader.getStreamPosition();
         reader.setStreamPosition(offset);
         read_box(reader, true);
         reader.setStreamPosition(pos_save);

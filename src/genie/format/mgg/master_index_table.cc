@@ -41,7 +41,7 @@ const std::vector<master_index_table::UnalignedAUIndex>& MasterIndexTable::getUn
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
+MasterIndexTable::MasterIndexTable(const uint16_t seq_count, const uint8_t num_classes) {
     aligned_aus.resize(seq_count, std::vector<std::vector<master_index_table::AlignedAUIndex>>(
                                       num_classes, std::vector<master_index_table::AlignedAUIndex>()));
 }
@@ -49,8 +49,8 @@ MasterIndexTable::MasterIndexTable(uint16_t seq_count, uint8_t num_classes) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader& hdr) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.read<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.read<uint64_t>();
     aligned_aus.resize(hdr.getReferenceOptions().getSeqIDs().size(),
                        std::vector<std::vector<master_index_table::AlignedAUIndex>>(
                            hdr.getMITConfigs().size(), std::vector<master_index_table::AlignedAUIndex>()));
@@ -103,8 +103,9 @@ const std::string& MasterIndexTable::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<uint64_t> MasterIndexTable::getDescriptorStreamOffsets(uint8_t class_index, uint8_t desc_index,
-                                                                   bool isUnaligned, uint64_t total_size) const {
+std::vector<uint64_t> MasterIndexTable::getDescriptorStreamOffsets(const uint8_t class_index, const uint8_t desc_index,
+                                                                   const bool isUnaligned,
+                                                                   const uint64_t total_size) const {
     std::vector<uint64_t> offsets;
     if (isUnaligned) {
         for (const auto& unaligned_au : unaligned_aus) {
@@ -122,7 +123,7 @@ std::vector<uint64_t> MasterIndexTable::getDescriptorStreamOffsets(uint8_t class
     offsets.erase(offsets.begin());
     offsets.emplace_back(total_size + last);
     for (uint64_t& offset : offsets) {
-        uint64_t tmp = offset;
+        const uint64_t tmp = offset;
         offset = offset - last;
         last = tmp;
     }
@@ -131,7 +132,7 @@ std::vector<uint64_t> MasterIndexTable::getDescriptorStreamOffsets(uint8_t class
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MasterIndexTable::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void MasterIndexTable::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Master index table");
 }
 

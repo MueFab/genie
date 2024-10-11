@@ -31,15 +31,15 @@ bool Reference::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& reader, core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
+Reference::Reference(util::BitReader& reader, const core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     dataset_group_ID = reader.readAlignedInt<uint8_t>();
     reference_ID = reader.readAlignedInt<uint8_t>();
     reference_name = reader.readAlignedStringTerminated();
     ref_version = reference::Version(reader);
-    auto seq_count = reader.readAlignedInt<uint16_t>();
+    const auto seq_count = reader.readAlignedInt<uint16_t>();
     for (size_t i = 0; i < seq_count; ++i) {
         sequences.emplace_back(reader, version);
     }
@@ -50,8 +50,9 @@ Reference::Reference(util::BitReader& reader, core::MPEGMinorVersion _version) :
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
-                     std::unique_ptr<reference::Location> location, core::MPEGMinorVersion _version)
+Reference::Reference(const uint8_t group_id, const uint8_t ref_id, std::string ref_name,
+                     const reference::Version _ref_version, std::unique_ptr<reference::Location> location,
+                     const core::MPEGMinorVersion _version)
     : dataset_group_ID(group_id),
       reference_ID(ref_id),
       reference_name(std::move(ref_name)),
@@ -116,11 +117,11 @@ void Reference::box_write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
+void Reference::patchID(const uint8_t groupID) { dataset_group_ID = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::patchRefID(uint8_t _old, uint8_t _new) {
+void Reference::patchRefID(const uint8_t _old, const uint8_t _new) {
     if (reference_ID == _old) {
         reference_ID = _new;
     }
@@ -131,7 +132,7 @@ void Reference::patchRefID(uint8_t _old, uint8_t _new) {
 core::meta::Reference Reference::decapsulate(std::string meta) {
     std::unique_ptr<core::meta::RefBase> location = reference_location->decapsulate();
     core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
-                                     ref_version.getPatch(), std::move(location), std::move(meta));
+                              ref_version.getPatch(), std::move(location), std::move(meta));
     for (auto& s : sequences) {
         ret.addSequence(core::meta::Sequence(s.getName(), s.getLength(), s.getID()));
     }
@@ -140,8 +141,8 @@ core::meta::Reference Reference::decapsulate(std::string meta) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, core::meta::Reference ref,
-                     core::MPEGMinorVersion _version)
+Reference::Reference(const uint8_t _dataset_group_id, const uint8_t _reference_ID, core::meta::Reference ref,
+                     const core::MPEGMinorVersion _version)
     : dataset_group_ID(_dataset_group_id),
       reference_ID(_reference_ID),
       reference_name(std::move(ref.getName())),
@@ -156,10 +157,9 @@ Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, core::met
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void Reference::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Reference");
-    print_offset(output, depth + 1, max_depth,
-                 "Dataset group ID: " + std::to_string(dataset_group_ID));
+    print_offset(output, depth + 1, max_depth, "Dataset group ID: " + std::to_string(dataset_group_ID));
     print_offset(output, depth + 1, max_depth, "Reference ID: " + std::to_string(reference_ID));
     print_offset(output, depth + 1, max_depth, "Reference name: " + reference_name);
     print_offset(output, depth + 1, max_depth, "Reference major version: " + std::to_string(ref_version.getMajor()));
@@ -177,8 +177,8 @@ void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
         location = "External at " + dynamic_cast<const reference::location::External&>(*reference_location).getURI();
     } else {
         const auto& i = dynamic_cast<const reference::location::Internal&>(*reference_location);
-        location = "Internal at (Dataset Group " + std::to_string(i.getDatasetGroupID()) +
-                   ", Dataset " + std::to_string(i.getDatasetID()) + ")";
+        location = "Internal at (Dataset Group " + std::to_string(i.getDatasetGroupID()) + ", Dataset " +
+                   std::to_string(i.getDatasetID()) + ")";
     }
     print_offset(output, depth + 1, max_depth, "Reference location: " + location);
 }

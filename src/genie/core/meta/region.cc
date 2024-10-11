@@ -14,7 +14,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Region::Region(uint16_t seqid, uint64_t start, uint64_t end, std::vector<record::ClassType> _classes)
+Region::Region(const uint16_t seqid, const uint64_t start, const uint64_t end, std::vector<record::ClassType> _classes)
     : seq_ID(seqid), classes(std::move(_classes)), start_pos(start), end_pos(end) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

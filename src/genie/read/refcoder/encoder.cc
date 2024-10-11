@@ -25,18 +25,19 @@ Encoder::RefEncodingState::RefEncodingState(const core::record::Chunk& data) : E
 std::pair<std::string, std::string> Encoder::getReferences(const core::record::Record& r, EncodingState& state) {
     std::pair<std::string, std::string> ret;
     {
-        auto begin = r.getAlignments().front().getPosition();
-        auto length = core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar());
-        auto end = begin + length;
+        const auto begin = r.getAlignments().front().getPosition();
+        const auto length =
+            core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar());
+        const auto end = begin + length;
         ret.first = dynamic_cast<RefEncodingState&>(state).excerpt.getString(begin, end);
     }
 
     if (r.getSegments().size() > 1) {
         const auto& srec = *reinterpret_cast<const core::record::alignment_split::SameRec*>(
             r.getAlignments().front().getAlignmentSplits().front().get());
-        auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
-        auto length = core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar());
-        auto end = begin + length;
+        const auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
+        const auto length = core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar());
+        const auto end = begin + length;
         ret.second = dynamic_cast<RefEncodingState&>(state).excerpt.getString(begin, end);
     }
 

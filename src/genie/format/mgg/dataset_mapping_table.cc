@@ -44,15 +44,15 @@ void DataSetMappingTable::addDataStream(DataStream d) { streams.emplace_back(d);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataSetMappingTable::DataSetMappingTable(uint16_t _dataset_id) : dataset_id(_dataset_id) {}
+DataSetMappingTable::DataSetMappingTable(const uint16_t _dataset_id) : dataset_id(_dataset_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     dataset_id = reader.readAlignedInt<uint16_t>();
-    size_t num_data_streams = (length - 14) / 3;
+    const size_t num_data_streams = (length - 14) / 3;
     for (size_t i = 0; i < num_data_streams; ++i) {
         streams.emplace_back(reader);
     }

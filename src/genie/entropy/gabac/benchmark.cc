@@ -25,8 +25,8 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-paramcabac::Binarization ConfigSearchBinarization::getBinarization(bool bypass, uint8_t outputbits,
-                                                                   uint8_t subsymsize) const {
+paramcabac::Binarization ConfigSearchBinarization::getBinarization(const bool bypass, const uint8_t outputbits,
+                                                                   const uint8_t subsymsize) const {
     return paramcabac::Binarization(
         lut[binarization_search_idx], bypass,
         paramcabac::BinarizationParameters(
@@ -148,9 +148,10 @@ uint8_t ConfigSearchTranformedSeq::getSplitRatio() const { return 1 << split_siz
 // ---------------------------------------------------------------------------------------------------------------------
 
 paramcabac::TransformedSubSeq ConfigSearchTranformedSeq::createConfig(
-    const core::GenSubIndex& descriptor_subsequence, bool original) {
+    const core::GenSubIndex& descriptor_subsequence,
+                                                                      const bool original) {
     int lut[] = {0, 2, 1};
-    auto subsymbol_trans = static_cast<paramcabac::SupportValues::TransformIdSubsym>(lut[getSubsymbolTransID()]);
+    const auto subsymbol_trans = static_cast<paramcabac::SupportValues::TransformIdSubsym>(lut[getSubsymbolTransID()]);
 
     auto symbol_size = output_bits;
     if (!split_in_binarization.getIndex(split_in_binarization_idx)) {
@@ -245,7 +246,7 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
         for (int j = 0; j < 2; ++j) {
             binarizations.back().emplace_back();
 
-            uint8_t splitsize = static_cast<uint8_t>(1) << i;
+            const uint8_t splitsize = static_cast<uint8_t>(1) << i;
             uint8_t codingsize = output_bits / splitsize;
 
             if (j == 0) {
@@ -281,8 +282,8 @@ void ConfigSearchTranformedSeq::mutate(std::mt19937& rd, std::normal_distributio
  * @brief
  * @return
  */
-std::string ResultTransformed::toCSV(const std::string& filename, size_t transform, size_t parameter,
-                                     size_t seq_id) const {
+std::string ResultTransformed::toCSV(const std::string& filename, const size_t transform, const size_t parameter,
+                                     const size_t seq_id) const {
     std::string ret;
     ret += filename + ";" + std::to_string(size) + ";" + std::to_string(milliseconds) + ";" +
            std::to_string(transform) + ";" + std::to_string(parameter) + ";" + std::to_string(seq_id) + ";";
@@ -439,7 +440,8 @@ int16_t ConfigSearchTransformation::getParameter() const { return parameter.getI
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ConfigSearchTransformation::ConfigSearchTransformation(paramcabac::TransformedParameters::TransformIdSubseq trans_id,
+ConfigSearchTransformation::ConfigSearchTransformation(
+    const paramcabac::TransformedParameters::TransformIdSubseq trans_id,
                                                        const std::pair<int64_t, int64_t>& range)
     : parameter_search_idx(0) {
     const uint16_t MATCH_CODING_BUFFER_SIZE = 255;
@@ -545,7 +547,7 @@ bool ConfigSearch::increment() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ConfigSearch::mutate(float rate) {
+void ConfigSearch::mutate(const float rate) {
     std::random_device rd;
     std::mt19937 gen{rd()};
     std::normal_distribution<> d{0, rate};
@@ -556,7 +558,7 @@ void ConfigSearch::mutate(float rate) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-paramcabac::Subsequence ConfigSearch::createConfig(core::GenSubIndex descriptor_subsequence, bool tokentype) {
+paramcabac::Subsequence ConfigSearch::createConfig(core::GenSubIndex descriptor_subsequence, const bool tokentype) {
     // Generate top level transformation
     auto t =
         paramcabac::TransformedParameters(static_cast<paramcabac::TransformedParameters::TransformIdSubseq>(
@@ -565,7 +567,7 @@ paramcabac::Subsequence ConfigSearch::createConfig(core::GenSubIndex descriptor_
 
     // Add config for transformed sequences
     std::vector<paramcabac::TransformedSubSeq> tss;
-    size_t i = 0;
+    const size_t i = 0;
     for (auto& p : params[transformation.getIndex(transformation_search_idx)].getTransformedSeqs()) {
         tss.emplace_back(p.createConfig(
             descriptor_subsequence,

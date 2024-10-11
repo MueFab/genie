@@ -24,7 +24,7 @@ namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::patchRefID(size_t refID) {
+void Record::patchRefID(const size_t refID) {
     sharedAlignmentInfo = AlignmentSharedData(static_cast<uint16_t>(refID), sharedAlignmentInfo.getAsDepth());
 }
 
@@ -45,8 +45,8 @@ Record::Record()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
-               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first)
+Record::Record(const uint8_t _number_of_template_segments, const ClassType _auTypeCfg, std::string &&_read_name,
+               std::string &&_read_group, const uint8_t _flags, const bool _is_read_1_first)
     : number_of_template_segments(_number_of_template_segments),
       reads(),
       alignmentInfo(0),
@@ -149,7 +149,7 @@ void Record::addSegment(Segment &&rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
+void Record::addAlignment(const uint16_t _seq_id, AlignmentBox &&rec) {
     if (alignmentInfo.empty()) {
         sharedAlignmentInfo =
             AlignmentSharedData(_seq_id, static_cast<uint8_t>(rec.getAlignment().getMappingScores().size()));
@@ -249,11 +249,11 @@ const AlignmentExternal &Record::getAlignmentExternal() const { return *moreAlig
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::setQVDepth(uint8_t depth) { qv_depth = depth; }
+void Record::setQVDepth(const uint8_t depth) { qv_depth = depth; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::setRead1First(bool val) { this->read_1_first = val; }
+void Record::setRead1First(const bool val) { this->read_1_first = val; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ void Record::setName(const std::string &_name) { read_name = _name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::setClassType(ClassType type) { this->class_ID = type; }
+void Record::setClassType(const ClassType type) { this->class_ID = type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -294,18 +294,18 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t Record::getMappedLength(size_t alignment, size_t split) const {
+size_t Record::getMappedLength(const size_t alignment, const size_t split) const {
     if (split == 0) {
         return getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
     }
-    auto &s2 =
+    const auto &s2 =
         dynamic_cast<alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getLengthOfCigar(s2.getAlignment().getECigar());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::setAlignment(size_t id, AlignmentBox &&b) { this->alignmentInfo[id] = std::move(b); }
+void Record::setAlignment(const size_t id, AlignmentBox &&b) { this->alignmentInfo[id] = std::move(b); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -321,11 +321,11 @@ std::pair<size_t, size_t> Record::getTemplatePosition() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t Record::getPosition(size_t alignment, size_t split) const {
+size_t Record::getPosition(const size_t alignment, const size_t split) const {
     if (split == 0) {
         return getAlignments()[alignment].getPosition();
     }
-    auto &s2 =
+    const auto &s2 =
         dynamic_cast<alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getAlignments()[alignment].getPosition() + s2.getDelta();
 }

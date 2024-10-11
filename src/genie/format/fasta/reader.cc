@@ -34,8 +34,8 @@ uint64_t FastaReader::getLength(const std::string& name) const { return fai.getL
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string FastaReader::loadSection(const std::string& sequence, uint64_t start, uint64_t end) {
-    auto startPos = fai.getFilePosition(sequence, start);
+std::string FastaReader::loadSection(const std::string& sequence, uint64_t start, const uint64_t end) {
+    const auto startPos = fai.getFilePosition(sequence, start);
     std::string ret;
     ret.reserve(end - start);
     fasta->seekg(startPos);
@@ -49,7 +49,8 @@ std::string FastaReader::loadSection(const std::string& sequence, uint64_t start
             break;
         }
     }
-    std::transform(ret.begin(), ret.end(), ret.begin(), [](char x) -> char { return static_cast<char>(toupper(x)); });
+    std::transform(ret.begin(), ret.end(), ret.begin(),
+                   [](const char x) -> char { return static_cast<char>(toupper(x)); });
     return ret;
 }
 
@@ -68,7 +69,7 @@ void FastaReader::index(std::istream& fasta, std::ostream& fai) {
         if (buffer.front() == '>') {
             lastline = false;
             if (seq.offset != 0) {
-                uint64_t tmp = seq.offset;
+                const uint64_t tmp = seq.offset;
                 seq.offset = nextoffset;
                 faiFile.addSequence(seq);
                 seq.offset = tmp;
@@ -99,8 +100,8 @@ void FastaReader::index(std::istream& fasta, std::ostream& fai) {
 void FastaReader::hash(const FaiFile& fai, std::istream& fasta, std::ostream& hash) {
     std::vector<std::pair<std::string, std::string>> hashes;
     for (const auto& s : fai.getSequences()) {
-        auto pos = fai.getFilePosition(s.second, 0);
-        auto length = fai.getLength(s.second);
+        const auto pos = fai.getFilePosition(s.second, 0);
+        const auto length = fai.getLength(s.second);
         auto sha_value = Sha256File::hash(fasta, pos, length);
         hashes.emplace_back(s.second, sha_value);
     }
@@ -110,7 +111,8 @@ void FastaReader::hash(const FaiFile& fai, std::istream& fasta, std::ostream& ha
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::meta::Reference FastaReader::getMeta() const {
-    std::string basename = path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1);
+    const std::string basename =
+        path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1);
     auto f = std::make_unique<core::meta::external_ref::Fasta>("file://" + path,
                                                                core::meta::ExternalRef::ChecksumAlgorithm::SHA256);
 

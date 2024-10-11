@@ -16,7 +16,7 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void AccessUnitHeader::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     static const std::string class_lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
     print_offset(output, depth, max_depth, "* Access Unit Header");
     print_offset(output, depth + 1, max_depth, "Access unit ID: " + std::to_string(header.getID()));
@@ -60,17 +60,17 @@ AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(mgb::AUHeader(), false) 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
-                                   const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit)
+                                   const std::map<size_t, core::parameter::EncodingSet>& parameterSets, const bool mit)
     : mit_flag(mit) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     header = mgb::AUHeader(reader, parameterSets, !mit_flag);
     UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader(mgb::AUHeader _header, bool _mit_flag)
+AccessUnitHeader::AccessUnitHeader(mgb::AUHeader _header, const bool _mit_flag)
     : header(std::move(_header)), mit_flag(_mit_flag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

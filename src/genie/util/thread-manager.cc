@@ -32,7 +32,7 @@ void ThreadManager::action(size_t) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::ThreadManager(size_t thread_num, size_t ctr)
+ThreadManager::ThreadManager(const size_t thread_num, const size_t ctr)
     : counter(ctr), threads(thread_num), stopFlag(false), abortFlag(false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ uint64_t ThreadManager::run() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::stop(bool abort) {
+void ThreadManager::stop(const bool abort) {
     abortFlag = abort;
     stopFlag = true;
 }

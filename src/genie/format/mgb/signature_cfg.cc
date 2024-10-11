@@ -19,11 +19,11 @@ bool SignatureCfg::operator==(const SignatureCfg& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _u_signature_size, uint8_t _base_bits)
+SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t _u_signature_size, const uint8_t _base_bits)
     : U_signature_size(_u_signature_size ? std::optional<uint8_t>(_u_signature_size)
                                          : std::optional<uint8_t>(std::nullopt)),
       base_bits(_base_bits) {
-    auto num_signatures = reader.read<uint16_t>();
+    const auto num_signatures = reader.read<uint16_t>();
     for (uint16_t i = 0; i < num_signatures; ++i) {
         size_t len = 0;
         if (U_signature_size != std::nullopt) {

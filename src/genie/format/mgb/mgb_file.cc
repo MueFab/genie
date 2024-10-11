@@ -32,16 +32,14 @@ uint8_t MgbFile::data_unit_order(const core::parameter::DataUnit& u) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void MgbFile::write(util::BitWriter& writer) {
-    for (auto& u : units) {
+    for (const auto& u : units) {
         u.second->write(writer);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgbFile::addUnit(std::unique_ptr<core::parameter::DataUnit> unit) {
-    units.emplace_back(0, std::move(unit));
-}
+void MgbFile::addUnit(std::unique_ptr<core::parameter::DataUnit> unit) { units.emplace_back(0, std::move(unit)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +50,7 @@ MgbFile::MgbFile() : file(nullptr) {}
 MgbFile::MgbFile(std::istream* _file) : file(_file), reader(std::make_unique<util::BitReader>(*file)) {
     while (true) {
         uint64_t pos = reader->getStreamPosition();
-        auto unit_type = reader->readAlignedInt<core::parameter::DataUnit::DataUnitType>();
+        const auto unit_type = reader->readAlignedInt<core::parameter::DataUnit::DataUnitType>();
         if (!reader->isStreamGood()) {
             break;
         }
@@ -79,7 +77,7 @@ MgbFile::MgbFile(std::istream* _file) : file(_file), reader(std::make_unique<uti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgbFile::print_debug(std::ostream& output, uint8_t max_depth) const {
+void MgbFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
     for (const auto& b : units) {
         b.second->print_debug(output, 0, max_depth);
     }
@@ -90,29 +88,27 @@ void MgbFile::print_debug(std::ostream& output, uint8_t max_depth) const {
 void MgbFile::sort_by_class() {
     auto sorter = [](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1,
                      const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u2) -> bool {
-        return base_sorter(
-            u1, u2, [](const AccessUnit& a1, const AccessUnit& a2) -> bool {
-                if (a1.getHeader().getClass() != a2.getHeader().getClass()) {
-                    return static_cast<uint8_t>(a1.getHeader().getClass()) <
-                           static_cast<uint8_t>(a2.getHeader().getClass());
-                }
-                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
-                    a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
-                    return a1.getHeader().getID() < a2.getHeader().getID();
-                }
-                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
-                    return false;
-                }
-                if (a1.getHeader().getAlignmentInfo().getRefID() != a2.getHeader().getAlignmentInfo().getRefID()) {
-                    return a1.getHeader().getAlignmentInfo().getRefID() < a2.getHeader().getAlignmentInfo().getRefID();
-                }
-                if (a1.getHeader().getAlignmentInfo().getStartPos() !=
-                    a2.getHeader().getAlignmentInfo().getStartPos()) {
-                    return a1.getHeader().getAlignmentInfo().getStartPos() <
-                           a2.getHeader().getAlignmentInfo().getStartPos();
-                }
-                return a1.getHeader().getAlignmentInfo().getEndPos() < a2.getHeader().getAlignmentInfo().getEndPos();
-            });
+        return base_sorter(u1, u2, [](const AccessUnit& a1, const AccessUnit& a2) -> bool {
+            if (a1.getHeader().getClass() != a2.getHeader().getClass()) {
+                return static_cast<uint8_t>(a1.getHeader().getClass()) <
+                       static_cast<uint8_t>(a2.getHeader().getClass());
+            }
+            if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
+                a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                return a1.getHeader().getID() < a2.getHeader().getID();
+            }
+            if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                return false;
+            }
+            if (a1.getHeader().getAlignmentInfo().getRefID() != a2.getHeader().getAlignmentInfo().getRefID()) {
+                return a1.getHeader().getAlignmentInfo().getRefID() < a2.getHeader().getAlignmentInfo().getRefID();
+            }
+            if (a1.getHeader().getAlignmentInfo().getStartPos() != a2.getHeader().getAlignmentInfo().getStartPos()) {
+                return a1.getHeader().getAlignmentInfo().getStartPos() <
+                       a2.getHeader().getAlignmentInfo().getStartPos();
+            }
+            return a1.getHeader().getAlignmentInfo().getEndPos() < a2.getHeader().getAlignmentInfo().getEndPos();
+        });
     };
     std::sort(units.begin(), units.end(), sorter);
 }
@@ -122,33 +118,29 @@ void MgbFile::sort_by_class() {
 void MgbFile::sort_by_position() {
     auto sorter = [](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1,
                      const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u2) -> bool {
-        return base_sorter(
-            u1, u2, [](const AccessUnit& a1, const AccessUnit& a2) -> bool {
-                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
-                    a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
-                    return a1.getHeader().getID() < a2.getHeader().getID();
-                }
-                if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
-                    return false;
-                }
-                if (a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
-                    return true;
-                }
-                if (a1.getHeader().getAlignmentInfo().getRefID() != a2.getHeader().getAlignmentInfo().getRefID()) {
-                    return a1.getHeader().getAlignmentInfo().getRefID() < a2.getHeader().getAlignmentInfo().getRefID();
-                }
-                if (a1.getHeader().getAlignmentInfo().getStartPos() !=
-                    a2.getHeader().getAlignmentInfo().getStartPos()) {
-                    return a1.getHeader().getAlignmentInfo().getStartPos() <
-                           a2.getHeader().getAlignmentInfo().getStartPos();
-                }
-                if (a1.getHeader().getAlignmentInfo().getEndPos() != a2.getHeader().getAlignmentInfo().getEndPos()) {
-                    return a1.getHeader().getAlignmentInfo().getEndPos() <
-                           a2.getHeader().getAlignmentInfo().getEndPos();
-                }
-                return static_cast<uint8_t>(a1.getHeader().getClass()) <
-                       static_cast<uint8_t>(a2.getHeader().getClass());
-            });
+        return base_sorter(u1, u2, [](const AccessUnit& a1, const AccessUnit& a2) -> bool {
+            if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
+                a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                return a1.getHeader().getID() < a2.getHeader().getID();
+            }
+            if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                return false;
+            }
+            if (a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
+                return true;
+            }
+            if (a1.getHeader().getAlignmentInfo().getRefID() != a2.getHeader().getAlignmentInfo().getRefID()) {
+                return a1.getHeader().getAlignmentInfo().getRefID() < a2.getHeader().getAlignmentInfo().getRefID();
+            }
+            if (a1.getHeader().getAlignmentInfo().getStartPos() != a2.getHeader().getAlignmentInfo().getStartPos()) {
+                return a1.getHeader().getAlignmentInfo().getStartPos() <
+                       a2.getHeader().getAlignmentInfo().getStartPos();
+            }
+            if (a1.getHeader().getAlignmentInfo().getEndPos() != a2.getHeader().getAlignmentInfo().getEndPos()) {
+                return a1.getHeader().getAlignmentInfo().getEndPos() < a2.getHeader().getAlignmentInfo().getEndPos();
+            }
+            return static_cast<uint8_t>(a1.getHeader().getClass()) < static_cast<uint8_t>(a2.getHeader().getClass());
+        });
     };
     std::sort(units.begin(), units.end(), sorter);
 }
@@ -174,23 +166,13 @@ void MgbFile::select_mapping_range(uint16_t ref_id, uint64_t start_pos, uint64_t
             return false;
         }
 
-        if (dynamic_cast<const AccessUnit&>(*u1.second).getHeader().getClass() ==
-            core::record::ClassType::CLASS_U) {
+        if (dynamic_cast<const AccessUnit&>(*u1.second).getHeader().getClass() == core::record::ClassType::CLASS_U) {
             return false;
         }
 
-        return dynamic_cast<const AccessUnit&>(*u1.second)
-                       .getHeader()
-                       .getAlignmentInfo()
-                       .getRefID() != ref_id ||
-               dynamic_cast<const AccessUnit&>(*u1.second)
-                       .getHeader()
-                       .getAlignmentInfo()
-                       .getStartPos() < start_pos ||
-               dynamic_cast<const AccessUnit&>(*u1.second)
-                       .getHeader()
-                       .getAlignmentInfo()
-                       .getEndPos() >= end_pos;
+        return dynamic_cast<const AccessUnit&>(*u1.second).getHeader().getAlignmentInfo().getRefID() != ref_id ||
+               dynamic_cast<const AccessUnit&>(*u1.second).getHeader().getAlignmentInfo().getStartPos() < start_pos ||
+               dynamic_cast<const AccessUnit&>(*u1.second).getHeader().getAlignmentInfo().getEndPos() >= end_pos;
     };
     units.erase(std::remove_if(units.begin(), units.end(), remover), units.end());
 }
@@ -206,25 +188,24 @@ void MgbFile::remove_unused_parametersets() {
     }
 
     units.erase(
-        std::remove_if(
-            units.begin(), units.end(),
-            [&ids](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1) -> bool {
-                if (u1.second->getDataUnitType() != core::parameter::DataUnit::DataUnitType::PARAMETER_SET) {
-                    return false;
-                }
-                if (ids.find(dynamic_cast<const core::parameter::ParameterSet&>(*u1.second).getID()) ==
-                    ids.end()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }),
+        std::remove_if(units.begin(), units.end(),
+                       [&ids](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1) -> bool {
+                           if (u1.second->getDataUnitType() != core::parameter::DataUnit::DataUnitType::PARAMETER_SET) {
+                               return false;
+                           }
+                           if (ids.find(dynamic_cast<const core::parameter::ParameterSet&>(*u1.second).getID()) ==
+                               ids.end()) {
+                               return true;
+                           } else {
+                               return false;
+                           }
+                       }),
         units.end());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Block> MgbFile::extractDescriptor(core::record::ClassType type, core::GenDesc descriptor,
+std::vector<Block> MgbFile::extractDescriptor(const core::record::ClassType type, core::GenDesc descriptor,
                                               const std::vector<uint8_t>& param_sets) {
     std::vector<Block> ret;
     for (auto& u : units) {
@@ -310,13 +291,13 @@ std::vector<std::unique_ptr<AccessUnit>> MgbFile::extractAUs(const std::vector<u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<uint8_t> MgbFile::collect_param_ids(bool multipleAlignments, bool pos40,
-                                                core::parameter::DataUnit::DatasetType dataset_type,
-                                                core::AlphabetID alphabet) {
+std::vector<uint8_t> MgbFile::collect_param_ids(const bool multipleAlignments, const bool pos40,
+                                                const core::parameter::DataUnit::DatasetType dataset_type,
+                                                const core::AlphabetID alphabet) {
     std::vector<uint8_t> ret;
     for (auto& parameterSet : parameterSets) {
         if (parameterSet.second.hasMultipleAlignments() == multipleAlignments &&
-            parameterSet.second.getPosSize() == 40 == pos40 && parameterSet.second.getDatasetType() == dataset_type &&
+            (parameterSet.second.getPosSize() == 40) == pos40 && parameterSet.second.getDatasetType() == dataset_type &&
             parameterSet.second.getAlphabetID() == alphabet) {
             ret.emplace_back(static_cast<uint8_t>(parameterSet.first));
         }

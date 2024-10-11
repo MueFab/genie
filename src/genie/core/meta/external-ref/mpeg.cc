@@ -15,7 +15,8 @@ namespace genie::core::meta::external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(std::string _ref_uri, ChecksumAlgorithm check, uint16_t group_id, uint16_t id, std::string checksum)
+MPEG::MPEG(std::string _ref_uri, const ChecksumAlgorithm check, const uint16_t group_id, const uint16_t id,
+           std::string checksum)
     : ExternalRef(std::move(_ref_uri), check, ReferenceType::MPEGG_REF),
       external_dataset_group_id(group_id),
       external_dataset_id(id),

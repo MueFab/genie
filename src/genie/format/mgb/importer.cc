@@ -16,12 +16,8 @@ namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly)
-    : ReferenceSource(manager),
-      reader(_file),
-      factory(manager, this, refOnly),
-      ref_manager(manager),
-      decoder(refd) {}
+Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, const bool refOnly)
+    : ReferenceSource(manager), reader(_file), factory(manager, this, refOnly), ref_manager(manager), decoder(refd) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,13 +42,13 @@ bool Importer::pump(uint64_t& id, std::mutex&) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
+std::string Importer::getRef(const bool raw, const size_t f_pos, const size_t start, const size_t end) {
     AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, false,
                   core::AlphabetID::ACGTN);
     std::string ret;
     {
         std::lock_guard<std::mutex> f_lock(this->lock);
-        size_t oldPos = reader.getStreamPosition();
+        const size_t oldPos = reader.getStreamPosition();
 
         if (raw) {
             reader.setStreamPosition(f_pos + start);
@@ -97,7 +93,7 @@ core::AccessUnit Importer::convertAU(AccessUnit&& au) {
     set.setClassType(unit.getHeader().getClass());
     if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U && !set.getParameters().isComputedReference()) {
         auto seqs = ref_manager->getSequences();
-        auto cur_seq = ref_manager->ID2Ref(unit.getHeader().getAlignmentInfo().getRefID());
+        const auto cur_seq = ref_manager->ID2Ref(unit.getHeader().getAlignmentInfo().getRefID());
         if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
             set.setReference(ref_manager->load(cur_seq, unit.getHeader().getAlignmentInfo().getStartPos(),
                                                unit.getHeader().getAlignmentInfo().getEndPos() + 1),

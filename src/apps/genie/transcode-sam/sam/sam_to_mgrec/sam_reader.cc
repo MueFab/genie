@@ -46,7 +46,7 @@ SamReader::~SamReader() {
 
 std::vector<std::pair<std::string, size_t>> SamReader::getRefs() {
     std::vector<std::pair<std::string, size_t>> ret;
-    auto num_ref = sam_hdr_nref(sam_header);
+    const auto num_ref = sam_hdr_nref(sam_header);
     ret.reserve(num_ref);
     for (int i = 0; i < num_ref; ++i) {
         ret.emplace_back(sam_hdr_tid2name(sam_header, i), sam_hdr_tid2len(sam_header, i));
@@ -88,7 +88,7 @@ int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
         sr.push_back(std::move(buffered_rec.value()));
         buffered_rec.reset();
     } else {
-        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        const auto res = sam_read1(sam_file, sam_header, sam_alignment);
         if (res >= 0) {
             sr.emplace_back(sam_alignment);
         } else {
@@ -97,7 +97,7 @@ int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
     }
 
     while (true) {
-        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        const auto res = sam_read1(sam_file, sam_header, sam_alignment);
         if (res >= 0) {
             buffered_rec = SamRecord(sam_alignment);
         } else {

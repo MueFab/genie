@@ -21,7 +21,7 @@ namespace genieapp::transcode_fasta {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string file_extension(const std::string& path) {
-    auto pos = path.find_last_of('.');
+    const auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
         c = static_cast<char>(std::tolower(c));

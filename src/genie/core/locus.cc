@@ -36,7 +36,7 @@ Locus::Locus(std::string _ref) : refName(std::move(_ref)), posPresent(false), st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Locus::Locus(std::string _ref, uint32_t _start, uint32_t _end)
+Locus::Locus(std::string _ref, const uint32_t _start, const uint32_t _end)
     : refName(std::move(_ref)), posPresent(true), start(_start), end(_end) {
     UTILS_DIE_IF(end < start, "Locus ends before start");
 }
@@ -49,7 +49,7 @@ Locus Locus::fromString(const std::string& string) {
     if (tok.size() == 1) {
         return Locus(tok.front());  // Sequence name only
     } else if (tok.size() == NUM_START_END) {
-        auto pos = util::tokenize(tok.back(), '-');  // Sequence + position
+        const auto pos = util::tokenize(tok.back(), '-');  // Sequence + position
         UTILS_DIE_IF(pos.size() != NUM_START_END, "Invalid locus");
         return {tok.front(), static_cast<uint32_t>(std::stoi(pos[0])), static_cast<uint32_t>(std::stoi(pos[1]))};
     } else {

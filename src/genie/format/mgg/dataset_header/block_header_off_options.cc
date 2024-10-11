@@ -18,7 +18,8 @@ bool BlockHeaderOffOptions::operator==(const BlockHeaderOffOptions& other) const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockHeaderOffOptions::BlockHeaderOffOptions(bool _ordered_blocks_flag) : ordered_blocks_flag(_ordered_blocks_flag) {}
+BlockHeaderOffOptions::BlockHeaderOffOptions(const bool _ordered_blocks_flag)
+    : ordered_blocks_flag(_ordered_blocks_flag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

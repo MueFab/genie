@@ -22,7 +22,7 @@ bool ReferenceOptions::operator==(const ReferenceOptions& other) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceOptions::ReferenceOptions(util::BitReader& reader) {
-    auto seq_count = reader.read<uint16_t>();
+    const auto seq_count = reader.read<uint16_t>();
     if (!seq_count) {
         reference_ID = std::numeric_limits<uint8_t>::max();
         return;
@@ -60,7 +60,7 @@ ReferenceOptions::ReferenceOptions() : reference_ID(std::numeric_limits<uint8_t>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceOptions::addSeq(uint8_t _reference_ID, uint16_t _seq_id, uint32_t blocks) {
+void ReferenceOptions::addSeq(const uint8_t _reference_ID, const uint16_t _seq_id, const uint32_t blocks) {
     UTILS_DIE_IF(_reference_ID != reference_ID && !seq_ID.empty(), "Unmatching ref id");
     reference_ID = _reference_ID;
     seq_ID.push_back(_seq_id);
@@ -81,7 +81,7 @@ uint8_t ReferenceOptions::getReferenceID() const { return reference_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceOptions::patchRefID(uint8_t _old, uint8_t _new) {
+void ReferenceOptions::patchRefID(const uint8_t _old, const uint8_t _new) {
     if (reference_ID == _old || reference_ID == 255) {
         reference_ID = _new;
     }

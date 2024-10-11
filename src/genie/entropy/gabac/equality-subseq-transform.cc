@@ -33,7 +33,7 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
     util::BlockStepper r = values->getReader();
     // Treat value as equalityFlags and vice versa
     while (r.isValid()) {
-        uint64_t symbol = r.get();
+        const uint64_t symbol = r.get();
         if (symbol == previousSymbol) {
             r.set(1);
         } else {
@@ -62,7 +62,7 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
     util::BlockStepper w = values->getReader();
     // Treat value as equalityFlags and vice versa
     while (r.isValid()) {
-        uint64_t symbol = r.get();
+        const uint64_t symbol = r.get();
         if (symbol == previousSymbol) {
             equalityFlags->push_back(1);
         } else {
@@ -85,7 +85,7 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
 
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     // Prepare internal and the output data structures
-    uint8_t wordsize = transformedSubseqs->front().getWordSize();
+    const uint8_t wordsize = transformedSubseqs->front().getWordSize();
     transformedSubseqs->resize(2);
     (*transformedSubseqs)[0].swap(
         &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
@@ -112,8 +112,8 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const flags = &(*transformedSubseqs)[0];
-    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
+    const util::DataBlock *const flags = &(*transformedSubseqs)[0];
+    const util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
     util::DataBlock symbols(0, (rawValues->getWordSize()));
 
     util::BlockStepper rflag = flags->getReader();
@@ -123,7 +123,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     uint64_t previousSymbol = 0;
     while (rflag.isValid()) {
         if (rflag.get() == 0) {
-            uint64_t val = rval.get();
+            const uint64_t val = rval.get();
             rval.inc();
             if (val >= previousSymbol) {
                 previousSymbol = val + 1;

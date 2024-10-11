@@ -17,8 +17,8 @@ namespace genie::format::mgg::reference::location::external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t _group_id, uint16_t _dataset_id,
-           std::string _ref_checksum, core::MPEGMinorVersion _version)
+MPEG::MPEG(const uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, const uint8_t _group_id,
+           const uint16_t _dataset_id, std::string _ref_checksum, const core::MPEGMinorVersion _version)
     : External(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
       version(_version),
       external_dataset_group_id(_group_id),
@@ -31,7 +31,7 @@ MPEG::MPEG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(util::BitReader& reader, size_t seq_count, core::MPEGMinorVersion _version)
+MPEG::MPEG(util::BitReader& reader, const size_t seq_count, const core::MPEGMinorVersion _version)
     : External(reader),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
@@ -50,8 +50,8 @@ MPEG::MPEG(util::BitReader& reader, size_t seq_count, core::MPEGMinorVersion _ve
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo,
-           size_t seq_count, core::MPEGMinorVersion _version)
+MPEG::MPEG(util::BitReader& reader, const uint8_t _reserved, std::string _uri, const ChecksumAlgorithm algo,
+           const size_t seq_count, const core::MPEGMinorVersion _version)
     : External(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {

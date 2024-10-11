@@ -24,7 +24,7 @@ namespace genieapp::run {
 std::string parent_dir(const std::string &path) {
     std::string ret;
 
-    auto pos = path.find_last_of('/');
+    const auto pos = path.find_last_of('/');
     if (pos == std::string::npos) {
         ret = ".";
     } else {
@@ -39,7 +39,7 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
+ProgramOptions::ProgramOptions(const int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
     app.add_option("-i,--input-file", inputFile, "Input file (mgrec or mgb)\n")->mandatory(true);
@@ -128,7 +128,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string size_string(std::uintmax_t f_size) {
+std::string size_string(const std::uintmax_t f_size) {
     size_t exponent = 0;
     auto size = static_cast<double>(f_size);
     while (size / 1024.0 > 1.0) {
@@ -152,13 +152,13 @@ void validateInputFile(const std::string &file) {
         return;
     }
     UTILS_DIE_IF(!std::filesystem::exists(file), "Input file does not exist: " + file);
-    std::ifstream stream(file);
+    const std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string random_string(size_t length) {
+std::string random_string(const size_t length) {
     // Define the character set
     const char charset[] =
         "0123456789"
@@ -205,7 +205,7 @@ void validateWorkingDir(const std::string &dir) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void validateOutputFile(const std::string &file, bool forced) {
+void validateOutputFile(const std::string &file, const bool forced) {
     if (file.substr(0, 2) == "-.") {
         return;
     }

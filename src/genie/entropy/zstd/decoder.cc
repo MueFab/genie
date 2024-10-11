@@ -22,21 +22,21 @@ namespace genie::entropy::zstd {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
-    auto id = data.getID();
+    const auto id = data.getID();
 
     uint8_t bytes = core::range2bytes(getSubsequence(id).range);
     if (id.first == core::GenDesc::RNAME) {
         bytes = 1;
     }
     util::DataBlock in = data.move();
-    size_t originalSize = ZSTD_getFrameContentSize(in.getData(), in.getRawSize());
+    const size_t originalSize = ZSTD_getFrameContentSize(in.getData(), in.getRawSize());
 
     UTILS_DIE_IF(originalSize == ZSTD_CONTENTSIZE_ERROR, "ZSTD_getFrameContentSize failed");
     UTILS_DIE_IF(originalSize == ZSTD_CONTENTSIZE_UNKNOWN, "ZSTD_getFrameContentSize unknown");
 
     util::DataBlock out(originalSize, bytes);
 
-    size_t decompressedSize = ZSTD_decompress(out.getData(), out.getRawSize(), in.getData(), in.getRawSize());
+    const size_t decompressedSize = ZSTD_decompress(out.getData(), out.getRawSize(), in.getData(), in.getRawSize());
 
     UTILS_DIE_IF(ZSTD_isError(decompressedSize),
                  "ZSTD decompression failed: " + std::string(ZSTD_getErrorName(decompressedSize)));
@@ -47,17 +47,17 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
-    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
+    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, const bool mmCoderEnabled) {
     (void)param;
     (void)mmCoderEnabled;
-    util::Watch watch;
+    const util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
     for (auto& subseq : std::get<0>(desc)) {
         if (subseq.isEmpty()) {
             continue;
         }
-        auto d_id = subseq.getID();
+        const auto d_id = subseq.getID();
 
         auto subseq_name = std::string();
         if (getDescriptor(std::get<0>(desc).getID()).tokentype) {

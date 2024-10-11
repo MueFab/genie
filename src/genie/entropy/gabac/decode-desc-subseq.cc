@@ -76,12 +76,12 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
 
         if (ioConf.inputStream->peek() != EOF) {
             // Set up for the inverse sequence transformation
-            size_t numTrnsfSubseqsCfgs = subseqCfg.getNumTransformSubseqCfgs();
+            const size_t numTrnsfSubseqsCfgs = subseqCfg.getNumTransformSubseqCfgs();
 
             // Loop through the transformed sequences
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
-                uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
+                const uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
                 transformedSubseqs[i].setWordSize(wordsize);
             }
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
@@ -108,9 +108,9 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                     if (numtrnsfSymbols <= 0) continue;
 
                     StreamHandler::readBytes(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain,
-                                                    &decodedTransformedSubseq);
+                                             &decodedTransformedSubseq);
 
-                    uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
+                    const uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
                     // Decoding
                     subseqPayloadSizeUsed += decodeTransformSubseq(
                         subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)),

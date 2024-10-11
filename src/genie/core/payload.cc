@@ -14,7 +14,7 @@ namespace genie::core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
-    auto pos = reader.getStreamPosition();
+    const auto pos = reader.getStreamPosition();
     reader.setStreamPosition(payloadPosition);
     util::DataBlock tmp;
     tmp.resize(payloadSize);
@@ -73,7 +73,7 @@ Payload::Payload(util::DataBlock payload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Payload::Payload(util::BitReader& reader, uint64_t size)
+Payload::Payload(util::BitReader& reader, const uint64_t size)
     : block_payload(),
       payloadLoaded(false),
       payloadPosition(reader.getStreamPosition()),

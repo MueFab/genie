@@ -43,20 +43,21 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
 void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::string& ecigar,
                                    core::AccessUnit::Descriptor& desc) {
     for (const auto& q : s.getQualities()) {
-        core::CigarTokenizer::tokenize(
-            ecigar, core::getECigarInfo(),
-            [&desc, &q](uint8_t cigar, const std::pair<size_t, size_t>& bs, const std::pair<size_t, size_t>&) -> bool {
-                auto qvs = std::string_view(q).substr(bs.first, bs.second);
-                uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
-                                           getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
-                                       ? 2
-                                       : static_cast<uint8_t>(desc.getSize()) - 1;
-                for (const auto& c : qvs) {
-                    UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-                    desc.get(codebook).push(c - 33);
-                }
-                return true;
-            });
+        core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(),
+                                       [&desc, &q](const uint8_t cigar, const std::pair<size_t, size_t>& bs,
+                                                   const std::pair<size_t, size_t>&) -> bool {
+                                           const auto qvs = std::string_view(q).substr(bs.first, bs.second);
+                                           const uint8_t codebook =
+                                               core::getECigarInfo().lut_step_ref[cigar] ||
+                                                       getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
+                                                   ? 2
+                                                   : static_cast<uint8_t>(desc.getSize()) - 1;
+                                           for (const auto& c : qvs) {
+                                               UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
+                                               desc.get(codebook).push(c - 33);
+                                           }
+                                           return true;
+                                       });
     }
 }
 
@@ -74,7 +75,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
-    util::Watch watch;
+    const util::Watch watch;
     auto param = std::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 

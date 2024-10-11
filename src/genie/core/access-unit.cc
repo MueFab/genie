@@ -68,7 +68,7 @@ MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mm
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
+AccessUnit::Subsequence::Subsequence(const uint8_t wordSize, GenSubIndex _id)
     : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -78,11 +78,11 @@ AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::push(uint64_t val) { data.push_back(val); }
+void AccessUnit::Subsequence::push(const uint64_t val) { data.push_back(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::pushDependency(uint64_t val) { dependency.push_back(val); }
+void AccessUnit::Subsequence::pushDependency(const uint64_t val) { dependency.push_back(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ void AccessUnit::Subsequence::inc() { position++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data.get(position + lookahead); }
+uint64_t AccessUnit::Subsequence::get(const size_t lookahead) const { return data.get(position + lookahead); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,16 +121,16 @@ uint64_t AccessUnit::Subsequence::pull() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) { return subdesc[sub]; }
+AccessUnit::Subsequence &AccessUnit::Descriptor::get(const uint16_t sub) { return subdesc[sub]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const { return subdesc[sub]; }
+const AccessUnit::Subsequence &AccessUnit::Descriptor::get(const uint16_t sub) const { return subdesc[sub]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
-    uint16_t s_id = pos << 4u | _type & 0xfu;
+AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(const uint16_t pos, const uint8_t _type) {
+    const uint16_t s_id = (pos << 4u) | (_type & 0xfu);
     while (subdesc.size() <= s_id) {
         subdesc.emplace_back(static_cast<uint8_t>(4), GenSubIndex(getID(), static_cast<uint16_t>(subdesc.size())));
     }
@@ -147,13 +147,11 @@ void AccessUnit::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::mov
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Descriptor::set(uint16_t _id, Subsequence &&sub) {
-    subdesc[_id] = std::move(sub);
-}
+void AccessUnit::Descriptor::set(const uint16_t _id, Subsequence &&sub) { subdesc[_id] = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Descriptor::Descriptor(GenDesc _id) : id(_id) {}
+AccessUnit::Descriptor::Descriptor(const GenDesc _id) : id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -207,11 +205,11 @@ void AccessUnit::set(GenDesc sub, Descriptor &&data) { descriptors[static_cast<u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::push(GenSubIndex sub, uint64_t value) { get(sub).push(value); }
+void AccessUnit::push(GenSubIndex sub, const uint64_t value) { get(sub).push(value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::pushDependency(GenSubIndex sub, uint64_t value) { get(sub).pushDependency(value); }
+void AccessUnit::pushDependency(GenSubIndex sub, const uint64_t value) { get(sub).pushDependency(value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -219,7 +217,7 @@ bool AccessUnit::isEnd(GenSubIndex sub) { return get(sub).end(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t AccessUnit::peek(GenSubIndex sub, size_t lookahead) { return get(sub).get(lookahead); }
+uint64_t AccessUnit::peek(GenSubIndex sub, const size_t lookahead) { return get(sub).get(lookahead); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -227,7 +225,7 @@ uint64_t AccessUnit::pull(GenSubIndex sub) { return get(sub).pull(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::annotateNumSymbols(size_t num) { numSymbols = num; }
+void AccessUnit::Subsequence::annotateNumSymbols(const size_t num) { numSymbols = num; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -245,7 +243,7 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id, const size_t size, util::BitReader &reader)
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
@@ -268,7 +266,7 @@ void AccessUnit::Subsequence::set(util::DataBlock &&dat) { data = std::move(dat)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::setPosition(size_t pos) { position = pos; }
+void AccessUnit::Subsequence::setPosition(const size_t pos) { position = pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -277,8 +275,8 @@ util::DataBlock &AccessUnit::Subsequence::getData() { return data; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t AccessUnit::Descriptor::getWrittenSize() const {
-    size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
-    return std::accumulate(subdesc.begin(), subdesc.end(), overhead, [](size_t sum, const Subsequence &payload) {
+    const size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
+    return std::accumulate(subdesc.begin(), subdesc.end(), overhead, [](const size_t sum, const Subsequence &payload) {
         return payload.isEmpty() ? sum : sum + payload.getRawSize();
     });
 }
@@ -300,7 +298,8 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader &reader) : id(_id) {
+AccessUnit::Descriptor::Descriptor(GenDesc _id, const size_t count, size_t remainingSize, util::BitReader &reader)
+    : id(_id) {
     if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         subdesc.emplace_back(GenSubIndex{_id, static_cast<uint16_t>(0)}, remainingSize, reader);
         return;
@@ -333,12 +332,12 @@ AccessUnit::Descriptor::Descriptor() : id(static_cast<GenDesc>(0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(parameter::EncodingSet &&set, size_t _numRecords)
+AccessUnit::AccessUnit(parameter::EncodingSet &&set, const size_t _numRecords)
     : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
         for (const auto &subdesc : desc.subseqs) {
-            auto bytes = range2bytes(getSubsequence(subdesc.id).range);
+            const auto bytes = range2bytes(getSubsequence(subdesc.id).range);
             desc_data.add(Subsequence(bytes, subdesc.id));
         }
         descriptors.push_back(std::move(desc_data));
@@ -375,7 +374,7 @@ void AccessUnit::addRecord() { numReads++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setReference(uint16_t ref) { referenceSequence = ref; }
+void AccessUnit::setReference(const uint16_t ref) { referenceSequence = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -383,11 +382,11 @@ uint16_t AccessUnit::getReference() const { return referenceSequence; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setMaxPos(uint64_t pos) { maxPos = pos; }
+void AccessUnit::setMaxPos(const uint64_t pos) { maxPos = pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setMinPos(uint64_t pos) { minPos = pos; }
+void AccessUnit::setMinPos(const uint64_t pos) { minPos = pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -399,7 +398,7 @@ uint64_t AccessUnit::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setNumReads(size_t recs) { numReads = recs; }
+void AccessUnit::setNumReads(const size_t recs) { numReads = recs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -407,7 +406,7 @@ record::ClassType AccessUnit::getClassType() const { return type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setClassType(record::ClassType _type) { type = _type; }
+void AccessUnit::setClassType(const record::ClassType _type) { type = _type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -455,7 +454,7 @@ bool AccessUnit::isReferenceOnly() const { return referenceOnly; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setReferenceOnly(bool ref) { referenceOnly = ref; }
+void AccessUnit::setReferenceOnly(const bool ref) { referenceOnly = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

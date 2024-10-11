@@ -22,14 +22,14 @@ Subsequence::Subsequence()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag)
+Subsequence::Subsequence(const uint16_t _descriptor_subsequence_ID, const bool _tokentypeFlag)
     : Subsequence(TransformedParameters(), _descriptor_subsequence_ID, _tokentypeFlag,
                   std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
-                         bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
+                         const bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
     : descriptor_subsequence_ID(), transform_subseq_parameters(_transform_subseq_parameters) {
     if (!_tokentypeFlag) {
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
@@ -42,7 +42,7 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader) {
+Subsequence::Subsequence(const bool tokentype, core::GenDesc desc, util::BitReader& reader) {
     core::GenSubIndex subSeq;
     if (!tokentype) {
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
@@ -75,7 +75,7 @@ Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Subsequence::setTransformSubseqCfg(size_t index, TransformedSubSeq&& _transformSubseq_cfg) {
+void Subsequence::setTransformSubseqCfg(const size_t index, TransformedSubSeq&& _transformSubseq_cfg) {
     transformSubseq_cfgs[index] = _transformSubseq_cfg;
 }
 
@@ -104,7 +104,9 @@ const TransformedParameters& Subsequence::getTransformParameters() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedSubSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
+const TransformedSubSeq& Subsequence::getTransformSubseqCfg(const uint8_t index) const {
+    return transformSubseq_cfgs[index];
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

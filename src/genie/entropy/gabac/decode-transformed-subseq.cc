@@ -27,7 +27,7 @@ void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::Bi
             case paramcabac::BinarizationParameters::BinarizationId::SSUTU:
             case paramcabac::BinarizationParameters::BinarizationId::SDTU:
                 if (reader.readSignFlag()) {
-                    int64_t symbolValueSigned = -static_cast<int64_t>(symbolValue);
+                    const int64_t symbolValueSigned = -static_cast<int64_t>(symbolValue);
                     symbolValue = static_cast<uint64_t>(symbolValueSigned);
                 }
                 break;
@@ -122,7 +122,8 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream, uint8_t wordsize) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream,
+                                   const uint8_t wordsize) {
     if (bitstream == nullptr) {
         UTILS_DIE("Bitstream is null");
     }
@@ -154,7 +155,8 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     const bool diffEnabled =
         trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING;
 
-    binFunc func = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
+    const binFunc func =
+        getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
@@ -392,7 +394,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock *bitstream, uint8_t wordsize, util::DataBlock *const depSymbols) {
+                             util::DataBlock *bitstream, const uint8_t wordsize, util::DataBlock *const depSymbols) {
     switch (trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
             return decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream, wordsize);

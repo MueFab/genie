@@ -22,7 +22,7 @@ uint32_t Block::getPayloadSize() const { return header.getPayloadSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Block::getLength() const {
-    uint64_t len = BlockHeader::getLength() + header.getPayloadSize();
+    const uint64_t len = BlockHeader::getLength() + header.getPayloadSize();
 
     /// block_payload[] u(8)
     //    len += block_payload.size() * sizeof(uint8_t);
@@ -45,7 +45,7 @@ bool Block::operator==(const Block& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(core::GenDesc _desc_id, util::DataBlock _payload)
+Block::Block(const core::GenDesc _desc_id, util::DataBlock _payload)
     : header(false, _desc_id, 0, static_cast<uint32_t>(_payload.getRawSize())), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -58,10 +58,9 @@ core::GenDesc Block::getDescID() const { return header.getDescriptorID(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void Block::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Block");
-    print_offset(output, depth + 1, max_depth,
-                 "Block descriptor ID: " + getDescriptor(header.getDescriptorID()).name);
+    print_offset(output, depth + 1, max_depth, "Block descriptor ID: " + getDescriptor(header.getDescriptorID()).name);
     print_offset(output, depth + 1, max_depth, "Block payload size: " + std::to_string(header.getPayloadSize()));
 }
 

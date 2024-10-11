@@ -12,7 +12,7 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OrderedLock::wait(size_t id) {
+void OrderedLock::wait(const size_t id) {
     std::unique_lock<std::mutex> lock(m);
     if (id == counter) {
         return;
@@ -22,7 +22,7 @@ void OrderedLock::wait(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OrderedLock::finished(size_t length) {
+void OrderedLock::finished(const size_t length) {
     {
         std::unique_lock<std::mutex> lock(m);
         counter += length;

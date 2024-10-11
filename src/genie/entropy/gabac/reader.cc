@@ -21,7 +21,7 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reader::Reader(util::DataBlock* bitstream, const bool bypassFlag, uint64_t numContexts)
+Reader::Reader(util::DataBlock* bitstream, const bool bypassFlag, const uint64_t numContexts)
     : m_bitInputStream(bitstream),
       m_decBinCabac(m_bitInputStream),
       m_bypassFlag(bypassFlag),
@@ -45,7 +45,7 @@ uint64_t Reader::readAsBIbypass(const std::vector<unsigned int>& binParams) {
 
 uint64_t Reader::readAsBIcabac(const std::vector<unsigned int>& binParams) {
     unsigned int bins = 0;
-    unsigned int cm = binParams[3];
+    const unsigned int cm = binParams[3];
     const unsigned int cLength = binParams[0];
     auto scan = m_contextModels.begin() + cm;
     for (size_t i = cLength; i > 0; i--) {
@@ -70,7 +70,7 @@ uint64_t Reader::readAsTUbypass(const std::vector<unsigned int>& binParams) {
 
 uint64_t Reader::readAsTUcabac(const std::vector<unsigned int>& binParams) {
     unsigned int i = 0;
-    unsigned int cm = binParams[3];
+    const unsigned int cm = binParams[3];
     const unsigned int cMax = binParams[0];
     auto scan = m_contextModels.begin() + cm;
     while (i < cMax) {
@@ -100,7 +100,7 @@ uint64_t Reader::readAsEGbypass(const std::vector<unsigned int>&) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Reader::readAsEGcabac(const std::vector<unsigned int>& binParams) {
-    unsigned int cm = binParams[3];
+    const unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
     unsigned int i = 0;
     while (m_decBinCabac.decodeBin(&*scan) == 0) {
@@ -211,7 +211,7 @@ uint64_t Reader::readAsDTUcabac(const std::vector<unsigned int>& binParams) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
+    const std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
     return readAsSUTUcabac(binParams);
 }
 

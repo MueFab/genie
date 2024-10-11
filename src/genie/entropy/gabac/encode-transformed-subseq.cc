@@ -275,7 +275,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
             const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             if (depSymbols) {
-                depSubsymValue = depSymbolValue >> oss - codingSubsymSize & subsymMask;
+                depSubsymValue = (depSymbolValue >> (oss - codingSubsymSize)) & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
@@ -412,7 +412,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, util::DataBlock *symbols,
-                             util::DataBlock *const depSymbols, size_t maxSize) {
+                             util::DataBlock *const depSymbols, const size_t maxSize) {
     switch (trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
             return encodeTransformSubseqOrder0(trnsfSubseqConf, symbols, maxSize);

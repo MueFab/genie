@@ -51,7 +51,7 @@ core::record::Chunk DecoderStub::decodeSequences(DecodingState& state, core::Acc
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderStub::decodeNames(DecodingState& state, core::record::Chunk& chunk) {
-    auto names = namecoder->process(state.nameStream);
+    const auto names = namecoder->process(state.nameStream);
     chunk.getStats().add(std::get<1>(names));
     for (size_t i = 0; i < std::get<0>(names).size(); ++i) {
         chunk.getData()[i].setName(std::get<0>(names)[i]);
@@ -121,7 +121,7 @@ void DecoderStub::addECigar(const core::record::Record& rec, std::vector<std::st
 void DecoderStub::flowIn(core::AccessUnit&& t, const util::Section& id) {
     auto t_data = std::move(t);
     t_data = entropyCodeAU(std::move(t_data), true);
-    auto state = createDecodingState(t_data);
+    const auto state = createDecodingState(t_data);
     auto chunk = decodeSequences(*state, t_data);
     decodeQualities(*state, chunk);
     decodeNames(*state, chunk);

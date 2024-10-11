@@ -17,8 +17,9 @@ SupportValues::SupportValues() : SupportValues(8, 8, 0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym_size, uint8_t _coding_order,
-                             bool _share_subsym_lut_flag, bool _share_subsym_prv_flag)
+SupportValues::SupportValues(const uint8_t _output_symbol_size, const uint8_t _coding_subsym_size,
+                             const uint8_t _coding_order, const bool _share_subsym_lut_flag,
+                             const bool _share_subsym_prv_flag)
     : output_symbol_size(_output_symbol_size),
       coding_subsym_size(_coding_subsym_size),
       coding_order(_coding_order),
@@ -27,7 +28,7 @@ SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader)
+SupportValues::SupportValues(const TransformIdSubsym transformIdSubsym, util::BitReader &reader)
     : share_subsym_lut_flag(false), share_subsym_prv_flag(false) {
     output_symbol_size = reader.read<uint8_t>(6);
     coding_subsym_size = reader.read<uint8_t>(6);
@@ -42,7 +43,7 @@ SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReade
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SupportValues::write(TransformIdSubsym transformIdSubsym, util::BitWriter &writer) const {
+void SupportValues::write(const TransformIdSubsym transformIdSubsym, util::BitWriter &writer) const {
     writer.writeBits(output_symbol_size, 6);
     writer.writeBits(coding_subsym_size, 6);
     writer.writeBits(coding_order, 2);
@@ -84,7 +85,7 @@ bool SupportValues::operator==(const SupportValues &val) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubsym) {
+SupportValues::SupportValues(nlohmann::json j, const TransformIdSubsym transformIdSubsym) {
     share_subsym_lut_flag = false;
     share_subsym_prv_flag = false;
     output_symbol_size = j["output_symbol_size"];
@@ -100,7 +101,7 @@ SupportValues::SupportValues(nlohmann::json j, TransformIdSubsym transformIdSubs
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-nlohmann::json SupportValues::toJson(TransformIdSubsym transformIdSubsym) const {
+nlohmann::json SupportValues::toJson(const TransformIdSubsym transformIdSubsym) const {
     nlohmann::json ret;
     ret["output_symbol_size"] = output_symbol_size;
     ret["coding_subsym_size"] = coding_subsym_size;

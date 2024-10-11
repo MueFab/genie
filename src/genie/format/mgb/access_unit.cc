@@ -23,7 +23,7 @@ namespace genie::format::mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::debugPrint(const core::parameter::EncodingSet &ps) const {
-    std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
+    const std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
     std::cerr << "AU " << header.getID() << ": class " << lut[static_cast<int>(header.getClass())];
     if (header.getClass() != core::record::ClassType::CLASS_U) {
         std::cerr << ", Position [" << header.getAlignmentInfo().getRefID() << "-"
@@ -72,16 +72,16 @@ size_t AccessUnit::getPayloadSize() const { return payloadbytes; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets, util::BitReader &bitReader,
-                       bool lazyPayload)
+                       const bool lazyPayload)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
-    uint64_t bitreader_pos = bitReader.getTotalBitsRead() / 8 - 1;
+    const uint64_t bitreader_pos = bitReader.getTotalBitsRead() / 8 - 1;
     bitReader.readBits(3);
-    auto du_size = bitReader.read<uint32_t>(29);
+    const auto du_size = bitReader.read<uint32_t>(29);
 
     header = AUHeader(bitReader, parameterSets);
 
-    uint64_t bytesRead = bitReader.getTotalBitsRead() / 8 - bitreader_pos;
+    const uint64_t bytesRead = bitReader.getTotalBitsRead() / 8 - bitreader_pos;
     payloadbytes = du_size - bytesRead;
     qv_payloads = parameterSets.at(header.getParameterID()).getQVConfig(header.getClass()).getNumSubsequences();
 
@@ -94,9 +94,10 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &par
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                       uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
-                       core::AlphabetID alphabet)
+AccessUnit::AccessUnit(const uint32_t _access_unit_ID, const uint8_t _parameter_set_ID,
+                       const core::record::ClassType _au_type, const uint32_t _reads_count,
+                       const DatasetType dataset_type, const uint8_t posSize, const bool signatureFlag,
+                       const core::AlphabetID alphabet)
     : DataUnit(DataUnitType::ACCESS_UNIT),
       header(_access_unit_ID, _parameter_set_ID, _au_type, _reads_count, dataset_type, posSize, signatureFlag,
              alphabet),

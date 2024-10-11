@@ -45,8 +45,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
             }
 
             for (auto c : s.getSequence()) {
-                state.streams.push(core::GenSub::UREADS,
-                                   getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
+                state.streams.push(core::GenSub::UREADS, getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
             }
         }
         if (r.getSegments().size() > 1) {
@@ -89,11 +88,11 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
+core::AccessUnit Encoder::pack(const util::Section& id, const uint8_t qv_depth,
                                std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) {
-    core::parameter::DataUnit::DatasetType dataType = state.refOnly
-                                                          ? core::parameter::DataUnit::DatasetType::REFERENCE
-                                                          : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
+    const core::parameter::DataUnit::DatasetType dataType = state.refOnly
+                                                                ? core::parameter::DataUnit::DatasetType::REFERENCE
+                                                                : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(static_cast<uint8_t>(id.start), static_cast<uint8_t>(id.start), dataType,
                                       core::AlphabetID::ACGTN, static_cast<uint32_t>(state.readLength), state.pairedEnd,
                                       false, qv_depth, 0, false, false);

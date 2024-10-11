@@ -42,7 +42,8 @@ void BlockHeader::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockHeader::BlockHeader(bool _reserved1, core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
+BlockHeader::BlockHeader(const bool _reserved1, const core::GenDesc _desc_id, const uint8_t _reserved2,
+                         const uint32_t payload_size)
     : reserved1(_reserved1), descriptor_ID(_desc_id), reserved2(_reserved2), block_payload_size(payload_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

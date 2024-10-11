@@ -21,7 +21,7 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
+bool ClassifierRegroup::isCovered(const size_t start, const size_t end) const {
     size_t position = start;
 
     for (auto it = currentSeqCoverage.begin(); it != currentSeqCoverage.end(); ++it) {
@@ -44,7 +44,7 @@ bool ClassifierRegroup::isCovered(const record::Record& r) const {
                          record::AlignmentSplit::Type::SAME_REC) {
             continue;
         }
-        auto pos = r.getPosition(0, i);
+        const auto pos = r.getPosition(0, i);
         if (!isCovered(pos, pos + r.getMappedLength(0, i))) {
             return false;
         }
@@ -94,7 +94,7 @@ void ClassifierRegroup::queueFinishedChunk(record::Chunk& data) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
+bool ClassifierRegroup::isWritten(const std::string& ref, const size_t index) {
     if (refState.find(ref) == refState.end()) {
         refState.insert(std::make_pair(ref, std::vector<uint8_t>(1, 0)));
     }
@@ -106,7 +106,8 @@ bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref)
+ClassifierRegroup::ClassifierRegroup(const size_t _auSize, ReferenceManager* rfmgr, const RefMode mode,
+                                     const bool raw_ref)
     : refMgr(rfmgr), currentSeqID(-1), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
@@ -260,7 +261,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
 
     for (auto& r : chunk.getData()) {
         auto classtype = r.getClassID();  // Only look at the ecigar for first classification
-        bool paired = r.getNumberOfTemplateSegments() > 1;
+        const bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
         if (r.getClassID() == record::ClassType::CLASS_U &&

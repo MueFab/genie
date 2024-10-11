@@ -143,7 +143,7 @@ TYPE SearchSpace<TYPE>::getIndex(size_t idx) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-TYPE SearchSpace<TYPE>::mutate(size_t index, float random) {
+TYPE SearchSpace<TYPE>::mutate(const size_t index, float random) {
     float value = getIndex(index);
     random = random * (max - min);
     value += random;

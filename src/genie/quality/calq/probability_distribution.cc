@@ -16,14 +16,14 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-ProbabilityDistribution::ProbabilityDistribution(size_t _rangeMin, size_t _rangeMax) {
+ProbabilityDistribution::ProbabilityDistribution(const size_t _rangeMin, const size_t _rangeMax) {
     this->rangeMin = _rangeMin;
     this->pdf.resize(_rangeMax - _rangeMin + 1);
 }
 
 // -----------------------------------------------------------------------------
 
-void ProbabilityDistribution::addToPdf(size_t qualScore, size_t number) {
+void ProbabilityDistribution::addToPdf(const size_t qualScore, const size_t number) {
     if (qualScore < rangeMin || qualScore > rangeMin + pdf.size() - 1) throwErrorException("PDF: Score not in range");
     pdf[qualScore - rangeMin] += number;
 }
@@ -34,14 +34,14 @@ void ProbabilityDistribution::resetPdf() { std::fill(pdf.begin(), pdf.end(), 0);
 
 // -----------------------------------------------------------------------------
 
-size_t ProbabilityDistribution::getCount(size_t value) const {
+size_t ProbabilityDistribution::getCount(const size_t value) const {
     if (value < rangeMin || value > rangeMin + pdf.size() - 1) throwErrorException("PDF: Value not in range");
     return value;
 }
 
 // -----------------------------------------------------------------------------
 
-size_t ProbabilityDistribution::operator[](size_t index) const {
+size_t ProbabilityDistribution::operator[](const size_t index) const {
     if (index >= pdf.size()) throwErrorException("PDF: Index not in range");
     return pdf[index];
 }

@@ -12,7 +12,7 @@ namespace genie::core::meta::blockheader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Disabled::Disabled(bool ordered) : BlockHeader(HeaderType::DISABLED), ordered_blocks_flag(ordered) {}
+Disabled::Disabled(const bool ordered) : BlockHeader(HeaderType::DISABLED), ordered_blocks_flag(ordered) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -22,7 +22,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
                           std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
-    uint8_t wordsize = transformedSubseqs->front().getWordSize();
+    const uint8_t wordsize = transformedSubseqs->front().getWordSize();
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
     symbols.swap(&(*transformedSubseqs)[0]);
@@ -48,8 +48,8 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     for (uint64_t i = 0; i < symbolsSize; i++) {
         uint64_t pointer = 0;
         uint64_t length = 0;
-        uint64_t windowStartIdx = i - matchBufferSize;
-        uint64_t windowEndIdx = i;
+        const uint64_t windowStartIdx = i - matchBufferSize;
+        const uint64_t windowEndIdx = i;
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
@@ -86,9 +86,9 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const pointers = &(*transformedSubseqs)[0];
-    util::DataBlock *const lengths = &(*transformedSubseqs)[1];
-    util::DataBlock *const rawValues = &(*transformedSubseqs)[2];
+    const util::DataBlock *const pointers = &(*transformedSubseqs)[0];
+    const util::DataBlock *const lengths = &(*transformedSubseqs)[1];
+    const util::DataBlock *const rawValues = &(*transformedSubseqs)[2];
 
     util::DataBlock symbols(0, (rawValues->getWordSize()));
     assert(lengths->size() == pointers->size() + rawValues->size());
@@ -99,14 +99,14 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::BlockStepper t1 = lengths->getReader();
     util::BlockStepper t2 = rawValues->getReader();
     while (t1.isValid()) {
-        uint64_t length = t1.get();
+        const uint64_t length = t1.get();
         t1.inc();
         if (length == 0) {
             symbols.push_back(t2.get());
             t2.inc();
             n++;
         } else {
-            uint64_t pointer = t0.get();
+            const uint64_t pointer = t0.get();
             t0.inc();
             for (uint64_t l = 0; l < length; l++) {
                 symbols.push_back(symbols.get(n - pointer));

@@ -32,7 +32,8 @@ void AuTypeCfg::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AuTypeCfg::AuTypeCfg(uint16_t _sequence_ID, uint64_t _aU_start_position, uint64_t _aU_end_position, uint8_t _posSize)
+AuTypeCfg::AuTypeCfg(const uint16_t _sequence_ID, const uint64_t _aU_start_position, const uint64_t _aU_end_position,
+                     const uint8_t _posSize)
     : sequence_ID(_sequence_ID),
       AU_start_position(_aU_start_position),
       AU_end_position(_aU_end_position),
@@ -40,11 +41,12 @@ AuTypeCfg::AuTypeCfg(uint16_t _sequence_ID, uint64_t _aU_start_position, uint64_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AuTypeCfg::AuTypeCfg(uint8_t _posSize) : AuTypeCfg(0, 0, 0, _posSize) {}
+AuTypeCfg::AuTypeCfg(const uint8_t _posSize) : AuTypeCfg(0, 0, 0, _posSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AuTypeCfg::AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader &reader) : posSize(_posSize) {
+AuTypeCfg::AuTypeCfg(const uint8_t _posSize, const bool multiple_alignments, util::BitReader &reader)
+    : posSize(_posSize) {
     sequence_ID = reader.read<uint16_t>();
     AU_start_position = reader.read<uint64_t>(posSize);
     AU_end_position = reader.read<uint64_t>(posSize);

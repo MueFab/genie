@@ -15,7 +15,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(size_t id, std::string information, std::string protection)
+AccessUnit::AccessUnit(const size_t id, std::string information, std::string protection)
     : access_unit_ID(id), AU_information_value(std::move(information)), AU_protection_value(std::move(protection)) {
     UTILS_DIE_IF(AU_information_value.empty() && AU_protection_value.empty(), "Empty AU metadata");
 }
@@ -52,7 +52,7 @@ const std::string& AccessUnit::getProtection() const { return AU_protection_valu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(size_t id) : access_unit_ID(id) {}
+AccessUnit::AccessUnit(const size_t id) : access_unit_ID(id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -18,7 +18,7 @@ bool ComputedRefExtended::operator==(const ComputedRefExtended& ext) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ComputedRefExtended::ComputedRefExtended(uint8_t _cr_pad_size, uint32_t _cr_buf_max_size)
+ComputedRefExtended::ComputedRefExtended(const uint8_t _cr_pad_size, const uint32_t _cr_buf_max_size)
     : cr_pad_size(_cr_pad_size), cr_buf_max_size(_cr_buf_max_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

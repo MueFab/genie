@@ -15,7 +15,8 @@ namespace genie::name::tokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SingleToken::SingleToken(Tokens t, uint32_t p, std::string ps) : token(t), param(p), paramString(std::move(ps)) {}
+SingleToken::SingleToken(const Tokens t, const uint32_t p, std::string ps)
+    : token(t), param(p), paramString(std::move(ps)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

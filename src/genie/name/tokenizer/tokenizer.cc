@@ -105,7 +105,7 @@ void TokenState::number() {
         step();
     }
 
-    auto delta = tok.param - getOldToken().param;
+    const auto delta = tok.param - getOldToken().param;
     if (getOldToken() == tok) {
         pushToken(Tokens::MATCH);
     } else if (getOldToken().token == Tokens::DIGITS && tok.param > getOldToken().param &&
@@ -119,7 +119,7 @@ void TokenState::number() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TokenState::character() {
-    SingleToken tok(Tokens::CHAR, *cur_it, "");
+    const SingleToken tok(Tokens::CHAR, *cur_it, "");
     step();
     if (tok == getOldToken()) {
         pushToken(Tokens::MATCH);
@@ -162,7 +162,7 @@ std::vector<SingleToken>&& TokenState::run() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void push32bigEndian(core::AccessUnit::Subsequence& seq, uint32_t value) {
+void push32bigEndian(core::AccessUnit::Subsequence& seq, const uint32_t value) {
     seq.push(value >> 24 & 0xff);
     seq.push(value >> 16 & 0xff);
     seq.push(value >> 8 & 0xff);

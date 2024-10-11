@@ -14,12 +14,14 @@ namespace genie::format::fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(std::string _name, size_t length, Manager* m)
+Reference::Reference(std::string _name, const size_t length, Manager* m)
     : core::Reference(std::move(_name), 0, length), mgr(m) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Reference::getSequence(uint64_t _start, uint64_t _end) { return mgr->getRef(getName(), _start, _end); }
+std::string Reference::getSequence(const uint64_t _start, const uint64_t _end) {
+    return mgr->getRef(getName(), _start, _end);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

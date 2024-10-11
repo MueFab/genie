@@ -14,7 +14,7 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LabelRegion::LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
+LabelRegion::LabelRegion(const uint16_t _seq_ID, const uint64_t _start_pos, const uint64_t _end_pos)
     : seq_ID(_seq_ID), class_IDs(), start_pos(_start_pos), end_pos(_end_pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
     seq_ID = reader.read<uint16_t>();
 
     // num_classes u(8)
-    auto num_classes = reader.read<uint8_t>(4);
+    const auto num_classes = reader.read<uint8_t>(4);
     class_IDs.resize(num_classes);
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
@@ -40,7 +40,7 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelRegion::addClassID(core::record::ClassType _class_ID) { class_IDs.push_back(_class_ID); }
+void LabelRegion::addClassID(const core::record::ClassType _class_ID) { class_IDs.push_back(_class_ID); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

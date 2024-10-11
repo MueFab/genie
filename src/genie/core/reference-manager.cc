@@ -36,7 +36,7 @@ void ReferenceManager::touch(const std::string& name, size_t num) {
     }
 
     cacheInfo.emplace_front(name, num);
-    auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
+    const auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
     cacheInfo.pop_back();
 
     line->chunk.reset();
@@ -45,7 +45,7 @@ void ReferenceManager::touch(const std::string& name, size_t num) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::validateRefID(size_t id) {
+void ReferenceManager::validateRefID(const size_t id) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
     for (size_t i = 0; i <= id; ++i) {
         auto s = std::to_string(i);
@@ -67,18 +67,18 @@ size_t ReferenceManager::ref2ID(const std::string& ref) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ReferenceManager::ID2Ref(size_t id) {
+std::string ReferenceManager::ID2Ref(const size_t id) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    auto it = indices.find(id);
+    const auto it = indices.find(id);
     UTILS_DIE_IF(it == indices.end(), "Unknown reference ID. Forgot to specify external reference?");
     return it->second;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ReferenceManager::refKnown(size_t id) {
+bool ReferenceManager::refKnown(const size_t id) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    auto it = indices.find(id);
+    const auto it = indices.find(id);
     return it != indices.end();
 }
 
@@ -121,16 +121,16 @@ const std::string& ReferenceManager::ReferenceExcerpt::getRefName() const { retu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkAt(size_t pos) const {
-    int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
+std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkAt(const size_t pos) const {
+    const int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= static_cast<int>(data.size()), "Invalid index");
     return data[id];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::ReferenceExcerpt::mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat) {
-    int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
+void ReferenceManager::ReferenceExcerpt::mapChunkAt(const size_t pos, std::shared_ptr<const std::string> dat) {
+    const int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= static_cast<int>(data.size()), "Invalid index");
     data[id] = std::move(dat);
 }
@@ -141,7 +141,7 @@ ReferenceManager::ReferenceExcerpt::ReferenceExcerpt() : ReferenceExcerpt("", 0,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt::ReferenceExcerpt(std::string name, size_t start, size_t end)
+ReferenceManager::ReferenceExcerpt::ReferenceExcerpt(std::string name, const size_t start, const size_t end)
     : ref_name(std::move(name)),
       global_start(start),
       global_end(end),
@@ -156,11 +156,11 @@ const std::shared_ptr<const std::string>& ReferenceManager::ReferenceExcerpt::un
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::ReferenceExcerpt::extend(size_t newEnd) {
+void ReferenceManager::ReferenceExcerpt::extend(const size_t newEnd) {
     if (newEnd < global_end) {
         return;
     }
-    size_t id = (newEnd - 1) / CHUNK_SIZE;
+    const size_t id = (newEnd - 1) / CHUNK_SIZE;
     for (size_t i = data.size() - 1; i < id; ++i) {
         data.push_back(undef_page());
     }
@@ -175,7 +175,7 @@ bool ReferenceManager::ReferenceExcerpt::isMapped(const std::shared_ptr<const st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ReferenceManager::ReferenceExcerpt::isMapped(size_t pos) const {
+bool ReferenceManager::ReferenceExcerpt::isMapped(const size_t pos) const {
     return isMapped(data[(pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE]);
 }
 
@@ -191,7 +191,7 @@ ReferenceManager::ReferenceExcerpt::Stepper::Stepper(const ReferenceExcerpt& e) 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::ReferenceExcerpt::Stepper::inc(size_t off) {
+void ReferenceManager::ReferenceExcerpt::Stepper::inc(const size_t off) {
     stringPos += off;
     while (stringPos >= CHUNK_SIZE) {
         stringPos -= CHUNK_SIZE;
@@ -218,7 +218,7 @@ ReferenceManager::ReferenceExcerpt::Stepper ReferenceManager::ReferenceExcerpt::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ReferenceManager::ReferenceExcerpt::getString(size_t start, size_t end) const {
+std::string ReferenceManager::ReferenceExcerpt::getString(const size_t start, const size_t end) const {
     if (start < global_start || end > global_end) {
         UTILS_DIE("String can't be bigger than reference excerpt");
     }
@@ -234,7 +234,7 @@ std::string ReferenceManager::ReferenceExcerpt::getString(size_t start, size_t e
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceManager(size_t csize) : cacheSize(csize) {}
+ReferenceManager::ReferenceManager(const size_t csize) : cacheSize(csize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -242,8 +242,8 @@ void ReferenceManager::addRef(size_t index, std::unique_ptr<Reference> ref) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
     UTILS_DIE_IF(indices.find(index) != indices.end(), "Ref index already taken");
     indices.insert(std::make_pair(index, ref->getName()));
-    auto sequence = data.find(ref->getName());
-    size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
+    const auto sequence = data.find(ref->getName());
+    const size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
     for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
         data[ref->getName()].push_back(std::make_unique<CacheLine>());
     }
@@ -252,10 +252,10 @@ void ReferenceManager::addRef(size_t index, std::unique_ptr<Reference> ref) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& name, size_t pos) {
+std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& name, const size_t pos) {
     std::unique_lock<std::mutex> lock2(cacheInfoLock);
-    size_t id = pos / CHUNK_SIZE;
-    auto it = data.find(name);
+    const size_t id = pos / CHUNK_SIZE;
+    const auto it = data.find(name);
 
     // Invalid chunk
     if (it == data.end()) {
@@ -300,7 +300,8 @@ std::shared_ptr<const std::string> ReferenceManager::loadAt(const std::string& n
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt ReferenceManager::load(const std::string& name, size_t start, size_t end) {
+ReferenceManager::ReferenceExcerpt ReferenceManager::load(const std::string& name, const size_t start,
+                                                          const size_t end) {
     ReferenceExcerpt ret(name, start, end);
     for (size_t i = start / CHUNK_SIZE; i <= (end - 1) / CHUNK_SIZE; i++) {
         ret.mapChunkAt(i * CHUNK_SIZE, loadAt(name, i * CHUNK_SIZE));

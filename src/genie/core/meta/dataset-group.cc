@@ -30,7 +30,7 @@ const std::string& DatasetGroup::getProtection() const { return DG_protection_va
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(uint16_t id, uint8_t version, std::string meta, std::string protection)
+DatasetGroup::DatasetGroup(const uint16_t id, const uint8_t version, std::string meta, std::string protection)
     : dataset_group_ID(id),
       version_number(version),
       DG_metadata_value(std::move(meta)),

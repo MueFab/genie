@@ -20,7 +20,7 @@ namespace genie::read::localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LocalReference::LocalReference(uint32_t _cr_buf_max_size) : cr_buf_max_size(_cr_buf_max_size), crBufSize(0) {}
+LocalReference::LocalReference(const uint32_t _cr_buf_max_size) : cr_buf_max_size(_cr_buf_max_size), crBufSize(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
     size_t count = 0;
     size_t read_pos = 0;
 
-    for (char cigar_pos : cigar) {
+    for (const char cigar_pos : cigar) {
         if (std::isdigit(cigar_pos)) {
             count *= 10;
             count += cigar_pos - '0';
@@ -82,9 +82,9 @@ std::string LocalReference::preprocess(const std::string &read, const std::strin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalReference::addSingleRead(const std::string &record, const std::string &ecigar, uint64_t position) {
+void LocalReference::addSingleRead(const std::string &record, const std::string &ecigar, const uint64_t position) {
     sequence_positions.push_back(position);
-    std::string read = preprocess(record, ecigar);
+    const std::string read = preprocess(record, ecigar);
     sequences.push_back(read);
     crBufSize += static_cast<uint32_t>(read.length());
 
@@ -126,7 +126,7 @@ void LocalReference::addRead(const core::record::Record &s) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string LocalReference::generateRef(uint32_t offset, uint32_t len) {
+std::string LocalReference::generateRef(const uint32_t offset, const uint32_t len) {
     std::string ref;
     for (uint32_t i = offset; i < offset + len; ++i) {
         ref += majorityVote(i);
@@ -139,7 +139,7 @@ std::string LocalReference::generateRef(uint32_t offset, uint32_t len) {
 uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
     uint32_t len = 0;
     uint32_t count = 0;
-    for (char cigar_pos : cigar) {
+    for (const char cigar_pos : cigar) {
         if (std::isdigit(cigar_pos)) {
             count *= 10;
             count += cigar_pos - '0';
@@ -177,22 +177,24 @@ uint32_t LocalReference::lengthFromCigar(const std::string &cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string LocalReference::getReference(uint32_t abs_pos, const std::string &cigar) {
+std::string LocalReference::getReference(const uint32_t abs_pos, const std::string &cigar) {
     return generateRef(abs_pos, lengthFromCigar(cigar));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string LocalReference::getReference(uint32_t abs_pos, uint32_t len) { return generateRef(abs_pos, len); }
+std::string LocalReference::getReference(const uint32_t abs_pos, const uint32_t len) {
+    return generateRef(abs_pos, len);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-char LocalReference::majorityVote(uint32_t abs_position) {
+char LocalReference::majorityVote(const uint32_t abs_position) {
     std::map<char, uint16_t> votes;
 
     // Collect all alignments
     for (size_t i = 0; i < sequences.size(); ++i) {
-        int64_t distance = abs_position - sequence_positions[i];
+        const int64_t distance = abs_position - sequence_positions[i];
         if (distance >= 0 && static_cast<uint64_t>(distance) < sequences[i].length()) {
             char c = sequences[i][distance];
             if (c != '0') {
@@ -204,7 +206,7 @@ char LocalReference::majorityVote(uint32_t abs_position) {
     // Find max
     char max = '\0';
     uint16_t max_value = 0;
-    for (auto &v : votes) {
+    for (const auto &v : votes) {
         if (max_value < v.second) {
             max_value = v.second;
             max = v.first;
@@ -221,10 +223,10 @@ char LocalReference::majorityVote(uint32_t abs_position) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalReference::printWindow() const {
-    uint64_t minPos = getWindowBorder();
+    const uint64_t minPos = getWindowBorder();
 
     for (size_t i = 0; i < sequences.size(); ++i) {
-        uint64_t totalOffset = sequence_positions[i] - minPos;
+        const uint64_t totalOffset = sequence_positions[i] - minPos;
         for (size_t s = 0; s < totalOffset; ++s) {
             std::cerr << ".";
         }

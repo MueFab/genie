@@ -19,18 +19,18 @@ namespace genie::quality::paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
+QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, const bool _reverse_flag)
     : QualityValues(MODE_QV1, _reverse_flag), parameter_set_qvps() {
     qvps_preset_ID = _qvps_preset_ID;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-QualityValues1::QualityValues1(core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
+QualityValues1::QualityValues1(const core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
     (void)desc;
     assert(desc == genie::core::GenDesc::QV);
 
-    auto qvps_flag = reader.read<bool>(1);
+    const auto qvps_flag = reader.read<bool>(1);
     if (qvps_flag) {
         parameter_set_qvps = ParameterSet(reader);
     } else {
@@ -63,8 +63,8 @@ void QualityValues1::write(util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
-    auto ret = std::make_unique<QualityValues1>(
-        qvps_preset_ID ? qvps_preset_ID.value() : QvpsPresetId ::ASCII, qv_reverse_flag);
+    auto ret = std::make_unique<QualityValues1>(qvps_preset_ID ? qvps_preset_ID.value() : QvpsPresetId ::ASCII,
+                                                qv_reverse_flag);
     if (parameter_set_qvps) {
         auto qvps = parameter_set_qvps;
         ret->setQvps(std::move(qvps.value()));
@@ -75,8 +75,7 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(core::GenDesc desc,
-                                                                      util::BitReader& reader) {
+std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(core::GenDesc desc, util::BitReader& reader) {
     return std::make_unique<QualityValues1>(desc, reader);
 }
 
@@ -111,7 +110,7 @@ const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(core::record::ClassType type) {
+std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(const core::record::ClassType type) {
     auto ret = std::make_unique<QualityValues1>(QvpsPresetId::ASCII, false);
     ParameterSet set;
 
@@ -137,7 +136,7 @@ size_t QualityValues1::getNumberCodeBooks() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Codebook& QualityValues1::getCodebook(size_t id) const {
+const Codebook& QualityValues1::getCodebook(const size_t id) const {
     if (qvps_preset_ID != std::nullopt) {
         UTILS_DIE_IF(id > 0, "Codebook out of bounds");
         return getPresetCodebook(qvps_preset_ID.value());

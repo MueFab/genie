@@ -87,7 +87,7 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
 
         // Loop through the transformed sequences
         for (size_t i = 0; i < numTrnsfSubseqs; i++) {
-            uint64_t numtrnsfSymbols = transformedSubseqs[i].size();
+            const uint64_t numtrnsfSymbols = transformedSubseqs[i].size();
             uint64_t trnsfSubseqPayloadSize = 0;
             if (numtrnsfSymbols > 0) {
                 // Encoding

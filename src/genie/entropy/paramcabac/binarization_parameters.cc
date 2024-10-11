@@ -19,7 +19,7 @@ BinarizationParameters::BinarizationParameters() : BinarizationParameters(Binari
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitReader &reader) {
+BinarizationParameters::BinarizationParameters(const BinarizationId binID, util::BitReader &reader) {
     switch (binID) {
         case BinarizationId::TU:
             cmax = reader.read<uint8_t>();
@@ -70,7 +70,7 @@ BinarizationParameters::BinarizationParameters(const BinarizationId &_binarizati
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BinarizationParameters::write(BinarizationId binID, util::BitWriter &writer) const {
+void BinarizationParameters::write(const BinarizationId binID, util::BitWriter &writer) const {
     switch (binID) {
         case BinarizationId::TU:
             writer.writeBits(cmax, 8);
@@ -127,7 +127,7 @@ bool BinarizationParameters::operator==(const BinarizationParameters &bin) const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters(nlohmann::json j, BinarizationId binID) {
+BinarizationParameters::BinarizationParameters(nlohmann::json j, const BinarizationId binID) {
     cmax = 0;
     cmax_teg = 0;
     cmax_dtu = 0;
@@ -154,7 +154,7 @@ BinarizationParameters::BinarizationParameters(nlohmann::json j, BinarizationId 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-nlohmann::json BinarizationParameters::toJson(BinarizationId binID) const {
+nlohmann::json BinarizationParameters::toJson(const BinarizationId binID) const {
     nlohmann::json ret;
     switch (binID) {
         case BinarizationId::TU:

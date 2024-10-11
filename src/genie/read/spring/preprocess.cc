@@ -27,7 +27,7 @@ namespace genie::read::spring {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
+void Preprocessor::setup(const std::string &wdir, const size_t num_thr, const bool paired_end) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
     cp.num_thr = static_cast<int>(num_thr);

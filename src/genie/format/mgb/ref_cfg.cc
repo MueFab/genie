@@ -40,7 +40,8 @@ void RefCfg::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RefCfg::RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize)
+RefCfg::RefCfg(const uint16_t _ref_sequence_ID, const uint64_t _ref_start_position, const uint64_t _ref_end_position,
+               const uint8_t _posSize)
     : ref_sequence_ID(_ref_sequence_ID),
       ref_start_position(_ref_start_position),
       ref_end_position(_ref_end_position),
@@ -48,11 +49,11 @@ RefCfg::RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RefCfg::RefCfg(uint8_t _posSize) : RefCfg(0, 0, 0, _posSize) {}
+RefCfg::RefCfg(const uint8_t _posSize) : RefCfg(0, 0, 0, _posSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RefCfg::RefCfg(uint8_t _posSize, util::BitReader &reader) : posSize(_posSize) {
+RefCfg::RefCfg(const uint8_t _posSize, util::BitReader &reader) : posSize(_posSize) {
     ref_sequence_ID = reader.read<uint16_t>();
     ref_start_position = reader.read<uint64_t>(posSize);
     ref_end_position = reader.read<uint64_t>(posSize);

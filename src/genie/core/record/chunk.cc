@@ -30,7 +30,7 @@ const ReferenceManager::ReferenceExcerpt& Chunk::getRef() const { return referen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Chunk::setRefID(size_t id) { refID = id; }
+void Chunk::setRefID(const size_t id) { refID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ bool Chunk::isReferenceOnly() const { return referenceOnly; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Chunk::setReferenceOnly(bool ref) { referenceOnly = ref; }
+void Chunk::setReferenceOnly(const bool ref) { referenceOnly = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

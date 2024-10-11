@@ -33,10 +33,10 @@ const std::string& DatasetGroupMetadata::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupMetadata::DatasetGroupMetadata(util::BitReader& bitreader, core::MPEGMinorVersion _version)
+DatasetGroupMetadata::DatasetGroupMetadata(util::BitReader& bitreader, const core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
+    const auto start_pos = bitreader.getStreamPosition() - 4;
+    const auto length = bitreader.readAlignedInt<uint64_t>();
     auto metadata_length = length - getHeaderLength();
     if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
@@ -49,8 +49,8 @@ DatasetGroupMetadata::DatasetGroupMetadata(util::BitReader& bitreader, core::MPE
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupMetadata::DatasetGroupMetadata(uint8_t _dataset_group_id, std::string _dg_metatdata_value,
-                                           core::MPEGMinorVersion _version)
+DatasetGroupMetadata::DatasetGroupMetadata(const uint8_t _dataset_group_id, std::string _dg_metatdata_value,
+                                           const core::MPEGMinorVersion _version)
     : version(_version), dataset_group_id(_dataset_group_id), dg_metatdata_value(std::move(_dg_metatdata_value)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ std::string DatasetGroupMetadata::decapsulate() { return std::move(dg_metatdata_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupMetadata::patchID(uint8_t groupID) { dataset_group_id = groupID; }
+void DatasetGroupMetadata::patchID(const uint8_t groupID) { dataset_group_id = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

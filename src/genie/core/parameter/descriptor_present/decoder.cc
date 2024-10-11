@@ -20,7 +20,7 @@ uint8_t Decoder::getMode() const { return encoding_mode_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(uint8_t _encoding_mode_id) : encoding_mode_ID(_encoding_mode_id) {}
+Decoder::Decoder(const uint8_t _encoding_mode_id) : encoding_mode_ID(_encoding_mode_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

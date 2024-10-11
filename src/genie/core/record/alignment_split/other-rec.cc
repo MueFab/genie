@@ -15,7 +15,7 @@ namespace genie::core::record::alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
+OtherRec::OtherRec(const uint64_t _split_pos, const uint16_t _split_seq_ID)
     : AlignmentSplit(Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

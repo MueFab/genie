@@ -28,21 +28,22 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(AccessUnitHeader h, core::MPEGMinorVersion _verison) : header(std::move(h)), version(_verison) {}
+AccessUnit::AccessUnit(AccessUnitHeader h, const core::MPEGMinorVersion _verison)
+    : header(std::move(h)), version(_verison) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(util::BitReader& reader, const std::map<size_t, core::parameter::EncodingSet>& parameterSets,
-                       bool mit, bool block_header, core::MPEGMinorVersion _version)
+                       const bool mit, const bool block_header, const core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     std::string tmp(4, '\0');
     reader.readAlignedBytes(tmp.data(), tmp.length());
     UTILS_DIE_IF(tmp != "auhd", "Access unit without header");
     header = AccessUnitHeader(reader, parameterSets, mit);
     do {
-        auto tmp_pos = reader.getStreamPosition();
+        const auto tmp_pos = reader.getStreamPosition();
         std::string tmp_str(4, '\0');
         reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
         if (tmp_str == "auin") {
@@ -125,7 +126,7 @@ const std::string& AccessUnit::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void AccessUnit::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Access Unit");
     header.print_debug(output, depth + 1, max_depth);
     if (au_information) {
@@ -160,7 +161,7 @@ mgb::AccessUnit AccessUnit::decapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version)
+AccessUnit::AccessUnit(mgb::AccessUnit au, const bool mit, const core::MPEGMinorVersion _version)
     : header(std::move(au.getHeader()), mit), version(_version) {
     for (auto& b : au.getBlocks()) {
         blocks.emplace_back(std::move(b));

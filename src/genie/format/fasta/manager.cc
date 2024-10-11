@@ -38,7 +38,7 @@ uint64_t Manager::getLength(const std::string& seq) const { return reader.getLen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Manager::getRef(const std::string& sequence, uint64_t start, uint64_t end) {
+std::string Manager::getRef(const std::string& sequence, const uint64_t start, const uint64_t end) {
     std::lock_guard<std::mutex> guard(readerMutex);
     return reader.loadSection(sequence, start, end);
 }
@@ -46,7 +46,7 @@ std::string Manager::getRef(const std::string& sequence, uint64_t start, uint64_
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::vector<std::unique_ptr<core::Reference>> Manager::generateRefHandles() {
-    auto seqs = getSequences();
+    const auto seqs = getSequences();
     std::vector<std::unique_ptr<core::Reference>> ret;
     for (const auto& s : seqs) {
         size_t length = getLength(s.second);

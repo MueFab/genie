@@ -16,7 +16,7 @@ bool BlockHeaderOnOptions::operator==(const BlockHeaderOnOptions& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockHeaderOnOptions::BlockHeaderOnOptions(bool _mit_flag, bool _cc_mode_flag)
+BlockHeaderOnOptions::BlockHeaderOnOptions(const bool _mit_flag, const bool _cc_mode_flag)
     : mit_flag(_mit_flag), cc_mode_flag(_cc_mode_flag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

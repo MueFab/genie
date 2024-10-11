@@ -18,7 +18,7 @@ namespace genie::core::meta::external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Fasta::Fasta(std::string _ref_uri, ChecksumAlgorithm check)
+Fasta::Fasta(std::string _ref_uri, const ChecksumAlgorithm check)
     : ExternalRef(std::move(_ref_uri), check, ReferenceType::FASTA_REF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@ namespace genie::entropy::lzma {
 template <typename T>
 void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) {
     for (const auto &subdesc : desc.subseqs) {
-        auto bits_p2 = core::range2bytes(subdesc.range) * 8;
+        const auto bits_p2 = core::range2bytes(subdesc.range) * 8;
         auto subseqCfg = Subsequence(bits_p2);
         decoder_config.setSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second), std::move(subseqCfg));
     }
@@ -49,7 +49,7 @@ void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &p
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence &&in) {
-    size_t num_symbols = in.getNumSymbols();
+    const size_t num_symbols = in.getNumSymbols();
     util::DataBlock input_buffer = in.move();
 
     lzma_stream strm = LZMA_STREAM_INIT;  // Initialize the lzma_stream structure
@@ -60,7 +60,7 @@ core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence &&in) {
     strm.next_in = static_cast<const unsigned char *>(input_buffer.getData());
     strm.avail_in = input_buffer.getRawSize();
 
-    size_t outSize = lzma_stream_buffer_bound(input_buffer.getRawSize());
+    const size_t outSize = lzma_stream_buffer_bound(input_buffer.getRawSize());
     util::DataBlock output_buffer(outSize, 1);
 
     strm.next_out = static_cast<unsigned char *>(output_buffer.getData());
@@ -85,12 +85,12 @@ core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence &&in) {
 
 core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor &desc) {
     EntropyCoded ret;
-    util::Watch watch;
+    const util::Watch watch;
     std::get<1>(ret) = std::move(desc);
     for (auto &subdesc : std::get<1>(ret)) {
         if (!subdesc.isEmpty()) {
             // add compressed payload
-            auto id = subdesc.getID();
+            const auto id = subdesc.getID();
 
             std::get<2>(ret).addInteger("size-lzma-total-raw", subdesc.getRawSize());
             auto subseq_name = std::string();
@@ -122,7 +122,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
+Encoder::Encoder(const bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

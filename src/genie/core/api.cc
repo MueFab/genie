@@ -30,39 +30,27 @@ std::string ExceptionVerificationFailed::msg() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionDecryptionFailed::msg() const {
-    return "Decryption failed. " + RuntimeException::msg();
-}
+std::string ExceptionDecryptionFailed::msg() const { return "Decryption failed. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionDatasetGroupNotFound::msg() const {
-    return "Dataset group not found. " + RuntimeException::msg();
-}
+std::string ExceptionDatasetGroupNotFound::msg() const { return "Dataset group not found. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionDatasetNotFound::msg() const {
-    return "Dataset not found. " + RuntimeException::msg();
-}
+std::string ExceptionDatasetNotFound::msg() const { return "Dataset not found. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionAccessUnitNotFound::msg() const {
-    return "Access unit not found. " + RuntimeException::msg();
-}
+std::string ExceptionAccessUnitNotFound::msg() const { return "Access unit not found. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionReferenceNotFound::msg() const {
-    return "Reference not found. " + RuntimeException::msg();
-}
+std::string ExceptionReferenceNotFound::msg() const { return "Reference not found. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionSequenceNotFound::msg() const {
-    return "Sequence not found. " + RuntimeException::msg();
-}
+std::string ExceptionSequenceNotFound::msg() const { return "Sequence not found. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,27 +60,19 @@ std::string ExceptionMetadataFieldNotFound::msg() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionMetadataInvalid::msg() const {
-    return "Metadata invalid. " + RuntimeException::msg();
-}
+std::string ExceptionMetadataInvalid::msg() const { return "Metadata invalid. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionReferenceInvalid::msg() const {
-    return "Reference invalid. " + RuntimeException::msg();
-}
+std::string ExceptionReferenceInvalid::msg() const { return "Reference invalid. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionParameterInvalid::msg() const {
-    return "Parameter invalid. " + RuntimeException::msg();
-}
+std::string ExceptionParameterInvalid::msg() const { return "Parameter invalid. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionBitstreamInvalid::msg() const {
-    return "Bitstream invalid." + RuntimeException::msg();
-}
+std::string ExceptionBitstreamInvalid::msg() const { return "Bitstream invalid." + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +83,7 @@ Hierarchy GenieState::getHierarchy() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
+std::vector<Records> GenieState::getDataBySimpleFilter(const uint64_t datasetGroupID, const uint64_t datasetID,
                                                        const SimpleFilter& filter) {
     (void)datasetGroupID;
     (void)datasetID;
@@ -114,7 +94,7 @@ std::vector<Records> GenieState::getDataBySimpleFilter(uint64_t datasetGroupID, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
+std::vector<Records> GenieState::getDataByAdvancedFilter(const uint64_t datasetGroupID, const uint64_t datasetID,
                                                          const AdvancedFilter& filter) {
     (void)datasetGroupID;
     (void)datasetID;
@@ -125,7 +105,7 @@ std::vector<Records> GenieState::getDataByAdvancedFilter(uint64_t datasetGroupID
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID,
+std::vector<Records> GenieState::getDataBySignature(const uint64_t datasetGroupID, const uint64_t datasetID,
                                                     const char* signature) {
     (void)datasetGroupID;
     (void)datasetID;
@@ -136,7 +116,7 @@ std::vector<Records> GenieState::getDataBySignature(uint64_t datasetGroupID, uin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const std::string& labelID) {
+std::vector<Records> GenieState::getDataByLabel(const uint64_t datasetGroupID, const std::string& labelID) {
     (void)datasetGroupID;
     (void)labelID;
     // UTILS_DIE("Not implemented");
@@ -145,7 +125,7 @@ std::vector<Records> GenieState::getDataByLabel(uint64_t datasetGroupID, const s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> GenieState::getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID) {
+std::vector<std::string> GenieState::getMetadataFields(const uint64_t datasetGroupID, const uint64_t datasetID) {
     (void)datasetGroupID;
     (void)datasetID;
     // UTILS_DIE("Not implemented");
@@ -154,7 +134,8 @@ std::vector<std::string> GenieState::getMetadataFields(uint64_t datasetGroupID, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const std::string& fieldName) {
+std::string GenieState::getMetadataContent(const uint64_t datasetGroupID, const uint64_t datasetID,
+                                           const std::string& fieldName) {
     (void)datasetGroupID;
     (void)datasetID;
     (void)fieldName;
@@ -164,7 +145,7 @@ std::string GenieState::getMetadataContent(uint64_t datasetGroupID, uint64_t dat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
+std::string GenieState::getDatasetGroupProtection(const uint64_t datasetGroupID) {
     (void)datasetGroupID;
     // UTILS_DIE("Not implemented");
     return {};
@@ -172,7 +153,7 @@ std::string GenieState::getDatasetGroupProtection(uint64_t datasetGroupID) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string GenieState::getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID) {
+std::string GenieState::getDatasetProtection(const uint64_t datasetGroupID, const uint64_t datasetID) {
     (void)datasetGroupID;
     (void)datasetID;
     // UTILS_DIE("Not implemented");
@@ -181,9 +162,10 @@ std::string GenieState::getDatasetProtection(uint64_t datasetGroupID, uint64_t d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<RegionProtection> GenieState::getDatasetRegionProtection(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                     uint64_t sequenceID, uint64_t startPos,
-                                                                     uint64_t endPos) {
+std::vector<RegionProtection> GenieState::getDatasetRegionProtection(const uint64_t datasetGroupID,
+                                                                     const uint64_t datasetID,
+                                                                     const uint64_t sequenceID, const uint64_t startPos,
+                                                                     const uint64_t endPos) {
     (void)datasetGroupID;
     (void)datasetID;
     (void)sequenceID;
@@ -195,7 +177,8 @@ std::vector<RegionProtection> GenieState::getDatasetRegionProtection(uint64_t da
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OutReference GenieState::getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences) {
+OutReference GenieState::getDatasetReference(const uint64_t datasetGroupID, const uint64_t datasetID,
+                                             const bool includeSequences) {
     (void)datasetGroupID;
     (void)datasetID;
     (void)includeSequences;
@@ -205,9 +188,10 @@ OutReference GenieState::getDatasetReference(uint64_t datasetGroupID, uint64_t d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                     uint64_t sequenceID, uint64_t startPos,
-                                                                     uint64_t endPos) {
+std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(const uint64_t datasetGroupID,
+                                                                     const uint64_t datasetID,
+                                                                     const uint64_t sequenceID, const uint64_t startPos,
+                                                                     const uint64_t endPos) {
     (void)datasetGroupID;
     (void)datasetID;
     (void)sequenceID;
@@ -219,9 +203,11 @@ std::vector<SimpleSegmentStatistics> GenieState::getSimpleStatistics(uint64_t da
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<AdvancedSegmentStatistics> GenieState::getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                         uint64_t sequenceID, uint64_t startPos,
-                                                                         uint64_t endPos) {
+std::vector<AdvancedSegmentStatistics> GenieState::getAdvancedStatistics(const uint64_t datasetGroupID,
+                                                                         const uint64_t datasetID,
+                                                                         const uint64_t sequenceID,
+                                                                         const uint64_t startPos,
+                                                                         const uint64_t endPos) {
     (void)datasetGroupID;
     (void)datasetID;
     (void)sequenceID;

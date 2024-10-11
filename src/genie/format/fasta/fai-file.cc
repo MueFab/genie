@@ -54,15 +54,15 @@ FaiFile::FaiFile(std::istream& stream) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t FaiFile::getFilePosition(const std::string& sequence, uint64_t position) const {
-    auto seq = seqs.find(sequence);
+uint64_t FaiFile::getFilePosition(const std::string& sequence, const uint64_t position) const {
+    const auto seq = seqs.find(sequence);
     UTILS_DIE_IF(seq == seqs.end(), "Unknown ref sequence");
     UTILS_DIE_IF(seq->second.length < position, "Reference position out of bounds");
-    uint64_t offset = seq->second.offset;
-    uint64_t fullbaselines = position / seq->second.linebases;
-    uint64_t fullbaselinesBytes = fullbaselines * seq->second.linewidth;
-    uint64_t lastline = position % seq->second.linebases;
-    uint64_t pos = offset + fullbaselinesBytes + lastline;
+    const uint64_t offset = seq->second.offset;
+    const uint64_t fullbaselines = position / seq->second.linebases;
+    const uint64_t fullbaselinesBytes = fullbaselines * seq->second.linewidth;
+    const uint64_t lastline = position % seq->second.linebases;
+    const uint64_t pos = offset + fullbaselinesBytes + lastline;
     return pos;
 }
 

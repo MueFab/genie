@@ -18,7 +18,8 @@ AlignmentSharedData::AlignmentSharedData() : seq_ID(0), as_depth(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : seq_ID(_seq_ID), as_depth(_as_depth) {}
+AlignmentSharedData::AlignmentSharedData(const uint16_t _seq_ID, const uint8_t _as_depth)
+    : seq_ID(_seq_ID), as_depth(_as_depth) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

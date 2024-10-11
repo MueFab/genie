@@ -66,7 +66,7 @@ class CircularBuffer {
      * @param index The index of the element to retrieve.
      * @return A reference to the element at the specified index.
      */
-    T& operator[](size_t index) { return data[(pos + index) % data.size()]; }
+    T& operator[](const size_t index) { return data[(pos + index) % data.size()]; }
 
     /**
      * @brief Retrieves a constant element at the specified index.
@@ -76,7 +76,7 @@ class CircularBuffer {
      * @param index The index of the element to retrieve.
      * @return A constant reference to the element at the specified index.
      */
-    const T& operator[](size_t index) const { return data[(pos + index) % data.size()]; }
+    const T& operator[](const size_t index) const { return data[(pos + index) % data.size()]; }
 
     /**
      * @brief Retrieves the oldest element in the buffer.

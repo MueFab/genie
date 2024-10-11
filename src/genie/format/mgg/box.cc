@@ -15,7 +15,8 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Box::print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, const std::string& msg) const {
+void Box::print_offset(std::ostream& output, const uint8_t depth, const uint8_t max_depth,
+                       const std::string& msg) const {
     if (depth > max_depth) {
         return;
     }
@@ -27,7 +28,7 @@ void Box::print_offset(std::ostream& output, uint8_t depth, uint8_t max_depth, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Box::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void Box::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     (void)output;
     (void)depth;
     (void)max_depth;

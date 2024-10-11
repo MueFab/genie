@@ -35,7 +35,7 @@ namespace genieapp::transcode_fastq {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string file_extension(const std::string& path) {
-    auto pos = path.find_last_of('.');
+    const auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
         c = static_cast<char>(std::tolower(c));
@@ -65,7 +65,7 @@ FileType getType(const std::string& ext) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OperationCase getOperation(FileType in, FileType out) {
+OperationCase getOperation(const FileType in, const FileType out) {
     if (in == FileType::THIRD_PARTY && out == FileType::THIRD_PARTY) {
         return OperationCase::CONVERT;
     } else {
@@ -151,12 +151,12 @@ std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int main(int argc, char* argv[]) {
-    ProgramOptions pOpts(argc, argv);
+int main(const int argc, char* argv[]) {
+    const ProgramOptions pOpts(argc, argv);
     if (pOpts.help) {
         return 0;
     }
-    genie::util::Watch watch;
+    const genie::util::Watch watch;
     std::unique_ptr<genie::core::FlowGraph> flowGraph;
     std::vector<std::unique_ptr<std::ifstream>> inputFiles;
     std::vector<std::unique_ptr<std::ofstream>> outputFiles;

@@ -40,7 +40,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
         descriptors.emplace_back(num_classes, static_cast<GenDesc>(i), bitReader);
     }
-    auto num_groups = bitReader.read<uint16_t>();
+    const auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
         rgroup_IDs.emplace_back();
         char c = 0;
@@ -52,24 +52,24 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     multiple_alignments_flag = bitReader.read<bool>(1);
     spliced_reads_flag = bitReader.read<bool>(1);
     reserved = bitReader.read<uint32_t>(30);
-    bool sig_flag = bitReader.read<bool>(1);
+    const bool sig_flag = bitReader.read<bool>(1);
     if (sig_flag) {
         signature_cfg = SignatureCfg();
-        bool const_flag = bitReader.read<bool>(1);
+        const bool const_flag = bitReader.read<bool>(1);
         if (const_flag) {
             signature_cfg->signature_length = bitReader.read<uint8_t>(8);
         }
     }
     for (size_t i = 0; i < num_classes; ++i) {
-        auto mode = bitReader.read<uint8_t>(4);
+        const auto mode = bitReader.read<uint8_t>(4);
         if (mode == 1) {
-            qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
-                mode, GenDesc::QV, bitReader));
+            qv_coding_configs.emplace_back(
+                GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, GenDesc::QV, bitReader));
         } else {
             bitReader.read<uint8_t>(1);
         }
     }
-    auto crps_flag = bitReader.read<bool>(1);
+    const auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {
         parameter_set_crps = ComputedRef(bitReader);
     }
@@ -78,9 +78,10 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
 
 //------------------------------------------------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(DataUnit::DatasetType _dataset_type, AlphabetID _alphabet_id, uint32_t _read_length,
-                         bool _paired_end, bool _pos_40_bits_flag, uint8_t _qv_depth, uint8_t _as_depth,
-                         bool _multiple_alignments_flag, bool _spliced_reads_flag)
+EncodingSet::EncodingSet(const DataUnit::DatasetType _dataset_type, const AlphabetID _alphabet_id,
+                         const uint32_t _read_length, const bool _paired_end, const bool _pos_40_bits_flag,
+                         const uint8_t _qv_depth, const uint8_t _as_depth, const bool _multiple_alignments_flag,
+                         const bool _spliced_reads_flag)
     : dataset_type(_dataset_type),
       alphabet_ID(_alphabet_id),
       read_length(_read_length),
@@ -132,7 +133,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
     uint64_t bits = tmp_writer.getTotalBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
-    uint64_t bytes = bits / 8 + (bits % 8 ? 1 : 0);
+    const uint64_t bytes = bits / 8 + (bits % 8 ? 1 : 0);
 
     // Now size is known, write to final destination
     writer.writeBits(bytes, 22);
@@ -148,7 +149,7 @@ uint64_t ParameterSet::getLength() const {
     tmp_writer.writeBits(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
 
-    uint64_t len = tmp_writer.getTotalBitsWritten() / 8;
+    const uint64_t len = tmp_writer.getTotalBitsWritten() / 8;
 
     return len;
 }
@@ -244,7 +245,7 @@ void EncodingSet::setComputedRef(ComputedRef &&_parameter_set_crps) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncodingSet::addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf) {
+void EncodingSet::addClass(const record::ClassType class_id, std::unique_ptr<QualityValues> conf) {
     for (auto &a : descriptors) {
         if (a.isClassSpecific()) {
             UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
@@ -402,11 +403,11 @@ const QualityValues &EncodingSet::getQVConfig(record::ClassType type) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setID(uint8_t id) { parameter_set_ID = id; }
+void ParameterSet::setID(const uint8_t id) { parameter_set_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
+void ParameterSet::setParentID(const uint8_t id) { parent_parameter_set_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -414,7 +415,7 @@ uint8_t ParameterSet::getParentID() const { return parent_parameter_set_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncodingSet::setQVDepth(uint8_t qv) { qv_depth = qv; }
+void EncodingSet::setQVDepth(const uint8_t qv) { qv_depth = qv; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -454,10 +455,11 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
-                           AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
-                           uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
-                           bool _spliced_reads_flag)
+ParameterSet::ParameterSet(const uint8_t _parameter_set_ID, const uint8_t _parent_parameter_set_ID,
+                           const DatasetType _dataset_type, const AlphabetID _alphabet_id, const uint32_t _read_length,
+                           const bool _paired_end, const bool _pos_40_bits_flag, const uint8_t _qv_depth,
+                           const uint8_t _as_depth, const bool _multiple_alignments_flag,
+                           const bool _spliced_reads_flag)
     : DataUnit(DataUnitType::PARAMETER_SET),
       parameter_set_ID(_parameter_set_ID),
       parent_parameter_set_ID(_parent_parameter_set_ID),

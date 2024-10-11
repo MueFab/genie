@@ -67,7 +67,7 @@ uint32_t pull32bigEndian(core::AccessUnit::Subsequence& seq) {
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(core::AccessUnit::Descriptor& desc) {
     std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;
     std::vector<SingleToken> oldRec;
-    util::Watch watch;
+    const util::Watch watch;
     while (!desc.getTokenType(0, TYPE_SEQ).end()) {
         uint16_t cur_pos = 0;
 

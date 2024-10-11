@@ -22,19 +22,19 @@ namespace genie::read::refcoder {
 
 std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
     std::vector<std::string> ret;
-    auto& excerpt = dynamic_cast<RefDecodingState&>(state).refExcerpt;
+    const auto& excerpt = dynamic_cast<RefDecodingState&>(state).refExcerpt;
     {
-        auto begin = static_cast<uint32_t>(meta.position[0]);
-        auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[0]),
-                                      static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        auto clipsize = begin + static_cast<uint32_t>(meta.length[0]) - end;
+        const auto begin = static_cast<uint32_t>(meta.position[0]);
+        const auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[0]),
+                                            static_cast<uint32_t>(excerpt.getGlobalEnd()));
+        const auto clipsize = begin + static_cast<uint32_t>(meta.length[0]) - end;
         ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
     }
     if (meta.num_segments == 2) {
-        auto begin = static_cast<uint32_t>(meta.position[1]);
-        auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
-                                      static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        auto clipsize = begin + static_cast<uint32_t>(meta.length[1]) - end;
+        const auto begin = static_cast<uint32_t>(meta.position[1]);
+        const auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
+                                            static_cast<uint32_t>(excerpt.getGlobalEnd()));
+        const auto clipsize = begin + static_cast<uint32_t>(meta.length[1]) - end;
         ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
     }
     return ret;

@@ -32,8 +32,8 @@ uint16_t PacketHeader::getPacketSize() const { return packet_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-PacketHeader::PacketHeader(uint16_t _sid, uint8_t _reserved, bool _marker_bit, uint8_t _sequence_number,
-                           uint16_t _packet_size)
+PacketHeader::PacketHeader(const uint16_t _sid, const uint8_t _reserved, const bool _marker_bit,
+                           const uint8_t _sequence_number, const uint16_t _packet_size)
     : sid(_sid),
       reserved(_reserved),
       marker_bit(_marker_bit),

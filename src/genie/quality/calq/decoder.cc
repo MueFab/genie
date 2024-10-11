@@ -25,7 +25,7 @@ std::vector<std::string> Decoder::decodeAligned(const paramqv1::QualityValues1& 
                                                 const std::vector<uint64_t>& positions,
                                                 core::AccessUnit::Descriptor& desc) {
     // calq variables
-    DecodingOptions options;  // default options
+    const DecodingOptions options;  // default options
     SideInformation sideInformation;
     EncodingBlock output;
     DecodingBlock input;
@@ -53,16 +53,17 @@ std::vector<std::string> Decoder::decodeUnaligned(const paramqv1::QualityValues1
 
     for (const auto& ecigar : ecigar_vec) {
         qv.emplace_back();
-        core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(),
-                                       [&qv, &desc, &param_casted](uint8_t cigar, const std::pair<size_t, size_t>& bs,
-                                                                   const std::pair<size_t, size_t>&) -> bool {
-                                           (void)cigar;
-                                           for (size_t i = 0; i < bs.second; ++i) {
-                                               auto index = static_cast<uint8_t>(desc.get(2).pull());
-                                               qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
-                                           }
-                                           return true;
-                                       });
+        core::CigarTokenizer::tokenize(
+            ecigar, core::getECigarInfo(),
+            [&qv, &desc, &param_casted](const uint8_t cigar, const std::pair<size_t, size_t>& bs,
+                                        const std::pair<size_t, size_t>&) -> bool {
+                (void)cigar;
+                for (size_t i = 0; i < bs.second; ++i) {
+                    const auto index = static_cast<uint8_t>(desc.get(2).pull());
+                    qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
+                }
+                return true;
+            });
     }
     return qv;
 }
@@ -74,7 +75,7 @@ void Decoder::fillInput(DecodingBlock& input, core::AccessUnit::Descriptor& desc
     // quantizerIndices + istepIndices
     for (uint16_t i = 1; i < desc.getSize(); ++i) {
         auto data = static_cast<uint8_t*>(desc.get(i).getData().getData());
-        auto size = desc.get(i).getData().size();
+        const auto size = desc.get(i).getData().size();
 
         if (i == 1) {
             input.quantizerIndices = std::vector<uint8_t>(data, data + size);
@@ -96,7 +97,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const std::vector<uint64_t>& positions, core::AccessUnit::Descriptor& desc) {
     std::vector<std::string> resultQV;
     core::stats::PerfStats stats;
-    util::Watch watch;
+    const util::Watch watch;
 
     if (desc.isEmpty()) {
         return std::make_tuple(resultQV, stats);

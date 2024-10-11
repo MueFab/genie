@@ -20,7 +20,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(transformedSubseqs != nullptr);
     const auto guard = static_cast<uint8_t>(subseqCfg.getTransformParameters().getParam());
     assert(guard > 0);
-    auto wordsize = transformedSubseqs->front().getWordSize();
+    const auto wordsize = transformedSubseqs->front().getWordSize();
 
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
@@ -37,7 +37,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     uint64_t lastSym = 0;
     uint64_t runValue = 0;
     while (r.isValid()) {
-        uint64_t curSym = r.get();
+        const uint64_t curSym = r.get();
         r.inc();
         if (lastSym != curSym && runValue > 0) {
             rawValues->push_back(lastSym);
@@ -90,8 +90,8 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(guard > 0);
 
     // Prepare internal and the output data structures
-    util::DataBlock *const lengths = &(*transformedSubseqs)[0];
-    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
+    const util::DataBlock *const lengths = &(*transformedSubseqs)[0];
+    const util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
     util::DataBlock symbols(0, (rawValues->getWordSize()));
 
     util::BlockStepper rVal = rawValues->getReader();
@@ -100,11 +100,11 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     // Re-compute the symbols from the lengths and raw values
     while (rVal.isValid()) {
         uint64_t totalLengthValue = 0;
-        uint64_t rawValue = rVal.get();
+        const uint64_t rawValue = rVal.get();
         rVal.inc();
 
         while (rLen.isValid()) {
-            uint64_t runValue = rLen.get();
+            const uint64_t runValue = rLen.get();
             rLen.inc();
 
             if (runValue == guard) {

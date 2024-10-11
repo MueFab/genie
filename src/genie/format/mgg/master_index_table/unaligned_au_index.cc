@@ -29,17 +29,19 @@ const std::vector<uint64_t>& UnalignedAUIndex::getBlockOffsets() const { return 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
-                                   core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
-                                   bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                                   const std::vector<core::GenDesc>& descriptors, core::AlphabetID alphabet)
+UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, const uint8_t _byte_offset_size,
+                                   const uint8_t _position_size,
+                                   const core::parameter::DataUnit::DatasetType dataset_type, const bool signature_flag,
+                                   const bool signature_const_flag, const uint8_t _signature_size,
+                                   const bool block_header_flag, const std::vector<core::GenDesc>& descriptors,
+                                   const core::AlphabetID alphabet)
     : byte_offset_size(_byte_offset_size), position_size(_position_size), signature_size(_signature_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
         ref_cfg = mgb::RefCfg(position_size, reader);
     } else if (signature_flag) {
         sig_cfg = mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
-                                                   getAlphabetProperties(alphabet).base_bits);
+                                    getAlphabetProperties(alphabet).base_bits);
         reader.flushHeldBits();
     }
     if (!block_header_flag) {
@@ -79,8 +81,8 @@ void UnalignedAUIndex::addBlockOffset(uint64_t offset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UnalignedAUIndex::UnalignedAUIndex(uint64_t _au_byte_offset, uint8_t _byte_offset_size, int8_t _position_size,
-                                   int8_t _signature_size)
+UnalignedAUIndex::UnalignedAUIndex(const uint64_t _au_byte_offset, const uint8_t _byte_offset_size,
+                                   const int8_t _position_size, const int8_t _signature_size)
     : au_byte_offset(_au_byte_offset),
       byte_offset_size(_byte_offset_size),
       position_size(_position_size),

@@ -42,7 +42,7 @@ std::unique_ptr<Location> External::factory(util::BitReader& reader, uint8_t _re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, RefType type)
+External::External(const uint8_t _reserved, std::string _uri, const ChecksumAlgorithm algo, const RefType type)
     : Location(_reserved, true), uri(std::move(_uri)), checksum_algo(algo), reference_type(type) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ External::External(util::BitReader& reader) : Location(reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(util::BitReader& reader, uint8_t _reserved) : Location(_reserved, true) {
+External::External(util::BitReader& reader, const uint8_t _reserved) : Location(_reserved, true) {
     uri = reader.readAlignedStringTerminated();
     checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     reference_type = reader.readAlignedInt<RefType>();

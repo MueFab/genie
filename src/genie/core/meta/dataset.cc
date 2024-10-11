@@ -20,7 +20,8 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(uint32_t _version, std::unique_ptr<BlockHeader> _headerCfg, std::string meta, std::string protection)
+Dataset::Dataset(const uint32_t _version, std::unique_ptr<BlockHeader> _headerCfg, std::string meta,
+                 std::string protection)
     : version(_version),
       headerCfg(std::move(_headerCfg)),
       DT_metadata_value(std::move(meta)),

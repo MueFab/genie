@@ -22,7 +22,8 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-QualDecoder::QualDecoder(const DecodingBlock& b, uint64_t positionOffset, uint8_t qualityOffset, EncodingBlock* o)
+QualDecoder::QualDecoder(const DecodingBlock& b, const uint64_t positionOffset, const uint8_t qualityOffset,
+                         EncodingBlock* o)
     : posOffset_(positionOffset),
       qualityValueOffset_(qualityOffset),
       qviIdx_(b.stepindices.size(), 0),
@@ -48,7 +49,7 @@ QualDecoder::~QualDecoder() = default;
 void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
     std::string qual;
 
-    size_t cigarLen = samRecord.cigar.length();
+    const size_t cigarLen = samRecord.cigar.length();
     size_t opLen = 0;
     size_t qvciPos = samRecord.posMin - posOffset_;
 
@@ -75,10 +76,9 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                         quantizerIndex = in.quantizerIndices[qvciPos++];
                     }
 
-                    uint8_t qualityValueIndex =
-                        in.stepindices.at(quantizerIndex)[qviIdx_[quantizerIndex]++];
+                    const uint8_t qualityValueIndex = in.stepindices.at(quantizerIndex)[qviIdx_[quantizerIndex]++];
 
-                    uint8_t q = static_cast<uint8_t>(
+                    const uint8_t q = static_cast<uint8_t>(
                         quantizers_.at(quantizerIndex).indexToReconstructionValue(qualityValueIndex));
 
                     qual += static_cast<char>(q + qualityValueOffset_);
@@ -90,7 +90,7 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                 for (size_t i = 0; i < opLen; i++) {
                     int qualityValueIndex =
                         in.stepindices.at(quantizers_.size() - 1)[qviIdx_[quantizers_.size() - 1]++];
-                    int q = quantizers_.at(quantizers_.size() - 1).indexToReconstructionValue(qualityValueIndex);
+                    const int q = quantizers_.at(quantizers_.size() - 1).indexToReconstructionValue(qualityValueIndex);
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }
                 break;
