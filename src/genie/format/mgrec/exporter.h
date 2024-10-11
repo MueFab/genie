@@ -1,7 +1,13 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @file exporter.h
+ * @brief Header file for the MGREC format exporter module in GENIE.
+ *
+ * This file defines the `Exporter` class used for writing records into the MGREC format.
+ * The exporter handles record formatting, manages the writing process, and maintains
+ * thread safety through an ordered lock mechanism.
+ *
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
@@ -21,29 +27,35 @@
 namespace genie::format::mgrec {
 
 /**
- * @brief
+ * @class Exporter
+ * @brief MGREC format exporter for writing records to a file.
+ *
+ * The `Exporter` class is designed to handle the export of records into the MGREC format,
+ * utilizing a bit-wise writer to serialize and output data. It ensures thread safety
+ * through an ordered lock mechanism, allowing parallel processing and synchronized
+ * record writing.
  */
 class Exporter : public core::FormatExporter {
-    util::BitWriter writer;  //!< @brief
-    util::OrderedLock lock;  //!< @brief
+    util::BitWriter writer;  //!< Bit writer for serializing records
+    util::OrderedLock lock;  //!< Ordered lock for thread-safe writing
 
  public:
     /**
-     * @brief
-     * @param _file_1
+     * @brief Construct an MGREC exporter.
+     * @param _file_1 Output stream for the MGREC file.
      */
     explicit Exporter(std::ostream& _file_1);
 
     /**
-     * @brief
-     * @param t
-     * @param id
+     * @brief Process and write a chunk of records to the MGREC file.
+     * @param t Chunk of records to be written.
+     * @param id Section identifier for synchronization.
      */
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
-     * @brief
-     * @param id
+     * @brief Skip processing of a given section.
+     * @param id Section identifier to be skipped.
      */
     void skipIn(const util::Section& id) override;
 };

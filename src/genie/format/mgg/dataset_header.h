@@ -2,6 +2,7 @@
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
+ * TODO: DOCSTRING
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_DATASET_HEADER_H_

@@ -1,7 +1,16 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @file packet.h
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ * @brief Defines the `Packet` class for handling MPEG-G packets.
+ *
+ * The `Packet` class provides a representation of a packet within the MPEG-G format,
+ * including its header and associated data. This class is used for encapsulating
+ * packet-level metadata and raw data payloads, ensuring proper reading and writing
+ * operations are handled correctly when processing MPEG-G streams.
+ *
+ * The packet structure in MPEG-G is crucial for maintaining the logical separation
+ * of data and metadata, allowing efficient parsing, transport, and storage of genomic data.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_PACKET_H_
@@ -20,42 +29,52 @@
 namespace genie::format::mgg {
 
 /**
- * @brief
+ * @class Packet
+ * @brief Represents a single packet within an MPEG-G container.
+ *
+ * The `Packet` class encapsulates a packet's header (`PacketHeader`) and its associated
+ * data payload. This class allows for reading and writing packets to a bitstream, making
+ * it a core component in the MPEG-G file format's handling of genomic data.
+ *
+ * ### Packet Structure:
+ * A packet consists of:
+ * 1. **Packet Header** - Encodes metadata such as stream ID, sequence number, and packet size.
+ * 2. **Data** - Raw data payload associated with the packet, stored as a string.
  */
 class Packet : public Box {
  private:
-    PacketHeader header;  //!< @brief
-    std::string data;     //!< @brief
+    PacketHeader header;  //!< @brief Header containing packet metadata (stream ID, sequence number, etc.)
+    std::string data;     //!< @brief The raw data payload of the packet.
 
  public:
     /**
-     * @brief
-     * @param _header
-     * @param _data
+     * @brief Constructs a `Packet` object with the specified header and data.
+     * @param _header Header containing packet metadata.
+     * @param _data The raw data payload for the packet.
      */
     Packet(PacketHeader _header, std::string _data);
 
     /**
-     * @brief
-     * @param reader
+     * @brief Constructs a `Packet` object by reading from a bitstream.
+     * @param reader Bitstream reader to extract packet header and data.
      */
     explicit Packet(util::BitReader& reader);
 
     /**
-     * @brief
-     * @param writer
+     * @brief Writes the packet header and data to a bitstream.
+     * @param writer Bitstream writer for serializing the packet.
      */
     void write(util::BitWriter& writer) const override;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the header of the packet.
+     * @return Constant reference to the packet header.
      */
     [[nodiscard]] const PacketHeader& getHeader() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the data payload of the packet.
+     * @return Constant reference to the data payload.
      */
     [[nodiscard]] const std::string& getData() const;
 };

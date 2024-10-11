@@ -77,6 +77,13 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool DecoderRegular::equals(const Decoder *dec) const {
+    return core::parameter::desc_pres::Decoder::equals(dec) &&
+           dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 DecoderTokenType::DecoderTokenType()
     : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (uint16_t i = 0; i < 2; ++i) {
@@ -137,6 +144,17 @@ void DecoderTokenType::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t DecoderTokenType::getRleGuardTokentype() const { return rle_guard_tokentype; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DecoderTokenType::equals(const Decoder *dec) const {
+    return core::parameter::desc_pres::Decoder::equals(dec) &&
+           dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
+           dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
+           dynamic_cast<const DecoderTokenType *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::entropy::paramcabac
 
