@@ -18,72 +18,72 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenSubIndex GenSub::POS_MAPPING_FIRST = std::make_pair(GenDesc::POS, (uint16_t)0);
-const GenSubIndex GenSub::POS_MAPPING_ADDITIONAL = std::make_pair(GenDesc::POS, (uint16_t)1);
+const GenSubIndex GenSub::POS_MAPPING_FIRST = std::make_pair(GenDesc::POS, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::POS_MAPPING_ADDITIONAL = std::make_pair(GenDesc::POS, static_cast<uint16_t>(1));
 
-const GenSubIndex GenSub::RCOMP = std::make_pair(GenDesc::RCOMP, (uint16_t)0);
+const GenSubIndex GenSub::RCOMP = std::make_pair(GenDesc::RCOMP, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::FLAGS_PCR_DUPLICATE = std::make_pair(GenDesc::FLAGS, (uint16_t)0);
-const GenSubIndex GenSub::FLAGS_QUALITY_FAIL = std::make_pair(GenDesc::FLAGS, (uint16_t)1);
-const GenSubIndex GenSub::FLAGS_PROPER_PAIR = std::make_pair(GenDesc::FLAGS, (uint16_t)2);
+const GenSubIndex GenSub::FLAGS_PCR_DUPLICATE = std::make_pair(GenDesc::FLAGS, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::FLAGS_QUALITY_FAIL = std::make_pair(GenDesc::FLAGS, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::FLAGS_PROPER_PAIR = std::make_pair(GenDesc::FLAGS, static_cast<uint16_t>(2));
 
-const GenSubIndex GenSub::MMPOS_TERMINATOR = std::make_pair(GenDesc::MMPOS, (uint16_t)0);
-const GenSubIndex GenSub::MMPOS_POSITION = std::make_pair(GenDesc::MMPOS, (uint16_t)1);
+const GenSubIndex GenSub::MMPOS_TERMINATOR = std::make_pair(GenDesc::MMPOS, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::MMPOS_POSITION = std::make_pair(GenDesc::MMPOS, static_cast<uint16_t>(1));
 
-const GenSubIndex GenSub::MMTYPE_TYPE = std::make_pair(GenDesc::MMTYPE, (uint16_t)0);
-const GenSubIndex GenSub::MMTYPE_SUBSTITUTION = std::make_pair(GenDesc::MMTYPE, (uint16_t)1);
-const GenSubIndex GenSub::MMTYPE_INSERTION = std::make_pair(GenDesc::MMTYPE, (uint16_t)2);
+const GenSubIndex GenSub::MMTYPE_TYPE = std::make_pair(GenDesc::MMTYPE, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::MMTYPE_SUBSTITUTION = std::make_pair(GenDesc::MMTYPE, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::MMTYPE_INSERTION = std::make_pair(GenDesc::MMTYPE, static_cast<uint16_t>(2));
 
-const GenSubIndex GenSub::CLIPS_RECORD_ID = std::make_pair(GenDesc::CLIPS, (uint16_t)0);
-const GenSubIndex GenSub::CLIPS_TYPE = std::make_pair(GenDesc::CLIPS, (uint16_t)1);
-const GenSubIndex GenSub::CLIPS_SOFT_STRING = std::make_pair(GenDesc::CLIPS, (uint16_t)2);
-const GenSubIndex GenSub::CLIPS_HARD_LENGTH = std::make_pair(GenDesc::CLIPS, (uint16_t)3);
+const GenSubIndex GenSub::CLIPS_RECORD_ID = std::make_pair(GenDesc::CLIPS, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::CLIPS_TYPE = std::make_pair(GenDesc::CLIPS, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::CLIPS_SOFT_STRING = std::make_pair(GenDesc::CLIPS, static_cast<uint16_t>(2));
+const GenSubIndex GenSub::CLIPS_HARD_LENGTH = std::make_pair(GenDesc::CLIPS, static_cast<uint16_t>(3));
 
-const GenSubIndex GenSub::UREADS = std::make_pair(GenDesc::UREADS, (uint16_t)0);
+const GenSubIndex GenSub::UREADS = std::make_pair(GenDesc::UREADS, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::RLEN = std::make_pair(GenDesc::RLEN, (uint16_t)0);
+const GenSubIndex GenSub::RLEN = std::make_pair(GenDesc::RLEN, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::PAIR_DECODING_CASE = std::make_pair(GenDesc::PAIR, (uint16_t)0);
-const GenSubIndex GenSub::PAIR_SAME_REC = std::make_pair(GenDesc::PAIR, (uint16_t)1);
-const GenSubIndex GenSub::PAIR_R1_SPLIT = std::make_pair(GenDesc::PAIR, (uint16_t)2);
-const GenSubIndex GenSub::PAIR_R2_SPLIT = std::make_pair(GenDesc::PAIR, (uint16_t)3);
-const GenSubIndex GenSub::PAIR_R1_DIFF_SEQ = std::make_pair(GenDesc::PAIR, (uint16_t)4);
-const GenSubIndex GenSub::PAIR_R2_DIFF_SEQ = std::make_pair(GenDesc::PAIR, (uint16_t)5);
-const GenSubIndex GenSub::PAIR_R1_DIFF_POS = std::make_pair(GenDesc::PAIR, (uint16_t)6);
-const GenSubIndex GenSub::PAIR_R2_DIFF_POS = std::make_pair(GenDesc::PAIR, (uint16_t)7);
+const GenSubIndex GenSub::PAIR_DECODING_CASE = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::PAIR_SAME_REC = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::PAIR_R1_SPLIT = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(2));
+const GenSubIndex GenSub::PAIR_R2_SPLIT = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(3));
+const GenSubIndex GenSub::PAIR_R1_DIFF_SEQ = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(4));
+const GenSubIndex GenSub::PAIR_R2_DIFF_SEQ = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(5));
+const GenSubIndex GenSub::PAIR_R1_DIFF_POS = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(6));
+const GenSubIndex GenSub::PAIR_R2_DIFF_POS = std::make_pair(GenDesc::PAIR, static_cast<uint16_t>(7));
 
-const GenSubIndex GenSub::MSCORE = std::make_pair(GenDesc::MSCORE, (uint16_t)0);
+const GenSubIndex GenSub::MSCORE = std::make_pair(GenDesc::MSCORE, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::MMAP_NUMBER_ALIGN = std::make_pair(GenDesc::MMAP, (uint16_t)0);
-const GenSubIndex GenSub::MMAP_RIGHT_ALIGN_ID = std::make_pair(GenDesc::MMAP, (uint16_t)1);
-const GenSubIndex GenSub::MMAP_OTHER_REC_FLAG = std::make_pair(GenDesc::MMAP, (uint16_t)2);
-const GenSubIndex GenSub::MMAP_REF_SEQ = std::make_pair(GenDesc::MMAP, (uint16_t)3);
-const GenSubIndex GenSub::MMAP_REF_POS = std::make_pair(GenDesc::MMAP, (uint16_t)4);
+const GenSubIndex GenSub::MMAP_NUMBER_ALIGN = std::make_pair(GenDesc::MMAP, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::MMAP_RIGHT_ALIGN_ID = std::make_pair(GenDesc::MMAP, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::MMAP_OTHER_REC_FLAG = std::make_pair(GenDesc::MMAP, static_cast<uint16_t>(2));
+const GenSubIndex GenSub::MMAP_REF_SEQ = std::make_pair(GenDesc::MMAP, static_cast<uint16_t>(3));
+const GenSubIndex GenSub::MMAP_REF_POS = std::make_pair(GenDesc::MMAP, static_cast<uint16_t>(4));
 
-const GenSubIndex GenSub::MSAR_CABAC_0 = std::make_pair(GenDesc::MSAR, (uint16_t)0);
-const GenSubIndex GenSub::MSAR_CABAC_1 = std::make_pair(GenDesc::MSAR, (uint16_t)1);
+const GenSubIndex GenSub::MSAR_CABAC_0 = std::make_pair(GenDesc::MSAR, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::MSAR_CABAC_1 = std::make_pair(GenDesc::MSAR, static_cast<uint16_t>(1));
 
-const GenSubIndex GenSub::RTYPE = std::make_pair(GenDesc::RTYPE, (uint16_t)0);
+const GenSubIndex GenSub::RTYPE = std::make_pair(GenDesc::RTYPE, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::RGROUP = std::make_pair(GenDesc::RGROUP, (uint16_t)0);
+const GenSubIndex GenSub::RGROUP = std::make_pair(GenDesc::RGROUP, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::QV_PRESENT = std::make_pair(GenDesc::QV, (uint16_t)0);
-const GenSubIndex GenSub::QV_CODEBOOK = std::make_pair(GenDesc::QV, (uint16_t)1);
-const GenSubIndex GenSub::QV_STEPS_0 = std::make_pair(GenDesc::QV, (uint16_t)2);
-const GenSubIndex GenSub::QV_STEPS_1 = std::make_pair(GenDesc::QV, (uint16_t)3);
-const GenSubIndex GenSub::QV_STEPS_2 = std::make_pair(GenDesc::QV, (uint16_t)4);
-const GenSubIndex GenSub::QV_STEPS_3 = std::make_pair(GenDesc::QV, (uint16_t)5);
-const GenSubIndex GenSub::QV_STEPS_4 = std::make_pair(GenDesc::QV, (uint16_t)6);
-const GenSubIndex GenSub::QV_STEPS_5 = std::make_pair(GenDesc::QV, (uint16_t)7);
-const GenSubIndex GenSub::QV_STEPS_6 = std::make_pair(GenDesc::QV, (uint16_t)8);
-const GenSubIndex GenSub::QV_STEPS_7 = std::make_pair(GenDesc::QV, (uint16_t)9);
+const GenSubIndex GenSub::QV_PRESENT = std::make_pair(GenDesc::QV, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::QV_CODEBOOK = std::make_pair(GenDesc::QV, static_cast<uint16_t>(1));
+const GenSubIndex GenSub::QV_STEPS_0 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(2));
+const GenSubIndex GenSub::QV_STEPS_1 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(3));
+const GenSubIndex GenSub::QV_STEPS_2 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(4));
+const GenSubIndex GenSub::QV_STEPS_3 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(5));
+const GenSubIndex GenSub::QV_STEPS_4 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(6));
+const GenSubIndex GenSub::QV_STEPS_5 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(7));
+const GenSubIndex GenSub::QV_STEPS_6 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(8));
+const GenSubIndex GenSub::QV_STEPS_7 = std::make_pair(GenDesc::QV, static_cast<uint16_t>(9));
 
-const GenSubIndex GenSub::RNAME_CABAC_0 = std::make_pair(GenDesc::RNAME, (uint16_t)0);
-const GenSubIndex GenSub::RNAME_CABAC_1 = std::make_pair(GenDesc::RNAME, (uint16_t)1);
+const GenSubIndex GenSub::RNAME_CABAC_0 = std::make_pair(GenDesc::RNAME, static_cast<uint16_t>(0));
+const GenSubIndex GenSub::RNAME_CABAC_1 = std::make_pair(GenDesc::RNAME, static_cast<uint16_t>(1));
 
-const GenSubIndex GenSub::RFTP = std::make_pair(GenDesc::RFTP, (uint16_t)0);
+const GenSubIndex GenSub::RFTP = std::make_pair(GenDesc::RFTP, static_cast<uint16_t>(0));
 
-const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, (uint16_t)0);
+const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, static_cast<uint16_t>(0));
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ const std::string &getMPEGVersionString(MPEGMinorVersion v) {
 
 MPEGMinorVersion getMPEGVersion(const std::string &v) {
     for (MPEGMinorVersion ret = MPEGMinorVersion::V1900; ret < MPEGMinorVersion::UNKNOWN;
-         ret = MPEGMinorVersion(static_cast<uint8_t>(ret) + 1)) {
+         ret = static_cast<MPEGMinorVersion>(static_cast<uint8_t>(ret) + 1)) {
         if (getMPEGVersionString(ret) == v) {
             return ret;
         }
@@ -366,15 +366,15 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescriptors()[uint8_t(desc)]; }
+const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescriptors()[static_cast<uint8_t>(desc)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &getSubsequence(GenSubIndex idx) {
-    if (getDescriptors()[uint8_t(idx.first)].tokentype) {
-        return getDescriptors()[uint8_t(idx.first)].subseqs[0];
+    if (getDescriptors()[static_cast<uint8_t>(idx.first)].tokentype) {
+        return getDescriptors()[static_cast<uint8_t>(idx.first)].subseqs[0];
     }
-    return getDescriptors()[uint8_t(idx.first)].subseqs[uint8_t(idx.second)];
+    return getDescriptors()[static_cast<uint8_t>(idx.first)].subseqs[static_cast<uint8_t>(idx.second)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -396,13 +396,13 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
         }
         return loc;
     }();
-    return prop[uint8_t(id)];
+    return prop[static_cast<uint8_t>(id)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &GenomicDescriptorProperties::getSubSeq(uint8_t sub) const {
-    return subseqs[uint8_t(sub)];
+    return subseqs[static_cast<uint8_t>(sub)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

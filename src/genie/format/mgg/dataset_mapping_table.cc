@@ -56,7 +56,7 @@ DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
     for (size_t i = 0; i < num_data_streams; ++i) {
         streams.emplace_back(reader);
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

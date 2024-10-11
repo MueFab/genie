@@ -49,7 +49,7 @@ ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
     dataset_group_id = bitreader.readAlignedInt<uint8_t>();
     reference_id = bitreader.readAlignedInt<uint8_t>();
     bitreader.readAlignedBytes(reference_metadata_value.data(), reference_metadata_value.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

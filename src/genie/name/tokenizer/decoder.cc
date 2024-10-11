@@ -74,32 +74,33 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
         std::vector<SingleToken> rec;
 
         if (std::get<0>(ret).empty()) {
-            UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF,
+            UTILS_DIE_IF(static_cast<Tokens>(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF,
                          "First token in AU must be DIFF");
-            UTILS_DIE_IF(desc.getTokenType(0, (uint8_t)Tokens::DIFF).get() != 0, "First DIFF in AU must be 0");
+            UTILS_DIE_IF(desc.getTokenType(0, static_cast<uint8_t>(Tokens::DIFF)).get() != 0,
+                         "First DIFF in AU must be 0");
         }
 
-        auto type = Tokens(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
+        auto type = static_cast<Tokens>(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
 
         while (type != Tokens::END) {
             SingleToken t(type, 0, "");
 
             if (type == Tokens::STRING) {
-                auto c = static_cast<char>(desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull());
+                auto c = static_cast<char>(desc.getTokenType(cur_pos, static_cast<uint8_t>(Tokens::STRING)).pull());
                 while (c != '\0') {
                     t.paramString += c;
-                    c = static_cast<char>(desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull());
+                    c = static_cast<char>(desc.getTokenType(cur_pos, static_cast<uint8_t>(Tokens::STRING)).pull());
                 }
             } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
-                t.param = pull32bigEndian(desc.getTokenType(cur_pos, (uint8_t)type));
-            } else if ((uint8_t)type < uint8_t(Tokens::MATCH)) {
-                t.param = (uint32_t)desc.getTokenType(cur_pos, (uint8_t)type).pull();
+                t.param = pull32bigEndian(desc.getTokenType(cur_pos, static_cast<uint8_t>(type)));
+            } else if (static_cast<uint8_t>(type) < static_cast<uint8_t>(Tokens::MATCH)) {
+                t.param = static_cast<uint32_t>(desc.getTokenType(cur_pos, (uint8_t)type).pull());
             }
 
             rec.push_back(t);
 
             cur_pos++;
-            type = Tokens(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
+            type = static_cast<Tokens>(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
         }
 
         rec = patch(oldRec, rec);

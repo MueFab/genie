@@ -67,8 +67,9 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                             inputStream, trnsfSubseqPayloadSizeRemain, &trnsfSubseqData[i]);
                     }
 
-                    trnsfSymbolsDecoder.emplace_back(&trnsfSubseqData[i], subseqCfg.getTransformSubseqCfg((uint8_t)i),
-                                                     (unsigned int)currNumtrnsfSymbols);
+                    trnsfSymbolsDecoder.emplace_back(&trnsfSubseqData[i],
+                                                     subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)),
+                                                     static_cast<unsigned int>(currNumtrnsfSymbols));
                 }
             }
         }

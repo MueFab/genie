@@ -18,7 +18,7 @@ DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MO
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres::DecoderRegular(MODE_LZMA) {
-    for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
+    for (size_t i = 0; i < core::getDescriptors()[static_cast<uint8_t>(desc)].subseqs.size(); ++i) {
         auto bits_p2 = genie::core::range2bytes(core::getDescriptor(desc).subseqs[i].range);
         descriptor_subsequence_cfgs.emplace_back(bits_p2);
     }
@@ -37,13 +37,13 @@ DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
+    descriptor_subsequence_cfgs[static_cast<uint8_t>(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
-    return descriptor_subsequence_cfgs[uint8_t(index)];
+    return descriptor_subsequence_cfgs[static_cast<uint8_t>(index)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

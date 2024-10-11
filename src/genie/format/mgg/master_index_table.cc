@@ -76,7 +76,7 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader&
                 : static_cast<uint8_t>(0),
             hdr.isBlockHeaderEnabled(), hdr.getMITConfigs().back().getDescriptorIDs(), hdr.getAlphabetID());
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

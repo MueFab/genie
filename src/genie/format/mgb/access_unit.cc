@@ -259,7 +259,7 @@ void AccessUnit::print_debug(std::ostream &output, uint8_t, uint8_t) const {
 
     output << ", " << header.getReadCount() << " records";
     output << ", " << header.getNumBlocks() << " blocks";
-    output << ", parameter set " << uint32_t(header.getParameterID()) << std::endl;
+    output << ", parameter set " << static_cast<uint32_t>(header.getParameterID()) << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

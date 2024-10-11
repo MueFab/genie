@@ -27,7 +27,7 @@ void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::Bi
             case paramcabac::BinarizationParameters::BinarizationId::SSUTU:
             case paramcabac::BinarizationParameters::BinarizationId::SDTU:
                 if (reader.readSignFlag()) {
-                    int64_t symbolValueSigned = -((int64_t)symbolValue);
+                    int64_t symbolValueSigned = -static_cast<int64_t>(symbolValue);
                     symbolValue = static_cast<uint64_t>(symbolValueSigned);
                 }
                 break;
@@ -140,7 +140,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     const bool bypassFlag = binarzation.getBypassFlag();
     size_t payloadSizeUsed = 0;
 
-    Reader reader(bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     reader.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -216,7 +216,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
     size_t payloadSizeUsed = 0;
 
-    Reader reader(bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     reader.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -269,8 +269,8 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
-                                                      subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                                                                  subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
@@ -324,7 +324,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
     size_t payloadSizeUsed = 0;
 
-    Reader reader(bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     reader.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -360,8 +360,8 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
-                                                      subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                                                                  subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 

@@ -86,14 +86,14 @@ void LocalReference::addSingleRead(const std::string &record, const std::string 
     sequence_positions.push_back(position);
     std::string read = preprocess(record, ecigar);
     sequences.push_back(read);
-    crBufSize += (uint32_t)read.length();
+    crBufSize += static_cast<uint32_t>(read.length());
 
     while (crBufSize > cr_buf_max_size) {
         if (sequences.size() == 1) {
             UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
         }
         // Erase oldest read
-        crBufSize -= (uint32_t)sequences.front().length();
+        crBufSize -= static_cast<uint32_t>(sequences.front().length());
         sequences.erase(sequences.begin());
         sequence_positions.erase(sequence_positions.begin());
     }
@@ -193,7 +193,7 @@ char LocalReference::majorityVote(uint32_t abs_position) {
     // Collect all alignments
     for (size_t i = 0; i < sequences.size(); ++i) {
         int64_t distance = abs_position - sequence_positions[i];
-        if (distance >= 0 && uint64_t(distance) < sequences[i].length()) {
+        if (distance >= 0 && static_cast<uint64_t>(distance) < sequences[i].length()) {
             char c = sequences[i][distance];
             if (c != '0') {
                 votes[c]++;

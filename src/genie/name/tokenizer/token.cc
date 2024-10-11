@@ -45,7 +45,7 @@ const TokenInfo& getTokenInfo(Tokens t) {
                                       {"NONE", 0}};
         return ret;
     }();
-    return info[uint8_t(t)];
+    return info[static_cast<uint8_t>(t)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

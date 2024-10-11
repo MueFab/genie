@@ -50,7 +50,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
                                            core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
                                        ? 2
-                                       : (uint8_t)desc.getSize() - 1;
+                                       : static_cast<uint8_t>(desc.getSize()) - 1;
                 for (const auto& c : qvs) {
                     UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
                     desc.get(codebook).push(c - 33);
@@ -66,7 +66,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
     for (const auto& q : s.getQualities()) {
         for (const auto& c : q) {
             UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-            desc.get((uint16_t)desc.getSize() - 1).push(c - 33);
+            desc.get(static_cast<uint16_t>(desc.getSize()) - 1).push(c - 33);
         }
     }
 }

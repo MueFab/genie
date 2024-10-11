@@ -34,7 +34,7 @@ Label::Label(util::BitReader& reader) {
         dataset_infos.emplace_back(reader);
     }
     reader.flushHeldBits();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()),
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()),
                  "Invalid length: start_pos " + std::to_string(start_pos) + "; length " + std::to_string(length) +
                      "; position should be " + std::to_string(start_pos + length) + "; position is " +
                      std::to_string(reader.getStreamPosition()));

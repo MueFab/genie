@@ -54,13 +54,13 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
             std::get<1>(state).setRead1First(false);
             std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 container.pull(core::GenSub::PAIR_R1_DIFF_POS),
-                (uint16_t)container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
+                static_cast<uint16_t>(container.pull(core::GenSub::PAIR_R1_DIFF_SEQ))));
             break;
         case core::GenConst::PAIR_R2_DIFF_REF:
             std::get<1>(state).setRead1First(true);
             std::get<0>(state).addAlignmentSplit(std::make_unique<genie::core::record::alignment_split::OtherRec>(
                 container.pull(core::GenSub::PAIR_R2_DIFF_POS),
-                (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
+                static_cast<uint16_t>(container.pull(core::GenSub::PAIR_R2_DIFF_SEQ))));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
             std::get<1>(state).setRead1First(true);
@@ -73,7 +73,7 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
     for (size_t i = 1; i < sequences.size(); ++i) {
         decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]),
-                         uint16_t(meta.position[1] - meta.position[0]), state);
+                         static_cast<uint16_t>(meta.position[1] - meta.position[0]), state);
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
@@ -88,12 +88,12 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
 
     meta.num_segments = 1;
     if (number_template_segments == 2) {
-        meta.decoding_case = uint8_t(container.pull(core::GenSub::PAIR_DECODING_CASE));
+        meta.decoding_case = static_cast<uint8_t>(container.pull(core::GenSub::PAIR_DECODING_CASE));
         if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
             meta.num_segments = 2;
-            const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
+            const auto SAME_REC_DATA = static_cast<uint32_t>(container.pull(core::GenSub::PAIR_SAME_REC));
             meta.first1 = !(SAME_REC_DATA & 1u);
-            const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
+            const auto DELTA = static_cast<int16_t>((uint16_t)(SAME_REC_DATA >> 1u));
             meta.position[1] = meta.position[0] + DELTA;
         }
     }
@@ -113,7 +113,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
 
     const auto RTYPE = container.pull(core::GenSub::RTYPE);
 
-    const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
+    const auto RCOMP = static_cast<uint8_t>(container.pull(core::GenSub::RCOMP));
 
     const auto FLAG_PCR = container.isEnd(core::GenSub::FLAGS_PCR_DUPLICATE)
                               ? 0
@@ -127,9 +127,9 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
                                ? 0
                                : container.pull(core::GenSub::FLAGS_PROPER_PAIR)
                                      << core::GenConst::FLAGS_PROPER_PAIR_POS;
-    const auto FLAGS = uint8_t(FLAG_PCR | FLAG_QUAL | FLAG_PAIR);
+    const auto FLAGS = static_cast<uint8_t>(FLAG_PCR | FLAG_QUAL | FLAG_PAIR);
 
-    const auto MSCORE = (uint32_t)container.pull(core::GenSub::MSCORE);
+    const auto MSCORE = static_cast<uint32_t>(container.pull(core::GenSub::MSCORE));
 
     // const auto RGROUP = container.isEnd(core::GenSub::RGROUP) ? 0 : container.pull(core::GenSub::RGROUP);
 
@@ -140,13 +140,13 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     decodeMismatches(clip_offset, sequence, ecigar);
 
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
-    alignment.addMappingScore((int32_t)MSCORE);
+    alignment.addMappingScore(static_cast<int32_t>(MSCORE));
 
     std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
-    std::get<1>(ret) =
-        core::record::Record((uint8_t)number_template_segments, core::record::ClassType(RTYPE), "", "", FLAGS);
+    std::get<1>(ret) = core::record::Record(static_cast<uint8_t>(number_template_segments),
+                                            static_cast<core::record::ClassType>(RTYPE), "", "", FLAGS);
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(ret).addSegment(std::move(segment));
@@ -203,8 +203,8 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
-    const auto RCOMP = (uint8_t)container.pull(core::GenSub::RCOMP);
-    const auto MSCORE = (int32_t)container.pull(core::GenSub::MSCORE);
+    const auto RCOMP = static_cast<uint8_t>(container.pull(core::GenSub::RCOMP));
+    const auto MSCORE = static_cast<int32_t>(container.pull(core::GenSub::MSCORE));
 
     std::string ecigar = std::move(cigar);
     decodeMismatches(softclip_offset, sequence, ecigar);

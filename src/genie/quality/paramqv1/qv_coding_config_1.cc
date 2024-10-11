@@ -49,13 +49,13 @@ void QualityValues1::setQvps(ParameterSet&& _parameter_set_qvps) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void QualityValues1::write(util::BitWriter& writer) const {
-    writer.writeBits(uint8_t(qv_coding_mode), 4);
+    writer.writeBits(static_cast<uint8_t>(qv_coding_mode), 4);
     writer.writeBits(static_cast<bool>(parameter_set_qvps), 1);
     if (parameter_set_qvps) {
         parameter_set_qvps->write(writer);
     }
     if (qvps_preset_ID) {
-        writer.writeBits(uint64_t(*qvps_preset_ID), 4);
+        writer.writeBits(static_cast<uint64_t>(*qvps_preset_ID), 4);
     }
     writer.writeBits(qv_reverse_flag, 1);
 }
@@ -106,7 +106,7 @@ const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
         ret.emplace_back(std::move(set));
         return ret;
     }();
-    return pSet[uint8_t(id)];
+    return pSet[static_cast<uint8_t>(id)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

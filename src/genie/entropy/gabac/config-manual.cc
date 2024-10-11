@@ -27,18 +27,18 @@ namespace genie::entropy::gabac {
 
 uint8_t getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize) {
     if (numAlphaSpecial > 0) { /* special case */
-        return (uint8_t)(numAlphaSpecial - 1);
+        return static_cast<uint8_t>(numAlphaSpecial - 1);
     } else {
-        return (uint8_t)(paramcabac::StateVars::get2PowN(codingSubsymSize) - 1);
+        return static_cast<uint8_t>(paramcabac::StateVars::get2PowN(codingSubsymSize) - 1);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
-    const auto genieDescID = (core::GenDesc)sub.first;
+    const auto genieDescID = static_cast<core::GenDesc>(sub.first);
     const core::GenSubIndex genieSubseqID = sub;
-    const auto subseqID = (uint8_t)sub.second;
+    const auto subseqID = static_cast<uint8_t>(sub.second);
 
     // default values
     const core::AlphabetID alphaID = core::AlphabetID::ACGTN;

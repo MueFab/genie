@@ -97,9 +97,9 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             }
             auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
                                        remainingData.getWordSize());
-            offset +=
-                gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
-                                             static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
+            offset += gabac::decodeTransformSubseq(
+                conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
+                static_cast<unsigned int>(numTransformedSymbols), &tmp, static_cast<uint8_t>(4));
 
             transformedSeqs.emplace_back(std::move(tmp));
         }
@@ -107,10 +107,12 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         gabac::doInverseSubsequenceTransform(conf0.getSubseqConfig(), &transformedSeqs);
 
         while (ret.getSize() < mappedTypeId) {
-            ret.add(core::AccessUnit::Subsequence(1, core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)ret.getSize()}));
+            ret.add(core::AccessUnit::Subsequence(
+                1, core::GenSubIndex{core::GenDesc::RNAME, static_cast<uint16_t>(ret.getSize())}));
         }
-        ret.add(core::AccessUnit::Subsequence(std::move(transformedSeqs.front()),
-                                              core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)mappedTypeId}));
+        ret.add(core::AccessUnit::Subsequence(
+            std::move(transformedSeqs.front()),
+            core::GenSubIndex{core::GenDesc::RNAME, static_cast<uint16_t>(mappedTypeId)}));
     }
     return ret;
 }
@@ -122,7 +124,8 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     core::AccessUnit::Subsequence in = std::move(data);
     auto id = in.getID();
 
-    if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
+    if (getDescriptor(in.getID().first).getSubSeq(static_cast<uint8_t>(in.getID().second)).mismatchDecoding &&
+        mmCoderEnabled) {
         in.attachMismatchDecoder(std::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
@@ -195,7 +198,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             auto d_id = subseq.getID();
 
             const auto& token_param = dynamic_cast<const paramcabac::DecoderRegular&>(param_desc.getDecoder());
-            auto conf0 = token_param.getSubsequenceCfg((uint8_t)d_id.second);
+            auto conf0 = token_param.getSubsequenceCfg(static_cast<uint8_t>(d_id.second));
 
             if (!subseq.isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-comp", subseq.getRawSize());

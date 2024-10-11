@@ -18,7 +18,7 @@ namespace genie::entropy::gabac {
 void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
                         std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
-    const auto guard = (uint8_t)subseqCfg.getTransformParameters().getParam();
+    const auto guard = static_cast<uint8_t>(subseqCfg.getTransformParameters().getParam());
     assert(guard > 0);
     auto wordsize = transformedSubseqs->front().getWordSize();
 

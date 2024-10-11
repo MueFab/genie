@@ -93,7 +93,8 @@ void MgbFile::sort_by_class() {
         return base_sorter(
             u1, u2, [](const genie::format::mgb::AccessUnit& a1, const genie::format::mgb::AccessUnit& a2) -> bool {
                 if (a1.getHeader().getClass() != a2.getHeader().getClass()) {
-                    return uint8_t(a1.getHeader().getClass()) < uint8_t(a2.getHeader().getClass());
+                    return static_cast<uint8_t>(a1.getHeader().getClass()) <
+                           static_cast<uint8_t>(a2.getHeader().getClass());
                 }
                 if (a1.getHeader().getClass() == core::record::ClassType::CLASS_U &&
                     a2.getHeader().getClass() == core::record::ClassType::CLASS_U) {
@@ -145,7 +146,8 @@ void MgbFile::sort_by_position() {
                     return a1.getHeader().getAlignmentInfo().getEndPos() <
                            a2.getHeader().getAlignmentInfo().getEndPos();
                 }
-                return uint8_t(a1.getHeader().getClass()) < uint8_t(a2.getHeader().getClass());
+                return static_cast<uint8_t>(a1.getHeader().getClass()) <
+                       static_cast<uint8_t>(a2.getHeader().getClass());
             });
     };
     std::sort(units.begin(), units.end(), sorter);
@@ -236,14 +238,14 @@ std::vector<Block> MgbFile::extractDescriptor(core::record::ClassType type, core
             }
             bool found = false;
             for (auto& a : au.getBlocks()) {
-                if (core::GenDesc(a.getDescriptorID()) == descriptor) {
+                if (static_cast<core::GenDesc>(a.getDescriptorID()) == descriptor) {
                     found = true;
                     ret.emplace_back(std::move(a));
                     break;
                 }
             }
             if (!found) {
-                ret.emplace_back(uint8_t(descriptor), core::AccessUnit::Descriptor(descriptor));
+                ret.emplace_back(static_cast<uint8_t>(descriptor), core::AccessUnit::Descriptor(descriptor));
             }
         }
     }

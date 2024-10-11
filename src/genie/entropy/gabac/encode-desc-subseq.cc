@@ -91,9 +91,9 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
             uint64_t trnsfSubseqPayloadSize = 0;
             if (numtrnsfSymbols > 0) {
                 // Encoding
-                trnsfSubseqPayloadSize =
-                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i), &(transformedSubseqs[i]),
-                                                 (!dependency.empty()) ? &dependency : nullptr);
+                trnsfSubseqPayloadSize = gabac::encodeTransformSubseq(
+                    subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)), &(transformedSubseqs[i]),
+                    (!dependency.empty()) ? &dependency : nullptr);
             }
 
             if (i < (numTrnsfSubseqs - 1)) {

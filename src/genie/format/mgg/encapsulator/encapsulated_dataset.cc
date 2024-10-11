@@ -25,14 +25,14 @@ EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, genie::c
     }
     for (uint8_t multiple_alignment = 0; multiple_alignment < 2; ++multiple_alignment) {
         for (uint8_t pos40 = 0; pos40 < 2; ++pos40) {
-            for (uint8_t data_type = 0; data_type < uint8_t(genie::core::parameter::DataUnit::DatasetType::COUNT);
-                 ++data_type) {
-                for (uint8_t alphabet_type = 0; alphabet_type < uint8_t(genie::core::AlphabetID::COUNT);
+            for (uint8_t data_type = 0;
+                 data_type < static_cast<uint8_t>(genie::core::parameter::DataUnit::DatasetType::COUNT); ++data_type) {
+                for (uint8_t alphabet_type = 0; alphabet_type < static_cast<uint8_t>(genie::core::AlphabetID::COUNT);
                      ++alphabet_type) {
-                    auto param_ids =
-                        mgb_file.collect_param_ids(static_cast<bool>(multiple_alignment), static_cast<bool>(pos40),
-                                                   genie::core::parameter::DataUnit::DatasetType(data_type),
-                                                   genie::core::AlphabetID(alphabet_type));
+                    auto param_ids = mgb_file.collect_param_ids(
+                        static_cast<bool>(multiple_alignment), static_cast<bool>(pos40),
+                        static_cast<genie::core::parameter::DataUnit::DatasetType>(data_type),
+                        static_cast<genie::core::AlphabetID>(alphabet_type));
                     if (param_ids.empty()) {
                         continue;
                     }

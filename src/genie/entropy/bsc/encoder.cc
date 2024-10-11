@@ -29,7 +29,7 @@ void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_confi
     for (const auto &subdesc : desc.subseqs) {
         auto bits_p2 = genie::core::range2bytes(subdesc.range) * 8;
         auto subseqCfg = Subsequence(bits_p2);
-        decoder_config.setSubsequenceCfg(uint8_t(subdesc.id.second), std::move(subseqCfg));
+        decoder_config.setSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second), std::move(subseqCfg));
     }
 }
 

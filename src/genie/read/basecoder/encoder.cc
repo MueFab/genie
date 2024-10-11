@@ -45,7 +45,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
         rec.getAlignments().front();            // TODO(Fabian): Multiple alignments. Currently only 1 supported
     const auto &RECORD = rec.getSegments()[0];  // First segment
 
-    container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
+    container.push(core::GenSub::RTYPE, static_cast<uint8_t>(rec.getClassID()));
 
     const auto POSITION = ALIGNMENT.getPosition() - pos;
     pos = ALIGNMENT.getPosition();
@@ -105,7 +105,8 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
-    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(!first1);  // FIRST1 is encoded in least significant bit
+    const auto SAME_REC_DATA =
+        (DELTA << 1u) | static_cast<uint32_t>(!first1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
 
@@ -277,7 +278,7 @@ void Encoder::encodeCigarToken(char cigar_char, CodingState &state) {
     if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_char)) {  // TODO(Fabian): other alphabets
         const char AMBIGUOUS_CHAR = '-';  // Character used twice in ecigar (deletion + alphabet 2)
         if ((cigar_char == AMBIGUOUS_CHAR && state.count == 0) || cigar_char != AMBIGUOUS_CHAR) {
-            state.count = std::max(state.count, size_t(1));
+            state.count = std::max(state.count, static_cast<size_t>(1));
             encodeMatch(state);
             return;
         }
@@ -354,7 +355,7 @@ bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
 
     for (size_t index = 0; index < inf.softClips.size(); ++index) {
         if (!inf.softClips[index].empty()) {
-            const auto TYPE = (uint32_t(last) << 1u) | index;
+            const auto TYPE = (static_cast<uint32_t>(last) << 1u) | index;
             container.push(core::GenSub::CLIPS_TYPE, TYPE);
             for (const auto &c : inf.softClips[index]) {
                 container.push(core::GenSub::CLIPS_SOFT_STRING, c);
@@ -363,7 +364,7 @@ bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
                 getAlphabetProperties(core::AlphabetID::ACGTN).lut.size();  // TODO(Fabian): other alphabets
             container.push(core::GenSub::CLIPS_SOFT_STRING, TERMINATOR);
         } else if (inf.hardClips[index]) {
-            const auto TYPE = 0x4u | (uint32_t(last) << 1u) | index;
+            const auto TYPE = 0x4u | (static_cast<uint32_t>(last) << 1u) | index;
             container.push(core::GenSub::CLIPS_TYPE, TYPE);
             container.push(core::GenSub::CLIPS_HARD_LENGTH, inf.hardClips[index]);
         }

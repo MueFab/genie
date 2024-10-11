@@ -22,7 +22,7 @@ ContextSelector::ContextSelector(const ContextSelector& src) = default;
 // ---------------------------------------------------------------------------------------------------------------------
 
 unsigned int ContextSelector::getContextIdxOrder0(const uint8_t subsymIdx) {
-    return (unsigned int)(subsymIdx * stateVars.getCodingSizeCtxOffset());
+    return static_cast<unsigned int>(subsymIdx * stateVars.getCodingSizeCtxOffset());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -32,9 +32,9 @@ unsigned int ContextSelector::getContextIdxOrderGT0(const uint8_t subsymIdx, con
                                                     const uint8_t codingOrder) {
     unsigned int ctxIdx = 0;
     ctxIdx += stateVars.getNumCtxLUTs();
-    ctxIdx += (unsigned int)(subsymIdx * stateVars.getCodingSizeCtxOffset());
+    ctxIdx += static_cast<unsigned int>(subsymIdx * stateVars.getCodingSizeCtxOffset());
     for (uint8_t i = 1; i <= codingOrder; i++) {
-        ctxIdx += (unsigned int)(subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i));
+        ctxIdx += static_cast<unsigned int>(subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i));
     }
 
     return ctxIdx;

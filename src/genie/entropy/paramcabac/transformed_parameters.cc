@@ -81,7 +81,7 @@ size_t TransformedParameters::getNumStreams() const {
         return *merge_coding_subseq_count;
     } else {
         static const std::vector<size_t> lut = {1, 2, 3, 2, 1};
-        return lut[uint8_t(transform_ID_subseq)];
+        return lut[static_cast<uint8_t>(transform_ID_subseq)];
     }
 }
 
@@ -121,7 +121,7 @@ void TransformedParameters::setMergeCodingShiftSizes(std::vector<uint8_t> mergeC
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TransformedParameters::write(util::BitWriter &writer) const {
-    writer.writeBits(uint8_t(transform_ID_subseq), 8);
+    writer.writeBits(static_cast<uint8_t>(transform_ID_subseq), 8);
     if (match_coding_buffer_size) {
         writer.writeBits(*match_coding_buffer_size, 16);
     }

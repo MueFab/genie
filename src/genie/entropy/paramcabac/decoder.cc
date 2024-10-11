@@ -21,8 +21,8 @@ DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MO
 
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(MODE_CABAC), descriptor_subsequence_cfgs() {
-    for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
-        descriptor_subsequence_cfgs.emplace_back((uint16_t)i, false);
+    for (size_t i = 0; i < core::getDescriptors()[static_cast<uint8_t>(desc)].subseqs.size(); ++i) {
+        descriptor_subsequence_cfgs.emplace_back(static_cast<uint16_t>(i), false);
     }
 }
 
@@ -39,13 +39,13 @@ DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
+    descriptor_subsequence_cfgs[static_cast<uint8_t>(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
-    return descriptor_subsequence_cfgs[uint8_t(index)];
+    return descriptor_subsequence_cfgs[static_cast<uint8_t>(index)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -105,13 +105,13 @@ DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderTokenType::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = cfg;
+    descriptor_subsequence_cfgs[static_cast<uint8_t>(index)] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) const {
-    return descriptor_subsequence_cfgs[uint8_t(index)];
+    return descriptor_subsequence_cfgs[static_cast<uint8_t>(index)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

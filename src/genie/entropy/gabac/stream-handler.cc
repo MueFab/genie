@@ -85,7 +85,7 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
-    const size_t BUFFER_SIZE = size_t(1000000) / buffer->getWordSize();
+    const size_t BUFFER_SIZE = static_cast<size_t>(1000000) / buffer->getWordSize();
     buffer->resize(0);
     while (input.good()) {
         size_t pos = buffer->size();
@@ -161,7 +161,7 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     if (shift > 0) shift -= 7;
 
     for (; shift >= 0; shift -= 7) {
-        auto code = (uint8_t)(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
+        auto code = static_cast<uint8_t>(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
         bytes[c++] = code;
     }
 

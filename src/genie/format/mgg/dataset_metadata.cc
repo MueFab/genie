@@ -35,7 +35,7 @@ DatasetMetadata::DatasetMetadata(genie::util::BitReader& bitreader, genie::core:
     }
     dg_metatdata_value.resize(metadata_length);
     bitreader.readAlignedBytes(dg_metatdata_value.data(), dg_metatdata_value.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(bitreader.getStreamPosition()), "Invalid length");
     UTILS_DIE_IF(!bitreader.isStreamGood(), "Invalid length");
 }
 

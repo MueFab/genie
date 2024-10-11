@@ -48,7 +48,7 @@ Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& re
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
         subSeq = std::pair<core::GenDesc, uint16_t>(desc, *descriptor_subsequence_ID);
     } else {
-        subSeq = std::pair<core::GenDesc, uint16_t>(desc, (uint16_t)0);  // FIXME use zero always?
+        subSeq = std::pair<core::GenDesc, uint16_t>(desc, static_cast<uint16_t>(0));  // FIXME use zero always?
     }
 
     transform_subseq_parameters = TransformedParameters(reader);

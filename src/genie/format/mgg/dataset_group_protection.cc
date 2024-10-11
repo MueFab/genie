@@ -45,7 +45,7 @@ DatasetGroupProtection::DatasetGroupProtection(genie::util::BitReader& bitreader
     }
     dg_protection_value.resize(protection_length);
     bitreader.readAlignedBytes(dg_protection_value.data(), dg_protection_value.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

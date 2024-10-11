@@ -78,7 +78,8 @@ void QualDecoder::decodeMappedRecordFromBlock(const DecodingRead& samRecord) {
                     uint8_t qualityValueIndex =
                         in.stepindices.at(static_cast<size_t>(quantizerIndex))[qviIdx_[quantizerIndex]++];
 
-                    uint8_t q = uint8_t(quantizers_.at(quantizerIndex).indexToReconstructionValue(qualityValueIndex));
+                    uint8_t q = static_cast<uint8_t>(
+                        quantizers_.at(quantizerIndex).indexToReconstructionValue(qualityValueIndex));
 
                     qual += static_cast<char>(q + qualityValueOffset_);
                 }

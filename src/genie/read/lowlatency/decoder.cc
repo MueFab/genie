@@ -35,7 +35,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     size_t i = 0;
     size_t rec_i = 0;
     while (i < data.getNumReads()) {
-        core::record::Record rec(uint8_t(data.getParameters().getNumberTemplateSegments()),
+        core::record::Record rec(static_cast<uint8_t>(data.getParameters().getNumberTemplateSegments()),
                                  core::record::ClassType::CLASS_U,
                                  std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[rec_i]), "", 0);
 

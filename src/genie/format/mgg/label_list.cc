@@ -31,7 +31,7 @@ LabelList::LabelList(util::BitReader& reader) {
     for (size_t i = 0; i < num_labels; ++i) {
         read_box(reader, false);
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

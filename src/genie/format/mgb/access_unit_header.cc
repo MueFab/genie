@@ -26,7 +26,7 @@ void AUHeader::write(genie::util::BitWriter &writer, bool write_signatures) cons
     writer.writeBits(access_unit_ID, 32);
     writer.writeBits(num_blocks, 8);
     writer.writeBits(parameter_set_ID, 8);
-    writer.writeBits(uint8_t(au_type), 4);
+    writer.writeBits(static_cast<uint8_t>(au_type), 4);
     writer.writeBits(reads_count, 32);
     if (mm_cfg) {
         mm_cfg->write(writer);

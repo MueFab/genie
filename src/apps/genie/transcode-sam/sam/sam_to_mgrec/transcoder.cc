@@ -889,7 +889,7 @@ void transcode_mpg2sam(Config& options) {
         genie::core::record::Record record(reader);
         // One line per segment and alignment
         for (size_t s = 0; s < record.getSegments().size(); ++s) {
-            for (size_t a = 0; a < std::max(record.getAlignments().size(), size_t(1)); ++a) {
+            for (size_t a = 0; a < std::max(record.getAlignments().size(), static_cast<size_t>(1)); ++a) {
                 std::string sam_record = record.getName() + "\t";
 
                 uint16_t flags = computeSAMFlags(s, a, record);

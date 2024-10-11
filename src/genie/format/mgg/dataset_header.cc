@@ -192,7 +192,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         }
     }
     reader.flushHeldBits();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

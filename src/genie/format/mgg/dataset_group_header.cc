@@ -51,7 +51,7 @@ DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
         d = reader.readAlignedInt<uint16_t>();
     }
 
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

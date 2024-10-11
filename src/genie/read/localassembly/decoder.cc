@@ -24,11 +24,11 @@ namespace genie::read::localassembly {
 
 std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
     std::vector<std::string> ret;
-    ret.emplace_back(dynamic_cast<LADecodingState&>(state).refEncoder.getReference((uint32_t)meta.position[0],
-                                                                                   (uint32_t)meta.length[0]));
+    ret.emplace_back(dynamic_cast<LADecodingState&>(state).refEncoder.getReference(
+        static_cast<uint32_t>(meta.position[0]), static_cast<uint32_t>(meta.length[0])));
     if (meta.num_segments == 2) {
-        ret.emplace_back(dynamic_cast<LADecodingState&>(state).refEncoder.getReference((uint32_t)meta.position[1],
-                                                                                       (uint32_t)meta.length[1]));
+        ret.emplace_back(dynamic_cast<LADecodingState&>(state).refEncoder.getReference(
+            static_cast<uint32_t>(meta.position[1]), static_cast<uint32_t>(meta.length[1])));
     }
     return ret;
 }

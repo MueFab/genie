@@ -84,7 +84,8 @@ Record::Record(util::BitReader &reader)
         ++index;
     }
     for (auto &a : alignmentInfo) {
-        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
+        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), static_cast<uint8_t>(number_of_template_segments),
+                         reader);
     }
     flags = reader.readAlignedInt<uint8_t>();
     moreAlignmentInfo = AlignmentExternal::factory(reader);
@@ -140,7 +141,7 @@ Record &Record::operator=(Record &&rec) noexcept {
 void Record::addSegment(Segment &&rec) {
     UTILS_DIE_IF(reads.size() == number_of_template_segments, "Record already full");
     if (reads.empty()) {
-        qv_depth = uint8_t(rec.getQualities().size());
+        qv_depth = static_cast<uint8_t>(rec.getQualities().size());
     }
     UTILS_DIE_IF(!reads.empty() && rec.getQualities().size() != qv_depth, "Incompatible qv depth");
     reads.push_back(std::move(rec));
@@ -150,7 +151,8 @@ void Record::addSegment(Segment &&rec) {
 
 void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
     if (alignmentInfo.empty()) {
-        sharedAlignmentInfo = AlignmentSharedData(_seq_id, uint8_t(rec.getAlignment().getMappingScores().size()));
+        sharedAlignmentInfo =
+            AlignmentSharedData(_seq_id, static_cast<uint8_t>(rec.getAlignment().getMappingScores().size()));
     } else {
         UTILS_DIE_IF(rec.getAlignment().getMappingScores().size() != sharedAlignmentInfo.getAsDepth(),
                      "Incompatible AS depth");

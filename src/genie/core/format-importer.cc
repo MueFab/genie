@@ -25,13 +25,13 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
         for (const auto& r : chunk.getData()) {
-            segment_count += uint32_t(r.getSegments().size());
+            segment_count += static_cast<uint32_t>(r.getSegments().size());
         }
         if (chunk.getData().empty()) {
             segment_count = 1;
         }
         if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
-            sec = {size_t(id), segment_count, true};
+            sec = {static_cast<size_t>(id), segment_count, true};
             id += segment_count;
         } else {
             bool dataLeft = pumpRetrieve(classifier);

@@ -35,7 +35,7 @@ AUInformation::AUInformation(genie::util::BitReader& bitreader, genie::core::MPE
     }
     au_information_value.resize(metadata_length);
     bitreader.readAlignedBytes(au_information_value.data(), au_information_value.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

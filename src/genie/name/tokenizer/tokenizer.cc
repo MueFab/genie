@@ -176,20 +176,20 @@ void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit
         //   while (streams.size() <= i) {
         //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
         //   }
-        streams.getTokenType(i, TYPE_SEQ).push((uint8_t)tokens[i].token);
+        streams.getTokenType(i, TYPE_SEQ).push(static_cast<uint8_t>(tokens[i].token));
         if (getTokenInfo(tokens[i].token).paramSeq == 0) {
             continue;
         }
 
         if (tokens[i].token == Tokens::STRING) {
             for (const auto& c : tokens[i].paramString) {
-                streams.getTokenType(i, (uint8_t)tokens[i].token).push(c);
+                streams.getTokenType(i, static_cast<uint8_t>(tokens[i].token)).push(c);
             }
-            streams.getTokenType(i, (uint8_t)tokens[i].token).push('\0');
+            streams.getTokenType(i, static_cast<uint8_t>(tokens[i].token)).push('\0');
         } else if (getTokenInfo(tokens[i].token).paramSeq == sizeof(uint32_t)) {
-            push32bigEndian(streams.getTokenType(i, (uint8_t)tokens[i].token), tokens[i].param);
+            push32bigEndian(streams.getTokenType(i, static_cast<uint8_t>(tokens[i].token)), tokens[i].param);
         } else {
-            streams.getTokenType(i, (uint8_t)tokens[i].token).push(tokens[i].param);
+            streams.getTokenType(i, static_cast<uint8_t>(tokens[i].token)).push(tokens[i].param);
         }
     }
 }

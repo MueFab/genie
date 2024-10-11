@@ -41,14 +41,14 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<gen
         auto ref = dynamic_cast<genie::core::meta::external_ref::MPEG*>(base.get());
         auto ret = std::make_unique<location::external::MPEG>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
-            genie::format::mgg::reference::location::External::ChecksumAlgorithm(ref->getChecksumAlgo()),
+            static_cast<genie::format::mgg::reference::location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()),
             static_cast<uint8_t>(ref->getGroupID()), ref->getID(), std::move(ref->getChecksum()), _version);
         return ret;
     } else if (dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get()) != nullptr) {
         auto ref = dynamic_cast<genie::core::meta::external_ref::Fasta*>(base.get());
         auto ret = std::make_unique<location::external::Fasta>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
-            genie::format::mgg::reference::location::External::ChecksumAlgorithm(ref->getChecksumAlgo()));
+            static_cast<genie::format::mgg::reference::location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
             ret->addChecksum(s);
         }
@@ -57,7 +57,7 @@ std::unique_ptr<Location> Location::referenceLocationFactory(std::unique_ptr<gen
         auto ref = dynamic_cast<genie::core::meta::external_ref::Raw*>(base.get());
         auto ret = std::make_unique<location::external::Raw>(
             static_cast<uint8_t>(0), std::move(ref->getURI()),
-            genie::format::mgg::reference::location::External::ChecksumAlgorithm(ref->getChecksumAlgo()));
+            static_cast<genie::format::mgg::reference::location::External::ChecksumAlgorithm>(ref->getChecksumAlgo()));
         for (auto& s : ref->getChecksums()) {
             ret->addChecksum(s);
         }

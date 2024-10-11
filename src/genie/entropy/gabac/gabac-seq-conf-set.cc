@@ -30,23 +30,23 @@ GabacSeqConfSet::GabacSeqConfSet() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) const {
-    return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+    return conf[static_cast<uint8_t>(sub.first)][static_cast<uint8_t>(sub.second)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) {
     if (getDescriptor(sub.first).tokentype) {
-        return conf[uint8_t(sub.first)][0];
+        return conf[static_cast<uint8_t>(sub.first)][0];
     } else {
-        return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+        return conf[static_cast<uint8_t>(sub.first)][static_cast<uint8_t>(sub.second)];
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg) {
-    conf[uint8_t(sub.first)][uint8_t(sub.second)].setSubseqConfig(std::move(subseqCfg));
+    conf[static_cast<uint8_t>(sub.first)][static_cast<uint8_t>(sub.second)].setSubseqConfig(std::move(subseqCfg));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -98,14 +98,14 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
         if (core::getDescriptor(desc.id).tokentype) {
             auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderTokenType>(parameterSet, desc.id);
             for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
-                auto subseqCfg = descConfig.getSubsequenceCfg((uint8_t)subdesc.id.second);
+                auto subseqCfg = descConfig.getSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second));
 
                 setConfAsGabac(subdesc.id, std::move(subseqCfg));
             }
         } else {
             auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderRegular>(parameterSet, desc.id);
             for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
-                auto subseqCfg = descConfig.getSubsequenceCfg((uint8_t)subdesc.id.second);
+                auto subseqCfg = descConfig.getSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second));
 
                 setConfAsGabac(subdesc.id, std::move(subseqCfg));
             }

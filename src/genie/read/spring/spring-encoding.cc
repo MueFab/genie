@@ -49,7 +49,7 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
         count.insert(count.end(), to_insert, {0, 0, 0, 0});
         currentsize = currentsize + to_insert;
         for (int64_t i = 0; i < (*current_contig_it).read_length; i++)
-            count[currentpos + i][chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
+            count[currentpos + i][chartolong[static_cast<uint8_t>((*current_contig_it).read[i])]] += 1;
     }
     std::string ref(count.size(), 'A');
     for (size_t i = 0; i < count.size(); i++) {
@@ -81,7 +81,7 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
         for (int64_t j = 0; j < (*current_contig_it).read_length; j++)
             if ((*current_contig_it).read[j] != ref[currentpos + j]) {
                 f_noise << (*current_contig_it).read[j];
-                pos_var = (uint16_t)(j - prevj);
+                pos_var = static_cast<uint16_t>(j - prevj);
                 f_noisepos.write(reinterpret_cast<char *>(&pos_var), sizeof(uint16_t));
                 prevj = j;
             }

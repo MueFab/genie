@@ -103,8 +103,8 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 // ---------------------------------------------------------------------------------------------------------------------
 
 SamRecordGroup::SamRecordGroup()
-    : data(size_t(TemplateType::TOTAL_INDICES), std::vector<std::list<SamRecord>>(size_t(MappingType::TOTAL_INDICES))) {
-}
+    : data(static_cast<size_t>(TemplateType::TOTAL_INDICES),
+           std::vector<std::list<SamRecord>>(static_cast<size_t>(MappingType::TOTAL_INDICES))) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ void SamRecordGroup::addRecord(SamRecord &&rec) {
     }
 
     // Put SAM record into the bucket for its mapping case
-    data[uint8_t(template_type)][uint8_t(mapping_type)].push_back(std::move(rec));
+    data[static_cast<uint8_t>(template_type)][static_cast<uint8_t>(mapping_type)].push_back(std::move(rec));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -141,16 +141,16 @@ bool SamRecordGroup::checkIfPaired() {
     size_t count_single_end = 0;
     size_t count_paired_end = 0;
 
-    for (auto &a : data[uint8_t(TemplateType::SINGLE)]) {
+    for (auto &a : data[static_cast<uint8_t>(TemplateType::SINGLE)]) {
         count_single_end += a.size();
     }
-    for (auto &a : data[uint8_t(TemplateType::PAIRED_1)]) {
+    for (auto &a : data[static_cast<uint8_t>(TemplateType::PAIRED_1)]) {
         count_paired_end += a.size();
     }
-    for (auto &a : data[uint8_t(TemplateType::PAIRED_2)]) {
+    for (auto &a : data[static_cast<uint8_t>(TemplateType::PAIRED_2)]) {
         count_paired_end += a.size();
     }
-    for (auto &a : data[uint8_t(TemplateType::PAIRED_UNKNOWN)]) {
+    for (auto &a : data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]) {
         count_paired_end += a.size();
     }
 
@@ -162,22 +162,24 @@ bool SamRecordGroup::checkIfPaired() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::core::record::ClassType SamRecordGroup::checkClassTypeSingle() {
-    size_t primary_count = data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].size() +
-                           data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::UNMAPPED)].size();
+    size_t primary_count =
+        data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].size() +
+        data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::UNMAPPED)].size();
     UTILS_DIE_IF(primary_count > 1, "Multiple primary alignments in single ended SAM record");
     if (primary_count == 0) {
         // std::cerr << "Warning: Single ended SAM record without primary reads, discarding whole record" << std::endl;
         data.clear();
         return genie::core::record::ClassType::NONE;
-    } else if (data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty() &&
-               !data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].empty()) {
+    } else if (data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].empty() &&
+               !data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::NONPRIMARY)]
+                    .empty()) {
         // std::cerr << "Warning: Single ended SAM record without primary alignment, but with secondary alignments, "
         //              "discarding "
         //              "alignments"
         //           << std::endl;
-        data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].clear();
+        data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::NONPRIMARY)].clear();
     }
-    return data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty()
+    return data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()
                ? genie::core::record::ClassType::CLASS_U
                : genie::core::record::ClassType::CLASS_I;
 }
@@ -185,9 +187,10 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypeSingle() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::removeDuplicatesPaired(TemplateType tempType, MappingType mapType) {
-    while (data[uint8_t(tempType)][uint8_t(mapType)].size() > 1) {
-        if (data[uint8_t(tempType)][uint8_t(mapType)].back() == data[uint8_t(tempType)][uint8_t(mapType)].front()) {
-            data[uint8_t(tempType)][uint8_t(mapType)].pop_back();
+    while (data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(mapType)].size() > 1) {
+        if (data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(mapType)].back() ==
+            data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(mapType)].front()) {
+            data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(mapType)].pop_back();
         } else {
             UTILS_DIE("Too many Pair_1 reads");
         }
@@ -197,26 +200,28 @@ void SamRecordGroup::removeDuplicatesPaired(TemplateType tempType, MappingType m
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t SamRecordGroup::primaryTemplateCount(TemplateType tempType) {
-    return data[uint8_t(tempType)][uint8_t(MappingType::PRIMARY)].size() +
-           data[uint8_t(tempType)][uint8_t(MappingType::UNMAPPED)].size();
+    return data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(MappingType::PRIMARY)].size() +
+           data[static_cast<uint8_t>(tempType)][static_cast<uint8_t>(MappingType::UNMAPPED)].size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t SamRecordGroup::mappingCount(MappingType mapType) {
-    return data[uint8_t(TemplateType::PAIRED_1)][uint8_t(mapType)].size() +
-           data[uint8_t(TemplateType::PAIRED_2)][uint8_t(mapType)].size() +
-           data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(mapType)].size();
+    return data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(mapType)].size() +
+           data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(mapType)].size() +
+           data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(mapType)].size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::removeAmbiguousSecondaryAlignments() {
     // Get rid of unknown pair index
-    if (data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::PRIMARY)].size() > 1 &&
-        !data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::NONPRIMARY)].empty()) {
+    if (data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(MappingType::PRIMARY)].size() >
+            1 &&
+        !data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(MappingType::NONPRIMARY)]
+             .empty()) {
         std::cerr << "Warning: Secondary alignments without read ordering are discarded" << std::endl;
-        data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::NONPRIMARY)].clear();
+        data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(MappingType::NONPRIMARY)].clear();
     }
 }
 
@@ -224,15 +229,19 @@ void SamRecordGroup::removeAmbiguousSecondaryAlignments() {
 
 void SamRecordGroup::moveSecondaryAlignments() {
     // Move secondary alignments which can be associated with a primary read
-    auto s1 = std::move(data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)]);
-    auto s2 = std::move(data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)]);
+    auto s1 =
+        std::move(data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::NONPRIMARY)]);
+    auto s2 =
+        std::move(data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::NONPRIMARY)]);
     for (auto it1 = s1.begin(); it1 != s1.end();) {
         bool found = false;
         for (auto it2 = s2.begin(); it2 != s2.end(); it2++) {
             if (it1->isPairOf(*it2)) {
                 found = true;
-                data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)].push_back(*it1);
-                data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)].push_back(*it2);
+                data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::NONPRIMARY)]
+                    .push_back(*it1);
+                data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::NONPRIMARY)]
+                    .push_back(*it2);
                 it1 = s1.erase(it1);
                 s2.erase(it2);
                 break;
@@ -245,10 +254,12 @@ void SamRecordGroup::moveSecondaryAlignments() {
 
     // Move secondary alignments which can not be associated
     for (auto &it1 : s1) {
-        data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)].push_back(it1);
+        data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::NONPRIMARY)].push_back(
+            it1);
     }
     for (auto &it2 : s2) {
-        data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)].push_back(it2);
+        data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::NONPRIMARY)].push_back(
+            it2);
     }
 }
 
@@ -257,28 +268,33 @@ void SamRecordGroup::moveSecondaryAlignments() {
 void SamRecordGroup::guessUnknownReadOrder(size_t &unknown_count, size_t &read_1_count, size_t &read_2_count) {
     // Get rid of unknown pair indices
     while (unknown_count > 0) {
-        auto index = data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::PRIMARY)].empty()
-                         ? uint8_t(MappingType::UNMAPPED)
-                         : uint8_t(MappingType::PRIMARY);
+        auto index =
+            data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()
+                ? static_cast<uint8_t>(MappingType::UNMAPPED)
+                : static_cast<uint8_t>(MappingType::PRIMARY);
         if (read_1_count == 0) {
-            data[uint8_t(TemplateType::PAIRED_1)][index].push_back(
-                data[uint8_t(TemplateType::PAIRED_UNKNOWN)][index].back());
-            data[uint8_t(TemplateType::PAIRED_UNKNOWN)][index].pop_back();
-            if (index == uint8_t(MappingType::PRIMARY)) {
-                auto &vec = data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)];
-                auto &vec2 = data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::NONPRIMARY)];
+            data[static_cast<uint8_t>(TemplateType::PAIRED_1)][index].push_back(
+                data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][index].back());
+            data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][index].pop_back();
+            if (index == static_cast<uint8_t>(MappingType::PRIMARY)) {
+                auto &vec =
+                    data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::NONPRIMARY)];
+                auto &vec2 = data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
+                                 [static_cast<uint8_t>(MappingType::NONPRIMARY)];
                 vec.insert(vec.end(), vec2.begin(), vec2.end());
                 vec2.clear();
             }
             read_1_count++;
             unknown_count--;
         } else if (read_2_count == 0) {
-            data[uint8_t(TemplateType::PAIRED_2)][index].push_back(
-                data[uint8_t(TemplateType::PAIRED_UNKNOWN)][index].back());
-            data[uint8_t(TemplateType::PAIRED_UNKNOWN)][index].pop_back();
-            if (index == uint8_t(MappingType::PRIMARY)) {
-                auto &vec = data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)];
-                auto &vec2 = data[uint8_t(TemplateType::PAIRED_UNKNOWN)][uint8_t(MappingType::NONPRIMARY)];
+            data[static_cast<uint8_t>(TemplateType::PAIRED_2)][index].push_back(
+                data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][index].back());
+            data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][index].pop_back();
+            if (index == static_cast<uint8_t>(MappingType::PRIMARY)) {
+                auto &vec =
+                    data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::NONPRIMARY)];
+                auto &vec2 = data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
+                                 [static_cast<uint8_t>(MappingType::NONPRIMARY)];
                 vec.insert(vec.end(), vec2.begin(), vec2.end());
                 vec2.clear();
             }
@@ -341,19 +357,22 @@ std::pair<SamRecord *, SamRecord *> SamRecordGroup::getReadTuple() {
     SamRecord *r1 = nullptr;
     SamRecord *r2 = nullptr;
 
-    if (!data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty()) {
-        r1 = &data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].front();
-    } else if (!data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::UNMAPPED)].empty()) {
-        r1 = &data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::UNMAPPED)].front();
-    } else if (!data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::PRIMARY)].empty()) {
-        r1 = &data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::PRIMARY)].front();
-    } else if (!data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::UNMAPPED)].empty()) {
-        r1 = &data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::UNMAPPED)].front();
+    if (!data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()) {
+        r1 = &data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].front();
+    } else if (!data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::UNMAPPED)].empty()) {
+        r1 = &data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::UNMAPPED)].front();
+    } else if (!data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::PRIMARY)]
+                    .empty()) {
+        r1 = &data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::PRIMARY)].front();
+    } else if (!data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::UNMAPPED)]
+                    .empty()) {
+        r1 = &data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::UNMAPPED)].front();
     }
-    if (!data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].empty()) {
-        r2 = &data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].front();
-    } else if (!data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::UNMAPPED)].empty()) {
-        r2 = &data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::UNMAPPED)].front();
+    if (!data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()) {
+        r2 = &data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::PRIMARY)].front();
+    } else if (!data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::UNMAPPED)]
+                    .empty()) {
+        r2 = &data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::UNMAPPED)].front();
     }
 
     return std::make_pair(r1, r2);
@@ -363,13 +382,17 @@ std::pair<SamRecord *, SamRecord *> SamRecordGroup::getReadTuple() {
 
 bool SamRecordGroup::isR1First(const std::pair<bool, genie::core::record::ClassType> &cls) {
     if (cls.second == genie::core::record::ClassType::CLASS_U || !cls.first ||
-        data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].empty()) {
+        data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()) {
         return true;
-    } else if (data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::PRIMARY)].empty()) {
+    } else if (data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()) {
         return false;
     } else {
-        return data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::PRIMARY)].front().getPos() <
-               data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].front().getPos();
+        return data[static_cast<uint8_t>(TemplateType::PAIRED_1)][static_cast<uint8_t>(MappingType::PRIMARY)]
+                   .front()
+                   .getPos() <
+               data[static_cast<uint8_t>(TemplateType::PAIRED_2)][static_cast<uint8_t>(MappingType::PRIMARY)]
+                   .front()
+                   .getPos();
     }
 }
 

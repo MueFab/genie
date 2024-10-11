@@ -112,7 +112,7 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, Re
     for (auto& c : currentChunks) {
         c.resize(2);
         for (auto& c2 : c) {
-            c2.resize((uint8_t)record::ClassType::CLASS_U);
+            c2.resize(static_cast<uint8_t>(record::ClassType::CLASS_U));
         }
     }
 }
@@ -296,18 +296,18 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             }
         }
 
-        if (currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().empty()) {
-            currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef() = record_reference;
+        if (currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getData().empty()) {
+            currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getRef() = record_reference;
         } else {
-            currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
+            currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getRef().merge(record_reference);
         }
         if (!movedStats) {
-            currentChunks[refBased][paired][(uint8_t)classtype - 1].getStats().add(chunk.getStats());
+            currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getStats().add(chunk.getStats());
             movedStats = true;
         }
-        currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
-        if (currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().size() == auSize) {
-            auto& classblock = currentChunks[refBased][paired][(uint8_t)classtype - 1];
+        currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getData().push_back(r);
+        if (currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1].getData().size() == auSize) {
+            auto& classblock = currentChunks[refBased][paired][static_cast<uint8_t>(classtype) - 1];
             queueFinishedChunk(classblock);
         }
     }

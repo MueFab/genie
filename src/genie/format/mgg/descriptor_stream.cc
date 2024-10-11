@@ -76,7 +76,7 @@ DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTab
         payload.emplace_back(reader, payloadSizes[i]);
     }
 
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

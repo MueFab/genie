@@ -56,7 +56,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);
-                std::cerr << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
+                std::cerr << "Found PS " << static_cast<uint32_t>(p.getID()) << "..." << std::endl;
                 parameters.insert(std::make_pair(p.getID(), std::move(p.getEncodingSet())));
                 break;
             }
