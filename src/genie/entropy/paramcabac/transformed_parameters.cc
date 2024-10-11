@@ -148,7 +148,7 @@ bool TransformedParameters::operator==(const TransformedParameters &val) const {
 
 nlohmann::json TransformedParameters::toJson() const {
     nlohmann::json ret;
-    ret["transform_ID_subseq"] = static_cast<uint8_t>(transform_ID_subseq);
+    ret["transform_ID_subseq"] = transform_ID_subseq;
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
         case TransformIdSubseq::EQUALITY_CODING:

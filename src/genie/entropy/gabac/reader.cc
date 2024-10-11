@@ -51,7 +51,7 @@ uint64_t Reader::readAsBIcabac(const std::vector<unsigned int>& binParams) {
     for (size_t i = cLength; i > 0; i--) {
         bins = (bins << 1u) | m_decBinCabac.decodeBin(&*(scan++));
     }
-    return static_cast<uint64_t>(bins);
+    return bins;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ uint64_t Reader::readAsTUbypass(const std::vector<unsigned int>& binParams) {
         if (m_decBinCabac.decodeBinsEP(1) == 0) break;
         i++;
     }
-    return static_cast<uint64_t>(i);
+    return i;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ uint64_t Reader::readAsTUcabac(const std::vector<unsigned int>& binParams) {
         i++;
         scan++;
     }
-    return static_cast<uint64_t>(i);
+    return i;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ uint64_t Reader::readAsEGbypass(const std::vector<unsigned int>&) {
     } else {
         return 0;
     }
-    return static_cast<uint64_t>(bins - 1);
+    return bins - 1;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ uint64_t Reader::readAsEGcabac(const std::vector<unsigned int>& binParams) {
     } else {
         return 0;
     }
-    return static_cast<uint64_t>(bins - 1);
+    return bins - 1;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -31,7 +31,7 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
             segment_count = 1;
         }
         if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
-            sec = {static_cast<size_t>(id), segment_count, true};
+            sec = {id, segment_count, true};
             id += segment_count;
         } else {
             bool dataLeft = pumpRetrieve(classifier);

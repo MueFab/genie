@@ -21,7 +21,7 @@ namespace genie::read::spring {
 template <size_t bitset_size>
 void stringtobitset(const std::string &s, const uint16_t readlen, std::bitset<bitset_size> &b,
                     std::bitset<bitset_size> **basemask) {
-    for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
+    for (int i = 0; i < readlen; i++) b |= basemask[i][static_cast<uint8_t>(s[i])];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -61,8 +61,8 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const
             int num_thr = 1;
 #endif
             uint64_t i, stop;
-            i = uint64_t(tid) * numreads / num_thr;
-            stop = uint64_t(tid + 1) * numreads / num_thr;
+            i = static_cast<uint64_t>(tid) * numreads / num_thr;
+            stop = static_cast<uint64_t>(tid + 1) * numreads / num_thr;
             if (tid == num_thr - 1) stop = numreads;
             // compute keys and and store in ull
             for (; i < stop; i++) {
@@ -102,8 +102,8 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const
 #endif
             std::ofstream foutkey(basedir + std::string("/keys.bin.") + std::to_string(tid), std::ios::binary);
             uint64_t i, stop;
-            i = uint64_t(tid) * dict[j].dict_numreads / num_thr;
-            stop = uint64_t(tid + 1) * dict[j].dict_numreads / num_thr;
+            i = static_cast<uint64_t>(tid) * dict[j].dict_numreads / num_thr;
+            stop = static_cast<uint64_t>(tid + 1) * dict[j].dict_numreads / num_thr;
             if (tid == num_thr - 1) stop = dict[j].dict_numreads;
             for (; i < stop; i++) foutkey.write(reinterpret_cast<char *>(&ull[i]), sizeof(uint64_t));
             foutkey.close();
@@ -153,8 +153,8 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, const
                                    std::ios::binary);
             uint64_t currentkey, currenthash;
             uint64_t i, stop;
-            i = uint64_t(tid) * dict[j].dict_numreads / num_thr;
-            stop = uint64_t(tid + 1) * dict[j].dict_numreads / num_thr;
+            i = static_cast<uint64_t>(tid) * dict[j].dict_numreads / num_thr;
+            stop = static_cast<uint64_t>(tid + 1) * dict[j].dict_numreads / num_thr;
             if (tid == num_thr - 1) stop = dict[j].dict_numreads;
             for (; i < stop; i++) {
                 finkey.read(reinterpret_cast<char *>(&currentkey), sizeof(uint64_t));
@@ -249,7 +249,7 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
 template <size_t bitset_size>
 void chartobitset(const char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
     b.reset();
-    for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
+    for (int i = 0; i < readlen; i++) b |= basemask[i][static_cast<uint8_t>(s[i])];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

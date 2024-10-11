@@ -81,7 +81,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
             std::filesystem::remove(filename);
         }
         auId++;
-        sec = {static_cast<size_t>(id), au.getNumReads(), true};
+        sec = {id, au.getNumReads(), true};
         id += sec.length;
     }
     au.setStats(std::move(stats));

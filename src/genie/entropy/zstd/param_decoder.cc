@@ -34,13 +34,13 @@ DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader &reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
-    descriptor_subsequence_cfgs[static_cast<uint8_t>(index)] = cfg;
+    descriptor_subsequence_cfgs[index] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
-    return descriptor_subsequence_cfgs[static_cast<uint8_t>(index)];
+    return descriptor_subsequence_cfgs[index];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

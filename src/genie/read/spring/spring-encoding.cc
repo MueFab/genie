@@ -76,7 +76,7 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
     int64_t currentpos;
     uint64_t abs_current_pos;
     for (; current_contig_it != current_contig.end(); ++current_contig_it) {
-        currentpos = (int64_t)(*current_contig_it).pos;
+        currentpos = (*current_contig_it).pos;
         prevj = 0;
         for (int64_t j = 0; j < (*current_contig_it).read_length; j++)
             if ((*current_contig_it).read[j] != ref[currentpos + j]) {

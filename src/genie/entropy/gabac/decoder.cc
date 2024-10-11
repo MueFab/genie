@@ -39,7 +39,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     {
         const size_t READAHEAD = 6;
         util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD,
-                                              (uint8_t)remainingData.getWordSize());
+                                              remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
@@ -99,7 +99,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
                                        remainingData.getWordSize());
             offset += gabac::decodeTransformSubseq(
                 conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
-                static_cast<unsigned int>(numTransformedSymbols), &tmp, static_cast<uint8_t>(4));
+                numTransformedSymbols, &tmp, 4);
 
             transformedSeqs.emplace_back(std::move(tmp));
         }

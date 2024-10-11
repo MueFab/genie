@@ -159,8 +159,8 @@ Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::co
 void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Reference");
     print_offset(output, depth + 1, max_depth,
-                 "Dataset group ID: " + std::to_string(static_cast<int>(dataset_group_ID)));
-    print_offset(output, depth + 1, max_depth, "Reference ID: " + std::to_string(static_cast<int>(reference_ID)));
+                 "Dataset group ID: " + std::to_string(dataset_group_ID));
+    print_offset(output, depth + 1, max_depth, "Reference ID: " + std::to_string(reference_ID));
     print_offset(output, depth + 1, max_depth, "Reference name: " + reference_name);
     print_offset(output, depth + 1, max_depth, "Reference major version: " + std::to_string(ref_version.getMajor()));
     print_offset(output, depth + 1, max_depth, "Reference minor version: " + std::to_string(ref_version.getMinor()));
@@ -177,8 +177,8 @@ void Reference::print_debug(std::ostream& output, uint8_t depth, uint8_t max_dep
         location = "External at " + dynamic_cast<const reference::location::External&>(*reference_location).getURI();
     } else {
         const auto& i = dynamic_cast<const reference::location::Internal&>(*reference_location);
-        location = "Internal at (Dataset Group " + std::to_string(static_cast<int>(i.getDatasetGroupID())) +
-                   ", Dataset " + std::to_string(static_cast<int>(i.getDatasetID())) + ")";
+        location = "Internal at (Dataset Group " + std::to_string(i.getDatasetGroupID()) +
+                   ", Dataset " + std::to_string(i.getDatasetID()) + ")";
     }
     print_offset(output, depth + 1, max_depth, "Reference location: " + location);
 }

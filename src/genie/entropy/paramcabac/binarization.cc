@@ -105,7 +105,7 @@ Binarization::Binarization(nlohmann::json j) {
 
 nlohmann::json Binarization::toJson() const {
     nlohmann::json ret;
-    ret["binarization_ID"] = static_cast<uint8_t>(binarization_ID);
+    ret["binarization_ID"] = binarization_ID;
     ret["bypass_flag"] = static_cast<bool>(bypass_flag);
     if (!cabac_binarization_parameters.toJson(binarization_ID).is_null()) {
         ret["cabac_binarization_parameters"] = cabac_binarization_parameters.toJson(binarization_ID);

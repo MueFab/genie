@@ -94,7 +94,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
             } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
                 t.param = pull32bigEndian(desc.getTokenType(cur_pos, static_cast<uint8_t>(type)));
             } else if (static_cast<uint8_t>(type) < static_cast<uint8_t>(Tokens::MATCH)) {
-                t.param = static_cast<uint32_t>(desc.getTokenType(cur_pos, (uint8_t)type).pull());
+                t.param = static_cast<uint32_t>(desc.getTokenType(cur_pos, static_cast<uint8_t>(type)).pull());
             }
 
             rec.push_back(t);

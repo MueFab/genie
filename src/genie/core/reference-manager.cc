@@ -122,7 +122,7 @@ const std::string& ReferenceManager::ReferenceExcerpt::getRefName() const { retu
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkAt(size_t pos) const {
-    int id = static_cast<int>(static_cast<size_t>(pos / CHUNK_SIZE) - static_cast<size_t>(global_start / CHUNK_SIZE));
+    int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= static_cast<int>(data.size()), "Invalid index");
     return data[id];
 }
@@ -130,7 +130,7 @@ std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkA
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::ReferenceExcerpt::mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat) {
-    int id = static_cast<int>(static_cast<size_t>(pos / CHUNK_SIZE) - static_cast<size_t>(global_start / CHUNK_SIZE));
+    int id = static_cast<int>(pos / CHUNK_SIZE - global_start / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= static_cast<int>(data.size()), "Invalid index");
     data[id] = std::move(dat);
 }

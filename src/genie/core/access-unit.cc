@@ -74,7 +74,7 @@ AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, (uint8_t)d.getWordSize()) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, d.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -148,7 +148,7 @@ void AccessUnit::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::mov
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Descriptor::set(uint16_t _id, Subsequence &&sub) {
-    subdesc[static_cast<uint16_t>(_id)] = std::move(sub);
+    subdesc[_id] = std::move(sub);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.readAlignedBytes(reinterpret_cast<char *>(data.getData()), size);
+    reader.readAlignedBytes(data.getData(), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id)
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data.getWordSize()) {}
+    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, data.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -59,14 +59,14 @@ template <size_t bitset_size>
 void setglobalarrays(reorder_global<bitset_size> &rg) {
     for (int i = 0; i < 64; i++) rg.mask64[i] = 1;
     for (int i = 0; i < rg.max_readlen; i++) {
-        rg.basemask[i][(uint8_t)'A'][2 * i] = 0;
-        rg.basemask[i][(uint8_t)'A'][2 * i + 1] = 0;
-        rg.basemask[i][(uint8_t)'C'][2 * i] = 0;
-        rg.basemask[i][(uint8_t)'C'][2 * i + 1] = 1;
-        rg.basemask[i][(uint8_t)'G'][2 * i] = 1;
-        rg.basemask[i][(uint8_t)'G'][2 * i + 1] = 0;
-        rg.basemask[i][(uint8_t)'T'][2 * i] = 1;
-        rg.basemask[i][(uint8_t)'T'][2 * i + 1] = 1;
+        rg.basemask[i][static_cast<uint8_t>('A')][2 * i] = 0;
+        rg.basemask[i][static_cast<uint8_t>('A')][2 * i + 1] = 0;
+        rg.basemask[i][static_cast<uint8_t>('C')][2 * i] = 0;
+        rg.basemask[i][static_cast<uint8_t>('C')][2 * i + 1] = 1;
+        rg.basemask[i][static_cast<uint8_t>('G')][2 * i] = 1;
+        rg.basemask[i][static_cast<uint8_t>('G')][2 * i + 1] = 0;
+        rg.basemask[i][static_cast<uint8_t>('T')][2 * i] = 1;
+        rg.basemask[i][static_cast<uint8_t>('T')][2 * i + 1] = 1;
     }
 }
 
@@ -95,7 +95,7 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
         std::fill(count[2], count[2] + rg.max_readlen, 0);
         std::fill(count[3], count[3] + rg.max_readlen, 0);
         for (int i = 0; i < cur_readlen; i++) {
-            count[chartoint((uint8_t)current[i])][i] = 1;
+            count[chartoint(static_cast<uint8_t>(current[i]))][i] = 1;
         }
         ref_len = cur_readlen;
     } else {
@@ -103,36 +103,36 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
             // shift count
             for (int i = 0; i < ref_len - shift; i++) {
                 for (int j = 0; j < 4; j++) count[j][i] = count[j][i + shift];
-                if (i < cur_readlen) count[chartoint((uint8_t)current[i])][i] += 1;
+                if (i < cur_readlen) count[chartoint(static_cast<uint8_t>(current[i]))][i] += 1;
             }
 
             // for the new positions set count to 1
             for (int i = ref_len - shift; i < cur_readlen; i++) {
                 for (int j = 0; j < 4; j++) count[j][i] = 0;
-                count[chartoint((uint8_t)current[i])][i] = 1;
+                count[chartoint(static_cast<uint8_t>(current[i]))][i] = 1;
             }
             ref_len = std::max<int>(ref_len - shift, cur_readlen);
         } else {  // reverse case is quite complicated in the variable length case
             if (cur_readlen - shift >= ref_len) {
                 for (int i = cur_readlen - shift - ref_len; i < cur_readlen - shift; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = count[j][i - (cur_readlen - shift - ref_len)];
-                    count[chartoint((uint8_t)current[i])][i] += 1;
+                    count[chartoint(static_cast<uint8_t>(current[i]))][i] += 1;
                 }
                 for (int i = 0; i < cur_readlen - shift - ref_len; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = 0;
-                    count[chartoint((uint8_t)current[i])][i] = 1;
+                    count[chartoint(static_cast<uint8_t>(current[i]))][i] = 1;
                 }
                 for (int i = cur_readlen - shift; i < cur_readlen; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = 0;
-                    count[chartoint((uint8_t)current[i])][i] = 1;
+                    count[chartoint(static_cast<uint8_t>(current[i]))][i] = 1;
                 }
                 ref_len = cur_readlen;
             } else if (ref_len + shift <= rg.max_readlen) {
                 for (int i = ref_len - cur_readlen + shift; i < ref_len; i++)
-                    count[chartoint((uint8_t)current[i - (ref_len - cur_readlen + shift)])][i] += 1;
+                    count[chartoint(static_cast<uint8_t>(current[i - (ref_len - cur_readlen + shift)]))][i] += 1;
                 for (int i = ref_len; i < ref_len + shift; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = 0;
-                    count[chartoint((uint8_t)current[i - (ref_len - cur_readlen + shift)])][i] = 1;
+                    count[chartoint(static_cast<uint8_t>(current[i - (ref_len - cur_readlen + shift)]))][i] = 1;
                 }
                 ref_len = ref_len + shift;
             } else {
@@ -140,11 +140,11 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
                     for (int j = 0; j < 4; j++) count[j][i] = count[j][i + (ref_len + shift - rg.max_readlen)];
                 }
                 for (int i = rg.max_readlen - cur_readlen; i < rg.max_readlen - shift; i++) {
-                    count[chartoint((uint8_t)current[i - (rg.max_readlen - cur_readlen)])][i] += 1;
+                    count[chartoint(static_cast<uint8_t>(current[i - (rg.max_readlen - cur_readlen)]))][i] += 1;
                 }
                 for (int i = rg.max_readlen - shift; i < rg.max_readlen; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = 0;
-                    count[chartoint((uint8_t)current[i - (rg.max_readlen - cur_readlen)])][i] = 1;
+                    count[chartoint(static_cast<uint8_t>(current[i - (rg.max_readlen - cur_readlen)]))][i] = 1;
                 }
                 ref_len = rg.max_readlen;
             }
@@ -174,7 +174,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
     std::ifstream f(rg.infile[0], std::ifstream::in | std::ios::binary);
     for (uint32_t i = 0; i < rg.numreads_array[0]; i++) {
         f.read(reinterpret_cast<char *>(&read_lengths[i]), sizeof(uint16_t));
-        uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i] + 4 - 1) / 4;
+        uint16_t num_bytes_to_read = (static_cast<uint32_t>(read_lengths[i]) + 4 - 1) / 4;
         f.read(reinterpret_cast<char *>(&read[i]), num_bytes_to_read);
     }
     f.close();
@@ -183,7 +183,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
         f.open(rg.infile[1], std::ifstream::in | std::ios::binary);
         for (uint32_t i = rg.numreads_array[0]; i < rg.numreads_array[0] + rg.numreads_array[1]; i++) {
             f.read(reinterpret_cast<char *>(&read_lengths[i]), sizeof(uint16_t));
-            uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i] + 4 - 1) / 4;
+            uint16_t num_bytes_to_read = (static_cast<uint32_t>(read_lengths[i]) + 4 - 1) / 4;
             f.read(reinterpret_cast<char *>(&read[i]), num_bytes_to_read);
         }
         f.close();
@@ -603,7 +603,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
         while (finRC >> std::noskipws >> c) {
             finorder.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
             if (c == 'd') {
-                uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1) / 4;
+                uint16_t num_bytes_to_write = (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
                 fout.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
                 fout.write(reinterpret_cast<char *>(&read[current]), num_bytes_to_write);
             } else {
@@ -615,7 +615,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
         finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
         while (!finorder_s.eof()) {
             numreads_s_thr[tid]++;
-            uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1) / 4;
+            uint16_t num_bytes_to_write = (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
             fout_s.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
             fout_s.write(reinterpret_cast<char *>(&read[current]), num_bytes_to_write);
             finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));

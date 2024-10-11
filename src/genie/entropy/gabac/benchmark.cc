@@ -85,7 +85,7 @@ ConfigSearchBinarization::ConfigSearchBinarization(const std::pair<int64_t, int6
         //     binarizationParameters.emplace_back(0, max_param, std::max(int64_t(1), max_param / 4));
     }
     binarization =
-        SearchSpace<uint8_t>(static_cast<uint8_t>(0), static_cast<uint8_t>(lut.size()) - 1, static_cast<uint8_t>(1));
+        SearchSpace<uint8_t>(0, static_cast<uint8_t>(lut.size()) - 1, 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

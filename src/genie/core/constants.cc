@@ -402,7 +402,7 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GenomicSubDescriptorProperties &GenomicDescriptorProperties::getSubSeq(uint8_t sub) const {
-    return subseqs[static_cast<uint8_t>(sub)];
+    return subseqs[sub];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

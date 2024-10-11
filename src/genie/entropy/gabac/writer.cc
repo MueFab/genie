@@ -66,7 +66,7 @@ void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int>& bin
     unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--) {  // i must be signed
-        unsigned int bin = static_cast<unsigned int>(static_cast<uint64_t>(input) >> static_cast<uint8_t>(i)) & 0x1u;
+        unsigned int bin = static_cast<unsigned int>(input >> static_cast<uint8_t>(i)) & 0x1u;
         m_binaryArithmeticEncoder.encodeBin(bin, &*(scan++));
     }
 }
