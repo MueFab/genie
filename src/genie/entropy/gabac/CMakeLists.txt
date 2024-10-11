@@ -26,7 +26,8 @@ set(source_files
         streams.cc
         reader.cc
         writer.cc
-        benchmark.h benchmark.cc benchmark.impl.h)
+        benchmark.h benchmark.cc benchmark.impl.h
+        gabac-seq-conf-set.impl.h)
 
 if (${GABAC_BUILD_SHARED_LIB})
     add_library(genie-gabac SHARED ${source_files})

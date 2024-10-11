@@ -1,7 +1,18 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @file reference.h
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ * @brief Defines the `Reference` class for representing reference sequences within the MGG (MPEG-G) container format in GENIE.
+ *
+ * The `Reference` class is used to encapsulate details about genomic reference sequences stored
+ * within an MGG (MPEG-G) container, part of the MPEG-G standard for genomic data representation.
+ * This class provides methods to manage sequence information, versioning, metadata, and associated
+ * storage locations for a given reference sequence. Additionally, it supports serialization and
+ * deserialization of the reference information from a bitstream.
+ *
+ * MPEG-G (ISO/IEC 23092) is a comprehensive standard designed to efficiently store, transmit,
+ * and process large-scale genomic data. The `Reference` class helps facilitate this by providing
+ * a structured way to manage and access reference sequence details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_REFERENCE_H_
@@ -25,139 +36,154 @@
 namespace genie::format::mgg {
 
 /**
- * @brief
+ * @class Reference
+ * @brief Represents genomic reference information within an MGG (MPEG-G) container.
+ *
+ * The `Reference` class is responsible for encapsulating and managing all metadata and sequence
+ * information associated with a genomic reference stored in an MGG container file. It provides
+ * methods to manipulate reference details, including sequence data, versioning, and storage location.
+ *
+ * The MPEG-G standard is designed to enable efficient genomic data compression and transport,
+ * making it suitable for handling large-scale datasets. `Reference` objects are a key component
+ * in managing reference sequence details for genomic datasets.
  */
 class Reference : public GenInfo {
  public:
-    enum class ReferenceType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };  //!< @brief
+    /**
+     * @enum ReferenceType
+     * @brief Enumerates the supported reference types in the MPEG-G format.
+     */
+    enum class ReferenceType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };  //!< @brief Type of reference
 
  private:
-    uint8_t dataset_group_ID;        //!< @brief
-    uint8_t reference_ID;            //!< @brief
-    std::string reference_name;      //!< @brief
-    reference::Version ref_version;  //!< @brief
+    uint8_t dataset_group_ID;        //!< @brief ID of the associated dataset group.
+    uint8_t reference_ID;            //!< @brief ID of the reference sequence.
+    std::string reference_name;      //!< @brief Name of the reference sequence.
+    reference::Version ref_version;  //!< @brief Version of the reference sequence.
 
-    std::vector<reference::Sequence> sequences;  //!< @brief seq_count is length of vector
+    std::vector<reference::Sequence> sequences;  //!< @brief Container holding reference sequences.
 
-    std::unique_ptr<reference::Location> reference_location;  //!< @brief
+    std::unique_ptr<reference::Location> reference_location;  //!< @brief Storage location details for the reference.
 
-    genie::core::MPEGMinorVersion version;  //!< @brief
+    genie::core::MPEGMinorVersion version;  //!< @brief MPEG-G minor version used.
 
  public:
     /**
-     * @brief
-     * @param groupID
+     * @brief Updates the dataset group ID.
+     * @param groupID New dataset group ID.
      */
     void patchID(uint8_t groupID);
 
     /**
-     * @brief
-     * @param _old
-     * @param _new
+     * @brief Patches the reference ID.
+     * @param _old Previous reference ID.
+     * @param _new New reference ID.
      */
     void patchRefID(uint8_t _old, uint8_t _new);
 
     /**
-     * @brief
+     * @brief Decapsulates the reference into a `meta::Reference` object.
+     * @param meta Metadata for the reference.
+     * @return A `meta::Reference` object containing the decapsulated details.
      */
     genie::core::meta::Reference decapsulate(std::string meta);
 
     /**
-     * @brief
-     * @param _dataset_group_id
-     * @param _reference_ID
-     * @param ref
-     * @param _version
+     * @brief Constructor to create a `Reference` object from a `meta::Reference` object.
+     * @param _dataset_group_id Dataset group ID.
+     * @param _reference_ID Reference ID.
+     * @param ref Metadata object for the reference.
+     * @param _version MPEG minor version.
      */
     Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
               genie::core::MPEGMinorVersion _version);
 
     /**
-     * @brief
-     * @param info
-     * @return
+     * @brief Checks for equality between two `GenInfo` objects.
+     * @param info The other `GenInfo` object.
+     * @return True if equal, false otherwise.
      */
     bool operator==(const GenInfo& info) const override;
 
     /**
-     * @brief
-     * @param reader
-     * @param _version
+     * @brief Constructor to create a `Reference` object from a bitstream.
+     * @param reader Bitstream reader to extract the reference data.
+     * @param _version MPEG minor version.
      */
     explicit Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version);
 
     /**
-     * @brief
-     * @param group_id
-     * @param ref_id
-     * @param ref_name
-     * @param _ref_version
-     * @param location
-     * @param _version
+     * @brief Constructor to create a `Reference` object with the provided details.
+     * @param group_id Dataset group ID.
+     * @param ref_id Reference ID.
+     * @param ref_name Name of the reference.
+     * @param _ref_version Version information.
+     * @param location Location details for the reference.
+     * @param _version MPEG minor version.
      */
     Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
               std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version);
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the dataset group ID.
+     * @return Dataset group ID.
      */
     [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the reference ID.
+     * @return Reference ID.
      */
     [[nodiscard]] uint8_t getReferenceID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the name of the reference.
+     * @return Reference name as a string.
      */
     [[nodiscard]] const std::string& getReferenceName() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the version of the reference.
+     * @return Reference version object.
      */
     [[nodiscard]] const reference::Version& getRefVersion() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the reference sequences.
+     * @return Vector of reference sequences.
      */
     [[nodiscard]] const std::vector<reference::Sequence>& getSequences() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the key for the `GenInfo` object.
+     * @return Key as a string.
      */
     [[nodiscard]] const std::string& getKey() const override;
 
     /**
-     * @brief
-     * @param seq
-     * @param checksum
+     * @brief Adds a new sequence to the reference.
+     * @param seq Sequence object.
+     * @param checksum Checksum for the sequence.
      */
     void addSequence(reference::Sequence seq, std::string checksum);
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the location details of the reference.
+     * @return Location object.
      */
     [[nodiscard]] const reference::Location& getLocation() const;
 
     /**
-     * @brief
-     * @param writer
+     * @brief Writes the reference data to a bitstream.
+     * @param writer Bitstream writer to output the reference data.
      */
     void box_write(genie::util::BitWriter& writer) const override;
 
     /**
-     * @brief
-     * @param output
-     * @param depth
-     * @param max_depth
+     * @brief Prints debug information for the reference.
+     * @param output Output stream.
+     * @param depth Current depth in the print hierarchy.
+     * @param max_depth Maximum depth to print.
      */
     void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
 };

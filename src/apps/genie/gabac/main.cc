@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
                 genie::core::GenSubIndex(
                     std::make_pair(genie::core::GenDesc(programOptions.descID), programOptions.subseqID)),
                 timeweight);
-            auto json = result.config.toJoson().dump(4);
+            auto json = result.config.toJson().dump(4);
             std::ofstream output_stream(programOptions.outputFilePath);
             output_stream.write(json.c_str(), json.length());
 

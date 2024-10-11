@@ -1,7 +1,17 @@
 /**
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @copyright This file is part of GENIE.
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ * @brief Declaration of the GabacSeqConfSet class for managing the gabac sequence configurations.
+ *
+ * This file contains the declaration of the GabacSeqConfSet class, which provides an interface for managing
+ * configuration sets used in gabac encoding and decoding. It includes functionality to translate between
+ * gabac configurations and MPEG-G parameter sets, and offers methods to load, store, and retrieve configuration data.
+ *
+ * @details The GabacSeqConfSet class maintains a set of configurations for genomic descriptors, handling their
+ * translation to and from MPEG-G P2 parameter sets. It provides methods to extract configurations, modify them,
+ * and interact with other components in the gabac library. The class ensures compatibility by validating the
+ * configurations against predefined modes and states.
  */
 
 #ifndef SRC_GENIE_ENTROPY_GABAC_GABAC_SEQ_CONF_SET_H_
@@ -23,104 +33,102 @@
 namespace genie::entropy::gabac {
 
 /**
- * @brief Manages the current set of gabac configurations and handles the translation to MPEG-G P2 parameter sets.
+ * @brief Manages a set of gabac configurations for genomic descriptors.
+ *
+ * The GabacSeqConfSet class handles storing, loading, and manipulating configurations used for
+ * encoding and decoding genomic data with gabac. It can translate configurations to and from
+ * MPEG-G parameter sets, ensuring compatibility and providing an easy-to-use interface.
  */
 class GabacSeqConfSet {
  private:
-    typedef std::vector<gabac::EncodingConfiguration> SeqConf;  //!< @brief Configuration for one genomic descriptor
-    std::vector<SeqConf> conf;                                  //!< @brief Configuration for all genomic descriptors
+    typedef std::vector<gabac::EncodingConfiguration> SeqConf;  //!< Configuration for one genomic descriptor.
+    std::vector<SeqConf> conf;                                  //!< Configuration for all genomic descriptors.
 
-    // Shortcuts
+    // Type aliases for readability.
     using DescriptorSubsequenceCfg = entropy::paramcabac::Subsequence;
     using ParameterSet = core::parameter::ParameterSet;
 
     /**
-     * @brief Extract the mgb::desc_conf_pres::paramcabac::DecoderConfigurationCabac from a
-     * mgb::ParameterSet. An exception will be thrown if none is available.
-     * @param parameterSet Input parameter set
-     * @param descriptor_id Which DecoderConfigurationCabac to extract
-     * @return A properly casted DecoderConfigurationCabac. No new object is created, the object was already inside the
-     * input parameter set
+     * @brief Loads a specific decoder configuration from the parameter set.
+     *
+     * This function extracts a paramcabac::DecoderConfigurationCabac from the provided ParameterSet.
+     * It ensures that the configuration is not class-specific and is of the correct mode.
+     *
+     * @tparam T The type of decoder configuration to extract.
+     * @param parameterSet The input parameter set from which to extract the configuration.
+     * @param descriptor_id The descriptor identifier to use for locating the configuration.
+     * @return A reference to the extracted DecoderConfigurationCabac.
      */
     template <typename T>
-    static const T &loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet &parameterSet,
-                                             core::GenDesc descriptor_id) {
-        auto &curDesc = parameterSet.getEncodingSet().getDescriptor(descriptor_id);
-        UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
-        auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
-        auto &base_conf = curDesc.get();
-        UTILS_DIE_IF(base_conf.getPreset() != PRESENT, "Config not present");
-        auto &decoder_conf =
-            dynamic_cast<const core::parameter::desc_pres::DescriptorPresent &>(base_conf).getDecoder();
-        UTILS_DIE_IF(decoder_conf.getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
-
-        return dynamic_cast<const T &>(decoder_conf);
-    }
+    static const T& loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet& parameterSet,
+                                             core::GenDesc descriptor_id);
 
  public:
     /**
-     * @brief Retrieve a configuration from the current set, fitting for the specified subsequence
-     * @param sub - identifies descriptor subseuqence
-     * @return Gabac configuration
+     * @brief Retrieves the gabac configuration for the specified subsequence.
+     * @param sub The subsequence identifier to retrieve the configuration for.
+     * @return The gabac configuration corresponding to the specified subsequence.
      */
-    [[nodiscard]] const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
+    [[nodiscard]] const gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) const;
 
     /**
-     * @brief
-     * @param sub
-     * @return
+     * @brief Retrieves a modifiable reference to the gabac configuration for the specified subsequence.
+     * @param sub The subsequence identifier to retrieve the configuration for.
+     * @return A reference to the gabac configuration corresponding to the specified subsequence.
      */
-    gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub);
+    gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub);
 
     /**
-     * @brief Set a configuration for the specified subsequence
-     * @param sub - identifies descriptor subsequence
-     * @param subseqCfg - the descritpor subsequence configuration
+     * @brief Sets a gabac configuration for the specified subsequence.
+     * @param sub The subsequence identifier to set the configuration for.
+     * @param subseqCfg The descriptor subsequence configuration to set.
      */
-    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg);
+    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg&& subseqCfg);
 
     /**
-     *  @brief Create a default config guaranteed to work (bypass, no transformation, binary binarization)
+     * @brief Constructs a GabacSeqConfSet with a default configuration.
+     *
+     * Creates a default gabac configuration set that is guaranteed to work with basic settings
+     * (bypass mode, no transformation, binary binarization).
      */
     GabacSeqConfSet();
 
     /**
-     * @brief Store the complete set of gabac configurations in an MPEG-G parameter set
-     * @param parameterSet Output object
+     * @brief Stores the complete set of gabac configurations into an MPEG-G parameter set.
+     * @param parameterSet The parameter set object to store the configurations into.
      */
-    void storeParameters(ParameterSet &parameterSet) const;
+    void storeParameters(ParameterSet& parameterSet) const;
 
     /**
-     * @brief
-     * @param desc
-     * @param parameterSet
+     * @brief Stores gabac configurations for a specific descriptor in a parameter set.
+     * @param desc The genomic descriptor to store configurations for.
+     * @param parameterSet The parameter set to store the configurations into.
      */
-    void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) const;
+    void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg& parameterSet) const;
 
     /**
-     * @brief Load a complete set of gabac configurations to the internal memory of gabac configurations
-     * @param parameterSet Input object
+     * @brief Loads a complete set of gabac configurations from an MPEG-G parameter set.
+     * @param parameterSet The parameter set object to load the configurations from.
      */
-    void loadParameters(const ParameterSet &parameterSet);
+    void loadParameters(const ParameterSet& parameterSet);
 
     /**
-     * @brief
-     * @tparam T
-     * @param desc
-     * @param decoder_config
+     * @brief Fills a decoder configuration with the settings from the internal configuration set.
+     * @tparam T The type of the decoder configuration to fill.
+     * @param desc The descriptor properties for the genomic data.
+     * @param decoder_config The decoder configuration object to populate.
      */
     template <typename T>
-    void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) const {
-        for (const auto &subdesc : desc.subseqs) {
-            auto subseqCfg = getConfAsGabac(subdesc.id).getSubseqConfig();
-            decoder_config.setSubsequenceCfg(uint8_t(subdesc.id.second), std::move(subseqCfg));
-        }
-    }
+    void fillDecoder(const core::GenomicDescriptorProperties& desc, T& decoder_config) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::entropy::gabac
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "genie/entropy/gabac/gabac-seq-conf-set.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

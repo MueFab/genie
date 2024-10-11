@@ -142,7 +142,7 @@ Subsequence::Subsequence(nlohmann::json j) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-nlohmann::json Subsequence::toJoson() const {
+nlohmann::json Subsequence::toJson() const {
     nlohmann::json ret;
     if (descriptor_subsequence_ID != std::nullopt) {
         ret["descriptor_subsequence_ID"] = *descriptor_subsequence_ID;

@@ -1,7 +1,10 @@
 /**
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @brief Defines the `AUProtection` class for handling access unit protection metadata.
+ * @details This class provides the functionality to represent, read, and write access unit protection information
+ *          within the MPEG-G mgg format. Access unit protection is used to secure specific dataset groups and IDs.
+ * @copyright This file is part of GENIE.
+ *            See LICENSE and/or https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_AU_PROTECTION_H_
@@ -19,75 +22,77 @@
 namespace genie::format::mgg {
 
 /**
- * @brief
+ * @brief Class representing access unit protection information in the MPEG-G mgg format.
+ * @details The `AUProtection` class stores protection information, including version, dataset group ID, and dataset ID,
+ *          and provides methods for reading, writing, and comparing protection values.
  */
 class AUProtection : public GenInfo {
  public:
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the key identifier for this protection box.
+     * @return A reference to the string representing the key.
      */
     [[nodiscard]] const std::string& getKey() const override;
 
     /**
-     * @brief
-     * @param bitreader
-     * @param _version
+     * @brief Constructor for reading protection information from a BitReader stream.
+     * @param bitreader The BitReader to extract data from.
+     * @param _version MPEG minor version to identify the format version.
      */
     explicit AUProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version);
 
     /**
-     * @brief
-     * @param _dataset_group_id
-     * @param _dataset_id
-     * @param _au_protection_value
-     * @param _version
+     * @brief Constructor for initializing access unit protection with specific parameters.
+     * @param _dataset_group_id Dataset group ID associated with the protection.
+     * @param _dataset_id Dataset ID associated with the protection.
+     * @param _au_protection_value String value representing the protection information.
+     * @param _version MPEG minor version of the data.
      */
     AUProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_protection_value,
                  genie::core::MPEGMinorVersion _version);
 
     /**
-     * @brief
-     * @param bitWriter
+     * @brief Writes the protection information to a BitWriter stream.
+     * @param bitWriter The BitWriter to write the data to.
      */
     void box_write(genie::util::BitWriter& bitWriter) const override;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the dataset group ID associated with this protection.
+     * @return The dataset group ID as an 8-bit unsigned integer.
      */
     [[nodiscard]] uint8_t getDatasetGroupID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the dataset ID associated with this protection.
+     * @return The dataset ID as a 16-bit unsigned integer.
      */
     [[nodiscard]] uint16_t getDatasetID() const;
 
     /**
-     * @brief
-     * @return
+     * @brief Retrieves the protection information string.
+     * @return A constant reference to the string representing the protection value.
      */
     [[nodiscard]] const std::string& getInformation() const;
 
     /**
-     * @brief
-     * @param info
-     * @return
+     * @brief Compares the equality of two `AUProtection` objects.
+     * @param info Reference to another `GenInfo` object for comparison.
+     * @return True if both objects have identical values, otherwise false.
      */
     bool operator==(const GenInfo& info) const override;
 
     /**
-     * @brief
-     * @return
+     * @brief Decapsulates and retrieves the protection value as a string.
+     * @return The string representing the protection information.
      */
     std::string decapsulate();
 
  private:
-    genie::core::MPEGMinorVersion version;  //!< @brief
-    uint8_t dataset_group_id;               //!< @brief
-    uint16_t dataset_id;                    //!< @brief
-    std::string au_protection_value;        //!< @brief
+    genie::core::MPEGMinorVersion version;  //!< @brief MPEG minor version of the protection data.
+    uint8_t dataset_group_id;               //!< @brief ID of the associated dataset group.
+    uint16_t dataset_id;                    //!< @brief ID of the associated dataset.
+    std::string au_protection_value;        //!< @brief String representing the protection value.
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

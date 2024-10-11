@@ -113,7 +113,7 @@ EncodingConfiguration::EncodingConfiguration(nlohmann::json j) : subseqCfg(std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-nlohmann::json EncodingConfiguration::toJson() const { return subseqCfg.toJoson(); }
+nlohmann::json EncodingConfiguration::toJson() const { return subseqCfg.toJson(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

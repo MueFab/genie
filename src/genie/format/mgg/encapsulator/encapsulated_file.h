@@ -1,7 +1,13 @@
 /**
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * @brief Defines the `EncapsulatedFile` structure for managing multiple MPEG-G dataset groups.
+ *
+ * The `EncapsulatedFile` class is a core component of the MPEG-G encapsulation module. It handles the encapsulation
+ * of a collection of dataset groups, providing methods for grouping input files, managing encapsulated dataset
+ * groups, and assembling a complete MPEG-G file.
+ *
+ * @copyright
+ * This file is part of GENIE. See LICENSE and/or https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_ENCAPSULATOR_ENCAPSULATED_FILE_H_
@@ -20,30 +26,48 @@
 namespace genie::format::mgg::encapsulator {
 
 /**
- * @brief
+ * @brief Manages a collection of encapsulated MPEG-G dataset groups.
+ *
+ * The `EncapsulatedFile` class is responsible for encapsulating multiple dataset groups, each represented by an
+ * `EncapsulatedDatasetGroup` object. It provides functionality to organize input files into groups based on
+ * common properties, encapsulate them, and assemble a final MPEG-G file (`MggFile`) that contains all the groups.
  */
 struct EncapsulatedFile {
-    std::vector<EncapsulatedDatasetGroup> groups;  //!< @brief
+    std::vector<EncapsulatedDatasetGroup> groups;  //!< @brief Collection of encapsulated dataset groups.
 
     /**
-     * @brief
-     * @param input_files
-     * @return
+     * @brief Groups input files by their respective group identifiers.
+     *
+     * This function takes a list of input files and categorizes them into groups based on common group identifiers.
+     * The resulting map associates each group identifier with a list of input files that belong to that group.
+     *
+     * @param input_files A vector of file paths to group.
+     * @return A map where each key is a group identifier (`uint8_t`) and each value is a vector of input file paths.
      */
     [[nodiscard]] static std::map<uint8_t, std::vector<std::string>> groupInputFiles(
         const std::vector<std::string>& input_files);
 
     /**
-     * @brief
-     * @param input_files
-     * @param version
+     * @brief Constructs an `EncapsulatedFile` from a collection of input files.
+     *
+     * This constructor reads the specified input files, organizes them into groups, and encapsulates them into
+     * `EncapsulatedDatasetGroup` objects. Each group is managed separately, allowing for flexible manipulation
+     * and assembly into a final MPEG-G file.
+     *
+     * @param input_files A vector of file paths representing the input datasets to be encapsulated.
+     * @param version The MPEG-G minor version for the encapsulated format.
+     * @throws `std::runtime_error` if any file cannot be read or if the group organization fails.
      */
     EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version);
 
     /**
-     * @brief
-     * @param version
-     * @return
+     * @brief Assembles all encapsulated dataset groups into a complete MPEG-G file.
+     *
+     * This function combines the encapsulated dataset groups into a single `MggFile` object, ready for writing
+     * to a file or further processing. The resulting MPEG-G file contains all dataset groups and their metadata.
+     *
+     * @param version The MPEG-G minor version to use for assembling the file.
+     * @return An `MggFile` object representing the assembled MPEG-G file.
      */
     genie::format::mgg::MggFile assemble(genie::core::MPEGMinorVersion version);
 };
