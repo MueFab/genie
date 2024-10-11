@@ -32,7 +32,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
             std::ifstream in_file(i + ".json");
             nlohmann::json my_json;
             in_file >> my_json;
-            genie::core::meta::Dataset dataset(my_json);
+            core::meta::Dataset dataset(my_json);
             if (dataset.getDataGroup() == std::nullopt) {
                 unknown_id.emplace_back(i);
                 continue;
@@ -57,7 +57,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, genie::core::MPEGMinorVersion version) {
+EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, core::MPEGMinorVersion version) {
     std::map<uint8_t, std::vector<std::string>> file_groups = groupInputFiles(input_files);
 
     for (auto& g : file_groups) {
@@ -69,12 +69,12 @@ EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::format::mgg::MggFile EncapsulatedFile::assemble(genie::core::MPEGMinorVersion version) {
-    genie::format::mgg::MggFile ret;
-    ret.addBox(std::make_unique<genie::format::mgg::FileHeader>(version));
+MggFile EncapsulatedFile::assemble(core::MPEGMinorVersion version) {
+    MggFile ret;
+    ret.addBox(std::make_unique<FileHeader>(version));
 
     for (auto& g : groups) {
-        ret.addBox(std::make_unique<genie::format::mgg::DatasetGroup>(g.assemble(version)));
+        ret.addBox(std::make_unique<DatasetGroup>(g.assemble(version)));
     }
     return ret;
 }

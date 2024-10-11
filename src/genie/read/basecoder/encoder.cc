@@ -389,7 +389,7 @@ void Encoder::encodeClips(const std::pair<ClipInformation, ClipInformation> &cli
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::encodeSplice(Encoder::CodingState &state) {
+void Encoder::encodeSplice(CodingState &state) {
     (void)state;
     UTILS_DIE("Splicing is currently not supported");
 }

@@ -20,7 +20,7 @@ DecapsulatedFile::DecapsulatedFile(const std::string& input_file) : reader(input
     mpegg_file.print_debug(std::cout, 2);
 
     for (auto& box : mpegg_file.getBoxes()) {
-        auto* grp = dynamic_cast<genie::format::mgg::DatasetGroup*>(box.get());
+        auto* grp = dynamic_cast<DatasetGroup*>(box.get());
         if (!grp) {
             continue;
         }

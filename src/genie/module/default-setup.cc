@@ -50,18 +50,18 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     std::unique_ptr<core::FlowGraphEncode> ret = std::make_unique<core::FlowGraphEncode>(threads);
 
     ret->setClassifier(
-        std::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
+        std::make_unique<core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
-    ret->addReadCoder(std::make_unique<genie::read::refcoder::Encoder>(writeRawStreams));
-    ret->addReadCoder(std::make_unique<genie::read::localassembly::Encoder>(false, writeRawStreams));
-    ret->addReadCoder(std::make_unique<genie::read::lowlatency::Encoder>(writeRawStreams));
-    ret->addReadCoder(std::make_unique<genie::read::spring::Encoder>(working_dir, threads, false, writeRawStreams));
-    ret->addReadCoder(std::make_unique<genie::read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
-    ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
+    ret->addReadCoder(std::make_unique<read::refcoder::Encoder>(writeRawStreams));
+    ret->addReadCoder(std::make_unique<read::localassembly::Encoder>(false, writeRawStreams));
+    ret->addReadCoder(std::make_unique<read::lowlatency::Encoder>(writeRawStreams));
+    ret->addReadCoder(std::make_unique<read::spring::Encoder>(working_dir, threads, false, writeRawStreams));
+    ret->addReadCoder(std::make_unique<read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
+    ret->setReadCoderSelector([](const core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().empty()) {
             return 2;
         }
-        if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
+        if (chunk.getData().front().getClassID() == core::record::ClassType::CLASS_U) {
             if (chunk.isReferenceOnly() ||
                 chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
                 return 2;
@@ -80,20 +80,20 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
         }
     });
 
-    ret->addQVCoder(std::make_unique<genie::quality::qvwriteout::Encoder>());
-    ret->setQVSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+    ret->addQVCoder(std::make_unique<quality::qvwriteout::Encoder>());
+    ret->setQVSelector([](const core::record::Chunk&) -> size_t { return 0; });
 
-    ret->addNameCoder(std::make_unique<genie::name::tokenizer::Encoder>());
-    ret->addNameCoder(std::make_unique<genie::name::writeout::Encoder>());
-    ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+    ret->addNameCoder(std::make_unique<name::tokenizer::Encoder>());
+    ret->addNameCoder(std::make_unique<name::writeout::Encoder>());
+    ret->setNameSelector([](const core::record::Chunk&) -> size_t { return 0; });
 
-    ret->addEntropyCoder(std::make_unique<genie::entropy::gabac::Encoder>(writeRawStreams));
-    ret->addEntropyCoder(std::make_unique<genie::entropy::lzma::Encoder>(writeRawStreams));
-    ret->addEntropyCoder(std::make_unique<genie::entropy::zstd::Encoder>(writeRawStreams));
-    ret->addEntropyCoder(std::make_unique<genie::entropy::bsc::Encoder>(writeRawStreams));
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
+    ret->addEntropyCoder(std::make_unique<entropy::gabac::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(std::make_unique<entropy::lzma::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(std::make_unique<entropy::zstd::Encoder>(writeRawStreams));
+    ret->addEntropyCoder(std::make_unique<entropy::bsc::Encoder>(writeRawStreams));
+    ret->setEntropyCoderSelector([](const core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
-    ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
+    ret->setExporterSelector([](const core::AccessUnit&) -> size_t { return 0; });
 
     return ret;
 }
@@ -104,14 +104,14 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
                                                            bool combinePairsFlag) {
     std::unique_ptr<core::FlowGraphDecode> ret = std::make_unique<core::FlowGraphDecode>(threads);
 
-    ret->addReadCoder(std::make_unique<genie::read::refcoder::Decoder>());
-    ret->addReadCoder(std::make_unique<genie::read::localassembly::Decoder>());
-    auto lld = std::make_unique<genie::read::lowlatency::Decoder>();
+    ret->addReadCoder(std::make_unique<read::refcoder::Decoder>());
+    ret->addReadCoder(std::make_unique<read::localassembly::Decoder>());
+    auto lld = std::make_unique<read::lowlatency::Decoder>();
     ret->setRefDecoder(lld.get());
     ret->addReadCoder(std::move(lld));
-    ret->addReadCoder(std::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
-    ret->addReadCoder(std::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
-    ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
+    ret->addReadCoder(std::make_unique<read::spring::Decoder>(working_dir, combinePairsFlag, false));
+    ret->addReadCoder(std::make_unique<read::spring::Decoder>(working_dir, combinePairsFlag, true));
+    ret->setReadCoderSelector([](const core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
@@ -142,26 +142,26 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
         }
     });
 
-    ret->addQVCoder(std::make_unique<genie::quality::calq::Decoder>());
-    ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>&,
-                          const std::vector<uint64_t>&, genie::core::AccessUnit::Descriptor&) -> size_t {
+    ret->addQVCoder(std::make_unique<quality::calq::Decoder>());
+    ret->setQVSelector([](const core::parameter::QualityValues& param, const std::vector<std::string>&,
+                          const std::vector<uint64_t>&, core::AccessUnit::Descriptor&) -> size_t {
         UTILS_DIE_IF(param.getMode() != 1, "Unsupported QV decoding mode");
         return 0;
     });
 
-    ret->addNameCoder(std::make_unique<genie::name::tokenizer::Decoder>());
-    ret->addNameCoder(std::make_unique<genie::name::writeout::Decoder>());
-    ret->setNameSelector([](const genie::core::AccessUnit::Descriptor& d) -> size_t {
+    ret->addNameCoder(std::make_unique<name::tokenizer::Decoder>());
+    ret->addNameCoder(std::make_unique<name::writeout::Decoder>());
+    ret->setNameSelector([](const core::AccessUnit::Descriptor& d) -> size_t {
         return d.getSize() <= 1 ? 1 : 0;
         // TODO(Fabian): Check if there is a better way to determine the name decoder
     });
 
-    ret->addEntropyCoder(std::make_unique<genie::entropy::gabac::Decoder>());
-    ret->addEntropyCoder(std::make_unique<genie::entropy::lzma::Decoder>());
-    ret->addEntropyCoder(std::make_unique<genie::entropy::zstd::Decoder>());
-    ret->addEntropyCoder(std::make_unique<genie::entropy::bsc::Decoder>());
-    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg& cfg,
-                                    genie::core::AccessUnit::Descriptor&, bool) -> size_t {
+    ret->addEntropyCoder(std::make_unique<entropy::gabac::Decoder>());
+    ret->addEntropyCoder(std::make_unique<entropy::lzma::Decoder>());
+    ret->addEntropyCoder(std::make_unique<entropy::zstd::Decoder>());
+    ret->addEntropyCoder(std::make_unique<entropy::bsc::Decoder>());
+    ret->setEntropyCoderSelector([](const core::parameter::DescriptorSubseqCfg& cfg,
+                                    core::AccessUnit::Descriptor&, bool) -> size_t {
         UTILS_DIE_IF(cfg.isClassSpecific(), "Class-specific entropy decoding not supported");
         auto* desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent*>(&cfg.get());
         UTILS_DIE_IF(desc == nullptr, "Decoder configuration not present");
@@ -174,7 +174,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
         return decoder->getMode();
     });
 
-    ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+    ret->setExporterSelector([](const core::record::Chunk&) -> size_t { return 0; });
 
     return ret;
 }
@@ -184,9 +184,9 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
 std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads) {
     std::unique_ptr<core::FlowGraphConvert> ret = std::make_unique<core::FlowGraphConvert>(threads);
 
-    ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+    ret->setExporterSelector([](const core::record::Chunk&) -> size_t { return 0; });
 
-    ret->setClassifier(std::make_unique<genie::core::ClassifierBypass>());
+    ret->setClassifier(std::make_unique<core::ClassifierBypass>());
 
     return ret;
 }

@@ -23,8 +23,8 @@ const size_t External::checksum_sizes[] = {128 / 8, 256 / 8};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint8_t _reserved, size_t seq_count,
-                                            genie::core::MPEGMinorVersion _version) {
+std::unique_ptr<Location> External::factory(util::BitReader& reader, uint8_t _reserved, size_t seq_count,
+                                            core::MPEGMinorVersion _version) {
     std::string _ref_uri = reader.readAlignedStringTerminated();
     auto _checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     switch (reader.readAlignedInt<RefType>()) {
@@ -47,7 +47,7 @@ External::External(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(genie::util::BitReader& reader) : Location(reader) {
+External::External(util::BitReader& reader) : Location(reader) {
     uri = reader.readAlignedStringTerminated();
     checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     reference_type = reader.readAlignedInt<RefType>();
@@ -55,7 +55,7 @@ External::External(genie::util::BitReader& reader) : Location(reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(genie::util::BitReader& reader, uint8_t _reserved) : Location(_reserved, true) {
+External::External(util::BitReader& reader, uint8_t _reserved) : Location(_reserved, true) {
     uri = reader.readAlignedStringTerminated();
     checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     reference_type = reader.readAlignedInt<RefType>();
@@ -75,7 +75,7 @@ External::RefType External::getReferenceType() const { return reference_type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void External::write(genie::util::BitWriter& writer) {
+void External::write(util::BitWriter& writer) {
     Location::write(writer);
     writer.writeAlignedBytes(uri.data(), uri.length());
     writer.writeAlignedInt('\0');

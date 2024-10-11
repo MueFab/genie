@@ -17,7 +17,7 @@ namespace genie::format::mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly)
-    : core::ReferenceSource(manager),
+    : ReferenceSource(manager),
       reader(_file),
       factory(manager, this, refOnly),
       ref_manager(manager),
@@ -27,7 +27,7 @@ Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::R
 
 bool Importer::pump(uint64_t& id, std::mutex&) {
     util::Watch watch;
-    std::optional<mgb::AccessUnit> unit;
+    std::optional<AccessUnit> unit;
     util::Section sec{};
     {
         std::unique_lock<std::mutex> lock_guard(lock);
@@ -75,7 +75,7 @@ std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
+core::AccessUnit Importer::convertAU(AccessUnit&& au) {
     auto unit = std::move(au);
     auto paramset = factory.getParams(unit.getHeader().getParameterID());
     core::AccessUnit set(std::move(paramset), unit.getHeader().getReadCount());

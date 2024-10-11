@@ -57,7 +57,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
 
         for (auto& d : au) {
             std::string filename;
-            size_t count = core::getDescriptor(d.getID()).subseqs.size();
+            size_t count = getDescriptor(d.getID()).subseqs.size();
             if (d.getID() == core::GenDesc::RNAME) {
                 filename = id_desc_prefix + std::to_string(auId);
             } else if (d.getID() == core::GenDesc::QV) {

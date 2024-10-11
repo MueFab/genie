@@ -27,7 +27,7 @@ namespace genie::entropy::lzma {
 template <typename T>
 void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) {
     for (const auto &subdesc : desc.subseqs) {
-        auto bits_p2 = genie::core::range2bytes(subdesc.range) * 8;
+        auto bits_p2 = core::range2bytes(subdesc.range) * 8;
         auto subseqCfg = Subsequence(bits_p2);
         decoder_config.setSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second), std::move(subseqCfg));
     }
@@ -39,7 +39,7 @@ void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &p
     auto descriptor_configuration = std::make_unique<core::parameter::desc_pres::DescriptorPresent>();
 
     auto decoder_config = std::make_unique<DecoderRegular>(desc);
-    fillDecoder(core::getDescriptor(desc), *decoder_config);
+    fillDecoder(getDescriptor(desc), *decoder_config);
     descriptor_configuration->setDecoder(std::move(decoder_config));
 
     parameterSet = core::parameter::DescriptorSubseqCfg();
@@ -94,11 +94,11 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
 
             std::get<2>(ret).addInteger("size-lzma-total-raw", subdesc.getRawSize());
             auto subseq_name = std::string();
-            if (core::getDescriptor(std::get<1>(ret).getID()).tokentype) {
-                subseq_name = core::getDescriptor(std::get<1>(ret).getID()).name;
+            if (getDescriptor(std::get<1>(ret).getID()).tokentype) {
+                subseq_name = getDescriptor(std::get<1>(ret).getID()).name;
             } else {
-                subseq_name = core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                              core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name;
+                subseq_name = getDescriptor(std::get<1>(ret).getID()).name + "-" +
+                              getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name;
             }
             std::get<2>(ret).addInteger("size-lzma-" + subseq_name + "-raw", subdesc.getRawSize());
 

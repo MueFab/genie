@@ -31,9 +31,9 @@ namespace genie::read::spring {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
-                                 genie::core::ReadEncoder::QvSelector *qv_coder,
-                                 genie::core::ReadEncoder::NameSelector *name_coder,
-                                 genie::core::ReadEncoder::EntropySelector *entropy,
+                                 core::ReadEncoder::QvSelector *qv_coder,
+                                 core::ReadEncoder::NameSelector *name_coder,
+                                 core::ReadEncoder::EntropySelector *entropy,
                                  std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
                                  bool write_raw) {
     // Read some parameters
@@ -168,8 +168,8 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const std::string &file_name, const compression_params &cp,
-                            genie::core::ReadEncoder::NameSelector *name_coder,
-                            genie::core::ReadEncoder::EntropySelector *entropy,
+                            core::ReadEncoder::NameSelector *name_coder,
+                            core::ReadEncoder::EntropySelector *entropy,
                             std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
                             bool write_raw) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
@@ -188,7 +188,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
             f_order_id.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
             id_array_block[j - block_start[block_num]] = id_array[index];
         }
-        genie::core::record::Chunk chunk;
+        core::record::Chunk chunk;
         for (size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
             chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U,
                                          std::move(id_array_block[i]), "", static_cast<uint8_t>(0));
@@ -204,7 +204,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                     continue;
                 }
                 std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
-                                              std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                                              std::to_string(static_cast<uint8_t>(core::GenDesc::RNAME)) + "_" +
                                               std::to_string(static_cast<uint8_t>(i)));
                 out_file_stream.write(static_cast<char *>(std::get<0>(raw_desc).get(i).getData().getData()),
                                       std::get<0>(raw_desc).get(i).getData().getRawSize());
@@ -234,8 +234,8 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::string &temp_dir, std::string *quality_array,
                                  const uint64_t &quality_array_size, const uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                                 const compression_params &cp, genie::core::ReadEncoder::QvSelector *qv_coder,
-                                 genie::core::ReadEncoder::EntropySelector *entropy,
+                                 const compression_params &cp, core::ReadEncoder::QvSelector *qv_coder,
+                                 core::ReadEncoder::EntropySelector *entropy,
                                  std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
                                  bool write_raw) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
@@ -268,7 +268,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 #endif
 
         for (int64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
-            genie::core::record::Chunk chunk;
+            core::record::Chunk chunk;
             for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
                 chunk.getData().emplace_back(static_cast<uint8_t>(2), core::record::ClassType::CLASS_U, "", "",
                                              static_cast<uint8_t>(0));
@@ -289,7 +289,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                         continue;
                     }
                     std::ofstream out_file_stream("rawstream_" + std::to_string(block_num) + "_" +
-                                                  std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) + "_" +
+                                                  std::to_string(static_cast<uint8_t>(core::GenDesc::QV)) + "_" +
                                                   std::to_string(static_cast<uint8_t>(i)));
                     out_file_stream.write(static_cast<char *>(std::get<1>(raw_desc).get(i).getData().getData()),
                                           std::get<1>(raw_desc).get(i).getData().getRawSize());
@@ -318,9 +318,9 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
                       const uint32_t &str_array_size, const uint32_t *order_array, const std::string &mode,
-                      genie::core::ReadEncoder::QvSelector *qv_coder,
-                      genie::core::ReadEncoder::NameSelector *name_coder,
-                      genie::core::ReadEncoder::EntropySelector *entropy,
+                      core::ReadEncoder::QvSelector *qv_coder,
+                      core::ReadEncoder::NameSelector *name_coder,
+                      core::ReadEncoder::EntropySelector *entropy,
                       std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
                       bool write_raw) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
@@ -377,7 +377,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             std::string name =
                 file_name.substr(file_name.find_last_of('/') + 1) + "." + std::to_string(block_num_offset + block_num);
             if (mode == "id") {
-                genie::core::record::Chunk chunk;
+                core::record::Chunk chunk;
                 for (size_t i = 0; i < num_reads_block; i++) {
                     chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U,
                                                  std::move(str_array[start_read_num + i]), "", static_cast<uint8_t>(0));
@@ -395,7 +395,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                         }
                         std::ofstream out_file_stream(
                             "rawstream_" + std::to_string(block_num_offset + block_num) + "_" +
-                            std::to_string(static_cast<uint8_t>(genie::core::GenDesc::RNAME)) + "_" +
+                            std::to_string(static_cast<uint8_t>(core::GenDesc::RNAME)) + "_" +
                             std::to_string(static_cast<uint8_t>(i)));
                         out_file_stream.write(static_cast<char *>(std::get<0>(name_raw).get(i).getData().getData()),
                                               std::get<0>(name_raw).get(i).getData().getRawSize());
@@ -411,7 +411,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 util::BitWriter bw(out);
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
-                genie::core::record::Chunk chunk;
+                core::record::Chunk chunk;
                 for (auto i = static_cast<uint32_t>(start_read_num); i < start_read_num + num_reads_block; i++) {
                     chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U, "", "",
                                                  static_cast<uint8_t>(0));
@@ -430,7 +430,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                         }
                         std::ofstream out_file_stream("rawstream_" + std::to_string(block_num_offset + block_num) +
                                                       "_" +
-                                                      std::to_string(static_cast<uint8_t>(genie::core::GenDesc::QV)) +
+                                                      std::to_string(static_cast<uint8_t>(core::GenDesc::QV)) +
                                                       "_" + std::to_string(static_cast<uint8_t>(i)));
                         out_file_stream.write(static_cast<char *>(std::get<1>(qv_str).get(i).getData().getData()),
                                               std::get<1>(qv_str).get(i).getData().getRawSize());

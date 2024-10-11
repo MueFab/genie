@@ -38,10 +38,10 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
+bool ClassifierRegroup::isCovered(const record::Record& r) const {
     for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size() + 1; ++i) {
         if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->getType() !=
-                         genie::core::record::AlignmentSplit::Type::SAME_REC) {
+                         record::AlignmentSplit::Type::SAME_REC) {
             continue;
         }
         auto pos = r.getPosition(0, i);
@@ -54,11 +54,11 @@ bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
+void ClassifierRegroup::queueFinishedChunk(record::Chunk& data) {
     if (!data.getRef().isEmpty()) {
         if (refMode == RefMode::RELEVANT) {
-            for (size_t i = data.getRef().getGlobalStart() / genie::core::ReferenceManager::getChunkSize();
-                 i <= (data.getRef().getGlobalEnd() - 1) / genie::core::ReferenceManager::getChunkSize(); ++i) {
+            for (size_t i = data.getRef().getGlobalStart() / ReferenceManager::getChunkSize();
+                 i <= (data.getRef().getGlobalEnd() - 1) / ReferenceManager::getChunkSize(); ++i) {
                 if (isWritten(data.getRef().getRefName(), i)) {
                     continue;
                 }
@@ -66,20 +66,20 @@ void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
 
                 if (rawRefMode) {
                     size_t length = refMgr->getLength(data.getRef().getRefName());
-                    data.addRefToWrite(i * genie::core::ReferenceManager::getChunkSize(),
-                                       std::min((i + 1) * genie::core::ReferenceManager::getChunkSize(), length));
+                    data.addRefToWrite(i * ReferenceManager::getChunkSize(),
+                                       std::min((i + 1) * ReferenceManager::getChunkSize(), length));
                 } else {
                     size_t length = refMgr->getLength(data.getRef().getRefName());
-                    core::record::Chunk refChunk;
+                    record::Chunk refChunk;
                     refChunk.setReferenceOnly(true);
                     refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
                     refChunk.getRef() = data.getRef();
-                    core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
-                    std::string seq = *data.getRef().getChunkAt(i * genie::core::ReferenceManager::getChunkSize());
-                    if ((i + 1) * genie::core::ReferenceManager::getChunkSize() > length) {
-                        seq = seq.substr(0, length - i * genie::core::ReferenceManager::getChunkSize());
+                    record::Record rec(1, record::ClassType::CLASS_U, "", "", 0);
+                    std::string seq = *data.getRef().getChunkAt(i * ReferenceManager::getChunkSize());
+                    if ((i + 1) * ReferenceManager::getChunkSize() > length) {
+                        seq = seq.substr(0, length - i * ReferenceManager::getChunkSize());
                     }
-                    core::record::Segment segment(std::move(seq));
+                    record::Segment segment(std::move(seq));
                     rec.addSegment(std::move(segment));
                     refChunk.getData().push_back(std::move(rec));
                     finishedChunks.push_back(std::move(refChunk));
@@ -127,30 +127,30 @@ record::Chunk ClassifierRegroup::getChunk() {
                 const auto& seq = seqvec.at(refModeFullSeqID);
                 auto cov_vec = refMgr->getCoverage(seq);
                 auto cov = cov_vec.at(refModeFullCovID);
-                size_t chunkOffset = cov.first / genie::core::ReferenceManager::getChunkSize();
+                size_t chunkOffset = cov.first / ReferenceManager::getChunkSize();
 
                 if (!isWritten(seq, chunkOffset + refModeFullChunkID)) {
-                    core::record::Chunk refChunk;
+                    record::Chunk refChunk;
 
                     std::cerr << "Writing ref " << seq << " ["
                               << std::max(cov.first, (chunkOffset + refModeFullChunkID) *
-                                                         genie::core::ReferenceManager::getChunkSize())
+                                                         ReferenceManager::getChunkSize())
                               << ", "
                               << std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
-                                                          genie::core::ReferenceManager::getChunkSize())
+                                                          ReferenceManager::getChunkSize())
                               << "]" << std::endl;
 
                     if (rawRefMode) {
                         refChunk.addRefToWrite(std::max(cov.first, (chunkOffset + refModeFullChunkID) *
-                                                                       genie::core::ReferenceManager::getChunkSize()),
+                                                                       ReferenceManager::getChunkSize()),
                                                std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
-                                                                        genie::core::ReferenceManager::getChunkSize()));
+                                                                        ReferenceManager::getChunkSize()));
                         refChunk.getRef() =
                             refMgr->load(seq,
                                          std::max(cov.first, (chunkOffset + refModeFullChunkID) *
-                                                                 genie::core::ReferenceManager::getChunkSize()),
+                                                                 ReferenceManager::getChunkSize()),
                                          std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
-                                                                  genie::core::ReferenceManager::getChunkSize()));
+                                                                  ReferenceManager::getChunkSize()));
                         refChunk.setRefID(refMgr->ref2ID(seq));
                     } else {
                         refChunk.setReferenceOnly(true);
@@ -158,33 +158,33 @@ record::Chunk ClassifierRegroup::getChunk() {
                         refChunk.getRef() =
                             refMgr->load(seq,
                                          std::max(cov.first, (chunkOffset + refModeFullChunkID) *
-                                                                 genie::core::ReferenceManager::getChunkSize()),
+                                                                 ReferenceManager::getChunkSize()),
                                          std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) *
-                                                                  genie::core::ReferenceManager::getChunkSize()));
-                        core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                                                                  ReferenceManager::getChunkSize()));
+                        record::Record rec(1, record::ClassType::CLASS_U, "", "", 0);
                         std::string ref_seq = *refChunk.getRef().getChunkAt(
-                            (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize());
+                            (chunkOffset + refModeFullChunkID) * ReferenceManager::getChunkSize());
                         if (ref_seq.empty()) {
                             std::cerr << "empty" << std::endl;
                         }
                         if (cov.first >
-                            (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize()) {
+                            (chunkOffset + refModeFullChunkID) * ReferenceManager::getChunkSize()) {
                             ref_seq = ref_seq.substr(cov.first - (chunkOffset + refModeFullChunkID) *
-                                                                     genie::core::ReferenceManager::getChunkSize());
+                                                                     ReferenceManager::getChunkSize());
                         }
                         if (cov.second <
-                            (chunkOffset + refModeFullChunkID + 1) * genie::core::ReferenceManager::getChunkSize()) {
+                            (chunkOffset + refModeFullChunkID + 1) * ReferenceManager::getChunkSize()) {
                             ref_seq = ref_seq.substr(
-                                0, (chunkOffset + refModeFullChunkID) * genie::core::ReferenceManager::getChunkSize() -
+                                0, (chunkOffset + refModeFullChunkID) * ReferenceManager::getChunkSize() -
                                        cov.second);
                         }
-                        core::record::Segment segment(std::move(ref_seq));
+                        record::Segment segment(std::move(ref_seq));
                         rec.addSegment(std::move(segment));
                         refChunk.getData().push_back(std::move(rec));
                     }
 
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / genie::core::ReferenceManager::getChunkSize())) {
+                    if (refModeFullChunkID > ((cov.second - 1) / ReferenceManager::getChunkSize())) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }
@@ -196,7 +196,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     return refChunk;
                 } else {
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / genie::core::ReferenceManager::getChunkSize())) {
+                    if (refModeFullChunkID > ((cov.second - 1) / ReferenceManager::getChunkSize())) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }
@@ -263,7 +263,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
-        if (r.getClassID() == core::record::ClassType::CLASS_U &&
+        if (r.getClassID() == record::ClassType::CLASS_U &&
             r.getNumberOfTemplateSegments() != r.getSegments().size()) {
             current_unpaired_u_Chunk.getData().emplace_back(std::move(r));
             if (current_unpaired_u_Chunk.getData().size() >= auSize) {
@@ -275,17 +275,17 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         ReferenceManager::ReferenceExcerpt record_reference;
 
         // Unaligned reads can't be ref based, otherwise check if reference available
-        if (classtype != core::record::ClassType::CLASS_U) {
+        if (classtype != record::ClassType::CLASS_U) {
             refBased = isCovered(r);
             if (refBased) {
                 size_t end = 0;
                 if (r.getAlignments().front().getAlignmentSplits().empty() ||
                     r.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                        core::record::AlignmentSplit::Type::SAME_REC) {
+                        record::AlignmentSplit::Type::SAME_REC) {
                     end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 0);
                 } else {
                     end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 1) +
-                          dynamic_cast<const core::record::alignment_split::SameRec&>(
+                          dynamic_cast<const record::alignment_split::SameRec&>(
                               *r.getAlignments().front().getAlignmentSplits().front())
                               .getDelta();
                     end = std::max(end,

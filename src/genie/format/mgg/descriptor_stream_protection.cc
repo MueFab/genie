@@ -20,7 +20,7 @@ DescriptorStreamProtection::DescriptorStreamProtection(std::string _dSProtection
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamProtection::DescriptorStreamProtection(genie::util::BitReader& reader) {
+DescriptorStreamProtection::DescriptorStreamProtection(util::BitReader& reader) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
     DSProtectionValue.resize(length);
@@ -41,7 +41,7 @@ const std::string& DescriptorStreamProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStreamProtection::box_write(genie::util::BitWriter& bitWriter) const {
+void DescriptorStreamProtection::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeAlignedBytes(DSProtectionValue.data(), DSProtectionValue.size());
 }
 

@@ -30,7 +30,7 @@ bool BlockHeaderOffOptions::getOrderedBlocksFlag() const { return ordered_blocks
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockHeaderOffOptions::write(genie::util::BitWriter& writer) const { writer.writeBits(ordered_blocks_flag, 1); }
+void BlockHeaderOffOptions::write(util::BitWriter& writer) const { writer.writeBits(ordered_blocks_flag, 1); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

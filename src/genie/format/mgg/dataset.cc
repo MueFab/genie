@@ -38,7 +38,7 @@ const DatasetHeader& Dataset::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::box_write(genie::util::BitWriter& bitWriter) const {
+void Dataset::box_write(util::BitWriter& bitWriter) const {
     header.write(bitWriter);
     if (metadata) {
         metadata->write(bitWriter);
@@ -97,7 +97,7 @@ std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
+Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
                  const std::vector<uint8_t>& param_ids)
     : version(_version) {
     bool mitFlag = false;

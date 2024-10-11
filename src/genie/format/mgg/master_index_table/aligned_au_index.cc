@@ -34,18 +34,18 @@ AlignedAUIndex::AlignedAUIndex(uint64_t _au_byte_offset, uint64_t _au_start_posi
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignedAUIndex::AlignedAUIndex(genie::util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
+AlignedAUIndex::AlignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                                core::parameter::DataUnit::DatasetType dataset_type, bool multiple_alignment,
-                               bool block_header_flag, const std::vector<genie::core::GenDesc>& descriptors)
+                               bool block_header_flag, const std::vector<core::GenDesc>& descriptors)
     : byte_offset_size(_byte_offset_size), position_size(_position_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     au_start_position = reader.read<uint64_t>(position_size);
     au_end_position = reader.read<uint64_t>(position_size);
     if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
+        ref_cfg = mgb::RefCfg(position_size, reader);
     }
     if (multiple_alignment) {
-        extended_cfg = genie::format::mgb::ExtendedAu(position_size, reader);
+        extended_cfg = mgb::ExtendedAu(position_size, reader);
     }
     if (!block_header_flag) {
         for (const auto& d : descriptors) {
@@ -57,7 +57,7 @@ AlignedAUIndex::AlignedAUIndex(genie::util::BitReader& reader, uint8_t _byte_off
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignedAUIndex::write(genie::util::BitWriter& writer) const {
+void AlignedAUIndex::write(util::BitWriter& writer) const {
     writer.writeBits(au_byte_offset, byte_offset_size);
     writer.writeBits(au_start_position, position_size);
     writer.writeBits(au_end_position, position_size);
@@ -90,19 +90,19 @@ bool AlignedAUIndex::isReference() const { return ref_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::format::mgb::RefCfg& AlignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
+const mgb::RefCfg& AlignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignedAUIndex::setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg) { ref_cfg = _ref_cfg; }
+void AlignedAUIndex::setReferenceInfo(const mgb::RefCfg& _ref_cfg) { ref_cfg = _ref_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignedAUIndex::setExtended(const genie::format::mgb::ExtendedAu& _ext_au) { extended_cfg = _ext_au; }
+void AlignedAUIndex::setExtended(const mgb::ExtendedAu& _ext_au) { extended_cfg = _ext_au; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::format::mgb::ExtendedAu& AlignedAUIndex::getExtension() const { return *extended_cfg; }
+const mgb::ExtendedAu& AlignedAUIndex::getExtension() const { return *extended_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

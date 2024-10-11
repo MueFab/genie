@@ -14,14 +14,14 @@ namespace genie::format::mgg {
 
 BlockHeader::BlockHeader(util::BitReader& reader) {
     reserved1 = reader.read<bool>(1);
-    descriptor_ID = reader.read<genie::core::GenDesc>(7);
+    descriptor_ID = reader.read<core::GenDesc>(7);
     reserved2 = reader.read<uint8_t>(3);
     block_payload_size = reader.read<uint32_t>(29);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::GenDesc BlockHeader::getDescriptorID() const { return descriptor_ID; }
+core::GenDesc BlockHeader::getDescriptorID() const { return descriptor_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ uint64_t BlockHeader::getLength() { return 1 + 4; }  /// 1 + 7 + 3 + 29}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockHeader::write(genie::util::BitWriter& writer) const {
+void BlockHeader::write(util::BitWriter& writer) const {
     writer.writeBits(reserved1, 1);
     writer.writeBits(static_cast<uint8_t>(descriptor_ID), 7);
     writer.writeBits(reserved2, 3);
@@ -42,7 +42,7 @@ void BlockHeader::write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockHeader::BlockHeader(bool _reserved1, genie::core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
+BlockHeader::BlockHeader(bool _reserved1, core::GenDesc _desc_id, uint8_t _reserved2, uint32_t payload_size)
     : reserved1(_reserved1), descriptor_ID(_desc_id), reserved2(_reserved2), block_payload_size(payload_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

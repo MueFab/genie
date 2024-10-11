@@ -47,7 +47,7 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
     // generate random temp directory in the working directory
 
     while (true) {
-        std::string random_str = "tmp." + spring::random_string(10);
+        std::string random_str = "tmp." + random_string(10);
         temp_dir = working_dir + "/" + random_str;
         if (!std::filesystem::exists(temp_dir)) break;
     }

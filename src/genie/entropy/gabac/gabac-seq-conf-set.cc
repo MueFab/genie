@@ -29,13 +29,13 @@ GabacSeqConfSet::GabacSeqConfSet() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) const {
+const EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) const {
     return conf[static_cast<uint8_t>(sub.first)][static_cast<uint8_t>(sub.second)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) {
+EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) {
     if (getDescriptor(sub.first).tokentype) {
         return conf[static_cast<uint8_t>(sub.first)][0];
     } else {
@@ -79,11 +79,11 @@ void GabacSeqConfSet::storeParameters(core::GenDesc desc, core::parameter::Descr
 
     if (desc == core::GenDesc::RNAME || desc == core::GenDesc::MSAR) {
         auto decoder_config = std::make_unique<paramcabac::DecoderTokenType>();
-        fillDecoder(core::getDescriptor(desc), *decoder_config);
+        fillDecoder(getDescriptor(desc), *decoder_config);
         descriptor_configuration->setDecoder(std::move(decoder_config));
     } else {
         auto decoder_config = std::make_unique<paramcabac::DecoderRegular>(desc);
-        fillDecoder(core::getDescriptor(desc), *decoder_config);
+        fillDecoder(getDescriptor(desc), *decoder_config);
         descriptor_configuration->setDecoder(std::move(decoder_config));
     }
 
@@ -95,15 +95,15 @@ void GabacSeqConfSet::storeParameters(core::GenDesc desc, core::parameter::Descr
 
 void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parameterSet) {
     for (const auto &desc : core::getDescriptors()) {
-        if (core::getDescriptor(desc.id).tokentype) {
-            auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderTokenType>(parameterSet, desc.id);
+        if (getDescriptor(desc.id).tokentype) {
+            auto &descConfig = loadDescriptorDecoderCfg<paramcabac::DecoderTokenType>(parameterSet, desc.id);
             for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
                 auto subseqCfg = descConfig.getSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second));
 
                 setConfAsGabac(subdesc.id, std::move(subseqCfg));
             }
         } else {
-            auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderRegular>(parameterSet, desc.id);
+            auto &descConfig = loadDescriptorDecoderCfg<paramcabac::DecoderRegular>(parameterSet, desc.id);
             for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
                 auto subseqCfg = descConfig.getSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second));
 

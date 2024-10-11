@@ -19,23 +19,23 @@ bool MITClassConfig::operator==(const MITClassConfig& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MITClassConfig::MITClassConfig(genie::core::record::ClassType _id) : id(_id) {}
+MITClassConfig::MITClassConfig(core::record::ClassType _id) : id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MITClassConfig::MITClassConfig(genie::util::BitReader& reader, bool block_header_flag) {
-    id = reader.read<genie::core::record::ClassType>(4);
+MITClassConfig::MITClassConfig(util::BitReader& reader, bool block_header_flag) {
+    id = reader.read<core::record::ClassType>(4);
     if (!block_header_flag) {
         auto num_descriptors = reader.read<uint8_t>(5);
         for (size_t i = 0; i < num_descriptors; ++i) {
-            descriptor_ids.emplace_back(reader.read<genie::core::GenDesc>(7));
+            descriptor_ids.emplace_back(reader.read<core::GenDesc>(7));
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MITClassConfig::write(genie::util::BitWriter& writer) const {
+void MITClassConfig::write(util::BitWriter& writer) const {
     writer.writeBits(static_cast<uint8_t>(id), 4);
     if (!descriptor_ids.empty()) {
         writer.writeBits(descriptor_ids.size(), 5);
@@ -47,15 +47,15 @@ void MITClassConfig::write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MITClassConfig::addDescriptorID(genie::core::GenDesc desc) { descriptor_ids.emplace_back(desc); }
+void MITClassConfig::addDescriptorID(core::GenDesc desc) { descriptor_ids.emplace_back(desc); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::ClassType MITClassConfig::getClassID() const { return id; }
+core::record::ClassType MITClassConfig::getClassID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<genie::core::GenDesc>& MITClassConfig::getDescriptorIDs() const { return descriptor_ids; }
+const std::vector<core::GenDesc>& MITClassConfig::getDescriptorIDs() const { return descriptor_ids; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

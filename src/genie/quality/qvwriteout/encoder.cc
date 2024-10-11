@@ -48,7 +48,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
             [&desc, &q](uint8_t cigar, const std::pair<size_t, size_t>& bs, const std::pair<size_t, size_t>&) -> bool {
                 auto qvs = std::string_view(q).substr(bs.first, bs.second);
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
-                                           core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
+                                           getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
                                        ? 2
                                        : static_cast<uint8_t>(desc.getSize()) - 1;
                 for (const auto& c : qvs) {

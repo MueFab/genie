@@ -24,7 +24,7 @@ UOptions::UOptions(uint64_t _reserved1, bool _reserved3)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UOptions::UOptions(genie::util::BitReader& reader) : reserved3(false) {
+UOptions::UOptions(util::BitReader& reader) : reserved3(false) {
     reserved1 = reader.read<uint64_t>(62);
     bool U_signature_flag = reader.read<bool>(1);
     if (U_signature_flag) {
@@ -40,7 +40,7 @@ UOptions::UOptions(genie::util::BitReader& reader) : reserved3(false) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UOptions::write(genie::util::BitWriter& writer) const {
+void UOptions::write(util::BitWriter& writer) const {
     writer.writeBits(reserved1, 62);
     writer.writeBits(hasSignature(), 1);
     if (hasSignature()) {

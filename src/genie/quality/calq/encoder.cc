@@ -38,8 +38,8 @@ core::GenSubIndex get_qv_steps(size_t i) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::EncodingOptions& opt,
-                                 calq::SideInformation& sideInformation, calq::EncodingBlock& input) {
+void Encoder::fillCalqStructures(const core::record::Chunk& chunk, EncodingOptions& opt,
+                                 SideInformation& sideInformation, EncodingBlock& input) {
     // fill calq objects
     for (auto& rec : chunk.getData()) {
         auto& f_segment = rec.getSegments().front();
@@ -66,7 +66,7 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
             sequences.push_back(s_segment.getSequence());
             qvalues.push_back(s_segment.getQualities().front());
 
-            if (rec.getClassID() == core::record::ClassType::CLASS_HM) {
+            if (rec.getClassID() == ClassType::CLASS_HM) {
                 positions.push_back(positions.back());
                 // create cigar like "x+"
                 std::string cigar = std::to_string(qvalues.back().size());
@@ -104,14 +104,14 @@ void Encoder::fillCalqStructures(const core::record::Chunk& chunk, calq::Encodin
 void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                             core::AccessUnit::Descriptor& desc) {
     // objects required for calq
-    calq::EncodingOptions encodingOptions;
-    calq::SideInformation sideInformation;
-    calq::EncodingBlock input;
-    calq::DecodingBlock output;
+    EncodingOptions encodingOptions;
+    SideInformation sideInformation;
+    EncodingBlock input;
+    DecodingBlock output;
 
     fillCalqStructures(chunk, encodingOptions, sideInformation, input);
 
-    calq::encode(encodingOptions, sideInformation, input, &output);
+    encode(encodingOptions, sideInformation, input, &output);
 
     // add codebooks from calq to param
     paramqv1::ParameterSet set;
@@ -136,7 +136,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
-                           calq::UniformMinMaxQuantizer& quantizer) {
+                           UniformMinMaxQuantizer& quantizer) {
     auto& subsequence = desc.get(static_cast<uint16_t>(desc.getSize()) - 1);
 
     for (const auto& q : s.getQualities()) {
@@ -152,7 +152,7 @@ void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Des
 void Encoder::encodeUnaligned(const core::record::Chunk& chunk, paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
     // create quantizer
-    calq::UniformMinMaxQuantizer quantizer(33, 126, 8);
+    UniformMinMaxQuantizer quantizer(33, 126, 8);
 
     // set codebook
     std::vector<uint8_t> codebookVec;

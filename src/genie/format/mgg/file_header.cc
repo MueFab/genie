@@ -47,7 +47,7 @@ FileHeader::FileHeader(core::MPEGMinorVersion _minor_version) : major_brand("MPE
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0'), minor_version() {
+FileHeader::FileHeader(util::BitReader& bitreader) : major_brand(6, '\0'), minor_version() {
     auto start_pos = bitreader.getStreamPosition() - 4;
     auto length = bitreader.readAlignedInt<uint64_t>();
     auto num_compatible_brands = (length - 22) / 4;
@@ -65,9 +65,9 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0')
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FileHeader::box_write(genie::util::BitWriter& bitWriter) const {
+void FileHeader::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeAlignedBytes(major_brand.data(), major_brand.length());
-    auto tmp = core::getMPEGVersionString(minor_version);
+    auto tmp = getMPEGVersionString(minor_version);
     bitWriter.writeAlignedBytes(tmp.data(), tmp.length());
     for (auto& b : compatible_brands) {
         bitWriter.writeAlignedBytes(b.data(), b.length());
@@ -90,7 +90,7 @@ bool FileHeader::operator==(const GenInfo& info) const {
 void FileHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* File Header");
     print_offset(output, depth + 1, max_depth, "Major brand: " + major_brand);
-    print_offset(output, depth + 1, max_depth, "Minor version: " + core::getMPEGVersionString(minor_version));
+    print_offset(output, depth + 1, max_depth, "Minor version: " + getMPEGVersionString(minor_version));
     for (const auto& b : compatible_brands) {
         print_offset(output, depth + 1, max_depth, "Compatible brand: " + b);
     }

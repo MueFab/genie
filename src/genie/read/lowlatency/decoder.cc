@@ -60,7 +60,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
             }
             std::string seq(length, '\0');
             for (auto& c : seq) {
-                c = core::getAlphabetProperties(core::AlphabetID::ACGTN).lut[data.pull(core::GenSub::UREADS)];
+                c = getAlphabetProperties(core::AlphabetID::ACGTN).lut[data.pull(core::GenSub::UREADS)];
             }
 
             core::record::Segment seg(std::move(seq));

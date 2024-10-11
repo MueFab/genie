@@ -16,7 +16,7 @@ DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MO
 
 DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres::DecoderRegular(MODE_ZSTD) {
     for (size_t i = 0; i < core::getDescriptors()[static_cast<uint8_t>(desc)].subseqs.size(); ++i) {
-        auto bits_p2 = genie::core::range2bytes(core::getDescriptor(desc).subseqs[i].range);
+        auto bits_p2 = core::range2bytes(getDescriptor(desc).subseqs[i].range);
         descriptor_subsequence_cfgs.emplace_back(bits_p2);
     }
 }
@@ -55,7 +55,7 @@ Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descripto
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc,
+std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(core::GenDesc desc,
                                                                                    util::BitReader &reader) {
     return std::make_unique<DecoderRegular>(desc, reader);
 }
@@ -63,7 +63,7 @@ std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::crea
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::write(util::BitWriter &writer) const {
-    core::parameter::desc_pres::Decoder::write(writer);
+    Decoder::write(writer);
     writer.writeBits(descriptor_subsequence_cfgs.size() - 1, 8);
     for (auto &i : descriptor_subsequence_cfgs) {
         i.write(writer);
@@ -73,7 +73,7 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DecoderRegular::equals(const Decoder *dec) const {
-    return core::parameter::desc_pres::Decoder::equals(dec) &&
+    return Decoder::equals(dec) &&
            dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
 }
 

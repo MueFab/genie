@@ -82,7 +82,7 @@ class DecoderStub : public core::ReadDecoder {
      * @param state Current decoding state.
      * @return Vector of reference sequences.
      */
-    virtual std::vector<std::string> getReferences(const basecoder::Decoder::SegmentMeta& meta,
+    virtual std::vector<std::string> getReferences(const Decoder::SegmentMeta& meta,
                                                    DecodingState& state) = 0;
 
     /**

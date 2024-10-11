@@ -85,7 +85,7 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
         std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         config = genie::entropy::gabac::EncodingConfiguration(nlohmann::json::parse(str));
     }
-    genie::entropy::gabac::run(ioconf, config, decode);
+    run(ioconf, config, decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()

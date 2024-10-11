@@ -34,7 +34,7 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
     if (write_raw) {
         static std::atomic<uint64_t> id(0);
         auto this_id = id++;
-        for (const auto& d : genie::core::getDescriptors()) {
+        for (const auto& d : getDescriptors()) {
             for (auto& s : au.get(d.id)) {
                 if (s.isEmpty()) {
                     continue;

@@ -103,7 +103,7 @@ void AccessUnit::setProtection(AUProtection au) { au_protection = std::move(au);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::box_write(genie::util::BitWriter& bitWriter) const {
+void AccessUnit::box_write(util::BitWriter& bitWriter) const {
     header.write(bitWriter);
     if (au_information != std::nullopt) {
         au_information->write(bitWriter);
@@ -149,8 +149,8 @@ AUProtection& AccessUnit::getProtection() { return *au_protection; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-format::mgb::AccessUnit AccessUnit::decapsulate() {
-    std::vector<format::mgb::Block> newBlocks;
+mgb::AccessUnit AccessUnit::decapsulate() {
+    std::vector<mgb::Block> newBlocks;
     newBlocks.reserve(blocks.size());
     for (auto& b : blocks) {
         newBlocks.emplace_back(b.decapsulate());
@@ -160,7 +160,7 @@ format::mgb::AccessUnit AccessUnit::decapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(format::mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version)
+AccessUnit::AccessUnit(mgb::AccessUnit au, bool mit, core::MPEGMinorVersion _version)
     : header(std::move(au.getHeader()), mit), version(_version) {
     for (auto& b : au.getBlocks()) {
         blocks.emplace_back(std::move(b));

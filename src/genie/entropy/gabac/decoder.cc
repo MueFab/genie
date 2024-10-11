@@ -24,8 +24,8 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration& conf0,
-                                              const gabac::EncodingConfiguration&,
+core::AccessUnit::Descriptor decompressTokens(const EncodingConfiguration& conf0,
+                                              const EncodingConfiguration&,
                                               core::AccessUnit::Subsequence&& data) {
     core::AccessUnit::Subsequence in = std::move(data);
     util::DataBlock remainingData = std::move(in.move());
@@ -40,7 +40,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         const size_t READAHEAD = 6;
         util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD,
                                               remainingData.getWordSize());
-        gabac::IBufferStream stream(&tmp);
+        IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
         reader.read<uint32_t>();
@@ -57,7 +57,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
             util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
                                                   remainingData.getWordSize());
-            gabac::IBufferStream stream(&tmp);
+            IBufferStream stream(&tmp);
             util::BitReader reader(stream);
 
             type_id = reader.read<uint16_t>(4);
@@ -67,7 +67,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 
             UTILS_DIE_IF(method != 3, "Only CABAC0 supported");
             offset++;
-            offset += gabac::StreamHandler::readU7(stream, numSymbols);
+            offset += StreamHandler::readU7(stream, numSymbols);
         }
 
         std::vector<util::DataBlock> transformedSeqs;
@@ -76,7 +76,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             if (j < (conf0.getSubseqConfig().getNumTransformSubseqCfgs() - 1)) {
                 util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
                                                       remainingData.getWordSize());
-                gabac::IBufferStream stream(&tmp);
+                IBufferStream stream(&tmp);
                 util::BitReader reader(stream);
                 payload_size = reader.read<uint32_t>();
                 offset += 4;
@@ -88,7 +88,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
                 if (conf0.getSubseqConfig().getNumTransformSubseqCfgs() > 1) {
                     util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
                                                           remainingData.getWordSize());
-                    gabac::IBufferStream stream(&tmp);
+                    IBufferStream stream(&tmp);
                     util::BitReader reader(stream);
                     numTransformedSymbols = reader.read<uint32_t>();
                     offset += 4;
@@ -97,14 +97,14 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             }
             auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
                                        remainingData.getWordSize());
-            offset += gabac::decodeTransformSubseq(
+            offset += decodeTransformSubseq(
                 conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
                 numTransformedSymbols, &tmp, 4);
 
             transformedSeqs.emplace_back(std::move(tmp));
         }
 
-        gabac::doInverseSubsequenceTransform(conf0.getSubseqConfig(), &transformedSeqs);
+        doInverseSubsequenceTransform(conf0.getSubseqConfig(), &transformedSeqs);
 
         while (ret.getSize() < mappedTypeId) {
             ret.add(core::AccessUnit::Subsequence(
@@ -119,7 +119,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
+core::AccessUnit::Subsequence Decoder::decompress(const EncodingConfiguration& conf,
                                                   core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
     auto id = in.getID();
@@ -132,27 +132,27 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
 
     // Interface to GABAC library
     util::DataBlock buffer = in.move();
-    gabac::IBufferStream in_stream(&buffer, 0);
+    IBufferStream in_stream(&buffer, 0);
 
-    uint8_t bytes = genie::core::range2bytes(core::getSubsequence(id).range);
+    uint8_t bytes = core::range2bytes(getSubsequence(id).range);
     util::DataBlock tmp(0, bytes);
-    gabac::OBufferStream outbuffer(&tmp);
+    OBufferStream outbuffer(&tmp);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cerr;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream,
+    const IOConfiguration GABAC_IO_SETUP = {&in_stream,
                                                    1,
                                                    nullptr,
                                                    &outbuffer,
                                                    bytes,
                                                    GABAC_BLOCK_SIZE,
                                                    GABC_LOG_OUTPUT_STREAM,
-                                                   gabac::IOConfiguration::LogLevel::LOG_TRACE};
+                                                   IOConfiguration::LogLevel::LOG_TRACE};
     const bool GABAC_DECODING_MODE = true;
 
     // Run
-    gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
+    run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
     outbuffer.flush(&tmp);
     return {std::move(tmp), in.getID()};
@@ -174,7 +174,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
 
         if (size) {
             std::get<1>(desc).addInteger("size-gabac-total-comp", size);
-            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-comp",
+            std::get<1>(desc).addInteger("size-gabac-" + getDescriptor(std::get<0>(desc).getID()).name + "-comp",
                                          size);
         }
 
@@ -182,12 +182,12 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
         auto conf0 = token_param.getSubsequenceCfg(0);
         auto conf1 = token_param.getSubsequenceCfg(1);
         std::get<0>(desc) =
-            decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
-                             gabac::EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
+            decompressTokens(EncodingConfiguration(std::move(conf0)),
+                             EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
 
         if (size) {
             std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).begin()->getRawSize());
-            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-raw",
+            std::get<1>(desc).addInteger("size-gabac-" + getDescriptor(std::get<0>(desc).getID()).name + "-raw",
                                          std::get<0>(desc).begin()->getRawSize());
         }
     } else {
@@ -203,19 +203,19 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             if (!subseq.isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-comp", subseq.getRawSize());
                 std::get<1>(desc).addInteger(
-                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
-                        core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-comp",
+                    "size-gabac-" + getDescriptor(std::get<0>(desc).getID()).name + "-" +
+                        getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-comp",
                     subseq.getRawSize());
             }
 
-            std::get<0>(desc).set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)),
+            std::get<0>(desc).set(d_id.second, decompress(EncodingConfiguration(std::move(conf0)),
                                                           std::move(subseq), mmCoderEnabled));
 
             if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
                 std::get<1>(desc).addInteger(
-                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
-                        core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-raw",
+                    "size-gabac-" + getDescriptor(std::get<0>(desc).getID()).name + "-" +
+                        getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-raw",
                     std::get<0>(desc).get(d_id.second).getRawSize());
             }
         }

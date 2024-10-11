@@ -30,7 +30,7 @@ namespace genie::format::mgb {
  */
 class MgbFile {
  private:
-    std::vector<std::pair<uint64_t, std::unique_ptr<genie::core::parameter::DataUnit>>> units;  //!< @brief
+    std::vector<std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>> units;  //!< @brief
     std::istream* file;                                                                         //!< @brief
     std::unique_ptr<util::BitReader> reader;                                                    //!< @brief
 
@@ -41,7 +41,7 @@ class MgbFile {
      * @param u
      * @return
      */
-    static uint8_t data_unit_order(const genie::core::parameter::DataUnit& u);
+    static uint8_t data_unit_order(const core::parameter::DataUnit& u);
 
     /**
      * @brief
@@ -52,8 +52,8 @@ class MgbFile {
      * @return
      */
     template <typename LAMBDA>
-    static bool base_sorter(const std::pair<uint64_t, std::unique_ptr<genie::core::parameter::DataUnit>>& u1,
-                            const std::pair<uint64_t, std::unique_ptr<genie::core::parameter::DataUnit>>& u2,
+    static bool base_sorter(const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1,
+                            const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u2,
                             LAMBDA lambda);
 
  public:
@@ -61,13 +61,13 @@ class MgbFile {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer);
+    void write(util::BitWriter& writer);
 
     /**
      * @brief
      * @param unit
      */
-    void addUnit(std::unique_ptr<genie::core::parameter::DataUnit> unit);
+    void addUnit(std::unique_ptr<core::parameter::DataUnit> unit);
 
     /**
      * @brief
@@ -145,7 +145,7 @@ class MgbFile {
      * @param param_sets
      * @return
      */
-    std::vector<std::unique_ptr<format::mgb::AccessUnit>> extractAUs(const std::vector<uint8_t>& param_sets);
+    std::vector<std::unique_ptr<AccessUnit>> extractAUs(const std::vector<uint8_t>& param_sets);
 
     /**
      * @brief
@@ -156,8 +156,8 @@ class MgbFile {
      * @return
      */
     std::vector<uint8_t> collect_param_ids(bool multipleAlignments, bool pos40,
-                                           genie::core::parameter::DataUnit::DatasetType dataset_type,
-                                           genie::core::AlphabetID alphabet);
+                                           core::parameter::DataUnit::DatasetType dataset_type,
+                                           core::AlphabetID alphabet);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

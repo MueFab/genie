@@ -41,7 +41,7 @@ std::unique_ptr<basecoder::DecoderStub::DecodingState> Decoder::createDecodingSt
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::recordDecodedHook(basecoder::DecoderStub::DecodingState& state, const core::record::Record& rec) {
+void Decoder::recordDecodedHook(DecodingState& state, const core::record::Record& rec) {
     dynamic_cast<LADecodingState&>(state).refEncoder.addRead(rec);
 }
 

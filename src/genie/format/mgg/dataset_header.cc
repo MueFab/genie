@@ -44,7 +44,7 @@ uint16_t DatasetHeader::getDatasetID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::MPEGMinorVersion DatasetHeader::getVersion() const { return version; }
+core::MPEGMinorVersion DatasetHeader::getVersion() const { return version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -122,12 +122,12 @@ const std::string& DatasetHeader::getKey() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader()
-    : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
+    : DatasetHeader(0, 0, core::MPEGMinorVersion::V2000, false, false, false, false,
                     core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
+DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, core::MPEGMinorVersion _version,
                              bool _multiple_alignments_flags, bool _byte_offset_size_flags,
                              bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
                              core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
@@ -148,7 +148,7 @@ DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, ge
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
+DatasetHeader::DatasetHeader(util::BitReader& reader) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
     group_ID = reader.readAlignedInt<uint8_t>();
@@ -169,7 +169,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         block_header_off = dataset_header::BlockHeaderOffOptions(reader);
     }
     referenceOptions = dataset_header::ReferenceOptions(reader);
-    dataset_type = reader.read<genie::core::parameter::DataUnit::DatasetType>(4);
+    dataset_type = reader.read<core::parameter::DataUnit::DatasetType>(4);
     if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
         auto num_classes = reader.read<uint8_t>(4);
         for (size_t i = 0; i < num_classes; ++i) {
@@ -177,7 +177,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
         }
     }
     parameters_update_flag = reader.read<bool>(1);
-    alphabet_id = reader.read<genie::core::AlphabetID>(7);
+    alphabet_id = reader.read<core::AlphabetID>(7);
     num_U_access_units = reader.read<uint32_t>(32);
     if (num_U_access_units) {
         u_options = dataset_header::UOptions(reader);
@@ -197,10 +197,10 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
+void DatasetHeader::box_write(util::BitWriter& writer) const {
     writer.writeAlignedInt<uint8_t>(group_ID);
     writer.writeAlignedInt<uint16_t>(ID);
-    const auto& v_string = genie::core::getMPEGVersionString(version);
+    const auto& v_string = getMPEGVersionString(version);
     writer.writeAlignedBytes(v_string.data(), v_string.length());
 
     writer.writeBits(multiple_alignment_flag, 1);
@@ -299,10 +299,10 @@ void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
 
 std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
     if (block_header_on != std::nullopt) {
-        return std::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
+        return std::make_unique<core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
                                                                          block_header_on->getCCFlag());
     } else {
-        return std::make_unique<genie::core::meta::blockheader::Disabled>(block_header_off->getOrderedBlocksFlag());
+        return std::make_unique<core::meta::blockheader::Disabled>(block_header_off->getOrderedBlocksFlag());
     }
 }
 

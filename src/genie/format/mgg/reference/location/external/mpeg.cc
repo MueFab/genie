@@ -18,7 +18,7 @@ namespace genie::format::mgg::reference::location::external {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MPEG::MPEG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t _group_id, uint16_t _dataset_id,
-           std::string _ref_checksum, genie::core::MPEGMinorVersion _version)
+           std::string _ref_checksum, core::MPEGMinorVersion _version)
     : External(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
       version(_version),
       external_dataset_group_id(_group_id),
@@ -31,7 +31,7 @@ MPEG::MPEG(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, uint8_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MPEGMinorVersion _version)
+MPEG::MPEG(util::BitReader& reader, size_t seq_count, core::MPEGMinorVersion _version)
     : External(reader),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
@@ -50,8 +50,8 @@ MPEG::MPEG(genie::util::BitReader& reader, size_t seq_count, genie::core::MPEGMi
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MPEG::MPEG(genie::util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo,
-           size_t seq_count, genie::core::MPEGMinorVersion _version)
+MPEG::MPEG(util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo,
+           size_t seq_count, core::MPEGMinorVersion _version)
     : External(_reserved, std::move(_uri), algo, RefType::MPEGG_REF),
       version(_version),
       ref_checksum(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0') {
@@ -94,7 +94,7 @@ void MPEG::addSeqChecksum(std::string checksum) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MPEG::write(genie::util::BitWriter& writer) {
+void MPEG::write(util::BitWriter& writer) {
     External::write(writer);
     writer.writeAlignedInt(external_dataset_group_id);
     writer.writeAlignedInt(external_dataset_id);
@@ -119,9 +119,9 @@ void MPEG::addChecksum(std::string checksum) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<genie::core::meta::RefBase> MPEG::decapsulate() {
-    auto ret = std::make_unique<genie::core::meta::external_ref::MPEG>(
-        std::move(getURI()), static_cast<genie::core::meta::ExternalRef::ChecksumAlgorithm>(getChecksumAlgorithm()),
+std::unique_ptr<core::meta::RefBase> MPEG::decapsulate() {
+    auto ret = std::make_unique<core::meta::external_ref::MPEG>(
+        std::move(getURI()), static_cast<core::meta::ExternalRef::ChecksumAlgorithm>(getChecksumAlgorithm()),
         external_dataset_group_id, external_dataset_id, std::move(ref_checksum));
     return ret;
 }

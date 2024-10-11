@@ -22,7 +22,7 @@ uint32_t Block::getPayloadSize() const { return header.getPayloadSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Block::getLength() const {
-    uint64_t len = genie::format::mgg::BlockHeader::getLength() + header.getPayloadSize();
+    uint64_t len = BlockHeader::getLength() + header.getPayloadSize();
 
     /// block_payload[] u(8)
     //    len += block_payload.size() * sizeof(uint8_t);
@@ -32,7 +32,7 @@ uint64_t Block::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Block::write(genie::util::BitWriter& writer) const {
+void Block::write(util::BitWriter& writer) const {
     header.write(writer);
     payload.write(writer);
 }
@@ -45,29 +45,29 @@ bool Block::operator==(const Block& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(genie::core::GenDesc _desc_id, genie::util::DataBlock _payload)
+Block::Block(core::GenDesc _desc_id, util::DataBlock _payload)
     : header(false, _desc_id, 0, static_cast<uint32_t>(_payload.getRawSize())), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::util::DataBlock& Block::getPayload() const { return payload.getPayload(); }
+const util::DataBlock& Block::getPayload() const { return payload.getPayload(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::GenDesc Block::getDescID() const { return header.getDescriptorID(); }
+core::GenDesc Block::getDescID() const { return header.getDescriptorID(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Block");
     print_offset(output, depth + 1, max_depth,
-                 "Block descriptor ID: " + genie::core::getDescriptor(header.getDescriptorID()).name);
+                 "Block descriptor ID: " + getDescriptor(header.getDescriptorID()).name);
     print_offset(output, depth + 1, max_depth, "Block payload size: " + std::to_string(header.getPayloadSize()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(format::mgb::Block b)
+Block::Block(mgb::Block b)
     : header(false, static_cast<core::GenDesc>(b.getDescriptorID()), 0,
              static_cast<uint32_t>(b.getPayloadUnparsed().getPayloadSize())),
       payload(std::move(b.getPayloadUnparsed())) {}
@@ -78,7 +78,7 @@ core::Payload Block::movePayload() { return std::move(payload); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-format::mgb::Block Block::decapsulate() { return {header.getDescriptorID(), movePayload()}; }
+mgb::Block Block::decapsulate() { return {header.getDescriptorID(), movePayload()}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

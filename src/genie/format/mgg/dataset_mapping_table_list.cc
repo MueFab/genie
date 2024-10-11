@@ -54,7 +54,7 @@ void DataSetMappingTableList::addDatasetMappingTableSID(uint16_t sid) { dataset_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataSetMappingTableList::box_write(genie::util::BitWriter& bitWriter) const {
+void DataSetMappingTableList::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeAlignedInt(dataset_group_ID);
     for (const auto& s : dataset_mapping_table_SID) {
         bitWriter.writeAlignedInt(s);

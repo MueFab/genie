@@ -114,8 +114,8 @@ uint8_t BinarizationParameters::numParams[static_cast<unsigned>(BinarizationId::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
-    return BinarizationParameters::numParams[static_cast<uint8_t>(binarzationId)];
+uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationId binarzationId) {
+    return numParams[static_cast<uint8_t>(binarzationId)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

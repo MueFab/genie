@@ -418,7 +418,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
         return;
     }
 
-    auto tuple = SamRecordGroup::getReadTuple();
+    auto tuple = getReadTuple();
     SamRecord *r1 = tuple.first;
     SamRecord *r2 = tuple.second;
 

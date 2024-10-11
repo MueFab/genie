@@ -80,8 +80,8 @@ void LabelList::patchID(uint8_t groupID) { dataset_group_ID = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<genie::core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
-    std::vector<genie::core::meta::Label> ret;
+std::vector<core::meta::Label> LabelList::decapsulate(uint16_t dataset) {
+    std::vector<core::meta::Label> ret;
     ret.reserve(labels.size());
     for (auto& l : labels) {
         ret.emplace_back(l.decapsulate(dataset));

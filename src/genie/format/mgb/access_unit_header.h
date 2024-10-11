@@ -56,7 +56,7 @@ class AUHeader {
      * @param writer
      * @param write_signatures
      */
-    void write(genie::util::BitWriter &writer, bool write_signatures) const;
+    void write(util::BitWriter &writer, bool write_signatures) const;
 
     /**
      * @brief
@@ -95,7 +95,7 @@ class AUHeader {
      * @param alphabet
      */
     AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-             uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type, uint8_t posSize,
+             uint32_t _reads_count, core::parameter::ParameterSet::DatasetType dataset_type, uint8_t posSize,
              bool signatureFlag, core::AlphabetID alphabet);
 
     /**

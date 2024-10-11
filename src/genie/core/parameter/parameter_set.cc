@@ -64,7 +64,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
         auto mode = bitReader.read<uint8_t>(4);
         if (mode == 1) {
             qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
-                mode, genie::core::GenDesc::QV, bitReader));
+                mode, GenDesc::QV, bitReader));
         } else {
             bitReader.read<uint8_t>(1);
         }
@@ -487,19 +487,19 @@ void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
     output << "* Parameter set " << static_cast<uint32_t>(getID());
     if (getEncodingSet().isComputedReference()) {
         switch (getEncodingSet().getComputedRef().getAlgorithm()) {
-            case core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY:
+            case ComputedRef::Algorithm::LOCAL_ASSEMBLY:
                 output << ", local assembly";
                 break;
-            case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
+            case ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
                 output << ", global assembly";
                 break;
-            case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
+            case ComputedRef::Algorithm::REF_TRANSFORM:
                 output << ", ref transform";
                 break;
-            case core::parameter::ComputedRef::Algorithm::PUSH_IN:
+            case ComputedRef::Algorithm::PUSH_IN:
                 output << ", push in";
                 break;
-            case core::parameter::ComputedRef::Algorithm::RESERVED:
+            case ComputedRef::Algorithm::RESERVED:
                 output << ", reserved";
                 break;
         }
@@ -507,10 +507,10 @@ void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
         output << ", reference based";
     }
     switch (getEncodingSet().getAlphabetID()) {
-        case core::AlphabetID::ACGTN:
+        case AlphabetID::ACGTN:
             output << ", alphabet ACTGN";
             break;
-        case core::AlphabetID::ACGTRYSWKMBDHVN_:
+        case AlphabetID::ACGTRYSWKMBDHVN_:
             output << ", alphabet ACGTRYSWKMBDHVN_";
             break;
         default:

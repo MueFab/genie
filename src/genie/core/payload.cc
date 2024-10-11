@@ -13,10 +13,10 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
+util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
     auto pos = reader.getStreamPosition();
     reader.setStreamPosition(payloadPosition);
-    genie::util::DataBlock tmp;
+    util::DataBlock tmp;
     tmp.resize(payloadSize);
     reader.readAlignedBytes(tmp.getData(), payloadSize);
     reader.setStreamPosition(pos);
@@ -53,18 +53,18 @@ bool Payload::isPayloadLoaded() const { return payloadLoaded; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::util::DataBlock& Payload::getPayload() const { return block_payload; }
+const util::DataBlock& Payload::getPayload() const { return block_payload; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::util::DataBlock&& Payload::movePayload() {
+util::DataBlock&& Payload::movePayload() {
     payloadLoaded = false;
     return std::move(block_payload);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Payload::Payload(genie::util::DataBlock payload)
+Payload::Payload(util::DataBlock payload)
     : block_payload(std::move(payload)),
       payloadLoaded(true),
       payloadPosition(-1),
@@ -84,7 +84,7 @@ Payload::Payload(util::BitReader& reader, uint64_t size)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Payload::write(genie::util::BitWriter& writer) const {
+void Payload::write(util::BitWriter& writer) const {
     if (!isPayloadLoaded() && internal_reader) {
         auto tmp = _internal_loadPayload(*internal_reader);
         writer.writeAlignedBytes(tmp.getData(), tmp.getRawSize());

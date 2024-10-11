@@ -118,8 +118,8 @@ core::meta::Reference FastaReader::getMeta() const {
     auto* f_ptr = f.get();
     core::meta::Reference ret(basename, 0, 0, 0, std::move(f), "");
     for (const auto& s : hashFile.getData()) {
-        ret.addSequence(genie::core::meta::Sequence(s.first, fai.getLength(s.first), static_cast<uint16_t>(id++)));
-        f_ptr->addChecksum(genie::util::fromHex(s.second));
+        ret.addSequence(core::meta::Sequence(s.first, fai.getLength(s.first), static_cast<uint16_t>(id++)));
+        f_ptr->addChecksum(util::fromHex(s.second));
     }
     return ret;
 }

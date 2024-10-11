@@ -31,7 +31,7 @@ bool Reference::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
+Reference::Reference(util::BitReader& reader, core::MPEGMinorVersion _version) : ref_version(0, 0, 0) {
     version = _version;
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
@@ -51,7 +51,7 @@ Reference::Reference(util::BitReader& reader, genie::core::MPEGMinorVersion _ver
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::Reference(uint8_t group_id, uint8_t ref_id, std::string ref_name, reference::Version _ref_version,
-                     std::unique_ptr<reference::Location> location, genie::core::MPEGMinorVersion _version)
+                     std::unique_ptr<reference::Location> location, core::MPEGMinorVersion _version)
     : dataset_group_ID(group_id),
       reference_ID(ref_id),
       reference_name(std::move(ref_name)),
@@ -101,7 +101,7 @@ const reference::Location& Reference::getLocation() const { return *reference_lo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::box_write(genie::util::BitWriter& writer) const {
+void Reference::box_write(util::BitWriter& writer) const {
     writer.writeAlignedInt(dataset_group_ID);
     writer.writeAlignedInt(reference_ID);
     writer.writeAlignedBytes(reference_name.data(), reference_name.length());
@@ -128,20 +128,20 @@ void Reference::patchRefID(uint8_t _old, uint8_t _new) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::meta::Reference Reference::decapsulate(std::string meta) {
-    std::unique_ptr<genie::core::meta::RefBase> location = reference_location->decapsulate();
-    genie::core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
+core::meta::Reference Reference::decapsulate(std::string meta) {
+    std::unique_ptr<core::meta::RefBase> location = reference_location->decapsulate();
+    core::meta::Reference ret(std::move(reference_name), ref_version.getMajor(), ref_version.getMinor(),
                                      ref_version.getPatch(), std::move(location), std::move(meta));
     for (auto& s : sequences) {
-        ret.addSequence(genie::core::meta::Sequence(s.getName(), s.getLength(), s.getID()));
+        ret.addSequence(core::meta::Sequence(s.getName(), s.getLength(), s.getID()));
     }
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, genie::core::meta::Reference ref,
-                     genie::core::MPEGMinorVersion _version)
+Reference::Reference(uint8_t _dataset_group_id, uint8_t _reference_ID, core::meta::Reference ref,
+                     core::MPEGMinorVersion _version)
     : dataset_group_ID(_dataset_group_id),
       reference_ID(_reference_ID),
       reference_name(std::move(ref.getName())),

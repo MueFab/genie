@@ -18,7 +18,7 @@ namespace genieapp::transcode_sam {
 
 int main(int argc, char* argv[]) {
     try {
-        genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
+        sam::sam_to_mgrec::Config programOptions(argc, argv);
         if (programOptions.help) {
             return 0;
         }

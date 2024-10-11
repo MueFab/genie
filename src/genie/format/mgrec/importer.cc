@@ -47,7 +47,7 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
          return false;
      }*/
     for (const auto& a : rec.getAlignments()) {
-        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
+        if (rec.getClassID() == core::record::ClassType::CLASS_HM) {
             discarded_HM++;
             return false;
         }

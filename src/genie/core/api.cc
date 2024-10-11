@@ -15,83 +15,83 @@ namespace genie::core::api {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionPartiallyAuthorized::msg() const {
-    return "Only partially authorized. " + genie::util::RuntimeException::msg();
+    return "Only partially authorized. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ExceptionNotAuthorized::msg() const { return "Not authorized. " + genie::util::RuntimeException::msg(); }
+std::string ExceptionNotAuthorized::msg() const { return "Not authorized. " + RuntimeException::msg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionVerificationFailed::msg() const {
-    return "Signature verification failed. " + genie::util::RuntimeException::msg();
+    return "Signature verification failed. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionDecryptionFailed::msg() const {
-    return "Decryption failed. " + genie::util::RuntimeException::msg();
+    return "Decryption failed. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionDatasetGroupNotFound::msg() const {
-    return "Dataset group not found. " + genie::util::RuntimeException::msg();
+    return "Dataset group not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionDatasetNotFound::msg() const {
-    return "Dataset not found. " + genie::util::RuntimeException::msg();
+    return "Dataset not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionAccessUnitNotFound::msg() const {
-    return "Access unit not found. " + genie::util::RuntimeException::msg();
+    return "Access unit not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionReferenceNotFound::msg() const {
-    return "Reference not found. " + genie::util::RuntimeException::msg();
+    return "Reference not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionSequenceNotFound::msg() const {
-    return "Sequence not found. " + genie::util::RuntimeException::msg();
+    return "Sequence not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionMetadataFieldNotFound::msg() const {
-    return "Metadata field not found. " + genie::util::RuntimeException::msg();
+    return "Metadata field not found. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionMetadataInvalid::msg() const {
-    return "Metadata invalid. " + genie::util::RuntimeException::msg();
+    return "Metadata invalid. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionReferenceInvalid::msg() const {
-    return "Reference invalid. " + genie::util::RuntimeException::msg();
+    return "Reference invalid. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionParameterInvalid::msg() const {
-    return "Parameter invalid. " + genie::util::RuntimeException::msg();
+    return "Parameter invalid. " + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string ExceptionBitstreamInvalid::msg() const {
-    return "Bitstream invalid." + genie::util::RuntimeException::msg();
+    return "Bitstream invalid." + RuntimeException::msg();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

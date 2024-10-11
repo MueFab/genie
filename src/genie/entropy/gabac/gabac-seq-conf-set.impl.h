@@ -40,7 +40,7 @@ void GabacSeqConfSet::fillDecoder(const core::GenomicDescriptorProperties &desc,
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-const T &GabacSeqConfSet::loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet &parameterSet,
+const T &GabacSeqConfSet::loadDescriptorDecoderCfg(const ParameterSet &parameterSet,
                                                    core::GenDesc descriptor_id) {
     auto &curDesc = parameterSet.getEncodingSet().getDescriptor(descriptor_id);
     UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");

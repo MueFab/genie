@@ -16,18 +16,18 @@ namespace genie::core::record::alignment_external {
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)
-    : AlignmentExternal(AlignmentExternal::Type::OTHER_REC), next_pos(_next_pos), next_seq_ID(_next_seq_ID) {}
+    : AlignmentExternal(Type::OTHER_REC), next_pos(_next_pos), next_seq_ID(_next_seq_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(util::BitReader &reader)
-    : AlignmentExternal(AlignmentExternal::Type::OTHER_REC),
+    : AlignmentExternal(Type::OTHER_REC),
       next_pos(reader.readAlignedInt<uint64_t, 5>()),
       next_seq_ID(reader.readAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec() : AlignmentExternal(AlignmentExternal::Type::OTHER_REC), next_pos(0), next_seq_ID(0) {}
+OtherRec::OtherRec() : AlignmentExternal(Type::OTHER_REC), next_pos(0), next_seq_ID(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

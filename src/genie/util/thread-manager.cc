@@ -21,7 +21,7 @@ void ThreadManager::action(size_t) {
             while (!stopFlag && s->pump(counter, lock)) {
             }
         }
-    } catch (genie::util::Exception& e) {
+    } catch (Exception& e) {
         std::cerr << e.msg() << std::endl;
         throw(e);
     } catch (std::exception& e) {

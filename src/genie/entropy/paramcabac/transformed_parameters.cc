@@ -77,7 +77,7 @@ TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t TransformedParameters::getNumStreams() const {
-    if (transform_ID_subseq == TransformedParameters::TransformIdSubseq::MERGE_CODING) {
+    if (transform_ID_subseq == TransformIdSubseq::MERGE_CODING) {
         return *merge_coding_subseq_count;
     } else {
         static const std::vector<size_t> lut = {1, 2, 3, 2, 1};

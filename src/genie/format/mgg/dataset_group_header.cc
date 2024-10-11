@@ -40,7 +40,7 @@ const std::string& DatasetGroupHeader::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupHeader::DatasetGroupHeader(genie::util::BitReader& reader) {
+DatasetGroupHeader::DatasetGroupHeader(util::BitReader& reader) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
     auto num_datasets = (length - 14) / 2;
@@ -76,7 +76,7 @@ void DatasetGroupHeader::addDatasetID(uint8_t _id) { dataset_IDs.emplace_back(_i
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupHeader::box_write(genie::util::BitWriter& writer) const {
+void DatasetGroupHeader::box_write(util::BitWriter& writer) const {
     writer.writeAlignedInt<uint8_t>(ID);
     writer.writeAlignedInt<uint8_t>(version);
     for (auto& d : dataset_IDs) {
