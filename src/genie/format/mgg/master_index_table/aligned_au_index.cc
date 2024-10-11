@@ -24,8 +24,9 @@ bool AlignedAUIndex::operator==(const AlignedAUIndex& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignedAUIndex::AlignedAUIndex(uint64_t _au_byte_offset, uint64_t _au_start_position, uint64_t _au_end_position,
-                               uint8_t _byte_offset_size, uint8_t _position_size)
+AlignedAUIndex::AlignedAUIndex(const uint64_t _au_byte_offset, const uint64_t _au_start_position,
+                               const uint64_t _au_end_position, const uint8_t _byte_offset_size,
+                               const uint8_t _position_size)
     : au_byte_offset(_au_byte_offset),
       au_start_position(_au_start_position),
       au_end_position(_au_end_position),
@@ -34,9 +35,9 @@ AlignedAUIndex::AlignedAUIndex(uint64_t _au_byte_offset, uint64_t _au_start_posi
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignedAUIndex::AlignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
-                               core::parameter::DataUnit::DatasetType dataset_type, bool multiple_alignment,
-                               bool block_header_flag, const std::vector<core::GenDesc>& descriptors)
+AlignedAUIndex::AlignedAUIndex(util::BitReader& reader, const uint8_t _byte_offset_size, const uint8_t _position_size,
+                               const core::parameter::DataUnit::DatasetType dataset_type, const bool multiple_alignment,
+                               const bool block_header_flag, const std::vector<core::GenDesc>& descriptors)
     : byte_offset_size(_byte_offset_size), position_size(_position_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     au_start_position = reader.read<uint64_t>(position_size);

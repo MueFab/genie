@@ -49,34 +49,26 @@ core::meta::DatasetGroup& DecapsulatedDatasetGroup::getMetaGroup() { return *met
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint8_t, core::meta::Reference>& DecapsulatedDatasetGroup::getMetaReferences() {
-    return meta_references;
-}
+std::map<uint8_t, core::meta::Reference>& DecapsulatedDatasetGroup::getMetaReferences() { return meta_references; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint64_t, std::pair<mgb::MgbFile, core::meta::Dataset>>&
-DecapsulatedDatasetGroup::getData() {
-    return data;
-}
+std::map<uint64_t, std::pair<mgb::MgbFile, core::meta::Dataset>>& DecapsulatedDatasetGroup::getData() { return data; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::optional<core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsulate_dataset_group(
-    DatasetGroup* grp) {
+std::optional<core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsulate_dataset_group(DatasetGroup* grp) {
     std::optional<core::meta::DatasetGroup> meta_group;
     if (grp->hasMetadata()) {
         if (meta_group == std::nullopt) {
-            meta_group =
-                core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
+            meta_group = core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
         }
         meta_group->setMetadata(grp->getMetadata().decapsulate());
     }
 
     if (grp->hasProtection()) {
         if (meta_group == std::nullopt) {
-            meta_group =
-                core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
+            meta_group = core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
         }
         meta_group->setProtection(grp->getProtection().decapsulate());
     }
@@ -85,8 +77,7 @@ std::optional<core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsulate_da
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint8_t, core::meta::Reference> DecapsulatedDatasetGroup::decapsulate_references(
-    DatasetGroup* grp) {
+std::map<uint8_t, core::meta::Reference> DecapsulatedDatasetGroup::decapsulate_references(DatasetGroup* grp) {
     std::map<uint8_t, std::string> ref_metadata;
 
     for (auto& m : grp->getReferenceMetadata()) {
@@ -108,8 +99,8 @@ std::map<uint8_t, core::meta::Reference> DecapsulatedDatasetGroup::decapsulate_r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>>
-DecapsulatedDatasetGroup::decapsulate_AU(AccessUnit& au) {
+std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>> DecapsulatedDatasetGroup::decapsulate_AU(
+    AccessUnit& au) {
     core::meta::AccessUnit meta_au(au.getHeader().getHeader().getID());
     bool has_meta = false;
     if (au.hasInformation()) {
@@ -120,8 +111,7 @@ DecapsulatedDatasetGroup::decapsulate_AU(AccessUnit& au) {
         has_meta = true;
         meta_au.setProtection(au.getProtection().decapsulate());
     }
-    std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>> ret(au.decapsulate(),
-                                                                                                std::nullopt);
+    std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>> ret(au.decapsulate(), std::nullopt);
     if (has_meta) {
         ret.second = std::move(meta_au);
     }
@@ -139,7 +129,7 @@ std::pair<mgb::MgbFile, core::meta::Dataset> DecapsulatedDatasetGroup::decapsula
     meta.setHeader(dt.getHeader().decapsulate());
 
     if (!dt.getHeader().getReferenceOptions().getSeqIDs().empty()) {
-        auto it = meta_references.find(dt.getHeader().getReferenceOptions().getReferenceID());
+        const auto it = meta_references.find(dt.getHeader().getReferenceOptions().getReferenceID());
         if (it != meta_references.end()) {
             meta.setReference(it->second);
         }
@@ -175,8 +165,8 @@ std::pair<mgb::MgbFile, core::meta::Dataset> DecapsulatedDatasetGroup::decapsula
 
     for (auto& ds : dt.getDescriptorStreams()) {
         if (ds.hasProtection()) {
-            meta.addDescriptorStream(core::meta::DescriptorStream(
-                static_cast<size_t>(ds.getHeader().getDescriptorID()), ds.getProtection().decapsulate()));
+            meta.addDescriptorStream(core::meta::DescriptorStream(static_cast<size_t>(ds.getHeader().getDescriptorID()),
+                                                                  ds.getProtection().decapsulate()));
         }
     }
 

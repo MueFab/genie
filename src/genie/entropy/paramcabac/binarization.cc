@@ -19,7 +19,7 @@ Binarization::Binarization()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID, bool _bypass_flag,
+Binarization::Binarization(const BinarizationParameters::BinarizationId _binarization_ID, const bool _bypass_flag,
                            BinarizationParameters&& _cabac_binarization_parameters, Context&& _cabac_Context_parameters)
     : binarization_ID(_binarization_ID),
       bypass_flag(_bypass_flag),
@@ -31,7 +31,8 @@ Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
+Binarization::Binarization(const uint8_t output_symbol_size, const uint8_t coding_subsym_size,
+                           util::BitReader& reader) {
     binarization_ID = reader.read<BinarizationParameters::BinarizationId>(5);
     bypass_flag = reader.read<bool>(1);
     cabac_binarization_parameters = BinarizationParameters(binarization_ID, reader);

@@ -27,7 +27,7 @@ namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
+std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(const uint16_t flags) {
     uint8_t flags_mpeg = 0;
 
     flags_mpeg |= (flags & BAM_FDUP) >> 10u;         // PCR / duplicate
@@ -41,9 +41,9 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r1, SamRecord *r2, bool paired_end,
-                                  bool force_split) {
-    SamRecord *base_rec = r1 ? r1 : r2;  // Record to derive name and flags from
+void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r1, SamRecord *r2, const bool paired_end,
+                                  const bool force_split) {
+    const SamRecord *base_rec = r1 ? r1 : r2;  // Record to derive name and flags from
     if (r1 && r2 && r1->isUnmapped()) {
         base_rec = r2;
     }
@@ -60,7 +60,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 
     if (r1 == nullptr || r2 == nullptr) {
         // Only one SAM record is unavailable
-        auto r_avail = r1 ? r1 : r2;  // The available SAM record
+        const auto r_avail = r1 ? r1 : r2;  // The available SAM record
         if ((r_avail->mate_rid == r_avail->getRID() && r_avail->mate_pos == r_avail->getPos()) ||
             r_avail->mate_rid == -1) {
             // Case 1: Paired SAM record is missing, switch to unpaired.
@@ -162,7 +162,7 @@ bool SamRecordGroup::checkIfPaired() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::core::record::ClassType SamRecordGroup::checkClassTypeSingle() {
-    size_t primary_count =
+    const size_t primary_count =
         data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::PRIMARY)].size() +
         data[static_cast<uint8_t>(TemplateType::SINGLE)][static_cast<uint8_t>(MappingType::UNMAPPED)].size();
     UTILS_DIE_IF(primary_count > 1, "Multiple primary alignments in single ended SAM record");
@@ -268,7 +268,7 @@ void SamRecordGroup::moveSecondaryAlignments() {
 void SamRecordGroup::guessUnknownReadOrder(size_t &unknown_count, size_t &read_1_count, size_t &read_2_count) {
     // Get rid of unknown pair indices
     while (unknown_count > 0) {
-        auto index =
+        const auto index =
             data[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)][static_cast<uint8_t>(MappingType::PRIMARY)].empty()
                 ? static_cast<uint8_t>(MappingType::UNMAPPED)
                 : static_cast<uint8_t>(MappingType::PRIMARY);
@@ -317,7 +317,7 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypePaired() {
     size_t read_1_count = primaryTemplateCount(TemplateType::PAIRED_1);
     size_t read_2_count = primaryTemplateCount(TemplateType::PAIRED_2);
     size_t unknown_count = primaryTemplateCount(TemplateType::PAIRED_UNKNOWN);
-    size_t primary_count = read_1_count + read_2_count + unknown_count;
+    const size_t primary_count = read_1_count + read_2_count + unknown_count;
     UTILS_DIE_IF(primary_count > 2, "More than 2 primary reads in paired sam record");
 
     if (primary_count == 0) {
@@ -329,7 +329,7 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypePaired() {
     removeAmbiguousSecondaryAlignments();
     guessUnknownReadOrder(unknown_count, read_1_count, read_2_count);
 
-    size_t unmapped_count = mappingCount(MappingType::UNMAPPED);
+    const size_t unmapped_count = mappingCount(MappingType::UNMAPPED);
 
     if (unmapped_count == 0) {
         return genie::core::record::ClassType::CLASS_I;
@@ -343,7 +343,7 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypePaired() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::pair<bool, genie::core::record::ClassType> SamRecordGroup::validate() {
-    bool paired = checkIfPaired();
+    const bool paired = checkIfPaired();
     if (!paired) {
         return std::make_pair(false, checkClassTypeSingle());
     } else {

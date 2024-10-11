@@ -18,7 +18,7 @@ namespace genie::core::meta::external_ref {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Raw::Raw(std::string _ref_uri, ChecksumAlgorithm check)
+Raw::Raw(std::string _ref_uri, const ChecksumAlgorithm check)
     : ExternalRef(std::move(_ref_uri), check, ReferenceType::RAW_REF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

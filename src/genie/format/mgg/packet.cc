@@ -14,7 +14,7 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Packet::Packet(PacketHeader _header, std::string _data) : header(_header), data(std::move(_data)) {}
+Packet::Packet(const PacketHeader _header, std::string _data) : header(_header), data(std::move(_data)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

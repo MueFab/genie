@@ -17,15 +17,17 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-double SoftclipSpreader::squash(double activity, double antiActivity) { return activity / (activity + antiActivity); }
+double SoftclipSpreader::squash(const double activity, const double antiActivity) {
+    return activity / (activity + antiActivity);
+}
 
 // -----------------------------------------------------------------------------
 
-double SoftclipSpreader::push(double score, size_t softclips) {
+double SoftclipSpreader::push(double score, const size_t softclips) {
     // Trigger spreading
     if (softclips >= MIN_HQ_SOFTCLIPS) {
         // Radius
-        auto clipped = static_cast<int>(std::min(softclips, MAX_PROPAGATION));
+        const auto clipped = static_cast<int>(std::min(softclips, MAX_PROPAGATION));
 
         // Remember for future positions
         forwardSpread.emplace_back(clipped + 1, score);
@@ -49,7 +51,7 @@ double SoftclipSpreader::push(double score, size_t softclips) {
         }
     }
 
-    double orig = std::min(original.push(score), 1.0);
+    const double orig = std::min(original.push(score), 1.0);
 
     return squashed ? squash(buffer.push(ownscore), 1.0 - orig) : buffer.push(ownscore);
 }
@@ -60,7 +62,7 @@ size_t SoftclipSpreader::getOffset() const { return MAX_PROPAGATION; }
 
 // -----------------------------------------------------------------------------
 
-SoftclipSpreader::SoftclipSpreader(size_t max_prop, size_t min_hq_clips, bool isSquashed)
+SoftclipSpreader::SoftclipSpreader(const size_t max_prop, const size_t min_hq_clips, const bool isSquashed)
     : buffer(max_prop, 0.0),
       original(max_prop, 0.0),
       MAX_PROPAGATION(max_prop),

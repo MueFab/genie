@@ -14,7 +14,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(std::string _name, uint64_t _length, uint16_t _id)
+Sequence::Sequence(std::string _name, const uint64_t _length, const uint16_t _id)
     : name(std::move(_name)), length(_length), id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

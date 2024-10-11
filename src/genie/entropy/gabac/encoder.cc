@@ -105,14 +105,14 @@ core::AccessUnit::Subsequence Encoder::compress(const EncodingConfiguration &con
 
 core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor &desc) {
     EntropyCoded ret;
-    util::Watch watch;
+    const util::Watch watch;
     std::get<1>(ret) = std::move(desc);
     if (!getDescriptor(std::get<1>(ret).getID()).tokentype) {
         for (auto &subdesc : std::get<1>(ret)) {
             if (!subdesc.isEmpty()) {
                 const auto &conf = configSet.getConfAsGabac(subdesc.getID());
                 // add compressed payload
-                auto id = subdesc.getID();
+                const auto id = subdesc.getID();
 
                 std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
                 std::get<2>(ret).addInteger("size-gabac-" + getDescriptor(std::get<1>(ret).getID()).name + "-" +
@@ -161,7 +161,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
+Encoder::Encoder(const bool _writeOutStreams) : writeOutStreams(_writeOutStreams) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

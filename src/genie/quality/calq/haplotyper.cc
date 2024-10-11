@@ -29,9 +29,9 @@ namespace genie::quality::calq {
 // -----------------------------------------------------------------------------
 
 // Returns score, takes seq and qual pileup and position
-Haplotyper::Haplotyper(size_t sigma, size_t ploidy, size_t qualOffset, size_t nrQuantizers,
-                       size_t maxHQSoftclip_propagation, size_t minHQSoftclip_streak, size_t filterCutOff, bool debug,
-                       bool squashed, FilterType filterType)
+Haplotyper::Haplotyper(const size_t sigma, const size_t ploidy, const size_t qualOffset, const size_t nrQuantizers,
+                       const size_t maxHQSoftclip_propagation, const size_t minHQSoftclip_streak,
+                       const size_t filterCutOff, const bool debug, const bool squashed, const FilterType filterType)
     : spreader(maxHQSoftclip_propagation, minHQSoftclip_streak, squashed),
       genotyper(static_cast<const int&>(ploidy), static_cast<const int&>(qualOffset),
                 static_cast<const int&>(nrQuantizers), debug),
@@ -41,18 +41,18 @@ Haplotyper::Haplotyper(size_t sigma, size_t ploidy, size_t qualOffset, size_t nr
       squashedActivity(squashed) {
     if (filterType == FilterType::GAUSS) {
         GaussKernel kernel(static_cast<double>(sigma));
-        double THRESHOLD = 0.0000001;
-        size_t size = kernel.calcMinSize(THRESHOLD, filterCutOff * 2 + 1);
+        const double THRESHOLD = 0.0000001;
+        const size_t size = kernel.calcMinSize(THRESHOLD, filterCutOff * 2 + 1);
 
-        buffer =
-            FilterBuffer([kernel](size_t pos, size_t _size) -> double { return kernel.calcValue(pos, _size); }, size);
+        buffer = FilterBuffer(
+            [kernel](const size_t pos, const size_t _size) -> double { return kernel.calcValue(pos, _size); }, size);
         localDistortion = kernel.calcValue((size - 1) / 2, size);
     } else if (filterType == FilterType::RECTANGLE) {
         RectangleKernel kernel(static_cast<double>(sigma));
-        size_t size = kernel.calcMinSize(filterCutOff * 2 + 1);
+        const size_t size = kernel.calcMinSize(filterCutOff * 2 + 1);
 
-        buffer =
-            FilterBuffer([kernel](size_t pos, size_t _size) -> double { return kernel.calcValue(pos, _size); }, size);
+        buffer = FilterBuffer(
+            [kernel](const size_t pos, const size_t _size) -> double { return kernel.calcValue(pos, _size); }, size);
         localDistortion = kernel.calcValue((size - 1) / 2, size);
     } else {
         throwErrorException("FilterType not supported by haplotyper");
@@ -65,7 +65,7 @@ size_t Haplotyper::getOffset() const { return buffer.getOffset() + spreader.getO
 
 // -----------------------------------------------------------------------------
 
-double log10sum(double a, double b) {
+double log10sum(const double a, const double b) {
     if (a > b) {
         return log10sum(b, a);
     } else if (a == -std::numeric_limits<double>::infinity()) {
@@ -92,13 +92,13 @@ std::vector<double> Haplotyper::calcPriors(double hetero) const {
 
 // -----------------------------------------------------------------------------
 
-std::vector<double> Haplotyper::calcNonRefLikelihoods(char ref, const std::string& seqPile,
+std::vector<double> Haplotyper::calcNonRefLikelihoods(const char ref, const std::string& seqPile,
                                                       const std::string& qualPile) {
     std::vector<double> result(polyploidy + 1, 0.0);
-    std::map<std::string, double> SNPlikelihoods = genotyper.getGenotypelikelihoods(seqPile, qualPile);
+    const std::map<std::string, double> SNPlikelihoods = genotyper.getGenotypelikelihoods(seqPile, qualPile);
 
     for (const auto& m : SNPlikelihoods) {
-        size_t altCount = polyploidy - std::count(m.first.begin(), m.first.end(), ref);
+        const size_t altCount = polyploidy - std::count(m.first.begin(), m.first.end(), ref);
         result[altCount] += m.second;
     }
 
@@ -111,13 +111,13 @@ std::vector<double> Haplotyper::calcNonRefLikelihoods(char ref, const std::strin
 
 // -----------------------------------------------------------------------------
 
-double Haplotyper::calcActivityScore(char ref, const std::string& seqPile, const std::string& qualPile,
-                                     double heterozygosity) {
+double Haplotyper::calcActivityScore(const char ref, const std::string& seqPile, const std::string& qualPile,
+                                     const double heterozygosity) {
     if (ref == 'N') {
         return 1.0;
     }
 
-    std::vector<double> likelihoods = calcNonRefLikelihoods(ref, seqPile, qualPile);
+    const std::vector<double> likelihoods = calcNonRefLikelihoods(ref, seqPile, qualPile);
     static std::vector<double> priors;
     if (priors.empty()) {
         priors = calcPriors(heterozygosity);
@@ -145,7 +145,7 @@ double Haplotyper::calcActivityScore(char ref, const std::string& seqPile, const
         altPriorSum = log10sum(altPriorSum, priors[i]);
     }
 
-    double altPosteriorSum = altLikelihoodSum + altPriorSum;
+    const double altPosteriorSum = altLikelihoodSum + altPriorSum;
     // Normalize
     posteriori0 = posteriori0 - log10sum(altPosteriorSum, posteriori0);
 
@@ -161,7 +161,8 @@ double Haplotyper::calcActivityScore(char ref, const std::string& seqPile, const
 
 // -----------------------------------------------------------------------------
 
-size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile, size_t hq_softclips, char reference) {
+size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile, const size_t hq_softclips,
+                        const char reference) {
     // Empty input
     if (seqPile.empty()) {
         buffer.push(spreader.push(0.0, 0));
@@ -172,7 +173,7 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
 
     const double HETEROZYGOSITY = 1.0 / 1000.0;
 
-    double altProb = calcActivityScore(reference, seqPile, qualPile, HETEROZYGOSITY);
+    const double altProb = calcActivityScore(reference, seqPile, qualPile, HETEROZYGOSITY);
 
     // Filter activity score
     buffer.push(spreader.push(altProb, hq_softclips / qualPile.size()));
@@ -181,7 +182,7 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
         activity = std::min(activity, 1.0);
     }
 
-    size_t quant = getQuantizerIndex(activity);
+    const size_t quant = getQuantizerIndex(activity);
 
     if (DEBUG) {
         static CircularBuffer<std::string> debug(this->getOffset(), "\n");
@@ -191,7 +192,7 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
 
         s << std::fixed << std::setw(6) << std::setprecision(4) << std::setfill('0') << altProb;
 
-        std::string out = debug.push(s.str());
+        const std::string out = debug.push(s.str());
 
         s.str("");
         if (out != "\n") {
@@ -214,7 +215,7 @@ size_t Haplotyper::push(const std::string& seqPile, const std::string& qualPile,
 
 // -----------------------------------------------------------------------------
 
-size_t Haplotyper::getQuantizerIndex(double activity) const {
+size_t Haplotyper::getQuantizerIndex(const double activity) const {
     return static_cast<size_t>(
         std::min(std::floor(activity / localDistortion * nr_quantizers), static_cast<double>(nr_quantizers - 1)));
 }

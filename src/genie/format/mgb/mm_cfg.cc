@@ -26,7 +26,8 @@ void MmCfg::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MmCfg::MmCfg(uint16_t _mm_threshold, uint32_t _mm_count) : mm_threshold(_mm_threshold), mm_count(_mm_count) {}
+MmCfg::MmCfg(const uint16_t _mm_threshold, const uint32_t _mm_count)
+    : mm_threshold(_mm_threshold), mm_count(_mm_count) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

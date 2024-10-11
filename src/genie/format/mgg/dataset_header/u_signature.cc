@@ -25,7 +25,7 @@ USignature::USignature(uint8_t _const_length) : const_length(_const_length) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 USignature::USignature(util::BitReader& reader) {
-    bool U_signature_constant_length = reader.read<bool>(1);
+    const bool U_signature_constant_length = reader.read<bool>(1);
     if (U_signature_constant_length) {
         const_length = reader.read<uint8_t>(8);
     }

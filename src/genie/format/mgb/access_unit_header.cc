@@ -22,7 +22,7 @@ bool AUHeader::operator==(const AUHeader &other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AUHeader::write(util::BitWriter &writer, bool write_signatures) const {
+void AUHeader::write(util::BitWriter &writer, const bool write_signatures) const {
     writer.writeBits(access_unit_ID, 32);
     writer.writeBits(num_blocks, 8);
     writer.writeBits(parameter_set_ID, 8);
@@ -56,7 +56,7 @@ void AUHeader::blockAdded() { num_blocks++; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::parameter::EncodingSet> &parameterSets,
-                   bool read_signatures) {
+                   const bool read_signatures) {
     UTILS_DIE_IF(!bitReader.isByteAligned(), "Bitreader not aligned");
     access_unit_ID = bitReader.read<uint32_t>();
     num_blocks = bitReader.read<uint8_t>();
@@ -80,9 +80,9 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
                 if (parameterSets.at(parameter_set_ID).isSignatureConstLength()) {
                     length = parameterSets.at(parameter_set_ID).getSignatureConstLength();
                 }
-                this->signature_config = SignatureCfg(
-                    bitReader, length,
-                    getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
+                this->signature_config =
+                    SignatureCfg(bitReader, length,
+                                 getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
             }
         }
     }
@@ -98,9 +98,10 @@ AUHeader::AUHeader()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AUHeader::AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                   uint32_t _reads_count, core::parameter::ParameterSet::DatasetType dataset_type,
-                   uint8_t posSize, bool signatureFlag, core::AlphabetID alphabet)
+AUHeader::AUHeader(const uint32_t _access_unit_ID, const uint8_t _parameter_set_ID,
+                   const core::record::ClassType _au_type, const uint32_t _reads_count,
+                   const core::parameter::ParameterSet::DatasetType dataset_type, const uint8_t posSize,
+                   const bool signatureFlag, const core::AlphabetID alphabet)
     : access_unit_ID(_access_unit_ID),
       num_blocks(0),
       parameter_set_ID(_parameter_set_ID),

@@ -57,7 +57,7 @@ DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(DescriptorSubseqCfg&& cfg) n
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg::DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util::BitReader& reader) {
+DescriptorSubseqCfg::DescriptorSubseqCfg(const size_t num_classes, const GenDesc desc, util::BitReader& reader) {
     class_specific_dec_cfg_flag = reader.read<bool>(1);
     if (class_specific_dec_cfg_flag == 0) {
         descriptor_configurations.emplace_back(Descriptor::factory(desc, reader));
@@ -70,7 +70,7 @@ DescriptorSubseqCfg::DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorSubseqCfg::setClassSpecific(uint8_t index, std::unique_ptr<Descriptor> conf) {
+void DescriptorSubseqCfg::setClassSpecific(const uint8_t index, std::unique_ptr<Descriptor> conf) {
     if (index > descriptor_configurations.size()) {
         UTILS_THROW_RUNTIME_EXCEPTION("Config index out of bounds.");
     }
@@ -92,13 +92,13 @@ const Descriptor& DescriptorSubseqCfg::get() const { return *descriptor_configur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Descriptor& DescriptorSubseqCfg::getClassSpecific(uint8_t index) const {
+const Descriptor& DescriptorSubseqCfg::getClassSpecific(const uint8_t index) const {
     return *descriptor_configurations[index];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorSubseqCfg::enableClassSpecific(uint8_t numClasses) {
+void DescriptorSubseqCfg::enableClassSpecific(const uint8_t numClasses) {
     if (class_specific_dec_cfg_flag) {
         return;
     }

@@ -127,11 +127,11 @@ DatasetHeader::DatasetHeader()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, core::MPEGMinorVersion _version,
-                             bool _multiple_alignments_flags, bool _byte_offset_size_flags,
-                             bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
-                             core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
-                             core::AlphabetID _alphabet_id)
+DatasetHeader::DatasetHeader(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                             const core::MPEGMinorVersion _version, const bool _multiple_alignments_flags,
+                             const bool _byte_offset_size_flags, const bool _non_overlapping_AU_range_flag,
+                             const bool _pos_40_bits_flag, const core::parameter::DataUnit::DatasetType _dataset_type,
+                             const bool _parameters_update_flag, const core::AlphabetID _alphabet_id)
     : group_ID(_dataset_group_id),
       ID(_dataset_id),
       version(_version),
@@ -149,8 +149,8 @@ DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, co
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     group_ID = reader.readAlignedInt<uint8_t>();
     ID = reader.readAlignedInt<uint16_t>();
     std::string versionString(4, '\0');
@@ -171,7 +171,7 @@ DatasetHeader::DatasetHeader(util::BitReader& reader) {
     referenceOptions = dataset_header::ReferenceOptions(reader);
     dataset_type = reader.read<core::parameter::DataUnit::DatasetType>(4);
     if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
-        auto num_classes = reader.read<uint8_t>(4);
+        const auto num_classes = reader.read<uint8_t>(4);
         for (size_t i = 0; i < num_classes; ++i) {
             mit_configs.emplace_back(reader, block_header_flag);
         }
@@ -183,7 +183,7 @@ DatasetHeader::DatasetHeader(util::BitReader& reader) {
         u_options = dataset_header::UOptions(reader);
     }
     for (size_t i = 0; i < referenceOptions.getSeqIDs().size(); ++i) {
-        bool flag = reader.read<bool>(1);
+        const bool flag = reader.read<bool>(1);
         UTILS_DIE_IF(flag == false && i == 0, "First ref must provide treshold");
         if (flag) {
             thresholds.emplace_back(reader.read<uint32_t>(31));
@@ -238,7 +238,7 @@ void DatasetHeader::box_write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::addRefSequence(uint8_t _reference_ID, uint16_t _seqID, uint32_t _blocks_num,
+void DatasetHeader::addRefSequence(const uint8_t _reference_ID, const uint16_t _seqID, const uint32_t _blocks_num,
                                    std::optional<uint32_t> _threshold) {
     UTILS_DIE_IF(_threshold == std::nullopt && thresholds.empty(), "First threshold must be supplied");
     referenceOptions.addSeq(_reference_ID, _seqID, _blocks_num);
@@ -247,7 +247,7 @@ void DatasetHeader::addRefSequence(uint8_t _reference_ID, uint16_t _seqID, uint3
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::setUAUs(uint32_t _num_U_access_units, dataset_header::UOptions u_opts) {
+void DatasetHeader::setUAUs(const uint32_t _num_U_access_units, dataset_header::UOptions u_opts) {
     UTILS_DIE_IF(!_num_U_access_units, "Resetting num_u_acces_units not supported");
     num_U_access_units = _num_U_access_units;
     u_options = u_opts;
@@ -286,11 +286,11 @@ void DatasetHeader::disableMIT() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::patchRefID(uint8_t _old, uint8_t _new) { referenceOptions.patchRefID(_old, _new); }
+void DatasetHeader::patchRefID(const uint8_t _old, const uint8_t _new) { referenceOptions.patchRefID(_old, _new); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
+void DatasetHeader::patchID(const uint8_t _groupID, const uint16_t _setID) {
     group_ID = _groupID;
     ID = _setID;
 }
@@ -300,7 +300,7 @@ void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
 std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
     if (block_header_on != std::nullopt) {
         return std::make_unique<core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
-                                                                         block_header_on->getCCFlag());
+                                                                  block_header_on->getCCFlag());
     } else {
         return std::make_unique<core::meta::blockheader::Disabled>(block_header_off->getOrderedBlocksFlag());
     }
@@ -308,7 +308,7 @@ std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void DatasetHeader::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Dataset Header");
 }
 

@@ -20,7 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void printCmdLine(int argc, char* argv[]) {
+static void printCmdLine(const int argc, char* argv[]) {
     std::cerr << "genie: command line: ";
     for (int i = 0; i < argc; i++) {
         std::cerr << argv[i] << " ";
@@ -43,7 +43,7 @@ int help(int, char*[]) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int main(int argc, char* argv[]) {
+int main(const int argc, char* argv[]) {
     printCmdLine(argc, argv);
 
 #ifdef GENIE_USE_OPENMP
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
         UTILS_DIE_IF(argc <= OPERATION_INDEX, "No operation specified, type 'genie help' for more info.");
         std::string operation = argv[OPERATION_INDEX];
         transform(operation.begin(), operation.end(), operation.begin(),
-                  [](char x) -> char { return static_cast<char>(tolower(x)); });
+                  [](const char x) -> char { return static_cast<char>(tolower(x)); });
         if (operation == "run") {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {

@@ -20,12 +20,12 @@ namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, Importer* _importer, bool ref)
+DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, Importer* _importer, const bool ref)
     : refmgr(mgr), importer(_importer), referenceOnly(ref) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const core::parameter::EncodingSet& DataUnitFactory::getParams(size_t id) const { return parameters.at(id); }
+const core::parameter::EncodingSet& DataUnitFactory::getParams(const size_t id) const { return parameters.at(id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
                     refmgr->addRef(i++, std::make_unique<Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
-                                                                         ref.getEnd() + 1, importer, pos, true));
+                                                                    ref.getEnd() + 1, importer, pos, true));
                     pos += ref.getEnd() - ref.getStart() + 1;
                 }
                 break;
@@ -69,7 +69,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
                     refmgr->addRef(i++, std::make_unique<Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
-                                                                         ref.getEnd() + 1, importer, pos, false));
+                                                                    ref.getEnd() + 1, importer, pos, false));
                     bitReader.skipAlignedBytes(ret.getPayloadSize());
                 } else {
                     if (!referenceOnly) {

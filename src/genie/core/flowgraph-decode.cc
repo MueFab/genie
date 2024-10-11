@@ -34,7 +34,7 @@ RefDecoder* FlowGraphDecode::getRefDecoder() { return refDecoder; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) {
+FlowGraphDecode::FlowGraphDecode(const size_t threads) : mgr(threads) {
     readSelector.setDrain(&exporterSelector);
     refMgr = std::make_unique<ReferenceManager>(16);
 }
@@ -48,7 +48,7 @@ void FlowGraphDecode::addImporter(std::unique_ptr<FormatImporterCompressed> dat)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setImporter(std::unique_ptr<FormatImporterCompressed> dat, size_t index) {
+void FlowGraphDecode::setImporter(std::unique_ptr<FormatImporterCompressed> dat, const size_t index) {
     importers[index] = std::move(dat);
     importers[index]->setDrain(&readSelector);
 }
@@ -65,7 +65,7 @@ void FlowGraphDecode::addReadCoder(std::unique_ptr<ReadDecoder> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setReadCoder(std::unique_ptr<ReadDecoder> dat, size_t index) {
+void FlowGraphDecode::setReadCoder(std::unique_ptr<ReadDecoder> dat, const size_t index) {
     readCoders[index] = std::move(dat);
     readSelector.setBranch(readCoders[index].get(), readCoders[index].get(), index);
     readCoders[index]->setQVCoder(&qvSelector);
@@ -82,7 +82,7 @@ void FlowGraphDecode::addEntropyCoder(std::unique_ptr<EntropyDecoder> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setEntropyCoder(std::unique_ptr<EntropyDecoder> dat, size_t index) {
+void FlowGraphDecode::setEntropyCoder(std::unique_ptr<EntropyDecoder> dat, const size_t index) {
     entropyCoders[index] = std::move(dat);
     entropySelector.setMod(entropyCoders[index].get(), index);
 }
@@ -96,7 +96,7 @@ void FlowGraphDecode::addExporter(std::unique_ptr<FormatExporter> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setExporter(std::unique_ptr<FormatExporter> dat, size_t index) {
+void FlowGraphDecode::setExporter(std::unique_ptr<FormatExporter> dat, const size_t index) {
     exporters[index] = std::move(dat);
     exporterSelector.set(exporters[index].get(), index);
 }
@@ -115,7 +115,7 @@ void FlowGraphDecode::setQVSelector(
         fun) {
     qvSelector.setSelection(std::move(fun));
 
-    for (auto& r : readCoders) {
+    for (const auto& r : readCoders) {
         r->setQVCoder(&qvSelector);
     }
 }
@@ -125,7 +125,7 @@ void FlowGraphDecode::setQVSelector(
 void FlowGraphDecode::setNameSelector(std::function<size_t(AccessUnit::Descriptor& desc)> fun) {
     nameSelector.setSelection(std::move(fun));
 
-    for (auto& r : readCoders) {
+    for (const auto& r : readCoders) {
         r->setNameCoder(&nameSelector);
     }
 }
@@ -153,7 +153,7 @@ void FlowGraphDecode::addNameCoder(std::unique_ptr<NameDecoder> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setNameCoder(std::unique_ptr<NameDecoder> dat, size_t index) {
+void FlowGraphDecode::setNameCoder(std::unique_ptr<NameDecoder> dat, const size_t index) {
     nameCoders[index] = std::move(dat);
     nameSelector.setMod(nameCoders[index].get(), index);
 }
@@ -167,7 +167,7 @@ void FlowGraphDecode::addQVCoder(std::unique_ptr<QVDecoder> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setQVCoder(std::unique_ptr<QVDecoder> dat, size_t index) {
+void FlowGraphDecode::setQVCoder(std::unique_ptr<QVDecoder> dat, const size_t index) {
     qvCoders[index] = std::move(dat);
     qvSelector.setMod(qvCoders[index].get(), index);
 }
@@ -188,7 +188,7 @@ void FlowGraphDecode::run() {
 
 stats::PerfStats FlowGraphDecode::getStats() {
     stats::PerfStats ret;
-    for (auto& e : exporters) {
+    for (const auto& e : exporters) {
         ret.add(e->getStats());
     }
     return ret;

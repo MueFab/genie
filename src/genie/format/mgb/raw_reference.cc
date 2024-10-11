@@ -19,16 +19,17 @@ namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReference::RawReference(bool headerLess) : DataUnit(DataUnitType::RAW_REFERENCE), seqs(), headerless(headerLess) {}
+RawReference::RawReference(const bool headerLess)
+    : DataUnit(DataUnitType::RAW_REFERENCE), seqs(), headerless(headerLess) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReference::RawReference(util::BitReader &reader, bool headerOnly, bool headerLess)
+RawReference::RawReference(util::BitReader &reader, bool headerOnly, const bool headerLess)
     : DataUnit(DataUnitType::RAW_REFERENCE), seqs(), headerless(headerLess) {
     if (!headerLess) {
         reader.read<uint64_t>();
     }
-    auto count = reader.read<uint16_t>();
+    const auto count = reader.read<uint16_t>();
     for (size_t i = 0; i < count; ++i) {
         seqs.emplace_back(reader, headerOnly);
     }
@@ -70,7 +71,7 @@ bool RawReference::isEmpty() const { return seqs.empty(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReferenceSequence &RawReference::getSequence(size_t index) { return seqs[index]; }
+RawReferenceSequence &RawReference::getSequence(const size_t index) { return seqs[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ std::vector<RawReferenceSequence>::iterator RawReference::end() { return seqs.en
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RawReference::setHeaderLess(bool state) { headerless = state; }
+void RawReference::setHeaderLess(const bool state) { headerless = state; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

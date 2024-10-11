@@ -29,10 +29,10 @@ bool DatasetGroup::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    auto end_pos = start_pos + static_cast<int64_t>(length);
+DatasetGroup::DatasetGroup(util::BitReader& reader, const core::MPEGMinorVersion _version) : version(_version) {
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
+    const auto end_pos = start_pos + static_cast<int64_t>(length);
     while (reader.getStreamPosition() != end_pos) {
         UTILS_DIE_IF(reader.getStreamPosition() > end_pos,
                      "Read " + std::to_string(reader.getStreamPosition() - end_pos) + " bytes too far");
@@ -45,7 +45,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, core::MPEGMinorVersion _vers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(uint8_t _id, uint8_t _version, core::MPEGMinorVersion _mpeg_version)
+DatasetGroup::DatasetGroup(const uint8_t _id, const uint8_t _version, const core::MPEGMinorVersion _mpeg_version)
     : header(DatasetGroupHeader(_id, _version)), version(_mpeg_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ void DatasetGroup::setLabels(LabelList l) { labels = std::move(l); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::patchID(uint8_t groupID) {
+void DatasetGroup::patchID(const uint8_t groupID) {
     if (header != std::nullopt) {
         header->patchID(groupID);
     }
@@ -182,7 +182,7 @@ void DatasetGroup::patchID(uint8_t groupID) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::patchRefID(uint8_t _old, uint8_t _new) {
+void DatasetGroup::patchRefID(const uint8_t _old, const uint8_t _new) {
     for (auto& r : references) {
         r.patchRefID(_old, _new);
     }
@@ -220,7 +220,7 @@ std::vector<Dataset>& DatasetGroup::getDatasets() { return dataset; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void DatasetGroup::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Dataset Group");
     header->print_debug(output, depth + 1, max_depth);
     for (const auto& r : references) {
@@ -245,7 +245,7 @@ void DatasetGroup::print_debug(std::ostream& output, uint8_t depth, uint8_t max_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
+void DatasetGroup::read_box(util::BitReader& reader, const bool in_offset) {
     std::string tmp_str(4, '\0');
     reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
     if (tmp_str == "dghd") {
@@ -289,11 +289,11 @@ void DatasetGroup::read_box(util::BitReader& reader, bool in_offset) {
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
         reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
-        auto offset = reader.readAlignedInt<uint64_t>();
+        const auto offset = reader.readAlignedInt<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             return;
         }
-        auto pos_save = reader.getStreamPosition();
+        const auto pos_save = reader.getStreamPosition();
         reader.setStreamPosition(offset);
         read_box(reader, true);
         reader.setStreamPosition(pos_save);

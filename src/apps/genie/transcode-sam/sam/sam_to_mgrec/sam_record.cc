@@ -25,7 +25,7 @@ namespace genieapp::transcode_sam::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-char SamRecord::fourBitBase2Char(uint8_t int_base) {
+char SamRecord::fourBitBase2Char(const uint8_t int_base) {
     switch (int_base) {
         case 1:
             return 'A';
@@ -46,13 +46,13 @@ char SamRecord::fourBitBase2Char(uint8_t int_base) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string SamRecord::getCigarString(bam1_t* sam_alignment) {
-    auto n_cigar = sam_alignment->core.n_cigar;
-    auto cigar_ptr = bam_get_cigar(sam_alignment);
+    const auto n_cigar = sam_alignment->core.n_cigar;
+    const auto cigar_ptr = bam_get_cigar(sam_alignment);
 
     std::string cigar;
     for (uint32_t i = 0; i < n_cigar; i++) {
-        char cigar_op = bam_cigar_opchr(bam_cigar_op(cigar_ptr[i]));
-        auto cigar_op_len = bam_cigar_oplen(cigar_ptr[i]);
+        const char cigar_op = bam_cigar_opchr(bam_cigar_op(cigar_ptr[i]));
+        const auto cigar_op_len = bam_cigar_oplen(cigar_ptr[i]);
         cigar += std::to_string(cigar_op_len) + cigar_op;
     }
     return cigar;
@@ -61,8 +61,8 @@ std::string SamRecord::getCigarString(bam1_t* sam_alignment) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string SamRecord::getSeqString(bam1_t* sam_alignment) {
-    auto seq_len = sam_alignment->core.l_qseq;
-    auto seq_ptr = bam_get_seq(sam_alignment);
+    const auto seq_len = sam_alignment->core.l_qseq;
+    const auto seq_ptr = bam_get_seq(sam_alignment);
     std::string tmp_seq(seq_len, ' ');
     for (auto i = 0; i < seq_len; i++) {
         tmp_seq[i] = fourBitBase2Char(bam_seqi(seq_ptr, i));
@@ -74,8 +74,8 @@ std::string SamRecord::getSeqString(bam1_t* sam_alignment) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string SamRecord::getQualString(bam1_t* sam_alignment) {
-    auto seq_len = sam_alignment->core.l_qseq;
-    auto qual_ptr = bam_get_qual(sam_alignment);
+    const auto seq_len = sam_alignment->core.l_qseq;
+    const auto qual_ptr = bam_get_qual(sam_alignment);
     std::string tmp_qual(seq_len, ' ');
     for (auto i = 0; i < seq_len; i++) {
         tmp_qual[i] = static_cast<char>(qual_ptr[i] + 33);
@@ -85,7 +85,7 @@ std::string SamRecord::getQualString(bam1_t* sam_alignment) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-char SamRecord::convertCigar2ECigarChar(char token) {
+char SamRecord::convertCigar2ECigarChar(const char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['M'] = '=';
@@ -100,14 +100,14 @@ char SamRecord::convertCigar2ECigarChar(char token) {
         return lut;
     }();
     UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
-    char ret = lut_loc[token];
+    const char ret = lut_loc[token];
     UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int SamRecord::stepSequence(char token) {
+int SamRecord::stepSequence(const char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['M'] = 1;
@@ -139,7 +139,7 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
             continue;
         }
         if (a == 'X') {
-            size_t end = std::stoi(digits) + seq_pos;
+            const size_t end = std::stoi(digits) + seq_pos;
             UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
             for (; seq_pos < end; ++seq_pos) {
                 ecigar += std::toupper(seq[seq_pos]);
@@ -150,7 +150,7 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
             } else if (a == 'H') {
                 ecigar += '[';
             }
-            char token = convertCigar2ECigarChar(a);
+            const char token = convertCigar2ECigarChar(a);
             seq_pos += stepSequence(a) * std::stoi(digits);
             ecigar += digits;
             ecigar += token;
@@ -254,11 +254,11 @@ void SamRecord::setQual(const std::string& _qual) { qual = _qual; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SamRecord::checkFlag(uint16_t _flag) const { return (flag & _flag) == _flag; }  // All must be set
+bool SamRecord::checkFlag(const uint16_t _flag) const { return (flag & _flag) == _flag; }  // All must be set
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SamRecord::checkNFlag(uint16_t _flag) const { return (flag & _flag) == 0; }  // All must be unset
+bool SamRecord::checkNFlag(const uint16_t _flag) const { return (flag & _flag) == 0; }  // All must be unset
 
 // ---------------------------------------------------------------------------------------------------------------------
 

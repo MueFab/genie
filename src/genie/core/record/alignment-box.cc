@@ -27,7 +27,7 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
+AlignmentBox::AlignmentBox(const ClassType type, const uint8_t as_depth, const uint8_t number_of_template_segments,
                            util::BitReader& reader)
     : splitAlignmentInfo(type == ClassType::CLASS_HM ? 0 : number_of_template_segments - 1) {
     mapping_pos = reader.readAlignedInt<uint64_t, 5>();
@@ -78,7 +78,7 @@ const std::vector<std::unique_ptr<AlignmentSplit>>& AlignmentBox::getAlignmentSp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(uint64_t _mapping_pos, Alignment&& _alignment)
+AlignmentBox::AlignmentBox(const uint64_t _mapping_pos, Alignment&& _alignment)
     : mapping_pos(_mapping_pos), alignment(std::move(_alignment)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -78,7 +78,8 @@ uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
 
 void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
                          const SupportValues& support_values, const Binarization& cabac_binarization,
-                         const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID, bool original) {
+                         const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID,
+                         const bool original) {
     const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
     const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
     const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();
@@ -141,23 +142,23 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                                + static_cast<uint32_t>(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::SUTU: {
-                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                const uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
                                ((1 << outputSymbolSize % splitUnitSize) - 1);
             } break;
             case BinarizationParameters::BinarizationId::SSUTU: {
-                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                const uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
                                ((1 << outputSymbolSize % splitUnitSize) - 1) + 1;
             } break;
             case BinarizationParameters::BinarizationId::DTU: {
-                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                const uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
                                outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
                                ((1 << outputSymbolSize % splitUnitSize) - 1);
             } break;
             case BinarizationParameters::BinarizationId::SDTU: {
-                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                const uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
                                outputSymbolSize / splitUnitSize * ((1 << splitUnitSize) - 1) +
                                ((1 << outputSymbolSize % splitUnitSize) - 1) + 1;
@@ -229,7 +230,7 @@ uint32_t StateVars::getCLengthBI() const { return cLengthBI; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t StateVars::getCodingOrderCtxOffset(uint8_t index) const { return codingOrderCtxOffset[index]; }
+uint64_t StateVars::getCodingOrderCtxOffset(const uint8_t index) const { return codingOrderCtxOffset[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -245,15 +246,15 @@ uint64_t StateVars::getNumCtxTotal() const { return numCtxTotal; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return sizeInBits / 8 + (sizeInBits % 8 ? 1 : 0); }
+uint8_t StateVars::getMinimalSizeInBytes(const uint8_t sizeInBits) { return sizeInBits / 8 + (sizeInBits % 8 ? 1 : 0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t StateVars::getLgWordSize(uint8_t sizeInBits) { return getMinimalSizeInBytes(sizeInBits) >> 3; }
+uint8_t StateVars::getLgWordSize(const uint8_t sizeInBits) { return getMinimalSizeInBytes(sizeInBits) >> 3; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t StateVars::getSignedValue(uint64_t input, uint8_t sizeInBytes) {
+int64_t StateVars::getSignedValue(const uint64_t input, const uint8_t sizeInBytes) {
     int64_t signedValue = 0;
 
     switch (sizeInBytes) {
@@ -278,9 +279,9 @@ int64_t StateVars::getSignedValue(uint64_t input, uint8_t sizeInBytes) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t StateVars::get2PowN(uint8_t N) {
+uint64_t StateVars::get2PowN(const uint8_t N) {
     assert(N <= 32);
-    uint64_t one = 1u;
+    const uint64_t one = 1u;
     return one << N;
 }
 

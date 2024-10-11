@@ -20,9 +20,9 @@ TransformedSubSeq::TransformedSubSeq()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSubSeq::TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
+TransformedSubSeq::TransformedSubSeq(const SupportValues::TransformIdSubsym _transform_ID_subsym,
                                      SupportValues&& _support_values, Binarization&& _cabac_binarization,
-                                     const core::GenSubIndex _subsequence_ID, bool original,
+                                     const core::GenSubIndex _subsequence_ID, const bool original,
                                      const core::AlphabetID _alphabet_ID)
     : transform_ID_subsym(_transform_ID_subsym),
       support_values(_support_values),
@@ -82,7 +82,7 @@ core::AlphabetID TransformedSubSeq::getAlphabetID() const { return alphabet_ID; 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void TransformedSubSeq::setAlphabetID(core::AlphabetID _alphabet_ID) { alphabet_ID = _alphabet_ID; }
+void TransformedSubSeq::setAlphabetID(const core::AlphabetID _alphabet_ID) { alphabet_ID = _alphabet_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ bool TransformedSubSeq::operator==(const TransformedSubSeq& val) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSubSeq::TransformedSubSeq(nlohmann::json j, bool last_transformed) {
+TransformedSubSeq::TransformedSubSeq(nlohmann::json j, const bool last_transformed) {
     transform_ID_subsym = j["transform_ID_subsym"];
     support_values = SupportValues(j["support_values"], transform_ID_subsym);
     cabac_binarization = Binarization(j["cabac_binarization"]);

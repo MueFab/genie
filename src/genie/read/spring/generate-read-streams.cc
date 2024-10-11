@@ -51,12 +51,12 @@ struct se_data {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit &raw_au) {
+void generate_subseqs(const se_data &data, const uint64_t block_num, core::AccessUnit &raw_au) {
     int64_t rc_to_int[128];
     rc_to_int[static_cast<uint8_t>('d')] = 0;
     rc_to_int[static_cast<uint8_t>('r')] = 1;
 
-    uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
+    const uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
     uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
 
     if (end_read_num >= data.cp.num_reads) {
@@ -320,7 +320,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
                               std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
-                              bool write_raw) {
+                              const bool write_raw) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
@@ -498,8 +498,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             // current is already seen when current is unaligned and its pair has
             // already appeared before - in such cases we don't need to handle it now.
             already_seen[current] = true;
-            uint32_t pair = current < data.cp.num_reads / 2 ? current + data.cp.num_reads / 2
-                                                              : current - data.cp.num_reads / 2;
+            uint32_t pair =
+                current < data.cp.num_reads / 2 ? current + data.cp.num_reads / 2 : current - data.cp.num_reads / 2;
             if (already_seen[pair]) {
                 if (bdata->block_num[pair] == current_block_num && data.pos_arr[current] >= data.pos_arr[pair] &&
                     data.pos_arr[current] - data.pos_arr[pair] < 32768) {
@@ -637,8 +637,8 @@ struct pe_statistics {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, pe_statistics *pest,
-                         core::AccessUnit &raw_au) {
+void generate_streams_pe(const se_data &data, const pe_block_data &bdata, const uint64_t cur_block_num,
+                         pe_statistics *pest, core::AccessUnit &raw_au) {
 #ifdef GENIE_USE_OPENMP
     const unsigned cur_thread_num = omp_get_thread_num();
 #else
@@ -703,7 +703,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);     // rlen
                 raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                    // pair decoding case same_rec
-                uint16_t delta = data.read_length_arr[current];
+                const uint16_t delta = data.read_length_arr[current];
                 raw_au.get(core::GenSub::PAIR_SAME_REC).push(2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
@@ -718,7 +718,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 } else {
                     raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
-                        uint32_t index = k ? pair : current;
+                        const uint32_t index = k ? pair : current;
                         uint16_t curr_noise_pos = 0;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
                             curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[index] + j];
@@ -740,9 +740,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
                 }
-                bool read_1_first = current < pair;
-                auto delta = static_cast<uint16_t>(data.pos_arr[pair] - data.pos_arr[current]);
-                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
+                const bool read_1_first = current < pair;
+                const auto delta = static_cast<uint16_t>(data.pos_arr[pair] - data.pos_arr[current]);
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                     // pair decoding case same_rec
                 raw_au.get(core::GenSub::PAIR_SAME_REC).push(!read_1_first + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
             }
@@ -792,13 +792,13 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             }
 
             // pair subsequences
-            bool same_block = bdata.block_num[current] == bdata.block_num[pair];
+            const bool same_block = bdata.block_num[current] == bdata.block_num[pair];
             if (same_block)
                 pest->count_split_same_AU[cur_thread_num]++;
             else
                 pest->count_split_diff_AU[cur_thread_num]++;
 
-            bool read_1_first = current < pair;
+            const bool read_1_first = current < pair;
             if (same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
                 raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);
@@ -916,7 +916,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                            core::ReadEncoder::EntropySelector *entropycoder,
                            std::vector<core::parameter::EncodingSet> &params, core::stats::PerfStats &stats,
-                           bool write_raw) {
+                           const bool write_raw) {
     if (!cp.paired_end)
         generate_read_streams_se(temp_dir, cp, entropycoder, params, stats, write_raw);
     else

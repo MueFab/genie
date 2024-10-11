@@ -14,7 +14,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream(size_t _descriptor_ID, std::string _ds_protection_value)
+DescriptorStream::DescriptorStream(const size_t _descriptor_ID, std::string _ds_protection_value)
     : descriptor_ID(_descriptor_ID), DS_protection_value(std::move(_ds_protection_value)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

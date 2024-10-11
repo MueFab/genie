@@ -28,10 +28,10 @@ EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncoderStub::encodeSeq(core::record::Chunk& data, EncodingState& state) {
-    util::Watch watch;
+    const util::Watch watch;
     for (auto& r : data.getData()) {
         state.readNum += r.getSegments().size();
-        uint64_t curPos = r.getAlignments().front().getPosition();
+        const uint64_t curPos = r.getAlignments().front().getPosition();
         UTILS_DIE_IF(curPos < state.lastReadPosition,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
@@ -55,10 +55,10 @@ void EncoderStub::encodeSeq(core::record::Chunk& data, EncodingState& state) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit EncoderStub::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+core::AccessUnit EncoderStub::pack(const size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
                                    EncodingState& state) {
-    core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
-    auto qv_depth = static_cast<uint8_t>(std::get<1>(qv).isEmpty() ? 0 : 1);
+    const core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
+    const auto qv_depth = static_cast<uint8_t>(std::get<1>(qv).isEmpty() ? 0 : 1);
     core::parameter::ParameterSet ret(static_cast<uint8_t>(id), static_cast<uint8_t>(id), dataType,
                                       core::AlphabetID::ACGTN, static_cast<uint32_t>(state.readLength), state.pairedEnd,
                                       false, qv_depth, 1, false, false);
@@ -103,7 +103,7 @@ void EncoderStub::removeRedundantDescriptors(core::AccessUnit& rawAU) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded EncoderStub::encodeQVs(QvSelector* qvcoder, core::record::Chunk& data) {
-    util::Watch watch;
+    const util::Watch watch;
     auto qv = qvcoder->process(data);
     data.getStats().addDouble("time-quality", watch.check());
     return qv;
@@ -112,7 +112,7 @@ core::QVEncoder::QVCoded EncoderStub::encodeQVs(QvSelector* qvcoder, core::recor
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Descriptor EncoderStub::encodeNames(NameSelector* namecoder, core::record::Chunk& data) {
-    util::Watch watch;
+    const util::Watch watch;
     auto name = namecoder->process(data);
     data.getStats().addDouble("time-name", watch.check());
     return std::get<0>(name);
@@ -132,7 +132,7 @@ void EncoderStub::flowIn(core::record::Chunk&& t, const util::Section& id) {
     auto qv = encodeQVs(qvcoder, data);
     auto rname = encodeNames(namecoder, data);
 
-    auto state = createState(data);
+    const auto state = createState(data);
     encodeSeq(data, *state);
 
     auto rawAU = pack(id.start, std::move(qv), std::move(rname), *state);

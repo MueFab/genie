@@ -22,8 +22,8 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch, std::unique_ptr<RefBase> base,
-                     std::string metadata)
+Reference::Reference(std::string name, const uint32_t major, const uint32_t minor, const uint32_t patch,
+                     std::unique_ptr<RefBase> base, std::string metadata)
     : reference_name(std::move(name)),
       reference_major_version(major),
       reference_minor_version(minor),
@@ -45,7 +45,7 @@ Reference::Reference(const nlohmann::json& json)
         }
     }
     if (json.contains("external_ref")) {
-        auto type = static_cast<ExternalRef::ReferenceType>(json["external_ref"]["reference_type"]);
+        const auto type = static_cast<ExternalRef::ReferenceType>(json["external_ref"]["reference_type"]);
         switch (type) {
             case ExternalRef::ReferenceType::FASTA_REF:
                 ref = std::make_unique<external_ref::Fasta>(json["external_ref"]);

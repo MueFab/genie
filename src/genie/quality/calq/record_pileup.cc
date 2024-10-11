@@ -28,7 +28,7 @@ std::string RecordPileup::preprocess(const std::string &read, const std::string 
     size_t count = 0;
     size_t read_pos = 0;
 
-    for (char cigar_pos : cigar) {
+    for (const char cigar_pos : cigar) {
         if (std::isdigit(cigar_pos)) {
             count *= 10;
             count += cigar_pos - '0';
@@ -100,7 +100,7 @@ void RecordPileup::addRecord(EncodingRecord &r) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
+std::pair<std::string, std::string> RecordPileup::getPileup(const uint64_t pos) {
     UTILS_DIE_IF(pos < this->minPos || pos > this->maxPos, "Position out of range");
 
     std::string seqs, quals;
@@ -115,7 +115,7 @@ std::pair<std::string, std::string> RecordPileup::getPileup(uint64_t pos) {
                 continue;
             }
 
-            char base = seq[pos - pos_read];
+            const char base = seq[pos - pos_read];
 
             if (base != '0') {
                 seqs.push_back(seq[pos - pos_read]);
@@ -143,7 +143,7 @@ void RecordPileup::nextRecord() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<EncodingRecord> RecordPileup::getRecordsBefore(uint64_t pos) {
+std::vector<EncodingRecord> RecordPileup::getRecordsBefore(const uint64_t pos) {
     // new vectors
     std::vector<std::vector<std::string>> new_pre_seqs;
     std::vector<std::vector<std::string>> new_pre_quals;
@@ -200,9 +200,9 @@ std::vector<EncodingRecord> RecordPileup::getAllRecords() { return this->records
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool RecordPileup::isRecordBeforePos(const std::vector<uint64_t> &positions,
-                                     const std::vector<std::string> &preprocessed_seqs, uint64_t pos) {
+                                     const std::vector<std::string> &preprocessed_seqs, const uint64_t pos) {
     for (uint64_t read_i = 0; read_i < positions.size(); ++read_i) {
-        uint64_t readMaxPos = positions[read_i] + preprocessed_seqs[read_i].size() - 1;
+        const uint64_t readMaxPos = positions[read_i] + preprocessed_seqs[read_i].size() - 1;
 
         if (readMaxPos >= pos) {
             return false;

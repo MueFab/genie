@@ -19,13 +19,13 @@ namespace genie::name::writeout {
 
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(core::AccessUnit::Descriptor& desc) {
     std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;
-    util::Watch watch;
+    const util::Watch watch;
     std::string cur_name;
     if (desc.isEmpty()) {
         return ret;
     }
     while (!desc.get(0).end()) {
-        auto cur_char = desc.get(0).pull();
+        const auto cur_char = desc.get(0).pull();
         if (cur_char == '\0') {
             std::get<0>(ret).emplace_back(std::move(cur_name));
             cur_name.clear();

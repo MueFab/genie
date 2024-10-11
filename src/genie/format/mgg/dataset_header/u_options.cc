@@ -19,18 +19,18 @@ bool UOptions::operator==(const UOptions& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UOptions::UOptions(uint64_t _reserved1, bool _reserved3)
+UOptions::UOptions(const uint64_t _reserved1, const bool _reserved3)
     : reserved1(_reserved1), u_signature(std::nullopt), reserved2(std::nullopt), reserved3(_reserved3) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 UOptions::UOptions(util::BitReader& reader) : reserved3(false) {
     reserved1 = reader.read<uint64_t>(62);
-    bool U_signature_flag = reader.read<bool>(1);
+    const bool U_signature_flag = reader.read<bool>(1);
     if (U_signature_flag) {
         u_signature = USignature(reader);
     }
-    bool reserved_flag = reader.read<bool>(1);
+    const bool reserved_flag = reader.read<bool>(1);
     if (reserved_flag) {
         reserved2 = reader.read<uint8_t>(8);
     }

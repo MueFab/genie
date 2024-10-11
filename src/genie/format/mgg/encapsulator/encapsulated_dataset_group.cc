@@ -17,7 +17,7 @@ namespace genie::format::mgg::encapsulator {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncapsulatedDatasetGroup::patchID(uint8_t id) {
+void EncapsulatedDatasetGroup::patchID(const uint8_t id) {
     if (group_meta != std::nullopt) {
         group_meta->patchID(id);
     }
@@ -30,7 +30,7 @@ void EncapsulatedDatasetGroup::patchID(uint8_t id) {
     for (auto& r : reference_meta) {
         r.patchID(id);
     }
-    for (auto& r : datasets) {
+    for (const auto& r : datasets) {
         for (auto& d : r->datasets) {
             d.patchID(id, d.getHeader().getDatasetID());
         }
@@ -42,11 +42,11 @@ void EncapsulatedDatasetGroup::patchID(uint8_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncapsulatedDatasetGroup::mergeMetadata(core::MPEGMinorVersion version) {
+void EncapsulatedDatasetGroup::mergeMetadata(const core::MPEGMinorVersion version) {
     std::string meta;
     std::string protection;
 
-    for (auto& d : datasets) {
+    for (const auto& d : datasets) {
         if (d->meta.getDataGroup() == std::nullopt) {
             continue;
         }
@@ -76,8 +76,8 @@ void EncapsulatedDatasetGroup::mergeMetadata(core::MPEGMinorVersion version) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void EncapsulatedDatasetGroup::mergeReferences(core::MPEGMinorVersion version) {
-    for (auto& d : datasets) {
+void EncapsulatedDatasetGroup::mergeReferences(const core::MPEGMinorVersion version) {
+    for (const auto& d : datasets) {
         if (d->meta.getReference() == std::nullopt) {
             continue;
         }
@@ -87,8 +87,7 @@ void EncapsulatedDatasetGroup::mergeReferences(core::MPEGMinorVersion version) {
         for (size_t i = 0; i < references.size(); ++i) {
             if (references[i] == ref) {
                 if (reference_meta[i].getReferenceMetadataValue().empty()) {
-                    reference_meta[i] = ReferenceMetadata(
-                        0, static_cast<uint8_t>(i), ref_meta.decapsulate());
+                    reference_meta[i] = ReferenceMetadata(0, static_cast<uint8_t>(i), ref_meta.decapsulate());
                 } else {
                     UTILS_DIE_IF(
                         !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
@@ -121,13 +120,13 @@ void EncapsulatedDatasetGroup::mergeReferences(core::MPEGMinorVersion version) {
         }
     }
 
-    for (auto& d : datasets) {
+    for (const auto& d : datasets) {
         for (auto& d2 : d->datasets) {
             if (d2.getHeader().getDatasetType() != core::parameter::DataUnit::DatasetType::ALIGNED) {
                 continue;
             }
 
-            auto ref_id = d2.getHeader().getReferenceOptions().getReferenceID();
+            const auto ref_id = d2.getHeader().getReferenceOptions().getReferenceID();
             for (auto& reference : references) {
                 if (ref_id == reference.getReferenceID()) {
                     for (auto& s : reference.getSequences()) {
@@ -143,7 +142,7 @@ void EncapsulatedDatasetGroup::mergeReferences(core::MPEGMinorVersion version) {
 
 void EncapsulatedDatasetGroup::mergeLabels() {
     std::map<std::string, std::vector<LabelDataset>> labels;
-    for (auto& d : datasets) {
+    for (const auto& d : datasets) {
         for (auto& l : d->meta.getLabels()) {
             for (auto& s : d->datasets) {
                 labels[l.getID()].emplace_back(s.getHeader().getDatasetID(), l);
@@ -172,7 +171,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
         datasets.emplace_back(std::make_unique<EncapsulatedDataset>(i, version));
     }
     size_t index = 0;
-    for (auto& d : datasets) {
+    for (const auto& d : datasets) {
         for (auto& d2 : d->datasets) {
             d2.patchID(0, static_cast<uint16_t>(index++));
         }
@@ -187,7 +186,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup EncapsulatedDatasetGroup::assemble(core::MPEGMinorVersion version) {
+DatasetGroup EncapsulatedDatasetGroup::assemble(const core::MPEGMinorVersion version) {
     DatasetGroup ret(0, 0, version);
     for (auto& r : references) {
         ret.addReference(std::move(r));
@@ -205,7 +204,7 @@ DatasetGroup EncapsulatedDatasetGroup::assemble(core::MPEGMinorVersion version) 
         ret.setProtection(std::move(*group_protection));
     }
 
-    for (auto& d : datasets) {
+    for (const auto& d : datasets) {
         for (auto& d2 : d->datasets) {
             ret.addDataset(std::move(d2));
         }

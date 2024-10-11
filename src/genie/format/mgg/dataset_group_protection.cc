@@ -33,11 +33,10 @@ const std::string& DatasetGroupProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupProtection::DatasetGroupProtection(util::BitReader& bitreader,
-                                               core::MPEGMinorVersion _version)
+DatasetGroupProtection::DatasetGroupProtection(util::BitReader& bitreader, const core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
+    const auto start_pos = bitreader.getStreamPosition() - 4;
+    const auto length = bitreader.readAlignedInt<uint64_t>();
     auto protection_length = length - getHeaderLength();
     if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
@@ -50,8 +49,8 @@ DatasetGroupProtection::DatasetGroupProtection(util::BitReader& bitreader,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupProtection::DatasetGroupProtection(uint8_t _dataset_group_id, std::string _dg_protection_value,
-                                               core::MPEGMinorVersion _version)
+DatasetGroupProtection::DatasetGroupProtection(const uint8_t _dataset_group_id, std::string _dg_protection_value,
+                                               const core::MPEGMinorVersion _version)
     : version(_version), dataset_group_id(_dataset_group_id), dg_protection_value(std::move(_dg_protection_value)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ std::string DatasetGroupProtection::decapsulate() { return std::move(dg_protecti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroupProtection::patchID(uint8_t groupID) { dataset_group_id = groupID; }
+void DatasetGroupProtection::patchID(const uint8_t groupID) { dataset_group_id = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

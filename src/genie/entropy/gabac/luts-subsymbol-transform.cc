@@ -21,7 +21,7 @@ bool LutEntry::operator>(const LutEntry& entry) const { return freq > entry.freq
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
+LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(const uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym, {std::vector<LutEntry>(numAlphaSubsym, {0, 0}),  // value, freq
                                                 0});
 }
@@ -29,8 +29,8 @@ LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
-                                               const paramcabac::StateVars& _stateVars, uint8_t _numLuts,
-                                               uint8_t _numPrvs, const bool _modeFlag)
+                                               const paramcabac::StateVars& _stateVars, const uint8_t _numLuts,
+                                               const uint8_t _numPrvs, const bool _modeFlag)
     : supportVals(_supportVals),
       stateVars(_stateVars),
       numLuts(_numLuts),
@@ -43,7 +43,7 @@ LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::setupLutsOrder1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
+void LUTsSubSymbolTransform::setupLutsOrder1(const uint8_t numSubsyms, const uint64_t numAlphaSubsym) {
     if (numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE) return;
 
     lutsO1.clear();
@@ -52,7 +52,7 @@ void LUTsSubSymbolTransform::setupLutsOrder1(uint8_t numSubsyms, uint64_t numAlp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
+void LUTsSubSymbolTransform::setupLutsOrder2(const uint8_t numSubsyms, const uint64_t numAlphaSubsym) {
     if (numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE) return;
 
     lutsO2.clear();
@@ -67,7 +67,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
     assert(symbols != nullptr);
 
-    size_t numSymbols = symbols->size();
+    const size_t numSymbols = symbols->size();
     if (numSymbols <= 0) return;
 
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
@@ -92,7 +92,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
     while (r.isValid()) {
         // Split symbol into subsymbols and then build subsymbols
-        uint64_t symbolValue = r.get();
+        const uint64_t symbolValue = r.get();
         uint64_t subsymValue = 0;
         uint32_t oss = outputSymbolSize;
 
@@ -102,13 +102,13 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
             d.inc();
         }
 
-        uint64_t symValue = abs(static_cast<int64_t>(symbolValue));
+        const uint64_t symValue = abs(static_cast<int64_t>(symbolValue));
         for (uint8_t s = 0; s < numSubsymbols; s++) {
-            uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
-            uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
+            const uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             if (depSymbols) {
-                depSubsymValue = depSymbolValue >> oss - codingSubsymSize & subsymMask;
+                depSubsymValue = (depSymbolValue >> (oss - codingSubsymSize)) & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
@@ -138,8 +138,8 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize,
-                                             LutOrder1& lut) {
+void LUTsSubSymbolTransform::decodeLutOrder1(Reader& reader, const uint64_t numAlphaSubsym,
+                                             const uint8_t codingSubsymSize, LutOrder1& lut) {
     uint32_t i, j;
     for (i = 0; i < numAlphaSubsym; i++) {
         lut[i].numMaxElems = reader.readLutSymbol(codingSubsymSize);
@@ -179,14 +179,14 @@ void LUTsSubSymbolTransform::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
     sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater<>());
     lutRow.numMaxElems =
-        std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e) { return e.freq != 0; });
+        std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](const LutEntry e) { return e.freq != 0; });
     if (lutRow.numMaxElems > 0) lutRow.numMaxElems--;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize,
-                                             LutOrder1& lut) {
+void LUTsSubSymbolTransform::encodeLutOrder1(Writer& writer, const uint64_t numAlphaSubsym,
+                                             const uint8_t codingSubsymSize, LutOrder1& lut) {
     uint32_t i, j;
     for (i = 0; i < numAlphaSubsym; i++) {
         sortLutRow(lut[i]);
@@ -231,8 +231,8 @@ void LUTsSubSymbolTransform::transformOrder2(std::vector<Subsymbol>& subsymbols,
     Subsymbol& subsymbol = subsymbols[subsymIdx];
     const uint64_t subsymVal = subsymbol.subsymValue;
     const LutRow lutRow = lutsO2[lutIdx][subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]];
-    auto entry = std::find_if(lutRow.entries.begin(), lutRow.entries.end(),
-                              [subsymVal](LutEntry e) { return e.value == subsymVal && e.freq > 0; });
+    const auto entry = std::find_if(lutRow.entries.begin(), lutRow.entries.end(),
+                                    [subsymVal](const LutEntry e) { return e.value == subsymVal && e.freq > 0; });
     if (entry != lutRow.entries.end()) {
         subsymbol.lutNumMaxElems = lutRow.numMaxElems;
         subsymbol.lutEntryIdx = distance(lutRow.entries.begin(), entry);
@@ -247,8 +247,8 @@ void LUTsSubSymbolTransform::transformOrder1(std::vector<Subsymbol>& subsymbols,
     const uint64_t subsymVal = subsymbol.subsymValue;
     const LutRow lutRow = lutsO1[lutIdx][subsymbols[prvIdx].prvValues[0]];
 
-    auto entry = std::find_if(lutRow.entries.begin(), lutRow.entries.end(),
-                              [subsymVal](LutEntry e) { return e.value == subsymVal && e.freq > 0; });
+    const auto entry = std::find_if(lutRow.entries.begin(), lutRow.entries.end(),
+                                    [subsymVal](const LutEntry e) { return e.value == subsymVal && e.freq > 0; });
     if (entry != lutRow.entries.end()) {
         subsymbol.lutNumMaxElems = lutRow.numMaxElems;
         subsymbol.lutEntryIdx = distance(lutRow.entries.begin(), entry);

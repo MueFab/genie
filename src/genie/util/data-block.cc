@@ -23,9 +23,7 @@ BlockStepper DataBlock::getReader() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DataBlock::operator==(const DataBlock &d) const {
-    return lgWordSize == d.lgWordSize && data == d.data;
-}
+bool DataBlock::operator==(const DataBlock &d) const { return lgWordSize == d.lgWordSize && data == d.data; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +43,7 @@ size_t DataBlock::size() const { return divByWordSize(data.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
+void DataBlock::reserve(const size_t size) { data.reserve(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +51,7 @@ void DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
+void DataBlock::resize(const size_t size) { data.resize(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +60,7 @@ bool DataBlock::empty() const { return data.empty(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DataBlock::swap(DataBlock *const d) {
-    size_t tmp = lgWordSize;
+    const size_t tmp = lgWordSize;
     lgWordSize = d->lgWordSize;
     d->lgWordSize = static_cast<uint8_t>(tmp);
     data.swap(d->data);
@@ -70,7 +68,7 @@ void DataBlock::swap(DataBlock *const d) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(size_t size, uint8_t word_size) : lgWordSize(0) {
+DataBlock::DataBlock(const size_t size, const uint8_t word_size) : lgWordSize(0) {
     setWordSize(word_size);
     data.resize(size * word_size);
 }
@@ -82,7 +80,7 @@ DataBlock::DataBlock(std::vector<uint8_t> *vec) : lgWordSize(0) { this->data.swa
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataBlock::DataBlock(std::string *vec) : lgWordSize(0) {
-    size_t size = vec->size() * sizeof(char);
+    const size_t size = vec->size() * sizeof(char);
     this->data.resize(size);
     this->data.shrink_to_fit();
     std::memcpy(this->data.data(), vec->data(), size);
@@ -91,9 +89,9 @@ DataBlock::DataBlock(std::string *vec) : lgWordSize(0) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) : lgWordSize(0) {
+DataBlock::DataBlock(const uint8_t *d, const size_t size, const uint8_t word_size) : lgWordSize(0) {
     setWordSize(word_size);
-    size_t s = size * word_size;
+    const size_t s = size * word_size;
     this->data.resize(s);
     this->data.shrink_to_fit();
     std::memcpy(this->data.data(), d, s);

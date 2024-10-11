@@ -401,14 +401,14 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenomicSubDescriptorProperties &GenomicDescriptorProperties::getSubSeq(uint8_t sub) const {
+const GenomicSubDescriptorProperties &GenomicDescriptorProperties::getSubSeq(const uint8_t sub) const {
     return subseqs[sub];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Alphabet::isIncluded(char c) const {
-    return std::any_of(lut.begin(), lut.end(), [c](char lc) { return lc == c; });
+    return std::any_of(lut.begin(), lut.end(), [c](const char lc) { return lc == c; });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -452,7 +452,7 @@ const CigarFormatInfo &getECigarInfo() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t bits2bytes(uint8_t bits) {
+uint8_t bits2bytes(const uint8_t bits) {
     auto bytes = static_cast<uint8_t>(std::ceil(bits / 8.0f));
     bytes = static_cast<uint8_t>(std::pow(2, std::ceil(log2(bytes))));
     return bytes;

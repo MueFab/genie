@@ -49,7 +49,7 @@ QualEncoder::~QualEncoder() = default;
 
 // -----------------------------------------------------------------------------
 
-void QualEncoder::quantizeUntil(uint64_t pos) {
+void QualEncoder::quantizeUntil(const uint64_t pos) {
     while (minPosUnencoded < pos) {
         std::string pos_seqs;
         std::string pos_qvalues;
@@ -133,7 +133,7 @@ size_t QualEncoder::nrMappedRecords() const { return nrMappedRecords_; }
 
 // -----------------------------------------------------------------------------
 void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string& cigar, const uint64_t pos) {
-    size_t cigarLen = cigar.length();
+    const size_t cigarLen = cigar.length();
     size_t opLen = 0;  // length of current CIGAR operation
     size_t qualIdx = 0;
     size_t quantizerIndicesIdx = pos - posOffset_;
@@ -155,8 +155,8 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
             case '=':
                 // Encode opLen quality values with computed quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
-                    uint8_t q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
-                    uint8_t quantizerIndex = out->quantizerIndices[quantizerIndicesIdx++];
+                    const uint8_t q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
+                    const uint8_t quantizerIndex = out->quantizerIndices[quantizerIndicesIdx++];
                     uint8_t qualityValueIndex = static_cast<uint8_t>(quantizers_.at(quantizerIndex).valueToIndex(q));
                     out->stepindices.at(quantizerIndex).push_back(qualityValueIndex);
                 }

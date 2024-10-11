@@ -18,7 +18,7 @@ Context::Context() : Context(true, 8, 8, false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Context::Context(bool _adaptive_mode_flag, uint8_t _output_symbol_size, uint8_t _coding_subsym_size,
+Context::Context(const bool _adaptive_mode_flag, const uint8_t _output_symbol_size, const uint8_t _coding_subsym_size,
                  bool _share_subsym_ctx_flag)
     : adaptive_mode_flag(_adaptive_mode_flag),
       num_contexts(0),
@@ -31,7 +31,7 @@ Context::Context(bool _adaptive_mode_flag, uint8_t _output_symbol_size, uint8_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Context::Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
+Context::Context(const uint8_t output_symbol_size, const uint8_t coding_subsym_size, util::BitReader& reader) {
     adaptive_mode_flag = reader.read<bool>(1);
     num_contexts = reader.read<uint16_t>();
     for (size_t i = 0; i < num_contexts; ++i) {
@@ -44,7 +44,7 @@ Context::Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::B
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Context::addContextInitializationValue(uint8_t _context_initialization_value) {
+void Context::addContextInitializationValue(const uint8_t _context_initialization_value) {
     ++num_contexts;
     this->context_initialization_value.push_back(_context_initialization_value);
 }

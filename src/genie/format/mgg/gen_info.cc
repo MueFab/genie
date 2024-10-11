@@ -21,12 +21,12 @@ uint64_t GenInfo::getHeaderLength() { return sizeof(uint64_t) + sizeof(char) * 4
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GenInfo::write(util::BitWriter& bitWriter) const {
-    int64_t begin = bitWriter.getStreamPosition();
+    const int64_t begin = bitWriter.getStreamPosition();
     bitWriter.writeAlignedBytes(getKey().data(), getKey().length());
-    int64_t size_pos = bitWriter.getStreamPosition();
+    const int64_t size_pos = bitWriter.getStreamPosition();
     bitWriter.writeAlignedInt<uint64_t>(0);
     box_write(bitWriter);
-    int64_t end = bitWriter.getStreamPosition();
+    const int64_t end = bitWriter.getStreamPosition();
     bitWriter.setStreamPosition(size_pos);
     bitWriter.writeAlignedInt<uint64_t>(end - begin);
     bitWriter.setStreamPosition(end);

@@ -16,11 +16,11 @@ UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& valueMin, const int& v
     : UniformQuantizer(valueMin, valueMax, nrSteps) {
     // Change the smallest and largest reconstruction values
 
-    int smallestIndex = 0;
-    int largestIndex = nrSteps - 1;
+    const int smallestIndex = 0;
+    const int largestIndex = nrSteps - 1;
 
     for (auto& lutElem : lut_) {
-        int currentIndex = lutElem.second.first;
+        const int currentIndex = lutElem.second.first;
         if (currentIndex == smallestIndex) {
             lutElem.second.second = valueMin;
         }
@@ -30,7 +30,7 @@ UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& valueMin, const int& v
     }
 
     for (auto& inverseLutElem : inverseLut_) {
-        int currentIndex = inverseLutElem.first;
+        const int currentIndex = inverseLutElem.first;
         if (currentIndex == smallestIndex) {
             inverseLutElem.second = valueMin;
         }

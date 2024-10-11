@@ -28,7 +28,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc) : core::parameter::desc_pres:
 
 DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader &reader)
     : core::parameter::desc_pres::DecoderRegular(MODE_BSC) {
-    uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
+    const uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(reader.read<uint8_t>(6));
     }
@@ -36,13 +36,13 @@ DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader &reader)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DecoderRegular::setSubsequenceCfg(uint8_t index, Subsequence &&cfg) {
+void DecoderRegular::setSubsequenceCfg(const uint8_t index, Subsequence &&cfg) {
     descriptor_subsequence_cfgs[index] = cfg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) const {
+const Subsequence &DecoderRegular::getSubsequenceCfg(const uint8_t index) const {
     return descriptor_subsequence_cfgs[index];
 }
 
@@ -54,7 +54,7 @@ std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descriptor_subsequence_cfgs[index]; }
+Subsequence &DecoderRegular::getSubsequenceCfg(const uint8_t index) { return descriptor_subsequence_cfgs[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

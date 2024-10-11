@@ -20,7 +20,7 @@ bool ComputedRef::operator==(const ComputedRef &cr) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
+ComputedRef::ComputedRef(const Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
         extension = ComputedRefExtended(0, 0);
     }
@@ -31,8 +31,8 @@ ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
 ComputedRef::ComputedRef(util::BitReader &reader) {
     cr_alg_ID = static_cast<Algorithm>(reader.read<uint8_t>());
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
-        auto pad = reader.read<uint8_t>();
-        auto buffer = reader.read<uint32_t>(24);
+        const auto pad = reader.read<uint8_t>();
+        const auto buffer = reader.read<uint32_t>(24);
         extension = ComputedRefExtended(pad, buffer);
     }
 }

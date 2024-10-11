@@ -17,10 +17,10 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    auto end_pos = start_pos + static_cast<int64_t>(length);
+Dataset::Dataset(util::BitReader& reader, const core::MPEGMinorVersion _version) : version(_version) {
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
+    const auto end_pos = start_pos + static_cast<int64_t>(length);
     std::string tmp(4, '\0');
     reader.readAlignedBytes(tmp.data(), tmp.length());
     UTILS_DIE_IF(tmp != "dthd", "Dataset without header");
@@ -97,13 +97,13 @@ std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameter
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
+Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, const core::MPEGMinorVersion _version,
                  const std::vector<uint8_t>& param_ids)
     : version(_version) {
     bool mitFlag = false;
     bool cc_mode = false;
     bool ordered_blocks = false;
-    bool headerON = meta.getHeader().getType() == core::meta::BlockHeader::HeaderType::ENABLED;
+    const bool headerON = meta.getHeader().getType() == core::meta::BlockHeader::HeaderType::ENABLED;
     if (headerON) {
         cc_mode = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getCCFlag();
         mitFlag = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getMITFlag();
@@ -117,8 +117,8 @@ Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorV
         }
         for (size_t c = 0; c < static_cast<size_t>(core::record::ClassType::COUNT); ++c) {
             for (size_t d = 0; d < static_cast<size_t>(core::GenDesc::COUNT); ++d) {
-                auto blocks = file.extractDescriptor(static_cast<core::record::ClassType>(c),
-                                                     static_cast<core::GenDesc>(d), param_ids);
+                const auto blocks = file.extractDescriptor(static_cast<core::record::ClassType>(c),
+                                                           static_cast<core::GenDesc>(d), param_ids);
                 auto desc =
                     DescriptorStream(static_cast<core::GenDesc>(d), static_cast<core::record::ClassType>(c), blocks);
                 if (!desc.isEmpty()) {
@@ -143,7 +143,7 @@ Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorV
     }
 
     auto params_p2 = file.extractParameters(param_ids);
-    for (auto& p : params_p2) {
+    for (const auto& p : params_p2) {
         parameterSets.emplace_back(static_cast<uint8_t>(0), static_cast<uint16_t>(0), p->getID(), p->getParentID(),
                                    std::move(p->getEncodingSet()), version);
     }
@@ -176,7 +176,7 @@ Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorV
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::patchID(uint8_t groupID, uint16_t setID) {
+void Dataset::patchID(const uint8_t groupID, const uint16_t setID) {
     header.patchID(groupID, setID);
     if (metadata != std::nullopt) {
         metadata->patchID(groupID, setID);
@@ -191,7 +191,7 @@ void Dataset::patchID(uint8_t groupID, uint16_t setID) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::patchRefID(uint8_t _old, uint8_t _new) { header.patchRefID(_old, _new); }
+void Dataset::patchRefID(const uint8_t _old, const uint8_t _new) { header.patchRefID(_old, _new); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -199,7 +199,7 @@ DatasetHeader& Dataset::getHeader() { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::read_box(util::BitReader& reader, bool in_offset) {
+void Dataset::read_box(util::BitReader& reader, const bool in_offset) {
     std::string tmp_str(4, '\0');
     reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
     if (tmp_str == "dtmd") {
@@ -243,11 +243,11 @@ void Dataset::read_box(util::BitReader& reader, bool in_offset) {
     } else if (tmp_str == "offs") {
         UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
         reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
-        auto offset = reader.readAlignedInt<uint64_t>();
+        const auto offset = reader.readAlignedInt<uint64_t>();
         if (offset == ~static_cast<uint64_t>(0)) {
             return;
         }
-        auto pos_save = reader.getStreamPosition();
+        const auto pos_save = reader.getStreamPosition();
         reader.setStreamPosition(offset);
         read_box(reader, true);
         reader.setStreamPosition(pos_save);

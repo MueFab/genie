@@ -22,10 +22,10 @@ const std::string& DatasetMetadata::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetMetadata::DatasetMetadata(util::BitReader& bitreader, core::MPEGMinorVersion _version)
+DatasetMetadata::DatasetMetadata(util::BitReader& bitreader, const core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
+    const auto start_pos = bitreader.getStreamPosition() - 4;
+    const auto length = bitreader.readAlignedInt<uint64_t>();
     auto metadata_length = length - getHeaderLength();
     if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
@@ -41,8 +41,8 @@ DatasetMetadata::DatasetMetadata(util::BitReader& bitreader, core::MPEGMinorVers
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetMetadata::DatasetMetadata(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_metatdata_value,
-                                 core::MPEGMinorVersion _version)
+DatasetMetadata::DatasetMetadata(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                                 std::string _dg_metatdata_value, const core::MPEGMinorVersion _version)
     : version(_version),
       dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
@@ -87,7 +87,7 @@ std::string DatasetMetadata::decapsulate() { return std::move(dg_metatdata_value
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetMetadata::patchID(uint8_t _groupID, uint16_t _setID) {
+void DatasetMetadata::patchID(const uint8_t _groupID, const uint16_t _setID) {
     dataset_group_id = _groupID;
     dataset_id = _setID;
 }

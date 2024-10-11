@@ -51,7 +51,7 @@ std::string reverse_complement(const std::string &s, const int readlen) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string random_string(size_t length) {
+std::string random_string(const size_t length) {
     static const char charset[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -89,7 +89,7 @@ void write_dna_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     if (readlen % 4 != 0) {
-        int i = readlen / 4;
+        const int i = readlen / 4;
         bitarray[pos_in_bitarray] = 0;
         for (int j = 0; j < readlen % 4; j++)
             bitarray[pos_in_bitarray] |= dna2int[static_cast<uint8_t>(read[4 * i + j])] << 2 * j;
@@ -106,7 +106,7 @@ void read_dna_from_bits(std::string &read, std::ifstream &fin) {
     const char int2dna[4] = {'A', 'G', 'C', 'T'};
     fin.read(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
     read.resize(readlen);
-    uint16_t num_bytes_to_read = (static_cast<uint32_t>(readlen) + 4 - 1) / 4;
+    const uint16_t num_bytes_to_read = (static_cast<uint32_t>(readlen) + 4 - 1) / 4;
     fin.read(reinterpret_cast<char *>(&bitarray[0]), num_bytes_to_read);
     uint8_t pos_in_bitarray = 0;
     for (int i = 0; i < readlen / 4; i++) {
@@ -117,7 +117,7 @@ void read_dna_from_bits(std::string &read, std::ifstream &fin) {
         pos_in_bitarray++;
     }
     if (readlen % 4 != 0) {
-        int i = readlen / 4;
+        const int i = readlen / 4;
         for (int j = 0; j < readlen % 4; j++) {
             read[4 * i + j] = int2dna[bitarray[pos_in_bitarray] & 3];
             bitarray[pos_in_bitarray] >>= 2;
@@ -146,7 +146,7 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout) {
         pos_in_bitarray++;
     }
     if (readlen % 2 != 0) {
-        int i = readlen / 2;
+        const int i = readlen / 2;
         bitarray[pos_in_bitarray] = 0;
         for (int j = 0; j < readlen % 2; j++)
             bitarray[pos_in_bitarray] |= dna2int[static_cast<uint8_t>(read[2 * i + j])] << 4 * j;
@@ -163,7 +163,7 @@ void read_dnaN_from_bits(std::string &read, std::ifstream &fin) {
     const char int2dna[5] = {'A', 'G', 'C', 'T', 'N'};
     fin.read(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
     read.resize(readlen);
-    uint16_t num_bytes_to_read = (static_cast<uint32_t>(readlen) + 2 - 1) / 2;
+    const uint16_t num_bytes_to_read = (static_cast<uint32_t>(readlen) + 2 - 1) / 2;
     fin.read(reinterpret_cast<char *>(&bitarray[0]), num_bytes_to_read);
     uint8_t pos_in_bitarray = 0;
     for (int i = 0; i < readlen / 2; i++) {
@@ -174,7 +174,7 @@ void read_dnaN_from_bits(std::string &read, std::ifstream &fin) {
         pos_in_bitarray++;
     }
     if (readlen % 2 != 0) {
-        int i = readlen / 2;
+        const int i = readlen / 2;
         for (int j = 0; j < readlen % 2; j++) {
             read[2 * i + j] = int2dna[bitarray[pos_in_bitarray] & 15];
             bitarray[pos_in_bitarray] >>= 4;

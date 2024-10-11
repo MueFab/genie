@@ -44,7 +44,7 @@ size_t StreamHandler::readU7(std::istream &input, uint64_t &retVal) {
         c++;
 
         input.read(reinterpret_cast<char *>(&byte), 1);
-        retVal = retVal << 7 | byte & 0x7F;
+        retVal = (retVal << 7) | (byte & 0x7F);
     } while ((byte & 0x80) != 0);
 
     return c;
@@ -68,7 +68,7 @@ size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlock *buffer) {
+size_t StreamHandler::readBytes(std::istream &input, const size_t bytes, util::DataBlock *buffer) {
     if (bytes > 0) {
         if (bytes % buffer->getWordSize()) {
             UTILS_DIE("Input stream length not a multiple of word size");
@@ -82,13 +82,13 @@ size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlo
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
-    auto safe = input.exceptions();
+    const auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
     const size_t BUFFER_SIZE = static_cast<size_t>(1000000) / buffer->getWordSize();
     buffer->resize(0);
     while (input.good()) {
-        size_t pos = buffer->size();
+        const size_t pos = buffer->size();
         buffer->resize(pos + BUFFER_SIZE);
         input.read(static_cast<char *>(buffer->getData()) + pos * buffer->getWordSize(),
                    BUFFER_SIZE * buffer->getWordSize());
@@ -106,8 +106,8 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlock *buffer) {
-    auto safe = input.exceptions();
+size_t StreamHandler::readBlock(std::istream &input, const size_t bytes, util::DataBlock *buffer) {
+    const auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
     if (bytes % buffer->getWordSize()) {
@@ -130,7 +130,7 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
 
 size_t StreamHandler::readStreamSize(std::istream &input) {
     input.seekg(0, std::istream::end);
-    size_t length = input.tellg();
+    const size_t length = input.tellg();
     input.seekg(0, std::istream::beg);
 
     return length;
@@ -138,7 +138,7 @@ size_t StreamHandler::readStreamSize(std::istream &input) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t numBytes) {
+size_t StreamHandler::writeUInt(std::ostream &output, const uint64_t value, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
     size_t c = 0;  // counter
     while (numBytes-- > 0) {
@@ -151,7 +151,7 @@ size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t num
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
+size_t StreamHandler::writeU7(std::ostream &output, const uint64_t value) {
     uint8_t bytes[U7_MAX_LENGTH] = {0};
     size_t c = 0;  // counter
     int shift;
@@ -161,7 +161,7 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     if (shift > 0) shift -= 7;
 
     for (; shift >= 0; shift -= 7) {
-        auto code = static_cast<uint8_t>(value >> shift & 0x7F | (shift > 0 ? 0x80 : 0x00));
+        const auto code = static_cast<uint8_t>(((value >> shift) & 0x7F) | (shift > 0 ? 0x80 : 0x00));
         bytes[c++] = code;
     }
 
@@ -172,9 +172,9 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, uint64_t numSymbols) {
+size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, const uint64_t numSymbols) {
     size_t streamSize = 0;
-    uint64_t payloadSize = buffer->getRawSize() + (numSymbols ? 4 : 0);
+    const uint64_t payloadSize = buffer->getRawSize() + (numSymbols ? 4 : 0);
     streamSize += writeUInt(output, payloadSize, 4);
     if (payloadSize >= 4) {
         streamSize += writeUInt(output, numSymbols, 4);
@@ -186,7 +186,7 @@ size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer,
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) {
-    size_t ret = buffer->getRawSize();
+    const size_t ret = buffer->getRawSize();
     if (ret > 0) {
         output.write(static_cast<char *>(buffer->getData()), ret);
         buffer->clear();

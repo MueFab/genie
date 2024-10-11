@@ -18,7 +18,7 @@ bool DataStream::operator==(const DataStream& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataStream::DataStream(Type _data_type, uint8_t _reserved, uint16_t _data_SID)
+DataStream::DataStream(const Type _data_type, const uint8_t _reserved, const uint16_t _data_SID)
     : data_type(_data_type), reserved(_reserved), data_SID(_data_SID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

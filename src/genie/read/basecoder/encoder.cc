@@ -21,7 +21,8 @@ namespace genie::read::basecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::CodingState::CodingState(const std::string &_read, const std::string &_ref, core::record::ClassType _type)
+Encoder::CodingState::CodingState(const std::string &_read, const std::string &_ref,
+                                  const core::record::ClassType _type)
     : count(0),
       read_pos(0),
       ref_offset(0),
@@ -34,7 +35,7 @@ Encoder::CodingState::CodingState(const std::string &_read, const std::string &_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint64_t startingMappingPos)
+Encoder::Encoder(const uint64_t startingMappingPos)
     : container(core::parameter::EncodingSet(), 0), pos(startingMappingPos), readCounter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -91,7 +92,8 @@ const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignment_split::SameRec &srec, bool first1) {
+void Encoder::encodeAdditionalSegment(const size_t length, const core::record::alignment_split::SameRec &srec,
+                                      const bool first1) {
     const auto LENGTH = length - 1;
     container.push(core::GenSub::RLEN, LENGTH);
 
@@ -143,7 +145,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
             // Other record
         } else {
             const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
-            auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
+            const auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
             if (rec.isRead1First()) {
                 if (split.getNextSeq() != rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
@@ -263,7 +265,7 @@ void Encoder::encodeMatch(CodingState &state) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Encoder::updateCount(char cigar_char, CodingState &state) {
+bool Encoder::updateCount(const char cigar_char, CodingState &state) {
     if (isdigit(cigar_char)) {
         state.count *= 10;
         state.count += cigar_char - '0';
@@ -274,7 +276,7 @@ bool Encoder::updateCount(char cigar_char, CodingState &state) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::encodeCigarToken(char cigar_char, CodingState &state) {
+void Encoder::encodeCigarToken(const char cigar_char, CodingState &state) {
     if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_char)) {  // TODO(Fabian): other alphabets
         const char AMBIGUOUS_CHAR = '-';  // Character used twice in ecigar (deletion + alphabet 2)
         if ((cigar_char == AMBIGUOUS_CHAR && state.count == 0) || cigar_char != AMBIGUOUS_CHAR) {
@@ -315,9 +317,9 @@ void Encoder::encodeCigarToken(char cigar_char, CodingState &state) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Encoder::ClipInformation Encoder::encodeCigar(const std::string &read, const std::string &cigar, const std::string &ref,
-                                              core::record::ClassType type) {
+                                              const core::record::ClassType type) {
     CodingState state(read, ref, type);
-    for (char cigar_char : cigar) {
+    for (const char cigar_char : cigar) {
         if (updateCount(cigar_char, state)) {
             continue;
         }
@@ -341,7 +343,7 @@ core::AccessUnit &&Encoder::moveStreams() { return std::move(container); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
+bool Encoder::encodeSingleClip(const ClipInformation &inf, const bool last) {
     bool clips_present = false;
     for (const auto &hard : inf.hardClips) {
         clips_present = hard || clips_present;

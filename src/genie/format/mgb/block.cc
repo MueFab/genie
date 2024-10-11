@@ -16,7 +16,7 @@ namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
+Block::Block(const uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
     : descriptor_ID(_descriptor_ID), block_payload_size(0), count(0), payload(std::move(_payload)) {
     count = static_cast<uint8_t>(std::get<core::AccessUnit::Descriptor>(payload).getSize());
 }
@@ -31,7 +31,7 @@ Block::Block()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUnit::Descriptor()) {
+Block::Block(const size_t qv_count, util::BitReader &reader) : payload(core::AccessUnit::Descriptor()) {
     reader.readBits(1);
     descriptor_ID = reader.read<uint8_t>(7);
     reader.readBits(3);
@@ -90,8 +90,7 @@ size_t Block::getWrittenSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Block::isLoaded() const {
-    return (std::holds_alternative<core::Payload>(payload) &&
-            std::get<core::Payload>(payload).isPayloadLoaded()) ||
+    return (std::holds_alternative<core::Payload>(payload) && std::get<core::Payload>(payload).isPayloadLoaded()) ||
            std::holds_alternative<core::AccessUnit::Descriptor>(payload);
 }
 

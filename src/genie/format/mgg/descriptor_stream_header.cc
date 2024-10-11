@@ -40,8 +40,8 @@ DescriptorStreamHeader::DescriptorStreamHeader()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamHeader::DescriptorStreamHeader(bool _reserved, core::GenDesc _genDesc,
-                                               core::record::ClassType _class_id, uint32_t _num_blocks)
+DescriptorStreamHeader::DescriptorStreamHeader(const bool _reserved, const core::GenDesc _genDesc,
+                                               const core::record::ClassType _class_id, const uint32_t _num_blocks)
     : reserved(_reserved), descriptor_id(_genDesc), class_id(_class_id), num_blocks(_num_blocks) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ void DescriptorStreamHeader::box_write(util::BitWriter& bitWriter) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     reserved = reader.read<bool>(1);
     descriptor_id = reader.read<core::GenDesc>(7);
     class_id = reader.read<core::record::ClassType>(4);

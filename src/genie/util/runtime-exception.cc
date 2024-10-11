@@ -13,7 +13,7 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RuntimeException::RuntimeException(const std::string &file, const std::string &function, int line,
+RuntimeException::RuntimeException(const std::string &file, const std::string &function, const int line,
                                    const std::string &msg) noexcept
     : Exception(file + ":" + function + ":" + std::to_string(line) + ": " + msg) {
     // These dummy casts just avoid compiler warnings due to unused variables

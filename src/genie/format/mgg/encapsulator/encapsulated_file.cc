@@ -57,8 +57,8 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, core::MPEGMinorVersion version) {
-    std::map<uint8_t, std::vector<std::string>> file_groups = groupInputFiles(input_files);
+EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files, const core::MPEGMinorVersion version) {
+    const std::map<uint8_t, std::vector<std::string>> file_groups = groupInputFiles(input_files);
 
     for (auto& g : file_groups) {
         auto group = EncapsulatedDatasetGroup(g.second, version);

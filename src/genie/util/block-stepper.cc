@@ -12,7 +12,7 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockStepper::BlockStepper(uint8_t *_cur, uint8_t *_end, uint8_t _wordSize)
+BlockStepper::BlockStepper(uint8_t *_cur, uint8_t *_end, const uint8_t _wordSize)
     : curr(_cur), end(_end), wordSize(_wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

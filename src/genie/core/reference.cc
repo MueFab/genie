@@ -31,7 +31,7 @@ uint64_t Reference::getEnd() const { return end; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(std::string _name, uint64_t _start, uint64_t _end)
+Reference::Reference(std::string _name, const uint64_t _start, const uint64_t _end)
     : name(std::move(_name)), start(_start), end(_end) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

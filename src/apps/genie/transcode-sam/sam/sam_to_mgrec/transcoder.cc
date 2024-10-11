@@ -367,11 +367,11 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options,
 
 std::string patch_ecigar(const std::string& ref, const std::string& seq, const std::string& ecigar) {
     std::string fixedCigar;
-    auto classChecker = [&](uint8_t cigar, const std::pair<size_t, size_t>& _bs,
+    auto classChecker = [&](const uint8_t cigar, const std::pair<size_t, size_t>& _bs,
                             const std::pair<size_t, size_t>& _rs) -> bool {
-        auto bs = std::string_view(seq).substr(_bs.first, _bs.second);
-        auto rs = std::string_view(ref).substr(_rs.first, _rs.second);
-        auto length = std::max(bs.length(), rs.length());
+        const auto bs = std::string_view(seq).substr(_bs.first, _bs.second);
+        const auto rs = std::string_view(ref).substr(_rs.first, _rs.second);
+        const auto length = std::max(bs.length(), rs.length());
         switch (cigar) {
             case '+':
             case '-':
@@ -637,13 +637,13 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
 void transcode_sam2mpg(Config& options) {
     int nref;
 
-    auto refs = sam_to_mgrec_phase1(options, nref);
+    const auto refs = sam_to_mgrec_phase1(options, nref);
     sam_to_mgrec_phase2(options, nref, refs);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-char convertECigar2CigarChar(char token) {
+char convertECigar2CigarChar(const char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['='] = 'M';
@@ -657,14 +657,14 @@ char convertECigar2CigarChar(char token) {
         return lut;
     }();
     UTILS_DIE_IF(token < 0, "Invalid cigar token" + std::to_string(token));
-    char ret = lut_loc[token];
+    const char ret = lut_loc[token];
     UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int stepRef(char token) {
+int stepRef(const char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['M'] = 1;
@@ -741,7 +741,7 @@ std::string eCigar2Cigar(const std::string& ecigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& record) {
+uint16_t computeSAMFlags(const size_t s, const size_t a, const genie::core::record::Record& record) {
     uint16_t flags = 0;
     if (record.getNumberOfTemplateSegments() > 1) {
         flags |= 0x1;
@@ -780,9 +780,9 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Record& record, std::string& rname,
-                               std::string& pos, int64_t& tlen, std::string& mapping_qual, std::string& cigar,
-                               uint16_t& flags, RefInfo& refinfo) {
+void processFirstMappedSegment(const size_t s, const size_t a, const genie::core::record::Record& record,
+                               std::string& rname, std::string& pos, int64_t& tlen, std::string& mapping_qual,
+                               std::string& cigar, uint16_t& flags, RefInfo& refinfo) {
     // This read is mapped, process mapping
     rname = refinfo.isValid() ? refinfo.getMgr()->ID2Ref(record.getAlignmentSharedData().getSeqID())
                               : std::to_string(record.getAlignmentSharedData().getSeqID());
@@ -815,12 +815,12 @@ void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void processSecondMappedSegment(size_t s, const genie::core::record::Record& record, int64_t& tlen, uint16_t& flags,
-                                std::string& pnext, std::string& rnext, RefInfo& refinfo) {
+void processSecondMappedSegment(const size_t s, const genie::core::record::Record& record, int64_t& tlen,
+                                uint16_t& flags, std::string& pnext, std::string& rnext, RefInfo& refinfo) {
     // According to SAM standard, primary alignments only
-    auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
-                          ? genie::core::record::AlignmentSplit::Type::UNPAIRED
-                          : record.getAlignments()[0].getAlignmentSplits().front()->getType();
+    const auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
+                                ? genie::core::record::AlignmentSplit::Type::UNPAIRED
+                                : record.getAlignments()[0].getAlignmentSplits().front()->getType();
     if ((s == 1 && split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
         split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED) {
         // Paired read is first read

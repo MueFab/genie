@@ -37,7 +37,7 @@ namespace genieapp::run {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string file_extension(const std::string& path) {
-    auto pos = path.find_last_of('.');
+    const auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
         c = static_cast<char>(std::tolower(c));
@@ -67,7 +67,7 @@ FileType getType(const std::string& ext) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OperationCase getOperation(FileType in, FileType out) {
+OperationCase getOperation(const FileType in, const FileType out) {
     if (in == FileType::THIRD_PARTY && out == FileType::MPEG) {
         return OperationCase::ENCODE;
     } else if (in == FileType::MPEG && out == FileType::THIRD_PARTY) {

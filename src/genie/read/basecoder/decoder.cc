@@ -21,7 +21,7 @@ namespace genie::read::basecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(core::AccessUnit &&au, size_t segments, size_t pos)
+Decoder::Decoder(core::AccessUnit &&au, const size_t segments, const size_t pos)
     : container(std::move(au)), position(pos), length(0), recordCounter(0), number_template_segments(segments) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     for (auto &sequence : sequences) {
         cigars.emplace_back(sequence.size(), '=');
     }
-    auto clip_offset = decodeClips(sequences, cigars);
+    const auto clip_offset = decodeClips(sequences, cigars);
 
     auto state = decode(std::get<0>(clip_offset), std::move(sequences.front()), std::move(cigars.front()));
     switch (meta.decoding_case) {
@@ -98,7 +98,7 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
         }
     }
 
-    auto deletions = numberDeletions(meta.num_segments);
+    const auto deletions = numberDeletions(meta.num_segments);
     for (size_t i = 0; i < meta.num_segments; ++i) {
         meta.length[i] = (length ? length : container.pull(core::GenSub::RLEN) + 1) + deletions[i];
     }
@@ -199,7 +199,7 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar, uint16_t delta_pos,
+void Decoder::decodeAdditional(const size_t softclip_offset, std::string &&seq, std::string &&cigar, uint16_t delta_pos,
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
@@ -220,7 +220,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<int32_t> Decoder::numberDeletions(size_t number) {
+std::vector<int32_t> Decoder::numberDeletions(const size_t number) {
     std::vector<int32_t> counters(number, 0);
     if (container.get(core::GenSub::MMPOS_TERMINATOR).isEmpty() || container.get(core::GenSub::MMTYPE_TYPE).isEmpty()) {
         return counters;
@@ -241,9 +241,9 @@ std::vector<int32_t> Decoder::numberDeletions(size_t number) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::string &cigar_extended) {
+void Decoder::decodeMismatches(const size_t clip_offset, std::string &sequence, std::string &cigar_extended) {
     uint64_t mismatchPosition = 0;
-    auto startPos = cigar_extended.find_first_not_of(']');
+    const auto startPos = cigar_extended.find_first_not_of(']');
     uint64_t cigarOffset = startPos == std::string::npos ? 0 : startPos;
     if (container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
         for (auto &c : sequence) {
@@ -267,7 +267,7 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
                           .getMismatchDecoder()
                           ->decodeMismatch(
                               getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
-                    : container.get(core::GenSub::MMTYPE_SUBSTITUTION).end()
+                : container.get(core::GenSub::MMTYPE_SUBSTITUTION).end()
                     ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
                     : container.get(core::GenSub::MMTYPE_SUBSTITUTION).pull();
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
@@ -297,7 +297,7 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
 
 std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequences,
                                                 std::vector<std::string> &cigar_extended) {
-    size_t num = recordCounter++;
+    const size_t num = recordCounter++;
     std::tuple<size_t, size_t> softclip_offset{0, 0};
     if (container.isEnd(core::GenSub::CLIPS_RECORD_ID) || num != container.peek(core::GenSub::CLIPS_RECORD_ID)) {
         return softclip_offset;
@@ -305,13 +305,13 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
     container.pull(core::GenSub::CLIPS_RECORD_ID);
     auto clipType = container.pull(core::GenSub::CLIPS_TYPE);
     while (clipType != core::GenConst::CLIPS_RECORD_END) {
-        bool hardclip = clipType & 4u;
-        size_t record_no = clipType & 2u ? sequences.size() - 1 : 0;
-        bool end = clipType & 1u;
+        const bool hardclip = clipType & 4u;
+        const size_t record_no = clipType & 2u ? sequences.size() - 1 : 0;
+        const bool end = clipType & 1u;
 
         if (hardclip) {
             const auto HARDCLIP_SIZE = container.pull(core::GenSub::CLIPS_HARD_LENGTH);
-            size_t cigar_position = end ? cigar_extended[record_no].size() : 0;
+            const size_t cigar_position = end ? cigar_extended[record_no].size() : 0;
             cigar_extended[record_no].insert(cigar_position, HARDCLIP_SIZE, ']');
         } else {
             std::string softClip;
@@ -324,7 +324,7 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
             sequences[record_no].erase(sequences[record_no].length() - softClip.length());
             size_t cigar_position = end ? cigar_extended[record_no].find_last_not_of(']') + 1 - softClip.size()
                                         : cigar_extended[record_no].find_first_not_of(']');
-            size_t seq_position = end ? sequences[record_no].length() : 0;
+            const size_t seq_position = end ? sequences[record_no].length() : 0;
             sequences[record_no].insert(seq_position, softClip);
             for (size_t i = 0; i < softClip.size(); ++i) {
                 cigar_extended[record_no][cigar_position++] = ')';

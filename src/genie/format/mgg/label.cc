@@ -25,10 +25,10 @@ Label::Label(std::string _label_ID) : label_ID(std::move(_label_ID)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 Label::Label(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     label_ID = reader.readAlignedStringTerminated();
-    auto num_datasets = reader.read<uint16_t>();
+    const auto num_datasets = reader.read<uint16_t>();
 
     for (size_t i = 0; i < num_datasets; ++i) {
         dataset_infos.emplace_back(reader);
@@ -89,7 +89,7 @@ const std::vector<LabelDataset>& Label::getDatasets() const { return dataset_inf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::meta::Label Label::decapsulate(uint16_t dataset) {
+core::meta::Label Label::decapsulate(const uint16_t dataset) {
     core::meta::Label ret(label_ID);
     for (auto& d : dataset_infos) {
         auto regions = d.decapsulate(dataset);
@@ -102,7 +102,7 @@ core::meta::Label Label::decapsulate(uint16_t dataset) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Label::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
+void Label::print_debug(std::ostream& output, const uint8_t depth, const uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Label");
 }
 

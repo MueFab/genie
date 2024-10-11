@@ -17,7 +17,7 @@ namespace genie::format::mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, bool _checkSupport)
+Importer::Importer(const size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, const bool _checkSupport)
     : blockSize(_blockSize),
       reader(_file_1),
       writer(_unsupported),
@@ -76,7 +76,7 @@ bool Importer::isRecordSupported(const core::record::Record& rec) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pumpRetrieve(core::Classifier* _classifier) {
-    util::Watch watch;
+    const util::Watch watch;
     core::record::Chunk chunk;
     bool seqid_valid = false;
     for (size_t i = 0; i < blockSize; ++i) {

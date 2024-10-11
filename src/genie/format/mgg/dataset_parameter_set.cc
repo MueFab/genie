@@ -26,9 +26,9 @@ bool DatasetParameterSet::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
-                                         uint8_t _parent_parameter_set_ID, core::parameter::EncodingSet ps,
-                                         core::MPEGMinorVersion _version)
+DatasetParameterSet::DatasetParameterSet(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                                         const uint8_t _parameter_set_ID, const uint8_t _parent_parameter_set_ID,
+                                         core::parameter::EncodingSet ps, const core::MPEGMinorVersion _version)
     : dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
       parameter_set_ID(_parameter_set_ID),
@@ -38,11 +38,11 @@ DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _da
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, core::MPEGMinorVersion _version,
-                                         bool parameters_update_flag)
+DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, const core::MPEGMinorVersion _version,
+                                         const bool parameters_update_flag)
     : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     dataset_group_id = reader.readAlignedInt<uint8_t>();
     dataset_id = reader.readAlignedInt<uint16_t>();
     parameter_set_ID = reader.readAlignedInt<uint8_t>();
@@ -116,15 +116,15 @@ core::parameter::EncodingSet&& DatasetParameterSet::moveParameterSet() { return 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::patchID(uint8_t _groupID, uint16_t _setID) {
+void DatasetParameterSet::patchID(const uint8_t _groupID, const uint16_t _setID) {
     dataset_group_id = _groupID;
     dataset_id = _setID;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id,
-                                         core::parameter::ParameterSet set, core::MPEGMinorVersion _version)
+DatasetParameterSet::DatasetParameterSet(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                                         core::parameter::ParameterSet set, const core::MPEGMinorVersion _version)
     : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
                           std::move(set.getEncodingSet()), _version) {}
 

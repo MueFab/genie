@@ -29,12 +29,12 @@ std::unique_ptr<core::meta::RefBase> Raw::decapsulate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Raw::Raw(uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo)
+Raw::Raw(const uint8_t _reserved, std::string _uri, const ChecksumAlgorithm algo)
     : External(_reserved, std::move(_uri), algo, RefType::RAW_REF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Raw::Raw(util::BitReader& reader, size_t seq_count) : External(reader) {
+Raw::Raw(util::BitReader& reader, const size_t seq_count) : External(reader) {
     for (size_t i = 0; i < seq_count; ++i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');
         reader.readAlignedBytes(seq_checksums.back().data(), seq_checksums.back().size());
@@ -43,7 +43,8 @@ Raw::Raw(util::BitReader& reader, size_t seq_count) : External(reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Raw::Raw(util::BitReader& reader, uint8_t _reserved, std::string _uri, ChecksumAlgorithm algo, size_t seq_count)
+Raw::Raw(util::BitReader& reader, const uint8_t _reserved, std::string _uri, const ChecksumAlgorithm algo,
+         const size_t seq_count)
     : External(_reserved, std::move(_uri), algo, RefType::RAW_REF) {
     for (size_t i = 0; i < seq_count; ++i) {
         seq_checksums.emplace_back(checksum_sizes[static_cast<uint8_t>(getChecksumAlgorithm())], '\0');

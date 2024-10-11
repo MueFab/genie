@@ -14,7 +14,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ExternalRef::ExternalRef(std::string _ref_uri, ChecksumAlgorithm check, ReferenceType ref)
+ExternalRef::ExternalRef(std::string _ref_uri, const ChecksumAlgorithm check, const ReferenceType ref)
     : ref_uri(std::move(_ref_uri)), checksum_alg(check), reference_type(ref) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

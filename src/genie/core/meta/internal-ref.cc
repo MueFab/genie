@@ -27,7 +27,7 @@ InternalRef::InternalRef(const nlohmann::json& json)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-InternalRef::InternalRef(uint16_t group_id, uint16_t id)
+InternalRef::InternalRef(const uint16_t group_id, const uint16_t id)
     : internal_dataset_group_id(group_id), internal_dataset_ID(id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

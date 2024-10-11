@@ -26,7 +26,7 @@ Segment::Segment(std::string&& _sequence) : sequence(std::move(_sequence)), qual
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Segment::Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader)
+Segment::Segment(const uint32_t length, const uint8_t qv_depth, util::BitReader& reader)
     : sequence(length, 0), quality_values(qv_depth, std::string(length, 0)) {
     reader.readAlignedBytes(&this->sequence[0], length);
     for (auto& q : quality_values) {

@@ -15,7 +15,7 @@ namespace genie::core::record::alignment_external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)
+OtherRec::OtherRec(const uint64_t _next_pos, const uint16_t _next_seq_ID)
     : AlignmentExternal(Type::OTHER_REC), next_pos(_next_pos), next_seq_ID(_next_seq_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

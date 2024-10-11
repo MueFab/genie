@@ -20,12 +20,12 @@ SameRec::SameRec() : AlignmentSplit(Type::SAME_REC), delta(0), alignment() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec(int64_t _delta, Alignment _alignment)
+SameRec::SameRec(const int64_t _delta, Alignment _alignment)
     : AlignmentSplit(Type::SAME_REC), delta(_delta), alignment(std::move(_alignment)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
+SameRec::SameRec(const uint8_t as_depth, util::BitReader &reader)
     : AlignmentSplit(Type::SAME_REC),
       delta(reader.readAlignedInt<int64_t, 6>()),
       alignment(as_depth, reader) {}

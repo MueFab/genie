@@ -21,7 +21,7 @@ inline static unsigned char readIn(util::BlockStepper *reader) {
     }
     // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple
     // bytes. Fix that.
-    auto byte = static_cast<unsigned char>(reader->get());
+    const auto byte = static_cast<unsigned char>(reader->get());
     reader->inc();
     return byte;
 }
@@ -51,7 +51,7 @@ size_t BitInputStream::getNumBytesRead() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 unsigned char BitInputStream::readByte() {
-    unsigned int result = read(8);
+    const unsigned int result = read(8);
     assert(result <= std::numeric_limits<unsigned char>::max());
     return static_cast<unsigned char>(result);
 }
@@ -78,7 +78,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
-        bits = m_heldBits >> m_numHeldBits - numBits;
+        bits = m_heldBits >> (m_numHeldBits - numBits);
         bits &= ~(0xffu << numBits);
         m_numHeldBits -= numBits;
         return bits;
@@ -91,7 +91,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     bits <<= numBits;  // make room for the bits to come
 
     // Read in more bytes to satisfy the request
-    unsigned int numBytesToLoad = (numBits - 1u >> 3u) + 1;
+    const unsigned int numBytesToLoad = ((numBits - 1u) >> 3u) + 1;
     unsigned int alignedWord = 0;
     // uint64_t alignedWord = 0;
     if (numBytesToLoad == 1) {
@@ -114,7 +114,7 @@ L1:
 L0:
 
     // Resolve remainder bits
-    unsigned int numNextHeldBits = (32 - numBits) % 8;
+    const unsigned int numNextHeldBits = (32 - numBits) % 8;
 
     // Copy required part of alignedWord into bits
     bits |= alignedWord >> numNextHeldBits;
@@ -132,7 +132,7 @@ L0:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitInputStream::skipBytes(unsigned int numBytes) {
+void BitInputStream::skipBytes(const unsigned int numBytes) {
     for (unsigned int i = 0; i < numBytes; i++) {
         readIn(&m_reader);
     }

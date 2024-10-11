@@ -29,13 +29,13 @@ void Exporter::skipIn(const util::Section &id) { util::OrderedSection sec(&lock,
 void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     getStats().add(data.getStats());
-    util::Watch watch;
+    const util::Watch watch;
     util::OrderedSection section(&lock, id);
     size_t size_seq = 0;
     size_t size_qual = 0;
     size_t size_name = 0;
 
-    auto num_files = file.size();
+    const auto num_files = file.size();
     // ideally should be 2 for paired end, but we can handle 1 as well
     const char readname_suffix[2][3] = {"/1", "/2"};
     // suffix attached when paired end data but only one output fastq file

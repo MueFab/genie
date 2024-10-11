@@ -22,10 +22,10 @@ const std::string& DatasetProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetProtection::DatasetProtection(util::BitReader& bitreader, core::MPEGMinorVersion _version)
+DatasetProtection::DatasetProtection(util::BitReader& bitreader, const core::MPEGMinorVersion _version)
     : version(_version) {
-    auto start_pos = bitreader.getStreamPosition();
-    auto length = bitreader.readAlignedInt<uint64_t>();
+    const auto start_pos = bitreader.getStreamPosition();
+    const auto length = bitreader.readAlignedInt<uint64_t>();
     auto protection_length = length - getHeaderLength();
     if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
@@ -40,8 +40,8 @@ DatasetProtection::DatasetProtection(util::BitReader& bitreader, core::MPEGMinor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetProtection::DatasetProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_protection_value,
-                                     core::MPEGMinorVersion _version)
+DatasetProtection::DatasetProtection(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                                     std::string _dg_protection_value, const core::MPEGMinorVersion _version)
     : version(_version),
       dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
@@ -86,7 +86,7 @@ std::string DatasetProtection::decapsulate() { return std::move(dg_protection_va
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetProtection::patchID(uint8_t _groupID, uint16_t _setID) {
+void DatasetProtection::patchID(const uint8_t _groupID, const uint16_t _setID) {
     dataset_group_id = _groupID;
     dataset_id = _setID;
 }

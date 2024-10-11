@@ -34,7 +34,7 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
             sec = {id, segment_count, true};
             id += segment_count;
         } else {
-            bool dataLeft = pumpRetrieve(classifier);
+            const bool dataLeft = pumpRetrieve(classifier);
             if (!dataLeft && !flushing) {
                 classifier->flush();
                 flushing = true;

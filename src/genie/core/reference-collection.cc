@@ -17,8 +17,9 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _start, uint64_t _end) const {
-    auto it = refs.find(name);
+std::string ReferenceCollection::getSequence(const std::string& name, const uint64_t _start,
+                                             const uint64_t _end) const {
+    const auto it = refs.find(name);
     if (it == refs.end()) {
         return "";
     }
@@ -76,7 +77,7 @@ void ReferenceCollection::registerRef(std::vector<std::unique_ptr<Reference>>&& 
 
 std::vector<std::pair<size_t, size_t>> ReferenceCollection::getCoverage(const std::string& name) const {
     std::vector<std::pair<size_t, size_t>> ret;
-    auto it = refs.find(name);
+    const auto it = refs.find(name);
     if (it == refs.end()) {
         return ret;
     }

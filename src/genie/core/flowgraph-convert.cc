@@ -15,7 +15,7 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphConvert::FlowGraphConvert(size_t threads) : mgr(threads) {}
+FlowGraphConvert::FlowGraphConvert(const size_t threads) : mgr(threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,14 +33,14 @@ void FlowGraphConvert::addImporter(std::unique_ptr<FormatImporter> dat) {
 void FlowGraphConvert::setClassifier(std::unique_ptr<Classifier> _classifier) {
     classifier = std::move(_classifier);
 
-    for (auto& i : importers) {
+    for (const auto& i : importers) {
         i->setClassifier(classifier.get());
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphConvert::setImporter(std::unique_ptr<FormatImporter> dat, size_t index) {
+void FlowGraphConvert::setImporter(std::unique_ptr<FormatImporter> dat, const size_t index) {
     importers[index] = std::move(dat);
     importers[index]->setClassifier(classifier.get());
     importers[index]->setDrain(&exporterSelector);
@@ -55,7 +55,7 @@ void FlowGraphConvert::addExporter(std::unique_ptr<FormatExporter> dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphConvert::setExporter(std::unique_ptr<FormatExporter> dat, size_t index) {
+void FlowGraphConvert::setExporter(std::unique_ptr<FormatExporter> dat, const size_t index) {
     exporters[index] = std::move(dat);
     exporterSelector.set(exporters[index].get(), index);
 }
@@ -80,13 +80,13 @@ void FlowGraphConvert::run() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphConvert::stop(bool abort) { mgr.stop(abort); }
+void FlowGraphConvert::stop(const bool abort) { mgr.stop(abort); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 stats::PerfStats FlowGraphConvert::getStats() {
     stats::PerfStats ret;
-    for (auto& e : exporters) {
+    for (const auto& e : exporters) {
         ret.add(e->getStats());
     }
     return ret;

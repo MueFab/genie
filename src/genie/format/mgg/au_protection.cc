@@ -22,10 +22,9 @@ const std::string& AUProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AUProtection::AUProtection(util::BitReader& bitreader, core::MPEGMinorVersion _version)
-    : version(_version) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
+AUProtection::AUProtection(util::BitReader& bitreader, const core::MPEGMinorVersion _version) : version(_version) {
+    const auto start_pos = bitreader.getStreamPosition() - 4;
+    const auto length = bitreader.readAlignedInt<uint64_t>();
     auto metadata_length = length - getHeaderLength();
     if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
@@ -40,8 +39,8 @@ AUProtection::AUProtection(util::BitReader& bitreader, core::MPEGMinorVersion _v
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AUProtection::AUProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_protection_value,
-                           core::MPEGMinorVersion _version)
+AUProtection::AUProtection(const uint8_t _dataset_group_id, const uint16_t _dataset_id,
+                           std::string _au_protection_value, const core::MPEGMinorVersion _version)
     : version(_version),
       dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),

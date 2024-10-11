@@ -33,8 +33,8 @@ DescriptorStream::DescriptorStream(DescriptorStreamHeader _header) : header(std:
 
 DescriptorStream::DescriptorStream(util::BitReader& reader, const MasterIndexTable& table,
                                    const std::vector<dataset_header::MITClassConfig>& configs) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.read<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.read<uint64_t>();
     std::string tmp(4, '\0');
     reader.readAlignedBytes(tmp.data(), tmp.length());
     UTILS_DIE_IF(tmp != "dshd", "Descriptor stream without header");
@@ -127,7 +127,7 @@ const std::string& DescriptorStream::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream(core::GenDesc descriptor, core::record::ClassType classID,
+DescriptorStream::DescriptorStream(const core::GenDesc descriptor, const core::record::ClassType classID,
                                    std::vector<mgb::Block> blocks)
     : header(false, descriptor, classID, static_cast<uint32_t>(blocks.size())) {
     for (auto& b : blocks) {

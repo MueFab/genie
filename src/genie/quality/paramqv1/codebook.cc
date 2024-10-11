@@ -46,7 +46,7 @@ void Codebook::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Codebook::Codebook(uint8_t v1, uint8_t v2) {
+Codebook::Codebook(const uint8_t v1, const uint8_t v2) {
     qv_recon.push_back(v1);
     qv_recon.push_back(v2);
 }

@@ -28,7 +28,7 @@ double PerfStats::Stat::avg() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void PerfStats::addDouble(const std::string& name, double dat) {
+void PerfStats::addDouble(const std::string& name, const double dat) {
     Stat s;
     s.isInteger = false;
     s.min.fData = dat;
@@ -40,7 +40,7 @@ void PerfStats::addDouble(const std::string& name, double dat) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void PerfStats::addInteger(const std::string& name, int64_t dat) {
+void PerfStats::addInteger(const std::string& name, const int64_t dat) {
     Stat s;
     s.isInteger = true;
     s.min.iData = dat;
@@ -56,7 +56,7 @@ void PerfStats::add(const std::string& name, const Stat& s) {
     if (!active) {
         return;
     }
-    auto it = data.find(name);
+    const auto it = data.find(name);
     if (it == data.end()) {
         data[name] = s;
     } else {
@@ -93,7 +93,7 @@ std::map<std::string, PerfStats::Stat>::const_iterator PerfStats::end() const { 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void PerfStats::setActive(bool _active) { active = _active; }
+void PerfStats::setActive(const bool _active) { active = _active; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

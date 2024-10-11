@@ -35,7 +35,7 @@ const std::string& RawReferenceSequence::getSequence() const { return ref_sequen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerOnly) {
+RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, const bool headerOnly) {
     sequence_ID = reader.read<uint16_t>();
     seq_start = reader.read<uint64_t>(40);
     seq_end = reader.read<uint64_t>(40);
@@ -50,7 +50,8 @@ RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerO
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence)
+RawReferenceSequence::RawReferenceSequence(const uint16_t _sequence_ID, const uint64_t _seq_start,
+                                           std::string&& _ref_sequence)
     : sequence_ID(_sequence_ID),
       seq_start(_seq_start),
       seq_end(_seq_start + _ref_sequence.length()),
@@ -72,8 +73,8 @@ bool RawReferenceSequence::isIdUnique(const RawReferenceSequence& s) const { ret
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t RawReferenceSequence::getTotalSize() const {
-    uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;     // sequence_ID, seq_start, seq_end
-    return ref_sequence.length() + HEADER_SIZE;  // Including \0
+    const uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;  // sequence_ID, seq_start, seq_end
+    return ref_sequence.length() + HEADER_SIZE;       // Including \0
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

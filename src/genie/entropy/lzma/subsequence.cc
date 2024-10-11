@@ -12,7 +12,7 @@ namespace genie::entropy::lzma {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(uint8_t _output_symbol_size) : output_symbol_size(_output_symbol_size) {}
+Subsequence::Subsequence(const uint8_t _output_symbol_size) : output_symbol_size(_output_symbol_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

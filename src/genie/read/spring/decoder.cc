@@ -228,7 +228,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
+Decoder::Decoder(const std::string& working_dir, const bool comb_p, const bool paired_end)
     : combine_pairs(comb_p), unmatched_record_index{} {
     basedir = working_dir;
 
@@ -391,7 +391,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
     const size_t CHUNK_SIZE = 100000;
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
-        size_t size = chunk.getData().size() * 2;
+        const size_t size = chunk.getData().size() * 2;
         flowOut(std::move(chunk), {pos, size, true});
         pos += size;
     }

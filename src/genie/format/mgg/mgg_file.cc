@@ -62,7 +62,7 @@ void MggFile::write(util::BitWriter& writer) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MggFile::print_debug(std::ostream& output, uint8_t max_depth) const {
+void MggFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
     for (const auto& b : boxes) {
         b->print_debug(output, 0, max_depth);
     }

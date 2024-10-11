@@ -15,7 +15,7 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
+uint64_t run(const IOConfiguration& conf, const EncodingConfiguration& enConf, const bool decode) {
     if (decode) {
         return decodeDescSubsequence(conf, enConf);
     } else {

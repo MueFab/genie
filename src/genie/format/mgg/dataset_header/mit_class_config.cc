@@ -19,14 +19,14 @@ bool MITClassConfig::operator==(const MITClassConfig& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MITClassConfig::MITClassConfig(core::record::ClassType _id) : id(_id) {}
+MITClassConfig::MITClassConfig(const core::record::ClassType _id) : id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MITClassConfig::MITClassConfig(util::BitReader& reader, bool block_header_flag) {
+MITClassConfig::MITClassConfig(util::BitReader& reader, const bool block_header_flag) {
     id = reader.read<core::record::ClassType>(4);
     if (!block_header_flag) {
-        auto num_descriptors = reader.read<uint8_t>(5);
+        const auto num_descriptors = reader.read<uint8_t>(5);
         for (size_t i = 0; i < num_descriptors; ++i) {
             descriptor_ids.emplace_back(reader.read<core::GenDesc>(7));
         }

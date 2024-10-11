@@ -16,7 +16,7 @@ namespace genieapp::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ProgramOptions::ProgramOptions(int argc, char *argv[])
+ProgramOptions::ProgramOptions(const int argc, char *argv[])
     : fastBenchmark(false),
       logLevel(),
       inputFilePath(),
@@ -30,7 +30,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[])
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ProgramOptions::processCommandLine(int argc, char *argv[]) {
+void ProgramOptions::processCommandLine(const int argc, char *argv[]) {
     CLI::App app{"Gabacify - GABAC entropy encoder application"};
 
     this->logLevel = "info";

@@ -20,7 +20,7 @@ namespace genie::read::localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::LAEncodingState::LAEncodingState(const core::record::Chunk& data, uint32_t _cr_buf_max_size)
+Encoder::LAEncodingState::LAEncodingState(const core::record::Chunk& data, const uint32_t _cr_buf_max_size)
     : EncodingState(data), refCoder(_cr_buf_max_size) {
     minPos = data.getData().front().getAlignments().front().getPosition();
     maxPos = 0;
@@ -51,7 +51,7 @@ void Encoder::printDebug(const LAEncodingState& state, const std::string& ref1, 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
+core::AccessUnit Encoder::pack(const size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
                                EncodingState& state) {
     auto ret = EncoderStub::pack(id, std::move(qv), std::move(rname), state);
 
@@ -68,24 +68,24 @@ core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::Acc
 std::pair<std::string, std::string> Encoder::getReferences(const core::record::Record& r, EncodingState& state) {
     std::pair<std::string, std::string> ret;
     {
-        auto begin = r.getAlignments().front().getPosition();
-        auto ecigar = r.getAlignments().front().getAlignment().getECigar();
+        const auto begin = r.getAlignments().front().getPosition();
+        const auto ecigar = r.getAlignments().front().getAlignment().getECigar();
         ret.first = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
 
         // Update AU end
-        auto end = begin + core::record::Record::getLengthOfCigar(ecigar);
+        const auto end = begin + core::record::Record::getLengthOfCigar(ecigar);
         state.maxPos = std::max(state.maxPos, end);
     }
 
     if (r.getSegments().size() > 1) {
         const auto& srec = *reinterpret_cast<const core::record::alignment_split::SameRec*>(
             r.getAlignments().front().getAlignmentSplits().front().get());
-        auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
-        auto ecigar = srec.getAlignment().getECigar();
+        const auto begin = r.getAlignments().front().getPosition() + srec.getDelta();
+        const auto ecigar = srec.getAlignment().getECigar();
         ret.second = dynamic_cast<LAEncodingState&>(state).refCoder.getReference(static_cast<uint32_t>(begin), ecigar);
 
         // Update AU end
-        auto end = begin + srec.getDelta() + core::record::Record::getLengthOfCigar(ecigar);
+        const auto end = begin + srec.getDelta() + core::record::Record::getLengthOfCigar(ecigar);
         state.maxPos = std::max(state.maxPos, end);
     }
 
@@ -115,7 +115,7 @@ std::unique_ptr<Encoder::EncodingState> Encoder::createState(const core::record:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(bool _debug, bool _write_raw) : EncoderStub(_write_raw), debug(_debug) {}
+Encoder::Encoder(const bool _debug, const bool _write_raw) : EncoderStub(_write_raw), debug(_debug) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

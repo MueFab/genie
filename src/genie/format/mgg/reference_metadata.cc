@@ -33,7 +33,7 @@ const std::string& ReferenceMetadata::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _reference_id,
+ReferenceMetadata::ReferenceMetadata(const uint8_t _dataset_group_id, const uint8_t _reference_id,
                                      std::string _reference_metadata_value)
     : dataset_group_id(_dataset_group_id),
       reference_id(_reference_id),
@@ -42,9 +42,9 @@ ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _referen
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(util::BitReader& bitreader) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
-    auto len_value = length - sizeof(uint8_t) * 2;
+    const auto start_pos = bitreader.getStreamPosition() - 4;
+    const auto length = bitreader.readAlignedInt<uint64_t>();
+    const auto len_value = length - sizeof(uint8_t) * 2;
     reference_metadata_value.resize(len_value);
     dataset_group_id = bitreader.readAlignedInt<uint8_t>();
     reference_id = bitreader.readAlignedInt<uint8_t>();
@@ -74,11 +74,11 @@ const std::string& ReferenceMetadata::getReferenceMetadataValue() const { return
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceMetadata::patchID(uint8_t groupID) { dataset_group_id = groupID; }
+void ReferenceMetadata::patchID(const uint8_t groupID) { dataset_group_id = groupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceMetadata::patchRefID(uint8_t _old, uint8_t _new) {
+void ReferenceMetadata::patchRefID(const uint8_t _old, const uint8_t _new) {
     if (reference_id == _old) {
         reference_id = _new;
     }

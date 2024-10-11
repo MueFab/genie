@@ -18,7 +18,7 @@ namespace genie::read::spring {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void call_reorder(const std::string &temp_dir, compression_params &cp) {
-    size_t bitset_size_reorder = (2 * cp.max_readlen - 1) / 64 * 64 + 64;
+    const size_t bitset_size_reorder = (2 * cp.max_readlen - 1) / 64 * 64 + 64;
     switch (bitset_size_reorder) {
         case 64:
             reorder_main<64>(temp_dir, cp);
@@ -76,7 +76,7 @@ void call_reorder(const std::string &temp_dir, compression_params &cp) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void call_encoder(const std::string &temp_dir, compression_params &cp) {
-    size_t bitset_size_encoder = (3 * cp.max_readlen - 1) / 64 * 64 + 64;
+    const size_t bitset_size_encoder = (3 * cp.max_readlen - 1) / 64 * 64 + 64;
     switch (bitset_size_encoder) {
         case 64:
             encoder_main<64>(temp_dir, cp);

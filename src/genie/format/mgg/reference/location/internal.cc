@@ -13,7 +13,8 @@ namespace genie::format::mgg::reference::location {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Internal::Internal(uint8_t _reserved, uint8_t _internal_dataset_group_id, uint16_t _internal_dataset_id)
+Internal::Internal(const uint8_t _reserved, const uint8_t _internal_dataset_group_id,
+                   const uint16_t _internal_dataset_id)
     : Location(_reserved, false),
       internal_dataset_group_id(_internal_dataset_group_id),
       internal_dataset_id(_internal_dataset_id) {}
@@ -27,7 +28,7 @@ Internal::Internal(util::BitReader& reader) : Location(reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Internal::Internal(util::BitReader& reader, uint8_t _reserved) : Location(_reserved, false) {
+Internal::Internal(util::BitReader& reader, const uint8_t _reserved) : Location(_reserved, false) {
     internal_dataset_group_id = reader.readAlignedInt<uint8_t>();
     internal_dataset_id = reader.readAlignedInt<uint16_t>();
 }

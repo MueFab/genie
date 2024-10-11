@@ -21,8 +21,8 @@ DescriptorStreamProtection::DescriptorStreamProtection(std::string _dSProtection
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamProtection::DescriptorStreamProtection(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
+    const auto start_pos = reader.getStreamPosition() - 4;
+    const auto length = reader.readAlignedInt<uint64_t>();
     DSProtectionValue.resize(length);
     reader.readAlignedBytes(DSProtectionValue.data(), DSProtectionValue.length());
     UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");

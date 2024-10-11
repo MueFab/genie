@@ -32,7 +32,7 @@ namespace genie::quality::calq {
 // -----------------------------------------------------------------------------
 
 static int combinationsWithRepetitions(std::vector<std::string>* genoAlphabet, const std::vector<char>& alleleAlphabet,
-                                       int* got, int nChosen, int len, int at, int maxTypes) {
+                                       int* got, const int nChosen, const int len, const int at, const int maxTypes) {
     if (nChosen == len) {
         if (!got) {
             return 1;
@@ -102,7 +102,7 @@ double Genotyper::computeEntropy(const std::string& seqPileup, const std::string
 
     computeGenotypeLikelihoods(seqPileup, qualPileup, depth);
 
-    double entropy = std::accumulate(
+    const double entropy = std::accumulate(
         genotypeLikelihoods_.begin(), genotypeLikelihoods_.end(), 0.0,
         [](const double& a, const std::pair<std::string, double>& b) { return a - b.second * log(b.second); });
 
@@ -129,7 +129,7 @@ int Genotyper::computeQuantizerIndex(const std::string& seqPileup, const std::st
 
     double largestGenotypeLikelihood = 0.0;
     double secondLargestGenotypeLikelihood = 0.0;
-    for (auto& genotypeLikelihood : genotypeLikelihoods_) {
+    for (const auto& genotypeLikelihood : genotypeLikelihoods_) {
         if (genotypeLikelihood.second > secondLargestGenotypeLikelihood) {
             secondLargestGenotypeLikelihood = genotypeLikelihood.second;
         }
@@ -139,9 +139,9 @@ int Genotyper::computeQuantizerIndex(const std::string& seqPileup, const std::st
         }
     }
 
-    double confidence = largestGenotypeLikelihood - secondLargestGenotypeLikelihood;
+    const double confidence = largestGenotypeLikelihood - secondLargestGenotypeLikelihood;
 
-    auto quant = static_cast<int>((1 - confidence) * (nrQuantizers_ - 1));
+    const auto quant = static_cast<int>((1 - confidence) * (nrQuantizers_ - 1));
 
     if (DEBUG) {
         std::stringstream s;
@@ -201,8 +201,8 @@ void Genotyper::computeGenotypeLikelihoods(const std::string& seqPileup, const s
     auto* tempGenotypeLikelihoods = static_cast<double*>(calloc(genotypeAlphabet_.size(), sizeof(double)));
     int itr = 0;
     for (size_t d = 0; d < depth; d++) {
-        auto y = static_cast<char>(seqPileup[d]);
-        auto q = static_cast<double>(qualPileup[d] - qualOffset_);
+        const auto y = static_cast<char>(seqPileup[d]);
+        const auto q = static_cast<double>(qualPileup[d] - qualOffset_);
 
         double pStrike = 1 - pow(10.0, -q / 10.0);
         double pError = (1 - pStrike) / (ALLELE_ALPHABET_SIZE - 1);

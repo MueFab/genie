@@ -15,7 +15,7 @@ namespace genie::format::fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(core::ReferenceManager* _refMgr, std::ostream* out, size_t _num_threads)
+Exporter::Exporter(core::ReferenceManager* _refMgr, std::ostream* out, const size_t _num_threads)
     : refMgr(_refMgr), outfile(out), num_threads(_num_threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
