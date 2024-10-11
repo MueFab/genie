@@ -13,7 +13,7 @@ namespace genie::core::record::alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Unpaired::Unpaired() : AlignmentSplit(AlignmentSplit::Type::UNPAIRED) {}
+Unpaired::Unpaired() : AlignmentSplit(Type::UNPAIRED) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -47,7 +47,7 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         }
     }
     if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
-        Source<record::Chunk>::flowOut(std::move(chunk), sec);
+        flowOut(std::move(chunk), sec);
     }
     return true;
 }

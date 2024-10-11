@@ -46,7 +46,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
             for (auto c : s.getSequence()) {
                 state.streams.push(core::GenSub::UREADS,
-                                   core::getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
+                                   getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[c]);
             }
         }
         if (r.getSegments().size() > 1) {

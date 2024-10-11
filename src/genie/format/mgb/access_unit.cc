@@ -25,13 +25,13 @@ namespace genie::format::mgb {
 void AccessUnit::debugPrint(const core::parameter::EncodingSet &ps) const {
     std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
     std::cerr << "AU " << header.getID() << ": class " << lut[static_cast<int>(header.getClass())];
-    if (header.getClass() != genie::core::record::ClassType::CLASS_U) {
+    if (header.getClass() != core::record::ClassType::CLASS_U) {
         std::cerr << ", Position [" << header.getAlignmentInfo().getRefID() << "-"
                   << header.getAlignmentInfo().getStartPos() << ":" << header.getAlignmentInfo().getEndPos() << "]";
     }
     std::cerr << ", " << header.getReadCount() << " records";
 
-    if (header.getClass() == genie::core::record::ClassType::CLASS_U) {
+    if (header.getClass() == core::record::ClassType::CLASS_U) {
         if (!ps.isComputedReference()) {
             std::cerr << " (Low Latency)";
         } else {
@@ -113,7 +113,7 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
         header.setAuTypeCfg(AuTypeCfg(posSize));
     } else {
         if (signatureFlag) {
-            header.setSignatureCfg(SignatureCfg(core::getAlphabetProperties(alphabet).base_bits));
+            header.setSignatureCfg(SignatureCfg(getAlphabetProperties(alphabet).base_bits));
         }
     }
 }

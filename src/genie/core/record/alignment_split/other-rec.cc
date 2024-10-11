@@ -16,18 +16,18 @@ namespace genie::core::record::alignment_split {
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
-    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID) {}
+    : AlignmentSplit(Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(util::BitReader &reader)
-    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
+    : AlignmentSplit(Type::OTHER_REC),
       split_pos(reader.readAlignedInt<uint64_t, 5>()),
       split_seq_ID(reader.readAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec() : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(0), split_seq_ID(0) {}
+OtherRec::OtherRec() : AlignmentSplit(Type::OTHER_REC), split_pos(0), split_seq_ID(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

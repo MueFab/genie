@@ -14,7 +14,7 @@ namespace genie::format::mgg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-mgg::LabelRegion::LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
+LabelRegion::LabelRegion(uint16_t _seq_ID, uint64_t _start_pos, uint64_t _end_pos)
     : seq_ID((_seq_ID)), class_IDs(), start_pos(_start_pos), end_pos(_end_pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
     class_IDs.resize(num_classes);
     // for class_IDs[] u(4)
     for (auto& class_ID : class_IDs) {
-        class_ID = reader.read<genie::core::record::ClassType>(4);
+        class_ID = reader.read<core::record::ClassType>(4);
     }
 
     // start_pos u(40)
@@ -40,7 +40,7 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LabelRegion::addClassID(genie::core::record::ClassType _class_ID) { class_IDs.push_back(_class_ID); }
+void LabelRegion::addClassID(core::record::ClassType _class_ID) { class_IDs.push_back(_class_ID); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ uint16_t LabelRegion::getSeqID() const { return seq_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<genie::core::record::ClassType>& LabelRegion::getClassIDs() const { return class_IDs; }
+const std::vector<core::record::ClassType>& LabelRegion::getClassIDs() const { return class_IDs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -92,8 +92,8 @@ uint64_t LabelRegion::sizeInBits() const { return sizeof(uint16_t) * 8 + 4 + 4 *
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::meta::Region LabelRegion::decapsulate() {
-    genie::core::meta::Region ret(seq_ID, start_pos, end_pos, std::move(class_IDs));
+core::meta::Region LabelRegion::decapsulate() {
+    core::meta::Region ret(seq_ID, start_pos, end_pos, std::move(class_IDs));
     return ret;
 }
 

@@ -17,7 +17,7 @@ ReferenceSource::ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::meta::Reference ReferenceSource::getMeta() const {
+meta::Reference ReferenceSource::getMeta() const {
     return {
         "",           0, 0, 0, std::make_unique<meta::InternalRef>(static_cast<uint16_t>(0), static_cast<uint16_t>(0)),
         "Placeholder"};

@@ -392,7 +392,7 @@ std::string patch_ecigar(const std::string& ref, const std::string& seq, const s
                 break;
         }
 
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(cigar)) {
+        if (getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(cigar)) {
             fixedCigar += std::string(1, cigar);
             return true;
         }
@@ -437,7 +437,7 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
         if (c == '+' || c == '-' || c == '(' || c == '[') {
             return genie::core::record::ClassType::CLASS_I;
         }
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
+        if (getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
             if (c == 'N') {
                 ret = std::max(ret, genie::core::record::ClassType::CLASS_N);
             } else {
@@ -475,11 +475,11 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
         auto cigar = a.getAlignment().getECigar();
         auto seq = r.getSegments()[0].getSequence();
 
-        if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+        if (!validateBases(seq, getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
             return false;
         }
 
-        if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+        if (!validateBases(refSeq, getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
             return false;
         }
 
@@ -508,11 +508,11 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                 cigar = split.getAlignment().getECigar();
                 seq = r.getSegments()[1].getSequence();
 
-                if (!validateBases(seq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                if (!validateBases(seq, getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
                     return false;
                 }
 
-                if (!validateBases(refSeq, genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
+                if (!validateBases(refSeq, getAlphabetProperties(genie::core::AlphabetID::ACGTN))) {
                     return false;
                 }
 
@@ -716,7 +716,7 @@ std::string eCigar2Cigar(const std::string& ecigar) {
             number_buffer.push_back(c);
             continue;
         }
-        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
+        if (getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
             matchCount += 1;
         } else {
             if (c == '=') {

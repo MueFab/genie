@@ -20,7 +20,7 @@ namespace genie::format::fasta {
 
 Manager::Manager(std::istream& fasta, std::istream& fai, std::istream& sha, core::ReferenceManager* mgr,
                  std::string path)
-    : core::ReferenceSource(mgr), reader(fasta, fai, sha, std::move(path)) {
+    : ReferenceSource(mgr), reader(fasta, fai, sha, std::move(path)) {
     auto ref = generateRefHandles();
     int i = 0;
     for (auto& r : ref) {
@@ -39,7 +39,7 @@ uint64_t Manager::getLength(const std::string& seq) const { return reader.getLen
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string Manager::getRef(const std::string& sequence, uint64_t start, uint64_t end) {
-    std::lock_guard<std::mutex> guard(Manager::readerMutex);
+    std::lock_guard<std::mutex> guard(readerMutex);
     return reader.loadSection(sequence, start, end);
 }
 
@@ -57,7 +57,7 @@ std::vector<std::unique_ptr<core::Reference>> Manager::generateRefHandles() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::meta::Reference Manager::getMeta() const { return reader.getMeta(); }
+core::meta::Reference Manager::getMeta() const { return reader.getMeta(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

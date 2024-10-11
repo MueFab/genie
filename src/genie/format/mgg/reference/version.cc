@@ -25,7 +25,7 @@ Version::Version(uint16_t _v_major, uint16_t _v_minor, uint16_t _v_patch)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Version::Version(genie::util::BitReader& reader) {
+Version::Version(util::BitReader& reader) {
     v_major = reader.readAlignedInt<uint16_t>();
     v_minor = reader.readAlignedInt<uint16_t>();
     v_patch = reader.readAlignedInt<uint16_t>();
@@ -33,7 +33,7 @@ Version::Version(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Version::write(genie::util::BitWriter& writer) const {
+void Version::write(util::BitWriter& writer) const {
     writer.writeAlignedInt(v_major);
     writer.writeAlignedInt(v_minor);
     writer.writeAlignedInt(v_patch);

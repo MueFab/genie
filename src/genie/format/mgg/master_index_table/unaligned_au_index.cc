@@ -32,14 +32,14 @@ const std::vector<uint64_t>& UnalignedAUIndex::getBlockOffsets() const { return 
 UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset_size, uint8_t _position_size,
                                    core::parameter::DataUnit::DatasetType dataset_type, bool signature_flag,
                                    bool signature_const_flag, uint8_t _signature_size, bool block_header_flag,
-                                   const std::vector<genie::core::GenDesc>& descriptors, core::AlphabetID alphabet)
+                                   const std::vector<core::GenDesc>& descriptors, core::AlphabetID alphabet)
     : byte_offset_size(_byte_offset_size), position_size(_position_size), signature_size(_signature_size) {
     au_byte_offset = reader.read<uint64_t>(byte_offset_size);
     if (dataset_type == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        ref_cfg = genie::format::mgb::RefCfg(position_size, reader);
+        ref_cfg = mgb::RefCfg(position_size, reader);
     } else if (signature_flag) {
-        sig_cfg = genie::format::mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
-                                                   core::getAlphabetProperties(alphabet).base_bits);
+        sig_cfg = mgb::SignatureCfg(reader, signature_const_flag ? signature_size : 0,
+                                                   getAlphabetProperties(alphabet).base_bits);
         reader.flushHeldBits();
     }
     if (!block_header_flag) {
@@ -52,7 +52,7 @@ UnalignedAUIndex::UnalignedAUIndex(util::BitReader& reader, uint8_t _byte_offset
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UnalignedAUIndex::write(genie::util::BitWriter& writer) const {
+void UnalignedAUIndex::write(util::BitWriter& writer) const {
     writer.writeBits(au_byte_offset, byte_offset_size);
     if (ref_cfg != std::nullopt) {
         ref_cfg->write(writer);
@@ -92,11 +92,11 @@ bool UnalignedAUIndex::isReference() const { return ref_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::format::mgb::RefCfg& UnalignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
+const mgb::RefCfg& UnalignedAUIndex::getReferenceInfo() const { return *ref_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UnalignedAUIndex::setReferenceInfo(const genie::format::mgb::RefCfg& _ref_cfg) { ref_cfg = _ref_cfg; }
+void UnalignedAUIndex::setReferenceInfo(const mgb::RefCfg& _ref_cfg) { ref_cfg = _ref_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,11 +104,11 @@ bool UnalignedAUIndex::hasSignature() const { return sig_cfg != std::nullopt; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::format::mgb::SignatureCfg& UnalignedAUIndex::getSignatureInfo() const { return *sig_cfg; }
+const mgb::SignatureCfg& UnalignedAUIndex::getSignatureInfo() const { return *sig_cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UnalignedAUIndex::setSignatureInfo(const genie::format::mgb::SignatureCfg& sigcfg) { sig_cfg = sigcfg; }
+void UnalignedAUIndex::setSignatureInfo(const mgb::SignatureCfg& sigcfg) { sig_cfg = sigcfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

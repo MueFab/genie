@@ -71,7 +71,7 @@ std::string Sha256File::hash(std::istream& file, size_t posStart, size_t length)
     }
     hasher.finish();
     std::string bytes_str(picosha2::k_digest_size, 0);
-    return picosha2::get_hash_hex_string(hasher);
+    return get_hash_hex_string(hasher);
     // return bytes_str;
 }
 

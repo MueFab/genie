@@ -61,9 +61,9 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
     size_t numDescSubseqSymbols = 0;
     size_t subseqPayloadSize = 0;
 
-    numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &subsequence);
+    numDescSubseqSymbols = StreamHandler::readFull(*conf.inputStream, &subsequence);
     if (conf.dependencyStream != nullptr) {
-        if (numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
+        if (numDescSubseqSymbols != StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
             UTILS_DIE("Size mismatch between dependency and descriptor subsequence");
         }
     }
@@ -71,9 +71,9 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
     if (numDescSubseqSymbols > 0) {
         // write number of symbols in descriptor subsequence
         if (subseqCfg.getTokentypeFlag()) {
-            subseqPayloadSize += gabac::StreamHandler::writeU7(*conf.outputStream, numDescSubseqSymbols);
+            subseqPayloadSize += StreamHandler::writeU7(*conf.outputStream, numDescSubseqSymbols);
         } else {
-            subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numDescSubseqSymbols, 4);
+            subseqPayloadSize += StreamHandler::writeUInt(*conf.outputStream, numDescSubseqSymbols, 4);
         }
 
         // Insert subsequence into vector
@@ -91,21 +91,21 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
             uint64_t trnsfSubseqPayloadSize = 0;
             if (numtrnsfSymbols > 0) {
                 // Encoding
-                trnsfSubseqPayloadSize = gabac::encodeTransformSubseq(
+                trnsfSubseqPayloadSize = encodeTransformSubseq(
                     subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)), &(transformedSubseqs[i]),
                     (!dependency.empty()) ? &dependency : nullptr);
             }
 
             if (i < (numTrnsfSubseqs - 1)) {
-                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize + 4, 4);
+                subseqPayloadSize += StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize + 4, 4);
             }
 
             if (numTrnsfSubseqs > 1) {
-                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numtrnsfSymbols, 4);
+                subseqPayloadSize += StreamHandler::writeUInt(*conf.outputStream, numtrnsfSymbols, 4);
             }
 
             if (trnsfSubseqPayloadSize > 0) {
-                subseqPayloadSize += gabac::StreamHandler::writeBytes(*conf.outputStream, &transformedSubseqs[i]);
+                subseqPayloadSize += StreamHandler::writeBytes(*conf.outputStream, &transformedSubseqs[i]);
             }
         }
     }

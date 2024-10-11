@@ -47,15 +47,15 @@ bool AccessUnitHeader::operator==(const GenInfo& info) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() const { return header; }
+const mgb::AUHeader& AccessUnitHeader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() { return header; }
+mgb::AUHeader& AccessUnitHeader::getHeader() { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(genie::format::mgb::AUHeader(), false) {}
+AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(mgb::AUHeader(), false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,18 +64,18 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
     : mit_flag(mit) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
-    header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
+    header = mgb::AUHeader(reader, parameterSets, !mit_flag);
     UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader(genie::format::mgb::AUHeader _header, bool _mit_flag)
+AccessUnitHeader::AccessUnitHeader(mgb::AUHeader _header, bool _mit_flag)
     : header(std::move(_header)), mit_flag(_mit_flag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitHeader::box_write(genie::util::BitWriter& bitWriter) const { header.write(bitWriter, !mit_flag); }
+void AccessUnitHeader::box_write(util::BitWriter& bitWriter) const { header.write(bitWriter, !mit_flag); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

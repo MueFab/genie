@@ -81,7 +81,7 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, const DatasetHeader&
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MasterIndexTable::box_write(genie::util::BitWriter& bitWriter) const {
+void MasterIndexTable::box_write(util::BitWriter& bitWriter) const {
     for (const auto& a : aligned_aus) {
         for (const auto& b : a) {
             for (const auto& c : b) {

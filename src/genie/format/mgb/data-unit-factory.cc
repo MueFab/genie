@@ -20,7 +20,7 @@ namespace genie::format::mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer, bool ref)
+DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, Importer* _importer, bool ref)
     : refmgr(mgr), importer(_importer), referenceOnly(ref) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(i++, std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++, std::make_unique<Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                          ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
@@ -63,12 +63,12 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT: {
                 auto ret = AccessUnit(parameters, bitReader, true);
                 if (getParams(ret.getHeader().getParameterID()).getDatasetType() ==
-                    mgb::AccessUnit::DatasetType::REFERENCE) {
+                    AccessUnit::DatasetType::REFERENCE) {
                     const auto& ref = ret.getHeader().getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(i++, std::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++, std::make_unique<Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                          ref.getEnd() + 1, importer, pos, false));
                     bitReader.skipAlignedBytes(ret.getPayloadSize());
                 } else {

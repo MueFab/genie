@@ -24,15 +24,15 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
     uint64_t subseqPayloadSizeUsed = 0;
 
     util::DataBlock data = std::move(d);
-    gabac::IBufferStream inputStream(&data, 0);
-    const uint64_t subseqPayloadSize = gabac::StreamHandler::readStreamSize(inputStream);
+    IBufferStream inputStream(&data, 0);
+    const uint64_t subseqPayloadSize = StreamHandler::readStreamSize(inputStream);
     if (subseqPayloadSize <= 0) return;  // Simple return as subseqPayloadSize can be zero.
 
     // Read number of symbols in descriptor subsequence
     if (subseqCfg.getTokentypeFlag()) {
-        subseqPayloadSizeUsed += gabac::StreamHandler::readU7(inputStream, numSubseqSymbolsTotal);
+        subseqPayloadSizeUsed += StreamHandler::readU7(inputStream, numSubseqSymbolsTotal);
     } else {
-        subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(inputStream, numSubseqSymbolsTotal, 4);
+        subseqPayloadSizeUsed += StreamHandler::readUInt(inputStream, numSubseqSymbolsTotal, 4);
     }
 
     if (numSubseqSymbolsTotal > 0) {
@@ -49,21 +49,21 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
 
                 if (i < (numTrnsfSubseqs - 1)) {
                     subseqPayloadSizeUsed +=
-                        gabac::StreamHandler::readUInt(inputStream, trnsfSubseqPayloadSizeRemain, 4);
+                        StreamHandler::readUInt(inputStream, trnsfSubseqPayloadSizeRemain, 4);
                 } else {
                     trnsfSubseqPayloadSizeRemain = subseqPayloadSize - subseqPayloadSizeUsed;
                 }
 
                 if (trnsfSubseqPayloadSizeRemain > 0) {
                     if (numTrnsfSubseqs > 1) {
-                        subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(inputStream, currNumtrnsfSymbols, 4);
+                        subseqPayloadSizeUsed += StreamHandler::readUInt(inputStream, currNumtrnsfSymbols, 4);
                         trnsfSubseqPayloadSizeRemain -= 4;
                     } else {
                         currNumtrnsfSymbols = numSubseqSymbolsTotal;
                     }
 
                     if (currNumtrnsfSymbols > 0) {
-                        subseqPayloadSizeUsed += gabac::StreamHandler::readBytes(
+                        subseqPayloadSizeUsed += StreamHandler::readBytes(
                             inputStream, trnsfSubseqPayloadSizeRemain, &trnsfSubseqData[i]);
                     }
 

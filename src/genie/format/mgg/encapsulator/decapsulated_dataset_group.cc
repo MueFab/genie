@@ -25,7 +25,7 @@ DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DecapsulatedDatasetGroup&& ot
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(genie::format::mgg::DatasetGroup* grp) {
+DecapsulatedDatasetGroup::DecapsulatedDatasetGroup(DatasetGroup* grp) {
     id = grp->getHeader().getID();
     meta_group = decapsulate_dataset_group(grp);
     meta_references = decapsulate_references(grp);
@@ -45,30 +45,30 @@ bool DecapsulatedDatasetGroup::hasMetaGroup() const { return meta_group != std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::meta::DatasetGroup& DecapsulatedDatasetGroup::getMetaGroup() { return *meta_group; }
+core::meta::DatasetGroup& DecapsulatedDatasetGroup::getMetaGroup() { return *meta_group; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint8_t, genie::core::meta::Reference>& DecapsulatedDatasetGroup::getMetaReferences() {
+std::map<uint8_t, core::meta::Reference>& DecapsulatedDatasetGroup::getMetaReferences() {
     return meta_references;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint64_t, std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset>>&
+std::map<uint64_t, std::pair<mgb::MgbFile, core::meta::Dataset>>&
 DecapsulatedDatasetGroup::getData() {
     return data;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::optional<genie::core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsulate_dataset_group(
-    genie::format::mgg::DatasetGroup* grp) {
-    std::optional<genie::core::meta::DatasetGroup> meta_group;
+std::optional<core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsulate_dataset_group(
+    DatasetGroup* grp) {
+    std::optional<core::meta::DatasetGroup> meta_group;
     if (grp->hasMetadata()) {
         if (meta_group == std::nullopt) {
             meta_group =
-                genie::core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
+                core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
         }
         meta_group->setMetadata(grp->getMetadata().decapsulate());
     }
@@ -76,7 +76,7 @@ std::optional<genie::core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsu
     if (grp->hasProtection()) {
         if (meta_group == std::nullopt) {
             meta_group =
-                genie::core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
+                core::meta::DatasetGroup(grp->getHeader().getID(), grp->getHeader().getVersion(), "", "");
         }
         meta_group->setProtection(grp->getProtection().decapsulate());
     }
@@ -85,15 +85,15 @@ std::optional<genie::core::meta::DatasetGroup> DecapsulatedDatasetGroup::decapsu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::map<uint8_t, genie::core::meta::Reference> DecapsulatedDatasetGroup::decapsulate_references(
-    genie::format::mgg::DatasetGroup* grp) {
+std::map<uint8_t, core::meta::Reference> DecapsulatedDatasetGroup::decapsulate_references(
+    DatasetGroup* grp) {
     std::map<uint8_t, std::string> ref_metadata;
 
     for (auto& m : grp->getReferenceMetadata()) {
         ref_metadata.emplace(m.getReferenceID(), m.decapsulate());
     }
 
-    std::map<uint8_t, genie::core::meta::Reference> references;
+    std::map<uint8_t, core::meta::Reference> references;
 
     for (auto& m : grp->getReferences()) {
         auto it = ref_metadata.find(m.getReferenceID());
@@ -108,9 +108,9 @@ std::map<uint8_t, genie::core::meta::Reference> DecapsulatedDatasetGroup::decaps
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<genie::format::mgb::AccessUnit, std::optional<genie::core::meta::AccessUnit>>
-DecapsulatedDatasetGroup::decapsulate_AU(genie::format::mgg::AccessUnit& au) {
-    genie::core::meta::AccessUnit meta_au(au.getHeader().getHeader().getID());
+std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>>
+DecapsulatedDatasetGroup::decapsulate_AU(AccessUnit& au) {
+    core::meta::AccessUnit meta_au(au.getHeader().getHeader().getID());
     bool has_meta = false;
     if (au.hasInformation()) {
         has_meta = true;
@@ -120,7 +120,7 @@ DecapsulatedDatasetGroup::decapsulate_AU(genie::format::mgg::AccessUnit& au) {
         has_meta = true;
         meta_au.setProtection(au.getProtection().decapsulate());
     }
-    std::pair<genie::format::mgb::AccessUnit, std::optional<genie::core::meta::AccessUnit>> ret(au.decapsulate(),
+    std::pair<mgb::AccessUnit, std::optional<core::meta::AccessUnit>> ret(au.decapsulate(),
                                                                                                 std::nullopt);
     if (has_meta) {
         ret.second = std::move(meta_au);
@@ -130,11 +130,11 @@ DecapsulatedDatasetGroup::decapsulate_AU(genie::format::mgg::AccessUnit& au) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedDatasetGroup::decapsulate_dataset(
-    genie::format::mgg::Dataset& dt, std::optional<genie::core::meta::DatasetGroup>& meta_group,
-    std::map<uint8_t, genie::core::meta::Reference>& meta_references, genie::format::mgg::DatasetGroup* grp) {
-    genie::format::mgb::MgbFile mgb_file;
-    genie::core::meta::Dataset meta;
+std::pair<mgb::MgbFile, core::meta::Dataset> DecapsulatedDatasetGroup::decapsulate_dataset(
+    Dataset& dt, std::optional<core::meta::DatasetGroup>& meta_group,
+    std::map<uint8_t, core::meta::Reference>& meta_references, DatasetGroup* grp) {
+    mgb::MgbFile mgb_file;
+    core::meta::Dataset meta;
 
     meta.setHeader(dt.getHeader().decapsulate());
 
@@ -155,11 +155,11 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
         }
     }
     for (auto& p : dt.getParameterSets()) {
-        mgb_file.addUnit(std::make_unique<genie::core::parameter::ParameterSet>(p.descapsulate()));
+        mgb_file.addUnit(std::make_unique<core::parameter::ParameterSet>(p.descapsulate()));
     }
     for (auto& au : dt.getAccessUnits()) {
         auto decap_au = decapsulate_AU(au);
-        mgb_file.addUnit(std::make_unique<genie::format::mgb::AccessUnit>(std::move(decap_au.first)));
+        mgb_file.addUnit(std::make_unique<mgb::AccessUnit>(std::move(decap_au.first)));
         if (decap_au.second != std::nullopt) {
             meta.addAccessUnit(std::move(*decap_au.second));
         }
@@ -175,7 +175,7 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
 
     for (auto& ds : dt.getDescriptorStreams()) {
         if (ds.hasProtection()) {
-            meta.addDescriptorStream(genie::core::meta::DescriptorStream(
+            meta.addDescriptorStream(core::meta::DescriptorStream(
                 static_cast<size_t>(ds.getHeader().getDescriptorID()), ds.getProtection().decapsulate()));
         }
     }

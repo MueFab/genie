@@ -13,8 +13,8 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::meta::Dataset genie::core::FlowGraph::getMeta() const {
-    return {0, std::make_unique<genie::core::meta::blockheader::Enabled>(false, false), "", ""};
+meta::Dataset FlowGraph::getMeta() const {
+    return {0, std::make_unique<meta::blockheader::Enabled>(false, false), "", ""};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

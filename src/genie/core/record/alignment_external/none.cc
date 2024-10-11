@@ -13,7 +13,7 @@ namespace genie::core::record::alignment_external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-None::None() : AlignmentExternal(AlignmentExternal::Type::NONE) {}
+None::None() : AlignmentExternal(Type::NONE) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

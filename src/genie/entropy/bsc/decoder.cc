@@ -24,7 +24,7 @@ namespace genie::entropy::bsc {
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
     auto id = data.getID();
 
-    uint8_t bytes = genie::core::range2bytes(core::getSubsequence(id).range);
+    uint8_t bytes = core::range2bytes(getSubsequence(id).range);
     if (id.first == core::GenDesc::RNAME) {
         bytes = 1;
     }
@@ -63,11 +63,11 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
         auto d_id = subseq.getID();
 
         auto subseq_name = std::string();
-        if (core::getDescriptor(std::get<0>(desc).getID()).tokentype) {
-            subseq_name = core::getDescriptor(std::get<0>(desc).getID()).name;
+        if (getDescriptor(std::get<0>(desc).getID()).tokentype) {
+            subseq_name = getDescriptor(std::get<0>(desc).getID()).name;
         } else {
-            subseq_name = core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
-                          core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name;
+            subseq_name = getDescriptor(std::get<0>(desc).getID()).name + "-" +
+                          getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name;
         }
         if (!subseq.isEmpty()) {
             std::get<1>(desc).addInteger("size-bsc-total-comp", subseq.getRawSize());

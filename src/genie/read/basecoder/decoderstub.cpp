@@ -31,7 +31,7 @@ core::record::Chunk DecoderStub::decodeSequences(DecodingState& state, core::Acc
     util::Watch watch;
     core::record::Chunk chunk;
     chunk.setStats(std::move(t_data.getStats()));
-    basecoder::Decoder decoder(std::move(t_data), state.numSegments, t_data.getMinPos());
+    Decoder decoder(std::move(t_data), state.numSegments, t_data.getMinPos());
     for (size_t recID = 0; recID < state.numRecords;) {
         auto meta = decoder.readSegmentMeta();
 

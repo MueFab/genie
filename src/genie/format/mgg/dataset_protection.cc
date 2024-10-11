@@ -22,12 +22,12 @@ const std::string& DatasetProtection::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
+DatasetProtection::DatasetProtection(util::BitReader& bitreader, core::MPEGMinorVersion _version)
     : version(_version) {
     auto start_pos = bitreader.getStreamPosition();
     auto length = bitreader.readAlignedInt<uint64_t>();
-    auto protection_length = length - GenInfo::getHeaderLength();
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    auto protection_length = length - getHeaderLength();
+    if (version != core::MPEGMinorVersion::V1900) {
         dataset_group_id = bitreader.readAlignedInt<uint8_t>();
         dataset_id = bitreader.readAlignedInt<uint16_t>();
         protection_length -= sizeof(uint8_t);
@@ -41,7 +41,7 @@ DatasetProtection::DatasetProtection(genie::util::BitReader& bitreader, genie::c
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetProtection::DatasetProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _dg_protection_value,
-                                     genie::core::MPEGMinorVersion _version)
+                                     core::MPEGMinorVersion _version)
     : version(_version),
       dataset_group_id(_dataset_group_id),
       dataset_id(_dataset_id),
@@ -49,8 +49,8 @@ DatasetProtection::DatasetProtection(uint8_t _dataset_group_id, uint16_t _datase
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetProtection::box_write(genie::util::BitWriter& bitWriter) const {
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+void DatasetProtection::box_write(util::BitWriter& bitWriter) const {
+    if (version != core::MPEGMinorVersion::V1900) {
         bitWriter.writeAlignedInt(dataset_group_id);
         bitWriter.writeAlignedInt(dataset_id);
     }

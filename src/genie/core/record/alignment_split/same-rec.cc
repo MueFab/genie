@@ -16,17 +16,17 @@ namespace genie::core::record::alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SameRec::SameRec() : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(0), alignment() {}
+SameRec::SameRec() : AlignmentSplit(Type::SAME_REC), delta(0), alignment() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 SameRec::SameRec(int64_t _delta, Alignment _alignment)
-    : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(_delta), alignment(std::move(_alignment)) {}
+    : AlignmentSplit(Type::SAME_REC), delta(_delta), alignment(std::move(_alignment)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
-    : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
+    : AlignmentSplit(Type::SAME_REC),
       delta(reader.readAlignedInt<int64_t, 6>()),
       alignment(as_depth, reader) {}
 

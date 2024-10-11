@@ -28,12 +28,12 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     getStats().add(data.getStats());
     auto parameter_id = static_cast<uint8_t>(parameter_stash.size());
     core::parameter::ParameterSet out_set(parameter_id, parameter_id, std::move(data.getParameters()));
-    mgb::RawReference ref;
+    RawReference ref;
     for (const auto& p : data.getRefToWrite()) {
         auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
         auto substr = string.substr(p.first % core::ReferenceManager::getChunkSize());
         substr = string.substr(0, p.second - p.first);
-        mgb::RawReferenceSequence refseq(data.getReference(), p.first, std::move(substr));
+        RawReferenceSequence refseq(data.getReference(), p.first, std::move(substr));
         ref.addSequence(std::move(refseq));
     }
     if (!ref.isEmpty()) {
@@ -42,7 +42,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                       << std::endl;
         }
         ref.write(writer);
-        ref = mgb::RawReference();
+        ref = RawReference();
     }
 
     if (data.getNumReads() == 0) {
@@ -68,7 +68,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                            : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
-    mgb::AccessUnit au(static_cast<uint32_t>(id_ctr), parameter_id, data.getClassType(),
+    AccessUnit au(static_cast<uint32_t>(id_ctr), parameter_id, data.getClassType(),
                        static_cast<uint32_t>(data.getNumReads()), datasetType, 32, false, core::AlphabetID::ACGTN);
     if (data.isReferenceOnly()) {
         au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
@@ -94,7 +94,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::skipIn(const genie::util::Section& id) { util::OrderedSection sec(&lock, id); }
+void Exporter::skipIn(const util::Section& id) { util::OrderedSection sec(&lock, id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

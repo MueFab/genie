@@ -24,7 +24,7 @@ USignature::USignature(uint8_t _const_length) : const_length(_const_length) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-USignature::USignature(genie::util::BitReader& reader) {
+USignature::USignature(util::BitReader& reader) {
     bool U_signature_constant_length = reader.read<bool>(1);
     if (U_signature_constant_length) {
         const_length = reader.read<uint8_t>(8);
@@ -33,7 +33,7 @@ USignature::USignature(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void USignature::write(genie::util::BitWriter& writer) const {
+void USignature::write(util::BitWriter& writer) const {
     writer.writeBits(isConstLength(), 1);
     if (isConstLength()) {
         writer.writeBits(getConstLength(), 8);

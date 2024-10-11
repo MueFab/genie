@@ -20,7 +20,7 @@ uint64_t GenInfo::getHeaderLength() { return sizeof(uint64_t) + sizeof(char) * 4
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenInfo::write(genie::util::BitWriter& bitWriter) const {
+void GenInfo::write(util::BitWriter& bitWriter) const {
     int64_t begin = bitWriter.getStreamPosition();
     bitWriter.writeAlignedBytes(getKey().data(), getKey().length());
     int64_t size_pos = bitWriter.getStreamPosition();

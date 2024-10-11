@@ -24,7 +24,7 @@ UpdateInfo::UpdateInfo(bool _multiple_alignment_flag, bool _pos_40_bits_flag, co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UpdateInfo::UpdateInfo(genie::util::BitReader& reader) {
+UpdateInfo::UpdateInfo(util::BitReader& reader) {
     multiple_alignment_flag = reader.read<bool>(1);
     pos_40_bits_flag = reader.read<bool>(1);
     alphabetId = reader.read<core::AlphabetID>(8);
@@ -36,7 +36,7 @@ UpdateInfo::UpdateInfo(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void UpdateInfo::write(genie::util::BitWriter& writer) const {
+void UpdateInfo::write(util::BitWriter& writer) const {
     writer.writeBits(multiple_alignment_flag, 1);
     writer.writeBits(pos_40_bits_flag, 1);
     writer.writeBits(static_cast<uint8_t>(alphabetId), 8);

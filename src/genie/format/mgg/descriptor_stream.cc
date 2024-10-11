@@ -127,8 +127,8 @@ const std::string& DescriptorStream::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core::record::ClassType classID,
-                                   std::vector<format::mgb::Block> blocks)
+DescriptorStream::DescriptorStream(core::GenDesc descriptor, core::record::ClassType classID,
+                                   std::vector<mgb::Block> blocks)
     : header(false, descriptor, classID, static_cast<uint32_t>(blocks.size())) {
     for (auto& b : blocks) {
         payload.emplace_back(b.movePayloadUnparsed());
@@ -137,8 +137,8 @@ DescriptorStream::DescriptorStream(genie::core::GenDesc descriptor, genie::core:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<format::mgb::Block> DescriptorStream::decapsulate() {
-    std::vector<format::mgb::Block> ret;
+std::vector<mgb::Block> DescriptorStream::decapsulate() {
+    std::vector<mgb::Block> ret;
     ret.reserve(payload.size());
     for (auto& p : payload) {
         ret.emplace_back(header.getDescriptorID(), std::move(p));

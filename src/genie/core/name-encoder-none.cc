@@ -13,8 +13,8 @@ namespace genie::core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> NameEncoderNone::process(const record::Chunk&) {
-    return std::make_tuple(AccessUnit::Descriptor(GenDesc::RNAME), core::stats::PerfStats());
+std::tuple<AccessUnit::Descriptor, stats::PerfStats> NameEncoderNone::process(const record::Chunk&) {
+    return std::make_tuple(AccessUnit::Descriptor(GenDesc::RNAME), stats::PerfStats());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

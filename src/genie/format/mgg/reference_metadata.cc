@@ -41,7 +41,7 @@ ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _referen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
+ReferenceMetadata::ReferenceMetadata(util::BitReader& bitreader) {
     auto start_pos = bitreader.getStreamPosition() - 4;
     auto length = bitreader.readAlignedInt<uint64_t>();
     auto len_value = (length - sizeof(uint8_t) * 2);
@@ -54,7 +54,7 @@ ReferenceMetadata::ReferenceMetadata(genie::util::BitReader& bitreader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceMetadata::box_write(genie::util::BitWriter& bitWriter) const {
+void ReferenceMetadata::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeAlignedInt<uint8_t>(dataset_group_id);
     bitWriter.writeAlignedInt<uint8_t>(reference_id);
     bitWriter.writeAlignedBytes(reference_metadata_value.data(), reference_metadata_value.length());

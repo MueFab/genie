@@ -21,7 +21,7 @@ bool ReferenceOptions::operator==(const ReferenceOptions& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceOptions::ReferenceOptions(genie::util::BitReader& reader) {
+ReferenceOptions::ReferenceOptions(util::BitReader& reader) {
     auto seq_count = reader.read<uint16_t>();
     if (!seq_count) {
         reference_ID = std::numeric_limits<uint8_t>::max();
@@ -38,7 +38,7 @@ ReferenceOptions::ReferenceOptions(genie::util::BitReader& reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceOptions::write(genie::util::BitWriter& writer) const {
+void ReferenceOptions::write(util::BitWriter& writer) const {
     writer.writeBits(seq_ID.size(), 16);
     if (seq_ID.empty()) {
         return;

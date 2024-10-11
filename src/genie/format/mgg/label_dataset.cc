@@ -78,8 +78,8 @@ void LabelDataset::write(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<genie::core::meta::Region> LabelDataset::decapsulate(uint16_t dataset) {
-    std::vector<genie::core::meta::Region> ret;
+std::vector<core::meta::Region> LabelDataset::decapsulate(uint16_t dataset) {
+    std::vector<core::meta::Region> ret;
     if (dataset != dataset_ID) {
         return ret;
     }
@@ -91,7 +91,7 @@ std::vector<genie::core::meta::Region> LabelDataset::decapsulate(uint16_t datase
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LabelDataset::LabelDataset(uint16_t _dataset_ID, genie::core::meta::Label& labels) : dataset_ID(_dataset_ID) {
+LabelDataset::LabelDataset(uint16_t _dataset_ID, core::meta::Label& labels) : dataset_ID(_dataset_ID) {
     for (auto& l : labels.getRegions()) {
         dataset_regions.emplace_back(l.getSeqID(), l.getStartPos(), l.getEndPos());
         for (auto& c : l.getClasses()) {

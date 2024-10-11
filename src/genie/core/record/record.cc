@@ -277,7 +277,7 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
             digits += c;
             continue;
         }
-        if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(c)) {
+        if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
             length++;
             digits.clear();
             continue;
@@ -299,7 +299,7 @@ size_t Record::getMappedLength(size_t alignment, size_t split) const {
         return getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
     }
     auto &s2 =
-        dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+        dynamic_cast<alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getLengthOfCigar(s2.getAlignment().getECigar());
 }
 
@@ -326,7 +326,7 @@ size_t Record::getPosition(size_t alignment, size_t split) const {
         return getAlignments()[alignment].getPosition();
     }
     auto &s2 =
-        dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+        dynamic_cast<alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getAlignments()[alignment].getPosition() + s2.getDelta();
 }
 

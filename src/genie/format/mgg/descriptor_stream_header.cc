@@ -19,7 +19,7 @@ bool DescriptorStreamHeader::getReserved() const { return reserved; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::GenDesc DescriptorStreamHeader::getDescriptorID() const { return descriptor_id; }
+core::GenDesc DescriptorStreamHeader::getDescriptorID() const { return descriptor_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,17 +36,17 @@ void DescriptorStreamHeader::addBlock() { num_blocks++; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader()
-    : DescriptorStreamHeader(false, static_cast<genie::core::GenDesc>(0), core::record::ClassType::NONE, 0) {}
+    : DescriptorStreamHeader(false, static_cast<core::GenDesc>(0), core::record::ClassType::NONE, 0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamHeader::DescriptorStreamHeader(bool _reserved, genie::core::GenDesc _genDesc,
+DescriptorStreamHeader::DescriptorStreamHeader(bool _reserved, core::GenDesc _genDesc,
                                                core::record::ClassType _class_id, uint32_t _num_blocks)
     : reserved(_reserved), descriptor_id(_genDesc), class_id(_class_id), num_blocks(_num_blocks) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const {
+void DescriptorStreamHeader::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeBits(reserved, 1);
     bitWriter.writeBits(static_cast<uint8_t>(descriptor_id), 7);
     bitWriter.writeBits(static_cast<uint8_t>(class_id), 4);
@@ -56,11 +56,11 @@ void DescriptorStreamHeader::box_write(genie::util::BitWriter& bitWriter) const 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
+DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& reader) {
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
     reserved = reader.read<bool>(1);
-    descriptor_id = reader.read<genie::core::GenDesc>(7);
+    descriptor_id = reader.read<core::GenDesc>(7);
     class_id = reader.read<core::record::ClassType>(4);
     num_blocks = reader.read<uint32_t>(32);
     reader.flushHeldBits();

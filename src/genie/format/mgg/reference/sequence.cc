@@ -21,7 +21,7 @@ bool Sequence::operator==(const Sequence& other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(std::string _name, uint32_t length, uint16_t id, genie::core::MPEGMinorVersion _version)
+Sequence::Sequence(std::string _name, uint32_t length, uint16_t id, core::MPEGMinorVersion _version)
     : name(std::move(_name)), sequence_length(length), sequence_id(id), version(_version) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -38,9 +38,9 @@ uint16_t Sequence::getID() const { return sequence_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion _version) : version(_version) {
+Sequence::Sequence(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
     name = reader.readAlignedStringTerminated();
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != core::MPEGMinorVersion::V1900) {
         sequence_length = reader.readAlignedInt<uint32_t>();
         sequence_id = reader.readAlignedInt<uint16_t>();
     }
@@ -48,10 +48,10 @@ Sequence::Sequence(genie::util::BitReader& reader, genie::core::MPEGMinorVersion
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Sequence::write(genie::util::BitWriter& writer) const {
+void Sequence::write(util::BitWriter& writer) const {
     writer.writeAlignedBytes(name.data(), name.length());
     writer.writeAlignedInt<uint8_t>('\0');
-    if (version != genie::core::MPEGMinorVersion::V1900) {
+    if (version != core::MPEGMinorVersion::V1900) {
         writer.writeAlignedInt(sequence_length);
         writer.writeAlignedInt(sequence_id);
     }
@@ -59,7 +59,7 @@ void Sequence::write(genie::util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sequence::Sequence(genie::core::meta::Sequence s, genie::core::MPEGMinorVersion _version)
+Sequence::Sequence(core::meta::Sequence s, core::MPEGMinorVersion _version)
     : name(std::move(s.getName())),
       sequence_length(static_cast<uint32_t>(s.getLength())),
       sequence_id(s.getID()),

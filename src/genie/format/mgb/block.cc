@@ -43,7 +43,7 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
 
     count = static_cast<uint8_t>(static_cast<core::GenDesc>(descriptor_ID) == core::GenDesc::QV
                                      ? qv_count
-                                     : core::getDescriptor(static_cast<core::GenDesc>(descriptor_ID)).subseqs.size());
+                                     : getDescriptor(static_cast<core::GenDesc>(descriptor_ID)).subseqs.size());
     // payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
     payload = core::Payload(reader, block_payload_size);
 
@@ -57,7 +57,7 @@ void Block::write(util::BitWriter &writer) const {
     writer.writeBits(descriptor_ID, 7);
     writer.writeBits(0, 3);
 
-    if (std::holds_alternative<genie::core::Payload>(payload)) {
+    if (std::holds_alternative<core::Payload>(payload)) {
         writer.writeBits(std::get<core::Payload>(payload).getPayloadSize(), 29);
         std::get<core::Payload>(payload).write(writer);
     } else {
@@ -80,7 +80,7 @@ uint8_t Block::getDescriptorID() const { return descriptor_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t Block::getWrittenSize() const {
-    if (std::holds_alternative<genie::core::Payload>(payload)) {
+    if (std::holds_alternative<core::Payload>(payload)) {
         return std::get<core::Payload>(payload).getPayloadSize() + sizeof(uint32_t) + sizeof(uint8_t);
     } else {
         return std::get<core::AccessUnit::Descriptor>(payload).getWrittenSize() + sizeof(uint32_t) + sizeof(uint8_t);
@@ -90,14 +90,14 @@ size_t Block::getWrittenSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Block::isLoaded() const {
-    return (std::holds_alternative<genie::core::Payload>(payload) &&
-            std::get<genie::core::Payload>(payload).isPayloadLoaded()) ||
-           std::holds_alternative<genie::core::AccessUnit::Descriptor>(payload);
+    return (std::holds_alternative<core::Payload>(payload) &&
+            std::get<core::Payload>(payload).isPayloadLoaded()) ||
+           std::holds_alternative<core::AccessUnit::Descriptor>(payload);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Block::isParsed() const { return std::holds_alternative<genie::core::AccessUnit::Descriptor>(payload); }
+bool Block::isParsed() const { return std::holds_alternative<core::AccessUnit::Descriptor>(payload); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ void Block::load() {
     if (isLoaded()) {
         return;
     }
-    std::get<genie::core::Payload>(payload).loadPayload();
+    std::get<core::Payload>(payload).loadPayload();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ void Block::unload() {
         return;
     }
     if (!isParsed()) {
-        std::get<genie::core::Payload>(payload).unloadPayload();
+        std::get<core::Payload>(payload).unloadPayload();
     }
 }
 
@@ -127,8 +127,8 @@ void Block::parse() {
     }
     std::stringstream ss;
 
-    ss.write(static_cast<const char *>(std::get<genie::core::Payload>(payload).getPayload().getData()),
-             static_cast<std::streamsize>(std::get<genie::core::Payload>(payload).getPayload().getRawSize()));
+    ss.write(static_cast<const char *>(std::get<core::Payload>(payload).getPayload().getData()),
+             static_cast<std::streamsize>(std::get<core::Payload>(payload).getPayload().getRawSize()));
 
     util::BitReader reader(ss);
 
@@ -154,7 +154,7 @@ void Block::pack() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(genie::core::GenDesc _descriptor_ID, core::Payload _payload)
+Block::Block(core::GenDesc _descriptor_ID, core::Payload _payload)
     : descriptor_ID(static_cast<uint8_t>(_descriptor_ID)),
       block_payload_size(static_cast<uint32_t>(_payload.getPayloadSize())),
       count(0),

@@ -104,11 +104,11 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     // numAlphaSubsym
     // Check for special cases for numAlphaSubsym
     if (original) {
-        numAlphaSubsym = StateVars::getNumAlphaSpecial(subsequence_ID, alphabet_ID);
+        numAlphaSubsym = getNumAlphaSpecial(subsequence_ID, alphabet_ID);
     }
 
     if (numAlphaSubsym == 0) {  // 0 == not special
-        numAlphaSubsym = StateVars::get2PowN(codingSubsymSize);
+        numAlphaSubsym = get2PowN(codingSubsymSize);
     }
 
     // cLengthBI
@@ -249,7 +249,7 @@ uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return (sizeInBit
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t StateVars::getLgWordSize(uint8_t sizeInBits) { return StateVars::getMinimalSizeInBytes(sizeInBits) >> 3; }
+uint8_t StateVars::getLgWordSize(uint8_t sizeInBits) { return getMinimalSizeInBytes(sizeInBits) >> 3; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -23,7 +23,7 @@ const std::string& DataSetMappingTable::getKey() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataSetMappingTable::box_write(genie::util::BitWriter& bitWriter) const {
+void DataSetMappingTable::box_write(util::BitWriter& bitWriter) const {
     bitWriter.writeAlignedInt(dataset_id);
     for (const auto& s : streams) {
         s.write(bitWriter);

@@ -20,7 +20,7 @@ USignature::USignature() : u_signature_length(std::nullopt) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-USignature::USignature(genie::util::BitReader& reader) {
+USignature::USignature(util::BitReader& reader) {
     if (reader.read<bool>(1)) {
         u_signature_length = reader.read<uint8_t>();
     }
@@ -40,7 +40,7 @@ void USignature::setConstLength(uint8_t length) { u_signature_length = length; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void USignature::write(genie::util::BitWriter& writer) const {
+void USignature::write(util::BitWriter& writer) const {
     writer.writeBits(u_signature_length != std::nullopt, 1);
     if (u_signature_length != std::nullopt) {
         writer.writeBits(*u_signature_length, 8);

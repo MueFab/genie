@@ -233,7 +233,7 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
     basedir = working_dir;
 
     while (true) {
-        std::string random_str = "tmp." + spring::random_string(10);
+        std::string random_str = "tmp." + random_string(10);
         basedir = working_dir + "/" + random_str + '/';
         if (!std::filesystem::exists(basedir)) break;
     }
@@ -263,9 +263,9 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
+void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     core::record::Chunk chunk;
-    genie::core::AccessUnit au = entropyCodeAU(std::move(t), true);
+    core::AccessUnit au = entropyCodeAU(std::move(t), true);
     util::Watch watch;
     std::array<std::vector<Record>, 2> matched_records;
     std::array<std::vector<Record>, 2> unmatched_records;

@@ -22,7 +22,7 @@ bool AUHeader::operator==(const AUHeader &other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AUHeader::write(genie::util::BitWriter &writer, bool write_signatures) const {
+void AUHeader::write(util::BitWriter &writer, bool write_signatures) const {
     writer.writeBits(access_unit_ID, 32);
     writer.writeBits(num_blocks, 8);
     writer.writeBits(parameter_set_ID, 8);
@@ -82,7 +82,7 @@ AUHeader::AUHeader(util::BitReader &bitReader, const std::map<size_t, core::para
                 }
                 this->signature_config = SignatureCfg(
                     bitReader, length,
-                    genie::core::getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
+                    getAlphabetProperties(parameterSets.at(parameter_set_ID).getAlphabetID()).base_bits);
             }
         }
     }
@@ -99,7 +99,7 @@ AUHeader::AUHeader()
 // ---------------------------------------------------------------------------------------------------------------------
 
 AUHeader::AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                   uint32_t _reads_count, genie::core::parameter::ParameterSet::DatasetType dataset_type,
+                   uint32_t _reads_count, core::parameter::ParameterSet::DatasetType dataset_type,
                    uint8_t posSize, bool signatureFlag, core::AlphabetID alphabet)
     : access_unit_ID(_access_unit_ID),
       num_blocks(0),
@@ -113,14 +113,14 @@ AUHeader::AUHeader(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::re
     if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
         mm_cfg = MmCfg();
     }
-    if (dataset_type == genie::core::parameter::ParameterSet::DatasetType::REFERENCE) {
+    if (dataset_type == core::parameter::ParameterSet::DatasetType::REFERENCE) {
         ref_cfg = RefCfg(posSize);
     }
     if (au_type != core::record::ClassType::CLASS_U) {
         au_Type_U_Cfg = AuTypeCfg(posSize);
     } else {
         if (signatureFlag) {
-            signature_config = SignatureCfg(genie::core::getAlphabetProperties(alphabet).base_bits);
+            signature_config = SignatureCfg(getAlphabetProperties(alphabet).base_bits);
         }
     }
 }

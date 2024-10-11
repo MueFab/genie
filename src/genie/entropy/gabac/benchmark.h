@@ -177,7 +177,7 @@ class ConfigSearchBinarization {
  private:
     SearchSpace<uint8_t> binarization;                                                    //!< @brief
     size_t binarization_search_idx;                                                       //!< @brief
-    std::vector<genie::entropy::paramcabac::BinarizationParameters::BinarizationId> lut;  //!< @brief
+    std::vector<paramcabac::BinarizationParameters::BinarizationId> lut;  //!< @brief
 
     std::vector<SearchSpace<uint8_t>> binarizationParameters;  //!< @brief
     size_t binarization_parameter_search_idx;                  //!< @brief
@@ -267,7 +267,7 @@ class ConfigSearchTranformedSeq {
      * @param original
      * @return
      */
-    paramcabac::TransformedSubSeq createConfig(const genie::core::GenSubIndex& descriptor_subsequence, bool original);
+    paramcabac::TransformedSubSeq createConfig(const core::GenSubIndex& descriptor_subsequence, bool original);
 
     /**
      * @brief
@@ -349,7 +349,7 @@ struct ResultFull {
  * @param filename
  * @return
  */
-ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const genie::core::GenSubIndex& gensub,
+ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, const core::GenSubIndex& gensub,
                                               util::DataBlock& data, float timeweight, bool original,
                                               size_t transformation, size_t transformation_param, size_t sequence_id,
                                               const std::string& filename);
@@ -361,7 +361,7 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
  * @param timeweight
  * @return
  */
-ResultFull benchmark_full(const std::string& input_file, const genie::core::GenSubIndex& desc, float timeweight);
+ResultFull benchmark_full(const std::string& input_file, const core::GenSubIndex& desc, float timeweight);
 
 /**
  * @brief
@@ -460,7 +460,7 @@ class ConfigSearch {
      * @param tokentype
      * @return
      */
-    paramcabac::Subsequence createConfig(genie::core::GenSubIndex descriptor_subsequence, bool tokentype);
+    paramcabac::Subsequence createConfig(core::GenSubIndex descriptor_subsequence, bool tokentype);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

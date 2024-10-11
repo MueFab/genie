@@ -66,12 +66,12 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
 
 core::record::Record Importer::buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data) {
     auto ret = core::record::Record(static_cast<uint8_t>(data.size()), core::record::ClassType::CLASS_U,
-                                    data[Files::FIRST][Lines::ID].substr(1), "", 0);
+                                    data[FIRST][ID].substr(1), "", 0);
 
     for (auto &cur_rec : data) {
-        auto seg = core::record::Segment(std::move(cur_rec[Lines::SEQUENCE]));
-        if (!cur_rec[Lines::QUALITY].empty()) {
-            seg.addQualities(std::move(cur_rec[Lines::QUALITY]));
+        auto seg = core::record::Segment(std::move(cur_rec[SEQUENCE]));
+        if (!cur_rec[QUALITY].empty()) {
+            seg.addQualities(std::move(cur_rec[QUALITY]));
         }
         ret.addSegment(std::move(seg));
     }

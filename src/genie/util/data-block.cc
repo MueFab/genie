@@ -15,7 +15,7 @@ namespace genie::util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockStepper util::DataBlock::getReader() const {
+BlockStepper DataBlock::getReader() const {
     return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.data() + data.size()),
                         getWordSize());
     // TODO(Fabian): Add BlockStepper for const
@@ -23,7 +23,7 @@ BlockStepper util::DataBlock::getReader() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool util::DataBlock::operator==(const util::DataBlock &d) const {
+bool DataBlock::operator==(const DataBlock &d) const {
     return lgWordSize == d.lgWordSize && data == d.data;
 }
 
@@ -41,27 +41,27 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return divByWordSize(data.size()); }
+size_t DataBlock::size() const { return divByWordSize(data.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
+void DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::clear() { data.clear(); }
+void DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
+void DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool util::DataBlock::empty() const { return data.empty(); }
+bool DataBlock::empty() const { return data.empty(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::swap(util::DataBlock *const d) {
+void DataBlock::swap(DataBlock *const d) {
     size_t tmp = lgWordSize;
     lgWordSize = d->lgWordSize;
     d->lgWordSize = static_cast<uint8_t>(tmp);

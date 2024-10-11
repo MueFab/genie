@@ -21,14 +21,14 @@ BlockHeaderOnOptions::BlockHeaderOnOptions(bool _mit_flag, bool _cc_mode_flag)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockHeaderOnOptions::BlockHeaderOnOptions(genie::util::BitReader& reader) {
+BlockHeaderOnOptions::BlockHeaderOnOptions(util::BitReader& reader) {
     mit_flag = reader.read<bool>(1);
     cc_mode_flag = reader.read<bool>(1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockHeaderOnOptions::write(genie::util::BitWriter& writer) const {
+void BlockHeaderOnOptions::write(util::BitWriter& writer) const {
     writer.writeBits(mit_flag, 1);
     writer.writeBits(cc_mode_flag, 1);
 }

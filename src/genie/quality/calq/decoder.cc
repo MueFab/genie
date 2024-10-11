@@ -20,15 +20,15 @@ bool Decoder::isAligned(const core::AccessUnit::Descriptor& desc) { return desc.
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::QualityValues1& param,
+std::vector<std::string> Decoder::decodeAligned(const paramqv1::QualityValues1& param,
                                                 const std::vector<std::string>& ecigar_vec,
                                                 const std::vector<uint64_t>& positions,
                                                 core::AccessUnit::Descriptor& desc) {
     // calq variables
-    calq::DecodingOptions options;  // default options
-    calq::SideInformation sideInformation;
-    calq::EncodingBlock output;
-    calq::DecodingBlock input;
+    DecodingOptions options;  // default options
+    SideInformation sideInformation;
+    EncodingBlock output;
+    DecodingBlock input;
 
     sideInformation.posOffset = positions[0];
     sideInformation.qualOffset = 0;
@@ -38,14 +38,14 @@ std::vector<std::string> Decoder::decodeAligned(const quality::paramqv1::Quality
     sideInformation.positions.emplace_back(positions);
     sideInformation.cigars.emplace_back(ecigar_vec);
 
-    calq::decode(options, sideInformation, input, &output);
+    decode(options, sideInformation, input, &output);
 
     return output.qvalues.front();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::QualityValues1& param_casted,
+std::vector<std::string> Decoder::decodeUnaligned(const paramqv1::QualityValues1& param_casted,
                                                   const std::vector<std::string>& ecigar_vec,
                                                   core::AccessUnit::Descriptor& desc) {
     std::vector<std::string> qv;
@@ -69,8 +69,8 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::fillInput(calq::DecodingBlock& input, core::AccessUnit::Descriptor& desc,
-                        const quality::paramqv1::QualityValues1& param) {
+void Decoder::fillInput(DecodingBlock& input, core::AccessUnit::Descriptor& desc,
+                        const paramqv1::QualityValues1& param) {
     // quantizerIndices + istepIndices
     for (uint16_t i = 1; i < desc.getSize(); ++i) {
         auto data = static_cast<uint8_t*>(desc.get(i).getData().getData());
@@ -102,7 +102,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
         return std::make_tuple(resultQV, stats);
     }
 
-    const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
+    const auto& param_casted = dynamic_cast<const paramqv1::QualityValues1&>(param);
 
     if (isAligned(desc)) {
         resultQV = decodeAligned(param_casted, ecigar_vec, positions, desc);

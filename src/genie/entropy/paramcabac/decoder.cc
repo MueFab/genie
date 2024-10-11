@@ -60,7 +60,7 @@ Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descripto
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc,
+std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(core::GenDesc desc,
                                                                                    util::BitReader &reader) {
     return std::make_unique<DecoderRegular>(desc, reader);
 }
@@ -68,7 +68,7 @@ std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::crea
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::write(util::BitWriter &writer) const {
-    core::parameter::desc_pres::Decoder::write(writer);
+    Decoder::write(writer);
     writer.writeBits(descriptor_subsequence_cfgs.size() - 1, 8);
     for (auto &i : descriptor_subsequence_cfgs) {
         i.write(writer);
@@ -78,14 +78,14 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DecoderRegular::equals(const Decoder *dec) const {
-    return core::parameter::desc_pres::Decoder::equals(dec) &&
+    return Decoder::equals(dec) &&
            dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderTokenType::DecoderTokenType()
-    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
+    : DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (uint16_t i = 0; i < 2; ++i) {
         descriptor_subsequence_cfgs.emplace_back(i, true);
     }
@@ -94,7 +94,7 @@ DecoderTokenType::DecoderTokenType()
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
-    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
+    : DecoderTokentype(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = 2;
     rle_guard_tokentype = reader.read<uint8_t>();
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
@@ -126,7 +126,7 @@ Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descrip
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(genie::core::GenDesc desc,
+std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(core::GenDesc desc,
                                                                                        util::BitReader &reader) {
     return std::make_unique<DecoderTokenType>(desc, reader);
 }
@@ -134,7 +134,7 @@ std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderTokenType::write(util::BitWriter &writer) const {
-    core::parameter::desc_pres::Decoder::write(writer);
+    Decoder::write(writer);
     writer.writeBits(rle_guard_tokentype, 8);
     for (auto &i : descriptor_subsequence_cfgs) {
         i.write(writer);
@@ -148,7 +148,7 @@ uint8_t DecoderTokenType::getRleGuardTokentype() const { return rle_guard_tokent
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool DecoderTokenType::equals(const Decoder *dec) const {
-    return core::parameter::desc_pres::Decoder::equals(dec) &&
+    return Decoder::equals(dec) &&
            dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
            dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
            dynamic_cast<const DecoderTokenType *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;

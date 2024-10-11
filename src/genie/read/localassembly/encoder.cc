@@ -21,7 +21,7 @@ namespace genie::read::localassembly {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Encoder::LAEncodingState::LAEncodingState(const core::record::Chunk& data, uint32_t _cr_buf_max_size)
-    : EncoderStub::EncodingState(data), refCoder(_cr_buf_max_size) {
+    : EncodingState(data), refCoder(_cr_buf_max_size) {
     minPos = data.getData().front().getAlignments().front().getPosition();
     maxPos = 0;
 }
@@ -53,7 +53,7 @@ void Encoder::printDebug(const LAEncodingState& state, const std::string& ref1, 
 
 core::AccessUnit Encoder::pack(size_t id, core::QVEncoder::QVCoded qv, core::AccessUnit::Descriptor rname,
                                EncodingState& state) {
-    auto ret = basecoder::EncoderStub::pack(id, std::move(qv), std::move(rname), state);
+    auto ret = EncoderStub::pack(id, std::move(qv), std::move(rname), state);
 
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(
@@ -135,7 +135,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         }
     }
 
-    basecoder::EncoderStub::flowIn(std::move(d), id);
+    EncoderStub::flowIn(std::move(d), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

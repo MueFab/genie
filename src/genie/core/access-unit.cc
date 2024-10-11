@@ -28,7 +28,7 @@ AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(AccessUnit::Subsequence &&sub) noexcept {
+AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(Subsequence &&sub) noexcept {
     data = std::move(sub.data);
     position = sub.position;
     id = sub.id;
@@ -57,7 +57,7 @@ util::DataBlock *AccessUnit::Subsequence::getDependency() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnit::Subsequence AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
+AccessUnit::Subsequence AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
     mmDecoder = std::move(mm);
     return *this;
 }
@@ -338,7 +338,7 @@ AccessUnit::AccessUnit(parameter::EncodingSet &&set, size_t _numRecords)
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
         for (const auto &subdesc : desc.subseqs) {
-            auto bytes = range2bytes(core::getSubsequence(subdesc.id).range);
+            auto bytes = range2bytes(getSubsequence(subdesc.id).range);
             desc_data.add(Subsequence(bytes, subdesc.id));
         }
         descriptors.push_back(std::move(desc_data));

@@ -14,7 +14,7 @@ namespace genie::core::meta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Region::Region(uint16_t seqid, uint64_t start, uint64_t end, std::vector<genie::core::record::ClassType> _classes)
+Region::Region(uint16_t seqid, uint64_t start, uint64_t end, std::vector<record::ClassType> _classes)
     : seq_ID(seqid), classes(std::move(_classes)), start_pos(start), end_pos(end) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ Region::Region(const nlohmann::json& json)
     : seq_ID(json["seq_ID"]), start_pos(json["start_pos"]), end_pos(json["end_pos"]) {
     std::vector<uint8_t> tmp = json["classes"];
     for (const auto& t : tmp) {
-        classes.push_back(static_cast<genie::core::record::ClassType>(t));
+        classes.push_back(static_cast<record::ClassType>(t));
     }
 }
 
@@ -48,7 +48,7 @@ uint16_t Region::getSeqID() const { return seq_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<genie::core::record::ClassType>& Region::getClasses() const { return classes; }
+const std::vector<record::ClassType>& Region::getClasses() const { return classes; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
