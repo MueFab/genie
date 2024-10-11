@@ -65,7 +65,7 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
     auto start_pos = reader.getStreamPosition() - 4;
     auto length = reader.readAlignedInt<uint64_t>();
     header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

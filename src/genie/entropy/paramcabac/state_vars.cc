@@ -64,14 +64,14 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
 uint8_t StateVars::getNumLuts(const uint8_t codingOrder, const bool shareSubsymLutFlag,
                               const SupportValues::TransformIdSubsym trnsfSubsymID) const {
     return (codingOrder > 0 && trnsfSubsymID == SupportValues::TransformIdSubsym::LUT_TRANSFORM)
-               ? ((shareSubsymLutFlag) ? 1 : (uint8_t)numSubsyms)
+               ? ((shareSubsymLutFlag) ? 1 : static_cast<uint8_t>(numSubsyms))
                : 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
-    return (shareSubsymPrvFlag) ? 1 : (uint8_t)numSubsyms;
+    return (shareSubsymPrvFlag) ? 1 : static_cast<uint8_t>(numSubsyms);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -127,18 +127,18 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 numCtxSubsym = cabacBinazParams.getCMax();  // cmax
                 break;
             case BinarizationParameters::BinarizationId::EG:
-                numCtxSubsym = uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
+                numCtxSubsym = static_cast<uint32_t>(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::SEG:
-                numCtxSubsym = uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
+                numCtxSubsym = static_cast<uint32_t>(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::TEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
+                               + static_cast<uint32_t>(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::STEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
+                               + static_cast<uint32_t>(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::SUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
@@ -186,7 +186,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 codingOrder == 0 || (1u << codingSubsymSize) > MAX_LUT_SIZE) {
                 UTILS_THROW_RUNTIME_EXCEPTION(
                     "LUT_TRANSFORM not supported with given configuration: coding_order = 0, binarization_ID = " +
-                    std::to_string((uint8_t)binarization_ID) +
+                    std::to_string(static_cast<uint8_t>(binarization_ID)) +
                     ", coding_subsym_size = " + std::to_string(codingSubsymSize));
             } else {
                 numCtxLuts = (codingSubsymSize / 2) * ((1 << 2) - 1) + ((1 << (codingSubsymSize % 2)) - 1);

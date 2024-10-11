@@ -58,7 +58,9 @@ void AlignmentBox::addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t AlignmentBox::getNumberOfTemplateSegments() const { return uint8_t(splitAlignmentInfo.size() + 1); }
+uint8_t AlignmentBox::getNumberOfTemplateSegments() const {
+    return static_cast<uint8_t>(splitAlignmentInfo.size() + 1);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

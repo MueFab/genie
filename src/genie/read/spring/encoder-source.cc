@@ -64,7 +64,8 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
                 filename = quality_desc_prefix + std::to_string(auId);
                 count = au.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getNumSubsequences();
             } else {
-                filename = read_desc_prefix + std::to_string(auId) + "." + std::to_string(uint8_t(d.getID()));
+                filename =
+                    read_desc_prefix + std::to_string(auId) + "." + std::to_string(static_cast<uint8_t>(d.getID()));
             }
             if (!std::filesystem::exists(filename)) {
                 continue;
@@ -80,7 +81,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
             std::filesystem::remove(filename);
         }
         auId++;
-        sec = {size_t(id), au.getNumReads(), true};
+        sec = {static_cast<size_t>(id), au.getNumReads(), true};
         id += sec.length;
     }
     au.setStats(std::move(stats));

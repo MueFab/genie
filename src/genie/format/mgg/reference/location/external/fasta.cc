@@ -19,7 +19,7 @@ namespace genie::format::mgg::reference::location::external {
 
 std::unique_ptr<genie::core::meta::RefBase> Fasta::decapsulate() {
     auto ret = std::make_unique<genie::core::meta::external_ref::Fasta>(
-        std::move(getURI()), genie::core::meta::ExternalRef::ChecksumAlgorithm(getChecksumAlgorithm()));
+        std::move(getURI()), static_cast<genie::core::meta::ExternalRef::ChecksumAlgorithm>(getChecksumAlgorithm()));
 
     for (auto& s : seq_checksums) {
         ret->addChecksum(std::move(s));

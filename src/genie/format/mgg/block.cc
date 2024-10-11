@@ -68,7 +68,7 @@ void Block::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(format::mgb::Block b)
-    : header(false, core::GenDesc(b.getDescriptorID()), 0,
+    : header(false, static_cast<core::GenDesc>(b.getDescriptorID()), 0,
              static_cast<uint32_t>(b.getPayloadUnparsed().getPayloadSize())),
       payload(std::move(b.getPayloadUnparsed())) {}
 

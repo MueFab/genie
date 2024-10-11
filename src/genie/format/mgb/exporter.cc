@@ -58,7 +58,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     }
 
     if (!found) {
-        std::cerr << "Writing PS " << uint32_t(out_set.getID()) << "..." << std::endl;
+        std::cerr << "Writing PS " << static_cast<uint32_t>(out_set.getID()) << "..." << std::endl;
         out_set.write(writer);
         parameter_stash.push_back(out_set);
     }
@@ -68,8 +68,8 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                            : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
-    mgb::AccessUnit au((uint32_t)id_ctr, parameter_id, data.getClassType(), (uint32_t)data.getNumReads(), datasetType,
-                       32, false, core::AlphabetID::ACGTN);
+    mgb::AccessUnit au(static_cast<uint32_t>(id_ctr), parameter_id, data.getClassType(),
+                       static_cast<uint32_t>(data.getNumReads()), datasetType, 32, false, core::AlphabetID::ACGTN);
     if (data.isReferenceOnly()) {
         au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
                                         data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
@@ -78,11 +78,11 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         au.getHeader().setAuTypeCfg(
             AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
-    for (uint8_t descriptor = 0; descriptor < (uint8_t)core::getDescriptors().size(); ++descriptor) {
-        if (data.get(core::GenDesc(descriptor)).isEmpty()) {
+    for (uint8_t descriptor = 0; descriptor < static_cast<uint8_t>(core::getDescriptors().size()); ++descriptor) {
+        if (data.get(static_cast<core::GenDesc>(descriptor)).isEmpty()) {
             continue;
         }
-        au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
+        au.addBlock(Block(descriptor, std::move(data.get(static_cast<core::GenDesc>(descriptor)))));
     }
 
     au.debugPrint(parameter_stash[au.getHeader().getParameterID()].getEncodingSet());

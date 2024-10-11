@@ -132,7 +132,7 @@ const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const {
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
     uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
-        subdesc.emplace_back((uint8_t)4, GenSubIndex(getID(), uint16_t(subdesc.size())));
+        subdesc.emplace_back(static_cast<uint8_t>(4), GenSubIndex(getID(), static_cast<uint16_t>(subdesc.size())));
     }
     return get(s_id);
 }
@@ -147,7 +147,9 @@ void AccessUnit::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::mov
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Descriptor::set(uint16_t _id, Subsequence &&sub) { subdesc[uint16_t(_id)] = std::move(sub); }
+void AccessUnit::Descriptor::set(uint16_t _id, Subsequence &&sub) {
+    subdesc[static_cast<uint16_t>(_id)] = std::move(sub);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -175,31 +177,33 @@ size_t AccessUnit::Descriptor::getSize() const { return subdesc.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) { return descriptors[uint8_t(sub.first)].get(sub.second); }
+AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) {
+    return descriptors[static_cast<uint8_t>(sub.first)].get(sub.second);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Descriptor &AccessUnit::get(GenDesc desc) { return descriptors[uint8_t(desc)]; }
+AccessUnit::Descriptor &AccessUnit::get(GenDesc desc) { return descriptors[static_cast<uint8_t>(desc)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const AccessUnit::Descriptor &AccessUnit::get(GenDesc desc) const { return descriptors[uint8_t(desc)]; }
+const AccessUnit::Descriptor &AccessUnit::get(GenDesc desc) const { return descriptors[static_cast<uint8_t>(desc)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AccessUnit::Subsequence &AccessUnit::get(GenSubIndex sub) const {
-    return descriptors[uint8_t(sub.first)].get(sub.second);
+    return descriptors[static_cast<uint8_t>(sub.first)].get(sub.second);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::set(GenSubIndex sub, Subsequence &&data) {
-    descriptors[uint8_t(sub.first)].set(sub.second, std::move(data));
+    descriptors[static_cast<uint8_t>(sub.first)].set(sub.second, std::move(data));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::set(GenDesc sub, Descriptor &&data) { descriptors[uint8_t(sub)] = std::move(data); }
+void AccessUnit::set(GenDesc sub, Descriptor &&data) { descriptors[static_cast<uint8_t>(sub)] = std::move(data); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -298,7 +302,7 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
 
 AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader &reader) : id(_id) {
     if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-        subdesc.emplace_back(GenSubIndex{_id, (uint16_t)0}, remainingSize, reader);
+        subdesc.emplace_back(GenSubIndex{_id, static_cast<uint16_t>(0)}, remainingSize, reader);
         return;
     }
     for (size_t i = 0; i < count; ++i) {
@@ -310,9 +314,9 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
             s = remainingSize;
         }
         if (s) {
-            subdesc.emplace_back(GenSubIndex{_id, (uint16_t)i}, s, reader);
+            subdesc.emplace_back(GenSubIndex{_id, static_cast<uint16_t>(i)}, s, reader);
         } else {
-            subdesc.emplace_back(GenSubIndex{_id, (uint16_t)i}, util::DataBlock(0, 4));
+            subdesc.emplace_back(GenSubIndex{_id, static_cast<uint16_t>(i)}, util::DataBlock(0, 4));
         }
     }
 }
@@ -325,7 +329,7 @@ bool AccessUnit::Descriptor::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
+AccessUnit::Descriptor::Descriptor() : id(static_cast<GenDesc>(0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

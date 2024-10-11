@@ -45,7 +45,7 @@ DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
     for (size_t i = 0; i < num_SIDs; ++i) {
         dataset_mapping_table_SID.emplace_back(reader.readAlignedInt<uint16_t>());
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

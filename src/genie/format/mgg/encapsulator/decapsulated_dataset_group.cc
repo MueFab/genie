@@ -175,8 +175,8 @@ std::pair<genie::format::mgb::MgbFile, genie::core::meta::Dataset> DecapsulatedD
 
     for (auto& ds : dt.getDescriptorStreams()) {
         if (ds.hasProtection()) {
-            meta.addDescriptorStream(genie::core::meta::DescriptorStream(size_t(ds.getHeader().getDescriptorID()),
-                                                                         ds.getProtection().decapsulate()));
+            meta.addDescriptorStream(genie::core::meta::DescriptorStream(
+                static_cast<size_t>(ds.getHeader().getDescriptorID()), ds.getProtection().decapsulate()));
         }
     }
 

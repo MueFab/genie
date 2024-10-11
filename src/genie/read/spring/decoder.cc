@@ -64,7 +64,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
         auto rtype = au.get(core::GenSub::RTYPE).pull();
         if (rtype == 5) {
             // put in refBuf
-            auto rlen = (uint32_t)au.get(core::GenSub::RLEN).pull() + 1;  // rlen
+            auto rlen = static_cast<uint32_t>(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
                 refBuf.push_back(
                     getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
@@ -87,7 +87,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 uint16_t data_pair;
                 switch (pairing_decoding_case) {
                     case 0:
-                        data_pair = (uint16_t)au.get(core::GenSub::PAIR_SAME_REC).pull();
+                        data_pair = static_cast<uint16_t>(au.get(core::GenSub::PAIR_SAME_REC).pull());
                         read_1_first = !(((uint16_t)(data_pair)) & 1);
                         delta = ((uint16_t)(data_pair)) >> 1;
                         number_of_record_segments = 2;
@@ -123,8 +123,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             }
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
-                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;      // rlen
-            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();  // pos
+                rlen[i] = static_cast<uint32_t>(au.get(core::GenSub::RLEN).pull()) + 1;        // rlen
+            auto pos = static_cast<uint32_t>(au.get(core::GenSub::POS_MAPPING_FIRST).pull());  // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -143,9 +143,9 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     while (true) {
                         bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
                         if (mmpos_flag == 1) break;
-                        auto mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
+                        auto mmpos = static_cast<uint32_t>(au.get(core::GenSub::MMPOS_POSITION).pull());
                         abs_mmpos += mmpos;
-                        auto mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
+                        auto mmtype_0 = static_cast<uint32_t>(au.get(core::GenSub::MMTYPE_TYPE).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
                         uint64_t mmtype_1 = 0;
@@ -307,8 +307,9 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
                    std::get<0>(qvs));
 
     for (size_t i = 0; i < matched_records[0].size(); ++i) {
-        chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                     std::move(matched_records[0][i].name), "", (uint8_t)0);
+        chunk.getData().emplace_back(cp.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
+                                     core::record::ClassType::CLASS_U, std::move(matched_records[0][i].name), "",
+                                     static_cast<uint8_t>(0));
         core::record::Segment seg(std::move(matched_records[0][i].seq));
         if (!matched_records[0][i].qv.empty()) {
             seg.addQualities(std::move(matched_records[0][i].qv));
@@ -325,8 +326,9 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     // now put unmatched reads to chunks if combine_pairs is false
     if (!combine_pairs) {
         for (auto& i : unmatched_records[0]) {
-            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(i.name), "", (uint8_t)0, true);
+            chunk.getData().emplace_back(cp.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
+                                         core::record::ClassType::CLASS_U, std::move(i.name), "",
+                                         static_cast<uint8_t>(0), true);
             // last parameter is read_1_first
             core::record::Segment seg(std::move(i.seq));
             if (!i.qv.empty()) {
@@ -335,8 +337,9 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
             chunk.getData().back().addSegment(std::move(seg));
         }
         for (auto& i : unmatched_records[1]) {
-            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
-                                         std::move(i.name), "", (uint8_t)0, false);
+            chunk.getData().emplace_back(cp.paired_end ? static_cast<uint8_t>(2) : static_cast<uint8_t>(1),
+                                         core::record::ClassType::CLASS_U, std::move(i.name), "",
+                                         static_cast<uint8_t>(0), false);
             // last parameter is read_1_first
             core::record::Segment seg(std::move(i.seq));
             if (!i.qv.empty()) {
@@ -389,7 +392,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
         size_t size = chunk.getData().size() * 2;
-        flowOut(std::move(chunk), {size_t(pos), size, true});
+        flowOut(std::move(chunk), {static_cast<size_t>(pos), size, true});
         pos += size;
     }
 }
@@ -548,7 +551,7 @@ void Decoder::flushIn(uint64_t& pos) {
 
     size_t size = chunk.getData().size() * 2;
     if (size) {
-        flowOut(std::move(chunk), {size_t(pos), size, true});
+        flowOut(std::move(chunk), {static_cast<size_t>(pos), size, true});
         pos += size;
     }
 
@@ -560,9 +563,7 @@ void Decoder::flushIn(uint64_t& pos) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::skipIn(const util::Section& id) {
-    {
-        util::OrderedSection sec(&lock, id);
-    }
+    { util::OrderedSection sec(&lock, id); }
     skipOut(id);
 }
 

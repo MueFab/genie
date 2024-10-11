@@ -96,7 +96,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
         for (auto &seq : rec.getSegments()) {
             UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN,
                          "Global assembly maximum read length " + std::to_string(MAX_READ_LEN) + " exceeded.");
-            cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
+            cp.max_readlen = std::max(cp.max_readlen, static_cast<uint32_t>(seq.getSequence().length()));
             if (seq.getSequence().find('N') != std::string::npos) {
                 write_dnaN_in_bits(seq.getSequence(), fout_N[seg_index]);
                 auto pos_N = static_cast<uint32_t>(cp.num_reads + rec_index);
@@ -113,7 +113,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
         fout_id << rec.getName() << "\n";
         ++rec_index;
     }
-    cp.num_reads += (uint32_t)rec_index;
+    cp.num_reads += static_cast<uint32_t>(rec_index);
     cp.num_blocks++;
 
     UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");

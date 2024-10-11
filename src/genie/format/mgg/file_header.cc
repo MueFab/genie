@@ -60,7 +60,7 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader) : major_brand(6, '\0')
     for (auto& b : compatible_brands) {
         bitreader.readAlignedBytes(b.data(), b.length());
     }
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(bitreader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -51,7 +51,7 @@ DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::M
         param_update = dataset_parameterset::UpdateInfo(reader);
     }
     params = genie::core::parameter::EncodingSet(reader);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

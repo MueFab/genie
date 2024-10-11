@@ -36,7 +36,7 @@ void DescriptorStreamHeader::addBlock() { num_blocks++; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader()
-    : DescriptorStreamHeader(false, genie::core::GenDesc(0), core::record::ClassType::NONE, 0) {}
+    : DescriptorStreamHeader(false, static_cast<genie::core::GenDesc>(0), core::record::ClassType::NONE, 0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& reader) {
     class_id = reader.read<core::record::ClassType>(4);
     num_blocks = reader.read<uint32_t>(32);
     reader.flushHeldBits();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

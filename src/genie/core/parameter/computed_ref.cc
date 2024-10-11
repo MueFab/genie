@@ -29,7 +29,7 @@ ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ComputedRef::ComputedRef(util::BitReader &reader) {
-    cr_alg_ID = Algorithm(reader.read<uint8_t>());
+    cr_alg_ID = static_cast<Algorithm>(reader.read<uint8_t>());
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
         auto pad = reader.read<uint8_t>();
         auto buffer = reader.read<uint32_t>(24);
@@ -55,7 +55,7 @@ ComputedRef::Algorithm ComputedRef::getAlgorithm() const { return cr_alg_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ComputedRef::write(util::BitWriter &writer) const {
-    writer.writeBits(uint8_t(cr_alg_ID), 8);
+    writer.writeBits(static_cast<uint8_t>(cr_alg_ID), 8);
     if (extension) {
         extension->write(writer);
     }

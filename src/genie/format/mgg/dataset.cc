@@ -115,14 +115,17 @@ Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MP
         if (ordered_blocks) {
             file.sort_by_position();
         }
-        for (size_t c = 0; c < size_t(core::record::ClassType::COUNT); ++c) {
-            for (size_t d = 0; d < size_t(core::GenDesc::COUNT); ++d) {
-                auto blocks = file.extractDescriptor(core::record::ClassType(c), core::GenDesc(d), param_ids);
-                auto desc = DescriptorStream(core::GenDesc(d), core::record::ClassType(c), blocks);
+        for (size_t c = 0; c < static_cast<size_t>(core::record::ClassType::COUNT); ++c) {
+            for (size_t d = 0; d < static_cast<size_t>(core::GenDesc::COUNT); ++d) {
+                auto blocks = file.extractDescriptor(static_cast<core::record::ClassType>(c),
+                                                     static_cast<core::GenDesc>(d), param_ids);
+                auto desc =
+                    DescriptorStream(static_cast<core::GenDesc>(d), static_cast<core::record::ClassType>(c), blocks);
                 if (!desc.isEmpty()) {
                     descriptor_streams.emplace_back(std::move(desc));
                     for (auto& b : meta.getDSs()) {
-                        if (core::GenDesc(b.getID()) == descriptor_streams.back().getHeader().getDescriptorID()) {
+                        if (static_cast<core::GenDesc>(b.getID()) ==
+                            descriptor_streams.back().getHeader().getDescriptorID()) {
                             descriptor_streams.back().setProtection(
                                 DescriptorStreamProtection(std::move(b.getProtection())));
                         }
@@ -220,7 +223,8 @@ void Dataset::read_box(util::BitReader& reader, bool in_offset) {
         UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
         UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
         parameterSets.emplace_back(reader, version, header.getParameterUpdateFlag());
-        encoding_sets.emplace(size_t(parameterSets.back().getParameterSetID()), parameterSets.back().getEncodingSet());
+        encoding_sets.emplace(static_cast<size_t>(parameterSets.back().getParameterSetID()),
+                              parameterSets.back().getEncodingSet());
     } else if (tmp_str == "mitb") {
         UTILS_DIE_IF(in_offset, "Offset not permitted");
         UTILS_DIE_IF(master_index_table != std::nullopt, "MIT already present");

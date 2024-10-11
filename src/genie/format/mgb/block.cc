@@ -24,7 +24,10 @@ Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block()
-    : descriptor_ID(0), block_payload_size(0), count(0), payload(core::AccessUnit::Descriptor(core::GenDesc(0))) {}
+    : descriptor_ID(0),
+      block_payload_size(0),
+      count(0),
+      payload(core::AccessUnit::Descriptor(static_cast<core::GenDesc>(0))) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,9 +41,9 @@ Block::Block(size_t qv_count, util::BitReader &reader) : payload(core::AccessUni
            reader.read(8);
        } */
 
-    count = static_cast<uint8_t>(core::GenDesc(descriptor_ID) == core::GenDesc::QV
+    count = static_cast<uint8_t>(static_cast<core::GenDesc>(descriptor_ID) == core::GenDesc::QV
                                      ? qv_count
-                                     : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size());
+                                     : core::getDescriptor(static_cast<core::GenDesc>(descriptor_ID)).subseqs.size());
     // payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
     payload = core::Payload(reader, block_payload_size);
 
@@ -129,7 +132,8 @@ void Block::parse() {
 
     util::BitReader reader(ss);
 
-    payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
+    payload =
+        core::AccessUnit::Descriptor(static_cast<core::GenDesc>(descriptor_ID), count, block_payload_size, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -151,7 +155,7 @@ void Block::pack() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(genie::core::GenDesc _descriptor_ID, core::Payload _payload)
-    : descriptor_ID(uint8_t(_descriptor_ID)),
+    : descriptor_ID(static_cast<uint8_t>(_descriptor_ID)),
       block_payload_size(static_cast<uint32_t>(_payload.getPayloadSize())),
       count(0),
       payload(std::move(_payload)) {}

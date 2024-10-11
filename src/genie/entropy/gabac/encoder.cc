@@ -35,7 +35,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
     if (num_streams == 0) {
         auto ret_empty = core::AccessUnit::Descriptor(desc.getID());
         // add empty payload
-        ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), (uint16_t)0}, util::DataBlock(0, 1)));
+        ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), static_cast<uint16_t>(0)}, util::DataBlock(0, 1)));
         return ret_empty;
     }
 
@@ -52,7 +52,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
 
     stream.flush(&block);
     core::AccessUnit::Descriptor ret(desc.getID());
-    ret.add(core::AccessUnit::Subsequence({desc.getID(), (uint8_t)0}, std::move(block)));
+    ret.add(core::AccessUnit::Subsequence({desc.getID(), static_cast<uint8_t>(0)}, std::move(block)));
     return ret;
 }
 
@@ -142,7 +142,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
             size += s.getNumSymbols() * sizeof(uint32_t);
         }
         std::string name = getDescriptor(std::get<1>(ret).getID()).name;
-        const auto &conf = configSet.getConfAsGabac({std::get<1>(ret).getID(), (uint16_t)0});
+        const auto &conf = configSet.getConfAsGabac({std::get<1>(ret).getID(), static_cast<uint16_t>(0)});
         std::get<1>(ret) = compressTokens(conf, std::move(std::get<1>(ret)));
         configSet.storeParameters(std::get<1>(ret).getID(), std::get<0>(ret));
 

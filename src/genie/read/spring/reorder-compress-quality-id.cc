@@ -190,8 +190,8 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         }
         genie::core::record::Chunk chunk;
         for (size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
-            chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U, std::move(id_array_block[i]), "",
-                                         (uint8_t)0);
+            chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U,
+                                         std::move(id_array_block[i]), "", static_cast<uint8_t>(0));
             chunk.getData().back().addSegment(core::record::Segment("N"));
         }
         auto raw_desc = name_coder->process(chunk);
@@ -270,7 +270,8 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
         for (int64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             genie::core::record::Chunk chunk;
             for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
-                chunk.getData().emplace_back((uint8_t)2, core::record::ClassType::CLASS_U, "", "", (uint8_t)0);
+                chunk.getData().emplace_back(static_cast<uint8_t>(2), core::record::ClassType::CLASS_U, "", "",
+                                             static_cast<uint8_t>(0));
                 core::record::Segment s(std::string(quality_array[i - block_start[start_block_num]].size(), 'N'));
                 s.addQualities(std::move(quality_array[i - block_start[start_block_num]]));
                 chunk.getData().back().addSegment(std::move(s));
@@ -339,7 +340,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 str_array[order_array[i] - start_read_bin] = temp_str;
         }
         f_in.close();
-        auto blocks = uint64_t(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
+        auto blocks = static_cast<uint64_t>(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
 
         //
         // According to the execution profile, this is the 2nd hottest
@@ -372,14 +373,14 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             if (end_read_num >= num_reads_bin) {
                 end_read_num = num_reads_bin;
             }
-            auto num_reads_block = (uint32_t)(end_read_num - start_read_num);
+            auto num_reads_block = static_cast<uint32_t>(end_read_num - start_read_num);
             std::string name =
                 file_name.substr(file_name.find_last_of('/') + 1) + "." + std::to_string(block_num_offset + block_num);
             if (mode == "id") {
                 genie::core::record::Chunk chunk;
                 for (size_t i = 0; i < num_reads_block; i++) {
-                    chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U,
-                                                 std::move(str_array[start_read_num + i]), "", (uint8_t)0);
+                    chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U,
+                                                 std::move(str_array[start_read_num + i]), "", static_cast<uint8_t>(0));
                     core::record::Segment s("N");
                     chunk.getData().back().addSegment(std::move(s));
                 }
@@ -411,8 +412,9 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
                 genie::core::record::Chunk chunk;
-                for (auto i = (uint32_t)start_read_num; i < start_read_num + num_reads_block; i++) {
-                    chunk.getData().emplace_back((uint8_t)1, core::record::ClassType::CLASS_U, "", "", (uint8_t)0);
+                for (auto i = static_cast<uint32_t>(start_read_num); i < start_read_num + num_reads_block; i++) {
+                    chunk.getData().emplace_back(static_cast<uint8_t>(1), core::record::ClassType::CLASS_U, "", "",
+                                                 static_cast<uint8_t>(0));
                     core::record::Segment s(std::string(str_array[i].size(), 'N'));
                     s.addQualities(std::move(str_array[i]));
                     chunk.getData().back().addSegment(std::move(s));

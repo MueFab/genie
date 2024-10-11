@@ -144,7 +144,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     util::DataBlock block(0, 1);
     OBufferStream bitstream(&block);
-    Writer writer(&bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Writer writer(&bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     writer.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -226,7 +226,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     util::DataBlock block(0, 1);
     OBufferStream bitstream(&block);
-    Writer writer(&bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Writer writer(&bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     writer.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -289,8 +289,8 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
                 lutsSubsymTrnsfm.transformOrder1(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
-                    binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
-                                                          subsymbols[s].lutNumMaxElems);  // update cMax
+                    binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                                                                      subsymbols[s].lutNumMaxElems));  // update cMax
                 }
             }
 
@@ -339,7 +339,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     util::DataBlock block(0, 1);
     OBufferStream bitstream(&block);
-    Writer writer(&bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
+    Writer writer(&bitstream, bypassFlag, static_cast<unsigned int>(stateVars.getNumCtxTotal()));
     writer.start();
 
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
@@ -384,8 +384,8 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
                 lutsSubsymTrnsfm.transformOrder2(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
-                    binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
-                                                          subsymbols[s].lutNumMaxElems);  // update cMax
+                    binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                                                                      subsymbols[s].lutNumMaxElems));  // update cMax
                 }
             }
 

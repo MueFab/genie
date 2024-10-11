@@ -43,7 +43,7 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
         read_id[endidx - 1] = MAX_NUM_READS;
     } else if (read_id[endidx - 1] == MAX_NUM_READS) {  // exactly one read has been deleted till now
         read_id[endidx - 1] = MAX_NUM_READS + 1;
-        read_id[endidx - 2] = (uint32_t)(size - 1);  // number of reads left in bin
+        read_id[endidx - 2] = static_cast<uint32_t>(size - 1);  // number of reads left in bin
     } else {                                         // more than two reads have been deleted
         read_id[endidx - 2]--;
     }

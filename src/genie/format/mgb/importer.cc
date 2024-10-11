@@ -81,7 +81,7 @@ core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
     core::AccessUnit set(std::move(paramset), unit.getHeader().getReadCount());
 
     for (auto& b : unit.getBlocks()) {
-        set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());
+        set.set(static_cast<core::GenDesc>(b.getDescriptorID()), b.movePayload());
     }
     if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U) {
         set.setReference(unit.getHeader().getAlignmentInfo().getRefID());

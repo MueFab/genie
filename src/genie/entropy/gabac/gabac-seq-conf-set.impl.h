@@ -33,7 +33,7 @@ template <typename T>
 void GabacSeqConfSet::fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) const {
     for (const auto &subdesc : desc.subseqs) {
         auto subseqCfg = getConfAsGabac(subdesc.id).getSubseqConfig();
-        decoder_config.setSubsequenceCfg(uint8_t(subdesc.id.second), std::move(subseqCfg));
+        decoder_config.setSubsequenceCfg(static_cast<uint8_t>(subdesc.id.second), std::move(subseqCfg));
     }
 }
 

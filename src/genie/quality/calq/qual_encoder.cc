@@ -57,7 +57,7 @@ void QualEncoder::quantizeUntil(uint64_t pos) {
         std::tie(pos_seqs, pos_qvalues) = recordPileup.getPileup(minPosUnencoded);
 
         if (!pos_seqs.empty()) {
-            auto l = uint8_t(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
+            auto l = static_cast<uint8_t>(genotyper_.computeQuantizerIndex(pos_seqs, pos_qvalues));
             out->quantizerIndices.push_back(l);
         } else {
             out->quantizerIndices.push_back(out->quantizerIndices.back());
@@ -155,9 +155,9 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
             case '=':
                 // Encode opLen quality values with computed quantizer indices
                 for (size_t i = 0; i < opLen; i++) {
-                    uint8_t q = uint8_t(qvalues[qualIdx++]) - qualityValueOffset_;
+                    uint8_t q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
                     uint8_t quantizerIndex = out->quantizerIndices[quantizerIndicesIdx++];
-                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(quantizerIndex).valueToIndex(q));
+                    uint8_t qualityValueIndex = static_cast<uint8_t>(quantizers_.at(quantizerIndex).valueToIndex(q));
                     out->stepindices.at(quantizerIndex).push_back(qualityValueIndex);
                 }
                 break;
@@ -166,7 +166,7 @@ void QualEncoder::encodeMappedQual(const std::string& qvalues, const std::string
                 // Encode opLen quality values with max quantizer index
                 for (size_t i = 0; i < opLen; i++) {
                     auto q = static_cast<uint8_t>(qvalues[qualIdx++]) - qualityValueOffset_;
-                    uint8_t qualityValueIndex = uint8_t(quantizers_.at(NR_QUANTIZERS - 1).valueToIndex(q));
+                    uint8_t qualityValueIndex = static_cast<uint8_t>(quantizers_.at(NR_QUANTIZERS - 1).valueToIndex(q));
                     out->stepindices.at(static_cast<size_t>(NR_QUANTIZERS)).push_back(qualityValueIndex);
                 }
                 break;

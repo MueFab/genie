@@ -25,13 +25,13 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
       codingSubsymSize(trnsfSubseqConf.getSupportValues().getCodingSubsymSize()),
       codingOrder(trnsfSubseqConf.getSupportValues().getCodingOrder()),
       subsymMask(paramcabac::StateVars::get2PowN(codingSubsymSize) - 1),
-      numSubSyms((uint8_t)trnsfSubseqConf.getStateVars().getNumSubsymbols()),
+      numSubSyms(static_cast<uint8_t>(trnsfSubseqConf.getStateVars().getNumSubsymbols())),
       numLuts(trnsfSubseqConf.getStateVars().getNumLuts(codingOrder,
                                                         trnsfSubseqConf.getSupportValues().getShareSubsymLutFlag(),
                                                         trnsfSubseqConf.getTransformIDSubsym())),
       numPrvs(trnsfSubseqConf.getStateVars().getNumPrvs(trnsfSubseqConf.getSupportValues().getShareSubsymPrvFlag())),
       reader(bitstream, trnsfSubseqConf.getBinarization().getBypassFlag(),
-             (unsigned int)trnsfSubseqConf.getStateVars().getNumCtxTotal()),
+             static_cast<unsigned int>(trnsfSubseqConf.getStateVars().getNumCtxTotal())),
       ctxSelector(trnsfSubseqConf.getStateVars()),
       invLutsSubsymTrnsfm(trnsfSubseqConf.getSupportValues(), trnsfSubseqConf.getStateVars(), numLuts, numPrvs, false),
       diffEnabled(trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING),
@@ -133,7 +133,8 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(const uint64_t *depSy
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] =
+                    static_cast<unsigned int>(std::min(defaultCmax, subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
@@ -171,7 +172,8 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] =
+                    static_cast<unsigned int>(std::min(defaultCmax, subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 

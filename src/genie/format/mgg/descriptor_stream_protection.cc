@@ -25,7 +25,7 @@ DescriptorStreamProtection::DescriptorStreamProtection(genie::util::BitReader& r
     auto length = reader.readAlignedInt<uint64_t>();
     DSProtectionValue.resize(length);
     reader.readAlignedBytes(DSProtectionValue.data(), DSProtectionValue.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+    UTILS_DIE_IF(start_pos + length != static_cast<uint64_t>(reader.getStreamPosition()), "Invalid length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

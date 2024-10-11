@@ -73,7 +73,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    auto const numSubsymbols = (uint8_t)stateVars.getNumSubsymbols();
+    auto const numSubsymbols = static_cast<uint8_t>(stateVars.getNumSubsymbols());
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
 
@@ -102,7 +102,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
             d.inc();
         }
 
-        uint64_t symValue = abs((int64_t)symbolValue);
+        uint64_t symValue = abs(static_cast<int64_t>(symbolValue));
         for (uint8_t s = 0; s < numSubsymbols; s++) {
             uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
             uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
@@ -159,14 +159,14 @@ void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
     if (codingOrder == 2) {
-        setupLutsOrder2((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder2(static_cast<uint8_t>(stateVars.getNumSubsymbols()), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             for (uint32_t k = 0; k < numAlphaSubsym; k++) {
                 decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
             }
         }
     } else if (codingOrder == 1) {
-        setupLutsOrder1((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder1(static_cast<uint8_t>(stateVars.getNumSubsymbols()), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }

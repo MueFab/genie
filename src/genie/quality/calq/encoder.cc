@@ -137,7 +137,7 @@ void Encoder::encodeAligned(const core::record::Chunk& chunk, paramqv1::QualityV
 
 void Encoder::addQualities(const core::record::Segment& s, core::AccessUnit::Descriptor& desc,
                            calq::UniformMinMaxQuantizer& quantizer) {
-    auto& subsequence = desc.get((uint16_t)desc.getSize() - 1);
+    auto& subsequence = desc.get(static_cast<uint16_t>(desc.getSize()) - 1);
 
     for (const auto& q : s.getQualities()) {
         for (const auto& c : q) {

@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
             auto result = genie::entropy::gabac::benchmark_full(
                 programOptions.inputFilePath,
                 genie::core::GenSubIndex(
-                    std::make_pair(genie::core::GenDesc(programOptions.descID), programOptions.subseqID)),
+                    std::make_pair(static_cast<genie::core::GenDesc>(programOptions.descID), programOptions.subseqID)),
                 timeweight);
             auto json = result.config.toJson().dump(4);
             std::ofstream output_stream(programOptions.outputFilePath);

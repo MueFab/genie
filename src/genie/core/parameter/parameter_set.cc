@@ -38,7 +38,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
         class_IDs.push_back(bitReader.read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(num_classes, GenDesc(i), bitReader);
+        descriptors.emplace_back(num_classes, static_cast<GenDesc>(i), bitReader);
     }
     auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
@@ -181,8 +181,8 @@ void EncodingSet::setSignatureLength(uint8_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncodingSet::write(util::BitWriter &writer) const {
-    writer.writeBits(uint8_t(dataset_type), 4);
-    writer.writeBits(uint8_t(alphabet_ID), 8);
+    writer.writeBits(static_cast<uint8_t>(dataset_type), 4);
+    writer.writeBits(static_cast<uint8_t>(alphabet_ID), 8);
     writer.writeBits(read_length, 24);
     writer.writeBits(number_of_template_segments_minus1, 2);
     writer.writeBits(0, 6);  // reserved_2
@@ -192,7 +192,7 @@ void EncodingSet::write(util::BitWriter &writer) const {
     writer.writeBits(as_depth, 3);
     writer.writeBits(class_IDs.size(), 4);  // num_classes
     for (auto &i : class_IDs) {
-        writer.writeBits(uint8_t(i), 4);
+        writer.writeBits(static_cast<uint8_t>(i), 4);
     }
     for (auto &i : descriptors) {
         i.write(writer);
@@ -262,12 +262,14 @@ void EncodingSet::addClass(record::ClassType class_id, std::unique_ptr<QualityVa
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncodingSet::setDescriptor(GenDesc index, DescriptorSubseqCfg &&descriptor) {
-    descriptors[uint8_t(index)] = std::move(descriptor);
+    descriptors[static_cast<uint8_t>(index)] = std::move(descriptor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DescriptorSubseqCfg &EncodingSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)]; }
+const DescriptorSubseqCfg &EncodingSet::getDescriptor(GenDesc index) const {
+    return descriptors[static_cast<uint8_t>(index)];
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -279,7 +281,9 @@ ParameterSet::DatasetType EncodingSet::getDatasetType() const { return dataset_t
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t EncodingSet::getPosSize() const { return pos_40_bits_flag ? uint8_t(40) : uint8_t(32); }
+uint8_t EncodingSet::getPosSize() const {
+    return pos_40_bits_flag ? static_cast<uint8_t>(40) : static_cast<uint8_t>(32);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -480,7 +484,7 @@ bool ParameterSet::operator==(const ParameterSet &pset) const { return set == ps
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
-    output << "* Parameter set " << uint32_t(getID());
+    output << "* Parameter set " << static_cast<uint32_t>(getID());
     if (getEncodingSet().isComputedReference()) {
         switch (getEncodingSet().getComputedRef().getAlgorithm()) {
             case core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY:

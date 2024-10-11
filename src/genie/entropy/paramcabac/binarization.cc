@@ -68,7 +68,7 @@ void Binarization::setContextParameters(Context&& _cabac_context_parameters) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Binarization::write(util::BitWriter& writer) const {
-    writer.writeBits(uint8_t(binarization_ID), 5);
+    writer.writeBits(static_cast<uint8_t>(binarization_ID), 5);
     writer.writeBits(bypass_flag, 1);
     cabac_binarization_parameters.write(binarization_ID, writer);
     if (!bypass_flag) {
@@ -94,7 +94,7 @@ bool Binarization::operator==(const Binarization& bin) const {
 
 Binarization::Binarization(nlohmann::json j) {
     binarization_ID = static_cast<BinarizationParameters::BinarizationId>(j["binarization_ID"]);
-    bypass_flag = static_cast<bool>(uint8_t(j["bypass_flag"]));
+    bypass_flag = static_cast<bool>(static_cast<uint8_t>(j["bypass_flag"]));
     cabac_binarization_parameters = BinarizationParameters(j["cabac_binarization_parameters"], binarization_ID);
     if (!bypass_flag) {
         cabac_context_parameters = Context(j["cabac_context_parameters"]);

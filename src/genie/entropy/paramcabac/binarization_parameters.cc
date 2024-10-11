@@ -109,12 +109,13 @@ uint8_t BinarizationParameters::getSplitUnitSize() const { return split_unit_siz
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SDTU) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
+uint8_t BinarizationParameters::numParams[static_cast<unsigned>(BinarizationId::SDTU) + 1u] = {0, 1, 0, 0, 1,
+                                                                                               1, 1, 1, 2, 2};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
-    return BinarizationParameters::numParams[uint8_t(binarzationId)];
+    return BinarizationParameters::numParams[static_cast<uint8_t>(binarzationId)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

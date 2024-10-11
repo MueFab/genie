@@ -24,15 +24,17 @@ std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::Segmen
     std::vector<std::string> ret;
     auto& excerpt = dynamic_cast<RefDecodingState&>(state).refExcerpt;
     {
-        auto begin = (uint32_t)meta.position[0];
-        auto end = std::min<uint32_t>(begin + (uint32_t)meta.length[0], static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        auto clipsize = begin + (uint32_t)meta.length[0] - end;
+        auto begin = static_cast<uint32_t>(meta.position[0]);
+        auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[0]),
+                                      static_cast<uint32_t>(excerpt.getGlobalEnd()));
+        auto clipsize = begin + static_cast<uint32_t>(meta.length[0]) - end;
         ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
     }
     if (meta.num_segments == 2) {
-        auto begin = (uint32_t)meta.position[1];
-        auto end = std::min<uint32_t>(begin + (uint32_t)meta.length[1], static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        auto clipsize = begin + (uint32_t)meta.length[1] - end;
+        auto begin = static_cast<uint32_t>(meta.position[1]);
+        auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
+                                      static_cast<uint32_t>(excerpt.getGlobalEnd()));
+        auto clipsize = begin + static_cast<uint32_t>(meta.length[1]) - end;
         ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
     }
     return ret;

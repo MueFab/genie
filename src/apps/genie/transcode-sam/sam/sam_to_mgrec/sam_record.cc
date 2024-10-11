@@ -170,11 +170,11 @@ SamRecord::SamRecord(bam1_t* sam_alignment)
     : qname(bam_get_qname(sam_alignment)),
       flag(sam_alignment->core.flag),
       rid(sam_alignment->core.tid),
-      pos((uint32_t)sam_alignment->core.pos),
+      pos(static_cast<uint32_t>(sam_alignment->core.pos)),
       mapq(sam_alignment->core.qual),
       cigar(getCigarString(sam_alignment)),
       mate_rid(sam_alignment->core.mtid),
-      mate_pos((uint32_t)sam_alignment->core.mpos),
+      mate_pos(static_cast<uint32_t>(sam_alignment->core.mpos)),
       //      tlen(sam_alignment->core.isize),
       seq(getSeqString(sam_alignment)),   // Initialized with empty char due to conversion later
       qual(getQualString(sam_alignment))  // Initialized with empty char due to conversion later

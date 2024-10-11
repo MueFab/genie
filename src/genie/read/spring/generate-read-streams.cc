@@ -53,8 +53,8 @@ struct se_data {
 
 void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit &raw_au) {
     int64_t rc_to_int[128];
-    rc_to_int[(uint8_t)'d'] = 0;
-    rc_to_int[(uint8_t)'r'] = 1;
+    rc_to_int[static_cast<uint8_t>('d')] = 0;
+    rc_to_int[static_cast<uint8_t>('r')] = 1;
 
     uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
     uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
@@ -88,8 +88,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i]) {
-            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);          // rlen
-            raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);                       // rlen
+            raw_au.get(core::GenSub::RCOMP).push(rc_to_int[static_cast<uint8_t>(data.RC_arr[i])]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
@@ -149,7 +149,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               bool write_raw) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
-    auto blocks = uint64_t(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
+    auto blocks = static_cast<uint64_t>(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
 
     params.resize(blocks);
 
@@ -166,7 +166,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         core::AccessUnit au(std::move(params[block_num]), 0);
 
         generate_subseqs(data, block_num, au);
-        num_reads_per_block[block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[block_num] = static_cast<uint32_t>(au.get(core::GenSub::RCOMP).getNumSymbols());  // rcomp
 
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);
         stat_vec[block_num].add(au.getStats());
@@ -178,7 +178,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
+            std::ofstream out(file_to_save_streams + "." + std::to_string(static_cast<uint8_t>(d.getID())),
+                              std::ios::binary);
             util::BitWriter bw(out);
             d.write(bw);
         }
@@ -191,7 +192,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     // write num blocks, reads per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
-    auto num_blocks = (uint32_t)blocks;
+    auto num_blocks = static_cast<uint32_t>(blocks);
     f_block_info.write(reinterpret_cast<char *>(&num_blocks), sizeof(uint32_t));
     f_block_info.write(reinterpret_cast<char *>(&num_reads_per_block[0]), num_blocks * sizeof(uint32_t));
 }
@@ -491,7 +492,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (!data.flag_arr[current])
                 bdata->block_seq_start.push_back(0);
             else
-                bdata->block_seq_start.push_back((uint32_t)data.pos_arr[current]);
+                bdata->block_seq_start.push_back(static_cast<uint32_t>(data.pos_arr[current]));
         }
         if (!already_seen[current]) {
             // current is already seen when current is unaligned and its pair has
@@ -538,7 +539,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (data.flag_arr[current]) {
                 // update current_block_seq_end
                 if (current_block_seq_end < data.pos_arr[current] + data.read_length_arr[current])
-                    current_block_seq_end = uint32_t(data.pos_arr[current] + data.read_length_arr[current]);
+                    current_block_seq_end =
+                        static_cast<uint32_t>(data.pos_arr[current] + data.read_length_arr[current]);
             }
         }
         if (num_records_current_block == data.cp.num_reads_per_block || i == data.cp.num_reads - 1) {
@@ -558,7 +560,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                 num_records_current_block = 0;
                 current_block_num++;
                 current_block_seq_end = 0;
-                bdata->block_start.push_back((uint32_t)bdata->read_index_genomic_record.size());
+                bdata->block_start.push_back(static_cast<uint32_t>(bdata->read_index_genomic_record.size()));
             }
         }
     }
@@ -644,8 +646,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 #endif
 
     int64_t rc_to_int[128];
-    rc_to_int[(uint8_t)'d'] = 0;
-    rc_to_int[(uint8_t)'r'] = 1;
+    rc_to_int[static_cast<uint8_t>('d')] = 0;
+    rc_to_int[static_cast<uint8_t>('r')] = 1;
 
     // first find the seq
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
@@ -707,10 +709,10 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);             // rlen
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);                       // rlen
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);                          // rlen
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[static_cast<uint8_t>(data.RC_arr[current])]);  // rcomp
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[static_cast<uint8_t>(data.RC_arr[pair])]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0) {
                     raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
                 } else {
@@ -739,7 +741,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     }
                 }
                 bool read_1_first = (current < pair);
-                auto delta = (uint16_t)(data.pos_arr[pair] - data.pos_arr[current]);
+                auto delta = static_cast<uint16_t>(data.pos_arr[pair] - data.pos_arr[current]);
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
                 raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
@@ -747,8 +749,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         } else {
             // only one read in genomic record
             if (data.flag_arr[current]) {
-                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
-                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);                       // rlen
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[static_cast<uint8_t>(data.RC_arr[current])]);  // rcomp
                 if (data.noise_len_arr[current] == 0) {
                     raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
                 } else {
@@ -867,7 +869,8 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
         generate_streams_pe(data, bdata, cur_block_num, &pest, au);
-        num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[cur_block_num] =
+            static_cast<uint32_t>(au.get(core::GenSub::RCOMP).getNumSymbols());  // rcomp
         num_records_per_block[cur_block_num] =
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au), write_raw);
@@ -881,7 +884,8 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
+            std::ofstream out(file_to_save_streams + "." + std::to_string(static_cast<uint8_t>(d.getID())),
+                              std::ios::binary);
             util::BitWriter bw(out);
             d.write(bw);
         }
@@ -901,7 +905,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     // write num blocks, reads per block and records per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
-    auto num_blocks = (uint32_t)bdata.block_start.size();
+    auto num_blocks = static_cast<uint32_t>(bdata.block_start.size());
     f_block_info.write(reinterpret_cast<char *>(&num_blocks), sizeof(uint32_t));
     f_block_info.write(reinterpret_cast<char *>(&num_reads_per_block[0]), num_blocks * sizeof(uint32_t));
     f_block_info.write(reinterpret_cast<char *>(&num_records_per_block[0]), num_blocks * sizeof(uint32_t));
