@@ -73,7 +73,7 @@ bool RawReferenceSequence::isIdUnique(const RawReferenceSequence& s) const { ret
 
 uint64_t RawReferenceSequence::getTotalSize() const {
     uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;     // sequence_ID, seq_start, seq_end
-    return (ref_sequence.length()) + HEADER_SIZE;  // Including \0
+    return ref_sequence.length() + HEADER_SIZE;  // Including \0
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

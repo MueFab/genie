@@ -32,7 +32,7 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
         0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
-    if (list_size == 1) return (current_contig.front()).read;
+    if (list_size == 1) return current_contig.front().read;
     auto current_contig_it = current_contig.begin();
     int64_t currentpos = 0, currentsize = 0, to_insert;
     std::vector<std::array<int64_t, 4>> count;
@@ -88,8 +88,8 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
         f_noise << "\n";
         abs_current_pos = abs_pos + currentpos;
         f_pos.write(reinterpret_cast<char *>(&abs_current_pos), sizeof(uint64_t));
-        f_order.write(reinterpret_cast<char *>(&((*current_contig_it).order)), sizeof(uint32_t));
-        f_readlength.write(reinterpret_cast<char *>(&((*current_contig_it).read_length)), sizeof(uint16_t));
+        f_order.write(reinterpret_cast<char *>(&(*current_contig_it).order), sizeof(uint32_t));
+        f_readlength.write(reinterpret_cast<char *>(&(*current_contig_it).read_length), sizeof(uint16_t));
         f_RC << (*current_contig_it).RC;
     }
     abs_pos += ref.size();

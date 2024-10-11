@@ -163,10 +163,10 @@ std::vector<SingleToken>&& TokenState::run() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void push32bigEndian(core::AccessUnit::Subsequence& seq, uint32_t value) {
-    seq.push((value >> 24) & 0xff);
-    seq.push((value >> 16) & 0xff);
-    seq.push((value >> 8) & 0xff);
-    seq.push((value) & 0xff);
+    seq.push(value >> 24 & 0xff);
+    seq.push(value >> 16 & 0xff);
+    seq.push(value >> 8 & 0xff);
+    seq.push(value & 0xff);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

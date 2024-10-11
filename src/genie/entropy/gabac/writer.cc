@@ -67,7 +67,7 @@ void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int>& bin
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--) {  // i must be signed
         unsigned int bin = static_cast<unsigned int>(input >> static_cast<uint8_t>(i)) & 0x1u;
-        m_binaryArithmeticEncoder.encodeBin(bin, &*(scan++));
+        m_binaryArithmeticEncoder.encodeBin(bin, &*scan++);
     }
 }
 
@@ -90,7 +90,7 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int>& bin
     unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
     for (uint64_t i = 0; i < input; i++) {
-        m_binaryArithmeticEncoder.encodeBin(1, &*(scan++));
+        m_binaryArithmeticEncoder.encodeBin(1, &*scan++);
     }
     if (cMax > input) {
         m_binaryArithmeticEncoder.encodeBin(0, &*scan);
@@ -107,7 +107,7 @@ void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>&) {
     writeAsBIbypass(1, std::vector<unsigned int>({numLeadZeros + 1}));
     if (numLeadZeros) {
         /* suffix */
-        writeAsBIbypass(valuePlus1 & ((1u << numLeadZeros) - 1), std::vector<unsigned int>({numLeadZeros}));
+        writeAsBIbypass(valuePlus1 & (1u << numLeadZeros) - 1, std::vector<unsigned int>({numLeadZeros}));
     }
 }
 
@@ -121,7 +121,7 @@ void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int>& bin
     writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1, 0, 0, binParams[3]}));
     if (numLeadZeros) {
         /* suffix */
-        writeAsBIbypass(valuePlus1 & ((1u << numLeadZeros) - 1), std::vector<unsigned int>({numLeadZeros}));
+        writeAsBIbypass(valuePlus1 & (1u << numLeadZeros) - 1, std::vector<unsigned int>({numLeadZeros}));
     }
 }
 
@@ -158,9 +158,9 @@ void Writer::writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int>& 
     unsigned int i, j;
     for (i = 0, j = outputSymSize; i < outputSymSize; i += splitUnitSize) {
         unsigned int unitSize =
-            (i == 0 && outputSymSize % splitUnitSize) ? outputSymSize % splitUnitSize : splitUnitSize;
+            i == 0 && outputSymSize % splitUnitSize ? outputSymSize % splitUnitSize : splitUnitSize;
         unsigned int cMax = (1u << unitSize) - 1;
-        unsigned int val = (input >> (j -= unitSize)) & cMax;
+        unsigned int val = input >> (j -= unitSize) & cMax;
         writeAsTUbypass(val, std::vector<unsigned int>({cMax}));
     }
 }
@@ -175,9 +175,9 @@ void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int>& b
     unsigned int i, j;
     for (i = 0, j = outputSymSize; i < outputSymSize; i += splitUnitSize) {
         unsigned int unitSize =
-            (i == 0 && outputSymSize % splitUnitSize) ? outputSymSize % splitUnitSize : splitUnitSize;
+            i == 0 && outputSymSize % splitUnitSize ? outputSymSize % splitUnitSize : splitUnitSize;
         unsigned int cMax = (1u << unitSize) - 1;
-        unsigned int val = (input >> (j -= unitSize)) & cMax;
+        unsigned int val = input >> (j -= unitSize) & cMax;
         writeAsTUcabac(val, std::vector<unsigned int>({cMax, 0, 0, cm}));
         cm += cMax;
     }
@@ -188,7 +188,7 @@ void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int>& b
 void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int>& binParams) {
     const unsigned int cMaxDtu = binParams[2];
 
-    writeAsTUbypass((input < cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu}));
+    writeAsTUbypass(input < cMaxDtu ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu}));
 
     if (input >= cMaxDtu) {
         input -= cMaxDtu;
@@ -202,7 +202,7 @@ void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int>& b
 void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int>& binParams) {
     const unsigned int cMaxDtu = binParams[2];
 
-    writeAsTUcabac((input < cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu, 0, 0, binParams[3]}));
+    writeAsTUcabac(input < cMaxDtu ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu, 0, 0, binParams[3]}));
 
     if (input >= cMaxDtu) {
         input -= cMaxDtu;

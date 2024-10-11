@@ -89,7 +89,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                 uint64_t numtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
 
-                if (i < (numTrnsfSubseqsCfgs - 1)) {
+                if (i < numTrnsfSubseqsCfgs - 1) {
                     subseqPayloadSizeUsed +=
                         StreamHandler::readUInt(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain, 4);
                 } else {
@@ -116,7 +116,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                         subseqCfg.getTransformSubseqCfg(static_cast<uint8_t>(i)),
                         static_cast<unsigned int>(numtrnsfSymbols), &decodedTransformedSubseq, wordsize,
                         !dependency.empty() ? &dependency : nullptr);
-                    transformedSubseqs[i].swap(&(decodedTransformedSubseq));
+                    transformedSubseqs[i].swap(&decodedTransformedSubseq);
                 }
             }
 

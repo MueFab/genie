@@ -17,7 +17,7 @@ namespace genie::format::mgg::encapsulator {
 
 EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file, core::MPEGMinorVersion version)
     : reader(input_file), mgb_file(&reader) {
-    if ((std::filesystem::exists(input_file + ".json") && std::filesystem::file_size(input_file + ".json"))) {
+    if (std::filesystem::exists(input_file + ".json") && std::filesystem::file_size(input_file + ".json")) {
         std::ifstream in_file(input_file + ".json");
         nlohmann::json my_json;
         in_file >> my_json;

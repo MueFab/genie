@@ -65,8 +65,8 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
 
     auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
                            ? core::parameter::DataUnit::DatasetType::ALIGNED
-                           : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
-                                                     : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
+                           : data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
+                                                : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
 
     AccessUnit au(static_cast<uint32_t>(id_ctr), parameter_id, data.getClassType(),
                        static_cast<uint32_t>(data.getNumReads()), datasetType, 32, false, core::AlphabetID::ACGTN);

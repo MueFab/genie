@@ -50,7 +50,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     refmgr->validateRefID(ref.getSeqID());
                     refmgr->addRef(i++, std::make_unique<Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                          ref.getEnd() + 1, importer, pos, true));
-                    pos += (ref.getEnd() - ref.getStart() + 1);
+                    pos += ref.getEnd() - ref.getStart() + 1;
                 }
                 break;
             }

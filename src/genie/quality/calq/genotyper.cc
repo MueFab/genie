@@ -122,7 +122,7 @@ int Genotyper::computeQuantizerIndex(const std::string& seqPileup, const std::st
         return nrQuantizers_;  // computation of quantizer index not possible
     }
     if (depth == 1) {
-        return (nrQuantizers_ - 1);  // no inference can be made, stay safe
+        return nrQuantizers_ - 1;  // no inference can be made, stay safe
     }
 
     computeGenotypeLikelihoods(seqPileup, qualPileup, depth);
@@ -211,7 +211,7 @@ void Genotyper::computeGenotypeLikelihoods(const std::string& seqPileup, const s
         for (auto const& genotype : genotypeAlphabet_) {
             double p = 0.0;
             for (int i = 0; i < polyploidy_; i++) {
-                p += (y == genotype[i]) ? pStrike : pError;
+                p += y == genotype[i] ? pStrike : pError;
             }
             p /= polyploidy_;
 

@@ -135,7 +135,7 @@ bool DescriptorSubseqCfg::desc_comp(const DescriptorSubseqCfg& cfg) const {
         return false;
     }
     for (size_t i = 0; i < cfg.descriptor_configurations.size(); ++i) {
-        if (!(descriptor_configurations[i]->equals(cfg.descriptor_configurations[i].get()))) {
+        if (!descriptor_configurations[i]->equals(cfg.descriptor_configurations[i].get())) {
             return false;
         }
     }

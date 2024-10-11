@@ -23,10 +23,10 @@ void ThreadManager::action(size_t) {
         }
     } catch (Exception& e) {
         std::cerr << e.msg() << std::endl;
-        throw(e);
+        throw e;
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
-        throw(e);
+        throw e;
     }
 }
 

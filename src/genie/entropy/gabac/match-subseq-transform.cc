@@ -29,9 +29,9 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     (*transformedSubseqs)[0].clear();
     transformedSubseqs->resize(3);
 
-    util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
-    util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
+    util::DataBlock *const pointers = &(*transformedSubseqs)[0];
+    util::DataBlock *const lengths = &(*transformedSubseqs)[1];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[2];
     pointers->setWordSize(core::range2bytes({0, matchBufferSize}));
     lengths->setWordSize(core::range2bytes({0, matchBufferSize}));
     rawValues->setWordSize(wordsize);
@@ -53,8 +53,8 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while ((offset < symbolsSize) &&
-                   (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i) < (matchBufferSize - 1u))) {
+            while (offset < symbolsSize &&
+                   (symbols.get(offset) == symbols.get(w + offset - i) && offset - i < matchBufferSize - 1u)) {
                 offset++;
             }
             offset -= i;
@@ -69,7 +69,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
         } else {
             pointers->push_back(i - pointer);
             lengths->push_back(length);
-            i += (length - 1);
+            i += length - 1;
         }
     }
 
@@ -86,9 +86,9 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
-    util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
+    util::DataBlock *const pointers = &(*transformedSubseqs)[0];
+    util::DataBlock *const lengths = &(*transformedSubseqs)[1];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[2];
 
     util::DataBlock symbols(0, (rawValues->getWordSize()));
     assert(lengths->size() == pointers->size() + rawValues->size());

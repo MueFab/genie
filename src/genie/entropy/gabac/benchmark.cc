@@ -114,7 +114,7 @@ void ConfigSearchBinarization::mutate(std::mt19937& rd, std::normal_distribution
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ConfigSearchTranformedSeq::lutValid() const {
-    return (output_bits / getSplitRatio()) <= 8 && coding_order.getIndex(coding_order_search_idx) > 0;
+    return output_bits / getSplitRatio() <= 8 && coding_order.getIndex(coding_order_search_idx) > 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ bool ConfigSearchTranformedSeq::increment() {
     // Skip split binarizations for coding order > 0
     while ((coding_order.getIndex(coding_order_search_idx) > 0 &&
             split_in_binarization.getIndex(split_in_binarization_idx)) ||
-           (output_bits % getSplitRatio()) ||
+           output_bits % getSplitRatio() ||
            ((coding_order.getIndex(coding_order_search_idx) == 2 && output_bits / getSplitRatio() > 8) ||
             (coding_order.getIndex(coding_order_search_idx) == 1 && output_bits / getSplitRatio() > 16))) {
         if (!increment()) {
@@ -343,7 +343,7 @@ std::string ResultFull::toCSV(const std::string& filename) const {
             ret += ";";
         }
     }
-    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
+    for (int i = 0; i < 3 - static_cast<int>(config.getTransformSubseqCfgs().size()); ++i) {
         ret += ";;;;;;";
     }
     return filename + ";" + ret;
@@ -357,7 +357,7 @@ std::string ResultFull::getCSVHeader() const {
     for (size_t i = 0; i < config.getTransformSubseqCfgs().size(); ++i) {
         desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
     }
-    for (int i = 0; i < (3 - static_cast<int>(config.getTransformSubseqCfgs().size())); ++i) {
+    for (int i = 0; i < 3 - static_cast<int>(config.getTransformSubseqCfgs().size()); ++i) {
         desc += "Coding order;Symbol size;Subsymbol size;Subsymbol transformation;Binarization;BinParam;";
     }
     return desc;

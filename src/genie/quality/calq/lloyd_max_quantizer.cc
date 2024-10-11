@@ -48,7 +48,7 @@ double LloydMaxQuantizer::calcCentroid(size_t left, size_t right, const Probabil
 
     if (right == pdf.getRangeMax() + 1) {
         sum += pdf[pdf.size() - 1];
-        weightSum += (right)*pdf[pdf.size() - 1];
+        weightSum += right*pdf[pdf.size() - 1];
         right -= 1;
     }
 
@@ -57,7 +57,7 @@ double LloydMaxQuantizer::calcCentroid(size_t left, size_t right, const Probabil
         weightSum += i * pdf[i - pdf.getRangeMin()];
     }
 
-    return (sum > THRESHOLD) ? (weightSum / sum) : (std::floor((left + right) / 2.0));
+    return sum > THRESHOLD ? weightSum / sum : std::floor((left + right) / 2.0);
 }
 
 // -----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void LloydMaxQuantizer::calcBorders(const ProbabilityDistribution& pdf) {
 
     // Step 2: Lloyd's II. algorithm
     for (int k = 0; k < static_cast<int>(borders.size()); ++k) {
-        double left = (k == 0) ? pdf.getRangeMin() : borders[k - 1];
+        double left = k == 0 ? pdf.getRangeMin() : borders[k - 1];
         double right = borders[k];
 
         // Calc centroid

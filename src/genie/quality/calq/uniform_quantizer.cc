@@ -26,13 +26,13 @@ namespace genie::quality::calq {
 // -----------------------------------------------------------------------------
 
 UniformQuantizer::UniformQuantizer(const int& valueMin, const int& valueMax, const int& nrSteps) : Quantizer() {
-    if ((valueMin > valueMax) || (nrSteps <= 1)) {
+    if (valueMin > valueMax || nrSteps <= 1) {
         throwErrorException("Error in quantizer initialization");
     }
 
     // Compute the step size
     auto stepSize =
-        static_cast<int>(floor((static_cast<double>(valueMax - valueMin)) / (static_cast<double>(nrSteps))));
+        static_cast<int>(floor(static_cast<double>(valueMax - valueMin) / static_cast<double>(nrSteps)));
 
     // Compute the borders and the representative values
     std::queue<int> borders;
@@ -40,10 +40,10 @@ UniformQuantizer::UniformQuantizer(const int& valueMin, const int& valueMax, con
     int newBorder = valueMin;
     borders.push(valueMin);
     reconstructionValues.push(valueMin + static_cast<int>(round(static_cast<double>(stepSize) / 2.0)));
-    for (int i = 0; i < (nrSteps - 1); i++) {
+    for (int i = 0; i < nrSteps - 1; i++) {
         newBorder += stepSize;
         borders.push(newBorder);
-        reconstructionValues.push(newBorder + static_cast<int>(round((static_cast<double>(stepSize) / 2.0))));
+        reconstructionValues.push(newBorder + static_cast<int>(round(static_cast<double>(stepSize) / 2.0)));
     }
     borders.push(valueMax);
 

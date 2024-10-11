@@ -152,7 +152,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     ContextSelector ctxSelector(stateVars);
     const bool diffEnabled =
-        (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
+        trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING;
 
     binFunc func = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
@@ -171,7 +171,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
                 subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
             }
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -256,11 +256,11 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
         uint32_t oss = outputSymbolSize;
         for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+            const uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             if (depSymbols) {
-                depSubsymValue = (depSymbolValue >> (oss -= codingSubsymSize)) & subsymMask;
+                depSubsymValue = depSymbolValue >> (oss -= codingSubsymSize) & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
@@ -281,7 +281,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -352,8 +352,8 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
         uint64_t symbolValue = 0;
 
         for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+            const uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             subsymbols[s].subsymIdx = s;
             binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
@@ -373,7 +373,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
             subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = symbolValue << codingSubsymSize | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);

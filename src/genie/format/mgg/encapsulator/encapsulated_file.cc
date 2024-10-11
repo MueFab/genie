@@ -28,7 +28,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::groupInputFiles(
             continue;
         }
 
-        if ((std::filesystem::exists(i + ".json") && std::filesystem::file_size(i + ".json"))) {
+        if (std::filesystem::exists(i + ".json") && std::filesystem::file_size(i + ".json")) {
             std::ifstream in_file(i + ".json");
             nlohmann::json my_json;
             in_file >> my_json;

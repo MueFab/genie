@@ -29,7 +29,7 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
             position = it->second - 1;
             it = currentSeqCoverage.begin();
         }
-        if (position >= (end - 1)) {
+        if (position >= end - 1) {
             return true;
         }
     }
@@ -184,7 +184,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     }
 
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / ReferenceManager::getChunkSize())) {
+                    if (refModeFullChunkID > (cov.second - 1) / ReferenceManager::getChunkSize()) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }
@@ -196,7 +196,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     return refChunk;
                 } else {
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1) / ReferenceManager::getChunkSize())) {
+                    if (refModeFullChunkID > (cov.second - 1) / ReferenceManager::getChunkSize()) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }

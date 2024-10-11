@@ -498,11 +498,11 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             // current is already seen when current is unaligned and its pair has
             // already appeared before - in such cases we don't need to handle it now.
             already_seen[current] = true;
-            uint32_t pair = (current < data.cp.num_reads / 2) ? (current + data.cp.num_reads / 2)
-                                                              : (current - data.cp.num_reads / 2);
+            uint32_t pair = current < data.cp.num_reads / 2 ? current + data.cp.num_reads / 2
+                                                              : current - data.cp.num_reads / 2;
             if (already_seen[pair]) {
-                if (bdata->block_num[pair] == current_block_num && (data.pos_arr[current] >= data.pos_arr[pair]) &&
-                    (data.pos_arr[current] - data.pos_arr[pair] < 32768)) {
+                if (bdata->block_num[pair] == current_block_num && data.pos_arr[current] >= data.pos_arr[pair] &&
+                    data.pos_arr[current] - data.pos_arr[pair] < 32768) {
                     // put in same record
                     bdata->block_num[current] = current_block_num;
                     bdata->genomic_record_index[current] = bdata->genomic_record_index[pair];
@@ -588,9 +588,9 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
         f_blocks_quality.write(reinterpret_cast<char *>(&quality_block_pos), sizeof(uint32_t));
         for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
             uint32_t current = bdata.read_index_genomic_record[j];
-            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
-            if ((bdata.block_num[current] == bdata.block_num[pair]) &&
-                (bdata.genomic_record_index[pair] == bdata.genomic_record_index[current])) {
+            uint32_t pair = current < num_reads / 2 ? current + num_reads / 2 : current - num_reads / 2;
+            if (bdata.block_num[current] == bdata.block_num[pair] &&
+                bdata.genomic_record_index[pair] == bdata.genomic_record_index[current]) {
                 // pair in genomic record
                 f_order_quality.write(reinterpret_cast<char *>(&current), sizeof(uint32_t));
                 quality_block_pos++;
@@ -617,9 +617,9 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
         // store order
         for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
             uint32_t current = bdata.read_index_genomic_record[j];
-            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
+            uint32_t pair = current < num_reads / 2 ? current + num_reads / 2 : current - num_reads / 2;
             // just write the min of current and pair
-            uint32_t min_index = (current > pair) ? pair : current;
+            uint32_t min_index = current > pair ? pair : current;
             f_order_id.write(reinterpret_cast<char *>(&min_index), sizeof(uint32_t));
         }
         f_order_id.close();
@@ -664,7 +664,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     for (uint32_t i = bdata.block_start[cur_block_num]; i < bdata.block_end[cur_block_num]; i++) {
         uint32_t current = bdata.read_index_genomic_record[i];
         uint32_t pair =
-            (current < data.cp.num_reads / 2) ? (current + data.cp.num_reads / 2) : (current - data.cp.num_reads / 2);
+            current < data.cp.num_reads / 2 ? current + data.cp.num_reads / 2 : current - data.cp.num_reads / 2;
 
         if (data.flag_arr[current]) {
             if (i == bdata.block_start[cur_block_num]) {
@@ -678,8 +678,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 prevpos = data.pos_arr[current];
             }
         }
-        if ((bdata.block_num[current] == bdata.block_num[pair]) &&
-            (bdata.genomic_record_index[current] == bdata.genomic_record_index[pair])) {
+        if (bdata.block_num[current] == bdata.block_num[pair] &&
+            bdata.genomic_record_index[current] == bdata.genomic_record_index[pair]) {
             // both reads in same record
             if (!data.flag_arr[current]) {
                 // Case 1: both unaligned
@@ -740,10 +740,10 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
                 }
-                bool read_1_first = (current < pair);
+                bool read_1_first = current < pair;
                 auto delta = static_cast<uint16_t>(data.pos_arr[pair] - data.pos_arr[current]);
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
-                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
+                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!read_1_first + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
             }
         } else {
@@ -792,13 +792,13 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             }
 
             // pair subsequences
-            bool same_block = (bdata.block_num[current] == bdata.block_num[pair]);
+            bool same_block = bdata.block_num[current] == bdata.block_num[pair];
             if (same_block)
                 pest->count_split_same_AU[cur_thread_num]++;
             else
                 pest->count_split_diff_AU[cur_thread_num]++;
 
-            bool read_1_first = (current < pair);
+            bool read_1_first = current < pair;
             if (same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
                 raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);

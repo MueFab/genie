@@ -49,7 +49,7 @@ uint64_t Reader::readAsBIcabac(const std::vector<unsigned int>& binParams) {
     const unsigned int cLength = binParams[0];
     auto scan = m_contextModels.begin() + cm;
     for (size_t i = cLength; i > 0; i--) {
-        bins = (bins << 1u) | m_decBinCabac.decodeBin(&*(scan++));
+        bins = bins << 1u | m_decBinCabac.decodeBin(&*scan++);
     }
     return bins;
 }
@@ -90,7 +90,7 @@ uint64_t Reader::readAsEGbypass(const std::vector<unsigned int>&) {
         i++;
     }
     if (i != 0) {
-        bins = (1u << i) | m_decBinCabac.decodeBinsEP(i);
+        bins = 1u << i | m_decBinCabac.decodeBinsEP(i);
     } else {
         return 0;
     }
@@ -109,7 +109,7 @@ uint64_t Reader::readAsEGcabac(const std::vector<unsigned int>& binParams) {
     }
     unsigned int bins = 0;
     if (i != 0) {
-        bins = (1u << i) | m_decBinCabac.decodeBinsEP(i);
+        bins = 1u << i | m_decBinCabac.decodeBinsEP(i);
     } else {
         return 0;
     }
@@ -147,11 +147,11 @@ uint64_t Reader::readAsSUTUbypass(const std::vector<unsigned int>& binParams) {
 
     for (i = 0; i < outputSymSize; i += splitUnitSize) {
         uint64_t val = 0;
-        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize) ? (1u << (outputSymSize % splitUnitSize)) - 1
+        uint32_t cMax = i == 0 && outputSymSize % splitUnitSize ? (1u << outputSymSize % splitUnitSize) - 1
                                                                   : (1u << splitUnitSize) - 1;
         val = readAsTUbypass(std::vector<unsigned int>({cMax}));
 
-        value = (value << splitUnitSize) | val;
+        value = value << splitUnitSize | val;
     }
 
     return value;
@@ -169,12 +169,12 @@ uint64_t Reader::readAsSUTUcabac(const std::vector<unsigned int>& binParams) {
 
     for (i = 0; i < outputSymSize; i += splitUnitSize) {
         uint64_t val = 0;
-        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize) ? (1u << (outputSymSize % splitUnitSize)) - 1
+        uint32_t cMax = i == 0 && outputSymSize % splitUnitSize ? (1u << outputSymSize % splitUnitSize) - 1
                                                                   : (1u << splitUnitSize) - 1;
         val = readAsTUcabac(std::vector<unsigned int>({cMax, 0, 0, cm}));
         cm += cMax;
 
-        value = (value << splitUnitSize) | val;
+        value = value << splitUnitSize | val;
     }
 
     return value;

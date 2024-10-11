@@ -89,8 +89,8 @@ void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubs
     transformedSubseqs->resize(2);
     (*transformedSubseqs)[0].swap(
         &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
-    util::DataBlock *const flags = &((*transformedSubseqs)[0]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    util::DataBlock *const flags = &(*transformedSubseqs)[0];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
 
     flags->setWordSize(1);
     rawValues->setWordSize(wordsize);
@@ -112,8 +112,8 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const flags = &((*transformedSubseqs)[0]);
-    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    util::DataBlock *const flags = &(*transformedSubseqs)[0];
+    util::DataBlock *const rawValues = &(*transformedSubseqs)[1];
     util::DataBlock symbols(0, (rawValues->getWordSize()));
 
     util::BlockStepper rflag = flags->getReader();

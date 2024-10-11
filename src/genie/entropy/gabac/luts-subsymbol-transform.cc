@@ -17,7 +17,7 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool LutEntry::operator>(const LutEntry& entry) const { return (freq > entry.freq); }
+bool LutEntry::operator>(const LutEntry& entry) const { return freq > entry.freq; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,15 +104,15 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
         uint64_t symValue = abs(static_cast<int64_t>(symbolValue));
         for (uint8_t s = 0; s < numSubsymbols; s++) {
-            uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
-            uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+            uint8_t lutIdx = numLuts > 1 ? s : 0;  // either private or shared LUT
+            uint8_t prvIdx = numPrvs > 1 ? s : 0;  // either private or shared PRV
 
             if (depSymbols) {
-                depSubsymValue = (depSymbolValue >> (oss - codingSubsymSize)) & subsymMask;
+                depSubsymValue = depSymbolValue >> oss - codingSubsymSize & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
-            subsymValue = (symValue >> (oss -= codingSubsymSize)) & subsymMask;
+            subsymValue = symValue >> (oss -= codingSubsymSize) & subsymMask;
 
             if (codingOrder == 2) {
                 LutOrder2& lut = lutsO2[lutIdx];

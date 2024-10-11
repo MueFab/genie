@@ -109,13 +109,13 @@ std::streambuf::pos_type DataBlockBuffer::seekoff(off_type off, std::ios_base::s
                                                   std::ios_base::openmode which) {
     (void)which;
     if (dir == std::ios_base::cur)
-        pos = (off < 0 && static_cast<size_t>(std::abs(off)) > pos) ? 0 : std::min<size_t>(pos + off, block.size());
+        pos = off < 0 && static_cast<size_t>(std::abs(off)) > pos ? 0 : std::min<size_t>(pos + off, block.size());
     else if (dir == std::ios_base::end)
-        pos = (off < 0 && static_cast<size_t>(std::abs(off)) > block.size())
+        pos = off < 0 && static_cast<size_t>(std::abs(off)) > block.size()
                   ? 0
                   : std::min<size_t>(block.size() + off, block.size());
     else if (dir == std::ios_base::beg)
-        pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min<size_t>(static_cast<size_t>(0) + off, block.size());
+        pos = off < 0 && std::abs(off) > 0 ? 0 : std::min<size_t>(static_cast<size_t>(0) + off, block.size());
     return pos;
 }
 

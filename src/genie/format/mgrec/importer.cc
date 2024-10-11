@@ -28,8 +28,8 @@ Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsu
 
 bool isECigarSupported(const std::string& ecigar) {
     // Splices not supported
-    if ((ecigar.find_first_of('*') != std::string::npos) || (ecigar.find_first_of('/') != std::string::npos) ||
-        (ecigar.find_first_of('%') != std::string::npos)) {
+    if (ecigar.find_first_of('*') != std::string::npos || ecigar.find_first_of('/') != std::string::npos ||
+        ecigar.find_first_of('%') != std::string::npos) {
         return false;
     }
     return true;

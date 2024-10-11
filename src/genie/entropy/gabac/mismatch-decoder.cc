@@ -47,7 +47,7 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                 uint64_t currNumtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
 
-                if (i < (numTrnsfSubseqs - 1)) {
+                if (i < numTrnsfSubseqs - 1) {
                     subseqPayloadSizeUsed +=
                         StreamHandler::readUInt(inputStream, trnsfSubseqPayloadSizeRemain, 4);
                 } else {
@@ -83,7 +83,7 @@ uint64_t MismatchDecoder::decodeMismatch(uint64_t ref) {
 
     for (size_t i = 0; i < numTrnsfSubseqs; i++) {
         decodedTrnsfSymbols[i] =
-            (trnsfSymbolsDecoder[i].symbolsAvail() > 0) ? trnsfSymbolsDecoder[i].decodeNextSymbol(&ref) : 0;
+            trnsfSymbolsDecoder[i].symbolsAvail() > 0 ? trnsfSymbolsDecoder[i].decodeNextSymbol(&ref) : 0;
     }
 
     numSubseqSymbolsDecoded++;

@@ -44,7 +44,7 @@ ReferenceMetadata::ReferenceMetadata(uint8_t _dataset_group_id, uint8_t _referen
 ReferenceMetadata::ReferenceMetadata(util::BitReader& bitreader) {
     auto start_pos = bitreader.getStreamPosition() - 4;
     auto length = bitreader.readAlignedInt<uint64_t>();
-    auto len_value = (length - sizeof(uint8_t) * 2);
+    auto len_value = length - sizeof(uint8_t) * 2;
     reference_metadata_value.resize(len_value);
     dataset_group_id = bitreader.readAlignedInt<uint8_t>();
     reference_id = bitreader.readAlignedInt<uint8_t>();
