@@ -88,8 +88,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 switch (pairing_decoding_case) {
                     case 0:
                         data_pair = static_cast<uint16_t>(au.get(core::GenSub::PAIR_SAME_REC).pull());
-                        read_1_first = !(((uint16_t)(data_pair)) & 1);
-                        delta = ((uint16_t)(data_pair)) >> 1;
+                        read_1_first = !(data_pair & 1);
+                        delta = data_pair >> 1;
                         number_of_record_segments = 2;
                         break;
                     case 1:
@@ -392,7 +392,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
         size_t size = chunk.getData().size() * 2;
-        flowOut(std::move(chunk), {static_cast<size_t>(pos), size, true});
+        flowOut(std::move(chunk), {pos, size, true});
         pos += size;
     }
 }
@@ -551,7 +551,7 @@ void Decoder::flushIn(uint64_t& pos) {
 
     size_t size = chunk.getData().size() * 2;
     if (size) {
-        flowOut(std::move(chunk), {static_cast<size_t>(pos), size, true});
+        flowOut(std::move(chunk), {pos, size, true});
         pos += size;
     }
 

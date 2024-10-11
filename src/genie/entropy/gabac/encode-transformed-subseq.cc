@@ -20,7 +20,7 @@ namespace genie::entropy::gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef void (Writer:: *binFunc)(uint64_t, const std::vector<unsigned int> &);
+typedef void (Writer::*binFunc)(uint64_t, const std::vector<unsigned int> &);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -289,8 +289,9 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
                 lutsSubsymTrnsfm.transformOrder1(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
-                    binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
-                                                                      subsymbols[s].lutNumMaxElems));  // update cMax
+                    binParams[0] =
+                        static_cast<unsigned int>(std::min(static_cast<uint64_t>(binarzationParams.getCMax()),
+                                                           subsymbols[s].lutNumMaxElems));  // update cMax
                 }
             }
 
@@ -384,8 +385,9 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
                 lutsSubsymTrnsfm.transformOrder2(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
-                    binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
-                                                                      subsymbols[s].lutNumMaxElems));  // update cMax
+                    binParams[0] =
+                        static_cast<unsigned int>(std::min(static_cast<uint64_t>(binarzationParams.getCMax()),
+                                                           subsymbols[s].lutNumMaxElems));  // update cMax
                 }
             }
 

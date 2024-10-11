@@ -172,7 +172,7 @@ void Genotyper::initLikelihoods() {
     // Initialize map containing the genotype likelihoods
     std::vector<int> chosen(polyploidy_, 0);
     combinationsWithRepetitions(&genotypeAlphabet_, alleleAlphabet_, chosen.data(), 0, polyploidy_, 0,
-                                static_cast<int>(ALLELE_ALPHABET_SIZE));
+                                ALLELE_ALPHABET_SIZE);
 
     // Initialize genotype alphabet
     for (auto& genotype : genotypeAlphabet_) {

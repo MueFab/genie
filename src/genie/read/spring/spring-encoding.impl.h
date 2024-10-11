@@ -144,16 +144,16 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                         (*current_contig_it).pos -= first_pos;
 
                     ref = buildcontig(current_contig, list_size);
-                    if ((int64_t)ref.size() >= eg.max_readlen && (eg.numreads_s + eg.numreads_N > 0)) {
+                    if (static_cast<int64_t>(ref.size()) >= eg.max_readlen && (eg.numreads_s + eg.numreads_N > 0)) {
                         // try to align the singleton reads to ref
                         // first create bitsets from first readlen positions of ref
                         forward_bitset.reset();
                         reverse_bitset.reset();
-                        stringtobitset(ref.substr(0, eg.max_readlen), (uint16_t)eg.max_readlen, forward_bitset,
-                                       egb.basemask);
+                        stringtobitset(ref.substr(0, eg.max_readlen), static_cast<uint16_t>(eg.max_readlen),
+                                       forward_bitset, egb.basemask);
                         stringtobitset(reverse_complement(ref.substr(0, eg.max_readlen), eg.max_readlen),
-                                       (uint16_t)eg.max_readlen, reverse_bitset, egb.basemask);
-                        for (int64_t j = 0; j < (int64_t)ref.size() - eg.max_readlen + 1; j++) {
+                                       static_cast<uint16_t>(eg.max_readlen), reverse_bitset, egb.basemask);
+                        for (int64_t j = 0; j < static_cast<int64_t>(ref.size()) - eg.max_readlen + 1; j++) {
                             // search for singleton reads
                             for (int rev = 0; rev < 2; rev++) {
                                 for (int l = 0; l < eg.numdict_s; l++) {
@@ -165,13 +165,13 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     startposidx = dict[l].bphf->lookup(ull);
                                     if (startposidx >= dict[l].numkeys)  // not found
                                         continue;
-                                    // check if any other thread is modifying same dictpos
+                                        // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
                                     if (!dict_lock[startposidx].test()) continue;
 #else
-                                    // if we are single-threaded we do not need to continue
-                                    // because nobody else could possibly try to modify the same
-                                    // dictpos
+                                        // if we are single-threaded we do not need to continue
+                                        // because nobody else could possibly try to modify the same
+                                        // dictpos
 #endif
                                     dict[l].findpos(dictidx, startposidx);
                                     if (dict[l].empty_bin[startposidx]) {  // bin is empty
@@ -245,7 +245,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 continue;
                                             }
 #else
-                                        // nothing to be done
+                                            // nothing to be done
 #endif
                                             dict[l1].findpos(dictidx, startposidx);
                                             dict[l1].remove(dictidx, startposidx, *it);
@@ -256,17 +256,20 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                         }
                                 }
                             }
-                            if (j != (int64_t)ref.size() - eg.max_readlen) {  // not at last position,shift bitsets
+                            if (j != static_cast<int64_t>(ref.size()) -
+                                         eg.max_readlen) {  // not at last position,shift bitsets
                                 forward_bitset >>= 3;
                                 forward_bitset = forward_bitset & mask[0][0];
-                                forward_bitset |= egb.basemask[eg.max_readlen - 1][(uint8_t)ref[j + eg.max_readlen]];
+                                forward_bitset |=
+                                    egb.basemask[eg.max_readlen - 1][static_cast<uint8_t>(ref[j + eg.max_readlen])];
                                 reverse_bitset <<= 3;
                                 reverse_bitset = reverse_bitset & mask[0][0];
                                 reverse_bitset |=
-                                    egb.basemask[0][(uint8_t)chartorevchar[(uint8_t)ref[j + eg.max_readlen]]];
+                                    egb.basemask[0]
+                                                [static_cast<uint8_t>(chartorevchar[(uint8_t)ref[j + eg.max_readlen]])];
                             }
                         }  // end for
-                    }  // end if
+                    }      // end if
                     // sort contig according to pos
                     current_contig.sort([](const contig_reads &ar, const contig_reads &br) { return ar.pos < br.pos; });
                     writecontig(ref, current_contig, f_seq, f_pos, f_noise, f_noisepos, f_order, f_RC, f_readlength,
@@ -420,44 +423,44 @@ template <size_t bitset_size>
 void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
     for (int i = 0; i < 63; i++) egb.mask63[i] = 1;
     for (int i = 0; i < eg.max_readlen; i++) {
-        egb.basemask[i][(uint8_t)'A'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'A'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'A'][3 * i + 2] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'C'][3 * i + 2] = 1;
-        egb.basemask[i][(uint8_t)'G'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'G'][3 * i + 1] = 1;
-        egb.basemask[i][(uint8_t)'G'][3 * i + 2] = 0;
-        egb.basemask[i][(uint8_t)'T'][3 * i] = 0;
-        egb.basemask[i][(uint8_t)'T'][3 * i + 1] = 1;
-        egb.basemask[i][(uint8_t)'T'][3 * i + 2] = 1;
-        egb.basemask[i][(uint8_t)'N'][3 * i] = 1;
-        egb.basemask[i][(uint8_t)'N'][3 * i + 1] = 0;
-        egb.basemask[i][(uint8_t)'N'][3 * i + 2] = 0;
+        egb.basemask[i][static_cast<uint8_t>('A')][3 * i] = 0;
+        egb.basemask[i][static_cast<uint8_t>('A')][3 * i + 1] = 0;
+        egb.basemask[i][static_cast<uint8_t>('A')][3 * i + 2] = 0;
+        egb.basemask[i][static_cast<uint8_t>('C')][3 * i] = 0;
+        egb.basemask[i][static_cast<uint8_t>('C')][3 * i + 1] = 0;
+        egb.basemask[i][static_cast<uint8_t>('C')][3 * i + 2] = 1;
+        egb.basemask[i][static_cast<uint8_t>('G')][3 * i] = 0;
+        egb.basemask[i][static_cast<uint8_t>('G')][3 * i + 1] = 1;
+        egb.basemask[i][static_cast<uint8_t>('G')][3 * i + 2] = 0;
+        egb.basemask[i][static_cast<uint8_t>('T')][3 * i] = 0;
+        egb.basemask[i][static_cast<uint8_t>('T')][3 * i + 1] = 1;
+        egb.basemask[i][static_cast<uint8_t>('T')][3 * i + 2] = 1;
+        egb.basemask[i][static_cast<uint8_t>('N')][3 * i] = 1;
+        egb.basemask[i][static_cast<uint8_t>('N')][3 * i + 1] = 0;
+        egb.basemask[i][static_cast<uint8_t>('N')][3 * i + 2] = 0;
     }
 
     // enc_noise uses substitution statistics from Minoche et al.
-    eg.enc_noise[(uint8_t)'A'][(uint8_t)'C'] = '0';
-    eg.enc_noise[(uint8_t)'A'][(uint8_t)'G'] = '1';
-    eg.enc_noise[(uint8_t)'A'][(uint8_t)'T'] = '2';
-    eg.enc_noise[(uint8_t)'A'][(uint8_t)'N'] = '3';
-    eg.enc_noise[(uint8_t)'C'][(uint8_t)'A'] = '0';
-    eg.enc_noise[(uint8_t)'C'][(uint8_t)'G'] = '1';
-    eg.enc_noise[(uint8_t)'C'][(uint8_t)'T'] = '2';
-    eg.enc_noise[(uint8_t)'C'][(uint8_t)'N'] = '3';
-    eg.enc_noise[(uint8_t)'G'][(uint8_t)'T'] = '0';
-    eg.enc_noise[(uint8_t)'G'][(uint8_t)'A'] = '1';
-    eg.enc_noise[(uint8_t)'G'][(uint8_t)'C'] = '2';
-    eg.enc_noise[(uint8_t)'G'][(uint8_t)'N'] = '3';
-    eg.enc_noise[(uint8_t)'T'][(uint8_t)'G'] = '0';
-    eg.enc_noise[(uint8_t)'T'][(uint8_t)'C'] = '1';
-    eg.enc_noise[(uint8_t)'T'][(uint8_t)'A'] = '2';
-    eg.enc_noise[(uint8_t)'T'][(uint8_t)'N'] = '3';
-    eg.enc_noise[(uint8_t)'N'][(uint8_t)'A'] = '0';
-    eg.enc_noise[(uint8_t)'N'][(uint8_t)'G'] = '1';
-    eg.enc_noise[(uint8_t)'N'][(uint8_t)'C'] = '2';
-    eg.enc_noise[(uint8_t)'N'][(uint8_t)'T'] = '3';
+    eg.enc_noise[static_cast<uint8_t>('A')][static_cast<uint8_t>('C')] = '0';
+    eg.enc_noise[static_cast<uint8_t>('A')][static_cast<uint8_t>('G')] = '1';
+    eg.enc_noise[static_cast<uint8_t>('A')][static_cast<uint8_t>('T')] = '2';
+    eg.enc_noise[static_cast<uint8_t>('A')][static_cast<uint8_t>('N')] = '3';
+    eg.enc_noise[static_cast<uint8_t>('C')][static_cast<uint8_t>('A')] = '0';
+    eg.enc_noise[static_cast<uint8_t>('C')][static_cast<uint8_t>('G')] = '1';
+    eg.enc_noise[static_cast<uint8_t>('C')][static_cast<uint8_t>('T')] = '2';
+    eg.enc_noise[static_cast<uint8_t>('C')][static_cast<uint8_t>('N')] = '3';
+    eg.enc_noise[static_cast<uint8_t>('G')][static_cast<uint8_t>('T')] = '0';
+    eg.enc_noise[static_cast<uint8_t>('G')][static_cast<uint8_t>('A')] = '1';
+    eg.enc_noise[static_cast<uint8_t>('G')][static_cast<uint8_t>('C')] = '2';
+    eg.enc_noise[static_cast<uint8_t>('G')][static_cast<uint8_t>('N')] = '3';
+    eg.enc_noise[static_cast<uint8_t>('T')][static_cast<uint8_t>('G')] = '0';
+    eg.enc_noise[static_cast<uint8_t>('T')][static_cast<uint8_t>('C')] = '1';
+    eg.enc_noise[static_cast<uint8_t>('T')][static_cast<uint8_t>('A')] = '2';
+    eg.enc_noise[static_cast<uint8_t>('T')][static_cast<uint8_t>('N')] = '3';
+    eg.enc_noise[static_cast<uint8_t>('N')][static_cast<uint8_t>('A')] = '0';
+    eg.enc_noise[static_cast<uint8_t>('N')][static_cast<uint8_t>('G')] = '1';
+    eg.enc_noise[static_cast<uint8_t>('N')][static_cast<uint8_t>('C')] = '2';
+    eg.enc_noise[static_cast<uint8_t>('N')][static_cast<uint8_t>('T')] = '3';
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -92,10 +92,10 @@ void DatasetGroupHeader::patchID(uint8_t groupID) { ID = groupID; }
 
 void DatasetGroupHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
     print_offset(output, depth, max_depth, "* Dataset Group Header");
-    print_offset(output, depth + 1, max_depth, "ID: " + std::to_string(static_cast<int>(ID)));
-    print_offset(output, depth + 1, max_depth, "Version: " + std::to_string(static_cast<int>(version)));
+    print_offset(output, depth + 1, max_depth, "ID: " + std::to_string(ID));
+    print_offset(output, depth + 1, max_depth, "Version: " + std::to_string(version));
     for (const auto& id : dataset_IDs) {
-        print_offset(output, depth + 1, max_depth, "Dataset ID: " + std::to_string(static_cast<int>(id)));
+        print_offset(output, depth + 1, max_depth, "Dataset ID: " + std::to_string(id));
     }
 }
 

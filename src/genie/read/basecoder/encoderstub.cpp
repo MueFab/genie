@@ -61,7 +61,7 @@ core::AccessUnit EncoderStub::pack(size_t id, core::QVEncoder::QVCoded qv, core:
     auto qv_depth = static_cast<uint8_t>(std::get<1>(qv).isEmpty() ? 0 : 1);
     core::parameter::ParameterSet ret(static_cast<uint8_t>(id), static_cast<uint8_t>(id), dataType,
                                       core::AlphabetID::ACGTN, static_cast<uint32_t>(state.readLength), state.pairedEnd,
-                                      false, qv_depth, static_cast<uint8_t>(1), false, false);
+                                      false, qv_depth, 1, false, false);
     ret.getEncodingSet().addClass(state.classType, std::move(std::get<0>(qv)));
 
     auto rawAU = state.readCoder.moveStreams();

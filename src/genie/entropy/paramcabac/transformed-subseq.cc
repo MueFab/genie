@@ -106,7 +106,7 @@ TransformedSubSeq::TransformedSubSeq(nlohmann::json j, bool last_transformed) {
 
 nlohmann::json TransformedSubSeq::toJson() const {
     nlohmann::json ret;
-    ret["transform_ID_subsym"] = static_cast<uint8_t>(transform_ID_subsym);
+    ret["transform_ID_subsym"] = transform_ID_subsym;
     ret["support_values"] = support_values.toJson(transform_ID_subsym);
     ret["cabac_binarization"] = cabac_binarization.toJson();
     return ret;

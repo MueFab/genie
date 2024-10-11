@@ -288,7 +288,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                           dynamic_cast<const core::record::alignment_split::SameRec&>(
                               *r.getAlignments().front().getAlignmentSplits().front())
                               .getDelta();
-                    end = std::max(static_cast<uint64_t>(end),
+                    end = std::max(end,
                                    r.getAlignments().front().getPosition() + r.getMappedLength(0, 0));
                 }
                 record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().getSeqID()),

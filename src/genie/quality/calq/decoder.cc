@@ -58,7 +58,7 @@ std::vector<std::string> Decoder::decodeUnaligned(const quality::paramqv1::Quali
                                                                    const std::pair<size_t, size_t>&) -> bool {
                                            (void)cigar;
                                            for (size_t i = 0; i < bs.second; ++i) {
-                                               auto index = static_cast<uint8_t>(desc.get((uint16_t)(2)).pull());
+                                               auto index = static_cast<uint8_t>(desc.get(2).pull());
                                                qv.back().push_back(param_casted.getCodebook(0).getEntries()[index]);
                                            }
                                            return true;

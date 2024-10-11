@@ -110,7 +110,7 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
         }
     }
 
-    return (uint64_t)subseqPayloadSize;
+    return subseqPayloadSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@ void AccessUnitHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t 
     print_offset(output, depth + 1, max_depth, "Access unit blocks: " + std::to_string(header.getNumBlocks()));
     print_offset(output, depth + 1, max_depth, "Access unit records: " + std::to_string(header.getReadCount()));
     print_offset(output, depth + 1, max_depth,
-                 "Access unit parameter set ID: " + std::to_string(static_cast<int>(header.getParameterID())));
+                 "Access unit parameter set ID: " + std::to_string(header.getParameterID()));
     if (header.getClass() != core::record::ClassType::CLASS_U) {
         print_offset(output, depth + 1, max_depth,
                      "Access unit reference ID: " + std::to_string(header.getAlignmentInfo().getRefID()));

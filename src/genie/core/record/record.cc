@@ -84,7 +84,7 @@ Record::Record(util::BitReader &reader)
         ++index;
     }
     for (auto &a : alignmentInfo) {
-        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), static_cast<uint8_t>(number_of_template_segments),
+        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), number_of_template_segments,
                          reader);
     }
     flags = reader.readAlignedInt<uint8_t>();
@@ -296,11 +296,11 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
 
 size_t Record::getMappedLength(size_t alignment, size_t split) const {
     if (split == 0) {
-        return static_cast<size_t>(getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar()));
+        return getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().getECigar()));
+    return getLengthOfCigar(s2.getAlignment().getECigar());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -323,11 +323,11 @@ std::pair<size_t, size_t> Record::getTemplatePosition() const {
 
 size_t Record::getPosition(size_t alignment, size_t split) const {
     if (split == 0) {
-        return static_cast<size_t>(getAlignments()[alignment].getPosition());
+        return getAlignments()[alignment].getPosition();
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return static_cast<size_t>(getAlignments()[alignment].getPosition() + s2.getDelta());
+    return getAlignments()[alignment].getPosition() + s2.getDelta();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

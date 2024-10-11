@@ -269,7 +269,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
-                binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                binParams[0] = static_cast<unsigned int>(std::min(static_cast<uint64_t>(binarzationParams.getCMax()),
                                                                   subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
@@ -360,7 +360,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
-                binParams[0] = static_cast<unsigned int>(std::min((uint64_t)binarzationParams.getCMax(),
+                binParams[0] = static_cast<unsigned int>(std::min(static_cast<uint64_t>(binarzationParams.getCMax()),
                                                                   subsymbols[s].lutNumMaxElems));  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);

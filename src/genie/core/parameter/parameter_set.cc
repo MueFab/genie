@@ -187,7 +187,7 @@ void EncodingSet::write(util::BitWriter &writer) const {
     writer.writeBits(number_of_template_segments_minus1, 2);
     writer.writeBits(0, 6);  // reserved_2
     writer.writeBits(max_au_data_unit_size, 29);
-    writer.writeBits(static_cast<uint8_t>(pos_40_bits_flag), 1);
+    writer.writeBits(pos_40_bits_flag, 1);
     writer.writeBits(qv_depth, 3);
     writer.writeBits(as_depth, 3);
     writer.writeBits(class_IDs.size(), 4);  // num_classes
@@ -204,8 +204,8 @@ void EncodingSet::write(util::BitWriter &writer) const {
         }
         writer.writeBits('\0', 8);  // NULL termination
     }
-    writer.writeBits(static_cast<uint8_t>(multiple_alignments_flag), 1);
-    writer.writeBits(static_cast<uint8_t>(spliced_reads_flag), 1);
+    writer.writeBits(multiple_alignments_flag, 1);
+    writer.writeBits(spliced_reads_flag, 1);
     writer.writeBits(reserved, 30);
     writer.writeBits(signature_cfg != std::nullopt, 1);
     if (signature_cfg != std::nullopt) {
@@ -217,7 +217,7 @@ void EncodingSet::write(util::BitWriter &writer) const {
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
-    writer.writeBits(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
+    writer.writeBits(static_cast<bool>(parameter_set_crps), 1);
     if (parameter_set_crps) {
         parameter_set_crps->write(writer);
     }

@@ -71,8 +71,7 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, c
         1,       blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::LOG_INFO};
 
     genie::core::GenSubIndex genieSubseqID =
-        (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>(
-        static_cast<genie::core::GenDesc>(descID), subseqID);
+        std::pair<genie::core::GenDesc, uint8_t>(static_cast<genie::core::GenDesc>(descID), subseqID);
 
     genie::entropy::gabac::EncodingConfiguration config;
 

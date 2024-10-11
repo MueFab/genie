@@ -17,7 +17,7 @@ namespace genie::util {
 
 BlockStepper util::DataBlock::getReader() const {
     return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.data() + data.size()),
-                        static_cast<uint8_t>(getWordSize()));
+                        getWordSize());
     // TODO(Fabian): Add BlockStepper for const
 }
 
@@ -41,11 +41,11 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return static_cast<size_t>(divByWordSize(data.size())); }
+size_t util::DataBlock::size() const { return divByWordSize(data.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve(static_cast<size_t>(mulByWordSize(size))); }
+void util::DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize(static_cast<size_t>(mulByWordSize(size))); }
+void util::DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

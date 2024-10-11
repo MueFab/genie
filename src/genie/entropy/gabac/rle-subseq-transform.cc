@@ -86,13 +86,13 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
         UTILS_DIE("invalid subseq count for rle inverse transform");
     }
 
-    const auto guard = (uint16_t)subseqCfg.getTransformParameters().getParam();
+    const auto guard = subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
 
     // Prepare internal and the output data structures
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
+    util::DataBlock symbols(0, (rawValues->getWordSize()));
 
     util::BlockStepper rVal = rawValues->getReader();
     util::BlockStepper rLen = lengths->getReader();

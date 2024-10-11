@@ -88,7 +88,7 @@ void EncapsulatedDatasetGroup::mergeReferences(genie::core::MPEGMinorVersion ver
             if (references[i] == ref) {
                 if (reference_meta[i].getReferenceMetadataValue().empty()) {
                     reference_meta[i] = genie::format::mgg::ReferenceMetadata(
-                        static_cast<uint8_t>(0), static_cast<uint8_t>(i), ref_meta.decapsulate());
+                        0, static_cast<uint8_t>(i), ref_meta.decapsulate());
                 } else {
                     UTILS_DIE_IF(
                         !(ref_meta.getReferenceMetadataValue() == reference_meta[i].getReferenceMetadataValue()),
@@ -174,7 +174,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(const std::vector<std::string
     size_t index = 0;
     for (auto& d : datasets) {
         for (auto& d2 : d->datasets) {
-            d2.patchID(static_cast<uint8_t>(0), static_cast<uint16_t>(index++));
+            d2.patchID(0, static_cast<uint16_t>(index++));
         }
     }
 
