@@ -6,10 +6,13 @@
 
 #ifndef SRC_APPS_GENIE_RUN_MAIN_H_
 #define SRC_APPS_GENIE_RUN_MAIN_H_
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genieapp::run {
+
+std::string file_extension(const std::string& path);
 
 /**
  * @brief

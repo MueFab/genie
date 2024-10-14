@@ -12,8 +12,10 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
+#include "apps/genie/run/main.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,13 +39,20 @@ std::string parent_dir(const std::string &path) {
     return ret;
 }
 
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
-    app.add_option("-i,--input-file", inputFile, "Input file (mgrec or mgb)\n")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "Output file (mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (fastq or mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (fastq or mgrec or mgb)\n")->mandatory(true);
+
+    inputSupFile = "";
+    app.add_option("-j, --input-suppl-file", inputSupFile, "Paired input fastq file\n");
+
+    outputSupFile = "";
+    app.add_option("-u, --output-suppl-file", outputSupFile, "Paired output fastq file\n");
 
     inputRefFile = "";
     app.add_option("-r,--input-ref-file", inputRefFile,
@@ -156,6 +165,10 @@ void validateInputFile(const std::string &file) {
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
+void validatePairedFiles(const std::string & file1, const std::string & file2) {
+    UTILS_DIE_IF(file_extension(file1) != file_extension(file2), "Input files do not have the same type.");
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
@@ -239,6 +252,7 @@ void ProgramOptions::validate() {
 
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
+        validatePairedFiles(inputFile, inputSupFile);
         inputSupFile = std::filesystem::canonical(inputSupFile).string();
         std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
         std::cerr << "Input supplementary file: " << inputSupFile << " with size "
@@ -278,6 +292,7 @@ void ProgramOptions::validate() {
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
+        validatePairedFiles(outputFile, outputSupFile);
         outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
         std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
         std::cerr << "Output supplementary file: " << outputSupFile << " with "
