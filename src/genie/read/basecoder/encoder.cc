@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <string>
 #include <utility>
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/record/alignment-box.h"

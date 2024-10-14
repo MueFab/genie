@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/reference.h"
+#include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/internal.h"
 #include "genie/util/runtime-exception.h"

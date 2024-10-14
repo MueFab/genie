@@ -5,6 +5,8 @@
  */
 
 #include "genie/format/mgg/reference/location/external.h"
+#include <memory>
+#include <string>
 #include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
 #include "genie/format/mgg/reference/location/external/mpeg.h"
@@ -27,14 +29,12 @@ std::unique_ptr<Location> External::factory(genie::util::BitReader& reader, uint
     auto _checksum_algo = reader.readAlignedInt<ChecksumAlgorithm>();
     switch (reader.readAlignedInt<RefType>()) {
         case RefType::MPEGG_REF:
-            return std::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
-                                                            seq_count, _version);
+            return std::make_unique<external::MPEG>(reader, _reserved, std::move(_ref_uri), _checksum_algo, seq_count,
+                                                    _version);
         case RefType::RAW_REF:
-            return std::make_unique<external::Raw>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
-                                                           seq_count);
+            return std::make_unique<external::Raw>(reader, _reserved, std::move(_ref_uri), _checksum_algo, seq_count);
         case RefType::FASTA_REF:
-            return std::make_unique<external::Fasta>(reader, _reserved, std::move(_ref_uri), _checksum_algo,
-                                                             seq_count);
+            return std::make_unique<external::Fasta>(reader, _reserved, std::move(_ref_uri), _checksum_algo, seq_count);
         default:
             UTILS_DIE("Unknown ref type");
     }

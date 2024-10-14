@@ -13,7 +13,6 @@
 #include <string>
 #include "genie/core/meta/external-ref.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core::meta::external_ref {

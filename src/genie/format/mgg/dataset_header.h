@@ -27,7 +27,6 @@
 #include "genie/format/mgg/gen_info.h"
 #include "genie/util/bit-reader.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::mgg {

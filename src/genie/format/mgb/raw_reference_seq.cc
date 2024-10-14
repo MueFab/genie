@@ -5,9 +5,9 @@
  */
 
 #include "genie/format/mgb/raw_reference_seq.h"
+#include <string>
 #include <utility>
 #include "genie/util/bit-writer.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -13,7 +13,6 @@
 #include "genie/core/meta/dataset.h"
 #include "genie/core/stats/perf-stats.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::core {

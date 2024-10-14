@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include "genie/run/main.h"
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"

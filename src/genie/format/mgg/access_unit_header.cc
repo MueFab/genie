@@ -5,7 +5,9 @@
  */
 
 #include "genie/format/mgg/access_unit_header.h"
+#include <map>
 #include <sstream>
+#include <string>
 #include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------

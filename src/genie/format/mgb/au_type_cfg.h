@@ -14,7 +14,6 @@
 #include "genie/format/mgb/extended_au.h"
 #include "genie/util/bit-writer.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::mgb {

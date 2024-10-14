@@ -8,6 +8,9 @@
 
 // -----------------------------------------------------------------------------
 
+#include <map>
+#include <string>
+#include <utility>
 #include <vector>
 #include "genie/quality/calq/calq_coder.h"
 #include "genie/quality/calq/error_exception_reporter.h"

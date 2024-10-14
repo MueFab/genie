@@ -6,8 +6,11 @@
 
 #include "genie/format/mgg/dataset_header.h"
 #include <limits>
+#include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -297,10 +300,9 @@ void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
 std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
     if (block_header_on != std::nullopt) {
         return std::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
-                                                                                 block_header_on->getCCFlag());
+                                                                         block_header_on->getCCFlag());
     } else {
-        return std::make_unique<genie::core::meta::blockheader::Disabled>(
-            block_header_off->getOrderedBlocksFlag());
+        return std::make_unique<genie::core::meta::blockheader::Disabled>(block_header_off->getOrderedBlocksFlag());
     }
 }
 

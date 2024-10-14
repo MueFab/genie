@@ -63,9 +63,7 @@ std::string random_string(size_t length) {
     std::mt19937 generator(rd());
     std::uniform_int_distribution<> distribution(0, max_index - 1);
 
-    auto randchar = [&]() -> char {
-        return charset[distribution(generator)];
-    };
+    auto randchar = [&]() -> char { return charset[distribution(generator)]; };
 
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);

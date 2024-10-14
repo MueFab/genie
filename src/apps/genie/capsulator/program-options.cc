@@ -5,7 +5,7 @@
  */
 
 #include "apps/genie/capsulator/program-options.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <set>
 #include <string>

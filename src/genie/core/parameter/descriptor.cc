@@ -5,8 +5,8 @@
  */
 
 #include "genie/core/parameter/descriptor.h"
+#include <memory>
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,8 +19,7 @@ bool Descriptor::equals(const Descriptor *desc) const { return dec_cfg_preset ==
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Descriptor::write(util::BitWriter &writer) const { writer.writeBits(uint8_t(dec_cfg_preset), 8);
-}
+void Descriptor::write(util::BitWriter &writer) const { writer.writeBits(uint8_t(dec_cfg_preset), 8); }
 std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &reader) {
     auto preset = reader.read<uint8_t>();
     UTILS_DIE_IF(preset != 0, "Invalid DecCfgPreset");

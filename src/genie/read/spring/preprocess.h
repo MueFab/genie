@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <string>
 #include "genie/core/record/chunk.h"
 #include "genie/read/spring/util.h"

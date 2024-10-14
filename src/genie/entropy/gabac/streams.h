@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cstdio>
 #include <istream>
 #include <ostream>
 #include "genie/util/data-block.h"
@@ -142,8 +143,7 @@ class DataBlockBuffer : public std::streambuf {
      * @param which
      * @return
      */
-    pos_type seekoff(off_type off, std::ios_base::seekdir dir,
-                     std::ios_base::openmode which) override;
+    pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override;
 
  private:
     util::DataBlock block;  //!< @brief

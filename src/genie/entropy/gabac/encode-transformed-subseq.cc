@@ -7,6 +7,7 @@
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include <algorithm>
 #include <cassert>
+#include <vector>
 #include "genie/entropy/gabac/context-selector.h"
 #include "genie/entropy/gabac/luts-subsymbol-transform.h"
 #include "genie/entropy/gabac/writer.h"
