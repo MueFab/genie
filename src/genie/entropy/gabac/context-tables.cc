@@ -6,6 +6,7 @@
 
 #include "genie/entropy/gabac/context-tables.h"
 #include <iostream>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

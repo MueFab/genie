@@ -5,7 +5,7 @@
  */
 
 #include "apps/genie/run/program-options.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <random>
 #include <set>

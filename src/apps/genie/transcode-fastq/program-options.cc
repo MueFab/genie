@@ -5,7 +5,7 @@
  */
 
 #include "apps/genie/transcode-fastq/program-options.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <random>
 #include <set>

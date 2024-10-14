@@ -7,10 +7,13 @@
 #define NOMINMAX
 #include "genie/entropy/gabac/benchmark.h"
 #include <algorithm>
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <string>
+#include <utility>
+#include <vector>
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"

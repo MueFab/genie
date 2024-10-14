@@ -6,9 +6,11 @@
 
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <fstream>
+#include <iostream>
 #include <random>
+#include <string>
 #include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"

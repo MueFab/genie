@@ -5,8 +5,9 @@
  */
 
 #include "genie/quality/calq/log.h"
-
+#include <iostream>
 #include <memory>
+#include <string>
 
 namespace genie::quality::calq {
 

@@ -5,8 +5,8 @@
  */
 
 #include "genie/entropy/paramcabac/context.h"
+#include <vector>
 #include "genie/util/bit-writer.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

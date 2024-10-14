@@ -6,7 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/run/main.h"
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
 #include <string>
@@ -153,9 +153,12 @@ void attachImporterMgrec(T& flow, const ProgramOptions& pOpts, std::vector<std::
         inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
         in_ptr = inputFiles.back().get();
     }
-    outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
-    flow.addImporter(std::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
-    if (file_extension(pOpts.inputFile) == "fasta") {
+
+    if (file_extension(pOpts.inputFile) == "mgrec") {
+        outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
+        flow.addImporter(std::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
+    } else if (file_extension(pOpts.inputFile) == "fasta") {
+
         flow.addImporter(std::make_unique<genie::core::NullImporter>());
     }
 }

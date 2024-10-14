@@ -5,10 +5,10 @@
  */
 
 #include "genie/core/record/alignment_split/same-rec.h"
+#include <memory>
 #include <utility>
 #include "genie/util/bit-reader.h"
 #include "genie/util/bit-writer.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,6 +7,7 @@
 #include "genie/core/access-unit.h"
 #include <algorithm>
 #include <utility>
+#include <vector>
 #include "genie/core/mismatch-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

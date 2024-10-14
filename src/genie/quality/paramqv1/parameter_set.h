@@ -15,7 +15,6 @@
 #include "genie/quality/paramqv1/codebook.h"
 #include "genie/util/bit-writer.h"
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::quality::paramqv1 {

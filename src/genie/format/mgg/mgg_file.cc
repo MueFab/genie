@@ -5,8 +5,11 @@
  */
 
 #include "genie/format/mgg/mgg_file.h"
+#include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,8 +30,7 @@ MggFile::MggFile(std::istream* _file) : file(_file), reader(*file) {
             boxes.emplace_back(std::make_unique<genie::format::mgg::FileHeader>(*reader));
         } else if (boxname == "dgcn") {
             const auto& hdr = dynamic_cast<const genie::format::mgg::FileHeader&>(*boxes.front());
-            boxes.emplace_back(
-                std::make_unique<genie::format::mgg::DatasetGroup>(*reader, hdr.getMinorVersion()));
+            boxes.emplace_back(std::make_unique<genie::format::mgg::DatasetGroup>(*reader, hdr.getMinorVersion()));
         } else {
             std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
             break;
