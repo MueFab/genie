@@ -87,21 +87,6 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/*template <class T>
-void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    std::ostream* out_ptr = &std::cout;
-    if (pOpts.outputFile.substr(0, 2) != "-.") {
-        outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile));
-        out_ptr = outputFiles.back().get();
-    }
-    if (file_extension(pOpts.outputFile) == "mgrec") {
-        flow.addExporter(std::make_unique<genie::format::mgrec::Exporter>(*out_ptr));
-    } else if (file_extension(pOpts.outputFile) == "fasta") {
-        flow.addExporter(std::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), out_ptr,
-                                                                                  pOpts.numberOfThreads));
-    }
-}*/
-
 template <class T>
 void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     std::ostream* file1 = &std::cout;
@@ -168,8 +153,7 @@ void attachImporterMgrec(T& flow, const ProgramOptions& pOpts, std::vector<std::
         inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
         in_ptr = inputFiles.back().get();
     }
-    // if (file_extension(pOpts.inputFile) == "mgrec") {
-    // outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
+    outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
     flow.addImporter(std::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
     if (file_extension(pOpts.inputFile) == "fasta") {
         flow.addImporter(std::make_unique<genie::core::NullImporter>());
@@ -187,7 +171,6 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
         inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
         file1 = inputFiles.back().get();
     }
-    /*if (file_extension(pOpts.inputFile) == "fastq") {*/
     if (file_extension(pOpts.inputSupFile) == "fastq") {
         std::istream* file2 = &std::cin;
         if (pOpts.inputSupFile.substr(0, 2) != "-.") {
@@ -198,13 +181,6 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
     } else {
         flow.addImporter(std::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1));
     }
-    /*} else if (file_extension(pOpts.inputFile) == "mgrec") {
-        auto tmpFile = pOpts.outputFile + ".unsupported.mgrec";
-        outputFiles.emplace_back(std::make_unique<std::ofstream>(tmpFile));
-        flow.addImporter(
-            std::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1, *outputFiles.back(), false));
-        std::remove(tmpFile.c_str());
-    }*/
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -241,13 +217,10 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         out_ptr = outputFiles.back().get();
     }
     flow->addExporter(std::make_unique<genie::format::mgb::Exporter>(out_ptr));
-    if (file_extension(pOpts.inputFile) == "fastq" &&
-        (pOpts.inputSupFile.empty() || file_extension(pOpts.inputSupFile) == "fastq")) {
+    if (file_extension(pOpts.inputFile) == "fastq") {
         attachImporterFastq(*flow, pOpts, inputFiles);
-    } else if (file_extension(pOpts.inputFile) == "mgrec" && pOpts.inputSupFile.empty()) {
-        attachImporterMgrec(*flow, pOpts, inputFiles, outputFiles);
     } else {
-        UTILS_DIE("Unknown input format");
+        attachImporterMgrec(*flow, pOpts, inputFiles, outputFiles);
     }
     if (pOpts.qvMode == "none") {
         flow->setQVCoder(std::make_unique<genie::quality::qvwriteout::NoneEncoder>(), 0);
