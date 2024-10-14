@@ -158,7 +158,6 @@ void attachImporterMgrec(T& flow, const ProgramOptions& pOpts, std::vector<std::
         outputFiles.emplace_back(std::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
         flow.addImporter(std::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *in_ptr, *outputFiles.back()));
     } else if (file_extension(pOpts.inputFile) == "fasta") {
-
         flow.addImporter(std::make_unique<genie::core::NullImporter>());
     }
 }
