@@ -56,7 +56,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileType getType(const std::string& ext) {
-    if (ext == "mgrec" || ext == "fasta" || ext == "fastq") {
+    if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam") {
         return FileType::THIRD_PARTY;
     } else if (ext == "mgb") {
         return FileType::MPEG;
@@ -184,6 +184,7 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
         flow.addImporter(std::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1));
     }
 }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
