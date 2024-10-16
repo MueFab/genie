@@ -15,7 +15,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_record.h"
 #include "apps/genie/transcode-sam/transcoding.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/record/record.h"

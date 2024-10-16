@@ -6,9 +6,9 @@
 
 #include "apps/genie/transcode-sam/main.h"
 #include <iostream>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/sam/sam_to_mgrec/program-options.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
+#include "genie/format/sam/sam/sam_to_mgrec/transcoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
+#include "genie/format/sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
 #include <filesystem>  // NOLINT
 #include <fstream>

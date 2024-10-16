@@ -11,8 +11,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_record.h"
 #include "util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

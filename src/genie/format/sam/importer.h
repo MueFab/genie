@@ -20,10 +20,19 @@
 #include "genie/util/original-source.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/source.h"
+#include "sam/sam_to_mgrec/transcoder.h"
+
+#include <queue>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+class SubfileReader;
+}
 namespace genie::format::sam {
+
+bool cmp_readers(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
+    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b);
 
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
@@ -32,10 +41,26 @@ class Importer : public core::FormatImporter {
  private:
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
-    std::vector<std::istream *> file_list;         //!< @brief Input streams (paired files supported)
     util::OrderedLock lock;                        //!< @brief Lock to ensure in order execution
+    bool phase1_complete;
+    std::string input_sam_file;
+    std::string input_ref_file;
+    int nref;
+    std::vector<std::pair<std::string, size_t>> refs;
+    std::priority_queue <genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *,
+        std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, decltype(cmp_readers)> reader_prio;
+    std::vector<std::unique_ptr<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>> readers;
+    std::vector<size_t> sam_hdr_to_fasta_lut;
+    size_t removed_unsupported_base = 0;
+    genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo refinf;
 
-    enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines
+
+        enum Lines {
+            ID = 0,
+            SEQUENCE = 1,
+            RESERVED = 2,
+            QUALITY = 3
+        };  //!< @brief FASTQ format lines
     enum Files { FIRST = 0, SECOND = 1 };                            //!< @brief File shortcuts
 
     /**
@@ -65,15 +90,8 @@ class Importer : public core::FormatImporter {
      * @param _blockSize How many records to extract per pump()
      * @param _file_1 Input file
      */
-    Importer(size_t _blockSize, std::istream &_file_1);
-
-    /**
-     * @brief Paired input
-     * @param _blockSize How many records to extract per pump()
-     * @param _file_1 Input file #1
-     * @param _file_2 Input file #2
-     */
-    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2);
+    Importer(size_t _blockSize, std::string input, std::string ref);
+    void setup_merge(int num_chunks);
 
     /**
      * @brief
