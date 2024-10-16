@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <thread>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,6 +35,11 @@ class Config {
      * @param argv
      */
     Config(int argc, char *argv[]);
+
+    Config() : verbosity_level(0), tmp_dir_path("/tmp"), forceOverwrite(false), help(false),
+ no_ref(false), clean(false), num_threads(std::thread::hardware_concurrency()) {
+
+    }
 
     /**
      * @brief

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <filesystem>  // NOLINT
 #include <iostream>
@@ -17,9 +17,9 @@
 #include <thread>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_group.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
+#include "genie/format/sam/sam/sam_to_mgrec/sam_group.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

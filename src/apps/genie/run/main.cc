@@ -6,6 +6,9 @@
 
 #define NOMINMAX
 #include "apps/genie/run/main.h"
+
+#include <format/sam/importer.h>
+
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
@@ -185,6 +188,16 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
     }
 }
 
+template <class T>
+void attachImporterSam(T& flow, const ProgramOptions& pOpts,std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+    constexpr size_t BLOCKSIZE = 128000; // welche Blocksize???
+    std::istream* in_ptr = &std::cin;
+    if (pOpts.inputFile.substr(0, 2) != "-.") {
+        inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
+        in_ptr = inputFiles.back().get();
+    }
+    flow.addImporter(std::make_unique<genie::format::sam::Importer>(BLOCKSIZE, pOpts.inputFile, pOpts.inputRefFile));
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -222,6 +235,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     flow->addExporter(std::make_unique<genie::format::mgb::Exporter>(out_ptr));
     if (file_extension(pOpts.inputFile) == "fastq") {
         attachImporterFastq(*flow, pOpts, inputFiles);
+    } else if (file_extension(pOpts.inputFile) == "sam") {
+        attachImporterSam(*flow, pOpts, inputFiles);
     } else {
         attachImporterMgrec(*flow, pOpts, inputFiles, outputFiles);
     }
