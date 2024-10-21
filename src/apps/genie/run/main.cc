@@ -191,10 +191,10 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
 template <class T>
 void attachImporterSam(T& flow, const ProgramOptions& pOpts,std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
     constexpr size_t BLOCKSIZE = 128000; // welche Blocksize???
-    std::istream* in_ptr = &std::cin;
+    //std::istream* in_ptr = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
         inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
-        in_ptr = inputFiles.back().get();
+        //in_ptr = inputFiles.back().get();
     }
     flow.addImporter(std::make_unique<genie::format::sam::Importer>(BLOCKSIZE, pOpts.inputFile, pOpts.inputRefFile));
 }

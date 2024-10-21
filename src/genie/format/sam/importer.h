@@ -20,19 +20,19 @@
 #include "genie/util/original-source.h"
 #include "genie/util/runtime-exception.h"
 #include "genie/util/source.h"
+#include "sam/sam_to_mgrec/sorter.h"
 #include "sam/sam_to_mgrec/transcoder.h"
 
 #include <queue>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
-class SubfileReader;
-}
 namespace genie::format::sam {
 
-bool cmp_readers(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
-    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b);
+struct CmpReaders {
+  bool operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
+      genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b) const;
+};
 
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
@@ -48,7 +48,7 @@ class Importer : public core::FormatImporter {
     int nref;
     std::vector<std::pair<std::string, size_t>> refs;
     std::priority_queue <genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *,
-        std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, decltype(cmp_readers)> reader_prio;
+        std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, CmpReaders> reader_prio;
     std::vector<std::unique_ptr<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>> readers;
     std::vector<size_t> sam_hdr_to_fasta_lut;
     size_t removed_unsupported_base = 0;
