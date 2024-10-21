@@ -26,13 +26,13 @@ namespace genie::format::sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::string input, std::string ref) : blockSize(_blockSize),
-input_sam_file(std::move(input)), input_ref_file(std::move(ref)) , phase1_complete(false), reader_prio(cmp_readers), refinf(input_ref_file) {}
+input_sam_file(std::move(input)), input_ref_file(std::move(ref)) , phase1_complete(false), reader_prio(CmpReaders()), refinf(input_ref_file) {}
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool cmp_readers(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
-    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b) {
+bool CmpReaders::operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
+    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b) const {
         return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
     }
 
@@ -269,52 +269,40 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     bool eof = false;
     {
         if (!reader_prio.empty()) {
-            auto* reader = reader_prio.top();
-            reader_prio.pop();
-            auto rec = reader->moveRecord();
-            rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
+            for(int i = 0; i < 10; ++i) {
+                auto* reader = reader_prio.top();
+                reader_prio.pop();
+                auto rec = reader->moveRecord();
+                rec.patchRefID(sam_hdr_to_fasta_lut[rec.getAlignmentSharedData().getSeqID()]);
 
-            if (fix_ecigar(rec, refs, refinf)) {
-                chunk.getData().push_back(std::move(rec));
-                //rec.write(total_output_writer);
-            } else {
-                removed_unsupported_base++;
-            }
+                if (fix_ecigar(rec, refs, refinf)) {
+                    chunk.getData().push_back(std::move(rec));
+                } else {
+                    removed_unsupported_base++;
+                }
 
-            if (reader->getRecord()) {
-                reader_prio.push(reader);
-            } else {
-                auto path = reader->getPath();
-                std::cerr << path << " depleted" << std::endl;
-                for (auto it = readers.begin(); it != readers.end(); ++it) {
-                    if (it->get() == reader) {
-                        readers.erase(it);
+                if (reader->getRecord()) {
+                    reader_prio.push(reader);
+                } else {
+                    auto path = reader->getPath();
+                    std::cerr << path << " depleted" << std::endl;
+                    for (auto it = readers.begin(); it != readers.end(); ++it) {
+                        if (it->get() == reader) {
+                            readers.erase(it);
+                            break;
+                        }
+                    }
+                    std::remove(path.c_str());
+                    if (reader_prio.empty()) {
+                        eof = true;
                         break;
                     }
                 }
-                std::remove(path.c_str());
             }
+        } else {
+            eof = true;
         }
-
-        /*for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
-            auto data = readData(file_list);
-            if (data.empty()) {
-                eof = true;
-                break;
-            }
-            auto record = buildRecord(data);
-            for (const auto &seg : record.getSegments()) {
-                size_seq += seg.getSequence().size();
-                for (const auto &q : seg.getQualities()) {
-                    size_qual += q.size();
-                }
-            }
-            size_name += record.getName().size() * 2;
-            chunk.getData().push_back(std::move(record));
-        }*/
     }
-
-
 
     chunk.getStats().addInteger("size-sam-seq", size_seq);
     chunk.getStats().addInteger("size-sam-qual", size_qual);
