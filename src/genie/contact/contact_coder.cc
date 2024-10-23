@@ -84,7 +84,7 @@ void compute_masks(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void decode_cm_masks(
+void decode_scm_masks(
     // Inputs
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
@@ -97,11 +97,7 @@ void decode_cm_masks(
     auto col_nentries = cm_param.getNumBinEntries(scm_param.getChr2ID());
 
     if (scm_param.getRowMaskExistsFlag()){
-        decode_cm_mask_payload(
-            scm_payload.getRowMaskPayload(),
-            row_nentries,
-            row_mask
-        );
+        decode_scm_mask_payload(scm_payload.getRowMaskPayload(), row_nentries, row_mask);
     } else {
         row_mask = xt::ones<bool>({row_nentries});
     }
@@ -109,11 +105,7 @@ void decode_cm_masks(
     if (scm_param.isIntraSCM()){
         col_mask = row_mask;
     } else if (scm_param.getColMaskExistsFlag()){
-        decode_cm_mask_payload(
-            scm_payload.getColMaskPayload(),
-            col_nentries,
-            col_mask
-        );
+        decode_scm_mask_payload(scm_payload.getColMaskPayload(), col_nentries, col_mask);
     } else {
         col_mask = xt::ones<bool>({col_nentries});
     }
@@ -121,7 +113,7 @@ void decode_cm_masks(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void decode_cm_mask_payload(
+void decode_scm_mask_payload(
     // Inputs
     const SubcontactMatrixMaskPayload& mask_payload,
     size_t num_entries,
@@ -1024,7 +1016,7 @@ void decode_scm(
     );
 
     if (row_mask_exists || col_mask_exists){
-        decode_cm_masks(
+        decode_scm_masks(
             cm_param,
             scm_param,
             scm_payload,
