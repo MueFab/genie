@@ -12,6 +12,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <queue>
 #include "genie/core/format-importer.h"
 #include "genie/core/record/record.h"
 #include "genie/core/stats/perf-stats.h"
@@ -23,15 +24,14 @@
 #include "sam/sam_to_mgrec/sorter.h"
 #include "sam/sam_to_mgrec/transcoder.h"
 
-#include <queue>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie::format::sam {
 
 struct CmpReaders {
-  bool operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
-      genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b) const;
+    bool operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *a,
+                    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *b) const;
 };
 
 /**
@@ -47,20 +47,15 @@ class Importer : public core::FormatImporter {
     std::string input_ref_file;
     int nref;
     std::vector<std::pair<std::string, size_t>> refs;
-    std::priority_queue <genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *,
-        std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, CmpReaders> reader_prio;
+    std::priority_queue<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *,
+                        std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, CmpReaders>
+        reader_prio;
     std::vector<std::unique_ptr<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>> readers;
     std::vector<size_t> sam_hdr_to_fasta_lut;
     size_t removed_unsupported_base = 0;
     genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo refinf;
 
-
-        enum Lines {
-            ID = 0,
-            SEQUENCE = 1,
-            RESERVED = 2,
-            QUALITY = 3
-        };  //!< @brief FASTQ format lines
+    enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines
     enum Files { FIRST = 0, SECOND = 1 };                            //!< @brief File shortcuts
 
     /**
@@ -103,7 +98,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genie::format::fastq
+}  // namespace genie::format::sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 

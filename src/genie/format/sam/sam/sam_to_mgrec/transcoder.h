@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ class RefInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

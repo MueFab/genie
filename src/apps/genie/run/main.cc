@@ -7,6 +7,7 @@
 #define NOMINMAX
 #include "apps/genie/run/main.h"
 
+#include <format/sam/exporter.h>
 #include <format/sam/importer.h>
 
 #include <filesystem>  // NOLINT
@@ -110,6 +111,8 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
         }
     } else if (file_extension(pOpts.outputFile) == "mgrec") {
         flow.addExporter(std::make_unique<genie::format::mgrec::Exporter>(*file1));
+    } else if (file_extension(pOpts.outputFile) == "sam") {
+        flow.addExporter(std::make_unique<genie::format::sam::Exporter>(pOpts.inputRefFile, pOpts.outputFile));
     } else if (file_extension(pOpts.outputFile) == "fasta") {
         flow.addExporter(
             std::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), file1, pOpts.numberOfThreads));
@@ -189,12 +192,12 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
 }
 
 template <class T>
-void attachImporterSam(T& flow, const ProgramOptions& pOpts,std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    constexpr size_t BLOCKSIZE = 128000; // welche Blocksize???
-    //std::istream* in_ptr = &std::cin;
+void attachImporterSam(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+    constexpr size_t BLOCKSIZE = 128000;  // welche Blocksize???
+    // std::istream* in_ptr = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
         inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
-        //in_ptr = inputFiles.back().get();
+        // in_ptr = inputFiles.back().get();
     }
     flow.addImporter(std::make_unique<genie::format::sam::Importer>(BLOCKSIZE, pOpts.inputFile, pOpts.inputRefFile));
 }

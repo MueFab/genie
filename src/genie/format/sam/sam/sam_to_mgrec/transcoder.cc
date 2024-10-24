@@ -17,11 +17,11 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include "apps/genie/transcode-sam/utils.h"
+#include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/format/sam/sam/sam_to_mgrec/sam_group.h"
 #include "genie/format/sam/sam/sam_to_mgrec/sam_reader.h"
 #include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
-#include "apps/genie/transcode-sam/utils.h"
-#include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

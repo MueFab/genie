@@ -9,14 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+
+
+
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 #include "genie/core/format-exporter.h"
 #include "genie/core/record/chunk.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/drain.h"
-
 #include "genie/util/ordered-lock.h"
 #include "genie/util/ordered-section.h"
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,22 +33,26 @@ namespace genie::format::sam {
  * @brief Module to export MPEG-G record to sam files
  */
 class Exporter : public core::FormatExporter {
-    std::vector<std::ostream *> file;  //!< @brief Support for paired output files
-    util::OrderedLock lock;            //!< @brief Lock to ensure in order execution
+    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    std::string fasta_file_path;
+    std::string outputFilePath;
+    std::optional<std::ofstream> output_stream;
+    std::ostream *output_file = &std::cout;
+    bool output_set = false;
 
  public:
     /**
      * @brief Unpaired mode
      * @param _file_1 Output file
      */
-    explicit Exporter(std::ostream &_file_1);
+    explicit Exporter(std::string refFile, std::string output_file);
 
     /**
      * @brief Paired mode
      * @param _file_1 Output file #1
      * @param _file_2 Output file #2
      */
-    Exporter(std::ostream &_file_1, std::ostream &_file_2);
+    Exporter();
 
     /**
      * @brief
