@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,10 +36,14 @@ class Config {
      */
     Config(int argc, char *argv[]);
 
-    Config() : verbosity_level(0), tmp_dir_path("/tmp"), forceOverwrite(false), help(false),
- no_ref(false), clean(false), num_threads(std::thread::hardware_concurrency()) {
-
-    }
+    Config()
+        : verbosity_level(0),
+          tmp_dir_path("/tmp"),
+          forceOverwrite(false),
+          help(false),
+          no_ref(false),
+          clean(false),
+          num_threads(std::thread::hardware_concurrency()) {}
 
     /**
      * @brief
@@ -78,7 +82,7 @@ class Config {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

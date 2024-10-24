@@ -13,6 +13,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
+#include <algorithm>
+#include <iostream>
 #include "genie/core/record/class-type.h"
 #include "genie/transcode-sam/utils.h"
 #include "genie/util/ordered-section.h"
@@ -25,16 +28,20 @@ namespace genie::format::sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::string input, std::string ref) : blockSize(_blockSize),
-input_sam_file(std::move(input)), input_ref_file(std::move(ref)) , phase1_complete(false), reader_prio(CmpReaders()), refinf(input_ref_file) {}
-
+Importer::Importer(size_t _blockSize, std::string input, std::string ref)
+    : blockSize(_blockSize),
+      input_sam_file(std::move(input)),
+      input_ref_file(std::move(ref)),
+      phase1_complete(false),
+      reader_prio(CmpReaders()),
+      refinf(input_ref_file) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool CmpReaders::operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * a,
-    genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader * b) const {
-        return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
-    }
+bool CmpReaders::operator()(const genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader* a,
+                            genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader* b) const {
+    return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -123,7 +130,6 @@ genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet) {
     return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) { return alphabet.isIncluded(c); });
 }
@@ -131,7 +137,7 @@ bool validateBases(const std::string& seq, const genie::core::Alphabet& alphabet
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>&,
-                    genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo& ref) {
+                genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo& ref) {
     if (r.getClassID() == genie::core::record::ClassType::CLASS_U) {
         return true;
     }
@@ -215,7 +221,6 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
 }
 
 void Importer::setup_merge(int num_chunks) {
-
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
     removed_unsupported_base = 0;
 
@@ -239,8 +244,8 @@ void Importer::setup_merge(int num_chunks) {
     readers.reserve(num_chunks);
 
     for (int i = 0; i < num_chunks; ++i) {
-        readers.emplace_back(
-            std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>( "/tmp/" + std::to_string(i) + PHASE1_EXT));
+        readers.emplace_back(std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>(
+            "/tmp/" + std::to_string(i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;
@@ -252,7 +257,7 @@ void Importer::setup_merge(int num_chunks) {
     }
 }
 
-bool Importer::pumpRetrieve(core::Classifier *_classifier) {
+bool Importer::pumpRetrieve(core::Classifier* _classifier) {
     if (!phase1_complete) {
         genieapp::transcode_sam::sam::sam_to_mgrec::Config options;
         options.inputFile = input_sam_file;
@@ -269,7 +274,7 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     bool eof = false;
     {
         if (!reader_prio.empty()) {
-            for(int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; ++i) {
                 auto* reader = reader_prio.top();
                 reader_prio.pop();
                 auto rec = reader->moveRecord();
@@ -319,7 +324,7 @@ core::record::Record Importer::buildRecord(std::vector<std::array<std::string, L
     auto ret = core::record::Record(uint8_t(data.size()), core::record::ClassType::CLASS_U,
                                     data[Files::FIRST][Lines::ID].substr(1), "", 0);
 
-    for (auto &cur_rec : data) {
+    for (auto& cur_rec : data) {
         auto seg = core::record::Segment(std::move(cur_rec[Lines::SEQUENCE]));
         if (!cur_rec[Lines::QUALITY].empty()) {
             seg.addQualities(std::move(cur_rec[Lines::QUALITY]));
@@ -332,7 +337,7 @@ core::record::Record Importer::buildRecord(std::vector<std::array<std::string, L
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::vector<std::array<std::string, Importer::LINES_PER_RECORD>> Importer::readData(
-    const std::vector<std::istream *> &_file_list) {
+    const std::vector<std::istream*>& _file_list) {
     std::vector<std::array<std::string, LINES_PER_RECORD>> data(_file_list.size());
     for (size_t cur_file = 0; cur_file < _file_list.size(); ++cur_file) {
         for (size_t cur_line = 0; cur_line < LINES_PER_RECORD; ++cur_line) {
@@ -349,7 +354,7 @@ std::vector<std::array<std::string, Importer::LINES_PER_RECORD>> Importer::readD
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::sanityCheck(const std::array<std::string, LINES_PER_RECORD> &data) {
+void Importer::sanityCheck(const std::array<std::string, LINES_PER_RECORD>& data) {
     constexpr char ID_TOKEN = '@';
     UTILS_DIE_IF(data[Lines::ID].front() != ID_TOKEN, "Invald sam identifier");
     constexpr char RESERVED_TOKEN = '+';
