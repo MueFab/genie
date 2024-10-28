@@ -2,6 +2,7 @@ project("genie-test-annotation")
 
 set(source_files
         annotation-test.cc
+		annotation-contact-test.cc
         helpers.cc
         main.cc
 
