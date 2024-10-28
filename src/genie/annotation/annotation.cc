@@ -41,7 +41,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
     }
     if (inputfile.is_open()) inputfile.close();
 
-    writeToFile(outputFileName);
+   // writeToFile(outputFileName);
 }
 
 void Annotation::writeToFile(std::string& outputFileName) {

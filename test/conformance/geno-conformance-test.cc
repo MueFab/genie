@@ -29,13 +29,21 @@
 #include "helpers.h"
 
 struct genoTestValues {
-    genie::genotype::SortingAlgoID SortingID;
+    genie::genotype::SortingAlgoID sortingID;
     genie::genotype::BinarizationID binID;
+    genie::genotype::ConcatAxis concatAxis;
+    bool transposeMat;
     genie::core::AlgoID algID;
     std::string filepath;
     genoTestValues(genie::genotype::SortingAlgoID _SortingID, genie::genotype::BinarizationID _binID,
-                   genie::core::AlgoID _algID, std::string _filepath)
-        : SortingID(_SortingID), binID(_binID), algID(_algID), filepath(_filepath) {}
+                   genie::genotype::ConcatAxis _concatAxis, bool _transposeMat, genie::core::AlgoID _algID,
+                   std::string _filepath)
+        : sortingID(_SortingID),
+          binID(_binID),
+          concatAxis(_concatAxis),
+          transposeMat(_transposeMat),
+          algID(_algID),
+          filepath(_filepath) {}
 };
 
 class GenotypeConformanceTest : public ::testing::TestWithParam<genoTestValues> {
@@ -67,8 +75,11 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     if (testparams.algID == genie::core::AlgoID::BSC) name += "_BSC";
     if (testparams.binID == genie::genotype::BinarizationID::BIT_PLANE) name += "_BITPLANE";
     if (testparams.binID == genie::genotype::BinarizationID::ROW_BIN) name += "_ROWBIN";
-    if (testparams.SortingID == genie::genotype::SortingAlgoID::NO_SORTING) name += "_NOSORT";
-    if (testparams.SortingID == genie::genotype::SortingAlgoID::RANDOM_SORT) name += "_RANDOMSORT";
+    if (testparams.concatAxis == genie::genotype::ConcatAxis::DO_NOT_CONCAT) name += "_NOCONCAT";
+    if (testparams.concatAxis == genie::genotype::ConcatAxis::CONCAT_COL_DIR) name += "_CONCATCOL";
+    if (testparams.concatAxis == genie::genotype::ConcatAxis::CONCAT_ROW_DIR) name += "_CONCATROW";
+    if (testparams.sortingID == genie::genotype::SortingAlgoID::NO_SORTING) name += "_NOSORT";
+    if (testparams.sortingID == genie::genotype::SortingAlgoID::RANDOM_SORT) name += "_RANDOMSORT";
 
     uint32_t BLOCK_SIZE = 200;
     bool TRANSFORM_MODE = true;
@@ -79,13 +90,13 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
     };
 
     genie::genotype::EncodingOptions genotype_opt = {
-        BLOCK_SIZE,                                  // block_size;
-        testparams.binID,                            // genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
-        false,                                       // transpose_mat;
-        testparams.SortingID,                        // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        testparams.SortingID,                        // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        testparams.algID                             // codec_ID;
+        BLOCK_SIZE,             // block_size;
+        testparams.binID,       // genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
+        testparams.concatAxis,  // concat_axis;
+        false,                  // transpose_mat;
+        testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        testparams.algID        // codec_ID;
     };
 
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";
@@ -109,17 +120,23 @@ INSTANTIATE_TEST_SUITE_P(
     testallGenoConformance, GenotypeConformanceTest,
     ::testing::Values(
         genoTestValues(genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.5.bgz.CASE01"),
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.5.bgz.CASE01"),
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG,
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
                        "/data/records/conformance/ALL.chrY.phase3_integrated_v2a.20130502.genotypes.bgz.CASE02"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE04"},
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.11.bgz.CASE04"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::ROW_BIN,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::RANDOM_SORT, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::JBIG, "/data/records/conformance/1.3.11.bgz.CASE03"},
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::JBIG,
+                       "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::core::AlgoID::BSC, "/data/records/conformance/1.3.11.bgz.CASE03"}));
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::BSC,
+                       "/data/records/conformance/1.3.11.bgz.CASE03"}));
