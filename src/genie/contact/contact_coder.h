@@ -98,7 +98,7 @@ void compute_masks(
 * @param row_mask The output vector for the row mask.
 * @param col_mask The output vector for the column mask.
 */
-void decode_cm_masks(
+void decode_scm_masks(
     // Inputs
     ContactMatrixParameters& cm_param,
     SubcontactMatrixParameters& scm_param,
@@ -122,7 +122,7 @@ void decode_cm_masks(
  * @param mask The output binary vector for the decoded mask.
  * @throws std::runtime_error If the number of entries and the size of the mask array differ, or if the start index exceeds the number of entries.
  */
-void decode_cm_mask_payload(
+void decode_scm_mask_payload(
     // Inputs
     const SubcontactMatrixMaskPayload& mask_payload,
     size_t num_entries,
