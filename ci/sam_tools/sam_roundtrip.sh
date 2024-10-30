@@ -47,63 +47,32 @@ compress_roundtrip () {
          genie_decoder_ref_parameter="-r $fasta_file"
          genie_transcoder_ref_parameter="-r $fasta_file"
     fi
-    echo "-----------------Genie transcode input"
-    eval $timing_command \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-sam \
-        -i $sam_file \
-        -w $working_dir \
-        -o $working_dir/transcoded.mgrec -f \
-        $genie_transcoder_ref_parameter \
-        -c \
-        || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    echo "-----------------input transcoded:"
-    ls -l $working_dir/transcoded.mgrec
-
-    echo "-----------------Genie compress"
+    echo "-----------------Genie compress input"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -i $working_dir/transcoded.mgrec \
+        -i $sam_file \
         -o $working_dir/output.mgb -f \
         -w $working_dir \
         $genie_encoder_parameters \
         || { echo "Genie compress ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    rm $working_dir/transcoded.mgrec
 
     echo "-----------------Compressed:"
     ls -l $sam_file
     ls -l $working_dir/output.mgb
     
     rm $working_dir/output.mgb.json
-    rm $working_dir/output.mgb.unsupported.mgrec
+    #rm $working_dir/output.mgb.unsupported.mgrec
 
     echo "-----------------Genie decompress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o $working_dir/output.mgrec \
+        -o $working_dir/output.sam \
         -w $working_dir \
         $genie_decoder_ref_parameter \
         -i $working_dir/output.mgb -f \
-        || { echo "Genie decompress ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
+        || { echo "Genie decompress ($sam_file; $genie_decoder_ref_parameter) failed!" ; exit 1; }
 
-    echo "-----------------Decompressed:"
-    ls -l $working_dir/output.mgrec
-
-    echo "-----------------Genie output transcode"
-    eval $timing_command \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-sam \
-        -i $working_dir/output.mgrec \
-        -w $working_dir \
-        -o $working_dir/output.sam \
-        $genie_transcoder_ref_parameter \
-        -f \
-        || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    rm $working_dir/output.mgrec
-    echo "-----------------Output transcoded:"
     ls -l $working_dir/output.sam
-
 
     echo "-----------------Check output files:"
     $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
