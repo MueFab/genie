@@ -7,19 +7,20 @@
 #include "genie/format/sam/importer.h"
 
 #include <genie/capsulator/program-options.h>
-#include <genie/transcode-fastq/program-options.h>
 
+#include <algorithm>
+#include <iostream>
+#include <memory>
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
-#include <algorithm>
-#include <iostream>
 #include "genie/core/record/class-type.h"
 #include "genie/transcode-sam/utils.h"
 #include "genie/util/ordered-section.h"
 #include "genie/util/stop-watch.h"
+#include "sam/sam_to_mgrec/sam_group.h"
+#include "sam/sam_to_mgrec/sam_reader.h"
 #include "sam/sam_to_mgrec/sorter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -222,7 +223,6 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
 
 void Importer::setup_merge(int num_chunks) {
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
-    removed_unsupported_base = 0;
 
     if (!input_ref_file.empty()) {
         for (const auto& ref : refs) {
@@ -241,11 +241,17 @@ void Importer::setup_merge(int num_chunks) {
             sam_hdr_to_fasta_lut.push_back(i);
         }
     }
+
+    //std::unique_ptr<std::ostream> total_output;
+    //std::ostream* out_stream = &std::cout;
+    //genie::util::BitWriter total_output_writer(*out_stream);
+
     readers.reserve(num_chunks);
 
+    std::string tmp_dir_path("/tmp");
     for (int i = 0; i < num_chunks; ++i) {
-        readers.emplace_back(std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>(
-            "/tmp/" + std::to_string(i) + PHASE1_EXT));
+        readers.emplace_back(
+            std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>(tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;
@@ -264,8 +270,9 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         options.fasta_file_path = input_ref_file;
         refs = genieapp::transcode_sam::sam::sam_to_mgrec::sam_to_mgrec_phase1(options, nref);
         phase1_complete = true;
-        setup_merge(nref);
+        setup_merge(nref);  // beginning of phase 2
     }
+    // rest of phase 2
     util::Watch watch;
     core::record::Chunk chunk;
     size_t size_seq = 0;

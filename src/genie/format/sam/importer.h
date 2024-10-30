@@ -42,10 +42,10 @@ class Importer : public core::FormatImporter {
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
     util::OrderedLock lock;                        //!< @brief Lock to ensure in order execution
-    bool phase1_complete;
     std::string input_sam_file;
     std::string input_ref_file;
     int nref;
+    bool phase1_complete;
     std::vector<std::pair<std::string, size_t>> refs;
     std::priority_queue<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *,
                         std::vector<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader *>, CmpReaders>
@@ -86,6 +86,8 @@ class Importer : public core::FormatImporter {
      * @param _file_1 Input file
      */
     Importer(size_t _blockSize, std::string input, std::string ref);
+    std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
+        genieapp::transcode_sam::sam::sam_to_mgrec::Config &options, int &chunk_id);
     void setup_merge(int num_chunks);
 
     /**
