@@ -4,7 +4,9 @@ project("genie-annotation")
 
 set(source_files
         annotation.cc
-		genotype_annotation.cc
+		geno_annotation.cc
+		site_annotation.cc
+		contact_annotation.cc
         JsonAttributeParser.cc
         Compressors.cc
 )
