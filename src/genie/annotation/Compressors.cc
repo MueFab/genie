@@ -226,7 +226,7 @@ void Compressor::parseCompressor(std::vector<std::string> commandline) {
     // ... outvarn}
 
     Parameter parameter;
-    uint8_t compressorID;
+    uint8_t compressorID = 0;
     parameter.read(commandline.at(1), compressorID);
 
     genie::core::record::annotation_parameter_set::compressorStep step;

@@ -4,14 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ANNOTATION_GENOTYPE_ANNOTATION_H
-#define GENIE_ANNOTATION_GENOTYPE_ANNOTATION_H
+#ifndef GENIE_ANNOTATION_GENO_ANNOTATION_H
+#define GENIE_ANNOTATION_GENO_ANNOTATION_H
 
-#include <cstdint>
 #include <fstream>
 #include <list>
 #include <map>
-#include <optional>
 #include <sstream>
 #include "genie/core/constants.h"
 
@@ -29,12 +27,12 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct DataUnits {
+struct GenoUnits {
     core::record::annotation_parameter_set::Record annotationParameterSet;
     std::vector<core::record::annotation_access_unit::Record> annotationAccessUnit;
 };
 
-class GenotypeAnnotation {
+class GenoAnnotation {
  public:
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { likelihood_opt = opt; }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotype_opt = opt; }
@@ -43,7 +41,7 @@ class GenotypeAnnotation {
         defaultTileSizeWidth = _defaultTileSizeWidth;
     } 
 
-    DataUnits parseGenotype(std::ifstream& inputfile);
+    GenoUnits parseGenotype(std::ifstream& inputfile);
     void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
 
  private:
@@ -91,4 +89,4 @@ class GenotypeAnnotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_ANNOTATION_GENOTYPE_ANNOTATION_H
+#endif  // GENIE_ANNOTATION_GENO_ANNOTATION_H
