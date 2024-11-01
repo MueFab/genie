@@ -20,7 +20,8 @@
 #include "genie/variantsite/ParameterSetComposer.h"
 #include "genie/variantsite/VariantSiteParser.h"
 
-#include "genotype_annotation.h"
+#include "geno_annotation.h"
+#include "site_annotation.h"
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"
@@ -34,41 +35,38 @@ enum class RecType { SITE_FILE = 0, GENO_FILE };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 class Annotation {
  public:
     void setCompressorConfig(std::stringstream& config) { compressors.parseConfig(config); }
     void setTileSize(uint32_t _defaultTileSizeHeight, uint32_t _defaultTileSizeWidth) {
         defaultTileSizeHeight = _defaultTileSizeHeight;
         defaultTileSizeWidth = _defaultTileSizeWidth;
-    } 
+        genoAnnotation.setTileSize(_defaultTileSizeHeight, defaultTileSizeWidth);
+        siteAnnotation.setTileSize(_defaultTileSizeHeight);
+    }
 
-    void setInfoFields(std::string jsonFileName);
+  //  void setInfoFields(std::string jsonFileName);
     void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
     void writeToFile(std::string& outputFileName);
 
-    void parseInfoTags(std::string& recordInputFileName);
-
-    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { genotypeAnnotation.setLikelihoodOptions(opt); }
-    void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genotypeAnnotation.setGenotypeOptions(opt); }
+    void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { genoAnnotation.setLikelihoodOptions(opt); }
+    void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genoAnnotation.setGenotypeOptions(opt); }
 
  private:
     std::ifstream recordInput;
     genie::annotation::Compressor compressors;
-    std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
-    std::vector<InfoField> infoFields;
 
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
     genie::core::record::annotation_parameter_set::Record annotationParameterSet;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
 
-    GenotypeAnnotation genotypeAnnotation;
+    GenoAnnotation genoAnnotation;
+    SiteAnnotation siteAnnotation;
 
-    uint32_t defaultTileSizeHeight;
-    uint32_t defaultTileSizeWidth;
-    void parseSite(std::ifstream& inputfile);
+    uint32_t defaultTileSizeHeight{0};
+    uint32_t defaultTileSizeWidth{0};
 };
 
 }  // namespace annotation
