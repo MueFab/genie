@@ -95,7 +95,7 @@ void GenotypeParameters::write(core::Writer& writer) const {
     writer.write(not_available_flag, 1);
     writer.write(static_cast<uint8_t>(binarization_ID), 3);
     if (binarization_ID == BinarizationID::BIT_PLANE) {
-        writer.write(getNumVariantsPayloads(), 8);
+        writer.write(getNumBitPlanes(), 8);// was getNumVariantsPayloads
         writer.write(static_cast<uint8_t>(concat_axis), 8);
     }
 
