@@ -127,7 +127,7 @@ INSTANTIATE_TEST_SUITE_P(
                        genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::ZSTD,
                        "/data/records/conformance/ALL.chrY.phase3_integrated_v2a.20130502.genotypes.bgz.CASE02"},
         genoTestValues{5, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
-                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::BSC,
+                       genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::ZSTD,
                        "/data/records/conformance/1.3.11.bgz.CASE03"},
         genoTestValues{6, genie::genotype::SortingAlgoID::NO_SORTING, genie::genotype::BinarizationID::BIT_PLANE,
                        genie::genotype::ConcatAxis::DO_NOT_CONCAT, false, genie::core::AlgoID::ZSTD,
