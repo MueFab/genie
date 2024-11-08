@@ -237,6 +237,11 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(num_bin_mats, 3);
+
+        genie::genotype::Int8MatDtype recon_allele_mat;
+        debinarize_bit_plane(bin_mats, num_bin_mats, genie::genotype::ConcatAxis::CONCAT_ROW_DIR, recon_allele_mat);
+
+        ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
 
     // Check CONCAT_COL_DIR
@@ -254,6 +259,11 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
         ASSERT_EQ(bin_mats.size(), 1);
         ASSERT_EQ(num_bin_mats, 3);
+
+        genie::genotype::Int8MatDtype recon_allele_mat;
+        debinarize_bit_plane(bin_mats, num_bin_mats, genie::genotype::ConcatAxis::CONCAT_COL_DIR, recon_allele_mat);
+
+        ASSERT_TRUE(ORIG_ALLELE_MAT == recon_allele_mat);
     }
 }
 
