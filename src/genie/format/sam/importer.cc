@@ -242,16 +242,16 @@ void Importer::setup_merge(int num_chunks) {
         }
     }
 
-    //std::unique_ptr<std::ostream> total_output;
-    //std::ostream* out_stream = &std::cout;
-    //genie::util::BitWriter total_output_writer(*out_stream);
+    // std::unique_ptr<std::ostream> total_output;
+    // std::ostream* out_stream = &std::cout;
+    // genie::util::BitWriter total_output_writer(*out_stream);
 
     readers.reserve(num_chunks);
 
     std::string tmp_dir_path("/tmp");
     for (int i = 0; i < num_chunks; ++i) {
-        readers.emplace_back(
-            std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>(tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
+        readers.emplace_back(std::make_unique<genieapp::transcode_sam::sam::sam_to_mgrec::SubfileReader>(
+            tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
         if (!readers.back()->getRecord()) {
             auto path = readers.back()->getPath();
             std::cerr << path << " depleted" << std::endl;
@@ -268,6 +268,7 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         genieapp::transcode_sam::sam::sam_to_mgrec::Config options;
         options.inputFile = input_sam_file;
         options.fasta_file_path = input_ref_file;
+        options.clean = true;
         refs = genieapp::transcode_sam::sam::sam_to_mgrec::sam_to_mgrec_phase1(options, nref);
         phase1_complete = true;
         setup_merge(nref);  // beginning of phase 2

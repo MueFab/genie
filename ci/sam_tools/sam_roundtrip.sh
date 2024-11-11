@@ -42,10 +42,8 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 compress_roundtrip () {
     genie_encoder_parameters="$1"
     genie_decoder_ref_parameter=""
-    genie_transcoder_ref_parameter="--no_ref"
-    if [[ "$genie_encoder_parameters" == *"-r "* ]]; then
+    if [[ "$fasta_file" != "" ]]; then
          genie_decoder_ref_parameter="-r $fasta_file"
-         genie_transcoder_ref_parameter="-r $fasta_file"
     fi
     echo "-----------------Genie compress input"
     eval $timing_command \
@@ -58,6 +56,7 @@ compress_roundtrip () {
 
     echo "-----------------Compressed:"
     ls -l $sam_file
+    ls -l $fasta_file
     ls -l $working_dir/output.mgb
     
     rm $working_dir/output.mgb.json
@@ -72,6 +71,7 @@ compress_roundtrip () {
         -i $working_dir/output.mgb -f \
         || { echo "Genie decompress ($sam_file; $genie_decoder_ref_parameter) failed!" ; exit 1; }
 
+    echo "-----------------Decompressed:"
     ls -l $working_dir/output.sam
 
     echo "-----------------Check output files:"
@@ -99,7 +99,7 @@ compress_roundtrip () {
         -i $working_dir/output.mgrec \
         -o $working_dir/output.sam \
         -f \
-        $genie_transcoder_ref_parameter \
+        $genie_decoder_ref_parameter \
         || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
         rm $working_dir/output.mgrec
