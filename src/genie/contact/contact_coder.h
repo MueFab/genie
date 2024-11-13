@@ -45,6 +45,28 @@ struct EncodingBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+struct RunLengthEncodingData {
+  bool firstVal;
+  UIntVecDtype rl_entries;
+  uint32_t maxCount;
+  TransformID transformID;
+};
+
+/**
+ * @brief Extract run length encoding relevant information from mask.
+ *
+ * This function computes the relevant information for run-length encoding such as the rl_entries and transformID.
+ *
+ * @param rleData The empty RunLengthEncodingData struct.
+ * @param scm_mask The subcontact matrix mask.
+ */
+void set_rle_information_from_mask(
+    RunLengthEncodingData& rleData,
+    const BinVecDtype scm_mask
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /**
  * @brief Compute a mask.
  *
