@@ -1234,8 +1234,56 @@ void encode_scm(
         );
 
         if (transform_mask){
-            //TODO(yeremia): implement this
-            UTILS_DIE("Not yet implemented!");
+            // TODO(irvan): implement 6.4.4.3.4.5
+            {
+                if(!is_intra_scm) {
+                    RunLengthEncodingData rowRLEData;
+                    RunLengthEncodingData colRLEData;
+
+                    set_rle_information_from_mask(rowRLEData, row_mask);
+                    set_rle_information_from_mask(colRLEData, col_mask);
+
+                    auto row_mask_payload = SubcontactMatrixMaskPayload(
+                        rowRLEData.transformID,
+                        rowRLEData.firstVal,
+                        rowRLEData.rl_entries
+                        );
+
+                    auto col_mask_payload = SubcontactMatrixMaskPayload(
+                        colRLEData.transformID,
+                        colRLEData.firstVal,
+                        colRLEData.rl_entries
+                        );
+
+                    // set row and mask to scm_payload
+                    scm_payload.setRowMaskPayload(
+                        std::move(row_mask_payload)
+                    );
+                    scm_param.setRowMaskExistsFlag(true);
+
+                    scm_payload.setColMaskPayload(
+                        std::move(col_mask_payload)
+                    );
+                    scm_param.setColMaskExistsFlag(true);
+                }
+                else { // if is_intra_scm is true
+                    RunLengthEncodingData symmetricalRLEData;
+
+                    set_rle_information_from_mask(symmetricalRLEData, row_mask);
+
+                    auto symmetrical_mask_payload = SubcontactMatrixMaskPayload(
+                        symmetricalRLEData.transformID,
+                        symmetricalRLEData.firstVal,
+                        symmetricalRLEData.rl_entries
+                        );
+
+                    // set row and mask to scm_payload
+                    scm_payload.setRowMaskPayload(
+                        std::move(symmetrical_mask_payload)
+                    );
+                    scm_param.setRowMaskExistsFlag(true);
+                }
+            }
         } else {
             auto row_mask_payload = SubcontactMatrixMaskPayload(
                 std::move(row_mask)
@@ -1409,6 +1457,44 @@ void encode_scm(
         } else {
             UTILS_DIE("Normalized matrix is not yet implemented!");
         }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void set_rle_information_from_mask(
+    RunLengthEncodingData& rleData,
+    const BinVecDtype scm_mask
+)   {
+    bool prevValue;
+    uint32_t count = 1;
+    size_t index = 0;
+    prevValue = scm_mask(0);
+    rleData.firstVal = scm_mask(0);
+
+    // init counts from maximum possible size (then resize later)
+    rleData.rl_entries = xt::xtensor<uint32_t, 1>::from_shape({scm_mask.size()});
+
+    for(size_t i = 1; i < scm_mask.size(); i++) {
+        if (scm_mask(i) == prevValue) {
+            count++;
+        } else {
+            rleData.rl_entries(index++) = count;
+            prevValue = !prevValue;
+            count = 1;
+        }
+    }
+    rleData.rl_entries(index++) = count; // add the last entry
+
+    rleData.rl_entries = xt::view(rleData.rl_entries, xt::range(0, index)); // resize
+
+    rleData.maxCount = xt::amax(rleData.rl_entries)();
+    if (rleData.maxCount <= UINT8_MAX) {
+        rleData.transformID = TransformID::ID_1;
+    } else if (rleData.maxCount <= UINT16_MAX) {
+        rleData.transformID = TransformID::ID_2;
+    } else if (rleData.maxCount <= UINT32_MAX) {
+        rleData.transformID = TransformID::ID_3;
     }
 }
 
