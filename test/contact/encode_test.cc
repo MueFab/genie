@@ -2961,3 +2961,1014 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
+    {   // Case: Test if the RLE information is correct
+        std::vector<bool> test_vector = {true, true, true, true, false, true, false, false};
+        genie::contact::UIntVecDtype test_rl_entries = {4,1,1,2};
+        genie::contact::BinVecDtype dummy_mask = xt::adapt(test_vector);
+        genie::contact::RunLengthEncodingData test_rle_data;
+
+        genie::contact::set_rle_information_from_mask(test_rle_data, dummy_mask);
+
+        ASSERT_EQ(test_rle_data.firstVal, true);
+        ASSERT_EQ(test_rle_data.rl_entries, test_rl_entries);
+        ASSERT_EQ(test_rle_data.maxCount, 4);
+        ASSERT_EQ(test_rle_data.transformID, genie::contact::TransformID::ID_1);
+    }
+
+
+    {
+        // Case: scm_mask_payload with rle data
+        std::vector<bool> test_vector = {true, true, true, true, false, true, false, false};
+        genie::contact::UIntVecDtype test_rl_entries = {4,1,1,2};
+        genie::contact::BinVecDtype dummy_mask = xt::adapt(test_vector);
+
+        // Get the corresponding RLE encoding data
+        genie::contact::RunLengthEncodingData test_rle_data;
+        genie::contact::set_rle_information_from_mask(test_rle_data, dummy_mask);
+
+        // Create dummy scm_payload
+        ASSERT_EQ(test_rle_data.firstVal, true);
+        ASSERT_EQ(test_rle_data.rl_entries, test_rl_entries);
+        ASSERT_EQ(test_rle_data.maxCount, 4);
+        ASSERT_EQ(test_rle_data.transformID, genie::contact::TransformID::ID_1);
+
+        // Configure transformID, FirstVal, etc. for scm_mask_payload
+        auto test_scm_mask_payload = genie::contact::SubcontactMatrixMaskPayload();
+        test_scm_mask_payload.setMaskArray(dummy_mask);
+        test_scm_mask_payload.setRLEntries(test_rle_data.transformID, test_rle_data.firstVal, test_rle_data.rl_entries);
+
+        // recast
+        std::vector<uint32_t> rleEntriesAsVector(test_rle_data.rl_entries.data(),
+            test_rle_data.rl_entries.data() + test_rle_data.rl_entries.size());
+
+        // various preliminary structural checks
+        ASSERT_EQ(test_scm_mask_payload.getFirstVal(), test_rle_data.firstVal);
+        //ASSERT_EQ(test_scm_mask_payload.getMaskArray(), test_vector);
+        ASSERT_EQ(test_scm_mask_payload.getTransformID(), test_rle_data.transformID);
+        ASSERT_EQ(test_scm_mask_payload.getRLEntries(), rleEntriesAsVector);
+
+        // Write scm mask paylaod into stringstream
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        test_scm_mask_payload.write(bitwriter);
+
+        ASSERT_TRUE(obj_payload.str().size() == test_scm_mask_payload.getSize());
+
+        // Read
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
+            bitreader,
+            test_vector.size()
+        );
+
+        ASSERT_EQ(test_scm_mask_payload.getFirstVal(), recon_obj.getFirstVal());
+        ASSERT_EQ(test_scm_mask_payload.getTransformID(), recon_obj.getTransformID());
+        ASSERT_EQ(test_scm_mask_payload.getRLEntries(), recon_obj.getRLEntries());
+
+        // Decode the RLE in scm_mask_payload
+        genie::contact::BinVecDtype recon_mask_array;
+        decode_scm_mask_payload(recon_obj, test_vector.size(), recon_mask_array);
+
+        ASSERT_TRUE(recon_mask_array == dummy_mask);
+    }
+
+    // ******************************************************************
+    // Case: Intra SCM Single Tile
+    // ******************************************************************
+
+    std::vector<genie::core::record::ContactRecord> RECS;
+
+
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::string filename = "GSE63525_GM12878_insitu_primary_30.hic-raw-250000-21_22.cont";
+    std::string filepath = gitRootDir + "/data/records/contact/" + filename;
+
+    {
+        std::ifstream reader(filepath, std::ios::binary);
+        ASSERT_EQ(reader.fail(), false);
+        genie::util::BitReader bitreader(reader);
+
+        while (bitreader.isGood()){
+            RECS.emplace_back(bitreader);
+        }
+        RECS.pop_back();
+    }
+
+    // One Tiles - Case 01
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true;
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 1000u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec : RECS) {
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        {
+            std::string out_path = gitRootDir + "/tmp/encoded/contact/IntraSCM_Raw_SingleTile/";
+            {
+                std::ofstream tmp_writer(out_path + "case01-scm_payload.bin", std::ios::binary);
+                genie::util::BitWriter tmp_bitwriter(&tmp_writer);
+                scm_payload.write(tmp_bitwriter);
+            }
+            {
+                std::ofstream tmp_writer(out_path + "case01-scm_param.bin", std::ios::binary);
+                genie::util::BitWriter tmp_bitwriter(&tmp_writer);
+                scm_param.write(tmp_bitwriter);
+            }
+            {
+                std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
+                genie::core::Writer tmp_corewriter(&tmp_writer);
+                cm_param.write(tmp_corewriter);
+            }
+        }
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(scm_payload == recon_scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // One tiles - Case 02
+
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 1000u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec : RECS) {
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(bitreader, cm_param, scm_param);
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // ******************************************************************
+    // Case: Intra SCM Multi Tiles
+    // ******************************************************************
+
+    ASSERT_EQ(RECS.size(), 1);
+
+    // Case 01
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // Case 02
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // ******************************************************************
+    // Case: Inter SCM Single Tiles
+    // ******************************************************************
+
+    // Case 01
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 1000u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec : RECS) {
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 =
+                xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 =
+                xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+//            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+            recon_end2 = xt::sort(recon_end2);
+            END2 = xt::sort(END2);
+            auto mask = xt::equal(recon_end2, END2);
+            ASSERT_TRUE(xt::all(mask));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // Case 02
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true;  // TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 1000u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec : RECS) {
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(bitreader, cm_param, scm_param);
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(cm_param, scm_param, recon_scm_payload, recon_rec, MULT);
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 =
+                xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 =
+                xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // ******************************************************************
+    // Case: Inter SCM Multi Tiles
+    // ******************************************************************
+
+    // Case 01
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            auto mask = xt::not_equal(START1, recon_start1);
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+
+    // Case 02
+    {
+        auto REMOVE_UNALIGNED_REGION = true;
+        auto TRANSFORM_MASK = true;
+        auto ENA_DIAG_TRANSFORM = true;
+        auto ENA_BINARIZATION = true; //TODO(yeremia): enabling only binarization breaks the code!
+        bool NORM_AS_WEIGHT = true;
+        bool MULTIPLICATIVE_NORM = true;
+        auto CODEC_ID = genie::core::AlgoID::JBIG;
+        auto TILE_SIZE = 150u;
+        auto MULT = 1u;
+
+        auto cm_param = genie::contact::ContactMatrixParameters();
+        auto scm_param = genie::contact::SubcontactMatrixParameters();
+        auto scm_payload = genie::contact::SubcontactMatrixPayload();
+
+        cm_param.setBinSize(RECS.front().getBinSize());
+        cm_param.setTileSize(TILE_SIZE);
+
+        for (auto& rec: RECS){
+            cm_param.upsertSample(
+                rec.getSampleID(),
+                rec.getSampleName()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr1ID(),
+                rec.getChr1Name(),
+                rec.getChr1Length()
+            );
+
+            cm_param.upsertChromosome(
+                rec.getChr2ID(),
+                rec.getChr2Name(),
+                rec.getChr2Length()
+            );
+        }
+
+        auto& REC = RECS.front();
+        auto rec = genie::core::record::ContactRecord(REC);
+        genie::contact::encode_scm(
+            cm_param,
+            rec,
+            scm_param,
+            scm_payload,
+            REMOVE_UNALIGNED_REGION,
+            TRANSFORM_MASK,
+            ENA_DIAG_TRANSFORM,
+            ENA_BINARIZATION,
+            NORM_AS_WEIGHT,
+            MULTIPLICATIVE_NORM,
+            CODEC_ID
+        );
+
+        auto obj_payload = std::stringstream();
+        std::ostream& writer = obj_payload;
+        auto bitwriter = genie::util::BitWriter(&writer);
+        scm_payload.write(bitwriter);
+
+        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
+        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+
+        std::istream& reader = obj_payload;
+        auto bitreader = genie::util::BitReader(reader);
+        auto recon_scm_payload = genie::contact::SubcontactMatrixPayload(
+            bitreader,
+            cm_param,
+            scm_param
+        );
+
+        ASSERT_TRUE(recon_scm_payload == scm_payload);
+
+        auto recon_rec = genie::core::record::ContactRecord();
+
+        decode_scm(
+            cm_param,
+            scm_param,
+            recon_scm_payload,
+            recon_rec,
+            MULT
+        );
+
+        ASSERT_EQ(recon_rec.getNumEntries(), REC.getNumEntries());
+        {
+            genie::contact::UInt64VecDtype START1 = xt::adapt(REC.getStartPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start1), xt::sort(START1));
+        }
+        {
+            genie::contact::UInt64VecDtype END1 = xt::adapt(REC.getEndPos1(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end1 = xt::adapt(recon_rec.getEndPos1(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end1), xt::sort(END1));
+        }
+        {
+            genie::contact::UInt64VecDtype START2 = xt::adapt(REC.getStartPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_start2), xt::sort(START2));
+        }
+        {
+            genie::contact::UInt64VecDtype END2 = xt::adapt(REC.getEndPos2(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_end2 = xt::adapt(recon_rec.getEndPos2(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_end2), xt::sort(END2));
+        }
+        {
+            genie::contact::UInt64VecDtype COUNT = xt::adapt(REC.getCounts(), {REC.getNumEntries()});
+            genie::contact::UInt64VecDtype recon_count = xt::adapt(recon_rec.getCounts(), {recon_rec.getNumEntries()});
+            ASSERT_EQ(xt::sort(recon_count), xt::sort(COUNT));
+        }
+    }
+}
