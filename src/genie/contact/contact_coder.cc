@@ -5,17 +5,18 @@
  */
 
 #include "contact_coder.h"
+#include <codecs/include/mpegg-codecs.h>
+#include <genie/core/record/contact/record.h>
+#include <genie/genotype/genotype_coder.h>
+#include <genie/util/runtime-exception.h>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
-#include <xtensor/xio.hpp>
-#include <codecs/include/mpegg-codecs.h>
-#include <genie/core/record/contact/record.h>
-#include <genie/util/runtime-exception.h>
 #include "contact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
 #include "subcontact_matrix_parameters.h"
@@ -144,7 +145,7 @@ void decode_scm_mask_payload(
             first_val = !first_val;
         }
         UTILS_DIE_IF(
-            start_idx >= num_entries,
+            start_idx > num_entries,
             "start_idx value must be smaller than num_entries!"
         );
         // This is the for-loop for assigning the remaining values
