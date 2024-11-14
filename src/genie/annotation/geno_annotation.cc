@@ -6,6 +6,10 @@
 #include "genie/variantsite/AccessUnitComposer.h"
 
 #include "geno_annotation.h"
+
+#include "ParameterSetComposer.h"
+#include "AnnotationEncoder.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -28,6 +32,8 @@ GenoUnits GenoAnnotation::parseGenotype(std::ifstream& inputfile) {
     parameterSetComposer.setGenotypeParameters(genotypeParameters);
     parameterSetComposer.setLikelihoodParameters(likelihoodParameters);
     parameterSetComposer.setCompressors(compressors);
+
+
     dataunits.annotationParameterSet = parameterSetComposer.Build(AT_ID, recData.at(0).genotypeDatablock.attributeInfo,
                                                                   {defaultTileSizeHeight, defaultTileSizeWidth});
 

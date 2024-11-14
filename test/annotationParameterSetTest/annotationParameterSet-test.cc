@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "RandomRecordFillIn.h"
-//#include "genie/contact/contact_matrix_parameters.h"
+// #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/writer.h"
@@ -22,30 +22,6 @@ class AnnotationParameterSetTests : public ::testing::Test {
 
     ~AnnotationParameterSetTests() override = default;
 
-    // Use SetUp instead of the constructor in the following cases:
-    // - In the body of a constructor (or destructor), it's not possible to
-    //   use the ASSERT_xx macros. Therefore, if the set-up operation could
-    //   cause a fatal test failure that should prevent the test from running,
-    //   it's necessary to use a CHECK macro or to use SetUp() instead of a
-    //   constructor.
-    // - If the tear-down operation could throw an exception, you must use
-    //   TearDown() as opposed to the destructor, as throwing in a destructor
-    //   leads to undefined behavior and usually will kill your program right
-    //   away. Note that many standard libraries (like STL) may throw when
-    //   exceptions are enabled in the compiler. Therefore you should prefer
-    //   TearDown() if you want to write portable tests that work with or
-    //   without exceptions.
-    // - The googletest team is considering making the assertion macros throw
-    //   on platforms where exceptions are enabled (e.g. Windows, Mac OS, and
-    //   Linux client-side), which will eliminate the need for the user to
-    //   propagate failures from a subroutine to its caller. Therefore, you
-    //   shouldn't use googletest assertions in a destructor if your code
-    //   could run on such a platform.
-    // - In a constructor or destructor, you cannot make a virtual function
-    //   call on this object. (You can call a method declared as virtual, but
-    //   it will be statically bound.) Therefore, if you need to call a method
-    //   that will be overridden in a derived class, you have to use
-    //   SetUp()/TearDown().
 
     void SetUp() override {
         srand(static_cast<unsigned int>(time(NULL)));
@@ -159,34 +135,24 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         std::vector<genie::core::record::annotation_parameter_set::TileStructure> additional_tile_structure;
 
         genie::core::record::annotation_parameter_set::TileConfiguration tile_configuration(
-            AT_coord_size, AG_class, attribute_contiguity, (AG_class==0? true:false),column_major_tile_order, symmetry_mode,
-            symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure, n_add_tile_structures,
-            n_attributes, attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
+            AT_coord_size, AG_class, attribute_contiguity, (AG_class == 0 ? true : false), column_major_tile_order,
+            symmetry_mode, symmetry_minor_diagonal, attribute_dependent_tiles, default_tile_structure,
+            n_add_tile_structures, n_attributes, attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 
         for (auto i = 0; i <= n_aux_attribute_groups; ++i) tileConfigurationArray.push_back(tile_configuration);
     }
 
     // annotation_encoding_parameters
-    uint8_t n_filter = 0;
-    std::vector<uint8_t> filter_ID_len;
-    std::vector<std::string> filter_ID;
-    std::vector<uint16_t> desc_len;
-    std::vector<std::string> description;
+    std::vector<genie::core::record::annotation_parameter_set::filterData> filters;
+    std::vector<std::string> features;
+    std::vector<std::string> ontologyTerms;
 
-    uint8_t n_features_names = 0;
-    std::vector<uint8_t> feature_name_len;
-    std::vector<std::string> feature_name;
-
-    uint8_t n_ontology_terms = 0;
-    std::vector<uint8_t> ontology_term_name_len;
-    std::vector<std::string> ontology_term_name;
-
-    uint8_t n_descriptors = 15;
+ //   uint8_t n_descriptors = 15;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration;
-    uint8_t n_compressors = 0;
+   // uint8_t n_compressors = 0;
     std::vector<genie::core::record::annotation_parameter_set::CompressorParameterSet> compressor_parameter_set;
 
-    uint8_t n_attributes = 20;
+   // uint8_t n_attributes = 20;
     std::vector<genie::core::record::annotation_parameter_set::AttributeParameterSet> attribute_parameter_set;
 
     using DescriptorID = genie::core::AnnotDesc;
@@ -232,13 +198,13 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
                                         {"VT", 0},    {"SNPSOURCE", 0}};
     uint16_t ID = 0;
 
-    for (auto itemName : infoName) {
+    for (auto& itemName : infoName) {
         uint16_t attribute_ID = ID;
         ID++;
-        uint8_t attribute_name_len = static_cast<uint8_t>(itemName.first.length());
+   //     uint8_t attribute_name_len = static_cast<uint8_t>(itemName.first.length());
         std::string attribute_name = itemName.first;
         genie::core::DataType attribute_type = static_cast<genie::core::DataType>(itemName.second);
-        uint8_t attribute_num_array_dims = 0;
+       // uint8_t attribute_num_array_dims = 0;
         std::vector<uint8_t> attribute_array_dims;
 
         genie::core::ArrayType typeval;
@@ -263,25 +229,16 @@ TEST_F(AnnotationParameterSetTests, annotationParameterSetForvariantSite) {  // 
         std::string attribute_miss_str;
         uint8_t compressor_ID = 0;
 
-        uint8_t n_steps_with_dependencies = 0;
-        std::vector<uint8_t> dependency_step_ID;
-        std::vector<uint8_t> n_dependencies;
-        std::vector<std::vector<uint8_t>> dependency_var_ID;
-        std::vector<std::vector<bool>> dependency_is_attribute;
-        std::vector<std::vector<uint16_t>> dependency_ID;
 
         genie::core::record::annotation_parameter_set::AttributeParameterSet attributeSet(
-            attribute_ID, attribute_name_len, attribute_name, attribute_type, attribute_num_array_dims,
-            attribute_array_dims, attribute_default_val, attribute_miss_val_flag, attribute_miss_default_flag,
-            attribute_miss_val, attribute_miss_str, compressor_ID, n_steps_with_dependencies, dependency_step_ID,
-            n_dependencies, dependency_var_ID, dependency_is_attribute, dependency_ID);
+            attribute_ID, attribute_name, attribute_type, attribute_array_dims, attribute_default_val,
+            attribute_miss_val_flag, attribute_miss_default_flag, attribute_miss_val, attribute_miss_str,
+            compressor_ID);
         attribute_parameter_set.push_back(attributeSet);
     }
 
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters annotation_encoding_parameters(
-        n_filter, filter_ID_len, filter_ID, desc_len, description, n_features_names, feature_name_len, feature_name,
-        n_ontology_terms, ontology_term_name_len, ontology_term_name, n_descriptors, descriptor_configuration,
-        n_compressors, compressor_parameter_set, n_attributes, attribute_parameter_set);
+        filters, features, ontologyTerms, descriptor_configuration, compressor_parameter_set, attribute_parameter_set);
 
     genie::core::record::annotation_parameter_set::Record annotationParameterSet(
         parameter_set_ID, AT_ID, AT_alphabet_ID, AT_coord_size, AT_pos_40_bits_flag, n_aux_attribute_groups,

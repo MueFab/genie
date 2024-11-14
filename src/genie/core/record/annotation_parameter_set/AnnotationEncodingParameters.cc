@@ -44,6 +44,36 @@ AnnotationEncodingParameters::AnnotationEncodingParameters()
       attribute_parameter_set{} {}
 
 AnnotationEncodingParameters::AnnotationEncodingParameters(
+    std::vector<filterData> filterData, std::vector<std::string> features, std::vector<std::string> ontologyTerms,
+    std::vector<DescriptorConfiguration> descriptorConfigurations,
+    std::vector<CompressorParameterSet> compressorParameterSets,
+    std::vector<AttributeParameterSet> attributeParameterSets) {
+    n_filter = (uint8_t)filterData.size();
+    for (auto& filter : filterData) {
+        filter_ID.push_back(filter.filter_ID);
+        filter_ID_len.push_back((uint8_t)filter.filter_ID.size());
+        description.push_back(filter.description);
+        desc_len.push_back((uint8_t)filter.description.size());
+    }
+    n_features_names = (uint8_t)features.size();
+    for (auto& feature : features) {
+        feature_name_len.push_back((uint8_t)feature.size());
+        feature_name.push_back(feature);
+    }
+    n_ontology_terms = (uint8_t)ontologyTerms.size();
+    for (auto& term : ontologyTerms) {
+        ontology_term_name_len.push_back((uint8_t)term.size());
+        ontology_term_name.push_back(term);
+    }
+    n_descriptors = (uint8_t)descriptorConfigurations.size();
+    descriptor_configuration = descriptorConfigurations;
+    n_compressors = (uint8_t)compressorParameterSets.size();
+    compressor_parameter_set = compressorParameterSets;
+    n_attributes = (uint8_t)attributeParameterSets.size();
+    attribute_parameter_set = attributeParameterSets;
+}
+
+AnnotationEncodingParameters::AnnotationEncodingParameters(
     uint8_t n_filter, std::vector<uint8_t> filter_ID_len, std::vector<std::string> filter_ID,
     std::vector<uint16_t> desc_len, std::vector<std::string> description, uint8_t n_features_names,
     std::vector<uint8_t> feature_name_len, std::vector<std::string> feature_name, uint8_t n_ontology_terms,

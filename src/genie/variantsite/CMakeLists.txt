@@ -24,6 +24,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC genie-annotation)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-bsc)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-lzma)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-zstd)
+target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})

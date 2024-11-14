@@ -6,15 +6,18 @@
 #include "genie/core/arrayType.h"
 #include "genie/util/string-helpers.h"
 
+#include "genie/annotation/AnnotationEncoder.h"
+#include "genie/annotation/ParameterSetComposer.h"
+
+#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/variantsite/VariantSiteParser.h"
-#include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/variantsite/AccessUnitComposer.h"
 #include "genie/variantsite/ParameterSetComposer.h"
+#include "genie/variantsite/VariantSiteParser.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
@@ -27,31 +30,6 @@ class VariantSiteRecordTests : public ::testing::Test {
     VariantSiteRecordTests() = default;
 
     ~VariantSiteRecordTests() override = default;
-
-    // Use SetUp instead of the constructor in the following cases:
-    // - In the body of a constructor (or destructor), it's not possible to
-    //   use the ASSERT_xx macros. Therefore, if the set-up operation could
-    //   cause a fatal test failure that should prevent the test from running,
-    //   it's necessary to use a CHECK macro or to use SetUp() instead of a
-    //   constructor.
-    // - If the tear-down operation could throw an exception, you must use
-    //   TearDown() as opposed to the destructor, as throwing in a destructor
-    //   leads to undefined behavior and usually will kill your program right
-    //   away. Note that many standard libraries (like STL) may throw when
-    //   exceptions are enabled in the compiler. Therefore you should prefer
-    //   TearDown() if you want to write portable tests that work with or
-    //   without exceptions.
-    // - The googletest team is considering making the assertion macros throw
-    //   on platforms where exceptions are enabled (e.g. Windows, Mac OS, and
-    //   Linux client-side), which will eliminate the need for the user to
-    //   propagate failures from a subroutine to its caller. Therefore, you
-    //   shouldn't use googletest assertions in a destructor if your code
-    //   could run on such a platform.
-    // - In a constructor or destructor, you cannot make a virtual function
-    //   call on this object. (You can call a method declared as virtual, but
-    //   it will be statically bound.) Therefore, if you need to call a method
-    //   that will be overridden in a derived class, you have to use
-    //   SetUp()/TearDown().
 
     void SetUp() override {
         // Code here will be called immediately before each test
@@ -157,8 +135,6 @@ TEST_F(VariantSiteRecordTests, DISABLED_readFileRunParser) {  // NOLINT(cert-err
         inputfile.close();
     }
 
-    genie::variant_site::ParameterSetComposer encodeParameters;
-
     auto& tile_descriptorStream = parser.getDescriptors().getTiles();
     auto& tile_attributeStream = parser.getAttributes().getTiles();
     std::vector<genie::core::AnnotDesc> descrList;
@@ -178,20 +154,32 @@ TEST_F(VariantSiteRecordTests, DISABLED_readFileRunParser) {  // NOLINT(cert-err
             attr[attrtile.first] << attrtile.second.getTile(i).rdbuf();
         }
     }
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), parser.getNumberOfRows(), 1);
-
-    //----------------------------------------------------//
     uint8_t AG_class = 1;
     uint8_t AT_ID = 1;
+
+    genie::annotation::AnnotationEncoder annotationEncodecomposer;
+    annotationEncodecomposer.setAttributes(info);
+    annotationEncodecomposer.setCompressors(compressors);
+    annotationEncodecomposer.setDescriptors(descrList);
+    auto annotationEncondingParameters = annotationEncodecomposer.Compose();
+    std::pair<uint64_t, uint64_t> tile_Size = {parser.getNumberOfRows(), 0u};
+    genie::annotation::ParameterSetComposer parametersSetcomposer;
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet= parametersSetcomposer.Compose(
+        AT_ID, AG_class, tile_Size, annotationEncondingParameters);
+
+ //   genie::variant_site::ParameterSetComposer encodeParameters;
+  //  genie::core::record::annotation_parameter_set::Record annotationParameterSet = encodeParameters.setParameterSet(
+  //      descrList, info, compressors.getCompressorParameters(), parser.getNumberOfRows(), 1);
+
+    //----------------------------------------------------//
     genie::variant_site::AccessUnitComposer accessUnit;
     genie::core::record::annotation_access_unit::Record annotationAccessUnit;
     uint64_t rowIndex = 0;
 
     std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTileStream;
     accessUnit.setCompressors(compressors);
-    accessUnit.setAccessUnit(desc, attributeTileStream, info, annotationParameterSet,
-        annotationAccessUnit, AG_class, AT_ID, rowIndex);
+    accessUnit.setAccessUnit(desc, attributeTileStream, info, annotationParameterSet, annotationAccessUnit, AG_class,
+                             AT_ID, rowIndex);
 
     genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
     genie::core::record::data_unit::Record AAU_dataUnit(annotationAccessUnit);
@@ -252,8 +240,8 @@ TEST_F(VariantSiteRecordTests, DISABLED_multitile) {  // NOLINT(cert-err58-cpp)
     for (auto& tile : tile_descriptorStream) descrList.push_back(tile.first);
 
     genie::variant_site::ParameterSetComposer encodeParameters;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, info, compressors.getCompressorParameters(), defaultTileSize, AT_ID);
+    genie::core::record::annotation_parameter_set::Record annotationParameterSet = encodeParameters.setParameterSet(
+        descrList, info, compressors.getCompressorParameters(), defaultTileSize, AT_ID);
 
     uint8_t AG_class = 1;
 

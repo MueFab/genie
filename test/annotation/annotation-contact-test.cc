@@ -38,6 +38,8 @@ TEST_F(AnnotationContactTests, contactparameterset) {
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
 
+    std::string outputFilename = inputFilename + "-output.bin";
+
 
     genie::annotation::Compressor compressors;
     std::string comment = "# 23fnv0-33 bla";
@@ -47,4 +49,13 @@ TEST_F(AnnotationContactTests, contactparameterset) {
     config << set1 << '\n' << set2 << '\n';
     compressors.parseConfig(config);
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
+
+    genie::annotation::ContactMatrixParameters cmParameters;
+
+    genie::annotation::Annotation annotationGenerator;
+    annotationGenerator.setCompressorConfig(config);
+    annotationGenerator.setTileSize(100, 3000);
+    annotationGenerator.setContactOptions(cmParameters);
+    annotationGenerator.startStream(genie::annotation::RecType::CM_FILE, inputFilename, outputFilename);
+
 }

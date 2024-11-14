@@ -220,7 +220,7 @@ RandomAnnotationEncodingParameters::randomTileConfiguration(uint8_t AT_coord_siz
         tileParameterSettings.n_add_tile_structures, n_attributes,
         attribute_ID, n_descriptors, descriptor_ID, additional_tile_structure);
 }
-
+/*
 genie::core::record::annotation_parameter_set::ContactMatrixParameters
 RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
     uint8_t num_samples = randomU8();
@@ -265,7 +265,7 @@ genie::core::record::annotation_parameter_set::ContactMatrixParameters
 RandomAnnotationEncodingParameters::simpleContactMatrixParameters() {
     return genie::core::record::annotation_parameter_set::ContactMatrixParameters();
 }
-
+*/
 genie::core::record::annotation_parameter_set::TileConfiguration
 RandomAnnotationEncodingParameters::randomTileConfiguration() {
     uint8_t AT_coord_size = randomU2();

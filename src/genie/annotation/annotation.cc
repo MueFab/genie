@@ -33,12 +33,16 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         annotationParameterSet = dataunits.annotationParameterSet;
         annotationAccessUnit = dataunits.annotationAccessUnit;
 
-    } else {
+    } else if (recType == RecType::SITE_FILE) {
         siteAnnotation.setCompressors(compressors);
         siteAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = siteAnnotation.parseSite(inputfile);
         annotationParameterSet = dataunits.annotationParameterSet;
         annotationAccessUnit = dataunits.annotationAccessUnit;
+    } else { // contact matrix
+        cmAnnotation.setCompressors(compressors);
+        cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
+        auto dataunits = cmAnnotation.parseContact(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();
 
