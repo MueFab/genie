@@ -55,12 +55,10 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::Buil
 
     genie::core::AnnotDesc descriptor_ID = genie::core::AnnotDesc::GENOTYPE;
     std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration> descriptor_configuration{
-        genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-            descriptor_ID, genie::core::AlgoID::LZMA, genotypeParameters, LZMAalgorithmParameters)};
+        genie::core::record::annotation_parameter_set::DescriptorConfiguration(genotypeParameters)};
 
     descriptor_ID = genie::core::AnnotDesc::LIKELIHOOD;
-    descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(
-        descriptor_ID, genie::core::AlgoID::LZMA, likelihoodParameters, BSCalgorithmParameters));
+    descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(likelihoodParameters));
 
     descriptor_ID = genie::core::AnnotDesc::LINKID;
     descriptor_configuration.emplace_back(genie::core::record::annotation_parameter_set::DescriptorConfiguration(

@@ -29,6 +29,8 @@ class Writer {
 
     explicit Writer(std::ostream* writer, bool log = false)
         : logwriter(writer), binwriter{writer}, writingLog(log), getWriteSize(false), writeBitSize(0) {}
+
+    util::BitWriter& getBinWriter() { return binwriter; }
     /**
      * @brief Write a specified number of bits, reserved are not written to log
      * @param value Data to write. The LSBs will be written.

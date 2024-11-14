@@ -13,6 +13,9 @@
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime-exception.h"
 #include "site_annotation.h"
+
+#include "AnnotationEncoder.h"
+#include "ParameterSetComposer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -46,20 +49,36 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
 
     for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
-    genie::variant_site::ParameterSetComposer encodeParameters;
+    //      auto& descrStream = parser.getDescriptors().getTiles();
+    //   for (auto& tile : descrStream) descrList.push_back(tile.first);
+
+    AnnotationEncoder encodingPars;
+    encodingPars.setDescriptors(descrList);
+    encodingPars.setCompressors(compressors);
+    encodingPars.setAttributes(parser.getAttributes().getInfo());
+    auto annotationEncodingParameters = encodingPars.Compose();
+    ParameterSetComposer parameterset;
+
     annotationParameterSet =
-        encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
-                                         compressors.getCompressorParameters(), defaultTileSizeHeight, AT_ID);
+        parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
+
+      genie::variant_site::ParameterSetComposer encodeParameters;
+
+     auto annotationParameterSet2 =
+          encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
+                                          compressors.getCompressorParameters(), defaultTileSizeHeight, AT_ID);
+      bool temp = false;
+     if (annotationParameterSet.getParameterSetID() == annotationParameterSet2.getParameterSetID()) {
+         temp = true;
+     }
 
     genie::variant_site::AccessUnitComposer accessUnit;
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
-
     auto& descrStream = parser.getDescriptors().getTiles();
-    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
-    for (auto& tile : descrStream) descrList.push_back(tile.first);
 
+    std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attr;
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;
         for (auto& desctile : descrStream) {

@@ -38,8 +38,6 @@ class RandomAnnotationEncodingParameters {
 
     genie::core::record::annotation_parameter_set::TileConfiguration randomTileConfiguration();
     genie::core::record::annotation_parameter_set::TileConfiguration randomTileConfiguration(uint8_t ATCoordSize);
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters randomContactMatrixParameters();
-    genie::core::record::annotation_parameter_set::ContactMatrixParameters simpleContactMatrixParameters();
     genie::core::record::annotation_parameter_set::CompressorParameterSet randomCompressorParameterSet();
     genie::core::record::annotation_parameter_set::AnnotationEncodingParameters randomAnnotationEncodingParameters();
     genie::core::record::annotation_parameter_set::Record randomAnnotationParameterSet();

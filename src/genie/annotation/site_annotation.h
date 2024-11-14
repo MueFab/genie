@@ -45,7 +45,7 @@ class SiteAnnotation {
     std::map<std::string, genie::core::record::variant_site::Info_tag> infoTags;
     std::map<std::string, InfoField> attributeInfo;
     std::vector<InfoField> infoFields;
-    std::vector<genie::core::AnnotDesc> descrList{
+    const std::vector<genie::core::AnnotDesc> descrList{
         genie::core::AnnotDesc::SEQUENCEID, genie::core::AnnotDesc::STARTPOS,       genie::core::AnnotDesc::STRAND,
         genie::core::AnnotDesc::NAME,       genie::core::AnnotDesc::DESCRIPTION,    genie::core::AnnotDesc::LINKNAME,
         genie::core::AnnotDesc::LINKID,     genie::core::AnnotDesc::DEPTH,          genie::core::AnnotDesc::SEQQUALITY,

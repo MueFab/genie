@@ -29,6 +29,11 @@ namespace core {
 namespace record {
 namespace annotation_parameter_set {
 
+struct filterData {
+    std::string filter_ID;
+    std::string description;
+};
+
 class TypedData {
  public:
     uint8_t data_type_ID;
@@ -64,6 +69,12 @@ class AnnotationEncodingParameters {
 
  public:
     AnnotationEncodingParameters();
+    AnnotationEncodingParameters(std::vector<filterData> filterData, std::vector<std::string> features,
+                                 std::vector<std::string> ontologyTerms,
+                                 std::vector<DescriptorConfiguration> descriptorConfigurations,
+                                 std::vector<CompressorParameterSet> compressorParameterSets,
+                                 std::vector<AttributeParameterSet> attributeParameterSets);
+
     AnnotationEncodingParameters(uint8_t n_filter, std::vector<uint8_t> filter_ID_len,
                                  std::vector<std::string> filter_ID, std::vector<uint16_t> desc_len,
                                  std::vector<std::string> description, uint8_t n_features_names,

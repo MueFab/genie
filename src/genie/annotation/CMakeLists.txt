@@ -9,7 +9,10 @@ set(source_files
 		contact_annotation.cc
         JsonAttributeParser.cc
         Compressors.cc
+		parameterSetComposer.cc
+		AnnotationEncoder.cc
 )
+
 
 add_library(genie-annotation ${source_files})
 

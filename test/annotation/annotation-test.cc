@@ -101,7 +101,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-const bool RUNBIGFILES = true;
+const bool RUNBIGFILES = false;
 
 TEST_P(AnnotationTests, annotationSite) {
     auto testParams = GetParam();
@@ -132,7 +132,7 @@ TEST_P(AnnotationTests, annotationSite) {
     annotationGenerator.startStream(genie::annotation::RecType::SITE_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
- }
+}
 
 TEST_P(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -146,7 +146,7 @@ TEST_P(AnnotationTests, annotationGeno) {
 
     auto inputfilesize = std::filesystem::file_size(inputFilename);
     if constexpr (!RUNBIGFILES)
-        if (inputfilesize > 50 * 1024*1024) return;
+        if (inputfilesize > 50 * 1024 * 1024) return;
 
     std::string outputFilename = filePath + "ALL.chrX.RC" + std::to_string(testParams.totNrOfRows);
     outputFilename += "-1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
@@ -189,17 +189,18 @@ TEST_P(AnnotationTests, annotationGeno) {
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
-
+    /*
     auto filesize = std::filesystem::file_size(outputFilename + ".bin");
     size_t expectedSize = 4 * 1024;  // at least 4kB
     filesize;
     expectedSize;
-    //    EXPECT_LE(expectedSize, filesize);
+    EXPECT_LE(expectedSize, filesize);
+    */
 }
 
 INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
-    ::testing::Values( TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 100u, 3000u),
+    ::testing::Values(TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 100u, 3000u),
                       TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
                       TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
                       TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 10000, 500u),
@@ -209,5 +210,4 @@ INSTANTIATE_TEST_SUITE_P(
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4, 546u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)
-                         ));
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)));

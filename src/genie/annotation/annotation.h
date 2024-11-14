@@ -22,6 +22,7 @@
 
 #include "geno_annotation.h"
 #include "site_annotation.h"
+#include "contact_annotation.h"
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"
@@ -31,7 +32,7 @@ namespace genie {
 namespace annotation {
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum class RecType { SITE_FILE = 0, GENO_FILE };
+enum class RecType { SITE_FILE = 0, GENO_FILE, CM_FILE };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,6 +54,8 @@ class Annotation {
     void setLikelihoodOptions(genie::likelihood::EncodingOptions opt) { genoAnnotation.setLikelihoodOptions(opt); }
     void setGenotypeOptions(genie::genotype::EncodingOptions opt) { genoAnnotation.setGenotypeOptions(opt); }
 
+    void setContactOptions(ContactMatrixParameters options) { cmAnnotation.setContactOptions(options); }
+
  private:
     std::ifstream recordInput;
     genie::annotation::Compressor compressors;
@@ -64,6 +67,7 @@ class Annotation {
 
     GenoAnnotation genoAnnotation;
     SiteAnnotation siteAnnotation;
+    CMAnnotation cmAnnotation;
 
     uint32_t defaultTileSizeHeight{0};
     uint32_t defaultTileSizeWidth{0};

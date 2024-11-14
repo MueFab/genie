@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_GENOTYPE_PARAMETERSETCOMPOSER_H_
-#define SRC_GENIE_GENOTYPE_PARAMETERSETCOMPOSER_H_
+#ifndef SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
+#define SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <iostream>
@@ -42,8 +42,14 @@ class ParameterSetComposer {
         uint8_t _AT_ID, std::map<std::string, genie::core::record::annotation_parameter_set::AttributeData>& info,
         std::vector<uint64_t> defaultTileSize = {200, 3000});
 
+ 
     void setGenotypeParameters(genie::genotype::GenotypeParameters _parameters) { genotypeParameters = _parameters; }
-
+    void setContactParameters(genie::contact::ContactMatrixParameters _parameters) {
+        contactMatrixParameters = _parameters;
+    }
+    void SetSubContactParameters(genie::contact::SubcontactMatrixParameters _parameters) {
+        subContactMatrixParameters = _parameters;
+    }
     void setLikelihoodParameters(genie::likelihood::LikelihoodParameters _parameters) {
         likelihoodParameters = _parameters;
     }
@@ -61,6 +67,7 @@ class ParameterSetComposer {
     genie::genotype::GenotypeParameters genotypeParameters;
     genie::likelihood::LikelihoodParameters likelihoodParameters;
     genie::contact::ContactMatrixParameters contactMatrixParameters;
+    genie::contact::SubcontactMatrixParameters subContactMatrixParameters;
 
     genie::annotation::Compressor compressors;
     bool useCompressors{ false };
@@ -99,7 +106,7 @@ class ParameterSetComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_GENOTYPE_PARAMETERSETCOMPOSER_H_
+#endif  // SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
