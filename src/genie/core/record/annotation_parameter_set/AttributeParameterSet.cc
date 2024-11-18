@@ -50,31 +50,31 @@ AttributeParameterSet::AttributeParameterSet()
       dependency_ID{} {}
 
 AttributeParameterSet::AttributeParameterSet(
-    uint16_t attribute_ID, uint8_t attribute_name_len, std::string attribute_name, core::DataType attribute_type,
-    uint8_t attribute_num_array_dims, std::vector<uint8_t> attribute_array_dims,
-    std::vector<uint8_t> attribute_default_val, bool attribute_miss_val_flag, bool attribute_miss_default_flag,
-    std::vector<uint8_t> attribute_miss_val, std::string attribute_miss_str, uint8_t compressor_ID,
-    uint8_t n_steps_with_dependencies, std::vector<uint8_t> dependency_step_ID, std::vector<uint8_t> n_dependencies,
-    std::vector<std::vector<uint8_t>> dependency_var_ID, std::vector<std::vector<bool>> dependency_is_attribute,
-    std::vector<std::vector<uint16_t>> dependency_ID)
-    : attribute_ID(attribute_ID),
-      attribute_name_len(attribute_name_len),
-      attribute_name(attribute_name),
-      attribute_type(attribute_type),
-      attribute_num_array_dims(attribute_num_array_dims),
-      attribute_array_dims(attribute_array_dims),
+    uint16_t _attribute_ID, uint8_t _attribute_name_len, std::string _attribute_name, core::DataType _attribute_type,
+    uint8_t _attribute_num_array_dims, std::vector<uint8_t> _attribute_array_dims,
+    std::vector<uint8_t> attribute_default_val, bool _attribute_miss_val_flag, bool _attribute_miss_default_flag,
+    std::vector<uint8_t> _attribute_miss_val, std::string _attribute_miss_str, uint8_t _compressor_ID,
+    uint8_t _n_steps_with_dependencies, std::vector<uint8_t> _dependency_step_ID, std::vector<uint8_t> _n_dependencies,
+    std::vector<std::vector<uint8_t>> _dependency_var_ID, std::vector<std::vector<bool>> _dependency_is_attribute,
+    std::vector<std::vector<uint16_t>> _dependency_ID)
+    : attribute_ID(_attribute_ID),
+      attribute_name_len(_attribute_name_len),
+      attribute_name(_attribute_name),
+      attribute_type(_attribute_type),
+      attribute_num_array_dims(_attribute_num_array_dims),
+      attribute_array_dims(_attribute_array_dims),
       attribute_default_val(attribute_default_val),
-      attribute_miss_val_flag(attribute_miss_val_flag),
-      attribute_miss_default_flag(attribute_miss_default_flag),
-      attribute_miss_val(attribute_miss_val),
-      attribute_miss_str(attribute_miss_str),
-      compressor_ID(compressor_ID),
-      n_steps_with_dependencies(n_steps_with_dependencies),
-      dependency_step_ID(dependency_step_ID),
-      n_dependencies(n_dependencies),
-      dependency_var_ID(dependency_var_ID),
-      dependency_is_attribute(dependency_is_attribute),
-      dependency_ID(dependency_ID) {
+      attribute_miss_val_flag(_attribute_miss_val_flag),
+      attribute_miss_default_flag(_attribute_miss_default_flag),
+      attribute_miss_val(_attribute_miss_val),
+      attribute_miss_str(_attribute_miss_str),
+      compressor_ID(_compressor_ID),
+      n_steps_with_dependencies(_n_steps_with_dependencies),
+      dependency_step_ID(_dependency_step_ID),
+      n_dependencies(_n_dependencies),
+      dependency_var_ID(_dependency_var_ID),
+      dependency_is_attribute(_dependency_is_attribute),
+      dependency_ID(_dependency_ID) {
     if (!attribute_miss_val_flag) {
         this->attribute_miss_default_flag = false;
         this->attribute_miss_str = "";

@@ -3021,8 +3021,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::SubcontactMatrixMaskPayload(
-            bitreader,
-            test_vector.size()
+            bitreader, static_cast < uint32_t>(test_vector.size())
         );
 
         ASSERT_EQ(test_scm_mask_payload.getFirstVal(), recon_obj.getFirstVal());

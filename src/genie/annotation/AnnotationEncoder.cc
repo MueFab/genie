@@ -48,12 +48,9 @@ void AnnotationEncoder::setAttributes(
         uint16_t attrID = info[it->first].getAttributeID();
         std::string attribute_name = info[it->first].getAttributeName();
         core::DataType attribute_type = info[it->first].getAttributeType();
-        uint8_t attribute_num_array_dims = info[it->first].getArrayLength();
         std::vector<uint8_t> attribute_array_dims;
         if (info[it->first].getArrayLength() == 1) {
-            attribute_num_array_dims = 0;
         } else {
-            attribute_num_array_dims = 1;
             attribute_array_dims.push_back(info[it->first].getArrayLength());
         }
         std::vector<uint8_t> attribute_default_val =

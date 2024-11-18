@@ -9,7 +9,7 @@ set(source_files
 		contact_annotation.cc
         JsonAttributeParser.cc
         Compressors.cc
-		parameterSetComposer.cc
+		ParameterSetComposer.cc
 		AnnotationEncoder.cc
 )
 
