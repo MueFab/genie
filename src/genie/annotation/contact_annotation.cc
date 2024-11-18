@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include <codecs/include/mpegg-codecs.h>
 #include "annotation.h"
 #include "genie/core/arrayType.h"
