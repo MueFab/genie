@@ -4,18 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <string>
-#include <thread>
+#include <thread> //NOLINT
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genieapp::transcode_sam {
 
 /**
  * @brief
@@ -78,11 +78,11 @@ class Config {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genieapp::transcode_sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

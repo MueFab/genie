@@ -9,13 +9,14 @@
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/record.h>
 
-#include <string>
-#include <vector>
 #include <algorithm>
+#include <string>
 #include <utility>
+#include <vector>
+
 #include "genie/util/ordered-section.h"
 #include "genie/util/stop-watch.h"
-#include "sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -127,8 +128,7 @@ std::string eCigar2Cigar(const std::string& ecigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void processSecondMappedSegment(size_t s, const genie::core::record::Record& record, int64_t& tlen, uint16_t& flags,
-                                std::string& pnext, std::string& rnext,
-                                genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo& refinfo) {
+                                std::string& pnext, std::string& rnext, RefInfo& refinfo) {
     // According to SAM standard, primary alignments only
     auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
                           ? genie::core::record::AlignmentSplit::Type::UNPAIRED
@@ -213,7 +213,7 @@ uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& 
 
 void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Record& record, std::string& rname,
                                std::string& pos, int64_t& tlen, std::string& mapping_qual, std::string& cigar,
-                               uint16_t& flags, genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo& refinfo) {
+                               uint16_t& flags, RefInfo& refinfo) {
     // This read is mapped, process mapping
     rname = refinfo.isValid() ? refinfo.getMgr()->ID2Ref(record.getAlignmentSharedData().getSeqID())
                               : std::to_string(record.getAlignmentSharedData().getSeqID());
@@ -258,7 +258,7 @@ void Exporter::flowIn(core::record::Chunk&& t, const util::Section& id) {
     size_t size_qual = 0;
     size_t size_name = 0;
 
-    genieapp::transcode_sam::sam::sam_to_mgrec::RefInfo refinf(fasta_file_path);
+    RefInfo refinf(fasta_file_path);
 
     if (!output_set && outputFilePath.substr(0, 2) != "-.") {
         output_stream = std::ofstream(outputFilePath);

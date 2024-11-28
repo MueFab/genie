@@ -4,28 +4,29 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/sam/sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <list>
 #include <memory>
-#include <mutex>
+#include <mutex> //NOLINT
 #include <optional>
 #include <queue>
 #include <string>
-#include <thread>
+#include <thread> //NOLINT
 #include <utility>
 #include <vector>
 #include "apps/genie/transcode-sam/utils.h"
+#include "genie/format/sam/sam_parameter.h"
 #include "genie/core/record/alignment_split/other-rec.h"
-#include "genie/format/sam/sam/sam_to_mgrec/sam_group.h"
-#include "genie/format/sam/sam/sam_to_mgrec/sam_reader.h"
-#include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
+#include "genie/format/sam/sam_to_mgrec/sam_group.h"
+#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam_to_mgrec/sorter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -303,7 +304,7 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
 
         // Sort data
 
-        std::sort(output_buffer.begin(), output_buffer.end(), compare);
+        std::sort(output_buffer.begin(), output_buffer.end(), genieapp::transcode_sam::compare);
 
         // Write data
         {
@@ -335,7 +336,8 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options, int& chunk_id) {
+std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(genieapp::transcode_sam::Config& options,
+                                                                int& chunk_id) {
     auto sam_reader = SamReader(options.inputFile);
     UTILS_DIE_IF(!sam_reader.isReady() || !sam_reader.isValid(), "Cannot open SAM file.");
 
@@ -541,7 +543,8 @@ bool fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std::pair<std::string, size_t>>& refs) {
+void sam_to_mgrec_phase2(genieapp::transcode_sam::Config& options, int num_chunks,
+                         const std::vector<std::pair<std::string, size_t>>& refs) {
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
     RefInfo refinf(options.fasta_file_path);
     size_t removed_unsupported_base = 0;
@@ -576,7 +579,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     std::vector<std::unique_ptr<SubfileReader>> readers;
     readers.reserve(num_chunks);
     auto cmp = [&](const SubfileReader* a, SubfileReader* b) {
-        return !compare(a->getRecord().value(), b->getRecord().value());
+        return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
     };
     std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
     for (int i = 0; i < num_chunks; ++i) {
@@ -634,7 +637,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transcode_sam2mpg(Config& options) {
+void transcode_sam2mpg(genieapp::transcode_sam::Config& options) {
     int nref;
 
     auto refs = sam_to_mgrec_phase1(options, nref);
@@ -860,7 +863,7 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void transcode_mpg2sam(Config& options) {
+void transcode_mpg2sam(genieapp::transcode_sam::Config& options) {
     std::istream* input_file = &std::cin;
     std::ostream* output_file = &std::cout;
     std::optional<std::ifstream> input_stream;
@@ -958,7 +961,7 @@ void transcode_mpg2sam(Config& options) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

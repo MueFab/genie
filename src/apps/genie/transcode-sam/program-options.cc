@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/sam/sam/sam_to_mgrec/program-options.h"
+#include "apps/genie/transcode-sam/program-options.h"
 #include <cassert>
 #include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
-#include <thread>
+#include <thread> //NOLINT
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genieapp::transcode_sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -266,7 +266,7 @@ void Config::validate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genieapp::transcode_sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

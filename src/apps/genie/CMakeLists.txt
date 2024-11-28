@@ -21,17 +21,8 @@ if (${GENIE_SAM_SUPPORT})
             transcode-sam/transcoding.h
             transcode-sam/utils.cc
             transcode-sam/utils.h
-            ../../genie/format/sam/sam/sam_to_mgrec/program-options.cc
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_record.h
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_record.cc
-            ../../genie/format/sam/sam/sam_to_mgrec/transcoder.cc
-            ../../genie/format/sam/sam/sam_to_mgrec/transcoder.h
-            ../../genie/format/sam/sam/sam_to_mgrec/sorter.cc
-            ../../genie/format/sam/sam/sam_to_mgrec/sorter.h
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_reader.h
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_reader.cc
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_group.h
-            ../../genie/format/sam/sam/sam_to_mgrec/sam_group.cc
+            transcode-sam/program-options.h
+            transcode-sam/program-options.cc
     )
 endif ()
 

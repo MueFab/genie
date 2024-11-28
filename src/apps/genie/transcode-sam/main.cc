@@ -5,10 +5,12 @@
  */
 
 #include "apps/genie/transcode-sam/main.h"
+#include <format/sam/sam_to_mgrec/transcoder.h>
+
+#include <apps/genie/transcode-sam/program-options.h>
+
 #include <iostream>
-#include "genie/format/sam/sam/sam_to_mgrec/program-options.h"
-#include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
-#include "genie/format/sam/sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,17 +20,17 @@ namespace genieapp::transcode_sam {
 
 int main(int argc, char* argv[]) {
     try {
-        genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
+        genieapp::transcode_sam::Config programOptions(argc, argv);
         if (programOptions.help) {
             return 0;
         }
         if ((programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" ||
              programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "bam") &&
             programOptions.outputFile.substr(programOptions.outputFile.length() - 5) == "mgrec") {
-            transcode_sam2mpg(programOptions);
+            genie::format::sam::sam_to_mgrec::transcode_sam2mpg(programOptions);
         } else if (programOptions.outputFile.substr(programOptions.outputFile.length() - 3) == "sam" &&
                    programOptions.inputFile.substr(programOptions.inputFile.length() - 5) == "mgrec") {
-            transcode_mpg2sam(programOptions);
+            genie::format::sam::sam_to_mgrec::transcode_mpg2sam(programOptions);
         } else {
             UTILS_DIE("Unknown operation. Check the file extensions of inputs and outputs.");
         }

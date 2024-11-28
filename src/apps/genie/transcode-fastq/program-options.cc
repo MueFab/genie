@@ -10,7 +10,7 @@
 #include <random>
 #include <set>
 #include <string>
-#include <thread>
+#include <thread> //NOLINT
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
@@ -46,10 +46,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     app.add_option("-o,--output-file", outputFile, "Output file (fastq or mgrec)\n")->mandatory(true);
 
     inputSupFile = "";
-    app.add_option("--input-suppl-file", inputSupFile, "Paired input fastq file\n");
+    app.add_option("-j,--input-suppl-file", inputSupFile, "Paired input fastq file\n");
 
     outputSupFile = "";
-    app.add_option("--output-suppl-file", outputSupFile, "Paired output fastq file\n");
+    app.add_option("-u,--output-suppl-file", outputSupFile, "Paired output fastq file\n");
 
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Override existing files\n");

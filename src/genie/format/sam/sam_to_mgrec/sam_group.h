@@ -4,22 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <list>
-#include <map>
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "genie/format/sam/sam/sam_to_mgrec/sam_record.h"
 #include "genie/core/record/record.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 /**
  * @brief Helping structure to sort the records
@@ -172,11 +171,11 @@ class SamRecordGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
