@@ -4,8 +4,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 /**
  * @brief
@@ -69,11 +69,11 @@ class SubfileReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

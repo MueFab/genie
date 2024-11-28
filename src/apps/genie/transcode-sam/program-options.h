@@ -4,22 +4,24 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <string>
+#include <thread> //NOLINT
+#include "format/sam/sam_parameter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genieapp::transcode_sam {
 
 /**
  * @brief
  */
-class Config {
+class ProgramOptions {
  public:
     /**
      * @brief
@@ -33,12 +35,21 @@ class Config {
      * @param argc
      * @param argv
      */
-    Config(int argc, char *argv[]);
+    ProgramOptions(int argc, char *argv[]);
+
+    ProgramOptions()
+        : verbosity_level(0),
+          tmp_dir_path("/tmp"),
+          forceOverwrite(false),
+          help(false),
+          no_ref(false),
+          clean(false),
+          num_threads(std::thread::hardware_concurrency()) {}
 
     /**
      * @brief
      */
-    ~Config();
+    ~ProgramOptions();
 
  public:
     int verbosity_level;          //!< @brief
@@ -51,6 +62,8 @@ class Config {
     bool no_ref;                  //!< @brief
     bool clean;                   //!< @brief
     uint32_t num_threads;         //!< @brief
+
+    [[nodiscard]] genie::format::sam::Config toConfig() const;
 
  private:
     /**
@@ -68,11 +81,11 @@ class Config {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genieapp::transcode_sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

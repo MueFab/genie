@@ -4,28 +4,27 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
+#include "genie/format/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <list>
 #include <memory>
-#include <mutex>
+#include <mutex>  //NOLINT
 #include <optional>
 #include <queue>
 #include <string>
-#include <thread>
+#include <thread>  //NOLINT
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
-#include "apps/genie/transcode-sam/utils.h"
 #include "genie/core/record/alignment_split/other-rec.h"
+#include "genie/format/sam/sam_to_mgrec/sam_group.h"
+#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam_to_mgrec/sorter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -958,7 +957,22 @@ void transcode_mpg2sam(Config& options) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2) {
+    if (r1.getAlignments().empty()) {
+        return false;
+    }
+    if (r2.getAlignments().empty()) {
+        return true;
+    }
+    if (r1.getAlignmentSharedData().getSeqID() != r2.getAlignmentSharedData().getSeqID()) {
+        return r1.getAlignmentSharedData().getSeqID() < r2.getAlignmentSharedData().getSeqID();
+    }
+    return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

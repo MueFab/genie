@@ -22,8 +22,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <atomic>
-#include <mutex>
-#include <thread>
+#include <mutex> //NOLINT
+#include <thread> //NOLINT
 #include <vector>
 #include "genie/util/original-source.h"
 

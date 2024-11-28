@@ -4,12 +4,9 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-// #include <htslib/sam.h>
-// #include <genie/format/sam/record.h>
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
@@ -21,7 +18,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -336,7 +333,7 @@ bool SamRecord::isPairOf(SamRecord& r) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
