@@ -9,7 +9,6 @@
 #include <iostream>
 #include <set>
 #include <string>
-#include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"

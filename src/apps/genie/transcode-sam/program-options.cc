@@ -1,28 +1,27 @@
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/MueFab/genie for more details.
+ * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
-#include <cassert>
+#include "apps/genie/transcode-sam/program-options.h"
 #include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
-#include <thread>
+#include <thread>  //NOLINT
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genieapp::transcode_sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Config::Config(const int argc, char *argv[])
+ProgramOptions::ProgramOptions(int argc, char *argv[])
     : verbosity_level(0),
       tmp_dir_path(),
       fasta_file_path(),
@@ -38,11 +37,26 @@ Config::Config(const int argc, char *argv[])
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Config::~Config() = default;
+ProgramOptions::~ProgramOptions() = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Config::processCommandLine(const int argc, char *argv[]) {
+genie::format::sam::Config ProgramOptions::toConfig() const {
+    genie::format::sam::Config config;
+    config.tmp_dir_path = tmp_dir_path;
+    config.fasta_file_path = fasta_file_path;
+    config.inputFile = inputFile;
+    config.outputFile = outputFile;
+    config.forceOverwrite = forceOverwrite;
+    config.no_ref = no_ref;
+    config.clean = clean;
+    config.num_threads = num_threads;
+    return config;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
     app.add_option("--ref", fasta_file_path, "Path to fasta reference file\n");
@@ -88,7 +102,7 @@ void validateInputFile(const std::string &file) {
         return;
     }
     UTILS_DIE_IF(!std::filesystem::exists(file), "Input file does not exist: " + file);
-    const std::ifstream stream(file);
+    std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
@@ -96,13 +110,13 @@ void validateInputFile(const std::string &file) {
 
 void validateReference(const std::string &file) {
     UTILS_DIE_IF(!std::filesystem::exists(file), "Reference file does not exist: " + file);
-    const std::ifstream stream(file);
+    std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void validateOutputFile(const std::string &file, const bool forced) {
+void validateOutputFile(const std::string &file, bool forced) {
     if (file.substr(0, 2) == "-.") {
         return;
     }
@@ -123,7 +137,7 @@ void validateOutputFile(const std::string &file, const bool forced) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string size_string(const std::uintmax_t f_size) {
+std::string size_string(std::uintmax_t f_size) {
     size_t exponent = 0;
     auto size = static_cast<double>(f_size);
     while (size / 1024.0 > 1.0) {
@@ -145,7 +159,7 @@ std::string size_string(const std::uintmax_t f_size) {
 std::string parent_dir(const std::string &path) {
     std::string ret;
 
-    const auto pos = path.find_last_of('/');
+    auto pos = path.find_last_of('/');
     if (pos == std::string::npos) {
         ret = ".";
     } else {
@@ -160,7 +174,7 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string random_string(const size_t length) {
+std::string random_string(size_t length) {
     // Define the character set
     const char charset[] =
         "0123456789"
@@ -207,7 +221,7 @@ void validateWorkingDir(const std::string &dir) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Config::validate() {
+void ProgramOptions::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
         inputFile = std::filesystem::canonical(inputFile).string();
@@ -266,7 +280,7 @@ void Config::validate() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genieapp::transcode_sam
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

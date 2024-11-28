@@ -4,8 +4,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,11 +14,11 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 /**
  * @brief
@@ -72,11 +72,11 @@ class SamReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

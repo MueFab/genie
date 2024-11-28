@@ -56,27 +56,15 @@ compress_roundtrip () {
         fi
     fi
 
-    echo "-----------------Genie transcode input"
-    eval $timing_command \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-fastq \
-        -i $primary_fastq_file \
-        $paired_fastq_parameter \
-        -o $working_dir/transcoded.mgrec -f \
-        || { echo "Genie transcode ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    echo "-----------------input transcoded:"
-    ls -l $working_dir/transcoded.mgrec
-
     echo "-----------------Genie compress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -i $working_dir/transcoded.mgrec \
+        -i $primary_fastq_file \
+        $paired_fastq_parameter \
         -o $working_dir/output.mgb -f \
         -w $working_dir \
         $genie_encoder_parameters \
         || { echo "Genie compress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    rm $working_dir/transcoded.mgrec
 
     echo "-----------------Compressed:"
     ls -l $primary_fastq_file
@@ -86,30 +74,17 @@ compress_roundtrip () {
     ls -l $working_dir/output.mgb
     
     rm $working_dir/output.mgb.json
-    rm $working_dir/output.mgb.unsupported.mgrec
-
+    
     echo "-----------------Genie decompress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o $working_dir/output.mgrec \
+        -o $working_dir/output_1.fastq \
+        --output-suppl-file $working_dir/output_2.fastq -f \
         -w $working_dir \
         -i $working_dir/output.mgb -f \
         $genie_decoder_recombine \
         || { echo "Genie decompress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
-    echo "-----------------Decompressed:"
-    ls -l $working_dir/output.mgrec
-
-    echo "-----------------Genie output transcode"
-    eval $timing_command \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-fastq \
-        -i $working_dir/output.mgrec \
-        -o $working_dir/output_1.fastq \
-        --output-suppl-file $working_dir/output_2.fastq -f \
-        || { echo "Genie transcode ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    rm $working_dir/output.mgrec
-    echo "-----------------Output transcoded:"
     ls -l $working_dir/output_1.fastq
     ls -l $working_dir/output_2.fastq
 
