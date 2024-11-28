@@ -1,7 +1,3 @@
-//
-// Created by Irvan on 20.11.2024.
-//
-
 #include <gtest/gtest.h>
 #include <random>
 #include "genie/entropy/rans/encoder.h"

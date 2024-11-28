@@ -27,7 +27,6 @@ namespace genie::entropy::rans {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 /**
  * @brief RANS Encoder class responsible for encoding data using RANS.
  */

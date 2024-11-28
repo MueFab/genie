@@ -2,16 +2,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace entropy {
-namespace rans {
+namespace genie::entropy::rans{
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 RANSDecoder::RANSDecoder(){};
 
 void RANSDecoder::decode(std::istream &input, std::ostream &output) {
-    uint32_t compressed_size = 0;
-
     RANSParams param;
 
     // read frequencies
@@ -20,11 +17,11 @@ void RANSDecoder::decode(std::istream &input, std::ostream &output) {
 
     // read the num of symbols
     input.read(reinterpret_cast<char*>(&param.num_symbols), sizeof(param.num_symbols));
-    input.read(reinterpret_cast<char*>(&compressed_size), sizeof(compressed_size));
+    input.read(reinterpret_cast<char*>(&param.compressed_size), sizeof(param.compressed_size));
 
     // read compressed data
-    std::vector<uint32_t> compressed_data(compressed_size);
-    input.read(reinterpret_cast<char*>(compressed_data.data()), compressed_size * sizeof(uint32_t));
+    std::vector<uint32_t> compressed_data(param.compressed_size);
+    input.read(reinterpret_cast<char*>(compressed_data.data()), param.compressed_size * sizeof(uint32_t));
 
     Rans64DecSymbol dsyms[256];
     for (int i = 0; i < 256; ++i) {
@@ -38,7 +35,7 @@ void RANSDecoder::decode(std::istream &input, std::ostream &output) {
         }
     }
 
-    // decode compressed dta
+    // decode compressed data
     Rans64State rans;
     uint32_t* ptr = compressed_data.data();
     Rans64DecInit(&rans, &ptr);
@@ -47,17 +44,15 @@ void RANSDecoder::decode(std::istream &input, std::ostream &output) {
     std::vector<uint8_t> dec_bytes(out_size, 0);
 
     for (size_t i = 0; i < out_size; ++i) {
-        uint32_t symbol_code = Rans64DecGet(&rans, 14);
+        uint32_t symbol_code = Rans64DecGet(&rans, PROB_BITS);
         uint8_t symbol = cum2sym[symbol_code];
         dec_bytes[i] = symbol;
-        Rans64DecAdvanceSymbol(&rans, &ptr, &dsyms[symbol], 14);
+        Rans64DecAdvanceSymbol(&rans, &ptr, &dsyms[symbol], PROB_BITS);
     }
 
     output.write(reinterpret_cast<char*>(dec_bytes.data()), dec_bytes.size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-}
-}
 }
 
