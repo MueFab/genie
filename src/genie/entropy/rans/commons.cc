@@ -74,8 +74,6 @@ void SymbolStats::normalize_freqs(uint32_t target_total)
 
     // if we nuked any non-0 frequency symbol to 0, we need to steal
     // the range to make the frequency nonzero from elsewhere.
-    //
-    // this is not at all optimal, i'm just doing the first thing that comes to mind.
     for (int i=0; i < 256; i++) {
         if (freqs[i] && cum_freqs[i+1] == cum_freqs[i]) {
             // symbol i was set to zero freq

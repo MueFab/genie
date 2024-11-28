@@ -45,7 +45,7 @@ struct SymbolStats {
 struct RANSParams {
     SymbolStats stats;
     uint32_t num_symbols;
-    size_t compressed_size;
+    uint32_t compressed_size;
 };
 
 } // namespace genie::entropy::rans
