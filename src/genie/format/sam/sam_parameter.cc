@@ -22,22 +22,11 @@ namespace genie::format::sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 Config::~Config() = default;
 
-bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2) {
-    if (r1.getAlignments().empty()) {
-        return false;
-    }
-    if (r2.getAlignments().empty()) {
-        return true;
-    }
-    if (r1.getAlignmentSharedData().getSeqID() != r2.getAlignmentSharedData().getSeqID()) {
-        return r1.getAlignmentSharedData().getSeqID() < r2.getAlignmentSharedData().getSeqID();
-    }
-    return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::format::sam
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

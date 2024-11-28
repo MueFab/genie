@@ -8,22 +8,21 @@
 
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
-#include <list>
+#include "genie/core/cigar-tokenizer.h"
+#include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/class-type.h"
-#include "genie/transcode-sam/utils.h"
-#include "genie/util/ordered-section.h"
-#include "genie/util/stop-watch.h"
 #include "genie/format/sam/sam_to_mgrec/sam_group.h"
 #include "genie/format/sam/sam_to_mgrec/sam_reader.h"
 #include "genie/format/sam/sam_to_mgrec/sorter.h"
-
-#include "genie/core/cigar-tokenizer.h"
-#include "genie/core/record/alignment_split/other-rec.h"
+#include "genie/format/sam/sam_to_mgrec/transcoder.h"
+#include "genie/util/ordered-section.h"
+#include "genie/util/stop-watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +79,7 @@ Importer::Importer(size_t _blockSize, std::string input, std::string ref)
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool CmpReaders::operator()(const sam_to_mgrec::SubfileReader* a, sam_to_mgrec::SubfileReader* b) const {
-    return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
+    return !sam_to_mgrec::compare(a->getRecord().value(), b->getRecord().value());
 }
 
 struct CleanStatistics {
@@ -485,7 +484,7 @@ void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id, const std
 
         // Sort data
 
-        std::sort(output_buffer.begin(), output_buffer.end(), genieapp::transcode_sam::compare);
+        std::sort(output_buffer.begin(), output_buffer.end(), sam_to_mgrec::compare);
 
         // Write data
         {
@@ -519,8 +518,7 @@ void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id, const std
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(format::sam::Config& options,
-                                                                          int& chunk_id) {
+std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(format::sam::Config& options, int& chunk_id) {
     auto sam_reader = sam_to_mgrec::SamReader(options.inputFile);
     UTILS_DIE_IF(!sam_reader.isReady() || !sam_reader.isValid(), "Cannot open SAM file.");
 
@@ -689,7 +687,7 @@ void sam_to_mgrec_phase2(format::sam::Config& options, int num_chunks,
     std::vector<std::unique_ptr<sam_to_mgrec::SubfileReader>> readers;
     readers.reserve(num_chunks);
     auto cmp = [&](const sam_to_mgrec::SubfileReader* a, sam_to_mgrec::SubfileReader* b) {
-        return !genieapp::transcode_sam::compare(a->getRecord().value(), b->getRecord().value());
+        return !sam_to_mgrec::compare(a->getRecord().value(), b->getRecord().value());
     };
     std::priority_queue<sam_to_mgrec::SubfileReader*, std::vector<sam_to_mgrec::SubfileReader*>, decltype(cmp)> heap(
         cmp);

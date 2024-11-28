@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <thread> //NOLINT
+#include "format/sam/sam_parameter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,7 @@ namespace genieapp::transcode_sam {
 /**
  * @brief
  */
-class Config {
+class ProgramOptions {
  public:
     /**
      * @brief
@@ -34,9 +35,9 @@ class Config {
      * @param argc
      * @param argv
      */
-    Config(int argc, char *argv[]);
+    ProgramOptions(int argc, char *argv[]);
 
-    Config()
+    ProgramOptions()
         : verbosity_level(0),
           tmp_dir_path("/tmp"),
           forceOverwrite(false),
@@ -48,7 +49,7 @@ class Config {
     /**
      * @brief
      */
-    ~Config();
+    ~ProgramOptions();
 
  public:
     int verbosity_level;          //!< @brief
@@ -61,6 +62,8 @@ class Config {
     bool no_ref;                  //!< @brief
     bool clean;                   //!< @brief
     uint32_t num_threads;         //!< @brief
+
+    [[nodiscard]] genie::format::sam::Config toConfig() const;
 
  private:
     /**

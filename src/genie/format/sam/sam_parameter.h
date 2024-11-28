@@ -40,7 +40,6 @@ class Config {
         : verbosity_level(0),
           tmp_dir_path("/tmp"),
           forceOverwrite(false),
-          help(false),
           no_ref(false),
           clean(false),
           num_threads(std::thread::hardware_concurrency()) {}
@@ -57,19 +56,9 @@ class Config {
     std::string inputFile;        //!< @brief
     std::string outputFile;       //!< @brief
     bool forceOverwrite;          //!< @brief
-    bool help;                    //!< @brief
     bool no_ref;                  //!< @brief
     bool clean;                   //!< @brief
     uint32_t num_threads;         //!< @brief
-
-    /**
-     * @brief
-     * @param r1
-     * @param r2
-     * @return
-     */
-    bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
