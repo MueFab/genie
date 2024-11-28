@@ -8,9 +8,6 @@
 #define SRC_GENIE_FORMAT_SAM_IMPORTER_H_
 
 #define PHASE1_EXT ".phase1.mgrec"
-#define PHASE2_EXT ".phase2.mgrec"
-#define PHASE2_TMP_EXT ".phase2.tmp"
-// #define PHASE1_BUFFER_SIZE 50000
 #define PHASE2_BUFFER_SIZE 1000000
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -93,21 +90,11 @@ class Importer : public core::FormatImporter {
     size_t removed_unsupported_base = 0;
     RefInfo refinf;
 
-    enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines
-    enum Files { FIRST = 0, SECOND = 1 };                            //!< @brief File shortcuts
-
  public:
-    /**
-     * @brief Unpaired input
-     * @param _blockSize How many records to extract per pump()
-     * @param _file_1 Input file
-     */
     Importer(size_t _blockSize, std::string input, std::string ref);
 
     std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(format::sam::Config &options,
                                                                     int &chunk_id);
-
-    void transcode_sam2mpg(format::sam::Config &options);
 
     void setup_merge(int num_chunks);
 
