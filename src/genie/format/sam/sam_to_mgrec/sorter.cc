@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/sam/sam/sam_to_mgrec/sorter.h"
+#include "genie/format/sam/sam_to_mgrec/sorter.h"
 #include <iostream>
 #include <string>
 #include <utility>
-#include "apps/genie/transcode-sam/utils.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +52,7 @@ bool SubfileReader::good() { return reader.good() && reader.peek() != EOF; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

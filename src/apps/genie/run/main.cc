@@ -7,9 +7,6 @@
 #define NOMINMAX
 #include "apps/genie/run/main.h"
 
-#include <format/sam/exporter.h>
-#include <format/sam/importer.h>
-
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
@@ -27,6 +24,8 @@
 #include "genie/format/mgb/importer.h"
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
+#include "genie/format/sam/importer.h"
+#include "genie/format/sam/exporter.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/calq/decoder.h"
 #include "genie/quality/calq/encoder.h"

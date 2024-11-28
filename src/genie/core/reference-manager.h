@@ -13,7 +13,7 @@
 #include <deque>
 #include <map>
 #include <memory>
-#include <mutex>
+#include <mutex> //NOLINT
 #include <string>
 #include <utility>
 #include <vector>
