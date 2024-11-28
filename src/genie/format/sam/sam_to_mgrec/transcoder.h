@@ -15,11 +15,10 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/program-options.h"
-#include "apps/genie/transcode-sam/transcoding.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/record/record.h"
 #include "genie/format/fasta/manager.h"
+#include "genie/format/sam/sam_parameter.h"
 #include "genie/format/sam/sam_to_mgrec/sam_record.h"
 #include "genie/util/bit-writer.h"
 
@@ -50,7 +49,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
  * @param nref
  * @return
  */
-std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(genieapp::transcode_sam::Config& options, int& nref);
+std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options, int& nref);
 
 /**
  * @brief
@@ -59,7 +58,7 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(genieapp::transc
  * @param ifile
  * @return
  */
-std::string gen_p2_tmp_fpath(genieapp::transcode_sam::Config& options, int rid, int ifile);
+std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
 
 /**
  * @brief
@@ -67,7 +66,7 @@ std::string gen_p2_tmp_fpath(genieapp::transcode_sam::Config& options, int rid, 
  * @param nref
  * @return
  */
-void sam_to_mgrec_phase2(genieapp::transcode_sam::Config& options, int nref,
+void sam_to_mgrec_phase2(Config& options, int nref,
                          const std::vector<std::pair<std::string, size_t>>& refs);
 
 /**
@@ -75,21 +74,29 @@ void sam_to_mgrec_phase2(genieapp::transcode_sam::Config& options, int nref,
  * @param options
  * @param nref
  */
-void clean_phase1_files(genieapp::transcode_sam::Config& options, int& nref);
+void clean_phase1_files(Config& options, int& nref);
 
 /**
  * @brief
  * @param options
  * @return
  */
-void transcode_sam2mpg(genieapp::transcode_sam::Config& options);
+void transcode_sam2mpg(Config& options);
 
 /**
  *
  * @param options
  * @return
  */
-void transcode_mpg2sam(genieapp::transcode_sam::Config& options);
+void transcode_mpg2sam(Config& options);
+
+/**
+ * @brief
+ * @param r1
+ * @param r2
+ * @return
+ */
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
 
 /**
  * @brief

@@ -5,13 +5,12 @@
  */
 
 #include "apps/genie/transcode-sam/program-options.h"
-#include <cassert>
 #include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
-#include <thread> //NOLINT
+#include <thread>  //NOLINT
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
@@ -22,7 +21,7 @@ namespace genieapp::transcode_sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Config::Config(int argc, char *argv[])
+ProgramOptions::ProgramOptions(int argc, char *argv[])
     : verbosity_level(0),
       tmp_dir_path(),
       fasta_file_path(),
@@ -38,11 +37,25 @@ Config::Config(int argc, char *argv[])
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Config::~Config() = default;
+ProgramOptions::~ProgramOptions() = default;
+
+genie::format::sam::Config ProgramOptions::toConfig() const {
+    genie::format::sam::Config config;
+    config.verbosity_level = verbosity_level;
+    config.tmp_dir_path = tmp_dir_path;
+    config.fasta_file_path = fasta_file_path;
+    config.inputFile = inputFile;
+    config.outputFile = outputFile;
+    config.forceOverwrite = forceOverwrite;
+    config.no_ref = no_ref;
+    config.clean = clean;
+    config.num_threads = num_threads;
+    return config;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Config::processCommandLine(int argc, char *argv[]) {
+void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
     app.add_option("--ref", fasta_file_path, "Path to fasta reference file\n");
@@ -207,7 +220,7 @@ void validateWorkingDir(const std::string &dir) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Config::validate() {
+void ProgramOptions::validate() {
     validateInputFile(inputFile);
     if (inputFile.substr(0, 2) != "-.") {
         inputFile = std::filesystem::canonical(inputFile).string();

@@ -18,9 +18,6 @@ set(source_files
 if (${GENIE_SAM_SUPPORT})
     set(source_files ${source_files}
             transcode-sam/main.cc
-            transcode-sam/transcoding.h
-            transcode-sam/utils.cc
-            transcode-sam/utils.h
             transcode-sam/program-options.h
             transcode-sam/program-options.cc
     )
