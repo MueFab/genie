@@ -744,10 +744,7 @@ void sam_to_mgrec_phase2(format::sam::Config& options, int num_chunks,
     std::cerr << removed_unsupported_base << " records removed because of unsupported bases." << std::endl;
 }
 
-void Importer::transcode_sam2mpg(format::sam::Config& options) {
-    refs = sam_to_mgrec_phase1(options, nref);
-    sam_to_mgrec_phase2(options, nref, refs);
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genie::format::sam
 

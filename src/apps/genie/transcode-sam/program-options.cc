@@ -39,9 +39,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[])
 
 ProgramOptions::~ProgramOptions() = default;
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 genie::format::sam::Config ProgramOptions::toConfig() const {
     genie::format::sam::Config config;
-    config.verbosity_level = verbosity_level;
     config.tmp_dir_path = tmp_dir_path;
     config.fasta_file_path = fasta_file_path;
     config.inputFile = inputFile;

@@ -37,8 +37,7 @@ class Config {
      */
 
     Config()
-        : verbosity_level(0),
-          tmp_dir_path("/tmp"),
+        : tmp_dir_path("/tmp"),
           forceOverwrite(false),
           no_ref(false),
           clean(false),
@@ -50,7 +49,6 @@ class Config {
     ~Config();
 
  public:
-    int verbosity_level;          //!< @brief
     std::string tmp_dir_path;     //!< @brief
     std::string fasta_file_path;  //!< @brief
     std::string inputFile;        //!< @brief
