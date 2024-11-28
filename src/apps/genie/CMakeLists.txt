@@ -18,20 +18,8 @@ set(source_files
 if (${GENIE_SAM_SUPPORT})
     set(source_files ${source_files}
             transcode-sam/main.cc
-            transcode-sam/transcoding.h
-            transcode-sam/utils.cc
-            transcode-sam/utils.h
-            transcode-sam/sam/sam_to_mgrec/program-options.cc
-            transcode-sam/sam/sam_to_mgrec/sam_record.h
-            transcode-sam/sam/sam_to_mgrec/sam_record.cc
-            transcode-sam/sam/sam_to_mgrec/transcoder.cc
-            transcode-sam/sam/sam_to_mgrec/transcoder.h
-            transcode-sam/sam/sam_to_mgrec/sorter.cc
-            transcode-sam/sam/sam_to_mgrec/sorter.h
-            transcode-sam/sam/sam_to_mgrec/sam_reader.h
-            transcode-sam/sam/sam_to_mgrec/sam_reader.cc
-            transcode-sam/sam/sam_to_mgrec/sam_group.h
-            transcode-sam/sam/sam_to_mgrec/sam_group.cc
+            transcode-sam/program-options.h
+            transcode-sam/program-options.cc
     )
 endif ()
 
@@ -46,6 +34,7 @@ target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-spring)
 target_link_libraries(genie PRIVATE genie-lowlatency)
 target_link_libraries(genie PRIVATE genie-fastq)
+target_link_libraries(genie PRIVATE genie-sam)
 target_link_libraries(genie PRIVATE genie-mgrec)
 target_link_libraries(genie PRIVATE genie-mgb)
 target_link_libraries(genie PRIVATE genie-localassembly)

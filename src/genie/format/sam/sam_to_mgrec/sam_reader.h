@@ -4,76 +4,79 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <fstream>
+#include <htslib/sam.h>
 #include <optional>
 #include <string>
-#include "genie/core/record/record.h"
-#include "genie/util/bit-reader.h"
-#include "genie/util/bit-writer.h"
+#include <utility>
+#include <vector>
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 /**
  * @brief
  */
-class SubfileReader {
+class SamReader {
  private:
-    std::ifstream reader;                            //!< @brief
-    genie::util::BitReader bitreader;                //!< @brief
-    std::optional<genie::core::record::Record> rec;  //!< @brief
-    std::string path;                                //!< @brief
+    samFile* sam_file;      //!< @brief
+    bam_hdr_t* sam_header;  //!< @brief
+    bam1_t* sam_alignment;  //!< @brief
+    kstring_t header_info;  //!< @brief
+
+    std::optional<SamRecord> buffered_rec;
 
  public:
     /**
      * @brief
      * @param fpath
      */
-    explicit SubfileReader(const std::string& fpath);
+    explicit SamReader(const std::string& fpath);
 
     /**
      * @brief
      */
-    ~SubfileReader();
-
-    /**
-     * @brief
-     * @return
-     */
-    genie::core::record::Record moveRecord();
+    ~SamReader();
 
     /**
      * @brief
      * @return
      */
-    const std::optional<genie::core::record::Record>& getRecord() const;
+    std::vector<std::pair<std::string, size_t>> getRefs();
 
     /**
      * @brief
      * @return
      */
-    bool good();
+    bool isReady();
 
     /**
      * @brief
      * @return
      */
-    std::string getPath() const { return path; }
+    bool isValid();
+
+    /**
+     * @brief
+     * @param sr
+     * @return
+     */
+    int readSamQuery(std::vector<SamRecord>& sr);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
-#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -15,16 +15,16 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
-#include "apps/genie/transcode-sam/transcoding.h"
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/record/record.h"
 #include "genie/format/fasta/manager.h"
+#include "genie/format/sam/sam_parameter.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 #include "genie/util/bit-writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +66,8 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
  * @param nref
  * @return
  */
-void sam_to_mgrec_phase2(Config& options, int nref, const std::vector<std::pair<std::string, size_t>>& refs);
+void sam_to_mgrec_phase2(Config& options, int nref,
+                         const std::vector<std::pair<std::string, size_t>>& refs);
 
 /**
  * @brief
@@ -88,6 +89,14 @@ void transcode_sam2mpg(Config& options);
  * @return
  */
 void transcode_mpg2sam(Config& options);
+
+/**
+ * @brief
+ * @param r1
+ * @param r2
+ * @return
+ */
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
 
 /**
  * @brief
@@ -123,11 +132,11 @@ class RefInfo {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

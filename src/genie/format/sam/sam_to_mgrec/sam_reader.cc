@@ -11,13 +11,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
-#include "util/runtime-exception.h"
+#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
