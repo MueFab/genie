@@ -6,6 +6,7 @@
 
 #define NOMINMAX
 #include "apps/genie/run/main.h"
+
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
@@ -23,6 +24,8 @@
 #include "genie/format/mgb/importer.h"
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
+#include "genie/format/sam/importer.h"
+#include "genie/format/sam/exporter.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/calq/decoder.h"
 #include "genie/quality/calq/encoder.h"
@@ -56,7 +59,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileType getType(const std::string& ext) {
-    if (ext == "mgrec" || ext == "fasta" || ext == "fastq") {
+    if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam") {
         return FileType::THIRD_PARTY;
     } else if (ext == "mgb") {
         return FileType::MPEG;
@@ -107,6 +110,8 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
         }
     } else if (file_extension(pOpts.outputFile) == "mgrec") {
         flow.addExporter(std::make_unique<genie::format::mgrec::Exporter>(*file1));
+    } else if (file_extension(pOpts.outputFile) == "sam") {
+        flow.addExporter(std::make_unique<genie::format::sam::Exporter>(pOpts.inputRefFile, pOpts.outputFile));
     } else if (file_extension(pOpts.outputFile) == "fasta") {
         flow.addExporter(
             std::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), file1, pOpts.numberOfThreads));
@@ -185,6 +190,17 @@ void attachImporterFastq(T& flow, const ProgramOptions& pOpts,
     }
 }
 
+template <class T>
+void attachImporterSam(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+    constexpr size_t BLOCKSIZE = 128000;  // welche Blocksize???
+    // std::istream* in_ptr = &std::cin;
+    if (pOpts.inputFile.substr(0, 2) != "-.") {
+        inputFiles.emplace_back(std::make_unique<std::ifstream>(pOpts.inputFile));
+        // in_ptr = inputFiles.back().get();
+    }
+    flow.addImporter(std::make_unique<genie::format::sam::Importer>(BLOCKSIZE, pOpts.inputFile, pOpts.inputRefFile));
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
@@ -221,6 +237,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     flow->addExporter(std::make_unique<genie::format::mgb::Exporter>(out_ptr));
     if (file_extension(pOpts.inputFile) == "fastq") {
         attachImporterFastq(*flow, pOpts, inputFiles);
+    } else if (file_extension(pOpts.inputFile) == "sam") {
+        attachImporterSam(*flow, pOpts, inputFiles);
     } else {
         attachImporterMgrec(*flow, pOpts, inputFiles, outputFiles);
     }

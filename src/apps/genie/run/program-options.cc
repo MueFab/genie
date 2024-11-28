@@ -10,12 +10,12 @@
 #include <random>
 #include <set>
 #include <string>
-#include <thread>
+#include <thread> //NOLINT
 #include <vector>
 
+#include "apps/genie/run/main.h"
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime-exception.h"
-#include "apps/genie/run/main.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,6 @@ std::string parent_dir(const std::string &path) {
     }
     return ret;
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +164,7 @@ void validateInputFile(const std::string &file) {
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
 
-void validatePairedFiles(const std::string & file1, const std::string & file2) {
+void validatePairedFiles(const std::string &file1, const std::string &file2) {
     UTILS_DIE_IF(file_extension(file1) != file_extension(file2), "Input files do not have the same type.");
 }
 

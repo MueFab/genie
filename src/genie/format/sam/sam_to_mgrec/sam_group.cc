@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
+#include "genie/format/sam/sam_to_mgrec/sam_group.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,14 +16,13 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "apps/genie/transcode-sam/utils.h"
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp::transcode_sam::sam::sam_to_mgrec {
+namespace genie::format::sam::sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -445,7 +444,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genieapp::transcode_sam::sam::sam_to_mgrec
+}  // namespace genie::format::sam::sam_to_mgrec
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

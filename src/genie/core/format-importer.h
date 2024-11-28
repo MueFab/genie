@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <mutex>
+#include <mutex> //NOLINT
 #include "genie/core/access-unit.h"
 #include "genie/core/classifier.h"
 #include "genie/core/record/record.h"
