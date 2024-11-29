@@ -3,23 +3,23 @@ project("genie")
 set(source_files
         main.cc
         run/main.cc
-        run/program-options.cc
+        run/program_options.cc
         transcode-fasta/main.cc
-        transcode-fasta/program-options.cc
+        transcode-fasta/program_options.cc
         transcode-fastq/main.cc
-        transcode-fastq/program-options.cc
+        transcode-fastq/program_options.cc
         gabac/code.cc
         gabac/main.cc
-        gabac/program-options.cc
-        capsulator/program-options.cc
+        gabac/program_options.cc
+        capsulator/program_options.cc
         capsulator/main.cc
 )
 
 if (${GENIE_SAM_SUPPORT})
     set(source_files ${source_files}
             transcode-sam/main.cc
-            transcode-sam/program-options.h
-            transcode-sam/program-options.cc
+            transcode-sam/program_options.h
+            transcode-sam/program_options.cc
     )
 endif ()
 
@@ -53,7 +53,7 @@ if (${GENIE_SAM_SUPPORT})
     target_link_libraries(genie ${BZIP2_LIBRARIES})
     target_link_libraries(genie ${ZLIB_LIBRARIES})
 
-    find_package(HTSlib REQUIRED)
+    find_package(HTSlib REQUIRED)  # NOLINT
     target_include_directories(genie PRIVATE ${HTSlib_INCLUDE_DIRS})
     target_link_libraries(genie PRIVATE ${HTSlib_LIBRARIES})
 endif ()

@@ -1,7 +1,7 @@
 project("read-tests")
 
 set(source_files
-       local-reference-test.cpp
+        local-reference-test.cpp
 )
 
 add_executable(read-tests ${source_files})

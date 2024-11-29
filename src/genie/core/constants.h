@@ -1,70 +1,80 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_CONSTANTS_H_
 #define SRC_GENIE_CORE_CONSTANTS_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#define NOMINMAX
-#include <algorithm>
-#include <cmath>
+#define NOMINMAX  // NOLINT
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/literal.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core {
 
+using util::operator""_u8;
+using util::operator""_u16;
+using util::operator""_u32;
+using util::operator""_u64;
+
 /**
  * @brief
  */
-enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1, COUNT = 2 };
+enum class AlphabetId : uint8_t {
+  kAcgtn = 0,  // NOLINT
+  kAcgtryswkmbdhvn = 1,
+  kCount = 2
+};
 
-enum class MPEGMinorVersion : uint8_t { V1900 = 0, V2000 = 1, UNKNOWN = 2 };
+enum class MpegMinorVersion : uint8_t { kV1900 = 0, kV2000 = 1, kUnknown = 2 };
 
 /**
  * @brief
  * @param v
  * @return
  */
-const std::string& getMPEGVersionString(MPEGMinorVersion v);
+const std::string& GetMpegVersionString(MpegMinorVersion v);
 
 /**
  * @brief
  * @param v
  * @return
  */
-MPEGMinorVersion getMPEGVersion(const std::string& v);
+MpegMinorVersion GetMpegVersion(const std::string& v);
 
 /**
  * @brief
  */
 enum class GenDesc : uint8_t {
-    POS = 0,
-    RCOMP = 1,
-    FLAGS = 2,
-    MMPOS = 3,
-    MMTYPE = 4,
-    CLIPS = 5,
-    UREADS = 6,
-    RLEN = 7,
-    PAIR = 8,
-    MSCORE = 9,
-    MMAP = 10,
-    MSAR = 11,
-    RTYPE = 12,
-    RGROUP = 13,
-    QV = 14,
-    RNAME = 15,
-    RFTP = 16,
-    RFTT = 17,
-    COUNT = 18
+  kPosition = 0,
+  kReverseComplement = 1,
+  kFlags = 2,
+  kMismatchPosition = 3,
+  kMismatchType = 4,
+  kClips = 5,
+  kUnalignedReads = 6,
+  kReadLength = 7,
+  kPair = 8,
+  kMappingScore = 9,
+  kMultiMap = 10,
+  kMultiSegmentAlignment = 11,
+  kRtype = 12,
+  kReadGroup = 13,
+  kQv = 14,
+  kReadName = 15,
+  kRefTransPosition = 16,
+  kRefTransTransform = 17,
+  kCount = 18
 };
 
 /**
@@ -75,214 +85,201 @@ using GenSubIndex = std::pair<GenDesc, uint16_t>;
 /**
  * @brief
  */
-struct GenSub {
-    static const GenSubIndex POS_MAPPING_FIRST;
-    static const GenSubIndex POS_MAPPING_ADDITIONAL;
-
-    static const GenSubIndex RCOMP;
-
-    static const GenSubIndex FLAGS_PCR_DUPLICATE;
-    static const GenSubIndex FLAGS_QUALITY_FAIL;
-    static const GenSubIndex FLAGS_PROPER_PAIR;
-
-    static const GenSubIndex MMPOS_TERMINATOR;
-    static const GenSubIndex MMPOS_POSITION;
-
-    static const GenSubIndex MMTYPE_TYPE;
-    static const GenSubIndex MMTYPE_SUBSTITUTION;
-    static const GenSubIndex MMTYPE_INSERTION;
-
-    static const GenSubIndex CLIPS_RECORD_ID;
-    static const GenSubIndex CLIPS_TYPE;
-    static const GenSubIndex CLIPS_SOFT_STRING;
-    static const GenSubIndex CLIPS_HARD_LENGTH;
-
-    static const GenSubIndex UREADS;
-
-    static const GenSubIndex RLEN;
-
-    static const GenSubIndex PAIR_DECODING_CASE;
-    static const GenSubIndex PAIR_SAME_REC;
-    static const GenSubIndex PAIR_R1_SPLIT;
-    static const GenSubIndex PAIR_R2_SPLIT;
-    static const GenSubIndex PAIR_R1_DIFF_SEQ;
-    static const GenSubIndex PAIR_R2_DIFF_SEQ;
-    static const GenSubIndex PAIR_R1_DIFF_POS;
-    static const GenSubIndex PAIR_R2_DIFF_POS;
-
-    static const GenSubIndex MSCORE;
-
-    static const GenSubIndex MMAP_NUMBER_ALIGN;
-    static const GenSubIndex MMAP_RIGHT_ALIGN_ID;
-    static const GenSubIndex MMAP_OTHER_REC_FLAG;
-    static const GenSubIndex MMAP_REF_SEQ;
-    static const GenSubIndex MMAP_REF_POS;
-
-    static const GenSubIndex MSAR_CABAC_0;
-    static const GenSubIndex MSAR_CABAC_1;
-
-    static const GenSubIndex RTYPE;
-
-    static const GenSubIndex RGROUP;
-
-    static const GenSubIndex QV_PRESENT;
-    static const GenSubIndex QV_CODEBOOK;
-    static const GenSubIndex QV_STEPS_0;
-    static const GenSubIndex QV_STEPS_1;
-    static const GenSubIndex QV_STEPS_2;
-    static const GenSubIndex QV_STEPS_3;
-    static const GenSubIndex QV_STEPS_4;
-    static const GenSubIndex QV_STEPS_5;
-    static const GenSubIndex QV_STEPS_6;
-    static const GenSubIndex QV_STEPS_7;
-
-    static const GenSubIndex RNAME_CABAC_0;
-    static const GenSubIndex RNAME_CABAC_1;
-
-    static const GenSubIndex RFTP;
-
-    static const GenSubIndex RFTT;
-};
+namespace gen_sub {
+constexpr GenSubIndex kPositionFirst = {GenDesc::kPosition, 0_u16};
+constexpr GenSubIndex kPositionAdditional = {GenDesc::kPosition, 1_u16};
+constexpr GenSubIndex kReverseComplement = {GenDesc::kReverseComplement, 0_u16};
+constexpr GenSubIndex kFlagsPcrDuplicate = {GenDesc::kFlags, 0_u16};
+constexpr GenSubIndex kFlagsQualityFail = {GenDesc::kFlags, 1_u16};
+constexpr GenSubIndex kFlagsProperPair = {GenDesc::kFlags, 2_u16};
+constexpr GenSubIndex kMismatchPosTerminator = {GenDesc::kMismatchPosition,
+                                                0_u16};
+constexpr GenSubIndex kMismatchPosDelta = {GenDesc::kMismatchPosition, 1_u16};
+constexpr GenSubIndex kMismatchType = {GenDesc::kMismatchType, 0_u16};
+constexpr GenSubIndex kMismatchTypeSubstBase = {GenDesc::kMismatchType, 1_u16};
+constexpr GenSubIndex kMismatchTypeInsert = {GenDesc::kMismatchType, 2_u16};
+constexpr GenSubIndex kClipsRecordId = {GenDesc::kClips, 0_u16};
+constexpr GenSubIndex kClipsType = {GenDesc::kClips, 1_u16};
+constexpr GenSubIndex kClipsSoftClip = {GenDesc::kClips, 2_u16};
+constexpr GenSubIndex kClipsHardClip = {GenDesc::kClips, 3_u16};
+constexpr GenSubIndex kUnalignedReads = {GenDesc::kUnalignedReads, 0_u16};
+constexpr GenSubIndex kReadLength = {GenDesc::kReadLength, 0_u16};
+constexpr GenSubIndex kPairDecodingCase = {GenDesc::kPair, 0_u16};
+constexpr GenSubIndex kPairSameRec = {GenDesc::kPair, 1_u16};
+constexpr GenSubIndex kPairR1Split = {GenDesc::kPair, 2_u16};
+constexpr GenSubIndex kPairR2Split = {GenDesc::kPair, 3_u16};
+constexpr GenSubIndex kPairR1DiffSeq = {GenDesc::kPair, 4_u16};
+constexpr GenSubIndex kPairR2DiffSeq = {GenDesc::kPair, 5_u16};
+constexpr GenSubIndex kPairR1DiffPos = {GenDesc::kPair, 6_u16};
+constexpr GenSubIndex kPairR2DiffPos = {GenDesc::kPair, 7_u16};
+constexpr GenSubIndex kMappingScore = {GenDesc::kMappingScore, 0_u16};
+constexpr GenSubIndex kMmapNumberAlign = {GenDesc::kMultiMap, 0_u16};
+constexpr GenSubIndex kMmapRightAlignId = {GenDesc::kMultiMap, 1_u16};
+constexpr GenSubIndex kMmapOtherRecFlag = {GenDesc::kMultiMap, 2_u16};
+constexpr GenSubIndex kMmapRefSeq = {GenDesc::kMultiMap, 3_u16};
+constexpr GenSubIndex kMmapRefPos = {GenDesc::kMultiMap, 4_u16};
+constexpr GenSubIndex kMultiSegmentAlignmentCabac0 = {
+    GenDesc::kMultiSegmentAlignment, 0_u16};
+constexpr GenSubIndex kMultiSegmentAlignmentCabac1 = {
+    GenDesc::kMultiSegmentAlignment, 1_u16};
+constexpr GenSubIndex kRtype = {GenDesc::kRtype, 0_u16};
+constexpr GenSubIndex kReadGroup = {GenDesc::kReadGroup, 0_u16};
+constexpr GenSubIndex kQvPresent = {GenDesc::kQv, 0_u16};
+constexpr GenSubIndex kQvCodebook = {GenDesc::kQv, 1_u16};
+constexpr GenSubIndex kQvSteps0 = {GenDesc::kQv, 2_u16};
+constexpr GenSubIndex kQvSteps1 = {GenDesc::kQv, 3_u16};
+constexpr GenSubIndex kQvSteps2 = {GenDesc::kQv, 4_u16};
+constexpr GenSubIndex kQvSteps3 = {GenDesc::kQv, 5_u16};
+constexpr GenSubIndex kQvSteps4 = {GenDesc::kQv, 6_u16};
+constexpr GenSubIndex kQvSteps5 = {GenDesc::kQv, 7_u16};
+constexpr GenSubIndex kQvSteps6 = {GenDesc::kQv, 8_u16};
+constexpr GenSubIndex kQvSteps7 = {GenDesc::kQv, 9_u16};
+constexpr GenSubIndex kReadNameCabac0 = {GenDesc::kReadName, 0_u16};
+constexpr GenSubIndex kReadNameCabac1 = {GenDesc::kReadName, 1_u16};
+constexpr GenSubIndex kRefTransPosition = {GenDesc::kRefTransPosition, 0_u16};
+constexpr GenSubIndex kRefTransTransform = {GenDesc::kRefTransTransform, 0_u16};
+};  // namespace gen_sub
 
 /**
  * @brief
  */
-struct GenConst {
-    static constexpr uint8_t MMPOS_PERSIST = 0;
-    static constexpr uint8_t MMPOS_TERMINATE = 1;
-    static constexpr uint8_t FLAGS_PCR_DUPLICATE_POS = 0;
-    static constexpr uint8_t FLAGS_PCR_DUPLICATE_MASK = 1u << FLAGS_PCR_DUPLICATE_POS;
-    static constexpr uint8_t FLAGS_QUALITY_FAIL_POS = 1;
-    static constexpr uint8_t FLAGS_QUALITY_FAIL_MASK = 1u << FLAGS_QUALITY_FAIL_POS;
-    static constexpr uint8_t FLAGS_PROPER_PAIR_POS = 2;
-    static constexpr uint8_t FLAGS_PROPER_PAIR_MASK = 1u << FLAGS_PROPER_PAIR_POS;
-    static constexpr uint8_t MMTYPE_SUBSTITUTION = 0;
-    static constexpr uint8_t MMTYPE_INSERTION = 1;
-    static constexpr uint8_t MMTYPE_DELETION = 2;
-    static constexpr uint8_t CLIPS_RECORD_END = 8;
-    static constexpr uint8_t PAIR_SAME_RECORD = 0;
-    static constexpr uint8_t PAIR_R1_SPLIT = 1;
-    static constexpr uint8_t PAIR_R2_SPLIT = 2;
-    static constexpr uint8_t PAIR_R1_DIFF_REF = 3;
-    static constexpr uint8_t PAIR_R2_DIFF_REF = 4;
-    static constexpr uint8_t PAIR_R1_UNPAIRED = 5;
-    static constexpr uint8_t PAIR_R2_UNPAIRED = 6;
-    static constexpr uint8_t RTYPE_REFERENCE = 0;
-    static constexpr uint8_t RTYPE_CLASS_P = 1;
-    static constexpr uint8_t RTYPE_CLASS_N = 2;
-    static constexpr uint8_t RTYPE_CLASS_M = 3;
-    static constexpr uint8_t RTYPE_CLASS_I = 4;
-    static constexpr uint8_t RTYPE_CLASS_U = 5;
-    static constexpr uint8_t RTYPE_CLASS_HM = 6;
-};
+namespace gen_const {
+constexpr uint8_t kMismatchPositionPersist = 0;  // NOLINT
+constexpr uint8_t kMismatchPosTerminate = 1;    // NOLINT
+constexpr uint8_t kFlagsPcrDuplicatePos = 0;
+constexpr uint8_t kFlagsPcrDuplicateMask = 1u << kFlagsPcrDuplicatePos;
+constexpr uint8_t kFlagsQualityFailPos = 1;
+constexpr uint8_t kFlagsQualityFailMask = 1u << kFlagsQualityFailPos;
+constexpr uint8_t kFlagsProperPairPos = 2;
+constexpr uint8_t kFlagsProperPairMask = 1u << kFlagsProperPairPos;
+constexpr uint8_t kMismatchTypeSubstitution = 0;
+constexpr uint8_t kMismatchTypeInsertion = 1;
+constexpr uint8_t kMismatchTypeDeletion = 2;
+constexpr uint8_t kClipsRecordEnd = 8;
+constexpr uint8_t kPairSameRecord = 0;
+constexpr uint8_t kPairR1Split = 1;
+constexpr uint8_t kPairR2Split = 2;
+constexpr uint8_t kPairR1DiffRef = 3;
+constexpr uint8_t kPairR2DiffRef = 4;
+constexpr uint8_t kPairR1Unpaired = 5;
+constexpr uint8_t kPairR2Unpaired = 6;
+constexpr uint8_t kRtypeReference = 0;
+constexpr uint8_t kRtypeClassP = 1;
+constexpr uint8_t kRtypeClassN = 2;
+constexpr uint8_t kRtypeClassM = 3;
+constexpr uint8_t kRtypeClassI = 4;
+constexpr uint8_t kRtypeClassU = 5;
+constexpr uint8_t kRtypeClassHm = 6;
+};  // namespace gen_const
 
 /**
  * @brief
  */
 struct GenomicSubDescriptorProperties {
-    GenSubIndex id;                     //!< @brief
-    std::string name;                   //!< @brief
-    bool mismatchDecoding;              //!< @brief
-    std::pair<int64_t, int64_t> range;  //!< @brief
+  GenSubIndex id;                     //!< @brief
+  std::string name;                   //!< @brief
+  bool mismatch_decoding;             //!< @brief
+  std::pair<int64_t, int64_t> range;  //!< @brief
 };
 
 /**
  * @brief
  */
 struct GenomicDescriptorProperties {
-    GenDesc id;                                           //!< @brief
-    std::string name;                                     //!< @brief
-    bool tokentype;                                       //!< @brief
-    std::vector<GenomicSubDescriptorProperties> subseqs;  //!< @brief
+  GenDesc id;                                            //!< @brief
+  std::string name;                                      //!< @brief
+  bool token_type;                                       //!< @brief
+  std::vector<GenomicSubDescriptorProperties> sub_seqs;  //!< @brief
 
-    /**
-     * @brief
-     * @param sub
-     * @return
-     */
-    [[nodiscard]] const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
+  /**
+   * @brief
+   * @param sub
+   * @return
+   */
+  [[nodiscard]] const GenomicSubDescriptorProperties& GetSubSeq(
+      uint8_t sub) const;
 };
 
 /**
  * @brief
  */
 struct Alphabet {
-    std::vector<char> lut;         //!< @brief
-    std::vector<char> inverseLut;  //!< @brief
-    uint8_t base_bits;
+  std::vector<char> lut;          //!< @brief
+  std::vector<char> inverse_lut;  //!< @brief
+  uint8_t base_bits;
 
-    /**
-     * @brief
-     * @param c
-     * @return
-     */
-    [[nodiscard]] bool isIncluded(char c) const;
+  /**
+   * @brief
+   * @param c
+   * @return
+   */
+  [[nodiscard]] bool IsIncluded(char c) const;
 };
 
 /**
  * @brief
  * @return
  */
-const std::vector<GenomicDescriptorProperties>& getDescriptors();
+const std::vector<GenomicDescriptorProperties>& GetDescriptors();
 
 /**
  * @brief
  * @param desc
  * @return
  */
-const GenomicDescriptorProperties& getDescriptor(GenDesc desc);
+const GenomicDescriptorProperties& GetDescriptor(GenDesc desc);
 
 /**
  * @brief
  * @param idx
  * @return
  */
-const GenomicSubDescriptorProperties& getSubsequence(GenSubIndex idx);
+const GenomicSubDescriptorProperties& GetSubsequence(GenSubIndex idx);
 
 /**
  * @brief
  * @param id
  * @return
  */
-const Alphabet& getAlphabetProperties(AlphabetID id);
+const Alphabet& GetAlphabetProperties(AlphabetId id);
 
 /**
  * @brief
  */
 struct CigarFormatInfo {
-    std::vector<uint8_t> lut_step_ref;    //!< @brief
-    std::vector<uint8_t> lut_step_bases;  //!< @brief
-    std::vector<uint8_t> lut_ignore;      //!< @brief
-    bool explicitSubstitution;            //!< @brief
+  std::vector<uint8_t> lut_step_ref;    //!< @brief
+  std::vector<uint8_t> lut_step_bases;  //!< @brief
+  std::vector<uint8_t> lut_ignore;      //!< @brief
+  bool explicit_substitution;           //!< @brief
 };
 
 /**
  * @brief
  * @return
  */
-const CigarFormatInfo& getECigarInfo();
+const CigarFormatInfo& GetECigarInfo();
 
 /**
  * @brief
  * @param bits
  * @return
  */
-uint8_t bits2bytes(uint8_t bits);
+uint8_t Bits2Bytes(uint8_t bits);
 
 /**
  * @brief
  * @param range
  * @return
  */
-uint8_t range2bytes(std::pair<int64_t, int64_t> range);
+uint8_t Range2Bytes(const std::pair<int64_t, int64_t>& range);
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_CONSTANTS_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

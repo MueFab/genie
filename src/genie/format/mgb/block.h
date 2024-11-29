@@ -1,146 +1,141 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGB_BLOCK_H_
 #define SRC_GENIE_FORMAT_MGB_BLOCK_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
-#include <sstream>
 #include <variant>
-#include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/payload.h"
-#include "genie/util/bit-writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/core/access_unit.h"
+#include "genie/core/payload.h"
+#include "genie/util/bit_writer.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgb {
 
 /**
  * @brief
  */
-class Block {
- private:
-    uint8_t descriptor_ID;        //!< @brief
-    uint32_t block_payload_size;  //!< @brief
+class Block final {
+  uint8_t descriptor_id_;        //!< @brief
+  uint32_t block_payload_size_;  //!< @brief
 
-    uint8_t count;  //!< @brief
+  uint8_t count_;  //!< @brief
 
-    std::variant<genie::core::Payload, core::AccessUnit::Descriptor> payload;  //!< @brief
+  std::variant<core::Payload, core::AccessUnit::Descriptor>
+      payload_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isLoaded() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsLoaded() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isParsed() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsParsed() const;
 
-    /**
-     * @brief
-     */
-    void load();
+  /**
+   * @brief
+   */
+  void load();
 
-    /**
-     * @brief
-     */
-    void unload();
+  /**
+   * @brief
+   */
+  void unload();
 
-    /**
-     * @brief
-     */
-    void parse();
+  /**
+   * @brief
+   */
+  void parse();
 
-    /**
-     * @brief
-     */
-    void pack();
+  /**
+   * @brief
+   */
+  void pack();
 
-    /**
-     * @brief
-     */
-    Block();
+  /**
+   * @brief
+   */
+  Block();
 
-    /**
-     * @brief
-     * @param _descriptor_ID
-     * @param _payload
-     */
-    Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload);
+  /**
+   * @brief
+   * @param descriptor_id
+   * @param payload
+   */
+  Block(uint8_t descriptor_id, core::AccessUnit::Descriptor&& payload);
 
-    /**
-     * @brief
-     * @param _descriptor_ID
-     * @param _payload
-     */
-    Block(genie::core::GenDesc _descriptor_ID, core::Payload _payload);
+  /**
+   * @brief
+   * @param descriptor_id
+   * @param payload
+   */
+  Block(core::GenDesc descriptor_id, core::Payload payload);
 
-    /**
-     * @brief
-     * @param qv_count
-     * @param reader
-     */
-    explicit Block(size_t qv_count, util::BitReader &reader);
+  /**
+   * @brief
+   * @param qv_count
+   * @param reader
+   */
+  explicit Block(size_t qv_count, util::BitReader& reader);
 
-    /**
-     * @brief
-     */
-    virtual ~Block() = default;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void write(util::BitWriter &writer) const;
+  /**
+   * @brief
+   * @return
+   */
+  core::AccessUnit::Descriptor&& MovePayload();
 
-    /**
-     * @brief
-     * @return
-     */
-    core::AccessUnit::Descriptor &&movePayload();
+  /**
+   * @brief
+   * @return
+   */
+  core::Payload MovePayloadUnparsed();
 
-    /**
-     * @brief
-     * @return
-     */
-    core::Payload movePayloadUnparsed();
+  /**
+   * @brief
+   * @return
+   */
+  core::Payload& GetPayloadUnparsed();
 
-    /**
-     * @brief
-     * @return
-     */
-    core::Payload &getPayloadUnparsed();
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetDescriptorId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint8_t getDescriptorID() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] size_t getWrittenSize() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] size_t GetWrittenSize() const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGB_BLOCK_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -10,10 +10,10 @@ set(source_files
         lloyd_max_quantizer.cc
         log.cc
         probability_distribution.cc
-        qual_decoder.cc
-        qual_encoder.cc
+        quality_decoder.cc
+        quality_encoder.cc
         quantizer.cc
-        softclip_spreader.cc
+        soft_clip_spreader.cc
         uniform_min_max_quantizer.cc
         uniform_quantizer.cc
         decoder.cc

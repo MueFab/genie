@@ -1,59 +1,64 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/read/refcoder/decoder.h"
+
 #include <algorithm>
 #include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
-#include "genie/read/basecoder/decoder.h"
-#include "genie/util/stop-watch.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/read/basecoder/decoder.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::read::refcoder {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::vector<std::string> Decoder::getReferences(const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
-    std::vector<std::string> ret;
-    const auto& excerpt = dynamic_cast<RefDecodingState&>(state).refExcerpt;
-    {
-        const auto begin = static_cast<uint32_t>(meta.position[0]);
-        const auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[0]),
-                                            static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        const auto clipsize = begin + static_cast<uint32_t>(meta.length[0]) - end;
-        ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
-    }
-    if (meta.num_segments == 2) {
-        const auto begin = static_cast<uint32_t>(meta.position[1]);
-        const auto end = std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
-                                            static_cast<uint32_t>(excerpt.getGlobalEnd()));
-        const auto clipsize = begin + static_cast<uint32_t>(meta.length[1]) - end;
-        ret.emplace_back(excerpt.getString(begin, end) + std::string(clipsize, 'N'));
-    }
-    return ret;
+// -----------------------------------------------------------------------------
+std::vector<std::string> Decoder::GetReferences(
+    const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
+  std::vector<std::string> ret;
+  const auto& excerpt = dynamic_cast<RefDecodingState&>(state).ref_excerpt;
+  {
+    const auto begin = static_cast<uint32_t>(meta.position[0]);
+    const auto end =
+        std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[0]),
+                           static_cast<uint32_t>(excerpt.GetGlobalEnd()));
+    const auto clip_length =
+        begin + static_cast<uint32_t>(meta.length[0]) - end;
+    ret.emplace_back(excerpt.GetString(begin, end) +
+                     std::string(clip_length, 'N'));
+  }
+  if (meta.num_segments == 2) {
+    const auto begin = static_cast<uint32_t>(meta.position[1]);
+    const auto end =
+        std::min<uint32_t>(begin + static_cast<uint32_t>(meta.length[1]),
+                           static_cast<uint32_t>(excerpt.GetGlobalEnd()));
+    const auto clip_length =
+        begin + static_cast<uint32_t>(meta.length[1]) - end;
+    ret.emplace_back(excerpt.GetString(begin, end) +
+                     std::string(clip_length, 'N'));
+  }
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<basecoder::DecoderStub::DecodingState> Decoder::createDecodingState(core::AccessUnit& t) {
-    return std::make_unique<RefDecodingState>(t);
+// -----------------------------------------------------------------------------
+std::unique_ptr<basecoder::DecoderStub::DecodingState>
+Decoder::CreateDecodingState(core::AccessUnit& t) {
+  return std::make_unique<RefDecodingState>(t);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 Decoder::RefDecodingState::RefDecodingState(core::AccessUnit& t_data)
-    : DecodingState(t_data), refExcerpt(t_data.getReferenceExcerpt()) {}
+    : DecodingState(t_data), ref_excerpt(t_data.GetReferenceExcerpt()) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::read::refcoder
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

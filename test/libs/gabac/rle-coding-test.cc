@@ -1,185 +1,191 @@
-#include <genie/entropy/gabac/rle-subseq-transform.h>
+#include <genie/entropy/gabac/rle_sub_seq_transform.h>
 #include <gtest/gtest.h>
+
 #include <vector>
+
 #include "common.h"
 
-genie::entropy::paramcabac::Subsequence createConfig(uint16_t guard) {
-    genie::entropy::paramcabac::TransformedParameters param(
-        genie::entropy::paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING, guard);
+genie::entropy::paramcabac::Subsequence CreateConfig(const uint16_t guard) {
+  genie::entropy::paramcabac::TransformedParameters param(
+      genie::entropy::paramcabac::TransformedParameters::TransformIdSubseq::
+          RLE_CODING,
+      guard);
 
-    std::vector<genie::entropy::paramcabac::TransformedSubSeq> vec;
-    genie::entropy::paramcabac::Subsequence cfg(std::move(param), 0, true, std::move(vec));
+  std::vector<genie::entropy::paramcabac::TransformedSubSeq> vec;
+  genie::entropy::paramcabac::Subsequence cfg(std::move(param), 0, true,
+                                              std::move(vec));
 
-    return cfg;
+  return cfg;
 }
 
 TEST(RleCodingTest, voidInput) {
-    genie::util::DataBlock values(0, 1);
-    genie::util::DataBlock lengths(0, 2);
+  genie::util::DataBlock values(0, 1);
+  genie::util::DataBlock lengths(0, 2);
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(10);
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(10);
 
-    // encode
-    genie::entropy::gabac::transformRleCoding(cfg, &transformSubset);
-    lengths = transformSubset[0];
-    values = transformSubset[1];
-    EXPECT_EQ(lengths.size(), 0);
-    EXPECT_EQ(values.size(), 0);
+  // encode
+  genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset);
+  lengths = transform_subset[0];
+  values = transform_subset[1];
+  EXPECT_EQ(lengths.Size(), 0);
+  EXPECT_EQ(values.Size(), 0);
 
-    // decode
-    genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
-    values = transformSubset[0];
-    EXPECT_EQ(values.size(), 0);
+  // Decode
+  genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset);
+  values = transform_subset[0];
+  EXPECT_EQ(values.Size(), 0);
 }
 
 TEST(RleCodingTest, singlePositivValue) {
-    genie::util::DataBlock values(0, 8);
-    genie::util::DataBlock lengths(0, 1);
-    genie::util::DataBlock expectedValues(0, 8);
-    genie::util::DataBlock expectedLengths(0, 1);
+  genie::util::DataBlock values(0, 8);
+  genie::util::DataBlock lengths(0, 1);
+  genie::util::DataBlock expected_values(0, 8);
+  genie::util::DataBlock expected_lengths(0, 1);
 
-    values = {42};
+  values = {42};
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(32);
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(32);
 
-    // encode
-    genie::entropy::gabac::transformRleCoding(cfg, &transformSubset);
-    lengths = transformSubset[0];
-    values = transformSubset[1];
+  // encode
+  genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset);
+  lengths = transform_subset[0];
+  values = transform_subset[1];
 
-    expectedLengths = {0};
-    expectedValues = {42};
+  expected_lengths = {0};
+  expected_values = {42};
 
-    EXPECT_EQ(lengths, expectedLengths);
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(lengths, expected_lengths);
+  EXPECT_EQ(values, expected_values);
 
-    // decode
-    genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
-    values = transformSubset[0];
-    expectedValues = {42};
+  // Decode
+  genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset);
+  values = transform_subset[0];
+  expected_values = {42};
 
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(values, expected_values);
 }
 
 TEST(RleCodingTest, singleNegativeValue) {
-    genie::util::DataBlock values(0, 8);
-    genie::util::DataBlock lengths(0, 1);
-    genie::util::DataBlock expectedValues(0, 8);
-    genie::util::DataBlock expectedLengths(0, 1);
+  genie::util::DataBlock values(0, 8);
+  genie::util::DataBlock lengths(0, 1);
+  genie::util::DataBlock expected_values(0, 8);
+  genie::util::DataBlock expected_lengths(0, 1);
 
-    values = {uint64_t(-42)};
+  values = {static_cast<uint64_t>(-42)};
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(32);
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(32);
 
-    // encode
-    genie::entropy::gabac::transformRleCoding(cfg, &transformSubset);
-    lengths = transformSubset[0];
-    values = transformSubset[1];
+  // encode
+  genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset);
+  lengths = transform_subset[0];
+  values = transform_subset[1];
 
-    expectedLengths = {0};
-    expectedValues = {uint64_t(-42)};
+  expected_lengths = {0};
+  expected_values = {static_cast<uint64_t>(-42)};
 
-    EXPECT_EQ(lengths, expectedLengths);
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(lengths, expected_lengths);
+  EXPECT_EQ(values, expected_values);
 
-    // decode
-    genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
-    values = transformSubset[0];
-    expectedValues = {uint64_t(-42)};
+  // Decode
+  genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset);
+  values = transform_subset[0];
+  expected_values = {static_cast<uint64_t>(-42)};
 
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(values, expected_values);
 }
 
 TEST(RleCodingTest, triggerGuard) {
-    genie::util::DataBlock values(0, 8);
-    genie::util::DataBlock lengths(0, 1);
-    genie::util::DataBlock expectedValues(0, 8);
-    genie::util::DataBlock expectedLengths(0, 1);
+  genie::util::DataBlock values(0, 8);
+  genie::util::DataBlock lengths(0, 1);
+  genie::util::DataBlock expected_values(0, 8);
+  genie::util::DataBlock expected_lengths(0, 1);
 
-    values = {1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 1, 1, 1, 3};
+  values = {1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 1, 1, 1, 3};
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(3);
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(3);
 
-    // encode
-    genie::entropy::gabac::transformRleCoding(cfg, &transformSubset);
-    lengths = transformSubset[0];
-    values = transformSubset[1];
+  // encode
+  genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset);
+  lengths = transform_subset[0];
+  values = transform_subset[1];
 
-    expectedLengths = {3, 1, 0, 3, 0, 2, 0};
-    expectedValues = {1, 3, 2, 1, 3};
+  expected_lengths = {3, 1, 0, 3, 0, 2, 0};
+  expected_values = {1, 3, 2, 1, 3};
 
-    EXPECT_EQ(lengths, expectedLengths);
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(lengths, expected_lengths);
+  EXPECT_EQ(values, expected_values);
 
-    // decode
-    genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
-    values = transformSubset[0];
-    expectedValues = {1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 1, 1, 1, 3};
+  // Decode
+  genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset);
+  values = transform_subset[0];
+  expected_values = {1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 1, 1, 1, 3};
 
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(values, expected_values);
 }
 
 TEST(RleCodingTest, semiRandom) {
-    genie::util::DataBlock values(0, 8);
-    genie::util::DataBlock lengths(0, 1);
-    genie::util::DataBlock expectedValues(0, 8);
-    genie::util::DataBlock expectedLengths(0, 1);
+  genie::util::DataBlock values(0, 8);
+  genie::util::DataBlock lengths(0, 1);
+  genie::util::DataBlock expected_values(0, 8);
+  genie::util::DataBlock expected_lengths(0, 1);
 
-    values = {uint64_t(-3438430427565543845LL),
-              uint64_t(-3438430427565543845LL),
-              8686590606261860295LL,
-              810438489069303389LL,
-              810438489069303389LL,
-              810438489069303389LL,
-              0};
+  values = {static_cast<uint64_t>(-3438430427565543845LL),
+            static_cast<uint64_t>(-3438430427565543845LL),
+            8686590606261860295LL,
+            810438489069303389LL,
+            810438489069303389LL,
+            810438489069303389LL,
+            0};
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(std::numeric_limits<uint16_t>::max());
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(std::numeric_limits<uint16_t>::max());
 
-    // encode
-    genie::entropy::gabac::transformRleCoding(cfg, &transformSubset);
-    lengths = transformSubset[0];
-    values = transformSubset[1];
+  // encode
+  genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset);
+  lengths = transform_subset[0];
+  values = transform_subset[1];
 
-    expectedLengths = {1, 0, 2, 0};
-    expectedValues = {uint64_t(-3438430427565543845LL), 8686590606261860295LL, 810438489069303389LL, 0};
+  expected_lengths = {1, 0, 2, 0};
+  expected_values = {static_cast<uint64_t>(-3438430427565543845LL),
+                     8686590606261860295LL, 810438489069303389LL, 0};
 
-    EXPECT_EQ(lengths, expectedLengths);
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(lengths, expected_lengths);
+  EXPECT_EQ(values, expected_values);
 
-    // decode
-    genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset);
-    values = transformSubset[0];
-    expectedValues = {uint64_t(-3438430427565543845LL),
-                      uint64_t(-3438430427565543845LL),
-                      8686590606261860295LL,
-                      810438489069303389LL,
-                      810438489069303389LL,
-                      810438489069303389LL,
-                      0};
+  // Decode
+  genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset);
+  values = transform_subset[0];
+  expected_values = {static_cast<uint64_t>(-3438430427565543845LL),
+                     static_cast<uint64_t>(-3438430427565543845LL),
+                     8686590606261860295LL,
+                     810438489069303389LL,
+                     810438489069303389LL,
+                     810438489069303389LL,
+                     0};
 
-    EXPECT_EQ(values, expectedValues);
+  EXPECT_EQ(values, expected_values);
 }
 
 TEST(RleCodingTest, roundTripCoding) {
-    genie::util::DataBlock values(0, 8);
-    genie::util::DataBlock lengths(0, 1);
-    genie::util::DataBlock expectedValues(0, 8);
-    genie::util::DataBlock expectedLengths(0, 1);
+  genie::util::DataBlock values(0, 8);
+  const genie::util::DataBlock lengths(0, 1);
 
-    values.resize(1024 * 1024);
-    gabac_tests::fillVectorRandomGeometric(&values);
+  values.Resize(1024 * 1024);
+  gabac_tests::FillVectorRandomGeometric(&values);
 
-    std::vector<genie::util::DataBlock> transformSubset = {values, lengths};
-    auto cfg = createConfig(2);
+  std::vector transform_subset = {values, lengths};
+  const auto cfg = CreateConfig(2);
 
-    // encode + decode
-    EXPECT_NO_THROW(genie::entropy::gabac::transformRleCoding(cfg, &transformSubset));
-    EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformRleCoding(cfg, &transformSubset));
+  // encode + Decode
+  EXPECT_NO_THROW(
+      genie::entropy::gabac::TransformRleCoding(cfg, &transform_subset));
+  EXPECT_NO_THROW(
+      genie::entropy::gabac::InverseTransformRleCoding(cfg, &transform_subset));
 
-    EXPECT_EQ(values, transformSubset[0]);
+  EXPECT_EQ(values, transform_subset[0]);
 }

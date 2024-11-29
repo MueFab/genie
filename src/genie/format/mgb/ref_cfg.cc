@@ -1,67 +1,65 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgb/ref_cfg.h"
-#include "genie/util/bit-writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/bit_writer.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool RefCfg::operator==(const RefCfg &other) const {
-    return ref_sequence_ID == other.ref_sequence_ID && ref_start_position == other.ref_start_position &&
-           ref_end_position == other.ref_end_position && posSize == other.posSize;
+// -----------------------------------------------------------------------------
+bool RefCfg::operator==(const RefCfg& other) const {
+  return ref_sequence_id_ == other.ref_sequence_id_ &&
+         ref_start_position_ == other.ref_start_position_ &&
+         ref_end_position_ == other.ref_end_position_ &&
+         pos_size_ == other.pos_size_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint16_t RefCfg::GetSeqId() const { return ref_sequence_id_; }
 
-uint16_t RefCfg::getSeqID() const { return ref_sequence_ID; }
+// -----------------------------------------------------------------------------
+uint64_t RefCfg::GetStart() const { return ref_start_position_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint64_t RefCfg::GetEnd() const { return ref_end_position_; }
 
-uint64_t RefCfg::getStart() const { return ref_start_position; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t RefCfg::getEnd() const { return ref_end_position; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void RefCfg::write(util::BitWriter &writer) const {
-    writer.writeBits(ref_sequence_ID, 16);
-    writer.writeBits(ref_start_position, posSize);
-    writer.writeBits(ref_end_position, posSize);
+// -----------------------------------------------------------------------------
+void RefCfg::Write(util::BitWriter& writer) const {
+  writer.WriteBits(ref_sequence_id_, 16);
+  writer.WriteBits(ref_start_position_, pos_size_);
+  writer.WriteBits(ref_end_position_, pos_size_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+RefCfg::RefCfg(const uint16_t ref_sequence_id,
+               const uint64_t ref_start_position,
+               const uint64_t ref_end_position, const uint8_t pos_size)
+    : ref_sequence_id_(ref_sequence_id),
+      ref_start_position_(ref_start_position),
+      ref_end_position_(ref_end_position),
+      pos_size_(pos_size) {}
 
-RefCfg::RefCfg(const uint16_t _ref_sequence_ID, const uint64_t _ref_start_position, const uint64_t _ref_end_position,
-               const uint8_t _posSize)
-    : ref_sequence_ID(_ref_sequence_ID),
-      ref_start_position(_ref_start_position),
-      ref_end_position(_ref_end_position),
-      posSize(_posSize) {}
+// -----------------------------------------------------------------------------
+RefCfg::RefCfg(const uint8_t pos_size) : RefCfg(0, 0, 0, pos_size) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-RefCfg::RefCfg(const uint8_t _posSize) : RefCfg(0, 0, 0, _posSize) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-RefCfg::RefCfg(const uint8_t _posSize, util::BitReader &reader) : posSize(_posSize) {
-    ref_sequence_ID = reader.read<uint16_t>();
-    ref_start_position = reader.read<uint64_t>(posSize);
-    ref_end_position = reader.read<uint64_t>(posSize);
+// -----------------------------------------------------------------------------
+RefCfg::RefCfg(const uint8_t pos_size, util::BitReader& reader)
+    : pos_size_(pos_size) {
+  ref_sequence_id_ = reader.Read<uint16_t>();
+  ref_start_position_ = reader.Read<uint64_t>(pos_size_);
+  ref_end_position_ = reader.Read<uint64_t>(pos_size_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

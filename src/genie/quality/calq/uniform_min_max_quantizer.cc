@@ -1,6 +1,7 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -12,32 +13,34 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& valueMin, const int& valueMax, const int& nrSteps)
-    : UniformQuantizer(valueMin, valueMax, nrSteps) {
-    // Change the smallest and largest reconstruction values
+UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& value_min,
+                                               const int& value_max,
+                                               const size_t& nr_steps)
+    : UniformQuantizer(value_min, value_max, nr_steps) {
+  // Change the smallest and largest reconstruction values
 
-    const int smallestIndex = 0;
-    const int largestIndex = nrSteps - 1;
+  constexpr size_t smallest_index = 0;
+  const size_t largest_index = nr_steps - 1;
 
-    for (auto& lutElem : lut_) {
-        const int currentIndex = lutElem.second.first;
-        if (currentIndex == smallestIndex) {
-            lutElem.second.second = valueMin;
-        }
-        if (currentIndex == largestIndex) {
-            lutElem.second.second = valueMax;
-        }
+  for (auto& [fst, snd] : lut_) {
+    const size_t current_index = snd.first;
+    if (current_index == smallest_index) {
+      snd.second = value_min;
     }
-
-    for (auto& inverseLutElem : inverseLut_) {
-        const int currentIndex = inverseLutElem.first;
-        if (currentIndex == smallestIndex) {
-            inverseLutElem.second = valueMin;
-        }
-        if (currentIndex == largestIndex) {
-            inverseLutElem.second = valueMax;
-        }
+    if (current_index == largest_index) {
+      snd.second = value_max;
     }
+  }
+
+  for (auto& [fst, snd] : inverse_lut_) {
+    const size_t current_index = fst;
+    if (current_index == smallest_index) {
+      snd = value_min;
+    }
+    if (current_index == largest_index) {
+      snd = value_max;
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------

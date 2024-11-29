@@ -3,7 +3,8 @@ project("genie-basecoder")
 set(source_files
         decoder.cc
         encoder.cc
-        encoderstub.cpp decoderstub.h decoderstub.cpp)
+        encoder_stub.cc
+        decoder_stub.cc)
 
 add_library(genie-basecoder ${source_files})
 

@@ -2,8 +2,8 @@ project("genie-fasta")
 
 set(source_files
         exporter.cc
-        fai-file.cc
-        fasta-source.cc
+        fai_file.cc
+        fasta_source.cc
         manager.cc
         reader.cc
         reference.cc

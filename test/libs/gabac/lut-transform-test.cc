@@ -29,7 +29,7 @@ TEST(LutTransformTest, roundTripCoding0) {
 
     EXPECT_NO_THROW(genie::entropy::gabac::transformLutTransform(2, &transsymbols, &inverseLut0, &inverseLut1));
     EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformLutTransform(2, &transsymbols, &inverseLut0, &inverseLut1));
-    EXPECT_EQ(decodedSymbols.size(), symbols.size());
+    EXPECT_EQ(decodedSymbols.size(), symbols.Size());
     EXPECT_EQ(decodedSymbols, symbols);
 }
 */

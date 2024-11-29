@@ -1,85 +1,90 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #define NOMINMAX
 #include "apps/genie/gabac/main.h"
+
 #include <cassert>
 #include <csignal>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "apps/genie/gabac/code.h"
-#include "apps/genie/gabac/program-options.h"
+#include "apps/genie/gabac/program_options.h"
 #include "genie/entropy/gabac/benchmark.h"
 #include "genie/entropy/gabac/gabac.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genieapp::gabac {
+namespace genie_app::gabac {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-    try {
-        ProgramOptions programOptions(argc, argv);
-
-        if (programOptions.task == "encode") {
-            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.paramFilePath,
-                 programOptions.blocksize, programOptions.descID, programOptions.subseqID, false,
-                 programOptions.dependencyFilePath);
-        } else if (programOptions.task == "decode") {
-            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.paramFilePath,
-                 programOptions.blocksize, programOptions.descID, programOptions.subseqID, true,
-                 programOptions.dependencyFilePath);
-        } else if (programOptions.task == "writeconfigs") {
-            for (const auto& d : genie::core::getDescriptors()) {
-                for (const auto& s : d.subseqs) {
-                    auto conf = genie::entropy::gabac::EncodingConfiguration(
-                                    genie::entropy::gabac::getEncoderConfigManual(s.id))
-                                    .toJson()
-                                    .dump(4);
-                    std::ofstream outstream("gabacconf_" + std::to_string(static_cast<uint8_t>(s.id.first)) + "_" +
-                                            std::to_string(s.id.second) + ".json");
-                    outstream << conf;
-                }
-            }
-        } else if (programOptions.task == "benchmark") {
-            float timeweight = 0.0f;
-            if (programOptions.fastBenchmark) {
-                timeweight = 1.0f;
-            }
-            auto result = genie::entropy::gabac::benchmark_full(
-                programOptions.inputFilePath,
-                genie::core::GenSubIndex(
-                    std::make_pair(static_cast<genie::core::GenDesc>(programOptions.descID), programOptions.subseqID)),
-                timeweight);
-            auto json = result.config.toJson().dump(4);
-            std::ofstream output_stream(programOptions.outputFilePath);
-            output_stream.write(json.c_str(), json.length());
-
-        } else {
-            UTILS_DIE("Invalid task: " + std::string(programOptions.task));
+  try {
+    if (ProgramOptions program_options(argc, argv);
+        program_options.task_ == "encode") {
+      code(program_options.input_file_path_, program_options.output_file_path_,
+           program_options.param_file_path_, program_options.blocksize_,
+           program_options.desc_id_, program_options.subseq_id_, false,
+           program_options.dependency_file_path_);
+    } else if (program_options.task_ == "Decode") {
+      code(program_options.input_file_path_, program_options.output_file_path_,
+           program_options.param_file_path_, program_options.blocksize_,
+           program_options.desc_id_, program_options.subseq_id_, true,
+           program_options.dependency_file_path_);
+    } else if (program_options.task_ == "writeconfigs") {
+      for (const auto& d : genie::core::GetDescriptors()) {
+        for (const auto& s : d.sub_seqs) {
+          auto conf = genie::entropy::gabac::EncodingConfiguration(
+                          genie::entropy::gabac::GetEncoderConfigManual(s.id))
+                          .ToJson()
+                          .dump(4);
+          std::ofstream outstream(
+              "gabacconf_" + std::to_string(static_cast<uint8_t>(s.id.first)) +
+              "_" + std::to_string(s.id.second) + ".json");
+          outstream << conf;
         }
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    } catch (...) {
-        std::cerr << "Unkown error occurred" << std::endl;
-        return EXIT_FAILURE;
-    }
+      }
+    } else if (program_options.task_ == "benchmark") {
+      float timeweight = 0.0f;
+      if (program_options.fast_benchmark_) {
+        timeweight = 1.0f;
+      }
+      auto result = genie::entropy::gabac::BenchmarkFull(
+          program_options.input_file_path_,
+          genie::core::GenSubIndex(std::make_pair(
+              static_cast<genie::core::GenDesc>(program_options.desc_id_),
+              program_options.subseq_id_)),
+          timeweight);
+      auto json = result.config.ToJson().dump(4);
+      std::ofstream output_stream(program_options.output_file_path_);
+      output_stream.write(json.c_str(),
+                          static_cast<std::streamsize>(json.length()));
 
-    return EXIT_SUCCESS;
+    } else {
+      UTILS_DIE("Invalid task: " + std::string(program_options.task_));
+    }
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+  } catch (...) {
+    std::cerr << "Unkown error occurred" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace genieapp::gabac
+}  // namespace genie_app::gabac
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
