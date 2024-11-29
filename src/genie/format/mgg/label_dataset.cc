@@ -1,108 +1,108 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/label_dataset.h"
+
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 bool LabelDataset::operator==(const LabelDataset& other) const {
-    return dataset_ID == other.dataset_ID && dataset_regions == other.dataset_regions;
+  return dataset_id_ == other.dataset_id_ &&
+         dataset_regions_ == other.dataset_regions_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+LabelDataset::LabelDataset(const uint16_t ds_id) : dataset_id_(ds_id) {}
 
-LabelDataset::LabelDataset(const uint16_t _ds_ID) : dataset_ID(_ds_ID) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 LabelDataset::LabelDataset(util::BitReader& reader) {
-    // dataset_IDs u(16)
-    dataset_ID = reader.read<uint16_t>();
-    // num_regions u(8)
-    const auto num_regions = reader.read<uint8_t>();
+  // dataset_IDs u(16)
+  dataset_id_ = reader.Read<uint16_t>();
+  // num_regions u(8)
+  const auto num_regions = reader.Read<uint8_t>();
 
-    /// data encapsulated in Class dataset_region
-    for (uint8_t i = 0; i < num_regions; ++i) {
-        dataset_regions.emplace_back(reader);
-    }
+  /// data encapsulated in Class dataset_region
+  for (uint8_t i = 0; i < num_regions; ++i) {
+    dataset_regions_.emplace_back(reader);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void LabelDataset::addDatasetRegion(LabelRegion _ds_region) { dataset_regions.emplace_back(std::move(_ds_region)); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t LabelDataset::getDatasetID() const { return dataset_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t LabelDataset::getBitLength() const {
-    // dataset_IDs u(16)
-    uint64_t bitlen = 16;
-
-    // num_regions u(8)
-    bitlen += 8;
-
-    /// data encapsulated in Class dataset_region
-    for (auto& ds_reg : dataset_regions) {
-        bitlen += ds_reg.sizeInBits();
-    }
-
-    return bitlen;
+// -----------------------------------------------------------------------------
+void LabelDataset::AddDatasetRegion(LabelRegion ds_region) {
+  dataset_regions_.emplace_back(std::move(ds_region));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint16_t LabelDataset::GetDatasetId() const { return dataset_id_; }
 
-void LabelDataset::write(util::BitWriter& bit_writer) const {
-    // dataset_IDs u(16)
-    bit_writer.writeBits(dataset_ID, 16);
+// -----------------------------------------------------------------------------
+uint64_t LabelDataset::GetBitLength() const {
+  // dataset_IDs u(16)
+  uint64_t bit_length = 16;
 
-    // num_regions u(8)
-    bit_writer.writeBits(dataset_regions.size(), 8);
+  // num_regions u(8)
+  bit_length += 8;
 
-    /// data encapsulated in Class dataset_region
-    for (auto& ds_reg : dataset_regions) {
-        ds_reg.write(bit_writer);
-    }
+  /// data encapsulated in Class dataset_region
+  for (auto& ds_reg : dataset_regions_) {
+    bit_length += ds_reg.SizeInBits();
+  }
+
+  return bit_length;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void LabelDataset::Write(util::BitWriter& bit_writer) const {
+  // dataset_IDs u(16)
+  bit_writer.WriteBits(dataset_id_, 16);
 
-std::vector<core::meta::Region> LabelDataset::decapsulate(const uint16_t dataset) {
-    std::vector<core::meta::Region> ret;
-    if (dataset != dataset_ID) {
-        return ret;
-    }
-    for (auto& r : dataset_regions) {
-        ret.emplace_back(r.decapsulate());
-    }
+  // num_regions u(8)
+  bit_writer.WriteBits(dataset_regions_.size(), 8);
+
+  /// data encapsulated in Class dataset_region
+  for (auto& ds_reg : dataset_regions_) {
+    ds_reg.Write(bit_writer);
+  }
+}
+
+// -----------------------------------------------------------------------------
+std::vector<core::meta::Region> LabelDataset::Decapsulate(
+    const uint16_t dataset) {
+  std::vector<core::meta::Region> ret;
+  if (dataset != dataset_id_) {
     return ret;
+  }
+  for (auto& r : dataset_regions_) {
+    ret.emplace_back(r.Decapsulate());
+  }
+  dataset_regions_.clear();
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-LabelDataset::LabelDataset(const uint16_t _dataset_ID, core::meta::Label& labels) : dataset_ID(_dataset_ID) {
-    for (auto& l : labels.getRegions()) {
-        dataset_regions.emplace_back(l.getSeqID(), l.getStartPos(), l.getEndPos());
-        for (auto& c : l.getClasses()) {
-            dataset_regions.back().addClassID(c);
-        }
+// -----------------------------------------------------------------------------
+LabelDataset::LabelDataset(const uint16_t dataset_id,
+                           const core::meta::Label& labels)
+    : dataset_id_(dataset_id) {
+  for (auto& l : labels.GetRegions()) {
+    dataset_regions_.emplace_back(l.GetSeqId(), l.GetStartPos(), l.GetEndPos());
+    for (auto& c : l.GetClasses()) {
+      dataset_regions_.back().AddClassId(c);
     }
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,17 +1,18 @@
 project("genie-util")
 
 set(source_files
-        block-stepper.cc
-        bit-reader.cc
-        bit-writer.cc
-        data-block.cc
+        block_stepper.cc
+        bit_reader.cc
+        bit_writer.cc
+        data_block.cc
         exception.cc
-        ordered-lock.cc
-        ordered-section.cc
-        runtime-exception.cc
-        string-helpers.cc
-        thread-manager.cc
-        stop-watch.cc
+        ordered_lock.cc
+        ordered_section.cc
+        runtime_exception.cc
+        string_helpers.cc
+        thread_manager.cc
+        stop_watch.cc
+        literal.h
 )
 
 add_library(genie-util ${source_files})

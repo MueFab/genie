@@ -1,91 +1,106 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/entropy/zstd/decoder.h"
 
 #include <zstd.h>
+
 #include <algorithm>
 #include <iostream>
 #include <string>
 #include <tuple>
 #include <utility>
-#include "genie/util/runtime-exception.h"
-#include "genie/util/stop-watch.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+#include "genie/util/stop_watch.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::entropy::zstd {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
-    const auto id = data.getID();
+  const auto id = data.GetId();
 
-    uint8_t bytes = core::range2bytes(getSubsequence(id).range);
-    if (id.first == core::GenDesc::RNAME) {
-        bytes = 1;
-    }
-    util::DataBlock in = data.move();
-    const size_t originalSize = ZSTD_getFrameContentSize(in.getData(), in.getRawSize());
+  uint8_t bytes = core::Range2Bytes(GetSubsequence(id).range);
+  if (id.first == core::GenDesc::kReadName) {
+    bytes = 1;
+  }
+  util::DataBlock in = data.Move();
+  const size_t original_size =
+      ZSTD_getFrameContentSize(in.GetData(), in.GetRawSize());
 
-    UTILS_DIE_IF(originalSize == ZSTD_CONTENTSIZE_ERROR, "ZSTD_getFrameContentSize failed");
-    UTILS_DIE_IF(originalSize == ZSTD_CONTENTSIZE_UNKNOWN, "ZSTD_getFrameContentSize unknown");
+  UTILS_DIE_IF(original_size == ZSTD_CONTENTSIZE_ERROR,
+               "ZSTD_getFrameContentSize failed");
+  UTILS_DIE_IF(original_size == ZSTD_CONTENTSIZE_UNKNOWN,
+               "ZSTD_getFrameContentSize unknown");
 
-    util::DataBlock out(originalSize, bytes);
+  util::DataBlock out(original_size, bytes);
 
-    const size_t decompressedSize = ZSTD_decompress(out.getData(), out.getRawSize(), in.getData(), in.getRawSize());
+  const size_t decompressed_size = ZSTD_decompress(
+      out.GetData(), out.GetRawSize(), in.GetData(), in.GetRawSize());
 
-    UTILS_DIE_IF(ZSTD_isError(decompressedSize),
-                 "ZSTD decompression failed: " + std::string(ZSTD_getErrorName(decompressedSize)));
+  UTILS_DIE_IF(ZSTD_isError(decompressed_size),
+               "ZSTD decompression failed: " +
+                   std::string(ZSTD_getErrorName(decompressed_size)));
 
-    return {std::move(out), data.getID()};
+  return {std::move(out), data.GetId()};
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
-    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, const bool mmCoderEnabled) {
-    (void)param;
-    (void)mmCoderEnabled;
-    const util::Watch watch;
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
-    std::get<0>(desc) = std::move(d);
-    for (auto& subseq : std::get<0>(desc)) {
-        if (subseq.isEmpty()) {
-            continue;
-        }
-        const auto d_id = subseq.getID();
-
-        auto subseq_name = std::string();
-        if (getDescriptor(std::get<0>(desc).getID()).tokentype) {
-            subseq_name = getDescriptor(std::get<0>(desc).getID()).name;
-        } else {
-            subseq_name = getDescriptor(std::get<0>(desc).getID()).name + "-" +
-                          getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name;
-        }
-        if (!subseq.isEmpty()) {
-            std::get<1>(desc).addInteger("size-zstd-total-comp", subseq.getRawSize());
-            std::get<1>(desc).addInteger("size-zstd-" + subseq_name + "-comp", subseq.getRawSize());
-        }
-
-        std::get<0>(desc).set(d_id.second, decompress(std::move(subseq)));
-
-        if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
-            std::get<1>(desc).addInteger("size-zstd-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
-            std::get<1>(desc).addInteger("size-zstd-" + subseq_name + "-raw",
-                                         std::get<0>(desc).get(d_id.second).getRawSize());
-        }
+// -----------------------------------------------------------------------------
+std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
+Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
+                 core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {
+  (void)param;
+  (void)mm_coder_enabled;
+  const util::Watch watch;
+  std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
+  std::get<0>(desc) = std::move(d);
+  for (auto& sub_sequence : std::get<0>(desc)) {
+    if (sub_sequence.IsEmpty()) {
+      continue;
     }
-    std::get<1>(desc).addDouble("time-zstd", watch.check());
-    return desc;
+    const auto [fst, snd] = sub_sequence.GetId();
+
+    auto sub_seq_name = std::string();
+    if (GetDescriptor(std::get<0>(desc).GetId()).token_type) {
+      sub_seq_name = GetDescriptor(std::get<0>(desc).GetId()).name;
+    } else {
+      sub_seq_name =
+          GetDescriptor(std::get<0>(desc).GetId()).name + "-" +
+          GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name;
+    }
+    if (!sub_sequence.IsEmpty()) {
+      std::get<1>(desc).AddInteger(
+          "Size-zstd-total-comp",
+          static_cast<int64_t>(sub_sequence.GetRawSize()));
+      std::get<1>(desc).AddInteger(
+          "Size-zstd-" + sub_seq_name + "-comp",
+          static_cast<int64_t>(sub_sequence.GetRawSize()));
+    }
+
+    std::get<0>(desc).Set(snd, decompress(std::move(sub_sequence)));
+
+    if (!std::get<0>(desc).Get(snd).IsEmpty()) {
+      std::get<1>(desc).AddInteger(
+          "Size-zstd-total-raw",
+          static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
+      std::get<1>(desc).AddInteger(
+          "Size-zstd-" + sub_seq_name + "-raw",
+          static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
+    }
+  }
+  std::get<1>(desc).AddDouble("time-zstd", watch.Check());
+  return desc;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::entropy::zstd
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

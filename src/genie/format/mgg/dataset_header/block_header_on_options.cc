@@ -1,6 +1,7 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -8,42 +9,37 @@
 
 namespace genie::format::mgg::dataset_header {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 bool BlockHeaderOnOptions::operator==(const BlockHeaderOnOptions& other) const {
-    return mit_flag == other.mit_flag && cc_mode_flag == other.cc_mode_flag;
+  return mit_flag_ == other.mit_flag_ && cc_mode_flag_ == other.cc_mode_flag_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+BlockHeaderOnOptions::BlockHeaderOnOptions(const bool mit_flag,
+                                           const bool cc_mode_flag)
+    : mit_flag_(mit_flag), cc_mode_flag_(cc_mode_flag) {}
 
-BlockHeaderOnOptions::BlockHeaderOnOptions(const bool _mit_flag, const bool _cc_mode_flag)
-    : mit_flag(_mit_flag), cc_mode_flag(_cc_mode_flag) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 BlockHeaderOnOptions::BlockHeaderOnOptions(util::BitReader& reader) {
-    mit_flag = reader.read<bool>(1);
-    cc_mode_flag = reader.read<bool>(1);
+  mit_flag_ = reader.Read<bool>(1);
+  cc_mode_flag_ = reader.Read<bool>(1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BlockHeaderOnOptions::write(util::BitWriter& writer) const {
-    writer.writeBits(mit_flag, 1);
-    writer.writeBits(cc_mode_flag, 1);
+// -----------------------------------------------------------------------------
+void BlockHeaderOnOptions::Write(util::BitWriter& writer) const {
+  writer.WriteBits(mit_flag_, 1);
+  writer.WriteBits(cc_mode_flag_, 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+bool BlockHeaderOnOptions::GetMitFlag() const { return mit_flag_; }
 
-bool BlockHeaderOnOptions::getMITFlag() const { return mit_flag; }
+// -----------------------------------------------------------------------------
+bool BlockHeaderOnOptions::GetCcFlag() const { return cc_mode_flag_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool BlockHeaderOnOptions::getCCFlag() const { return cc_mode_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg::dataset_header
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

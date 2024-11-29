@@ -1,6 +1,7 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -31,53 +32,54 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-static int combinationsWithRepetitions(std::vector<std::string>* genoAlphabet, const std::vector<char>& alleleAlphabet,
-                                       int* got, const int nChosen, const int len, const int at, const int maxTypes) {
-    if (nChosen == len) {
-        if (!got) {
-            return 1;
-        }
-        std::string tmp;
-        for (int i = 0; i < len; i++) {
-            tmp += alleleAlphabet[got[i]];
-        }
-        genoAlphabet->push_back(tmp);
-        return 1;
+static int CombinationsWithRepetitions(  // NOLINT
+    std::vector<std::string>* geno_alphabet,
+    const std::vector<char>& allele_alphabet, int* got, const int n_chosen,
+    const int len, const int at, const int max_types) {
+  if (n_chosen == len) {
+    if (!got) {
+      return 1;
     }
-
-    int count = 0;
-    for (int i = at; i < maxTypes; i++) {
-        if (got) {
-            got[nChosen] = i;
-        }
-        count += combinationsWithRepetitions(genoAlphabet, alleleAlphabet, got, nChosen + 1, len, i, maxTypes);
+    std::string tmp;
+    for (int i = 0; i < len; i++) {
+      tmp += allele_alphabet[got[i]];
     }
+    geno_alphabet->push_back(tmp);
+    return 1;
+  }
 
-    return count;
+  int count = 0;
+  for (int i = at; i < max_types; i++) {
+    if (got) {
+      got[n_chosen] = i;
+    }
+    count += CombinationsWithRepetitions(geno_alphabet, allele_alphabet, got,
+                                         n_chosen + 1, len, i, max_types);
+  }
+
+  return count;
 }
 
 // -----------------------------------------------------------------------------
 
-Genotyper::Genotyper(const int& polyploidy, const int& qualOffset, const int& nrQuantizers, const bool debug)
-    : alleleAlphabet_(ALLELE_ALPHABET),
-      alleleLikelihoods_(),
-      genotypeAlphabet_(),
-      genotypeLikelihoods_(),
-      nrQuantizers_(nrQuantizers),
+Genotyper::Genotyper(const int polyploidy, const int qual_offset,
+                     const int nr_quantizers, const bool debug)
+    : current_allele_alphabet_(allele_alphabet_),
+      nr_quantizers_(nr_quantizers),
       polyploidy_(polyploidy),
-      qualOffset_(qualOffset),
-      DEBUG(debug) {
-    if (nrQuantizers < 1) {
-        throwErrorException("nrQuantizers must be greater than zero");
-    }
-    if (polyploidy < 1) {
-        throwErrorException("Polyploidy must be greater than zero");
-    }
-    if (qualOffset < 0) {
-        throwErrorException("qualOffset must not be negative");
-    }
+      qual_offset_(qual_offset),
+      debug_(debug) {
+  if (nr_quantizers < 1) {
+    THROW_ERROR_EXCEPTION("nrQuantizers must be greater than zero");
+  }
+  if (polyploidy < 1) {
+    THROW_ERROR_EXCEPTION("Polyploidy must be greater than zero");
+  }
+  if (qual_offset < 0) {
+    THROW_ERROR_EXCEPTION("qualOffset must not be negative");
+  }
 
-    initLikelihoods();
+  InitLikelihoods();
 }
 
 // -----------------------------------------------------------------------------
@@ -86,162 +88,171 @@ Genotyper::~Genotyper() = default;
 
 // -----------------------------------------------------------------------------
 
-double Genotyper::computeEntropy(const std::string& seqPileup, const std::string& qualPileup) {
-    const size_t depth = seqPileup.length();
+double Genotyper::ComputeEntropy(const std::string& seq_pileup,
+                                 const std::string& qual_pileup) {
+  const size_t depth = seq_pileup.length();
 
-    if (depth != qualPileup.length()) {
-        throwErrorException("Lengths of seqPileup and qualPileup differ");
-    }
+  if (depth != qual_pileup.length()) {
+    THROW_ERROR_EXCEPTION("Lengths of seqPileup and qualPileup differ");
+  }
 
-    if (depth == 0) {
-        return -1.0;  // computation of entropy not possible
-    }
-    if (depth == 1) {
-        return 0.0;  // no information content for one symbol
-    }
+  if (depth == 0) {
+    return -1.0;  // computation of entropy not possible
+  }
+  if (depth == 1) {
+    return 0.0;  // no information content for one symbol
+  }
 
-    computeGenotypeLikelihoods(seqPileup, qualPileup, depth);
+  ComputeGenotypeLikelihoods(seq_pileup, qual_pileup, depth);
 
-    const double entropy = std::accumulate(
-        genotypeLikelihoods_.begin(), genotypeLikelihoods_.end(), 0.0,
-        [](const double& a, const std::pair<std::string, double>& b) { return a - b.second * log(b.second); });
+  const double entropy = std::accumulate(
+      genotype_likelihoods_.begin(), genotype_likelihoods_.end(), 0.0,
+      [](const double& a, const std::pair<std::string, double>& b) {
+        return a - b.second * log(b.second);
+      });
 
-    return entropy;
+  return entropy;
 }
 
 // -----------------------------------------------------------------------------
 
-int Genotyper::computeQuantizerIndex(const std::string& seqPileup, const std::string& qualPileup) {
-    const size_t depth = seqPileup.length();
+int Genotyper::ComputeQuantizerIndex(const std::string& seq_pileup,
+                                     const std::string& qual_pileup) {
+  const size_t depth = seq_pileup.length();
 
-    if (depth != qualPileup.length()) {
-        throwErrorException("Lengths of seqPileup and qualPileup differ");
+  if (depth != qual_pileup.length()) {
+    THROW_ERROR_EXCEPTION("Lengths of seqPileup and qualPileup differ");
+  }
+
+  if (depth == 0) {
+    return nr_quantizers_;  // computation of quantizer index not possible
+  }
+  if (depth == 1) {
+    return nr_quantizers_ - 1;  // no inference can be made, stay safe
+  }
+
+  ComputeGenotypeLikelihoods(seq_pileup, qual_pileup, depth);
+
+  double largest_genotype_likelihood = 0.0;
+  double second_largest_genotype_likelihood = 0.0;
+  for (const auto& [fst, snd] : genotype_likelihoods_) {
+    if (snd > second_largest_genotype_likelihood) {
+      second_largest_genotype_likelihood = snd;
     }
-
-    if (depth == 0) {
-        return nrQuantizers_;  // computation of quantizer index not possible
+    if (second_largest_genotype_likelihood > largest_genotype_likelihood) {
+      second_largest_genotype_likelihood = largest_genotype_likelihood;
+      largest_genotype_likelihood = snd;
     }
-    if (depth == 1) {
-        return nrQuantizers_ - 1;  // no inference can be made, stay safe
+  }
+
+  const double confidence =
+      largest_genotype_likelihood - second_largest_genotype_likelihood;
+
+  const auto quant = static_cast<int>((1 - confidence) * (nr_quantizers_ - 1));
+
+  if (debug_) {
+    std::stringstream s;
+    s << 'N' << " " << seq_pileup << " ";
+
+    s << std::fixed << std::setw(6) << std::setprecision(4) << std::setfill('0')
+      << 1 - confidence;
+
+    s << " " << std::fixed << std::setw(6) << std::setprecision(4)
+      << std::setfill('0') << 1 - confidence << " " << quant << std::endl;
+
+    std::string line;
+    while (std::getline(s, line)) {
+      GetLogging().error_out(line);
     }
+  }
 
-    computeGenotypeLikelihoods(seqPileup, qualPileup, depth);
-
-    double largestGenotypeLikelihood = 0.0;
-    double secondLargestGenotypeLikelihood = 0.0;
-    for (const auto& genotypeLikelihood : genotypeLikelihoods_) {
-        if (genotypeLikelihood.second > secondLargestGenotypeLikelihood) {
-            secondLargestGenotypeLikelihood = genotypeLikelihood.second;
-        }
-        if (secondLargestGenotypeLikelihood > largestGenotypeLikelihood) {
-            secondLargestGenotypeLikelihood = largestGenotypeLikelihood;
-            largestGenotypeLikelihood = genotypeLikelihood.second;
-        }
-    }
-
-    const double confidence = largestGenotypeLikelihood - secondLargestGenotypeLikelihood;
-
-    const auto quant = static_cast<int>((1 - confidence) * (nrQuantizers_ - 1));
-
-    if (DEBUG) {
-        std::stringstream s;
-        s << 'N' << " " << seqPileup << " ";
-
-        s << std::fixed << std::setw(6) << std::setprecision(4) << std::setfill('0') << 1 - confidence;
-
-        s << " " << std::fixed << std::setw(6) << std::setprecision(4) << std::setfill('0') << 1 - confidence << " "
-          << quant << std::endl;
-
-        std::string line;
-        while (std::getline(s, line)) {
-            getLogging().errorOut(line);
-        }
-    }
-
-    return quant;
+  return quant;
 }
 
 // -----------------------------------------------------------------------------
 
-void Genotyper::initLikelihoods() {
-    // Initialize map containing the allele likelihoods
-    for (auto const& allele : alleleAlphabet_) {
-        alleleLikelihoods_.insert(std::pair<char, double>(allele, 0.0));
-    }
+void Genotyper::InitLikelihoods() {
+  // Initialize map containing the allele likelihoods
+  for (const auto& allele : current_allele_alphabet_) {
+    allele_likelihoods_.insert(std::pair(allele, 0.0));
+  }
 
-    // Initialize map containing the genotype likelihoods
-    std::vector<int> chosen(polyploidy_, 0);
-    combinationsWithRepetitions(&genotypeAlphabet_, alleleAlphabet_, chosen.data(), 0, polyploidy_, 0,
-                                ALLELE_ALPHABET_SIZE);
+  // Initialize map containing the genotype likelihoods
+  std::vector chosen(polyploidy_, 0);
+  CombinationsWithRepetitions(&genotype_alphabet_, current_allele_alphabet_,
+                              chosen.data(), 0, polyploidy_, 0,
+                              allele_alphabet_size_);
 
-    // Initialize genotype alphabet
-    for (auto& genotype : genotypeAlphabet_) {
-        genotypeLikelihoods_.insert(std::pair<std::string, double>(genotype, 0.0));
-    }
+  // Initialize genotype alphabet
+  for (auto& genotype : genotype_alphabet_) {
+    genotype_likelihoods_.insert(std::pair(genotype, 0.0));
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-void Genotyper::resetLikelihoods() {
-    for (auto& genotypeLikelihood : genotypeLikelihoods_) {
-        genotypeLikelihood.second = 0.0;
-    }
+void Genotyper::ResetLikelihoods() {
+  for (auto& [fst, snd] : genotype_likelihoods_) {
+    snd = 0.0;
+  }
 
-    for (auto& alleleLikelihood : alleleLikelihoods_) {
-        alleleLikelihood.second = 0.0;
-    }
+  for (auto& [fst, snd] : allele_likelihoods_) {
+    snd = 0.0;
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-void Genotyper::computeGenotypeLikelihoods(const std::string& seqPileup, const std::string& qualPileup,
+void Genotyper::ComputeGenotypeLikelihoods(const std::string& seq_pileup,
+                                           const std::string& qual_pileup,
                                            const size_t& depth) {
-    resetLikelihoods();
+  ResetLikelihoods();
 
-    auto* tempGenotypeLikelihoods = static_cast<double*>(calloc(genotypeAlphabet_.size(), sizeof(double)));
-    int itr = 0;
-    for (size_t d = 0; d < depth; d++) {
-        const auto y = static_cast<char>(seqPileup[d]);
-        const auto q = static_cast<double>(qualPileup[d] - qualOffset_);
+  auto* temp_genotype_likelihoods =
+      static_cast<double*>(calloc(genotype_alphabet_.size(), sizeof(double)));
+  int itr = 0;
+  for (size_t d = 0; d < depth; d++) {
+    const auto y = static_cast<char>(seq_pileup[d]);
+    const auto q = static_cast<double>(qual_pileup[d] - qual_offset_);
 
-        double pStrike = 1 - pow(10.0, -q / 10.0);
-        double pError = (1 - pStrike) / (ALLELE_ALPHABET_SIZE - 1);
+    double p_strike = 1 - pow(10.0, -q / 10.0);
+    double p_error = (1 - p_strike) / (allele_alphabet_size_ - 1);
 
-        itr = 0;
-        for (auto const& genotype : genotypeAlphabet_) {
-            double p = 0.0;
-            for (int i = 0; i < polyploidy_; i++) {
-                p += y == genotype[i] ? pStrike : pError;
-            }
-            p /= polyploidy_;
-
-            // We are using the log likelihood to avoid numerical problems
-            tempGenotypeLikelihoods[itr++] += log(p);
-        }
-    }
     itr = 0;
-    for (auto const& genotype : genotypeAlphabet_) {
-        genotypeLikelihoods_[genotype] = tempGenotypeLikelihoods[itr++];
-    }
-    free(tempGenotypeLikelihoods);
+    for (const auto& genotype : genotype_alphabet_) {
+      double p = 0.0;
+      for (int i = 0; i < polyploidy_; i++) {
+        p += y == genotype[i] ? p_strike : p_error;
+      }
+      p /= polyploidy_;
 
-    // Normalize the genotype likelihoods
-    double cum = 0.0;
-    for (auto& genotypeLikelihood : genotypeLikelihoods_) {
-        genotypeLikelihood.second = exp(genotypeLikelihood.second);
-        cum += genotypeLikelihood.second;
+      // We are using the Log likelihood to avoid numerical problems
+      temp_genotype_likelihoods[itr++] += log(p);
     }
-    for (auto& genotypeLikelihood : genotypeLikelihoods_) {
-        genotypeLikelihood.second /= cum;
-    }
+  }
+  itr = 0;
+  for (const auto& genotype : genotype_alphabet_) {
+    genotype_likelihoods_[genotype] = temp_genotype_likelihoods[itr++];
+  }
+  free(temp_genotype_likelihoods);
+
+  // Normalize the genotype likelihoods
+  double cum = 0.0;
+  for (auto& [fst, snd] : genotype_likelihoods_) {
+    snd = exp(snd);
+    cum += snd;
+  }
+  for (auto& [fst, snd] : genotype_likelihoods_) {
+    snd /= cum;
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-const std::map<std::string, double>& Genotyper::getGenotypelikelihoods(const std::string& seqPileup,
-                                                                       const std::string& qualPileup) {
-    computeGenotypeLikelihoods(seqPileup, qualPileup, qualPileup.size());
-    return genotypeLikelihoods_;
+const std::map<std::string, double>& Genotyper::GetGenotypelikelihoods(
+    const std::string& seq_pileup, const std::string& qual_pileup) {
+  ComputeGenotypeLikelihoods(seq_pileup, qual_pileup, qual_pileup.size());
+  return genotype_likelihoods_;
 }
 
 // -----------------------------------------------------------------------------

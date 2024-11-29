@@ -1,22 +1,24 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_META_REFERENCE_H_
 #define SRC_GENIE_CORE_META_REFERENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "genie/core/meta/refbase.h"
 #include "genie/core/meta/sequence.h"
 #include "nlohmann/json.hpp"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::meta {
 
@@ -24,146 +26,147 @@ namespace genie::core::meta {
  * @brief Reference metadata
  */
 class Reference {
- private:
-    std::string reference_name;            //!< @brief Name of the full reference
-    uint32_t reference_major_version;      //!< @brief Major version level
-    uint32_t reference_minor_version;      //!< @brief Minor version level
-    uint32_t reference_patch_version;      //!< @brief Patch level
-    std::vector<Sequence> seqs;            //!< @brief List of reference sequences
-    std::unique_ptr<RefBase> ref;          //!< @brief Reference type specific information
-    std::string reference_metadata_value;  //!< @brief MPEG-G part 3 meta information
+  std::string reference_name_;        //!< @brief Name of the full reference
+  uint32_t reference_major_version_;  //!< @brief Major version level
+  uint32_t reference_minor_version_;  //!< @brief Minor version level
+  uint32_t reference_patch_version_;  //!< @brief Patch level
+  std::vector<Sequence> seqs_;        //!< @brief List of reference sequences
+  std::unique_ptr<RefBase>
+      ref_;  //!< @brief Reference type specific information
+  std::string
+      reference_metadata_value_;  //!< @brief MPEG-G part 3 meta information
 
  public:
-    /**
-     * @brief
-     * @param _ref
-     */
-    Reference(const Reference& _ref);
+  /**
+   * @brief
+   * @param ref
+   */
+  Reference(const Reference& ref);
 
-    /**
-     * @brief
-     * @param _ref
-     */
-    Reference(Reference&& _ref) noexcept;
+  /**
+   * @brief
+   * @param ref
+   */
+  Reference(Reference&& ref) noexcept;
 
-    /**
-     * @brief
-     * @param _ref
-     * @return
-     */
-    Reference& operator=(const Reference& _ref);
+  /**
+   * @brief
+   * @param ref
+   * @return
+   */
+  Reference& operator=(const Reference& ref);
 
-    /**
-     * @brief
-     * @param _ref
-     * @return
-     */
-    Reference& operator=(Reference&& _ref) noexcept;
+  /**
+   * @brief
+   * @param ref
+   * @return
+   */
+  Reference& operator=(Reference&& ref) noexcept;
 
-    /**
-     * @brief Construct from raw data
-     * @param name Reference name
-     * @param major Major version level
-     * @param minor Minor version level
-     * @param patch Patch version level
-     * @param base Reference type specific information
-     * @param metadata MPEG-G part 3 meta information
-     */
-    Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch, std::unique_ptr<RefBase> base,
-              std::string metadata);
+  /**
+   * @brief Construct from raw data
+   * @param name Reference name
+   * @param major Major version level
+   * @param minor Minor version level
+   * @param patch Patch version level
+   * @param base Reference type specific information
+   * @param metadata MPEG-G part 3 meta information
+   */
+  Reference(std::string name, uint32_t major, uint32_t minor, uint32_t patch,
+            std::unique_ptr<RefBase> base, std::string metadata);
 
-    /**
-     * @brief Construct from json
-     * @param json Json representation
-     */
-    explicit Reference(const nlohmann::json& json);
+  /**
+   * @brief Construct from json
+   * @param json Json representation
+   */
+  explicit Reference(const nlohmann::json& json);
 
-    /**
-     * @brief Convert to json
-     * @return Json representation
-     */
-    [[nodiscard]] nlohmann::json toJson() const;
+  /**
+   * @brief Convert to json
+   * @return Json representation
+   */
+  [[nodiscard]] nlohmann::json ToJson() const;
 
-    /**
-     * @brief Return sequence name
-     * @return Sequence name
-     */
-    [[nodiscard]] const std::string& getName() const;
+  /**
+   * @brief Return sequence name
+   * @return Sequence name
+   */
+  [[nodiscard]] const std::string& GetName() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string& getName();
+  /**
+   * @brief
+   * @return
+   */
+  std::string& GetName();
 
-    /**
-     * @brief Return major version level
-     * @return Major version
-     */
-    [[nodiscard]] uint32_t getMajorVersion() const;
+  /**
+   * @brief Return major version level
+   * @return Major version
+   */
+  [[nodiscard]] uint32_t GetMajorVersion() const;
 
-    /**
-     * @brief Return minor version level
-     * @return Minor version level
-     */
-    [[nodiscard]] uint32_t getMinorVersion() const;
+  /**
+   * @brief Return minor version level
+   * @return Minor version level
+   */
+  [[nodiscard]] uint32_t GetMinorVersion() const;
 
-    /**
-     * @brief Return patch version level
-     * @return Patch version level
-     */
-    [[nodiscard]] uint32_t getPatchVersion() const;
+  /**
+   * @brief Return patch version level
+   * @return Patch version level
+   */
+  [[nodiscard]] uint32_t GetPatchVersion() const;
 
-    /**
-     * @brief Return list of reference sequences
-     * @return Information about all reference sequences
-     */
-    [[nodiscard]] const std::vector<Sequence>& getSequences() const;
+  /**
+   * @brief Return list of reference sequences
+   * @return Information about all reference sequences
+   */
+  [[nodiscard]] const std::vector<Sequence>& GetSequences() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::vector<Sequence>& getSequences();
+  /**
+   * @brief
+   * @return
+   */
+  std::vector<Sequence>& GetSequences();
 
-    /**
-     * @brief Add a new reference sequence
-     * @param s Sequence to add
-     */
-    void addSequence(Sequence s);
+  /**
+   * @brief Add a new reference sequence
+   * @param s Sequence to add
+   */
+  void AddSequence(Sequence s);
 
-    /**
-     * @brief Get reference type specific information
-     * @return Reference type specific information
-     */
-    [[nodiscard]] const RefBase& getBase() const;
+  /**
+   * @brief Get reference type specific information
+   * @return Reference type specific information
+   */
+  [[nodiscard]] const RefBase& GetBase() const;
 
-    /**
-     * @brief Get reference type specific information
-     * @return Reference type specific information
-     */
-    std::unique_ptr<RefBase> moveBase();
+  /**
+   * @brief Get reference type specific information
+   * @return Reference type specific information
+   */
+  std::unique_ptr<RefBase> MoveBase();
 
-    /**
-     * @brief Return MPEG-G part 3 meta information
-     * @return MPEG-G part 3 meta information
-     */
-    [[nodiscard]] const std::string& getInformation() const;
+  /**
+   * @brief Return MPEG-G part 3 meta information
+   * @return MPEG-G part 3 meta information
+   */
+  [[nodiscard]] const std::string& GetInformation() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string& getInformation();
+  /**
+   * @brief
+   * @return
+   */
+  std::string& GetInformation();
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::meta
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_META_REFERENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

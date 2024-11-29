@@ -1,168 +1,172 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
 #define SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include <algorithm>
+#include <algorithm>  // NOLINT
 #include <cmath>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::entropy::gabac {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+template <typename Type>
+SearchSpace<Type>::SearchSpaceIterator::SearchSpaceIterator(Type value,
+                                                            Type stride)
+    : value_(value), stride_(stride) {}
 
-template <typename TYPE>
-SearchSpace<TYPE>::SearchSpaceIterator::SearchSpaceIterator(TYPE _value, TYPE _stride)
-    : value(_value), stride(_stride) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-template <typename RET>
-RET SearchSpace<TYPE>::SearchSpaceIterator::get() const {
-    return static_cast<RET>(value);
+// -----------------------------------------------------------------------------
+template <typename Type>
+template <typename Ret>
+Ret SearchSpace<Type>::SearchSpaceIterator::Get() const {
+  return static_cast<Ret>(value_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator& SearchSpace<TYPE>::SearchSpaceIterator::operator-=(int64_t idx) {
-    value -= stride * idx;
-    return *this;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator&
+SearchSpace<Type>::SearchSpaceIterator::operator-=(int64_t idx) {
+  value_ -= stride_ * idx;
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator SearchSpace<TYPE>::SearchSpaceIterator::operator+(int64_t idx) const {
-    SearchSpaceIterator ret = *this;
-    ret += idx;
-    return ret;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator
+SearchSpace<Type>::SearchSpaceIterator::operator+(int64_t idx) const {
+  SearchSpaceIterator ret = *this;
+  ret += idx;
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator SearchSpace<TYPE>::SearchSpaceIterator::operator-(int64_t idx) const {
-    SearchSpaceIterator ret = *this;
-    ret -= idx;
-    return ret;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator
+SearchSpace<Type>::SearchSpaceIterator::operator-(int64_t idx) const {
+  SearchSpaceIterator ret = *this;
+  ret -= idx;
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-int64_t SearchSpace<TYPE>::SearchSpaceIterator::operator-(SearchSpaceIterator& other) const {
-    return (value - other.value) / stride;
+// -----------------------------------------------------------------------------
+template <typename Type>
+int64_t SearchSpace<Type>::SearchSpaceIterator::operator-(
+    SearchSpaceIterator& other) const {
+  return (value_ - other.value_) / stride_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator& SearchSpace<TYPE>::SearchSpaceIterator::operator++() {
-    return *this += 1;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator&
+SearchSpace<Type>::SearchSpaceIterator::operator++() {
+  return *this += 1;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator& SearchSpace<TYPE>::SearchSpaceIterator::operator--() {
-    return *this -= 1;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator&
+SearchSpace<Type>::SearchSpaceIterator::operator--() {
+  return *this -= 1;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-bool SearchSpace<TYPE>::SearchSpaceIterator::operator==(const SearchSpaceIterator& other) const {
-    return value == other.value;
+// -----------------------------------------------------------------------------
+template <typename Type>
+bool SearchSpace<Type>::SearchSpaceIterator::operator==(
+    const SearchSpaceIterator& other) const {
+  return value_ == other.value_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-bool SearchSpace<TYPE>::SearchSpaceIterator::operator!=(const SearchSpaceIterator& other) const {
-    return !(*this == other);
+// -----------------------------------------------------------------------------
+template <typename Type>
+bool SearchSpace<Type>::SearchSpaceIterator::operator!=(
+    const SearchSpaceIterator& other) const {
+  return !(*this == other);  // NOLINT
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator& SearchSpace<TYPE>::SearchSpaceIterator::operator+=(int64_t idx) {
-    value += stride * idx;
-    return *this;
+// -----------------------------------------------------------------------------
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator&
+SearchSpace<Type>::SearchSpaceIterator::operator+=(int64_t idx) {
+  value_ += stride_ * idx;
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+template <typename Type>
+SearchSpace<Type>::SearchSpace() : SearchSpace(0, 0, 1) {}
 
-template <typename TYPE>
-SearchSpace<TYPE>::SearchSpace() : SearchSpace(0, 0, 1) {}
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename TYPE>
-SearchSpace<TYPE>::SearchSpace(TYPE _min, TYPE _max, TYPE _stride) : min(_min), max(_max), stride(_stride) {
-    UTILS_DIE_IF((max - min) % stride != 0, "Invalid stride");
+template <typename Type>
+SearchSpace<Type>::SearchSpace(Type min, Type max, Type stride)
+    : min_(min), max_(max), stride_(stride) {
+  UTILS_DIE_IF((max_ - min_) % stride_ != 0, "Invalid stride_");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator SearchSpace<TYPE>::begin() const {
-    return SearchSpaceIterator(min, stride);
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator
+SearchSpace<Type>::begin()  // NOLINT
+    const {
+  return SearchSpaceIterator(min_, stride_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-typename SearchSpace<TYPE>::SearchSpaceIterator SearchSpace<TYPE>::end() const {
-    return SearchSpaceIterator(max + stride, stride);
+template <typename Type>
+typename SearchSpace<Type>::SearchSpaceIterator SearchSpace<Type>::end()
+    const {  // NOLINT
+  return SearchSpaceIterator(max_ + stride_, stride_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-size_t SearchSpace<TYPE>::size() const {
-    return (max - min) / stride + 1;
+template <typename Type>
+size_t SearchSpace<Type>::Size() const {
+  return (max_ - min_) / stride_ + 1;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-TYPE SearchSpace<TYPE>::getIndex(size_t idx) const {
-    return static_cast<TYPE>(min + stride * idx);
+template <typename Type>
+Type SearchSpace<Type>::GetIndex(size_t idx) const {
+  return static_cast<Type>(min_ + stride_ * idx);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-template <typename TYPE>
-TYPE SearchSpace<TYPE>::mutate(const size_t index, float random) {
-    float value = getIndex(index);
-    random = random * (max - min);
-    value += random;
-    while (value < min) {
-        value = max - (min - value);
-    }
-    while (value > max) {
-        value = min + (value - max);
-    }
-    return TYPE(std::round((value - min) / static_cast<float>(stride)));
+template <typename Type>
+Type SearchSpace<Type>::Mutate(const size_t index, float random) {
+  float value = GetIndex(index);
+  random = random * (max_ - min_);
+  value += random;
+  while (value < min_) {
+    value = max_ - (min_ - value);
+  }
+  while (value > max_) {
+    value = min_ + (value - max_);
+  }
+  return Type(std::round((value - min_) / static_cast<float>(stride_)));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::entropy::gabac
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_ENTROPY_GABAC_BENCHMARK_IMPL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
