@@ -9,6 +9,7 @@ set(source_files
         sam_to_mgrec/sam_record.cc
         sam_to_mgrec/sorter.cc
         sam_to_mgrec/transcoder.cc
+        sam_to_mgrec/sam_sorter.cc
 )
 
 add_library(genie-sam ${source_files})
