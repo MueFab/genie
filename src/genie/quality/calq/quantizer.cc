@@ -28,7 +28,7 @@ Quantizer::Quantizer() = default;
 
 // -----------------------------------------------------------------------------
 
-Quantizer::Quantizer(const std::map<size_t, int>& inverse_lut)
+Quantizer::Quantizer(const std::map<std::size_t, int>& inverse_lut)
     : inverse_lut_(inverse_lut) {}
 
 // -----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ int Quantizer::ValueToReconstructionValue(const int& value) const {
 
 // -----------------------------------------------------------------------------
 
-const std::map<size_t, int>& Quantizer::InverseLut() const {
+const std::map<std::size_t, int>& Quantizer::InverseLut() const {
   return inverse_lut_;
 }
 
