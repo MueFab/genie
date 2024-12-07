@@ -50,7 +50,7 @@ if [[ "$1" == "debug" ]]; then
         exit 0
     fi
 
-    make -j || { echo 'Make failed!' ; exit 1; }
+    make || { echo 'Make failed!' ; exit 1; }
 
 elif [[ "$1" == "release" ]]; then
     mkdir -p cmake-build-release
@@ -62,7 +62,7 @@ elif [[ "$1" == "release" ]]; then
         exit 0
     fi
 
-    make -j || { echo 'Make failed!' ; exit 1; }
+    make || { echo 'Make failed!' ; exit 1; }
 else
     if ! command -v doxygen &> /dev/null
     then

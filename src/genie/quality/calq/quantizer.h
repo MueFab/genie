@@ -64,7 +64,7 @@ class Quantizer {
    * @param inverse_lut The inverse LUT mapping indices to reconstruction
    * values.
    */
-  explicit Quantizer(const std::map<size_t, int>& inverse_lut);
+  explicit Quantizer(const std::map<std::size_t, int>& inverse_lut);
 
   /**
    * @brief Destructor for the `Quantizer` class.
@@ -131,7 +131,7 @@ class Quantizer {
   std::map<int, std::pair<int, int>>
       lut_;  //!< @brief Maps quality values to (index, reconstruction value)
              //!< pairs.
-  std::map<size_t, int>
+  std::map<std::size_t, int>
       inverse_lut_;  //!< @brief Maps indices to reconstruction values.
 };
 
