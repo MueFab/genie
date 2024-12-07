@@ -24,16 +24,10 @@ namespace genie::read::spring {
 template <size_t BitsetSize>
 EncoderGlobalB<BitsetSize>::EncoderGlobalB(const int max_read_len_param) {
   max_read_len = max_read_len_param;
-  base_mask = new std::bitset<BitsetSize>*[max_read_len_param];
-  for (int i = 0; i < max_read_len_param; i++)
-    base_mask[i] = new std::bitset<BitsetSize>[128];
-}
-
-// -----------------------------------------------------------------------------
-template <size_t BitsetSize>
-EncoderGlobalB<BitsetSize>::~EncoderGlobalB() {
-  for (int i = 0; i < max_read_len; i++) delete[] base_mask[i];
-  delete[] base_mask;
+  base_mask.resize(max_read_len_param);
+  for (auto& b : base_mask) {
+    b.resize(128, std::bitset<BitsetSize>());
+  }
 }
 
 // -----------------------------------------------------------------------------

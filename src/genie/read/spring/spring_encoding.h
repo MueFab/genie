@@ -24,6 +24,7 @@
 #include <bitset>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "genie/read/spring/bitset_util.h"
 #include "genie/read/spring/params.h"
@@ -39,8 +40,8 @@ namespace genie::read::spring {
  */
 template <size_t BitsetSize>
 struct EncoderGlobalB {
-  std::bitset<BitsetSize>** base_mask;  //!< @brief Base mask used for bitset
-                                        //!< conversion of A, C, G, T, N bases.
+  /// @brief Base mask used for bitset conversion of A, C, G, T, N bases.
+  std::vector<std::vector<std::bitset<BitsetSize>>> base_mask;
   int max_read_len;  //!< @brief Maximum read length for the sequences.
   std::bitset<BitsetSize> mask63;  //!< @brief Bitset with 63 bits set to 1
 
@@ -49,11 +50,6 @@ struct EncoderGlobalB {
    * @param max_read_len_param Maximum read length.
    */
   explicit EncoderGlobalB(int max_read_len_param);
-
-  /**
-   * @brief Destructor to clean up dynamically allocated base masks.
-   */
-  ~EncoderGlobalB();
 };
 
 /**

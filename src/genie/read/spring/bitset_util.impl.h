@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -26,9 +27,10 @@ namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void StringToBitset(const std::string& s, const uint16_t read_length,
-                    std::bitset<BitsetSize>& b,
-                    std::bitset<BitsetSize>** base_mask) {
+void StringToBitset(
+    const std::string& s, const uint16_t read_length,
+    std::bitset<BitsetSize>& b,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask) {
   for (int i = 0; i < read_length; i++)
     b |= base_mask[i][static_cast<uint8_t>(s[i])];
 }
