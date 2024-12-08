@@ -21,6 +21,7 @@
 
 #include <bitset>
 #include <string>
+#include <vector>
 
 #include "genie/read/spring/bitset_util.h"
 #include "genie/read/spring/params.h"
@@ -62,7 +63,7 @@ struct ReorderGlobal {
 
   bool paired_end{};  //!< @brief Indicates if the reads are paired-end.
 
-  std::bitset<BitsetSize>**
+  std::vector<std::vector<std::bitset<BitsetSize>>>
       base_mask;  //!< @brief Bitset masks for base representation.
   std::bitset<BitsetSize>
       mask64;  //!< @brief Bitset mask with 64 bits set to 1.
@@ -72,11 +73,6 @@ struct ReorderGlobal {
    * @param max_read_len_param Maximum read length.
    */
   explicit ReorderGlobal(int max_read_len_param);
-
-  /**
-   * @brief Destructor for the reorder_global structure.
-   */
-  ~ReorderGlobal();
 };
 
 /**
@@ -115,9 +111,9 @@ void SetGlobalArrays(ReorderGlobal<BitsetSize>& rg);
  */
 template <size_t BitsetSize>
 void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
-                    std::bitset<BitsetSize>& rev_ref, int** count,
-                    bool reset_count, bool rev, int shift,
-                    uint16_t cur_read_len, int& ref_len,
+                    std::bitset<BitsetSize>& rev_ref,
+                    std::array<std::vector<int>, 4>& count, bool reset_count,
+                    bool rev, int shift, uint16_t cur_read_len, int& ref_len,
                     const ReorderGlobal<BitsetSize>& rg);
 
 /**
@@ -128,7 +124,8 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
  * @param rg Global reorder settings.
  */
 template <size_t BitsetSize>
-void ReadDnaFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
+void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<uint16_t>& read_lengths,
                  const ReorderGlobal<BitsetSize>& rg);
 
 /**
@@ -152,12 +149,16 @@ void ReadDnaFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
  */
 template <size_t BitsetSize>
 bool SearchMatch(const std::bitset<BitsetSize>& ref,
-                 std::bitset<BitsetSize>* mask1,
-                 OmpLock* dict_lock, OmpLock* read_lock,
-                 std::bitset<BitsetSize>** mask, uint16_t* read_lengths,
-                 bool* remaining_reads, std::bitset<BitsetSize>* read,
-                 BbHashDict* dict, uint32_t& k, bool rev, int shift,
-                 const int& ref_len, const ReorderGlobal<BitsetSize>& rg);
+                 const std::vector<std::bitset<BitsetSize>>& mask1,
+                 std::vector<OmpLock>& dict_lock,
+                 std::vector<OmpLock>& read_lock,
+                 std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+                 std::vector<uint16_t>& read_lengths,
+                 std::vector<uint8_t>& remaining_reads,
+                 std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<BbHashDict>& dict, uint32_t& k, bool rev,
+                 int shift, const int& ref_len,
+                 const ReorderGlobal<BitsetSize>& rg);
 
 /**
  * @brief Reorders the reads based on the reference sequence.
@@ -168,8 +169,9 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
  * @param rg Global reorder settings.
  */
 template <size_t BitsetSize>
-void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
-             uint16_t* read_lengths, const ReorderGlobal<BitsetSize>& rg);
+void Reorder(std::vector<std::bitset<BitsetSize>>& read,
+             std::vector<BbHashDict>& dict, std::vector<uint16_t>& read_lengths,
+             const ReorderGlobal<BitsetSize>& rg);
 
 /**
  * @brief Converts bitsets to string format and writes them to files.
@@ -179,7 +181,8 @@ void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
  * @param rg Global reorder settings.
  */
 template <size_t BitsetSize>
-void WriteToFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
+void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<uint16_t>& read_lengths,
                  ReorderGlobal<BitsetSize>& rg);
 
 /**

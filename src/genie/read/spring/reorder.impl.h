@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -28,16 +29,10 @@ using util::operator""_u32;
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 ReorderGlobal<BitsetSize>::ReorderGlobal(const int max_read_len_param) {
-  base_mask = new std::bitset<BitsetSize>*[max_read_len_param];
+  base_mask =
+      std::vector<std::vector<std::bitset<BitsetSize>>>(max_read_len_param);
   for (int i = 0; i < max_read_len_param; i++)
-    base_mask[i] = new std::bitset<BitsetSize>[128];
-}
-
-// -----------------------------------------------------------------------------
-template <size_t BitsetSize>
-ReorderGlobal<BitsetSize>::~ReorderGlobal() {
-  for (int i = 0; i < max_read_len; i++) delete[] base_mask[i];
-  delete[] base_mask;
+    base_mask[i] = std::vector<std::bitset<BitsetSize>>(128);
 }
 
 // -----------------------------------------------------------------------------
@@ -76,7 +71,8 @@ void SetGlobalArrays(ReorderGlobal<BitsetSize>& rg) {
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
-                    std::bitset<BitsetSize>& rev_ref, int** count,
+                    std::bitset<BitsetSize>& rev_ref,
+                    std::array<std::vector<int>, 4>& count,
                     const bool reset_count, const bool rev, const int shift,
                     const uint16_t cur_read_len, int& ref_len,
                     const ReorderGlobal<BitsetSize>& rg) {
@@ -97,10 +93,10 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
   }
 
   if (reset_count) {  // reset_count - unmatched read so start over
-    std::fill(count[0], count[0] + rg.max_read_len, 0);
-    std::fill(count[1], count[1] + rg.max_read_len, 0);
-    std::fill(count[2], count[2] + rg.max_read_len, 0);
-    std::fill(count[3], count[3] + rg.max_read_len, 0);
+    std::fill(count[0].begin(), count[0].begin() + rg.max_read_len, 0);
+    std::fill(count[1].begin(), count[1].begin() + rg.max_read_len, 0);
+    std::fill(count[2].begin(), count[2].begin() + rg.max_read_len, 0);
+    std::fill(count[3].begin(), count[3].begin() + rg.max_read_len, 0);
     for (int i = 0; i < cur_read_len; i++) {
       count[char_to_int(static_cast<uint8_t>(current[i]))][i] = 1;
     }
@@ -186,7 +182,8 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void ReadDnaFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
+void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<uint16_t>& read_lengths,
                  const ReorderGlobal<BitsetSize>& rg) {
   std::ifstream f(rg.infile[0], std::ifstream::in | std::ios::binary);
   UTILS_DIE_IF(!f, "Cannot open file to read: " + rg.infile[0]);
@@ -216,14 +213,18 @@ void ReadDnaFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 bool SearchMatch(const std::bitset<BitsetSize>& ref,
-                 std::bitset<BitsetSize>* mask1,
+                 const std::vector<std::bitset<BitsetSize>>& mask1,
 #ifdef GENIE_USE_OPENMP
-                 OmpLock* dict_lock, OmpLock* read_lock,
+                 std::vector<OmpLock>& dict_lock,
+                 std::vector<OmpLock>& read_lock,
 #endif
-                 std::bitset<BitsetSize>** mask, uint16_t* read_lengths,
-                 bool* remaining_reads, std::bitset<BitsetSize>* read,
-                 BbHashDict* dict, uint32_t& k, const bool rev, const int shift,
-                 const int& ref_len, const ReorderGlobal<BitsetSize>& rg) {
+                 std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+                 std::vector<uint16_t>& read_lengths,
+                 std::vector<uint8_t>& remaining_reads,
+                 std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<BbHashDict>& dict, uint32_t& k, const bool rev,
+                 const int shift, const int& ref_len,
+                 const ReorderGlobal<BitsetSize>& rg) {
   static constexpr unsigned int thresh = kThresh_Reorder;
   constexpr int max_search = kMax_Search_Reorder;
   std::bitset<BitsetSize> b;
@@ -300,23 +301,25 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
-             uint16_t* read_lengths, const ReorderGlobal<BitsetSize>& rg) {
+void Reorder(std::vector<std::bitset<BitsetSize>>& read,
+             std::vector<BbHashDict>& dict, std::vector<uint16_t>& read_lengths,
+             const ReorderGlobal<BitsetSize>& rg) {
 #ifdef GENIE_USE_OPENMP
   constexpr uint32_t num_locks =
       kNum_Locks_Reorder;  // limits on number of locks
                            // (power of 2 for fast mod)
-  auto* dict_lock = new OmpLock[num_locks];
-  auto* read_lock = new OmpLock[num_locks];
+  auto dict_lock = std::vector<OmpLock>(num_locks);
+  auto read_lock = std::vector<OmpLock>(num_locks);
 #endif
-  auto** mask = new std::bitset<BitsetSize>*[rg.max_read_len];
+  auto mask =
+      std::vector<std::vector<std::bitset<BitsetSize>>>(rg.max_read_len);
   for (int i = 0; i < rg.max_read_len; i++)
-    mask[i] = new std::bitset<BitsetSize>[rg.max_read_len];
+    mask[i] = std::vector<std::bitset<BitsetSize>>(rg.max_read_len);
   GenerateMasks<BitsetSize>(mask, rg.max_read_len, 2);
-  auto* mask1 = new std::bitset<BitsetSize>[rg.num_dict];
+  auto mask1 = std::vector<std::bitset<BitsetSize>>(rg.num_dict);
   GenerateIndexMasks<BitsetSize>(mask1, dict, rg.num_dict, 2);
-  bool* remaining_reads = new bool[rg.num_reads];
-  std::fill(remaining_reads, remaining_reads + rg.num_reads, 1);
+  auto remaining_reads = std::vector<uint8_t>(rg.num_reads);
+  std::fill(remaining_reads.begin(), remaining_reads.begin() + rg.num_reads, 1);
 
   // we go through remaining_reads array from behind as that speeds up deletion
   // from bin arrays
@@ -332,7 +335,7 @@ void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
   // parallel regions.
   //
   uint32_t first_read = 0;
-  auto* unmatched = new uint32_t[rg.num_thr];
+  auto unmatched = std::vector<uint32_t>(rg.num_thr);
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(rg.num_thr) default(none)             \
     shared(rg, read, dict, read_lengths, mask1, mask, remaining_reads, \
@@ -370,8 +373,8 @@ void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
     uint32_t num_reads_thr = 0;
     uint32_t num_unmatched_past_1_m_thr = 0;
 
-    auto count = new int*[4];
-    for (int i = 0; i < 4; i++) count[i] = new int[rg.max_read_len];
+    auto count = std::array<std::vector<int>, 4>();
+    for (int i = 0; i < 4; i++) count[i] = std::vector<int>(rg.max_read_len);
     // in the dict read_id array
     uint64_t start_pos_index;  // index in start position
     bool flag = false, done = false, prev_unmatched = false,
@@ -622,28 +625,20 @@ void Reorder(std::bitset<BitsetSize>* read, BbHashDict* dict,
     file_out_positions.close();
     file_out_order_singleton.close();
     file_out_lengths.close();
-    for (int i = 0; i < 4; i++) delete[] count[i];
-    delete[] count;
   }  // parallel end
 
-  delete[] remaining_reads;
 #ifdef GENIE_USE_OPENMP
-  delete[] dict_lock;
-  delete[] read_lock;
 #endif
   std::cerr << "Reordering done, "
-            << static_cast<int>(
-                   std::accumulate(unmatched, unmatched + rg.num_thr, 0_u32))
+            << static_cast<int>(std::accumulate(
+                   unmatched.begin(), unmatched.begin() + rg.num_thr, 0_u32))
             << " were unmatched\n";
-  for (int i = 0; i < rg.max_read_len; i++) delete[] mask[i];
-  delete[] mask;
-  delete[] mask1;
-  delete[] unmatched;
 }
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void WriteToFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
+void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
+                 std::vector<uint16_t>& read_lengths,
                  ReorderGlobal<BitsetSize>& rg) {
   //
   // This loop must be executed in parallel with the same #threads
@@ -761,7 +756,8 @@ void WriteToFile(std::bitset<BitsetSize>* read, uint16_t* read_lengths,
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
-  auto* rg_pointer = new ReorderGlobal<BitsetSize>(cp.max_read_len);
+  auto rg_pointer =
+      std::make_unique<ReorderGlobal<BitsetSize>>(cp.max_read_len);
   ReorderGlobal<BitsetSize>& rg = *rg_pointer;
   rg.basedir = temp_dir;
   rg.infile[0] = rg.basedir + "/input_clean_1.dna";
@@ -777,7 +773,7 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   rg.num_thr = cp.num_thr;
   rg.paired_end = cp.paired_end;
   rg.max_shift = rg.max_read_len / 2;
-  auto* dict = new BbHashDict[rg.num_dict];
+  auto dict = std::vector<BbHashDict>(rg.num_dict);
   dict[0].start_ = rg.max_read_len > 100
                        ? rg.max_read_len / 2 - 32
                        : rg.max_read_len / 2 - rg.max_read_len * 32 / 100;
@@ -792,8 +788,8 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   rg.num_reads_array[1] = cp.num_reads_clean[1];
 
   SetGlobalArrays(rg);
-  auto* read = new std::bitset<BitsetSize>[rg.num_reads];
-  auto* read_lengths = new uint16_t[rg.num_reads];
+  auto read = std::vector<std::bitset<BitsetSize>>(rg.num_reads);
+  auto read_lengths = std::vector<uint16_t>(rg.num_reads);
   std::cerr << "Reading file\n";
   ReadDnaFile<BitsetSize>(read, read_lengths, rg);
   if (rg.num_reads > 0) {
@@ -805,10 +801,6 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   Reorder<BitsetSize>(read, dict, read_lengths, rg);
   std::cerr << "Writing to file\n";
   WriteToFile<BitsetSize>(read, read_lengths, rg);
-  delete[] read;
-  delete[] dict;
-  delete[] read_lengths;
-  delete rg_pointer;
   std::cerr << "Done!\n";
 }
 

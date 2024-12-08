@@ -33,15 +33,16 @@ void BbHashDict::FindPos(int64_t* dict_idx,
 
 // -----------------------------------------------------------------------------
 void BbHashDict::Remove(const int64_t* dict_idx, const uint64_t& start_pos_idx,
-                        const int64_t current) const {
+                        const int64_t current) {
   const auto size = dict_idx[1] - dict_idx[0];
   if (size == 1) {  // just one read left in bin
     empty_bin_[start_pos_idx] = true;
     return;  // need to keep one read to check during matching
   }
-  const int64_t pos = std::lower_bound(read_id_ + dict_idx[0],
-                                       read_id_ + dict_idx[1], current) -
-                      (read_id_ + dict_idx[0]);
+  const int64_t pos =
+      std::lower_bound(read_id_.begin() + dict_idx[0],
+                       read_id_.begin() + dict_idx[1], current) -
+      (read_id_.begin() + dict_idx[0]);
 
   for (int64_t i = dict_idx[0] + pos; i < dict_idx[1] - 1; i++)
     read_id_[i] = read_id_[i + 1];

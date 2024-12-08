@@ -58,7 +58,8 @@ void ReorderCompressQualityId(const std::string& temp_dir,
  * @param order_array Array to store the generated order.
  * @param num_reads Number of reads.
  */
-void GenerateOrder(const std::string& file_order, uint32_t* order_array,
+void GenerateOrder(const std::string& file_order,
+                   std::vector<uint32_t>& order_array,
                    const uint32_t& num_reads);
 
 /**
@@ -87,7 +88,8 @@ void ReadBlockStartEnd(const std::string& file_blocks,
  * @param stats Reference to performance statistics.
  * @param write_raw Flag to indicate if raw data should be written.
  */
-void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
+void ReorderCompressIdPe(std::vector<std::string>& id_array,
+                         const std::string& temp_dir,
                          const std::string& file_order_id,
                          const std::vector<uint32_t>& block_start,
                          const std::vector<uint32_t>& block_end,
@@ -116,8 +118,9 @@ void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
  */
 void ReorderCompressQualityPe(
     std::string file_quality[2], const std::string& temp_dir,
-    std::string* quality_array, const uint64_t& quality_array_size,
-    const uint32_t* order_array, const std::vector<uint32_t>& block_start,
+    std::vector<std::string>& quality_array, const uint64_t& quality_array_size,
+    const std::vector<uint32_t>& order_array, const std::vector<uint32_t>&
+    block_start,
     const std::vector<uint32_t>& block_end, const CompressionParams& cp,
     core::ReadEncoder::qv_selector* qv_coder,
     core::ReadEncoder::entropy_selector* entropy,
@@ -147,8 +150,10 @@ void ReorderCompressQualityPe(
 void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
                      const uint32_t& num_reads_per_file, const int& num_thr,
                      const uint32_t& num_reads_per_block,
-                     std::string* str_array, const uint32_t& str_array_size,
-                     const uint32_t* order_array, const std::string& mode,
+                     std::vector<std::string>& str_array,
+                     const uint32_t& str_array_size,
+                     const std::vector<uint32_t>& order_array,
+                     const std::string& mode,
                      core::ReadEncoder::qv_selector* qv_coder,
                      core::ReadEncoder::name_selector* name_coder,
                      core::ReadEncoder::entropy_selector* entropy,

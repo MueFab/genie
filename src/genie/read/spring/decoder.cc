@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -491,17 +492,15 @@ void Decoder::FlushIn(uint64_t& pos) {
           file_unmatched_read_names_1_sorted);
       std::ofstream f_out_unmatched_read_names_2_sorted(
           file_unmatched_read_names_2_sorted);
-      auto* sorter = new kwaymergesort::KwayMergeSort(
+      std::make_unique<kwaymergesort::KwayMergeSort>(
           file_unmatched_read_names_1_, &f_out_unmatched_read_names_1_sorted,
-          static_cast<int>(max_buffer_size), false, basedir_);
-      sorter->Sort();
-      delete sorter;
+          static_cast<int>(max_buffer_size), false, basedir_)
+          ->Sort();
       f_out_unmatched_read_names_1_sorted.close();
-      sorter = new kwaymergesort::KwayMergeSort(
+      std::make_unique<kwaymergesort::KwayMergeSort>(
           file_unmatched_read_names_2_, &f_out_unmatched_read_names_2_sorted,
-          static_cast<int>(max_buffer_size), false, basedir_);
-      sorter->Sort();
-      delete sorter;
+          static_cast<int>(max_buffer_size), false, basedir_)
+          ->Sort();
       f_out_unmatched_read_names_2_sorted.close();
       auto sort_read_names_end = std::chrono::steady_clock::now();
 
@@ -566,7 +565,7 @@ void Decoder::FlushIn(uint64_t& pos) {
       // file_unmatched_fastq1
       std::ifstream fin_unmatched1(file_unmatched_fastq1_);
       UTILS_DIE_IF(!fin_unmatched1,
-                     "Cannot open file to read: " + file_unmatched_fastq1_);
+                   "Cannot open file to read: " + file_unmatched_fastq1_);
       // now reorder the unmatched records in file 2, by picking them in
       // chunks
       uint32_t bin_size = std::min(kBin_Size_Combine_Pairs, size_unmatched);

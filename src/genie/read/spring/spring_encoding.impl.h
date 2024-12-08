@@ -13,6 +13,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "genie/util/runtime_exception.h"
 
@@ -51,24 +52,26 @@ std::string BitsetToString(std::bitset<BitsetSize> b, const uint16_t read_len,
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
-            uint16_t* read_lengths_s, const EncoderGlobal& eg,
+void Encode(std::vector<std::bitset<BitsetSize>>& read,
+            std::vector<BbHashDict>& dict, std::vector<uint32_t>& order_s,
+            std::vector<uint16_t>& read_lengths_s, const EncoderGlobal& eg,
             const EncoderGlobalB<BitsetSize>& egb) {
-  static constexpr int kThresh_S = kThresh_Encoder;
-  static constexpr int kMaxSearch = kMax_Search_Encoder;
+  static constexpr int thresh_s = kThresh_Encoder;
+  static constexpr int max_search = kMax_Search_Encoder;
 #ifdef GENIE_USE_OPENMP
-  auto* read_lock = new OmpLock[eg.num_reads_s + eg.num_reads_n];
-  auto* dict_lock = new OmpLock[eg.num_reads_s + eg.num_reads_n];
+  auto read_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
+  auto dict_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
 #endif
-  auto remaining_reads = new bool[eg.num_reads_s + eg.num_reads_n];
-  std::fill(remaining_reads, remaining_reads + eg.num_reads_s + eg.num_reads_n,
-            1);
+  auto remaining_reads = std::vector<uint8_t>(eg.num_reads_s + eg.num_reads_n);
+  std::fill(remaining_reads.begin(),
+            remaining_reads.begin() + eg.num_reads_s + eg.num_reads_n, 1);
 
-  auto* mask1 = new std::bitset<BitsetSize>[eg.num_dict_s];
+  auto mask1 = std::vector<std::bitset<BitsetSize>>(eg.num_dict_s);
   GenerateIndexMasks<BitsetSize>(mask1, dict, eg.num_dict_s, 3);
-  auto** mask = new std::bitset<BitsetSize>*[eg.max_read_len];
+  auto mask =
+      std::vector<std::vector<std::bitset<BitsetSize>>>(eg.max_read_len);
   for (int i = 0; i < eg.max_read_len; i++)
-    mask[i] = new std::bitset<BitsetSize>[eg.max_read_len];
+    mask[i] = std::vector<std::bitset<BitsetSize>>(eg.max_read_len);
   GenerateMasks<BitsetSize>(mask, eg.max_read_len, 3);
 
   //
@@ -155,7 +158,7 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
              list_size = 0;  // list_size variable introduced because
     // list::Size() was running very slowly
     // on UIUC machine
-    auto* deleted_rids = new std::list<uint32_t>[eg.num_dict_s];
+    auto deleted_rids = std::vector<std::list<uint32_t>>(eg.num_dict_s);
     bool done = false;
     while (!done) {
       if (!(in_flag >> c)) done = true;
@@ -233,7 +236,7 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
                   if (ull == ull1) {  // checking if ull is actually
                                       // the key for this bin
                     for (int64_t i = dictidx[1] - 1;
-                         i >= dictidx[0] && i >= dictidx[1] - kMaxSearch; i--) {
+                         i >= dictidx[0] && i >= dictidx[1] - max_search; i--) {
                       auto rid = dict[l].read_id_[i];
                       int hamming;
                       if (!rev)
@@ -246,7 +249,7 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
                             ((reverse_bitset ^ read[rid]) &
                              mask[0][eg.max_read_len - read_lengths_s[rid]])
                                 .count());
-                      if (hamming <= kThresh_S) {
+                      if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
                         read_lock[rid].Set();
 #endif
@@ -355,10 +358,9 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
     f_order.close();
     f_read_length.close();
     f_rc.close();
-    delete[] deleted_rids;
   }  // end omp parallel
 
-  auto* file_len_seq_thr = new uint64_t[eg.num_thr];
+  auto file_len_seq_thr = std::vector<uint64_t>(eg.num_thr);
   for (int tid = 0; tid < eg.num_thr; tid++) {
     std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
     UTILS_DIE_IF(!in_seq, "Cannot open file to write: " + eg.outfile_seq + '.' +
@@ -464,14 +466,6 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
   f_order.close();
   f_read_length.close();
   f_unaligned.close();
-  delete[] remaining_reads;
-#ifdef GENIE_USE_OPENMP
-  delete[] dict_lock;
-  delete[] read_lock;
-#endif
-  for (int i = 0; i < eg.max_read_len; i++) delete[] mask[i];
-  delete[] mask;
-  delete[] mask1;
 
   // write length of unaligned array
   std::ofstream f_unaligned_count(eg.outfile_unaligned + ".count",
@@ -501,7 +495,6 @@ void Encode(std::bitset<BitsetSize>* read, BbHashDict* dict, uint32_t* order_s,
     abs_pos += file_len_seq_thr[tid];
   }
   file_out_pos.close();
-  delete[] file_len_seq_thr;
 
   std::cerr << "Encoding done:\n";
   std::cerr << matched_s << " singleton reads were aligned\n";
@@ -555,8 +548,10 @@ void SetGlobalArrays(EncoderGlobal& eg, EncoderGlobalB<BitsetSize>& egb) {
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void ReadSingletons(std::bitset<BitsetSize>* read, uint32_t* order_s,
-                    uint16_t* read_lengths_s, const EncoderGlobal& eg,
+void ReadSingletons(std::vector<std::bitset<BitsetSize>>& read,
+                    std::vector<uint32_t>& order_s,
+                    std::vector<uint16_t>& read_lengths_s,
+                    const EncoderGlobal& eg,
                     const EncoderGlobalB<BitsetSize>& egb) {
   // not parallelized right now since these are very small number of reads
   std::ifstream f(eg.infile + ".singleton",
@@ -593,10 +588,8 @@ void ReadSingletons(std::bitset<BitsetSize>* read, uint32_t* order_s,
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
-  auto* egb_ptr = new EncoderGlobalB<BitsetSize>(cp.max_read_len);
-  auto* eg_ptr = new EncoderGlobal;
-  EncoderGlobalB<BitsetSize>& egb = *egb_ptr;
-  EncoderGlobal& eg = *eg_ptr;
+  auto egb = EncoderGlobalB<BitsetSize>(cp.max_read_len);
+  auto eg = EncoderGlobal();
 
   eg.basedir = temp_dir;
   eg.infile = eg.basedir + "/temp.dna";
@@ -618,14 +611,15 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
 
   GetDataParams(eg, cp);  // populate num_reads
   SetGlobalArrays<BitsetSize>(eg, egb);
-  auto* read = new std::bitset<BitsetSize>[eg.num_reads_s + eg.num_reads_n];
-  auto* order_s = new uint32_t[eg.num_reads_s + eg.num_reads_n];
-  auto* read_lengths_s = new uint16_t[eg.num_reads_s + eg.num_reads_n];
+  auto read =
+      std::vector<std::bitset<BitsetSize>>(eg.num_reads_s + eg.num_reads_n);
+  auto order_s = std::vector<uint32_t>(eg.num_reads_s + eg.num_reads_n);
+  auto read_lengths_s = std::vector<uint16_t>(eg.num_reads_s + eg.num_reads_n);
   ReadSingletons<BitsetSize>(read, order_s, read_lengths_s, eg, egb);
   remove(eg.infile_n.c_str());
   CorrectOrder(order_s, eg);
 
-  auto* dict = new BbHashDict[eg.num_dict_s];
+  auto dict = std::vector<BbHashDict>(eg.num_dict_s);
   if (eg.max_read_len > 50) {
     dict[0].start_ = 0;
     dict[0].end_ = 20;
@@ -644,12 +638,6 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
                                     eg.basedir, eg.num_thr);
 
   Encode<BitsetSize>(read, dict, order_s, read_lengths_s, eg, egb);
-  delete[] read;
-  delete[] dict;
-  delete[] order_s;
-  delete[] read_lengths_s;
-  delete eg_ptr;
-  delete egb_ptr;
 }
 
 // -----------------------------------------------------------------------------
