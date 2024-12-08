@@ -1,76 +1,78 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/mgg_file.h"
+
 #include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/format/mgg/file_header.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-MggFile::MggFile(std::istream* _file) : file(_file), reader(*file) {
-    while (true) {
-        std::string boxname(4, '\0');
-        reader->readAlignedBytes(boxname.data(), boxname.length());
-        if (!reader->isStreamGood()) {
-            break;
-        }
-        UTILS_DIE_IF(boxes.empty() && boxname != "flhd", "No file header found");
-        UTILS_DIE_IF(!boxes.empty() && boxname == "flhd", "Multiple file headers found");
-        if (boxname == "flhd") {
-            boxes.emplace_back(std::make_unique<genie::format::mgg::FileHeader>(*reader));
-        } else if (boxname == "dgcn") {
-            const auto& hdr = dynamic_cast<const genie::format::mgg::FileHeader&>(*boxes.front());
-            boxes.emplace_back(std::make_unique<genie::format::mgg::DatasetGroup>(*reader, hdr.getMinorVersion()));
-        } else {
-            std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
-            break;
-        }
+// -----------------------------------------------------------------------------
+MggFile::MggFile(std::istream* file) : file_(file), reader_(*file_) {
+  while (true) {
+    std::string boxname(4, '\0');
+    reader_->ReadAlignedBytes(boxname.data(), boxname.length());
+    if (!reader_->IsStreamGood()) {
+      break;
     }
-    file->clear();
-    file->seekg(0, std::ios::beg);
+    UTILS_DIE_IF(boxes_.empty() && boxname != "flhd", "No file header found");
+    UTILS_DIE_IF(!boxes_.empty() && boxname == "flhd",
+                 "Multiple file headers found");
+    if (boxname == "flhd") {
+      boxes_.emplace_back(std::make_unique<FileHeader>(*reader_));
+    } else if (boxname == "dgcn") {
+      const auto& hdr = dynamic_cast<const FileHeader&>(*boxes_.front());
+      boxes_.emplace_back(
+          std::make_unique<DatasetGroup>(*reader_, hdr.GetMinorVersion()));
+    } else {
+      std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
+      break;
+    }
+  }
+  file_->clear();
+  file_->seekg(0, std::ios::beg);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+std::vector<std::unique_ptr<Box>>& MggFile::GetBoxes() { return boxes_; }
 
-std::vector<std::unique_ptr<Box>>& MggFile::getBoxes() { return boxes; }
+// -----------------------------------------------------------------------------
+MggFile::MggFile() : file_(nullptr) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-MggFile::MggFile() : file(nullptr), reader() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void MggFile::addBox(std::unique_ptr<Box> box) { boxes.emplace_back(std::move(box)); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void MggFile::write(util::BitWriter& writer) {
-    for (const auto& b : boxes) {
-        b->write(writer);
-    }
+// -----------------------------------------------------------------------------
+void MggFile::AddBox(std::unique_ptr<Box> box) {
+  boxes_.emplace_back(std::move(box));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void MggFile::print_debug(std::ostream& output, uint8_t max_depth) const {
-    for (const auto& b : boxes) {
-        b->print_debug(output, 0, max_depth);
-    }
+// -----------------------------------------------------------------------------
+void MggFile::Write(util::BitWriter& writer) const {
+  for (const auto& b : boxes_) {
+    b->Write(writer);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void MggFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
+  for (const auto& b : boxes_) {
+    b->PrintDebug(output, 0, max_depth);
+  }
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -12,13 +12,14 @@ set(source_files
         raw_reference_seq.cc
         raw_reference.cc
 
-        data-unit-factory.cc
+        data_unit_factory.cc
 
         exporter.cc
         importer.cc
 
         reference.cc
-        mgb_file.h mgb_file.cc mgb_file.impl.h access_unit_header.h access_unit_header.cc)
+        mgb_file.cc
+        access_unit_header.cc)
 
 add_library(genie-mgb ${source_files})
 

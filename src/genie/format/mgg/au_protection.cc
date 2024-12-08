@@ -1,93 +1,99 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/au_protection.h"
+
 #include <string>
 #include <utility>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& AUProtection::getKey() const {
-    static const std::string key = "aupr";
-    return key;
+// -----------------------------------------------------------------------------
+const std::string& AuProtection::GetKey() const {
+  static const std::string key = "aupr";
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-AUProtection::AUProtection(genie::util::BitReader& bitreader, genie::core::MPEGMinorVersion _version)
-    : version(_version) {
-    auto start_pos = bitreader.getStreamPosition() - 4;
-    auto length = bitreader.readAlignedInt<uint64_t>();
-    auto metadata_length = length - GenInfo::getHeaderLength();
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        dataset_group_id = bitreader.readAlignedInt<uint8_t>();
-        dataset_id = bitreader.readAlignedInt<uint16_t>();
-        metadata_length -= sizeof(uint8_t);
-        metadata_length -= sizeof(uint16_t);
-    }
-    au_protection_value.resize(metadata_length);
-    bitreader.readAlignedBytes(au_protection_value.data(), au_protection_value.length());
-    UTILS_DIE_IF(start_pos + length != uint64_t(bitreader.getStreamPosition()), "Invalid length");
+// -----------------------------------------------------------------------------
+AuProtection::AuProtection(util::BitReader& bitreader,
+                           const core::MpegMinorVersion version)
+    : version_(version) {
+  const auto start_pos = bitreader.GetStreamPosition() - 4;
+  const auto length = bitreader.ReadAlignedInt<uint64_t>();
+  auto metadata_length = length - GetHeaderLength();
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    dataset_group_id_ = bitreader.ReadAlignedInt<uint8_t>();
+    dataset_id_ = bitreader.ReadAlignedInt<uint16_t>();
+    metadata_length -= sizeof(uint8_t);
+    metadata_length -= sizeof(uint16_t);
+  }
+  au_protection_value_.resize(metadata_length);
+  bitreader.ReadAlignedBytes(au_protection_value_.data(),
+                             au_protection_value_.length());
+  UTILS_DIE_IF(start_pos + length != bitreader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+AuProtection::AuProtection(const uint8_t dataset_group_id,
+                           const uint16_t dataset_id,
+                           std::string au_protection_value,
+                           const core::MpegMinorVersion version)
+    : version_(version),
+      dataset_group_id_(dataset_group_id),
+      dataset_id_(dataset_id),
+      au_protection_value_(std::move(au_protection_value)) {}
 
-AUProtection::AUProtection(uint8_t _dataset_group_id, uint16_t _dataset_id, std::string _au_protection_value,
-                           genie::core::MPEGMinorVersion _version)
-    : version(_version),
-      dataset_group_id(_dataset_group_id),
-      dataset_id(_dataset_id),
-      au_protection_value(std::move(_au_protection_value)) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AUProtection::box_write(genie::util::BitWriter& bitWriter) const {
-    if (version != genie::core::MPEGMinorVersion::V1900) {
-        bitWriter.writeAlignedInt(dataset_group_id);
-        bitWriter.writeAlignedInt(dataset_id);
-    }
-    bitWriter.writeAlignedBytes(au_protection_value.data(), au_protection_value.length());
+// -----------------------------------------------------------------------------
+void AuProtection::BoxWrite(util::BitWriter& bit_writer) const {
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    bit_writer.WriteAlignedInt(dataset_group_id_);
+    bit_writer.WriteAlignedInt(dataset_id_);
+  }
+  bit_writer.WriteAlignedBytes(au_protection_value_.data(),
+                              au_protection_value_.length());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint8_t AuProtection::GetDatasetGroupId() const { return dataset_group_id_; }
 
-uint8_t AUProtection::getDatasetGroupID() const { return dataset_group_id; }
+// -----------------------------------------------------------------------------
+uint16_t AuProtection::GetDatasetId() const { return dataset_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t AUProtection::getDatasetID() const { return dataset_id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& AUProtection::getInformation() const { return au_protection_value; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool AUProtection::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const AUProtection&>(info);
-    return version == other.version && dataset_group_id == other.dataset_group_id &&
-           dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
-           au_protection_value == other.au_protection_value;
+// -----------------------------------------------------------------------------
+const std::string& AuProtection::GetInformation() const {
+  return au_protection_value_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+bool AuProtection::operator==(const GenInfo& info) const {
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const AuProtection&>(info);
+  return version_ == other.version_ &&
+         dataset_group_id_ == other.dataset_group_id_ &&
+         dataset_group_id_ == other.dataset_group_id_ &&
+         dataset_id_ == other.dataset_id_ &&
+         au_protection_value_ == other.au_protection_value_;
+}
 
-std::string AUProtection::decapsulate() { return std::move(au_protection_value); }
+// -----------------------------------------------------------------------------
+std::string AuProtection::decapsulate() {
+  return std::move(au_protection_value_);
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

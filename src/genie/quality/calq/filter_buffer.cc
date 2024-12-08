@@ -1,20 +1,14 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/calq/filter_buffer.h"
 
-// -----------------------------------------------------------------------------
-
-#include <cmath>
-
-// -----------------------------------------------------------------------------
-
 #include <algorithm>
-
-// -----------------------------------------------------------------------------
+#include <cmath>
 
 #include "genie/quality/calq/error_exception_reporter.h"
 
@@ -24,89 +18,96 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-GaussKernel::GaussKernel(double sigma) : SIGMA(sigma), INV_SQRT_SIGMA_2PI(1.0 / (std::sqrt(2.0 * PI) * sigma)) {}
+GaussKernel::GaussKernel(const double sigma)
+    : sigma_(sigma),
+      inv_sqrt_sigma_2_pi_(1.0 / (std::sqrt(2.0 * pi_) * sigma)) {}
 
 // -----------------------------------------------------------------------------
 
-double GaussKernel::calcValue(size_t pos, size_t size) const {
-    const double MEAN = std::floor((size - 1) / 2.0);
-    double exponent = (pos - MEAN) / SIGMA;
-    exponent = exponent * exponent * (-0.5);
-    return INV_SQRT_SIGMA_2PI * std::pow(EULER, exponent);
+double GaussKernel::CalcValue(const size_t pos, const size_t size) const {
+  const double mean = std::floor(static_cast<double>(size - 1) / 2.0);
+  double exponent = (static_cast<double>(pos) - mean) / sigma_;
+  exponent = exponent * exponent * -0.5;
+  return inv_sqrt_sigma_2_pi_ * std::pow(euler_, exponent);
 }
 
 // -----------------------------------------------------------------------------
 
-size_t GaussKernel::calcMinSize(double threshold, size_t maximum) const {
-    threshold /= INV_SQRT_SIGMA_2PI;
-    threshold = std::log(threshold);
-    threshold *= -2.0;
-    threshold = std::sqrt(threshold) * SIGMA;  // Euler now reversed
+size_t GaussKernel::CalcMinSize(double threshold, const size_t maximum) const {
+  threshold /= inv_sqrt_sigma_2_pi_;
+  threshold = std::log(threshold);
+  threshold *= -2.0;
+  threshold = std::sqrt(threshold) * sigma_;  // Euler now reversed
 
-    // + 1 to make sure it is odd.
-    auto size = static_cast<size_t>(std::ceil(threshold) * 2 + 1);
-    return std::min(size, maximum);
+  // + 1 to make sure it is odd.
+  const auto size = static_cast<size_t>(std::ceil(threshold) * 2 + 1);
+  return std::min(size, maximum);
 }
 
 // -----------------------------------------------------------------------------
 
 // New activity score in pipeline
-void FilterBuffer::push(double activityScore) { buffer.push(activityScore); }
+void FilterBuffer::push(const double activity_score) {
+  buffer_.push(activity_score);
+}
 
 // -----------------------------------------------------------------------------
 
 // Calculate filter score at offset position
 double FilterBuffer::filter() const {
-    double result = 0.0;
-    for (size_t i = 0; i < kernel.size(); ++i) {
-        result += kernel[i] * buffer[i];
-        // std::cout << kernel[i] << " " << buffer[i] << std::endl;
-    }
-    return result;
+  double result = 0.0;
+  for (size_t i = 0; i < kernel_.size(); ++i) {
+    result += kernel_[i] * buffer_[i];
+    // std::cout << kernel[i] << " " << buffer[i] << std::endl;
+  }
+  return result;
 }
 
 // -----------------------------------------------------------------------------
 
 // Initialize buffer and
-FilterBuffer::FilterBuffer(const std::function<double(size_t, size_t)>& kernelBuilder, size_t kernelSize)
-    : buffer(kernelSize, 0.0) {
-    if (!(kernelSize % 2)) {
-        throwErrorException("Kernel size must be an odd number");
-    }
-    kernel.resize(kernelSize, 0.0);
+FilterBuffer::FilterBuffer(
+    const std::function<double(size_t, size_t)>& kernel_builder,
+    const size_t kernel_size)
+    : buffer_(kernel_size, 0.0) {
+  if (!(kernel_size % 2)) {
+    THROW_ERROR_EXCEPTION("Kernel Size must be an odd number");
+  }
+  kernel_.resize(kernel_size, 0.0);
 
-    for (size_t i = 0; i < kernel.size(); ++i) {
-        kernel[i] = kernelBuilder(i, kernelSize);
-    }
+  for (size_t i = 0; i < kernel_.size(); ++i) {
+    kernel_[i] = kernel_builder(i, kernel_size);
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-FilterBuffer::FilterBuffer() : buffer(1, 0.0) {}
+FilterBuffer::FilterBuffer() : buffer_(1, 0.0) {}
 
 // -----------------------------------------------------------------------------
 
-size_t FilterBuffer::getSize() const { return buffer.size(); }
+size_t FilterBuffer::GetSize() const { return buffer_.size(); }
 
 // -----------------------------------------------------------------------------
 
-size_t FilterBuffer::getOffset() const { return (buffer.size() + 1) / 2; }
+size_t FilterBuffer::GetOffset() const { return (buffer_.size() + 1) / 2; }
 
 // -----------------------------------------------------------------------------
 
-RectangleKernel::RectangleKernel(double size) : SIZE(size) {}
+RectangleKernel::RectangleKernel(const double size) : size_(size) {}
 
 // -----------------------------------------------------------------------------
 
-double RectangleKernel::calcValue(size_t pos, size_t size) const {
-    const double MEAN = std::floor((size - 1) / 2.0);
-    return (pos - MEAN) <= SIZE ? 1.0 : 0.0;
+double RectangleKernel::CalcValue(const size_t pos, const size_t size) const {
+  const double mean = std::floor(static_cast<double>(size - 1) / 2.0);
+  return static_cast<double>(pos) - mean <= size_ ? 1.0 : 0.0;
 }
 
 // -----------------------------------------------------------------------------
 
-size_t RectangleKernel::calcMinSize(size_t maximum) const {
-    return static_cast<size_t>(std::min(SIZE * 2 + 1, static_cast<double>(maximum)));
+size_t RectangleKernel::CalcMinSize(const size_t maximum) const {
+  return static_cast<size_t>(
+      std::min(size_ * 2 + 1, static_cast<double>(maximum)));
 }
 
 // -----------------------------------------------------------------------------

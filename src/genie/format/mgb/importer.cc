@@ -1,115 +1,119 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgb/importer.h"
+
 #include <string>
 #include <utility>
-#include "genie/format/mgb/access_unit.h"
-#include "genie/util/stop-watch.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/format/mgb/access_unit.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+Importer::Importer(std::istream& file, core::ReferenceManager* manager,
+                   core::RefDecoder* ref_decoder, const bool ref_only)
+    : ReferenceSource(manager),
+      reader_(file),
+      factory_(manager, this, ref_only),
+      ref_manager_(manager),
+      decoder_(ref_decoder) {}
 
-Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly)
-    : core::ReferenceSource(manager),
-      reader(_file),
-      factory(manager, this, refOnly),
-      ref_manager(manager),
-      decoder(refd) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Importer::pump(uint64_t& id, std::mutex&) {
-    util::Watch watch;
-    std::optional<mgb::AccessUnit> unit;
-    util::Section sec{};
-    {
-        std::unique_lock<std::mutex> lock_guard(lock);
-        unit = factory.read(reader);
-        if (!unit) {
-            return false;
-        }
-        sec.start = id;
-        sec.length = unit->getHeader().getReadCount();
-        id += unit->getHeader().getReadCount();
+// -----------------------------------------------------------------------------
+bool Importer::Pump(uint64_t& id, std::mutex&) {
+  // util::Watch watch; TODO(fabian): Statistics
+  std::optional<AccessUnit> unit;
+  util::Section sec{};
+  {
+    std::unique_lock lock_guard(lock_);
+    unit = factory_.read(reader_);
+    if (!unit) {
+      return false;
     }
-
-    flowOut(convertAU(std::move(unit.value())), sec);
-    return true;
+    sec.start = id;
+    sec.length = unit->GetHeader().GetReadCount();
+    id += unit->GetHeader().GetReadCount();
+  }
+  FlowOut(ConvertAu(std::move(unit.value())), sec);
+  return true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+std::string Importer::GetRef(const bool raw, const size_t f_pos,
+                             const size_t start, const size_t end) {
+  AccessUnit au(0, 0, core::record::ClassType::kNone, 0,
+                core::parameter::DataUnit::DatasetType::kReference, 0, false,
+                core::AlphabetId::kAcgtn);
+  std::string ret;
+  {
+    std::lock_guard f_lock(this->lock_);
+    const size_t old_pos = reader_.GetStreamPosition();
 
-std::string Importer::getRef(bool raw, size_t f_pos, size_t start, size_t end) {
-    AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, false,
-                  core::AlphabetID::ACGTN);
-    std::string ret;
-    {
-        std::lock_guard<std::mutex> f_lock(this->lock);
-        size_t oldPos = reader.getStreamPosition();
-
-        if (raw) {
-            reader.setStreamPosition(f_pos + start);
-            ret.resize(end - start);
-            reader.readAlignedBytes(&ret[0], ret.length());
-        } else {
-            reader.setStreamPosition(f_pos);
-            au = AccessUnit(factory.getParams(), reader, false);
-        }
-
-        reader.setStreamPosition(oldPos);
-    }
-
-    if (!raw) {
-        ret = decoder->decode(convertAU(std::move(au)));
-    }
-
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-core::AccessUnit Importer::convertAU(mgb::AccessUnit&& au) {
-    auto unit = std::move(au);
-    auto paramset = factory.getParams(unit.getHeader().getParameterID());
-    core::AccessUnit set(std::move(paramset), unit.getHeader().getReadCount());
-
-    for (auto& b : unit.getBlocks()) {
-        set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());
-    }
-    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U) {
-        set.setReference(unit.getHeader().getAlignmentInfo().getRefID());
-        set.setMinPos(unit.getHeader().getAlignmentInfo().getStartPos());
-        set.setMaxPos(unit.getHeader().getAlignmentInfo().getEndPos());
-        ref_manager->validateRefID(set.getReference());
+    if (raw) {
+      reader_.SetStreamPosition(f_pos + start);
+      ret.resize(end - start);
+      reader_.ReadAlignedBytes(&ret[0], ret.length());
     } else {
-        set.setReference(0);
-        set.setMinPos(0);
-        set.setMaxPos(0);
+      reader_.SetStreamPosition(f_pos);
+      au = AccessUnit(factory_.GetParams(), reader_, false);
     }
-    set.setNumReads(unit.getHeader().getReadCount());
-    set.setClassType(unit.getHeader().getClass());
-    if (unit.getHeader().getClass() != core::record::ClassType::CLASS_U && !set.getParameters().isComputedReference()) {
-        auto seqs = ref_manager->getSequences();
-        auto cur_seq = ref_manager->ID2Ref(unit.getHeader().getAlignmentInfo().getRefID());
-        if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
-            set.setReference(ref_manager->load(cur_seq, unit.getHeader().getAlignmentInfo().getStartPos(),
-                                               unit.getHeader().getAlignmentInfo().getEndPos() + 1),
-                             {});
-        }
-    }
-    return set;
+
+    reader_.SetStreamPosition(old_pos);
+  }
+
+  if (!raw) {
+    ret = decoder_->Decode(ConvertAu(std::move(au)));
+  }
+
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+core::AccessUnit Importer::ConvertAu(AccessUnit&& au) const {
+  auto unit = std::move(au);
+  auto paramset = factory_.GetParams(unit.GetHeader().GetParameterId());
+  core::AccessUnit set(std::move(paramset), unit.GetHeader().GetReadCount());
+
+  for (auto& b : unit.GetBlocks()) {
+    set.Set(static_cast<core::GenDesc>(b.GetDescriptorId()), b.MovePayload());
+  }
+  if (unit.GetHeader().GetClass() != core::record::ClassType::kClassU) {
+    set.SetReference(unit.GetHeader().GetAlignmentInfo().GetRefId());
+    set.SetMinPos(unit.GetHeader().GetAlignmentInfo().GetStartPos());
+    set.SetMaxPos(unit.GetHeader().GetAlignmentInfo().GetEndPos());
+    ref_manager_->ValidateRefId(set.GetReference());
+  } else {
+    set.SetReference(0);
+    set.SetMinPos(0);
+    set.SetMaxPos(0);
+  }
+  set.SetNumReads(unit.GetHeader().GetReadCount());
+  set.SetClassType(unit.GetHeader().GetClass());
+  if (unit.GetHeader().GetClass() != core::record::ClassType::kClassU &&
+      !set.GetParameters().IsComputedReference()) {
+    auto seqs = ref_manager_->GetSequences();
+    if (const auto cur_seq = ref_manager_->Id2Ref(
+            unit.GetHeader().GetAlignmentInfo().GetRefId());
+        std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
+      set.SetReference(
+          ref_manager_->Load(
+              cur_seq, unit.GetHeader().GetAlignmentInfo().GetStartPos(),
+              unit.GetHeader().GetAlignmentInfo().GetEndPos() + 1),
+          {});
+    }
+  }
+  return set;
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

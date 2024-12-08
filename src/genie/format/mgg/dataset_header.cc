@@ -1,320 +1,350 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_header.h"
-#include <limits>
+
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/core/meta/block_header/enabled.h"
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
 bool DatasetHeader::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const DatasetHeader&>(info);
-    return group_ID == other.group_ID && ID == other.ID && version == other.version &&
-           multiple_alignment_flag == other.multiple_alignment_flag &&
-           byte_offset_size_flag == other.byte_offset_size_flag &&
-           non_overlapping_AU_range_flag == other.non_overlapping_AU_range_flag &&
-           pos_40_bits_flag == other.pos_40_bits_flag && block_header_on == other.block_header_on &&
-           block_header_off == other.block_header_off && referenceOptions == other.referenceOptions &&
-           dataset_type == other.dataset_type && mit_configs == other.mit_configs &&
-           parameters_update_flag == other.parameters_update_flag && alphabet_id == other.alphabet_id &&
-           num_U_access_units == other.num_U_access_units && u_options == other.u_options &&
-           thresholds == other.thresholds;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const DatasetHeader&>(info);
+  return group_id_ == other.group_id_ && id_ == other.id_ &&
+         version_ == other.version_ &&
+         multiple_alignment_flag_ == other.multiple_alignment_flag_ &&
+         byte_offset_size_flag_ == other.byte_offset_size_flag_ &&
+         non_overlapping_au_range_flag_ ==
+             other.non_overlapping_au_range_flag_ &&
+         pos_40_bits_flag_ == other.pos_40_bits_flag_ &&
+         block_header_on_ == other.block_header_on_ &&
+         block_header_off_ == other.block_header_off_ &&
+         reference_options_ == other.reference_options_ &&
+         dataset_type_ == other.dataset_type_ &&
+         mit_configs_ == other.mit_configs_ &&
+         parameters_update_flag_ == other.parameters_update_flag_ &&
+         alphabet_id_ == other.alphabet_id_ &&
+         num_u_access_units_ == other.num_u_access_units_ &&
+         u_options_ == other.u_options_ && thresholds_ == other.thresholds_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint8_t DatasetHeader::GetDatasetGroupId() const { return group_id_; }
 
-uint8_t DatasetHeader::getDatasetGroupID() const { return group_ID; }
+// -----------------------------------------------------------------------------
+uint16_t DatasetHeader::GetDatasetId() const { return id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+core::MpegMinorVersion DatasetHeader::GetVersion() const { return version_; }
 
-uint16_t DatasetHeader::getDatasetID() const { return ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-genie::core::MPEGMinorVersion DatasetHeader::getVersion() const { return version; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetHeader::getByteOffsetSize() const { return byte_offset_size_flag ? 64 : 32; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::getNonOverlappingAURangeFlag() const { return non_overlapping_AU_range_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetHeader::getPosBits() const { return pos_40_bits_flag ? 40 : 32; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::isBlockHeaderEnabled() const { return block_header_on != std::nullopt; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::isMITEnabled() const { return block_header_off != std::nullopt || block_header_on->getMITFlag(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::isCCModeEnabled() const { return block_header_on != std::nullopt && block_header_on->getCCFlag(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::isOrderedBlockMode() const {
-    return block_header_off != std::nullopt && block_header_off->getOrderedBlocksFlag();
+// -----------------------------------------------------------------------------
+bool DatasetHeader::GetMultipleAlignmentFlag() const {
+  return multiple_alignment_flag_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const dataset_header::ReferenceOptions& DatasetHeader::getReferenceOptions() const { return referenceOptions; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-core::parameter::DataUnit::DatasetType DatasetHeader::getDatasetType() const { return dataset_type; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<dataset_header::MITClassConfig>& DatasetHeader::getMITConfigs() const { return mit_configs; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetHeader::getParameterUpdateFlag() const { return parameters_update_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-core::AlphabetID DatasetHeader::getAlphabetID() const { return alphabet_id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const dataset_header::UOptions& DatasetHeader::getUOptions() const { return *u_options; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<std::optional<uint32_t>>& DatasetHeader::getRefSeqThresholds() const { return thresholds; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& DatasetHeader::getKey() const {
-    static const std::string key = "dthd";
-    return key;
+// -----------------------------------------------------------------------------
+uint8_t DatasetHeader::GetByteOffsetSize() const {
+  return byte_offset_size_flag_ ? 64 : 32;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+bool DatasetHeader::GetNonOverlappingAuRangeFlag() const {
+  return non_overlapping_au_range_flag_;
+}
 
+// -----------------------------------------------------------------------------
+uint8_t DatasetHeader::GetPosBits() const {
+  return pos_40_bits_flag_ ? 40 : 32;
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetHeader::IsBlockHeaderEnabled() const {
+  return block_header_on_ != std::nullopt;
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetHeader::IsMitEnabled() const {
+  return block_header_off_ != std::nullopt || block_header_on_->GetMitFlag();
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetHeader::IsCcModeEnabled() const {
+  return block_header_on_ != std::nullopt && block_header_on_->GetCcFlag();
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetHeader::IsOrderedBlockMode() const {
+  return block_header_off_ != std::nullopt &&
+         block_header_off_->GetOrderedBlocksFlag();
+}
+
+// -----------------------------------------------------------------------------
+const dataset_header::ReferenceOptions& DatasetHeader::GetReferenceOptions()
+    const {
+  return reference_options_;
+}
+
+// -----------------------------------------------------------------------------
+core::parameter::DataUnit::DatasetType DatasetHeader::GetDatasetType() const {
+  return dataset_type_;
+}
+
+// -----------------------------------------------------------------------------
+const std::vector<dataset_header::MitClassConfig>&
+DatasetHeader::GetMitConfigs() const {
+  return mit_configs_;
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetHeader::GetParameterUpdateFlag() const {
+  return parameters_update_flag_;
+}
+
+// -----------------------------------------------------------------------------
+core::AlphabetId DatasetHeader::GetAlphabetId() const { return alphabet_id_; }
+
+// -----------------------------------------------------------------------------
+uint32_t DatasetHeader::GetNumUAccessUnits() const {
+  return num_u_access_units_;
+}
+
+// -----------------------------------------------------------------------------
+const dataset_header::UOptions& DatasetHeader::GetUOptions() const {
+  return *u_options_;
+}
+
+// -----------------------------------------------------------------------------
+const std::vector<std::optional<uint32_t>>& DatasetHeader::GetRefSeqThresholds()
+    const {
+  return thresholds_;
+}
+
+// -----------------------------------------------------------------------------
+const std::string& DatasetHeader::GetKey() const {
+  static const std::string key = "dthd";  // NOLINT
+  return key;
+}
+
+// -----------------------------------------------------------------------------
 DatasetHeader::DatasetHeader()
-    : DatasetHeader(0, 0, genie::core::MPEGMinorVersion::V2000, false, false, false, false,
-                    core::parameter::DataUnit::DatasetType::ALIGNED, false, core::AlphabetID::ACGTN) {}
+    : DatasetHeader(0, 0, core::MpegMinorVersion::kV2000, false, false, false,
+                    false, core::parameter::DataUnit::DatasetType::kAligned,
+                    false, core::AlphabetId::kAcgtn) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetHeader::DatasetHeader(uint8_t _dataset_group_id, uint16_t _dataset_id, genie::core::MPEGMinorVersion _version,
-                             bool _multiple_alignments_flags, bool _byte_offset_size_flags,
-                             bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
-                             core::parameter::DataUnit::DatasetType _dataset_type, bool _parameters_update_flag,
-                             core::AlphabetID _alphabet_id)
-    : group_ID(_dataset_group_id),
-      ID(_dataset_id),
-      version(_version),
-      multiple_alignment_flag(_multiple_alignments_flags),
-      byte_offset_size_flag(_byte_offset_size_flags),
-      non_overlapping_AU_range_flag(_non_overlapping_AU_range_flag),
-      pos_40_bits_flag(_pos_40_bits_flag),
-      dataset_type(_dataset_type),
-      parameters_update_flag(_parameters_update_flag),
-      alphabet_id(_alphabet_id) {
-    block_header_on = dataset_header::BlockHeaderOnOptions{false, false};
-    num_U_access_units = 0;
+// -----------------------------------------------------------------------------
+DatasetHeader::DatasetHeader(
+    const uint8_t dataset_group_id, const uint16_t dataset_id,
+    const core::MpegMinorVersion version, const bool multiple_alignments_flags,
+    const bool byte_offset_size_flags, const bool non_overlapping_au_range_flag,
+    const bool pos_40_bits_flag,
+    const core::parameter::DataUnit::DatasetType dataset_type,
+    const bool parameters_update_flag, const core::AlphabetId alphabet_id)
+    : group_id_(dataset_group_id),
+      id_(dataset_id),
+      version_(version),
+      multiple_alignment_flag_(multiple_alignments_flags),
+      byte_offset_size_flag_(byte_offset_size_flags),
+      non_overlapping_au_range_flag_(non_overlapping_au_range_flag),
+      pos_40_bits_flag_(pos_40_bits_flag),
+      dataset_type_(dataset_type),
+      parameters_update_flag_(parameters_update_flag),
+      alphabet_id_(alphabet_id) {
+  block_header_on_ = dataset_header::BlockHeaderOnOptions{false, false};
+  num_u_access_units_ = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+DatasetHeader::DatasetHeader(util::BitReader& reader) {
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  group_id_ = reader.ReadAlignedInt<uint8_t>();
+  id_ = reader.ReadAlignedInt<uint16_t>();
+  std::string version_string(4, '\0');
+  reader.ReadAlignedBytes(version_string.data(), version_string.length());
+  version_ = core::GetMpegVersion(version_string);
+  UTILS_DIE_IF(version_ == core::MpegMinorVersion::kUnknown,
+               "Unknown MPEG version");
 
-DatasetHeader::DatasetHeader(genie::util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    group_ID = reader.readAlignedInt<uint8_t>();
-    ID = reader.readAlignedInt<uint16_t>();
-    std::string versionString(4, '\0');
-    reader.readAlignedBytes(versionString.data(), versionString.length());
-    version = core::getMPEGVersion(versionString);
-    UTILS_DIE_IF(version == core::MPEGMinorVersion::UNKNOWN, "Unknown MPEG version");
-
-    multiple_alignment_flag = reader.read<bool>(1);
-    byte_offset_size_flag = reader.read<bool>(1);
-    non_overlapping_AU_range_flag = reader.read<bool>(1);
-    pos_40_bits_flag = reader.read<bool>(1);
-    bool block_header_flag = reader.read<bool>(1);
-    if (block_header_flag) {
-        block_header_on = dataset_header::BlockHeaderOnOptions(reader);
+  multiple_alignment_flag_ = reader.Read<bool>(1);
+  byte_offset_size_flag_ = reader.Read<bool>(1);
+  non_overlapping_au_range_flag_ = reader.Read<bool>(1);
+  pos_40_bits_flag_ = reader.Read<bool>(1);
+  bool block_header_flag = reader.Read<bool>(1);
+  if (block_header_flag) {
+    block_header_on_ = dataset_header::BlockHeaderOnOptions(reader);
+  } else {
+    block_header_off_ = dataset_header::BlockHeaderOffOptions(reader);
+  }
+  reference_options_ = dataset_header::ReferenceOptions(reader);
+  dataset_type_ = reader.Read<core::parameter::DataUnit::DatasetType>(4);
+  if ((block_header_on_ != std::nullopt && block_header_on_->GetMitFlag()) ||
+      block_header_on_ == std::nullopt) {
+    const auto num_classes = reader.Read<uint8_t>(4);
+    for (size_t i = 0; i < num_classes; ++i) {
+      mit_configs_.emplace_back(reader, block_header_flag);
+    }
+  }
+  parameters_update_flag_ = reader.Read<bool>(1);
+  alphabet_id_ = reader.Read<core::AlphabetId>(7);
+  num_u_access_units_ = reader.Read<uint32_t>(32);
+  if (num_u_access_units_) {
+    u_options_ = dataset_header::UOptions(reader);
+  }
+  for (size_t i = 0; i < reference_options_.GetSeqIDs().size(); ++i) {
+    const bool flag = reader.Read<bool>(1);
+    UTILS_DIE_IF(flag == false && i == 0, "First ref must provide threshold");
+    if (flag) {
+      thresholds_.emplace_back(reader.Read<uint32_t>(31));
     } else {
-        block_header_off = dataset_header::BlockHeaderOffOptions(reader);
+      thresholds_.emplace_back(std::nullopt);
     }
-    referenceOptions = dataset_header::ReferenceOptions(reader);
-    dataset_type = reader.read<genie::core::parameter::DataUnit::DatasetType>(4);
-    if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
-        auto num_classes = reader.read<uint8_t>(4);
-        for (size_t i = 0; i < num_classes; ++i) {
-            mit_configs.emplace_back(reader, block_header_flag);
-        }
-    }
-    parameters_update_flag = reader.read<bool>(1);
-    alphabet_id = reader.read<genie::core::AlphabetID>(7);
-    num_U_access_units = reader.read<uint32_t>(32);
-    if (num_U_access_units) {
-        u_options = dataset_header::UOptions(reader);
-    }
-    for (size_t i = 0; i < referenceOptions.getSeqIDs().size(); ++i) {
-        bool flag = reader.read<bool>(1);
-        UTILS_DIE_IF(flag == false && i == 0, "First ref must provide treshold");
-        if (flag) {
-            thresholds.emplace_back(reader.read<uint32_t>(31));
-        } else {
-            thresholds.emplace_back(std::nullopt);
-        }
-    }
-    reader.flushHeldBits();
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+  }
+  reader.FlushHeldBits();
+  UTILS_DIE_IF(start_pos + length != reader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void DatasetHeader::BoxWrite(util::BitWriter& writer) const {
+  writer.WriteAlignedInt<uint8_t>(group_id_);
+  writer.WriteAlignedInt<uint16_t>(id_);
+  const auto& v_string = GetMpegVersionString(version_);
+  writer.WriteAlignedBytes(v_string.data(), v_string.length());
 
-void DatasetHeader::box_write(genie::util::BitWriter& writer) const {
-    writer.writeAlignedInt<uint8_t>(group_ID);
-    writer.writeAlignedInt<uint16_t>(ID);
-    const auto& v_string = genie::core::getMPEGVersionString(version);
-    writer.writeAlignedBytes(v_string.data(), v_string.length());
-
-    writer.writeBits(multiple_alignment_flag, 1);
-    writer.writeBits(byte_offset_size_flag, 1);
-    writer.writeBits(non_overlapping_AU_range_flag, 1);
-    writer.writeBits(pos_40_bits_flag, 1);
-    writer.writeBits(block_header_on != std::nullopt, 1);
-    if (block_header_on != std::nullopt) {
-        block_header_on->write(writer);
-    } else {
-        block_header_off->write(writer);
+  writer.WriteBits(multiple_alignment_flag_, 1);
+  writer.WriteBits(byte_offset_size_flag_, 1);
+  writer.WriteBits(non_overlapping_au_range_flag_, 1);
+  writer.WriteBits(pos_40_bits_flag_, 1);
+  writer.WriteBits(block_header_on_ != std::nullopt, 1);
+  if (block_header_on_ != std::nullopt) {
+    block_header_on_->Write(writer);
+  } else {
+    block_header_off_->Write(writer);
+  }
+  reference_options_.Write(writer);
+  writer.WriteBits(static_cast<uint8_t>(dataset_type_), 4);
+  if ((block_header_on_ != std::nullopt && block_header_on_->GetMitFlag()) ||
+      block_header_on_ == std::nullopt) {
+    writer.WriteBits(mit_configs_.size(), 4);
+    for (const auto& c : mit_configs_) {
+      c.Write(writer);
     }
-    referenceOptions.write(writer);
-    writer.writeBits(static_cast<uint8_t>(dataset_type), 4);
-    if ((block_header_on != std::nullopt && block_header_on->getMITFlag()) || block_header_on == std::nullopt) {
-        writer.writeBits(mit_configs.size(), 4);
-        for (const auto& c : mit_configs) {
-            c.write(writer);
-        }
+  }
+  writer.WriteBits(parameters_update_flag_, 1);
+  writer.WriteBits(static_cast<uint8_t>(alphabet_id_), 7);
+  writer.WriteBits(num_u_access_units_, 32);
+  if (num_u_access_units_) {
+    u_options_->Write(writer);
+  }
+  for (const auto& t : thresholds_) {
+    writer.WriteBits(t != std::nullopt, 1);
+    if (t != std::nullopt) {
+      writer.WriteBits(*t, 31);
     }
-    writer.writeBits(parameters_update_flag, 1);
-    writer.writeBits(static_cast<uint8_t>(alphabet_id), 7);
-    writer.writeBits(num_U_access_units, 32);
-    if (num_U_access_units) {
-        u_options->write(writer);
-    }
-    for (const auto& t : thresholds) {
-        writer.writeBits(t != std::nullopt, 1);
-        if (t != std::nullopt) {
-            writer.writeBits(*t, 31);
-        }
-    }
-    writer.flushBits();
+  }
+  writer.FlushBits();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::addRefSequence(uint8_t _reference_ID, uint16_t _seqID, uint32_t _blocks_num,
-                                   std::optional<uint32_t> _threshold) {
-    UTILS_DIE_IF(_threshold == std::nullopt && thresholds.empty(), "First threshold must be supplied");
-    referenceOptions.addSeq(_reference_ID, _seqID, _blocks_num);
-    thresholds.emplace_back(_threshold);
+// -----------------------------------------------------------------------------
+void DatasetHeader::AddRefSequence(const uint8_t reference_id,
+                                   const uint16_t seq_id,
+                                   const uint32_t blocks_num,
+                                   std::optional<uint32_t> threshold) {
+  UTILS_DIE_IF(threshold == std::nullopt && thresholds_.empty(),
+               "First threshold must be supplied");
+  reference_options_.AddSeq(reference_id, seq_id, blocks_num);
+  thresholds_.emplace_back(threshold);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::setUAUs(uint32_t _num_U_access_units, dataset_header::UOptions u_opts) {
-    UTILS_DIE_IF(!_num_U_access_units, "Resetting num_u_acces_units not supported");
-    num_U_access_units = _num_U_access_units;
-    u_options = u_opts;
+// -----------------------------------------------------------------------------
+void DatasetHeader::SetUaUs(const uint32_t num_u_access_units,
+                            dataset_header::UOptions u_opts) {
+  UTILS_DIE_IF(!num_u_access_units,
+               "Resetting num_u_access_units not supported");
+  num_u_access_units_ = num_u_access_units;
+  u_options_ = u_opts;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::addClassConfig(dataset_header::MITClassConfig config) {
-    UTILS_DIE_IF(block_header_on != std::nullopt && !block_header_on->getMITFlag(),
-                 "Adding classes without MIT has no effect");
-    UTILS_DIE_IF(config.getDescriptorIDs().empty() && block_header_off != std::nullopt,
-                 "Descriptor streams not supplied (block_header_flag)");
-    if ((!config.getDescriptorIDs().empty() && block_header_off == std::nullopt)) {
-        config = dataset_header::MITClassConfig(config.getClassID());
-    }
-    UTILS_DIE_IF(!mit_configs.empty() && mit_configs.back().getClassID() >= config.getClassID(),
-                 "Class IDs must be in order.");
-    mit_configs.emplace_back(std::move(config));
+// -----------------------------------------------------------------------------
+void DatasetHeader::AddClassConfig(dataset_header::MitClassConfig config) {
+  UTILS_DIE_IF(
+      block_header_on_ != std::nullopt && !block_header_on_->GetMitFlag(),
+      "Adding classes without MIT has no effect");
+  UTILS_DIE_IF(
+      config.GetDescriptorIDs().empty() && block_header_off_ != std::nullopt,
+      "Descriptor streams not supplied (block_header_flag)");
+  if (!config.GetDescriptorIDs().empty() && block_header_off_ == std::nullopt) {
+    config = dataset_header::MitClassConfig(config.GetClassId());
+  }
+  UTILS_DIE_IF(!mit_configs_.empty() &&
+                   mit_configs_.back().GetClassId() >= config.GetClassId(),
+               "Class IDs must be in order.");
+  mit_configs_.emplace_back(std::move(config));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::disableBlockHeader(dataset_header::BlockHeaderOffOptions opts) {
-    UTILS_DIE_IF(!mit_configs.empty(), "Disabling block header after adding MIT information not supported.");
-    block_header_on = std::nullopt;
-    block_header_off = opts;
+// -----------------------------------------------------------------------------
+void DatasetHeader::DisableBlockHeader(
+    dataset_header::BlockHeaderOffOptions opts) {
+  UTILS_DIE_IF(
+      !mit_configs_.empty(),
+      "Disabling block header after adding MIT information not supported.");
+  block_header_on_ = std::nullopt;
+  block_header_off_ = opts;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::disableMIT() {
-    UTILS_DIE_IF(block_header_on == std::nullopt, "MIT can only be disabled when block headers are activated");
-    block_header_on = dataset_header::BlockHeaderOnOptions(false, block_header_on->getCCFlag());
-    mit_configs.clear();
+// -----------------------------------------------------------------------------
+void DatasetHeader::DisableMit() {
+  UTILS_DIE_IF(block_header_on_ == std::nullopt,
+               "MIT can only be disabled when block headers are activated");
+  block_header_on_ = dataset_header::BlockHeaderOnOptions(
+      false, block_header_on_->GetCcFlag());
+  mit_configs_.clear();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::patchRefID(uint8_t _old, uint8_t _new) { referenceOptions.patchRefID(_old, _new); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::patchID(uint8_t _groupID, uint16_t _setID) {
-    group_ID = _groupID;
-    ID = _setID;
+// -----------------------------------------------------------------------------
+void DatasetHeader::PatchRefId(const uint8_t old, const uint8_t _new) {
+  reference_options_.PatchRefId(old, _new);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() {
-    if (block_header_on != std::nullopt) {
-        return std::make_unique<genie::core::meta::blockheader::Enabled>(block_header_on->getMITFlag(),
-                                                                         block_header_on->getCCFlag());
-    } else {
-        return std::make_unique<genie::core::meta::blockheader::Disabled>(block_header_off->getOrderedBlocksFlag());
-    }
+// -----------------------------------------------------------------------------
+void DatasetHeader::PatchId(const uint8_t group_id, const uint16_t set_id) {
+  group_id_ = group_id;
+  id_ = set_id;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
-    print_offset(output, depth, max_depth, "* Dataset Header");
+// -----------------------------------------------------------------------------
+std::unique_ptr<core::meta::BlockHeader> DatasetHeader::decapsulate() const {
+  if (block_header_on_ != std::nullopt) {
+    return std::make_unique<core::meta::block_header::Enabled>(
+        block_header_on_->GetMitFlag(), block_header_on_->GetCcFlag());
+  }
+  return std::make_unique<core::meta::block_header::Disabled>(
+      block_header_off_->GetOrderedBlocksFlag());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void DatasetHeader::PrintDebug(std::ostream& output, const uint8_t depth,
+                                const uint8_t max_depth) const {
+  print_offset(output, depth, max_depth, "* Dataset Header");
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

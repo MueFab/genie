@@ -1,93 +1,83 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_header/u_options.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg::dataset_header {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 bool UOptions::operator==(const UOptions& other) const {
-    return reserved1 == other.reserved1 && u_signature == other.u_signature && reserved2 == other.reserved2 &&
-           reserved3 == other.reserved3;
+  return reserved1_ == other.reserved1_ && u_signature_ == other.u_signature_ &&
+         reserved2_ == other.reserved2_ && reserved3_ == other.reserved3_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+UOptions::UOptions(const uint64_t reserved1, const bool reserved3)
+    : reserved1_(reserved1),
+      u_signature_(std::nullopt),
+      reserved2_(std::nullopt),
+      reserved3_(reserved3) {}
 
-UOptions::UOptions(uint64_t _reserved1, bool _reserved3)
-    : reserved1(_reserved1), u_signature(std::nullopt), reserved2(std::nullopt), reserved3(_reserved3) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-UOptions::UOptions(genie::util::BitReader& reader) : reserved3(false) {
-    reserved1 = reader.read<uint64_t>(62);
-    bool U_signature_flag = reader.read<bool>(1);
-    if (U_signature_flag) {
-        u_signature = USignature(reader);
-    }
-    bool reserved_flag = reader.read<bool>(1);
-    if (reserved_flag) {
-        reserved2 = reader.read<uint8_t>(8);
-    }
-    //  reserved3 = reader.read<bool>(1); // TODO(muenteferi): Reference decoder and reference bitstreams contradict
-    //  document
+// -----------------------------------------------------------------------------
+UOptions::UOptions(util::BitReader& reader) : reserved3_(false) {
+  reserved1_ = reader.Read<uint64_t>(62);
+  if (reader.Read<bool>(1)) {
+    u_signature_ = USignature(reader);
+  }
+  if (reader.Read<bool>(1)) {
+    reserved2_ = reader.Read<uint8_t>(8);
+  }
+  //  reserved3 = reader.read<bool>(1); // TODO(muenteferi): Reference decoder
+  //  and reference bitstreams contradict document
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UOptions::write(genie::util::BitWriter& writer) const {
-    writer.writeBits(reserved1, 62);
-    writer.writeBits(hasSignature(), 1);
-    if (hasSignature()) {
-        u_signature->write(writer);
-    }
-    writer.writeBits(hasReserved2(), 1);
-    if (hasReserved2()) {
-        writer.writeBits(getReserved2(), 8);
-    }
-    writer.writeBits(reserved3, 1);
+// -----------------------------------------------------------------------------
+void UOptions::Write(util::BitWriter& writer) const {
+  writer.WriteBits(reserved1_, 62);
+  writer.WriteBits(HasSignature(), 1);
+  if (HasSignature()) {
+    u_signature_->Write(writer);
+  }
+  writer.WriteBits(HasReserved2(), 1);
+  if (HasReserved2()) {
+    writer.WriteBits(GetReserved2(), 8);
+  }
+  writer.WriteBits(reserved3_, 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint64_t UOptions::GetReserved1() const { return reserved1_; }
 
-uint64_t UOptions::getReserved1() const { return reserved1; }
+// -----------------------------------------------------------------------------
+bool UOptions::GetReserved3() const { return reserved3_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+bool UOptions::HasReserved2() const { return reserved2_ != std::nullopt; }
 
-bool UOptions::getReserved3() const { return reserved3; }
+// -----------------------------------------------------------------------------
+uint8_t UOptions::GetReserved2() const { return *reserved2_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+bool UOptions::HasSignature() const { return u_signature_ != std::nullopt; }
 
-bool UOptions::hasReserved2() const { return reserved2 != std::nullopt; }
+// -----------------------------------------------------------------------------
+const USignature& UOptions::GetSignature() const { return *u_signature_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void UOptions::AddSignature(USignature s) { u_signature_ = s; }
 
-uint8_t UOptions::getReserved2() const { return *reserved2; }
+// -----------------------------------------------------------------------------
+void UOptions::AddReserved2(uint8_t r) { reserved2_ = r; }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool UOptions::hasSignature() const { return u_signature != std::nullopt; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const USignature& UOptions::getSignature() const { return *u_signature; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UOptions::addSignature(USignature s) { u_signature = s; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void UOptions::addReserved2(uint8_t r) { reserved2 = r; }
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg::dataset_header
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

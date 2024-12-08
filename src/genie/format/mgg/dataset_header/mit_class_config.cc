@@ -1,65 +1,65 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_header/mit_class_config.h"
+
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg::dataset_header {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool MITClassConfig::operator==(const MITClassConfig& other) const {
-    return id == other.id && descriptor_ids == other.descriptor_ids;
+// -----------------------------------------------------------------------------
+bool MitClassConfig::operator==(const MitClassConfig& other) const {
+  return id_ == other.id_ && descriptor_ids_ == other.descriptor_ids_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+MitClassConfig::MitClassConfig(const core::record::ClassType id) : id_(id) {}
 
-MITClassConfig::MITClassConfig(genie::core::record::ClassType _id) : id(_id) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-MITClassConfig::MITClassConfig(genie::util::BitReader& reader, bool block_header_flag) {
-    id = reader.read<genie::core::record::ClassType>(4);
-    if (!block_header_flag) {
-        auto num_descriptors = reader.read<uint8_t>(5);
-        for (size_t i = 0; i < num_descriptors; ++i) {
-            descriptor_ids.emplace_back(reader.read<genie::core::GenDesc>(7));
-        }
+// -----------------------------------------------------------------------------
+MitClassConfig::MitClassConfig(util::BitReader& reader,
+                               const bool block_header_flag) {
+  id_ = reader.Read<core::record::ClassType>(4);
+  if (!block_header_flag) {
+    const auto num_descriptors = reader.Read<uint8_t>(5);
+    for (size_t i = 0; i < num_descriptors; ++i) {
+      descriptor_ids_.emplace_back(reader.Read<core::GenDesc>(7));
     }
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void MITClassConfig::write(genie::util::BitWriter& writer) const {
-    writer.writeBits(static_cast<uint8_t>(id), 4);
-    if (!descriptor_ids.empty()) {
-        writer.writeBits(descriptor_ids.size(), 5);
-        for (const auto& d : descriptor_ids) {
-            writer.writeBits(static_cast<uint8_t>(d), 7);
-        }
+// -----------------------------------------------------------------------------
+void MitClassConfig::Write(util::BitWriter& writer) const {
+  writer.WriteBits(static_cast<uint8_t>(id_), 4);
+  if (!descriptor_ids_.empty()) {
+    writer.WriteBits(descriptor_ids_.size(), 5);
+    for (const auto& d : descriptor_ids_) {
+      writer.WriteBits(static_cast<uint8_t>(d), 7);
     }
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void MitClassConfig::AddDescriptorId(core::GenDesc desc) {
+  descriptor_ids_.emplace_back(desc);
+}
 
-void MITClassConfig::addDescriptorID(genie::core::GenDesc desc) { descriptor_ids.emplace_back(desc); }
+// -----------------------------------------------------------------------------
+core::record::ClassType MitClassConfig::GetClassId() const { return id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+const std::vector<core::GenDesc>& MitClassConfig::GetDescriptorIDs() const {
+  return descriptor_ids_;
+}
 
-genie::core::record::ClassType MITClassConfig::getClassID() const { return id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<genie::core::GenDesc>& MITClassConfig::getDescriptorIDs() const { return descriptor_ids; }
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg::dataset_header
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

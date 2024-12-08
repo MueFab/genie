@@ -3,7 +3,7 @@ project("genie-localassembly")
 set(source_files
         decoder.cc
         encoder.cc
-        local-reference.cc)
+        local_reference.cc)
 
 add_library(genie-localassembly ${source_files})
 

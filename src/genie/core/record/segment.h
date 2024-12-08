@@ -1,85 +1,85 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_SEGMENT_H_
 #define SRC_GENIE_CORE_RECORD_SEGMENT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include <memory>
 #include <string>
 #include <vector>
-#include "genie/util/bit-reader.h"
-#include "genie/util/bit-writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 /**
  * @brief
  */
 class Segment {
-    std::string sequence;                     //!< @brief
-    std::vector<std::string> quality_values;  //!< @brief
+  std::string sequence_;                     //!< @brief
+  std::vector<std::string> quality_values_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     */
-    Segment();
+  /**
+   * @brief
+   */
+  Segment();
 
-    /**
-     * @brief
-     * @param _sequence
-     */
-    explicit Segment(std::string&& _sequence);
+  /**
+   * @brief
+   * @param sequence
+   */
+  explicit Segment(std::string&& sequence);
 
-    /**
-     * @brief
-     * @param length
-     * @param qv_depth
-     * @param reader
-     */
-    Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader);
+  /**
+   * @brief
+   * @param length
+   * @param qv_depth
+   * @param reader
+   */
+  Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getSequence() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetSequence() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::vector<std::string>& getQualities() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<std::string>& GetQualities() const;
 
-    /**
-     * @brief
-     * @param qv
-     */
-    void addQualities(std::string&& qv);
+  /**
+   * @brief
+   * @param qv
+   */
+  void AddQualities(std::string&& qv);
 
-    /**
-     * @brief
-     * @param write
-     */
-    void write(util::BitWriter& write) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_SEGMENT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

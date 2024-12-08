@@ -1,106 +1,104 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#define NOMINMAX
+#define NOMINMAX  // NOLINT
 #include "apps/genie/capsulator/main.h"
+
 #include <filesystem>  // NOLINT
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include "apps/genie/capsulator/program-options.h"
+
+#include "apps/genie/capsulator/program_options.h"
 #include "format/mgb/mgb_file.h"
 #include "format/mgg/encapsulator/decapsulated_file.h"
 #include "format/mgg/encapsulator/encapsulated_file.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mgg/mgg_file.h"
-#include "genie/util/runtime-exception.h"
-#include "util/string-helpers.h"
+#include "genie/util/runtime_exception.h"
+#include "util/string_helpers.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genieapp::capsulator {
+namespace genie_app::capsulator {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 void encapsulate(ProgramOptions& options) {
-    auto version = genie::core::MPEGMinorVersion::V2000;
+  auto version = genie::core::MpegMinorVersion::kV2000;
 
-    //   mgb_file.remove_class(genie::core::record::ClassType::CLASS_N);
-    //   mgb_file.remove_class(genie::core::record::ClassType::CLASS_M);
-    //   mgb_file.select_mapping_range(0, 54111088, 101380838);
-    //   mgb_file.sort_by_class();
+  auto inputs = genie::util::Tokenize(options.input_file_, ';');
+  auto input_file =
+      genie::format::mgg::encapsulator::EncapsulatedFile(inputs, version);
+  auto mgg_file = input_file.assemble(version);
 
-    // mgb_file.print_debug(std::cout, 100);
+  std::ofstream output_stream(options.output_file_);
+  genie::util::BitWriter writer(output_stream);
 
-    auto inputs = genie::util::tokenize(options.inputFile, ';');
-    auto input_file = genie::format::mgg::encapsulator::EncapsulatedFile(inputs, version);
-    auto mgg_file = input_file.assemble(version);
+  mgg_file.print_debug(std::cerr, 100);
 
-    std::ofstream outstream(options.outputFile);
-    genie::util::BitWriter writer(outstream);
-
-    mgg_file.print_debug(std::cerr, 100);
-
-    mgg_file.write(writer);
+  mgg_file.Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 void decapsulate(ProgramOptions& options) {
-    genie::format::mgg::encapsulator::DecapsulatedFile ret(options.inputFile);
-    std::string global_output_prefix = options.outputFile.substr(0, options.outputFile.find_last_of('.'));
+  genie::format::mgg::encapsulator::DecapsulatedFile ret(options.input_file_);
+  std::string global_output_prefix =
+      options.output_file_.substr(0, options.output_file_.find_last_of('.'));
 
-    for (auto& grp : ret.getGroups()) {
-        for (auto& dt : grp.getData()) {
-            std::string local_output_prefix =
-                global_output_prefix + "." + std::to_string(grp.getID()) + "." + std::to_string(dt.first);
-            auto meta_json = dt.second.second.toJson().dump(4);
-            std::ofstream json_file(local_output_prefix + ".mgb.json");
-            json_file.write(meta_json.data(), meta_json.length());
+  for (auto& grp : ret.GetGroups()) {
+    for (auto& [fst, snd] : grp.GetData()) {
+      std::string local_output_prefix = global_output_prefix + "." +
+                                        std::to_string(grp.GetId()) + "." +
+                                        std::to_string(fst);
+      auto meta_json = snd.second.ToJson().dump(4);
+      std::ofstream json_file(local_output_prefix + ".mgb.json");
+      json_file.write(meta_json.data(),
+                      static_cast<std::streamsize>(meta_json.length()));
 
-            std::ofstream mgb_output_file(local_output_prefix + ".mgb");
-            genie::util::BitWriter mgb_output_writer(mgb_output_file);
-            dt.second.first.write(mgb_output_writer);
-        }
+      std::ofstream mgb_output_file(local_output_prefix + ".mgb");
+      genie::util::BitWriter mgb_output_writer(mgb_output_file);
+      snd.first.Write(mgb_output_writer);
     }
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+int main(const int argc, char* argv[]) {
+  ProgramOptions p_opts(argc, argv);
 
-int main(int argc, char* argv[]) {
-    ProgramOptions pOpts(argc, argv);
-
-    try {
-        if (pOpts.inputFile.substr(pOpts.inputFile.length() - 3) == "mgb" &&
-            pOpts.outputFile.substr(pOpts.outputFile.length() - 3) == "mgg") {
-            encapsulate(pOpts);
-        } else if (pOpts.inputFile.substr(pOpts.inputFile.length() - 3) == "mgg" &&
-                   pOpts.outputFile.substr(pOpts.outputFile.length() - 3) == "mgb") {
-            decapsulate(pOpts);
-        }
-    } catch (genie::util::RuntimeException& e) {
-        std::cerr << e.msg() << std::endl;
-        return -1;
-    } catch (std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
-        return -1;
-    } catch (...) {
-        std::cerr << "Unknown error" << std::endl;
-        return -1;
+  try {
+    if (p_opts.input_file_.substr(p_opts.input_file_.length() - 3) == "mgb" &&
+        p_opts.output_file_.substr(p_opts.output_file_.length() - 3) == "mgg") {
+      encapsulate(p_opts);
+    } else if (p_opts.input_file_.substr(p_opts.input_file_.length() - 3) ==
+                   "mgg" &&
+               p_opts.output_file_.substr(p_opts.output_file_.length() - 3) ==
+                   "mgb") {
+      decapsulate(p_opts);
     }
-    return 0;
+  } catch (genie::util::RuntimeException& e) {
+    std::cerr << e.Msg() << std::endl;
+    return -1;
+  } catch (std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    return -1;
+  } catch (...) {
+    std::cerr << "Unknown error" << std::endl;
+    return -1;
+  }
+  return 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace genieapp::capsulator
+}  // namespace genie_app::capsulator
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

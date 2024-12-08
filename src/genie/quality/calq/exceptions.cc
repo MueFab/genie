@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/calq/exceptions.h"
@@ -27,7 +28,7 @@ Exception::~Exception() noexcept = default;
 
 // -----------------------------------------------------------------------------
 
-std::string Exception::getMessage() const { return msg_; }
+std::string Exception::GetMessage() const { return msg_; }
 
 // -----------------------------------------------------------------------------
 

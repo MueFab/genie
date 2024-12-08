@@ -1,53 +1,59 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/calq/log.h"
+
 #include <iostream>
 #include <memory>
 #include <string>
+
+// -----------------------------------------------------------------------------
 
 namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-static std::unique_ptr<LogConfiguration> currentConfig;
+static std::unique_ptr<LogConfiguration> current_config;
 
 // -----------------------------------------------------------------------------
 
-void setLogging(const LogConfiguration& c) { currentConfig = std::make_unique<LogConfiguration>(c); }
-
-// -----------------------------------------------------------------------------
-
-LogConfiguration getLogging() {
-    if (!currentConfig) {
-        setLogging(loggingPresets::getStandard());
-    }
-    return *currentConfig;
+void SetLogging(const LogConfiguration& c) {
+  current_config = std::make_unique<LogConfiguration>(c);
 }
 
 // -----------------------------------------------------------------------------
 
-namespace loggingPresets {
-
-// -----------------------------------------------------------------------------
-
-LogConfiguration getSilent() {
-    return {[](const std::string&) {}, [](const std::string&) {}};
+LogConfiguration GetLogging() {
+  if (!current_config) {
+    SetLogging(logging_presets::GetStandard());
+  }
+  return *current_config;
 }
 
 // -----------------------------------------------------------------------------
 
-LogConfiguration getStandard() {
-    return {[](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg) { std::cerr << msg << std::endl; }};
+namespace logging_presets {
+
+// -----------------------------------------------------------------------------
+
+LogConfiguration GetSilent() {
+  return {[](const std::string&) {}, [](const std::string&) {}};
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace loggingPresets
+LogConfiguration GetStandard() {
+  return {[](const std::string& msg) { std::cout << msg << std::endl; },
+          [](const std::string& msg) { std::cerr << msg << std::endl; }};
+}
+
+// -----------------------------------------------------------------------------
+
+}  // namespace logging_presets
 
 // -----------------------------------------------------------------------------
 

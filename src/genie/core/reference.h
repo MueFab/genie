@@ -1,20 +1,19 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_REFERENCE_H_
 #define SRC_GENIE_CORE_REFERENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <memory>
 #include <string>
-#include <vector>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core {
 
@@ -22,59 +21,58 @@ namespace genie::core {
  * @brief
  */
 class Reference {
- private:
-    std::string name;  //!< @brief
-    uint64_t start;    //!< @brief
-    uint64_t end;      //!< @brief
+  std::string name_;  //!< @brief
+  uint64_t start_;    //!< @brief
+  uint64_t end_;      //!< @brief
 
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getName() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetName() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint64_t getStart() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetStart() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint64_t getEnd() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetEnd() const;
 
-    /**
-     * @brief
-     * @param _start
-     * @param _end
-     * @return
-     */
-    virtual std::string getSequence(uint64_t _start, uint64_t _end) = 0;
+  /**
+   * @brief
+   * @param start
+   * @param end
+   * @return
+   */
+  virtual std::string GetSequence(uint64_t start, uint64_t end) = 0;
 
-    /**
-     * @brief
-     */
-    virtual ~Reference() = default;
+  /**
+   * @brief
+   */
+  virtual ~Reference() = default;
 
-    /**
-     * @brief
-     * @param _name
-     * @param _start
-     * @param _end
-     */
-    Reference(std::string _name, uint64_t _start, uint64_t _end);
+  /**
+   * @brief
+   * @param name
+   * @param start
+   * @param end
+   */
+  Reference(std::string name, uint64_t start, uint64_t end);
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_REFERENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
