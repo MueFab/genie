@@ -1,76 +1,85 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
+
 #include <memory>
 #include <utility>
-#include "genie/core/global-cfg.h"
-#include "genie/core/parameter/descriptor_present/decoder-regular.h"
-#include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/core/global_cfg.h"
+#include "genie/core/parameter/descriptor_present/decoder_regular.h"
+#include "genie/core/parameter/descriptor_present/decoder_token_type.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core::parameter::desc_pres {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DescriptorPresent::DescriptorPresent() : Descriptor(PRESENT), decoder_configuration(nullptr) {
-    decoder_configuration = nullptr;
+// -----------------------------------------------------------------------------
+DescriptorPresent::DescriptorPresent()
+    : Descriptor(kPresent), decoder_configuration_(nullptr) {
+  decoder_configuration_ = nullptr;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(PRESENT) {
-    auto mode = reader.read<uint8_t>();
-    if ((desc == GenDesc::MSAR || desc == GenDesc::RNAME) && mode == 0) {
-        decoder_configuration =
-            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, desc, reader);
-    } else {
-        decoder_configuration =
-            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderRegular>(mode, desc, reader);
-    }
+// -----------------------------------------------------------------------------
+DescriptorPresent::DescriptorPresent(const GenDesc desc,
+                                     util::BitReader& reader)
+    : Descriptor(kPresent) {
+  if (const auto mode = reader.Read<uint8_t>();
+      (desc == GenDesc::kMultiSegmentAlignment || desc == GenDesc::kReadName) &&
+      mode == 0) {
+    decoder_configuration_ =
+        GlobalCfg::GetSingleton()
+            .GetIndustrialPark()
+            .Construct<DecoderTokenType>(mode, desc, reader);
+  } else {
+    decoder_configuration_ =
+        GlobalCfg::GetSingleton().GetIndustrialPark().Construct<DecoderRegular>(
+            mode, desc, reader);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DescriptorPresent::equals(const Descriptor *desc) const {
-    return Descriptor::equals(desc) &&
-           decoder_configuration->equals(dynamic_cast<const DescriptorPresent *>(desc)->decoder_configuration.get());
+// -----------------------------------------------------------------------------
+bool DescriptorPresent::Equals(const Descriptor* desc) const {
+  return Descriptor::Equals(desc) &&
+         decoder_configuration_->Equals(
+             dynamic_cast<const DescriptorPresent*>(desc)
+                 ->decoder_configuration_.get());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<Descriptor> DescriptorPresent::clone() const {
-    auto ret = std::make_unique<DescriptorPresent>();
-    ret->dec_cfg_preset = dec_cfg_preset;
-    ret->decoder_configuration = decoder_configuration->clone();
-    return ret;
+// -----------------------------------------------------------------------------
+std::unique_ptr<Descriptor> DescriptorPresent::Clone() const {
+  auto ret = std::make_unique<DescriptorPresent>();
+  ret->dec_cfg_preset_ = dec_cfg_preset_;
+  ret->decoder_configuration_ = decoder_configuration_->Clone();
+  return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DescriptorPresent::write(util::BitWriter &writer) const {
-    Descriptor::write(writer);
-    if (dec_cfg_preset != PRESENT) {
-        return;
-    }
-    decoder_configuration->write(writer);
+// -----------------------------------------------------------------------------
+void DescriptorPresent::Write(util::BitWriter& writer) const {
+  Descriptor::Write(writer);
+  if (dec_cfg_preset_ != kPresent) {
+    return;
+  }
+  decoder_configuration_->Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void DescriptorPresent::SetDecoder(std::unique_ptr<Decoder> conf) {
+  decoder_configuration_ = std::move(conf);
+}
 
-void DescriptorPresent::setDecoder(std::unique_ptr<Decoder> conf) { decoder_configuration = std::move(conf); }
+// -----------------------------------------------------------------------------
+const Decoder& DescriptorPresent::GetDecoder() const {
+  return *decoder_configuration_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const Decoder &DescriptorPresent::getDecoder() const { return *decoder_configuration; }
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::parameter::desc_pres
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

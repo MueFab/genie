@@ -1,95 +1,97 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_header/reference_options.h"
+
 #include <limits>
 #include <vector>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg::dataset_header {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 bool ReferenceOptions::operator==(const ReferenceOptions& other) const {
-    return reference_ID == other.reference_ID && seq_ID == other.seq_ID && seq_blocks == other.seq_blocks;
+  return reference_id_ == other.reference_id_ && seq_id_ == other.seq_id_ &&
+         seq_blocks_ == other.seq_blocks_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-ReferenceOptions::ReferenceOptions(genie::util::BitReader& reader) {
-    auto seq_count = reader.read<uint16_t>();
-    if (!seq_count) {
-        reference_ID = std::numeric_limits<uint8_t>::max();
-        return;
-    }
-    reference_ID = reader.read<uint8_t>();
-    for (uint16_t i = 0; i < seq_count; ++i) {
-        seq_ID.emplace_back(reader.read<uint16_t>());
-    }
-    for (uint16_t i = 0; i < seq_count; ++i) {
-        seq_blocks.emplace_back(reader.read<uint32_t>());
-    }
+// -----------------------------------------------------------------------------
+ReferenceOptions::ReferenceOptions(util::BitReader& reader) {
+  const auto seq_count = reader.Read<uint16_t>();
+  if (!seq_count) {
+    reference_id_ = std::numeric_limits<uint8_t>::max();
+    return;
+  }
+  reference_id_ = reader.Read<uint8_t>();
+  for (uint16_t i = 0; i < seq_count; ++i) {
+    seq_id_.emplace_back(reader.Read<uint16_t>());
+  }
+  for (uint16_t i = 0; i < seq_count; ++i) {
+    seq_blocks_.emplace_back(reader.Read<uint32_t>());
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+void ReferenceOptions::Write(util::BitWriter& writer) const {
+  writer.WriteBits(seq_id_.size(), 16);
+  if (seq_id_.empty()) {
+    return;
+  }
+  writer.WriteBits(reference_id_, 8);
 
-void ReferenceOptions::write(genie::util::BitWriter& writer) const {
-    writer.writeBits(seq_ID.size(), 16);
-    if (seq_ID.empty()) {
-        return;
-    }
-    writer.writeBits(reference_ID, 8);
+  for (auto& i : seq_id_) {
+    writer.WriteBits(i, 16);
+  }
 
-    for (auto& i : seq_ID) {
-        writer.writeBits(i, 16);
-    }
-
-    for (auto& b : seq_blocks) {
-        writer.writeBits(b, 32);
-    }
+  for (auto& b : seq_blocks_) {
+    writer.WriteBits(b, 32);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+ReferenceOptions::ReferenceOptions()
+    : reference_id_(std::numeric_limits<uint8_t>::max()) {}
 
-ReferenceOptions::ReferenceOptions() : reference_ID(std::numeric_limits<uint8_t>::max()) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ReferenceOptions::addSeq(uint8_t _reference_ID, uint16_t _seq_id, uint32_t blocks) {
-    UTILS_DIE_IF(_reference_ID != reference_ID && !seq_ID.empty(), "Unmatching ref id");
-    reference_ID = _reference_ID;
-    seq_ID.push_back(_seq_id);
-    seq_blocks.push_back(blocks);
+// -----------------------------------------------------------------------------
+void ReferenceOptions::AddSeq(const uint8_t reference_id, const uint16_t seq_id,
+                              const uint32_t blocks) {
+  UTILS_DIE_IF(reference_id != reference_id_ && !seq_id_.empty(),
+               "Mismatching ref id");
+  reference_id_ = reference_id;
+  seq_id_.push_back(seq_id);
+  seq_blocks_.push_back(blocks);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<uint16_t>& ReferenceOptions::getSeqIDs() const { return seq_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<uint32_t>& ReferenceOptions::getSeqBlocks() const { return seq_blocks; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t ReferenceOptions::getReferenceID() const { return reference_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ReferenceOptions::patchRefID(uint8_t _old, uint8_t _new) {
-    if (reference_ID == _old || reference_ID == 255) {
-        reference_ID = _new;
-    }
+// -----------------------------------------------------------------------------
+const std::vector<uint16_t>& ReferenceOptions::GetSeqIDs() const {
+  return seq_id_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+const std::vector<uint32_t>& ReferenceOptions::GetSeqBlocks() const {
+  return seq_blocks_;
+}
+
+// -----------------------------------------------------------------------------
+uint8_t ReferenceOptions::GetReferenceId() const { return reference_id_; }
+
+// -----------------------------------------------------------------------------
+void ReferenceOptions::PatchRefId(const uint8_t old_id, const uint8_t new_id) {
+  if (reference_id_ == old_id || reference_id_ == 255) {
+    reference_id_ = new_id;
+  }
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg::dataset_header
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

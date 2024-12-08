@@ -1,142 +1,158 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_parameter_set.h"
+
 #include <sstream>
 #include <string>
 #include <utility>
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 bool DatasetParameterSet::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const DatasetParameterSet&>(info);
-    return dataset_group_id == other.dataset_group_id && dataset_id == other.dataset_id &&
-           parameter_set_ID == other.parameter_set_ID && parent_parameter_set_ID == other.parent_parameter_set_ID &&
-           param_update == other.param_update && param_update == other.param_update && version == other.version;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const DatasetParameterSet&>(info);
+  return dataset_group_id_ == other.dataset_group_id_ &&
+         dataset_id_ == other.dataset_id_ &&
+         parameter_set_id_ == other.parameter_set_id_ &&
+         parent_parameter_set_id_ == other.parent_parameter_set_id_ &&
+         param_update_ == other.param_update_ &&
+         param_update_ == other.param_update_ && version_ == other.version_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+DatasetParameterSet::DatasetParameterSet(const uint8_t dataset_group_id,
+                                         const uint16_t dataset_id,
+                                         const uint8_t parameter_set_id,
+                                         const uint8_t parent_parameter_set_id,
+                                         core::parameter::EncodingSet ps,
+                                         const core::MpegMinorVersion version)
+    : dataset_group_id_(dataset_group_id),
+      dataset_id_(dataset_id),
+      parameter_set_id_(parameter_set_id),
+      parent_parameter_set_id_(parent_parameter_set_id),
+      params_(std::move(ps)),
+      version_(version) {}
 
-DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id, uint8_t _parameter_set_ID,
-                                         uint8_t _parent_parameter_set_ID, genie::core::parameter::EncodingSet ps,
-                                         core::MPEGMinorVersion _version)
-    : dataset_group_id(_dataset_group_id),
-      dataset_id(_dataset_id),
-      parameter_set_ID(_parameter_set_ID),
-      parent_parameter_set_ID(_parent_parameter_set_ID),
-      params(std::move(ps)),
-      version(_version) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::DatasetParameterSet(genie::util::BitReader& reader, core::MPEGMinorVersion _version,
-                                         bool parameters_update_flag)
-    : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    dataset_group_id = reader.readAlignedInt<uint8_t>();
-    dataset_id = reader.readAlignedInt<uint16_t>();
-    parameter_set_ID = reader.readAlignedInt<uint8_t>();
-    parent_parameter_set_ID = reader.readAlignedInt<uint8_t>();
-    if (version != genie::core::MPEGMinorVersion::V1900 && parameters_update_flag) {
-        param_update = dataset_parameterset::UpdateInfo(reader);
-    }
-    params = genie::core::parameter::EncodingSet(reader);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+// -----------------------------------------------------------------------------
+DatasetParameterSet::DatasetParameterSet(util::BitReader& reader,
+                                         const core::MpegMinorVersion version,
+                                         const bool parameters_update_flag)
+    : version_(version) {
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  dataset_group_id_ = reader.ReadAlignedInt<uint8_t>();
+  dataset_id_ = reader.ReadAlignedInt<uint16_t>();
+  parameter_set_id_ = reader.ReadAlignedInt<uint8_t>();
+  parent_parameter_set_id_ = reader.ReadAlignedInt<uint8_t>();
+  if (version_ != core::MpegMinorVersion::kV1900 && parameters_update_flag) {
+    param_update_ = dataset_parameter_set::UpdateInfo(reader);
+  }
+  params_ = core::parameter::EncodingSet(reader);
+  UTILS_DIE_IF(start_pos + length != reader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::box_write(genie::util::BitWriter& writer) const {
-    writer.writeAlignedInt(dataset_group_id);
-    writer.writeAlignedInt(dataset_id);
-    writer.writeAlignedInt(parameter_set_ID);
-    writer.writeAlignedInt(parent_parameter_set_ID);
-    if (param_update != std::nullopt) {
-        param_update->write(writer);
-    }
-    params.write(writer);
+// -----------------------------------------------------------------------------
+void DatasetParameterSet::BoxWrite(util::BitWriter& writer) const {
+  writer.WriteAlignedInt(dataset_group_id_);
+  writer.WriteAlignedInt(dataset_id_);
+  writer.WriteAlignedInt(parameter_set_id_);
+  writer.WriteAlignedInt(parent_parameter_set_id_);
+  if (param_update_ != std::nullopt) {
+    param_update_->Write(writer);
+  }
+  params_.Write(writer);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::addParameterUpdate(dataset_parameterset::UpdateInfo update) {
-    if (version != core::MPEGMinorVersion::V1900) {
-        param_update = update;
-    }
+// -----------------------------------------------------------------------------
+void DatasetParameterSet::AddParameterUpdate(
+    dataset_parameter_set::UpdateInfo update) {
+  if (version_ != core::MpegMinorVersion::kV1900) {
+    param_update_ = update;
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& DatasetParameterSet::getKey() const {
-    static const std::string key = "pars";
-    return key;
+// -----------------------------------------------------------------------------
+const std::string& DatasetParameterSet::GetKey() const {
+  static const std::string key = "pars";
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint16_t DatasetParameterSet::getDatasetID() const { return dataset_id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetParameterSet::getParameterSetID() const { return parameter_set_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t DatasetParameterSet::getParentParameterSetID() const { return parent_parameter_set_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool DatasetParameterSet::hasParameterUpdate() const { return param_update != std::nullopt; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const dataset_parameterset::UpdateInfo& DatasetParameterSet::getParameterUpdate() const { return *param_update; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::core::parameter::EncodingSet& DatasetParameterSet::getEncodingSet() const { return params; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-genie::core::parameter::EncodingSet&& DatasetParameterSet::moveParameterSet() { return std::move(params); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetParameterSet::patchID(uint8_t _groupID, uint16_t _setID) {
-    dataset_group_id = _groupID;
-    dataset_id = _setID;
+// -----------------------------------------------------------------------------
+uint8_t DatasetParameterSet::GetDatasetGroupId() const {
+  return dataset_group_id_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint16_t DatasetParameterSet::GetDatasetId() const { return dataset_id_; }
 
-DatasetParameterSet::DatasetParameterSet(uint8_t _dataset_group_id, uint16_t _dataset_id,
-                                         genie::core::parameter::ParameterSet set, core::MPEGMinorVersion _version)
-    : DatasetParameterSet(_dataset_group_id, _dataset_id, set.getID(), set.getParentID(),
-                          std::move(set.getEncodingSet()), _version) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-genie::core::parameter::ParameterSet DatasetParameterSet::descapsulate() {
-    return {parameter_set_ID, parent_parameter_set_ID, std::move(params)};
+// -----------------------------------------------------------------------------
+uint8_t DatasetParameterSet::GetParameterSetId() const {
+  return parameter_set_id_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint8_t DatasetParameterSet::GetParentParameterSetId() const {
+  return parent_parameter_set_id_;
+}
+
+// -----------------------------------------------------------------------------
+bool DatasetParameterSet::HasParameterUpdate() const {
+  return param_update_ != std::nullopt;
+}
+
+// -----------------------------------------------------------------------------
+const dataset_parameter_set::UpdateInfo&
+DatasetParameterSet::GetParameterUpdate() const {
+  return *param_update_;
+}
+
+// -----------------------------------------------------------------------------
+const core::parameter::EncodingSet& DatasetParameterSet::GetEncodingSet()
+    const {
+  return params_;
+}
+
+// -----------------------------------------------------------------------------
+core::parameter::EncodingSet&& DatasetParameterSet::MoveParameterSet() {
+  return std::move(params_);
+}
+
+// -----------------------------------------------------------------------------
+void DatasetParameterSet::PatchId(const uint8_t group_id,
+                                  const uint16_t set_id) {
+  dataset_group_id_ = group_id;
+  dataset_id_ = set_id;
+}
+
+// -----------------------------------------------------------------------------
+DatasetParameterSet::DatasetParameterSet(const uint8_t dataset_group_id,
+                                         const uint16_t dataset_id,
+                                         core::parameter::ParameterSet set,
+                                         const core::MpegMinorVersion version)
+    : DatasetParameterSet(dataset_group_id, dataset_id, set.GetId(),
+                          set.GetParentId(), std::move(set.GetEncodingSet()),
+                          version) {}
+
+// -----------------------------------------------------------------------------
+core::parameter::ParameterSet DatasetParameterSet::descapsulate() {
+  return {parameter_set_id_, parent_parameter_set_id_, std::move(params_)};
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -1,91 +1,118 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
 #define SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include "genie/util/bit-reader.h"
-#include "genie/util/bit-writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core::record {
 
 /**
  * @brief
  */
-class Alignment {
-    std::string ecigar_string;           //!< @brief
-    uint8_t reverse_comp;                //!< @brief
-    std::vector<int32_t> mapping_score;  //!< @brief
+class Alignment final {
+  std::string e_cigar_string_;          //!< @brief
+  uint8_t reverse_comp_;                //!< @brief
+  std::vector<int32_t> mapping_score_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param _ecigar_string
-     * @param _reverse_comp
-     */
-    Alignment(std::string&& _ecigar_string, uint8_t _reverse_comp);
+  /**
+   * @brief
+   */
+  Alignment(Alignment&&) = default;
 
-    /**
-     * @brief
-     * @param as_depth
-     * @param reader
-     */
-    Alignment(uint8_t as_depth, util::BitReader& reader);
+  /**
+   * @brief
+   */
+  Alignment& operator=(Alignment&&) = default;
 
-    /**
-     * @brief
-     */
-    Alignment();
+  /**
+   * @brief
+   */
+  Alignment(const Alignment&) = default;
 
-    /**
-     * @brief
-     * @param score
-     */
-    void addMappingScore(int32_t score);
+  /**
+   * @brief
+   */
+  Alignment& operator=(const Alignment&) = default;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::vector<int32_t>& getMappingScores() const;
+  /**
+   * @brief
+   */
+  ~Alignment() = default;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getECigar() const;
+  /**
+   * @brief
+   * @param e_cigar_string
+   * @param reverse_comp
+   */
+  Alignment(std::string&& e_cigar_string, uint8_t reverse_comp);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint8_t getRComp() const;
+  /**
+   * @brief
+   * @param as_depth
+   * @param reader
+   */
+  Alignment(uint8_t as_depth, util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void write(util::BitWriter& writer) const;
+  /**
+   * @brief
+   */
+  Alignment();
+
+  /**
+   * @brief
+   * @param score
+   */
+  void AddMappingScore(int32_t score);
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<int32_t>& GetMappingScores() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetECigar() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetRComp() const;
+
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

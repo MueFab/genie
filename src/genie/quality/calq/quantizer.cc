@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/quality/calq/quantizer.h"
@@ -23,11 +24,12 @@ namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
 
-Quantizer::Quantizer() : lut_(), inverseLut_() {}
+Quantizer::Quantizer() = default;
 
 // -----------------------------------------------------------------------------
 
-Quantizer::Quantizer(const std::map<int, int>& inverseLut) : lut_(), inverseLut_(inverseLut) {}
+Quantizer::Quantizer(const std::map<std::size_t, int>& inverse_lut)
+    : inverse_lut_(inverse_lut) {}
 
 // -----------------------------------------------------------------------------
 
@@ -35,57 +37,59 @@ Quantizer::~Quantizer() = default;
 
 // -----------------------------------------------------------------------------
 
-int Quantizer::valueToIndex(const int& value) const {
-    if (lut_.find(value) == lut_.end()) {
-        throwErrorException("Value out of range");
-    }
-    return lut_.at(value).first;
+int Quantizer::ValueToIndex(const int& value) const {
+  if (lut_.find(value) == lut_.end()) {
+    THROW_ERROR_EXCEPTION("Value out of range");
+  }
+  return lut_.at(value).first;
 }
 
 // -----------------------------------------------------------------------------
 
-int Quantizer::indexToReconstructionValue(const int& index) const {
-    if (inverseLut_.find(index) == inverseLut_.end()) {
-        throwErrorException("Index not found");
-    }
-    return inverseLut_.at(index);
+int Quantizer::IndexToReconstructionValue(const int& index) const {
+  if (inverse_lut_.find(index) == inverse_lut_.end()) {
+    THROW_ERROR_EXCEPTION("Index not found");
+  }
+  return inverse_lut_.at(index);
 }
 
 // -----------------------------------------------------------------------------
 
-int Quantizer::valueToReconstructionValue(const int& value) const {
-    if (lut_.find(value) == lut_.end()) {
-        throwErrorException("Value out of range");
-    }
+int Quantizer::ValueToReconstructionValue(const int& value) const {
+  if (lut_.find(value) == lut_.end()) {
+    THROW_ERROR_EXCEPTION("Value out of range");
+  }
 
-    return lut_.at(value).second;
+  return lut_.at(value).second;
 }
 
 // -----------------------------------------------------------------------------
 
-const std::map<int, int>& Quantizer::inverseLut() const { return inverseLut_; }
+const std::map<std::size_t, int>& Quantizer::InverseLut() const {
+  return inverse_lut_;
+}
 
 // -----------------------------------------------------------------------------
 
 void Quantizer::print() const {
-    std::stringstream stream;
-    stream << "LUT:" << std::endl;
-    for (auto const& lutElem : lut_) {
-        stream << "  " << lutElem.first << ": ";
-        stream << lutElem.second.first << ",";
-        stream << lutElem.second.second << std::endl;
-    }
+  std::stringstream stream;
+  stream << "LUT:" << std::endl;
+  for (const auto& [fst, snd] : lut_) {
+    stream << "  " << fst << ": ";
+    stream << snd.first << ",";
+    stream << snd.second << std::endl;
+  }
 
-    stream << "Inverse LUT:" << std::endl;
-    for (auto const& inverseLutElem : inverseLut_) {
-        stream << "  " << inverseLutElem.first << ": ";
-        stream << inverseLutElem.second << std::endl;
-    }
+  stream << "Inverse LUT:" << std::endl;
+  for (const auto& [fst, snd] : inverse_lut_) {
+    stream << "  " << fst << ": ";
+    stream << snd << std::endl;
+  }
 
-    std::string line;
-    while (std::getline(stream, line)) {
-        getLogging().standardOut(line);
-    }
+  std::string line;
+  while (std::getline(stream, line)) {
+    GetLogging().standard_out(line);
+  }
 }
 
 // -----------------------------------------------------------------------------

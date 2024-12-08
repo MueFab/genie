@@ -1,19 +1,20 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 #define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <htslib/sam.h>
-#include <string>
-#include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <string>
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::sam::sam_to_mgrec {
 
@@ -22,302 +23,304 @@ namespace genie::format::sam::sam_to_mgrec {
  */
 class SamRecord {
  public:
-    std::string qname;  //!< @brief Query template name
-    uint16_t flag;      //!< @brief Flag
-    int32_t rid;        //!< @brief Reference sequence ID
-    uint32_t pos;       //!< @brief Position
-    uint8_t mapq;       //!< @brief Mapping Quality
-    std::string cigar;  //!< @brief CIGAR
-    int32_t mate_rid;   //!< @brief Mate reference sequence ID
-    uint32_t mate_pos;  //!< @brief Mate position
-    std::string seq;    //!< @brief Read sequence
-    std::string qual;   //!< @brief
+  std::string qname_;  //!< @brief Query template name
+  uint16_t flag_;      //!< @brief Flag
+  int32_t rid_;        //!< @brief Reference sequence ID
+  uint32_t pos_;       //!< @brief Position
+  uint8_t mapq_;       //!< @brief Mapping Quality
+  std::string cigar_;  //!< @brief CIGAR
+  int32_t mate_rid_;   //!< @brief Mate reference sequence ID
+  uint32_t mate_pos_;  //!< @brief Mate position
+  std::string seq_;    //!< @brief Read sequence
+  std::string qual_;   //!< @brief
 
- public:
-    /**
-     * @brief
-     * @param rec
-     * @return
-     */
-    bool operator==(const SamRecord& rec) const {
-        return qname == rec.qname && flag == rec.flag && rid == rec.rid && pos == rec.pos && mapq == rec.mapq &&
-               cigar == rec.cigar && mate_rid == rec.mate_rid && mate_pos == rec.mate_pos && seq == rec.seq &&
-               qual == rec.qual;
-    }
+  /**
+   * @brief
+   * @param rec
+   * @return
+   */
+  bool operator==(const SamRecord& rec) const {
+    return qname_ == rec.qname_ && flag_ == rec.flag_ && rid_ == rec.rid_ &&
+           pos_ == rec.pos_ && mapq_ == rec.mapq_ && cigar_ == rec.cigar_ &&
+           mate_rid_ == rec.mate_rid_ && mate_pos_ == rec.mate_pos_ &&
+           seq_ == rec.seq_ && qual_ == rec.qual_;
+  }
 
-    /**
-     * @brief
-     * @param int_base
-     * @return
-     */
-    static char fourBitBase2Char(uint8_t int_base);
+  /**
+   * @brief
+   * @param int_base
+   * @return
+   */
+  static char FourBitBase2Char(uint8_t int_base);
 
-    /**
-     * @brief
-     * @param sam_alignment
-     * @return
-     */
-    static std::string getCigarString(bam1_t* sam_alignment);
+  /**
+   * @brief
+   * @param sam_alignment
+   * @return
+   */
+  static std::string GetCigarString(const bam1_t* sam_alignment);
 
-    /**
-     * @brief
-     * @param sam_alignment
-     * @return
-     */
-    static std::string getSeqString(bam1_t* sam_alignment);
+  /**
+   * @brief
+   * @param sam_alignment
+   * @return
+   */
+  static std::string GetSeqString(const bam1_t* sam_alignment);
 
-    /**
-     * @brief
-     * @param sam_alignment
-     * @return
-     */
-    static std::string getQualString(bam1_t* sam_alignment);
+  /**
+   * @brief
+   * @param sam_alignment
+   * @return
+   */
+  static std::string GetQualString(const bam1_t* sam_alignment);
 
-    /**
-     * @brief
-     * @param token
-     * @return
-     */
-    static char convertCigar2ECigarChar(char token);
+  /**
+   * @brief
+   * @param token
+   * @return
+   */
+  static char ConvertCigar2ECigarChar(char token);
 
-    /**
-     * @brief
-     * @param token
-     * @return
-     */
-    static int stepSequence(char token);
+  /**
+   * @brief
+   * @param token
+   * @return
+   */
+  static int StepSequence(char token);
 
-    /**
-     * @brief
-     * @param cigar
-     * @param seq
-     * @return
-     */
-    static std::string convertCigar2ECigar(const std::string& cigar, const std::string& seq);
+  /**
+   * @brief
+   * @param cigar
+   * @param seq
+   * @return
+   */
+  static std::string ConvertCigar2ECigar(const std::string& cigar,
+                                         const std::string& seq);
 
-    /**
-     * @brief
-     */
-    SamRecord();
+  /**
+   * @brief
+   */
+  SamRecord();
 
-    /**
-     * @brief
-     * @param sam_alignment
-     */
-    explicit SamRecord(bam1_t* sam_alignment);
+  /**
+   * @brief
+   * @param sam_alignment
+   */
+  explicit SamRecord(const bam1_t* sam_alignment);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getQname() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetQname() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string&& moveQname();
+  /**
+   * @brief
+   * @return
+   */
+  std::string&& MoveQname();
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint16_t getFlag() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint16_t GetFlag() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] int32_t getRID() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] int32_t GetRid() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint32_t getPos() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint32_t GetPos() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint8_t getMapq() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetMapq() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getCigar() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetCigar() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string&& moveCigar();
+  /**
+   * @brief
+   * @return
+   */
+  std::string&& MoveCigar();
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string getECigar() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string GetECigar() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] int32_t getMRID() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] int32_t GetMrid() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint32_t getMPos() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint32_t GetMPos() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getSeq() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetSeq() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string&& moveSeq();
+  /**
+   * @brief
+   * @return
+   */
+  std::string&& MoveSeq();
 
-    /**
-     * @brief
-     * @param _seq
-     */
-    void setSeq(std::string&& _seq);
+  /**
+   * @brief
+   * @param seq
+   */
+  void SetSeq(std::string&& seq);
 
-    /**
-     * @brief
-     * @param _seq
-     */
-    void setSeq(const std::string& _seq);
+  /**
+   * @brief
+   * @param seq
+   */
+  void SetSeq(const std::string& seq);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getQual() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetQual() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::string&& moveQual();
+  /**
+   * @brief
+   * @return
+   */
+  std::string&& MoveQual();
 
-    /**
-     * @brief
-     * @param _qual
-     */
-    void setQual(const std::string& _qual);
+  /**
+   * @brief
+   * @param qual
+   */
+  void SetQual(const std::string& qual);
 
-    /**
-     * @brief
-     * @param _flag
-     * @return
-     */
-    [[nodiscard]] bool checkFlag(uint16_t _flag) const;
+  /**
+   * @brief
+   * @param flag
+   * @return
+   */
+  [[nodiscard]] bool CheckFlag(uint16_t flag) const;
 
-    /**
-     * @brief
-     * @param _flag
-     * @return
-     */
-    [[nodiscard]] bool checkNFlag(uint16_t _flag) const;
+  /**
+   * @brief
+   * @param flag
+   * @return
+   */
+  [[nodiscard]] bool CheckNFlag(uint16_t flag) const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isUnmapped() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsUnmapped() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isMateUnmapped() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsMateUnmapped() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isPrimary() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsPrimary() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isSecondary() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsSecondary() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isDuplicates() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsDuplicates() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isSupplementary() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsSupplementary() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isPaired() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsPaired() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isRead1() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsRead1() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isRead2() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsRead2() const;
 
-    /**
-     * @brief SamRecord are correctly oriented with respect to one another,
-     * i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
-     * If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
-     * This includes that the reads are mapped to the same chromosomes.
-     * @return
-     */
-    [[nodiscard]] bool isProperlyPaired() const;
+  /**
+   * @brief SamRecord are correctly oriented with respect to one another,
+   * i.e. that one of the mate pairs maps to the forward strand and the other
+   * maps to the reverse strand. If the mates don't map in a proper pair, that
+   * may mean that both reads map to the forward or reverse strand. This
+   * includes that the reads are mapped to the same chromosomes.
+   * @return
+   */
+  [[nodiscard]] bool IsProperlyPaired() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isPairedAndBothMapped() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsPairedAndBothMapped() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool isReverse() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsReverse() const;
 
-    /**
-     * @brief
-     * @param r
-     * @return
-     */
-    bool isPairOf(SamRecord& r) const;
+  /**
+   * @brief
+   * @param r
+   * @return
+   */
+  [[nodiscard]] bool IsPairOf(const SamRecord& r) const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::sam::sam_to_mgrec
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

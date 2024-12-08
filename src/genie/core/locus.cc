@@ -1,71 +1,69 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/locus.h"
+
 #include <string>
 #include <utility>
-#include "genie/util/runtime-exception.h"
-#include "genie/util/string-helpers.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/util/runtime_exception.h"
+#include "genie/util/string_helpers.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+const std::string& Locus::GetRef() const { return ref_name_; }
 
-const std::string& Locus::getRef() const { return refName; }
+// -----------------------------------------------------------------------------
+uint32_t Locus::GetStart() const { return start_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+uint32_t Locus::GetEnd() const { return end_; }
 
-uint32_t Locus::getStart() const { return start; }
+// -----------------------------------------------------------------------------
+bool Locus::PositionPresent() const { return pos_present_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+Locus::Locus(std::string ref)
+    : ref_name_(std::move(ref)), pos_present_(false), start_(0), end_(0) {}
 
-uint32_t Locus::getEnd() const { return end; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Locus::positionPresent() const { return posPresent; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Locus::Locus(std::string _ref) : refName(std::move(_ref)), posPresent(false), start(0), end(0) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Locus::Locus(std::string _ref, uint32_t _start, uint32_t _end)
-    : refName(std::move(_ref)), posPresent(true), start(_start), end(_end) {
-    UTILS_DIE_IF(end < start, "Locus ends before start");
+// -----------------------------------------------------------------------------
+Locus::Locus(std::string ref, const uint32_t start, const uint32_t end)
+    : ref_name_(std::move(ref)), pos_present_(true), start_(start), end_(end) {
+  UTILS_DIE_IF(end_ < start_, "Locus ends before start");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-Locus Locus::fromString(const std::string& string) {
-    auto tok = util::tokenize(string, ':');
-    constexpr size_t NUM_START_END = 2;
-    if (tok.size() == 1) {
-        return Locus(tok.front());  // Sequence name only
-    } else if (tok.size() == NUM_START_END) {
-        auto pos = util::tokenize(tok.back(), '-');  // Sequence + position
-        UTILS_DIE_IF(pos.size() != NUM_START_END, "Invalid locus");
-        return {tok.front(), static_cast<uint32_t>(std::stoi(pos[0])), static_cast<uint32_t>(std::stoi(pos[1]))};
-    } else {
-        UTILS_DIE("Invalid locus");
-    }
+// -----------------------------------------------------------------------------
+Locus Locus::FromString(const std::string& string) {
+  auto tok = util::Tokenize(string, ':');
+  if (tok.size() == 1) {
+    return Locus(tok.front());  // Sequence name only
+  }
+  if (constexpr size_t num_start_end = 2; tok.size() == num_start_end) {
+    const auto pos = util::Tokenize(tok.back(), '-');  // Sequence + position
+    UTILS_DIE_IF(pos.size() != num_start_end, "Invalid locus");
+    return {tok.front(), static_cast<uint32_t>(std::stoi(pos[0])),
+            static_cast<uint32_t>(std::stoi(pos[1]))};
+  }
+  UTILS_DIE("Invalid locus");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::string Locus::toString() const {
-    return posPresent ? refName + ':' + std::to_string(start) + '-' + std::to_string(end) : refName;
+// -----------------------------------------------------------------------------
+std::string Locus::ToString() const {
+  return pos_present_ ? ref_name_ + ':' + std::to_string(start_) + '-' +
+                            std::to_string(end_)
+                      : ref_name_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

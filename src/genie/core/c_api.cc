@@ -1,167 +1,189 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include "genie/core/c_api.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 extern "C" {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const char* genie_strerror(genie_ReturnCode rc) {
-    (void)rc;
-    return "Not implemented";
+const char* GenieStrerror(const GenieReturnCode rc) {
+  (void)rc;
+  return "Not implemented";
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getHierarchy(genie_Hierarchy** outputHierarchy) {
-    (void)outputHierarchy;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetHierarchy(GenieHierarchy** output_hierarchy) {
+  (void)output_hierarchy;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                             const genie_SimpleFilter* filter, genie_Records** outputRecords) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)filter;
-    (void)outputRecords;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDataBySimpleFilter(const uint64_t dataset_group_id,
+                                           const uint64_t dataset_id,
+                                           const GenieSimpleFilter* filter,
+                                           GenieRecords** output_records) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)filter;
+  (void)output_records;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                               const genie_AdvancedFilter* filter, genie_Records** outputRecords) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)filter;
-    (void)outputRecords;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDataByAdvancedFilter(const uint64_t dataset_group_id,
+                                             const uint64_t dataset_id,
+                                             const GenieAdvancedFilter* filter,
+                                             GenieRecords** output_records) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)filter;
+  (void)output_records;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID, const char* signature,
-                                          genie_Records** outputRecords) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)signature;
-    (void)outputRecords;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDataBySignature(const uint64_t dataset_group_id,
+                                        const uint64_t dataset_id,
+                                        const char* signature,
+                                        GenieRecords** output_records) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)signature;
+  (void)output_records;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDataByLabel(uint64_t datasetGroupID, const char* labelID, genie_Records** outputRecords) {
-    (void)datasetGroupID;
-    (void)labelID;
-    (void)outputRecords;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDataByLabel(const uint64_t dataset_group_id,
+                                    const char* label_id,
+                                    GenieRecords** output_records) {
+  (void)dataset_group_id;
+  (void)label_id;
+  (void)output_records;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID, char*** outputMetadata) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)outputMetadata;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetMetadataFields(const uint64_t dataset_group_id,
+                                       const uint64_t dataset_id,
+                                       char*** output_metadata) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)output_metadata;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const char* fieldName,
-                                          char** outputMetadata) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)fieldName;
-    (void)outputMetadata;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetMetadataContent(const uint64_t dataset_group_id,
+                                        const uint64_t dataset_id,
+                                        const char* field_name,
+                                        char** output_metadata) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)field_name;
+  (void)output_metadata;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDatasetGroupProtection(uint64_t datasetGroupID, char** outputProtection) {
-    (void)datasetGroupID;
-    (void)outputProtection;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDatasetGroupProtection(const uint64_t dataset_group_id,
+                                               char** output_protection) {
+  (void)dataset_group_id;
+  (void)output_protection;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID, char** outputProtection) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)outputProtection;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDatasetProtection(const uint64_t dataset_group_id,
+                                          const uint64_t dataset_id,
+                                          char** output_protection) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)output_protection;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDatasetRegionProtection(uint64_t datasetGroup_ID, uint64_t datasetID, uint64_t sequenceID,
-                                                  uint64_t startPos, uint64_t endPos,
-                                                  genie_RegionProtection** outputProtection) {
-    (void)datasetGroup_ID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    (void)outputProtection;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDatasetRegionProtection(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos, GenieRegionProtection** output_protection) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  (void)output_protection;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences,
-                                           genie_Reference* outputReference) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)includeSequences;
-    (void)outputReference;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetDatasetReference(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const bool include_sequences, const GenieReference* output_reference) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)include_sequences;
+  (void)output_reference;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
-                                           uint64_t startPos, uint64_t endPos, const uint64_t* maxSegments,
-                                           genie_SimpleSegmentStatistics** outputStatistics) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    (void)maxSegments;
-    (void)outputStatistics;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetSimpleStatistics(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos, const uint64_t* max_segments,
+    GenieSimpleSegmentStatistics** output_statistics) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  (void)max_segments;
+  (void)output_statistics;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie_ReturnCode genie_getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID, uint64_t sequenceID,
-                                             uint64_t startPos, uint64_t endPos, const uint64_t* maxSegments,
-                                             genie_AdvancedSegmentStatistics** outputStatistics) {
-    (void)datasetGroupID;
-    (void)datasetID;
-    (void)sequenceID;
-    (void)startPos;
-    (void)endPos;
-    (void)maxSegments;
-    (void)outputStatistics;
-    return genie_ReturnCode_G_UNLISTED_ERROR;
+GenieReturnCode GenieGetAdvancedStatistics(
+    const uint64_t dataset_group_id, const uint64_t dataset_id,
+    const uint64_t sequence_id, const uint64_t start_pos,
+    const uint64_t end_pos, const uint64_t* max_segments,
+    GenieAdvancedSegmentStatistics** output_statistics) {
+  (void)dataset_group_id;
+  (void)dataset_id;
+  (void)sequence_id;
+  (void)start_pos;
+  (void)end_pos;
+  (void)max_segments;
+  (void)output_statistics;
+  return kGenieReturnCodeGUnlistedError;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
