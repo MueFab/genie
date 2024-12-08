@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,8 +38,9 @@ void StringToBitset(
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void GenerateIndexMasks(std::bitset<BitsetSize>* mask1, BbHashDict* dict,
-                        const int num_dict, const int bpb) {
+void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
+                        std::vector<BbHashDict>& dict, const int num_dict,
+                        const int bpb) {
   for (int j = 0; j < num_dict; j++) mask1[j].reset();
   for (int j = 0; j < num_dict; j++)
     for (int i = bpb * dict[j].start_; i < bpb * (dict[j].end_ + 1); i++)
@@ -47,14 +49,16 @@ void GenerateIndexMasks(std::bitset<BitsetSize>* mask1, BbHashDict* dict,
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
-                         const uint16_t* read_lengths, const int num_dict,
-                         const uint32_t& num_reads, const int bpb,
-                         const std::string& basedir, const int& num_threads) {
-  auto* mask = new std::bitset<BitsetSize>[num_dict];
+void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
+                         std::vector<BbHashDict>& dict,
+                         const std::vector<uint16_t>& read_lengths,
+                         const int num_dict, const uint32_t& num_reads,
+                         const int bpb, const std::string& basedir,
+                         const int& num_threads) {
+  auto mask = std::vector<std::bitset<BitsetSize>>(num_dict);
   GenerateIndexMasks<BitsetSize>(mask, dict, num_dict, bpb);
   for (int j = 0; j < num_dict; j++) {
-    auto* ull = new uint64_t[num_reads];
+    auto ull = std::vector<uint64_t>(num_reads);
 
     //
     // It is not worth putting parallel region here.
@@ -126,21 +130,19 @@ void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
     }  // parallel end
 
     // deduplicating ull
-    std::sort(ull, ull + dict[j].dict_num_reads_);
+    std::sort(ull.begin(), ull.begin() + dict[j].dict_num_reads_);
     uint32_t k = 0;
     for (uint32_t i = 1; i < dict[j].dict_num_reads_; i++)
       if (ull[i] != ull[k]) ull[++k] = ull[i];
     dict[j].num_keys_ = k + 1;
     // construct boo hash
-    auto data_iterator =
-        boomphf::range(static_cast<const uint64_t*>(ull),
-                       static_cast<const uint64_t*>(ull + dict[j].num_keys_));
+    auto data_iterator = boomphf::range(
+        static_cast<const uint64_t*>(ull.data()),
+        static_cast<const uint64_t*>(ull.data() + dict[j].num_keys_));
     double gamma_factor = 5.0;  // balance between speed and memory
-    dict[j].boo_hash_fun_ = new boomphf::mphf<uint64_t, HashObj>(
+    dict[j].boo_hash_fun_ = std::make_unique<BooHashFunType>(
         dict[j].num_keys_, data_iterator, /*num_thr*/ 1, gamma_factor, true,
         false);
-
-    delete[] ull;
 
     //
     // compute hashes for all reads
@@ -216,9 +218,8 @@ void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
     for (int j = 0; j < num_dict; j++) {
       // fill start_pos by first storing numbers and then doing cumulative
       // sum
-      dict[j].start_pos_ =
-          new uint32_t[dict[j].num_keys_ +
-                       1]();  // 1 extra to store end pos of last key
+      dict[j].start_pos_ = std::vector<uint32_t>(
+          dict[j].num_keys_ + 1);  // 1 extra to store end pos of last key
       uint64_t current_hash;
       for (int tid = 0; tid < num_threads; tid++) {
         std::ifstream fin_hash(basedir + std::string("/hash.bin.") +
@@ -238,13 +239,13 @@ void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
         fin_hash.close();
       }
 
-      dict[j].empty_bin_ = new bool[dict[j].num_keys_]();
+      dict[j].empty_bin_ = std::vector<uint8_t>(dict[j].num_keys_);
       for (uint32_t i = 1; i < dict[j].num_keys_; i++)
         dict[j].start_pos_[i] =
             dict[j].start_pos_[i] + dict[j].start_pos_[i - 1];
 
       // insert elements in the dict array
-      dict[j].read_id_ = new uint32_t[dict[j].dict_num_reads_];
+      dict[j].read_id_ = std::vector<uint32_t>(dict[j].dict_num_reads_);
       uint32_t i = 0;
       for (int tid = 0; tid < num_threads; tid++) {
         std::ifstream fin_hash(basedir + std::string("/hash.bin.") +
@@ -275,13 +276,12 @@ void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
       dict[j].start_pos_[0] = 0;
     }  // parallel for end
   }
-  delete[] mask;
 }
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void GenerateMasks(std::bitset<BitsetSize>** mask, const int max_read_len,
-                   const int bpb) {
+void GenerateMasks(std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+                   const int max_read_len, const int bpb) {
   // mask for zeroing the end bits (needed while reordering to compute Hamming
   // distance between shifted reads)
   for (int i = 0; i < max_read_len; i++) {
@@ -295,8 +295,9 @@ void GenerateMasks(std::bitset<BitsetSize>** mask, const int max_read_len,
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void CharToBitset(const char* s, const int read_len, std::bitset<BitsetSize>& b,
-                  std::bitset<BitsetSize>** base_mask) {
+void CharToBitset(
+    const char* s, const int read_len, std::bitset<BitsetSize>& b,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask) {
   b.reset();
   for (int i = 0; i < read_len; i++)
     b |= base_mask[i][static_cast<uint8_t>(s[i])];

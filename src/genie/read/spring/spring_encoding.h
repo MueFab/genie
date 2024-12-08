@@ -146,7 +146,8 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp);
  * @param order_s Array of read orders.
  * @param eg Reference to the global encoder configuration.
  */
-void CorrectOrder(uint32_t* order_s, const EncoderGlobal& eg);
+void CorrectOrder(std::vector<uint32_t>& order_s,
+                  const EncoderGlobal& eg);
 
 /**
  * @brief Convert a bitset to a string representation.

@@ -54,10 +54,9 @@ void ReorderCompressQualityId(const std::string& temp_dir,
   file_quality[1] = basedir + "/quality_2";
 
   if (!paired_end) {
-    uint32_t* order_array;
     // array containing index mapping position in original fastq to
     // position after reordering
-    order_array = new uint32_t[num_reads];
+    auto order_array = std::vector<uint32_t>(num_reads);
     GenerateOrder(file_order, order_array, num_reads);
 
     uint32_t str_array_size =
@@ -65,7 +64,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     // smallest multiple of num_reads_per_block bigger than num_reads/4
     // num_reads/4 chosen so that these many qualities/ids can be stored in
     // memory without exceeding the RAM consumption of reordering stage
-    auto* str_array = new std::string[str_array_size];
+    auto str_array = std::vector<std::string>(str_array_size);
     // array to load ids and/or qualities into
 
     if (preserve_quality) {
@@ -87,9 +86,6 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       remove(file_id.c_str());
     }
 
-    delete[] order_array;
-    delete[] str_array;
-
   } else {
     // paired end
     std::string file_order_quality = basedir + "/order_quality.bin";
@@ -101,10 +97,10 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       // read block start and end into vector
       ReadBlockStartEnd(file_blocks_quality, block_start, block_end);
       // read order into order_array
-      auto* order_array = new uint32_t[num_reads];
+      auto order_array = std::vector<uint32_t>(num_reads);
       GenerateOrder(file_order_quality, order_array, num_reads);
       uint64_t quality_array_size = num_reads / 4 + 3 * num_reads_per_block;
-      auto* quality_array = new std::string[quality_array_size];
+      auto quality_array = std::vector<std::string>(quality_array_size);
       // num_reads/4 so that memory consumption isn't too high
       // 3*num_reads_per_block added to ensure that we are done in 4
       // passes (needed because block sizes are not exactly equal to
@@ -113,8 +109,6 @@ void ReorderCompressQualityId(const std::string& temp_dir,
                                quality_array_size, order_array, block_start,
                                block_end, cp, qv_coder, entropy, params, stats,
                                write_raw);
-      delete[] quality_array;
-      delete[] order_array;
       remove(file_quality[0].c_str());
       remove(file_quality[1].c_str());
       block_start.clear();
@@ -122,7 +116,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     }
     if (preserve_id) {
       ReadBlockStartEnd(file_blocks_id, block_start, block_end);
-      auto* id_array = new std::string[num_reads / 2];
+      auto id_array = std::vector<std::string>(num_reads / 2);
       std::ifstream f_id(file_id);
       UTILS_DIE_IF(!f_id, "Cannot open file to read: " + file_id);
       for (uint32_t i = 0; i < num_reads / 2; i++)
@@ -130,7 +124,6 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       ReorderCompressIdPe(id_array, temp_dir, file_order_id, block_start,
                           block_end, cp, name_coder, entropy, params, stats,
                           write_raw);
-      delete[] id_array;
       for (uint32_t i = 0; i < block_start.size(); i++)
         remove((file_order_id + "." + std::to_string(i)).c_str());
       remove(file_id.c_str());
@@ -161,7 +154,8 @@ void ReadBlockStartEnd(const std::string& file_blocks,
 }
 
 // -----------------------------------------------------------------------------
-void GenerateOrder(const std::string& file_order, uint32_t* order_array,
+void GenerateOrder(const std::string& file_order,
+                   std::vector<uint32_t>& order_array,
                    const uint32_t& num_reads) {
   std::ifstream fin_order(file_order, std::ios::binary);
   UTILS_DIE_IF(!fin_order, "Cannot open file to read: " + file_order);
@@ -174,7 +168,8 @@ void GenerateOrder(const std::string& file_order, uint32_t* order_array,
 }
 
 // -----------------------------------------------------------------------------
-void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
+void ReorderCompressIdPe(std::vector<std::string>& id_array,
+                         const std::string& temp_dir,
                          const std::string& file_order_id,
                          const std::vector<uint32_t>& block_start,
                          const std::vector<uint32_t>& block_end,
@@ -201,8 +196,8 @@ void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
     UTILS_DIE_IF(!f_order_id,
                  "Cannot open file to read: " + file_order_id + "." +
                      std::to_string(block_num));
-    auto* id_array_block =
-        new std::string[block_end[block_num] - block_start[block_num]];
+    auto id_array_block =
+        std::vector<std::string>(block_end[block_num] - block_start[block_num]);
     uint32_t index;
     for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
       f_order_id.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
@@ -247,7 +242,6 @@ void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
     std::get<1>(encoded).Write(bw);
 
     f_order_id.close();
-    delete[] id_array_block;
   }
 
   for (const auto& s : stat_vec) {
@@ -256,15 +250,18 @@ void ReorderCompressIdPe(std::string* id_array, const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
-void ReorderCompressQualityPe(
-    std::string file_quality[2], const std::string& temp_dir,
-    std::string* quality_array, const uint64_t& quality_array_size,
-    const uint32_t* order_array, const std::vector<uint32_t>& block_start,
-    const std::vector<uint32_t>& block_end, const CompressionParams& cp,
-    core::ReadEncoder::qv_selector* qv_coder,
-    core::ReadEncoder::entropy_selector* entropy,
-    std::vector<core::parameter::EncodingSet>& params,
-    core::stats::PerfStats& stats, bool write_raw) {
+void ReorderCompressQualityPe(std::string file_quality[2],
+                              const std::string& temp_dir,
+                              std::vector<std::string>& quality_array,
+                              const uint64_t& quality_array_size,
+                              const std::vector<uint32_t>& order_array,
+                              const std::vector<uint32_t>& block_start,
+                              const std::vector<uint32_t>& block_end,
+                              const CompressionParams& cp,
+                              core::ReadEncoder::qv_selector* qv_coder,
+                              core::ReadEncoder::entropy_selector* entropy,
+                              std::vector<core::parameter::EncodingSet>& params,
+                              core::stats::PerfStats& stats, bool write_raw) {
   const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
   uint32_t start_block_num = 0;
   uint32_t end_block_num = 0;
@@ -364,8 +361,10 @@ void ReorderCompressQualityPe(
 void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
                      const uint32_t& num_reads_per_file, const int& num_thr,
                      const uint32_t& num_reads_per_block,
-                     std::string* str_array, const uint32_t& str_array_size,
-                     const uint32_t* order_array, const std::string& mode,
+                     std::vector<std::string>& str_array,
+                     const uint32_t& str_array_size,
+                     const std::vector<uint32_t>& order_array,
+                     const std::string& mode,
                      core::ReadEncoder::qv_selector* qv_coder,
                      core::ReadEncoder::name_selector* name_coder,
                      core::ReadEncoder::entropy_selector* entropy,
