@@ -13,11 +13,12 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <numeric>
 #include <string>
 #include <vector>
-#include <mutex>
 
+#include "barrier.h"
 #include "genie/util/literal.h"
 #include "genie/util/runtime_exception.h"
 
@@ -289,7 +290,7 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
 }
 
 template <size_t BitsetSize>
-void process_read_task(uint32_t tid, ReorderGlobal<BitsetSize>& rg,
+void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        std::vector<std::bitset<BitsetSize>>& read,
                        std::vector<uint16_t>& read_lengths,
                        std::vector<uint8_t>& remaining_reads,
@@ -298,7 +299,10 @@ void process_read_task(uint32_t tid, ReorderGlobal<BitsetSize>& rg,
                        std::vector<std::bitset<BitsetSize>>& mask1,
                        std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                        std::vector<OmpLock>& dict_lock,
-                       std::vector<OmpLock>& read_lock) {
+                       std::vector<OmpLock>& read_lock,
+                       std::mutex &mutex,
+                       uint32_t &first_read,
+                       Barrier& barrier) {
   // Thread-specific file streams
   std::string tid_str = std::to_string(tid);
   std::ofstream file_out_reverse_comp(rg.outfile_rc + '.' + tid_str,
@@ -314,93 +318,259 @@ void process_read_task(uint32_t tid, ReorderGlobal<BitsetSize>& rg,
       std::ofstream::out | std::ios::binary);
   std::ofstream file_out_lengths(rg.outfile_read_length + '.' + tid_str,
                                  std::ofstream::out | std::ios::binary);
-
   unmatched[tid] = 0;
   std::bitset<BitsetSize> ref, reverse_reference, b;
 
   int64_t first_rid = 0;
+  // first_rid represents first read of contig, used for left searching
+
+  // variables for early stopping
   bool stop_searching = false;
   uint32_t num_reads_thr = 0;
   uint32_t num_unmatched_past_1_m_thr = 0;
 
   auto count = std::array<std::vector<int>, 4>();
   for (int i = 0; i < 4; i++) count[i] = std::vector<int>(rg.max_read_len);
-
-  int64_t current = 0;
+  // in the dict read_id array
+  uint64_t start_pos_index;  // index in start position
+  bool flag = false, done = false, prev_unmatched = false,
+       left_search_start = false, left_search = false;
+  // left_search_start - true when left search is starting (to avoid
+  // double deletion of first read) left_search - true during left search
+  // - needed so that we know when to pick arbitrary read
+  int64_t current, prev;
   uint64_t ull;
-  bool done = false;
+  int ref_len;
+  int64_t ref_pos = 0, cur_read_pos = 0;
+  // starting positions of the ref and the current read in the contig, can
+  // be negative during left search or due to RC useful for sorting
+  // according to starting position in the encoding stage.
 
-  // Fetch initial read
+  int64_t remaining_pos =
+      rg.num_reads -
+      1;  // used for searching next unmatched read when no match is found
+
+  // Critical Setup ----------------------------------------------------------
   {
-    std::lock_guard<std::mutex> lock(rg.mutex);  // Protect shared state
-    if (rg.remaining_reads > 0) {
-      current = rg.remaining_reads--;
+    std::lock_guard lock(mutex);
+    // doing initial setup and first read
+    current = first_read;
+    // some fix below to make sure no errors occurs when we have very
+    // few reads (comparable to num_threads). basically if read already
+    // taken, this thread just gives up
+    if (rg.num_reads == 0 || remaining_reads[current] == 0) {
+      done = true;
+    } else {
       remaining_reads[current] = false;
       ++unmatched[tid];
-    } else {
-      done = true;
     }
+    first_read += rg.num_reads / rg.num_thr;  // spread out first read equally
   }
+
+  // Finish setup with barrier ------------------------------------------------
+  barrier.wait();
 
   if (!done) {
     UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference, count,
-                               true, false, 0, read_lengths[current],
-                               rg.max_read_len, rg);
+                               true, false, 0, read_lengths[current], ref_len,
+                               rg);
+    cur_read_pos = 0;
+    ref_pos = 0;
+    first_rid = current;
+    prev_unmatched = true;
+    prev = current;
   }
-
   while (!done) {
+    if (num_reads_thr % 1000000 == 0) {
+      if (static_cast<float>(num_unmatched_past_1_m_thr) >
+          kStopCriteriaReorder * 1000000) {
+        stop_searching = true;
+      }
+      num_unmatched_past_1_m_thr = 0;
+    }
     num_reads_thr++;
-
-    // Update references and search for matches
+    // delete the read from the corresponding dictionary bins (unless we
+    // are starting left search)
+    if (!left_search_start) {
+      for (int l = 0; l < rg.num_dict; l++) {
+        int64_t dict_idx[2];
+        if (read_lengths[current] <= dict[l].end_) continue;
+        b = read[current] & mask1[l];
+        ull = (b >> 2 * dict[l].start_).to_ullong();
+        start_pos_index = dict[l].boo_hash_fun_->lookup(ull);
+        // check if any other thread is modifying same dict position
+        dict_lock[ReorderLockIdx(start_pos_index)].Set();
+        dict[l].FindPos(dict_idx, start_pos_index);
+        dict[l].Remove(dict_idx, start_pos_index, current);
+        dict_lock[ReorderLockIdx(start_pos_index)].Unset();
+      }
+    } else {
+      left_search_start = false;
+    }
+    flag = false;
     if (!stop_searching) {
       for (int shift = 0; shift < rg.max_shift; shift++) {
-        uint32_t matched_read = 0;
-        bool match_found = SearchMatch<BitsetSize>(
-            ref, mask1, dict_lock, read_lock, mask, read_lengths,
-            remaining_reads, read, dict, matched_read, false, shift,
-            rg.max_read_len, rg);
+        uint32_t k;
+        // find forward match
+        flag = SearchMatch<BitsetSize>(ref, mask1, dict_lock, read_lock, mask,
+                                       read_lengths, remaining_reads, read,
+                                       dict, k, false, shift, ref_len, rg);
+        if (flag == 1) {
+          current = k;
+          int ref_len_old = ref_len;
+          UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
+                                     count, false, false, shift,
+                                     read_lengths[current], ref_len, rg);
+          if (!left_search) {
+            cur_read_pos = ref_pos + shift;
+            ref_pos = cur_read_pos;
+          } else {
+            cur_read_pos =
+                ref_pos + ref_len_old - shift - read_lengths[current];
+            ref_pos = ref_pos + ref_len_old - shift - ref_len;
+          }
+          if (prev_unmatched ==
+              true) {  // prev read not singleton, write it now
+            file_out_reverse_comp << 'd';
+            file_out_order.write(reinterpret_cast<char*>(&prev),
+                                 sizeof(uint32_t));
+            file_out_flags << 0;  // for unmatched
+            int64_t zero = 0;
+            file_out_positions.write(reinterpret_cast<char*>(&zero),
+                                     sizeof(int64_t));
+            file_out_lengths.write(reinterpret_cast<char*>(&read_lengths[prev]),
+                                   sizeof(uint16_t));
+          }
+          file_out_reverse_comp << (left_search ? 'r' : 'd');
+          file_out_order.write(reinterpret_cast<char*>(&current),
+                               sizeof(uint32_t));
+          file_out_flags << 1;  // for matched
+          file_out_positions.write(reinterpret_cast<char*>(&cur_read_pos),
+                                   sizeof(int64_t));
+          file_out_lengths.write(
+              reinterpret_cast<char*>(&read_lengths[current]),
+              sizeof(uint16_t));
 
-        if (match_found) {
-          // Handle matched read
-          // Update references, write results
-          // (Handle code from the provided OpenMP loop)
+          prev_unmatched = false;
           break;
         }
+
+        // find reverse match
+        flag = SearchMatch<BitsetSize>(
+            reverse_reference, mask1, dict_lock, read_lock, mask, read_lengths,
+            remaining_reads, read, dict, k, true, shift, ref_len, rg);
+
+        if (flag == 1) {
+          current = k;
+          int ref_len_old = ref_len;
+          UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
+                                     count, false, true, shift,
+                                     read_lengths[current], ref_len, rg);
+          if (!left_search) {
+            cur_read_pos =
+                ref_pos + ref_len_old + shift - read_lengths[current];
+            ref_pos = ref_pos + ref_len_old + shift - ref_len;
+          } else {
+            cur_read_pos = ref_pos - shift;
+            ref_pos = cur_read_pos;
+          }
+          if (prev_unmatched ==
+              true) {  // prev read not singleton, write it now
+            file_out_reverse_comp << 'd';
+            file_out_order.write(reinterpret_cast<char*>(&prev),
+                                 sizeof(uint32_t));
+            file_out_flags << 0;  // for unmatched
+            int64_t zero = 0;
+            file_out_positions.write(reinterpret_cast<char*>(&zero),
+                                     sizeof(int64_t));
+            file_out_lengths.write(reinterpret_cast<char*>(&read_lengths[prev]),
+                                   sizeof(uint16_t));
+          }
+          file_out_reverse_comp << (left_search ? 'd' : 'r');
+          file_out_order.write(reinterpret_cast<char*>(&current),
+                               sizeof(uint32_t));
+          file_out_flags << 1;  // for matched
+          file_out_positions.write(reinterpret_cast<char*>(&cur_read_pos),
+                                   sizeof(int64_t));
+          file_out_lengths.write(
+              reinterpret_cast<char*>(&read_lengths[current]),
+              sizeof(uint16_t));
+
+          prev_unmatched = false;
+          break;
+        }
+
+        reverse_reference <<= 2;
+        ref >>= 2;
       }
     }
-
-    // If no match is found, pick a new unmatched read
-    if (!stop_searching) {
-      for (int64_t j = rg.remaining_reads - 1; j >= 0; --j) {
-        if (remaining_reads[j]) {
-          std::lock_guard<std::mutex> lock(rg.mutex);
-          if (remaining_reads[j]) {
-            current = j;
-            remaining_reads[j] = false;
-            ++unmatched[tid];
-            break;
+    if (flag == 0) {
+      // no match found
+      num_unmatched_past_1_m_thr++;
+      if (!left_search) {  // start left search
+        left_search = true;
+        left_search_start = true;
+        // update ref and count with RC of first_read
+        UpdateRefCount<BitsetSize>(read[first_rid], ref, reverse_reference,
+                                   count, true, true, 0,
+                                   read_lengths[first_rid], ref_len, rg);
+        ref_pos = 0;
+        cur_read_pos = 0;
+      } else {  // left search done, now pick arbitrary read and start
+                // new contig
+        left_search = false;
+        for (int64_t j = remaining_pos; j >= 0; --j) {
+          if (remaining_reads[j] == 1) {
+            read_lock[ReorderLockIdx(j)].Set();
+            if (remaining_reads[j]) {  // checking again inside
+                                       // critical block
+              current = j;
+              remaining_pos = j - 1;
+              remaining_reads[j] = false;
+              flag = true;
+              ++unmatched[tid];
+            }
+            read_lock[ReorderLockIdx(j)].Unset();
+            if (flag == 1) break;
           }
         }
-      }
-
-      if (current == 0) {  // No reads left
-        done = true;
+        if (flag == 0) {
+          if (prev_unmatched ==
+              true) {  // last read was singleton, write it now
+            file_out_order_singleton.write(reinterpret_cast<char*>(&prev),
+                                           sizeof(uint32_t));
+          }
+          done = true;  // no reads left
+        } else {
+          UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
+                                     count, true, false, 0,
+                                     read_lengths[current], ref_len, rg);
+          ref_pos = 0;
+          cur_read_pos = 0;
+          if (prev_unmatched == true) {  // prev read singleton, write it now
+            file_out_order_singleton.write(reinterpret_cast<char*>(&prev),
+                                           sizeof(uint32_t));
+          }
+          prev_unmatched = true;
+          first_rid = current;
+          prev = current;
+        }
       }
     }
-  }
+  }  // while (!done) end
 
-  // Close files
   file_out_reverse_comp.close();
+  file_out_order.close();
   file_out_flags.close();
   file_out_positions.close();
-  file_out_order.close();
   file_out_order_singleton.close();
   file_out_lengths.close();
 }
 
 template <size_t BitsetSize>
 void parallel_process_reads(
-    ReorderGlobal<BitsetSize>& rg, std::vector<std::bitset<BitsetSize>>& read,
+    const ReorderGlobal<BitsetSize>& rg, std::vector<std::bitset<BitsetSize>>&
+    read,
     std::vector<uint16_t>& read_lengths, std::vector<uint8_t>& remaining_reads,
     std::vector<int>& unmatched, std::vector<BbHashDict>& dict,
     std::vector<std::bitset<BitsetSize>>& mask1,
@@ -409,13 +579,17 @@ void parallel_process_reads(
   // Create dynamic scheduler
   DynamicScheduler scheduler(rg.num_thr);
 
+  std::mutex mutex;
+  uint32_t first_read;
+  Barrier barrier(rg.num_thr);
+
   // Dispatch tasks dynamically
   scheduler.run(rg.num_thr, [&](size_t tid) {
     process_read_task(tid, rg, read, read_lengths, remaining_reads, unmatched,
-                      dict, mask1, mask, dict_lock, read_lock);
+    dict, mask1, mask, dict_lock, read_lock,  mutex,
+     first_read,
+     barrier);
   });
-
-  std::cerr << "All reads processed dynamically.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -450,278 +624,11 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
   // per-thread basis (with the tid as part of the name) between
   // parallel regions.
   //
-  uint32_t first_read = 0;
   auto unmatched = std::vector<uint32_t>(rg.num_thr);
 
-  parallel_process_reads(rg, read, read_lengths, remaining_reads, unmatched,
-                         dict, mask1, mask, dict_lock, read_lock);
-
-
-#pragma omp parallel num_threads(rg.num_thr) default(none)             \
-    shared(rg, read, dict, read_lengths, mask1, mask, remaining_reads, \
-               unmatched, first_read, dict_lock, read_lock)
-  {
-    int tid = omp_get_thread_num();
-    std::string tid_str = std::to_string(tid);
-    std::ofstream file_out_reverse_comp(rg.outfile_rc + '.' + tid_str,
-                                        std::ofstream::out);
-    std::ofstream file_out_flags(rg.outfile_flag + '.' + tid_str,
-                                 std::ofstream::out);
-    std::ofstream file_out_positions(rg.outfile_pos + '.' + tid_str,
-                                     std::ofstream::out | std::ios::binary);
-    std::ofstream file_out_order(rg.outfile_order + '.' + tid_str,
-                                 std::ofstream::out | std::ios::binary);
-    std::ofstream file_out_order_singleton(
-        rg.outfile_order + ".singleton." + tid_str,
-        std::ofstream::out | std::ios::binary);
-    std::ofstream file_out_lengths(rg.outfile_read_length + '.' + tid_str,
-                                   std::ofstream::out | std::ios::binary);
-
-    unmatched[tid] = 0;
-    std::bitset<BitsetSize> ref, reverse_reference, b;
-
-    int64_t first_rid = 0;
-    // first_rid represents first read of contig, used for left searching
-
-    // variables for early stopping
-    bool stop_searching = false;
-    uint32_t num_reads_thr = 0;
-    uint32_t num_unmatched_past_1_m_thr = 0;
-
-    auto count = std::array<std::vector<int>, 4>();
-    for (int i = 0; i < 4; i++) count[i] = std::vector<int>(rg.max_read_len);
-    // in the dict read_id array
-    uint64_t start_pos_index;  // index in start position
-    bool flag = false, done = false, prev_unmatched = false,
-         left_search_start = false, left_search = false;
-    // left_search_start - true when left search is starting (to avoid
-    // double deletion of first read) left_search - true during left search
-    // - needed so that we know when to pick arbitrary read
-    int64_t current, prev;
-    uint64_t ull;
-    int ref_len;
-    int64_t ref_pos = 0, cur_read_pos = 0;
-    // starting positions of the ref and the current read in the contig, can
-    // be negative during left search or due to RC useful for sorting
-    // according to starting position in the encoding stage.
-
-    int64_t remaining_pos =
-        rg.num_reads -
-        1;  // used for searching next unmatched read when no match is found
-#pragma omp critical
-    {  // doing initial setup and first read
-      current = first_read;
-      // some fix below to make sure no errors occurs when we have very
-      // few reads (comparable to num_threads). basically if read already
-      // taken, this thread just gives up
-      if (rg.num_reads == 0 || remaining_reads[current] == 0) {
-        done = true;
-      } else {
-        remaining_reads[current] = false;
-        ++unmatched[tid];
-      }
-      first_read += rg.num_reads / rg.num_thr;  // spread out first read equally
-    }
-#pragma omp barrier
-    if (!done) {
-      UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference, count,
-                                 true, false, 0, read_lengths[current], ref_len,
-                                 rg);
-      cur_read_pos = 0;
-      ref_pos = 0;
-      first_rid = current;
-      prev_unmatched = true;
-      prev = current;
-    }
-    while (!done) {
-      if (num_reads_thr % 1000000 == 0) {
-        if (static_cast<float>(num_unmatched_past_1_m_thr) >
-            kStopCriteriaReorder * 1000000) {
-          stop_searching = true;
-        }
-        num_unmatched_past_1_m_thr = 0;
-      }
-      num_reads_thr++;
-      // delete the read from the corresponding dictionary bins (unless we
-      // are starting left search)
-      if (!left_search_start) {
-        for (int l = 0; l < rg.num_dict; l++) {
-          int64_t dict_idx[2];
-          if (read_lengths[current] <= dict[l].end_) continue;
-          b = read[current] & mask1[l];
-          ull = (b >> 2 * dict[l].start_).to_ullong();
-          start_pos_index = dict[l].boo_hash_fun_->lookup(ull);
-          // check if any other thread is modifying same dict position
-          dict_lock[ReorderLockIdx(start_pos_index)].Set();
-          dict[l].FindPos(dict_idx, start_pos_index);
-          dict[l].Remove(dict_idx, start_pos_index, current);
-          dict_lock[ReorderLockIdx(start_pos_index)].Unset();
-        }
-      } else {
-        left_search_start = false;
-      }
-      flag = false;
-      if (!stop_searching) {
-        for (int shift = 0; shift < rg.max_shift; shift++) {
-          uint32_t k;
-          // find forward match
-          flag = SearchMatch<BitsetSize>(ref, mask1, dict_lock, read_lock, mask,
-                                         read_lengths, remaining_reads, read,
-                                         dict, k, false, shift, ref_len, rg);
-          if (flag == 1) {
-            current = k;
-            int ref_len_old = ref_len;
-            UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
-                                       count, false, false, shift,
-                                       read_lengths[current], ref_len, rg);
-            if (!left_search) {
-              cur_read_pos = ref_pos + shift;
-              ref_pos = cur_read_pos;
-            } else {
-              cur_read_pos =
-                  ref_pos + ref_len_old - shift - read_lengths[current];
-              ref_pos = ref_pos + ref_len_old - shift - ref_len;
-            }
-            if (prev_unmatched ==
-                true) {  // prev read not singleton, write it now
-              file_out_reverse_comp << 'd';
-              file_out_order.write(reinterpret_cast<char*>(&prev),
-                                   sizeof(uint32_t));
-              file_out_flags << 0;  // for unmatched
-              int64_t zero = 0;
-              file_out_positions.write(reinterpret_cast<char*>(&zero),
-                                       sizeof(int64_t));
-              file_out_lengths.write(
-                  reinterpret_cast<char*>(&read_lengths[prev]),
-                  sizeof(uint16_t));
-            }
-            file_out_reverse_comp << (left_search ? 'r' : 'd');
-            file_out_order.write(reinterpret_cast<char*>(&current),
-                                 sizeof(uint32_t));
-            file_out_flags << 1;  // for matched
-            file_out_positions.write(reinterpret_cast<char*>(&cur_read_pos),
-                                     sizeof(int64_t));
-            file_out_lengths.write(
-                reinterpret_cast<char*>(&read_lengths[current]),
-                sizeof(uint16_t));
-
-            prev_unmatched = false;
-            break;
-          }
-
-          // find reverse match
-          flag = SearchMatch<BitsetSize>(reverse_reference, mask1, dict_lock,
-                                         read_lock, mask, read_lengths,
-                                         remaining_reads, read, dict, k, true,
-                                         shift, ref_len, rg);
-
-          if (flag == 1) {
-            current = k;
-            int ref_len_old = ref_len;
-            UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
-                                       count, false, true, shift,
-                                       read_lengths[current], ref_len, rg);
-            if (!left_search) {
-              cur_read_pos =
-                  ref_pos + ref_len_old + shift - read_lengths[current];
-              ref_pos = ref_pos + ref_len_old + shift - ref_len;
-            } else {
-              cur_read_pos = ref_pos - shift;
-              ref_pos = cur_read_pos;
-            }
-            if (prev_unmatched ==
-                true) {  // prev read not singleton, write it now
-              file_out_reverse_comp << 'd';
-              file_out_order.write(reinterpret_cast<char*>(&prev),
-                                   sizeof(uint32_t));
-              file_out_flags << 0;  // for unmatched
-              int64_t zero = 0;
-              file_out_positions.write(reinterpret_cast<char*>(&zero),
-                                       sizeof(int64_t));
-              file_out_lengths.write(
-                  reinterpret_cast<char*>(&read_lengths[prev]),
-                  sizeof(uint16_t));
-            }
-            file_out_reverse_comp << (left_search ? 'd' : 'r');
-            file_out_order.write(reinterpret_cast<char*>(&current),
-                                 sizeof(uint32_t));
-            file_out_flags << 1;  // for matched
-            file_out_positions.write(reinterpret_cast<char*>(&cur_read_pos),
-                                     sizeof(int64_t));
-            file_out_lengths.write(
-                reinterpret_cast<char*>(&read_lengths[current]),
-                sizeof(uint16_t));
-
-            prev_unmatched = false;
-            break;
-          }
-
-          reverse_reference <<= 2;
-          ref >>= 2;
-        }
-      }
-      if (flag == 0) {
-        // no match found
-        num_unmatched_past_1_m_thr++;
-        if (!left_search) {  // start left search
-          left_search = true;
-          left_search_start = true;
-          // update ref and count with RC of first_read
-          UpdateRefCount<BitsetSize>(read[first_rid], ref, reverse_reference,
-                                     count, true, true, 0,
-                                     read_lengths[first_rid], ref_len, rg);
-          ref_pos = 0;
-          cur_read_pos = 0;
-        } else {  // left search done, now pick arbitrary read and start
-                  // new contig
-          left_search = false;
-          for (int64_t j = remaining_pos; j >= 0; --j) {
-            if (remaining_reads[j] == 1) {
-              read_lock[ReorderLockIdx(j)].Set();
-              if (remaining_reads[j]) {  // checking again inside
-                                         // critical block
-                current = j;
-                remaining_pos = j - 1;
-                remaining_reads[j] = false;
-                flag = true;
-                ++unmatched[tid];
-              }
-              read_lock[ReorderLockIdx(j)].Unset();
-              if (flag == 1) break;
-            }
-          }
-          if (flag == 0) {
-            if (prev_unmatched ==
-                true) {  // last read was singleton, write it now
-              file_out_order_singleton.write(reinterpret_cast<char*>(&prev),
-                                             sizeof(uint32_t));
-            }
-            done = true;  // no reads left
-          } else {
-            UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference,
-                                       count, true, false, 0,
-                                       read_lengths[current], ref_len, rg);
-            ref_pos = 0;
-            cur_read_pos = 0;
-            if (prev_unmatched == true) {  // prev read singleton, write it now
-              file_out_order_singleton.write(reinterpret_cast<char*>(&prev),
-                                             sizeof(uint32_t));
-            }
-            prev_unmatched = true;
-            first_rid = current;
-            prev = current;
-          }
-        }
-      }
-    }  // while (!done) end
-
-    file_out_reverse_comp.close();
-    file_out_order.close();
-    file_out_flags.close();
-    file_out_positions.close();
-    file_out_order_singleton.close();
-    file_out_lengths.close();
-  }  // parallel end
+  parallel_process_reads<BitsetSize>(rg, read, read_lengths, remaining_reads,
+                                     unmatched, dict, mask1, mask, dict_lock,
+                                     read_lock);
 
   std::cerr << "Reordering done, "
             << static_cast<int>(std::accumulate(
