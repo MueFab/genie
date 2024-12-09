@@ -88,7 +88,7 @@ void ReadBlockStartEnd(const std::string& file_blocks,
  * @param stats Reference to performance statistics.
  * @param write_raw Flag to indicate if raw data should be written.
  */
-void ReorderCompressIdPe(std::vector<std::string>& id_array,
+void ReorderCompressIdPe(const std::vector<std::string>& id_array,
                          const std::string& temp_dir,
                          const std::string& file_order_id,
                          const std::vector<uint32_t>& block_start,

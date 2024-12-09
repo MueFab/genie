@@ -568,7 +568,7 @@ void Decoder::FlushIn(uint64_t& pos) {
                    "Cannot open file to read: " + file_unmatched_fastq1_);
       // now reorder the unmatched records in file 2, by picking them in
       // chunks
-      uint32_t bin_size = std::min(kBin_Size_Combine_Pairs, size_unmatched);
+      uint32_t bin_size = std::min(kBinSizeCombinePairs, size_unmatched);
       std::vector<Record> records_bin(bin_size);
       Record tmp_fastq_record;
       for (uint32_t i = 0; i <= size_unmatched / bin_size; i++) {

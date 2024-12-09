@@ -20,9 +20,7 @@
 
 // -----------------------------------------------------------------------------
 
-#ifdef GENIE_USE_OPENMP
 #include <omp.h>
-#endif
 
 // -----------------------------------------------------------------------------
 
@@ -31,44 +29,42 @@ namespace genie::read::spring {
 // -----------------------------------------------------------------------------
 // Constants for Spring module configuration
 
-constexpr uint16_t kMax_Read_Len =
+constexpr uint16_t kMaxReadLen =
     511;  //!< @brief Maximum supported read length.
-constexpr uint32_t kMax_Read_Len_Unaligned_Reads =
+constexpr uint32_t kMaxReadLenUnalignedReads =
     4294967290;  //!< @brief Maximum read length for unaligned reads. May not be
                  //!< supported in MPEG-G.
-constexpr uint32_t kMax_Num_Reads =
+constexpr uint32_t kMaxNumReads =
     4294967290;  //!< @brief Maximum number of reads supported.
-constexpr int kNum_Dict_Reorder =
+constexpr int kNumDictReorder =
     2;  //!< @brief Number of dictionaries used for reordering.
-constexpr int kMax_Search_Reorder =
+constexpr int kMaxSearchReorder =
     1000;  //!< @brief Maximum search iterations during reordering.
-constexpr int kThresh_Reorder = 4;  //!< @brief Threshold for reordering.
-constexpr float kStop_Criteria_Reorder =
+constexpr int kThreshReorder = 4;  //!< @brief Threshold for reordering.
+constexpr float kStopCriteriaReorder =
     0.5;  //!< @brief Stop criterion for reordering (fraction of unmatched
           //!< reads).
-constexpr int kNum_Dict_Encoder =
+constexpr int kNumDictEncoder =
     2;  //!< @brief Number of dictionaries used for encoding.
-constexpr int kMax_Search_Encoder =
+constexpr int kMaxSearchEncoder =
     1000;  //!< @brief Maximum search iterations during encoding.
-constexpr int kThresh_Encoder = 24;  //!< @brief Threshold for encoding.
-constexpr int kNum_Reads_Per_Block =
+constexpr int kThreshEncoder = 24;  //!< @brief Threshold for encoding.
+constexpr int kNumReadsPerBlock =
     256000;  //!< @brief Number of reads per block during compression.
-constexpr int kNum_Reads_Per_Block_Unaligned_Reads =
+constexpr int kNumReadsPerBlockUnalignedReads =
     256000;  //!< @brief Number of reads per block for unaligned reads (longer
              //!< reads).
-constexpr uint32_t kMax_Num_Tokens_Id =
+constexpr uint32_t kMaxNumTokensId =
     1024;  //!< @brief Maximum number of tokens for read IDs.
-constexpr uint32_t kBin_Size_Combine_Pairs =
+constexpr uint32_t kBinSizeCombinePairs =
     30000000;  //!< @brief Size of bins when combining paired reads in memory.
 
 // -----------------------------------------------------------------------------
 // OpenMP-specific configuration and utilities
 
-#ifdef GENIE_USE_OPENMP
-
-constexpr int kNum_Locks_Reorder =
+constexpr int kNumLocksReorder =
     0x10000;  //!< @brief Number of locks (must be a power of 2).
-constexpr int kLocks_Reorder_Mask =
+constexpr int kLocksReorderMask =
     0xffff;  //!< @brief Mask used for lock indexing.
 
 /**
@@ -77,7 +73,7 @@ constexpr int kLocks_Reorder_Mask =
  * @return Index of the lock to use.
  */
 inline uint64_t ReorderLockIdx(const uint64_t hash_value) {
-  return hash_value & kLocks_Reorder_Mask;
+  return hash_value & kLocksReorderMask;
 }
 
 /**
@@ -119,7 +115,6 @@ class OmpLock {
   int Test() { return omp_test_lock(&lck_); }
 };
 
-#endif /* GENIE_USE_OPENMP */
 
 // -----------------------------------------------------------------------------
 

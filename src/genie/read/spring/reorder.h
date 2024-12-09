@@ -50,7 +50,7 @@ struct ReorderGlobal {
       max_read_len{};  //!< @brief Maximum shift, number of
                        //!< threads, and maximum read length.
   const int num_dict =
-      kNum_Dict_Reorder;  //!< @brief Number of dictionaries for reordering.
+      kNumDictReorder;  //!< @brief Number of dictionaries for reordering.
 
   std::string basedir;        //!< @brief Base directory for input/output files.
   std::string infile[2];      //!< @brief Input files for paired-end reads.

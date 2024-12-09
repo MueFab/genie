@@ -47,7 +47,7 @@ void Preprocessor::Setup(const std::string& working_dir_p, const size_t num_thr,
   cp.num_reads_clean[0] = 0;
   cp.num_reads_clean[1] = 0;
   cp.max_read_len = 0;
-  cp.num_reads_per_block = kNum_Reads_Per_Block;
+  cp.num_reads_per_block = kNumReadsPerBlock;
   cp.num_blocks = 0;
   // generate random temp directory in the working directory
 
@@ -94,9 +94,9 @@ void Preprocessor::Preprocess(core::record::Chunk&& t,
   UTILS_DIE_IF(
       data.GetData().front().GetNumberOfTemplateSegments() *
               (data.GetData().size() + cp.num_reads) >
-          kMax_Num_Reads,
+          kMaxNumReads,
       "Too many reads in the input. Global assembly only supports up to " +
-          std::to_string(kMax_Num_Reads) + " reads.");
+          std::to_string(kMaxNumReads) + " reads.");
 
   size_t rec_index = 0;
   for (auto& rec : data.GetData()) {
@@ -105,9 +105,9 @@ void Preprocessor::Preprocess(core::record::Chunk&& t,
         "Number of segments differs between global assembly data chunks.");
     size_t seg_index = 0;
     for (auto& seq : rec.GetSegments()) {
-      UTILS_DIE_IF(seq.GetSequence().size() > kMax_Read_Len,
+      UTILS_DIE_IF(seq.GetSequence().size() > kMaxReadLen,
                    "Global assembly maximum read length " +
-                       std::to_string(kMax_Read_Len) + " exceeded.");
+                       std::to_string(kMaxReadLen) + " exceeded.");
       cp.max_read_len = std::max(
           cp.max_read_len, static_cast<uint32_t>(seq.GetSequence().length()));
       if (seq.GetSequence().find('N') != std::string::npos) {

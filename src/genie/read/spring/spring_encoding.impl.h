@@ -50,18 +50,298 @@ std::string BitsetToString(std::bitset<BitsetSize> b, const uint16_t read_len,
   return s;
 }
 
+template <size_t BitsetSize>
+void process_task(
+    size_t task_id, const EncoderGlobal& eg,
+    const EncoderGlobalB<BitsetSize>& egb, std::vector<BbHashDict>& dict,
+    const std::vector<std::bitset<BitsetSize>>& mask1,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+    std::vector<std::bitset<BitsetSize>>& read, std::vector<uint32_t>& order_s,
+    std::vector<uint16_t>& read_lengths_s,
+    std::vector<uint8_t>& remaining_reads, std::vector<OmpLock>& read_lock,
+    std::vector<OmpLock>& dict_lock, const std::string& char_to_rev_char) {
+  int tid = task_id;
+  static constexpr int thresh_s = kThreshEncoder;
+  static constexpr int max_search = kMaxSearchEncoder;
+  std::ifstream f(eg.infile + '.' + std::to_string(tid), std::ios::binary);
+  UTILS_DIE_IF(
+      !f, "Cannot open file to read: " + eg.infile + '.' + std::to_string(tid));
+  std::ifstream in_flag(eg.infile_flag + '.' + std::to_string(tid));
+  UTILS_DIE_IF(!in_flag, "Cannot open file to read: " + eg.infile_flag + '.' +
+                             std::to_string(tid));
+  std::ifstream in_pos(eg.infile_pos + '.' + std::to_string(tid),
+                       std::ios::binary);
+  UTILS_DIE_IF(!in_pos, "Cannot open file to read: " + eg.infile_pos + '.' +
+                            std::to_string(tid));
+  std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid),
+                         std::ios::binary);
+  UTILS_DIE_IF(!in_order, "Cannot open file to read: " + eg.infile_order + '.' +
+                              std::to_string(tid));
+  std::ifstream in_rc(eg.infile_rc + '.' + std::to_string(tid));
+  UTILS_DIE_IF(!in_rc, "Cannot open file to read: " + eg.infile_rc + '.' +
+                           std::to_string(tid));
+  std::ifstream in_read_length(
+      eg.infile_read_length + '.' + std::to_string(tid), std::ios::binary);
+  UTILS_DIE_IF(!in_read_length,
+               "Cannot open file to read: " + eg.infile_read_length + '.' +
+                   std::to_string(tid));
+  std::ofstream f_seq(eg.outfile_seq + '.' + std::to_string(tid));
+  UTILS_DIE_IF(!f_seq, "Cannot open file to write: " + eg.outfile_seq + '.' +
+                           std::to_string(tid));
+  std::ofstream f_pos(eg.outfile_pos + '.' + std::to_string(tid),
+                      std::ios::binary);
+  UTILS_DIE_IF(!f_pos, "Cannot open file to write: " + eg.outfile_pos + '.' +
+                           std::to_string(tid));
+  std::ofstream f_noise(eg.outfile_noise + '.' + std::to_string(tid));
+  UTILS_DIE_IF(!f_noise, "Cannot open file to write: " + eg.outfile_noise +
+                             '.' + std::to_string(tid));
+  std::ofstream f_noise_pos(eg.outfile_noise_pos + '.' + std::to_string(tid),
+                            std::ios::binary);
+  UTILS_DIE_IF(!f_noise_pos,
+               "Cannot open file to write: " + eg.outfile_noise_pos + '.' +
+                   std::to_string(tid));
+  std::ofstream f_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp",
+                        std::ios::binary);
+  UTILS_DIE_IF(!f_order, "Cannot open file to write: " + eg.infile_order + '.' +
+                             std::to_string(tid) + ".tmp");
+  std::ofstream f_rc(eg.infile_rc + '.' + std::to_string(tid) + ".tmp");
+  UTILS_DIE_IF(!f_rc, "Cannot open file to write: " + eg.infile_rc + '.' +
+                          std::to_string(tid) + ".tmp");
+  std::ofstream f_read_length(
+      eg.infile_read_length + '.' + std::to_string(tid) + ".tmp",
+      std::ios::binary);
+  UTILS_DIE_IF(!f_read_length,
+               "Cannot open file to write: " + eg.infile_read_length + '.' +
+                   std::to_string(tid) + ".tmp");
+  // in the dict read_id array
+  uint64_t start_pos_idx;  // index in start_pos
+  uint64_t ull;
+  uint64_t abs_pos = 0;  // absolute position in reference (total length
+  // of all contigs till now)
+  bool flag = false;
+  // flag to check if match was found or not
+  std::string current, ref;
+  std::bitset<BitsetSize> forward_bitset, reverse_bitset, b;
+  char c = '0', rc = 'd';
+  std::list<ContigReads> current_contig;
+  int64_t p = 0;
+  uint16_t rl = 0;
+  uint32_t ord = 0,
+           list_size = 0;  // list_size variable introduced because
+  // list::Size() was running very slowly
+  // on UIUC machine
+  auto deleted_rids = std::vector<std::list<uint32_t>>(eg.num_dict_s);
+  bool done = false;
+  while (!done) {
+    if (!(in_flag >> c)) done = true;
+    if (!done) {
+      ReadDnaFromBits(current, f);
+      rc = static_cast<char>(in_rc.get());
+      in_pos.read(reinterpret_cast<char*>(&p), sizeof(int64_t));
+      in_order.read(reinterpret_cast<char*>(&ord), sizeof(uint32_t));
+      in_read_length.read(reinterpret_cast<char*>(&rl), sizeof(uint16_t));
+    }
+    if (c == '0' || done || list_size > 10000000) {  // limit on list Size so
+      // that memory doesn't get
+      // too large
+      if (list_size != 0) {
+        // sort contig according to pos
+        current_contig.sort([](const ContigReads& ar, const ContigReads& br) {
+          return ar.pos < br.pos;
+        });
+        // make first pos zero and shift all pos values accordingly
+        auto current_contig_it = current_contig.begin();
+        int64_t first_pos = current_contig_it->pos;
+        for (; current_contig_it != current_contig.end(); ++current_contig_it)
+          current_contig_it->pos -= first_pos;
+
+        ref = BuildContig(current_contig, list_size);
+        if (static_cast<int64_t>(ref.size()) >= eg.max_read_len &&
+            eg.num_reads_s + eg.num_reads_n > 0) {
+          // try to align the singleton reads to ref
+          // first create bitsets from first read_len positions of
+          // ref
+          forward_bitset.reset();
+          reverse_bitset.reset();
+          StringToBitset(ref.substr(0, eg.max_read_len),
+                         static_cast<uint16_t>(eg.max_read_len), forward_bitset,
+                         egb.base_mask);
+          StringToBitset(ReverseComplement(ref.substr(0, eg.max_read_len),
+                                           eg.max_read_len),
+                         static_cast<uint16_t>(eg.max_read_len), reverse_bitset,
+                         egb.base_mask);
+          for (int64_t j = 0;
+               j < static_cast<int64_t>(ref.size()) - eg.max_read_len + 1;
+               j++) {
+            // search for singleton reads
+            for (int rev = 0; rev < 2; rev++) {
+              for (int l = 0; l < eg.num_dict_s; l++) {
+                int64_t dictidx[2];
+                if (!rev)
+                  b = forward_bitset & mask1[l];
+                else
+                  b = reverse_bitset & mask1[l];
+                ull = (b >> 3 * dict[l].start_).to_ullong();
+                start_pos_idx = dict[l].boo_hash_fun_->lookup(ull);
+                if (start_pos_idx >= dict[l].num_keys_)  // not found
+                  continue;
+                // check if any other thread is modifying
+                // same dictpos
+                if (!dict_lock[start_pos_idx].Test()) continue;
+                dict[l].FindPos(dictidx, start_pos_idx);
+                if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
+                  dict_lock[start_pos_idx].Unset();
+                  continue;
+                }
+                uint64_t ull1 =
+                    ((read[dict[l].read_id_[dictidx[0]]] & mask1[l]) >>
+                     3 * dict[l].start_)
+                        .to_ullong();
+                if (ull == ull1) {  // checking if ull is actually
+                                    // the key for this bin
+                  for (int64_t i = dictidx[1] - 1;
+                       i >= dictidx[0] && i >= dictidx[1] - max_search; i--) {
+                    auto rid = dict[l].read_id_[i];
+                    int hamming;
+                    if (!rev)
+                      hamming = static_cast<int>(
+                          ((forward_bitset ^ read[rid]) &
+                           mask[0][eg.max_read_len - read_lengths_s[rid]])
+                              .count());
+                    else
+                      hamming = static_cast<int>(
+                          ((reverse_bitset ^ read[rid]) &
+                           mask[0][eg.max_read_len - read_lengths_s[rid]])
+                              .count());
+                    if (hamming <= thresh_s) {
+                      read_lock[rid].Set();
+                      if (remaining_reads[rid]) {
+                        remaining_reads[rid] = false;
+                        flag = true;
+                      }
+                      read_lock[rid].Unset();
+                    }
+                    if (flag == 1) {  // match found
+                      flag = false;
+                      list_size++;
+                      char l_rc = rev ? 'r' : 'd';
+                      int64_t pos =
+                          rev ? (j + eg.max_read_len - read_lengths_s[rid]) : j;
+                      std::string read_string =
+                          rev ? ReverseComplement(
+                                    BitsetToString<BitsetSize>(
+                                        read[rid], read_lengths_s[rid], egb),
+                                    read_lengths_s[rid])
+                              : BitsetToString<BitsetSize>(
+                                    read[rid], read_lengths_s[rid], egb);
+                      current_contig.push_back({read_string, pos, l_rc,
+                                                order_s[rid],
+                                                read_lengths_s[rid]});
+                      for (int l1 = 0; l1 < eg.num_dict_s; l1++) {
+                        if (read_lengths_s[rid] > dict[l1].end_)
+                          deleted_rids[l1].push_back(rid);
+                      }
+                    }
+                  }
+                }
+                dict_lock[start_pos_idx].Unset();
+                // delete from dictionaries
+                for (int l1 = 0; l1 < eg.num_dict_s; l1++)
+                  for (auto it = deleted_rids[l1].begin();
+                       it != deleted_rids[l1].end();) {
+                    b = read[*it] & mask1[l1];
+                    ull = (b >> 3 * dict[l1].start_).to_ullong();
+                    start_pos_idx = dict[l1].boo_hash_fun_->lookup(ull);
+                    if (!dict_lock[start_pos_idx].Test()) {
+                      ++it;
+                      continue;
+                    }
+                    dict[l1].FindPos(dictidx, start_pos_idx);
+                    dict[l1].Remove(dictidx, start_pos_idx, *it);
+                    it = deleted_rids[l1].erase(it);
+                    dict_lock[start_pos_idx].Unset();
+                  }
+              }
+            }
+            if (j != static_cast<int64_t>(ref.size()) -
+                         eg.max_read_len) {  // not at last
+                                             // position,shift
+                                             // bitsets
+              forward_bitset >>= 3;
+              forward_bitset = forward_bitset & mask[0][0];
+              forward_bitset |=
+                  egb.base_mask[eg.max_read_len - 1]
+                               [static_cast<uint8_t>(ref[j + eg.max_read_len])];
+              reverse_bitset <<= 3;
+              reverse_bitset = reverse_bitset & mask[0][0];
+              reverse_bitset |= egb.base_mask[0][static_cast<uint8_t>(
+                  char_to_rev_char[static_cast<uint8_t>(
+                      ref[j + eg.max_read_len])])];
+            }
+          }  // end for
+        }  // end if
+        // sort contig according to pos
+        current_contig.sort([](const ContigReads& ar, const ContigReads& br) {
+          return ar.pos < br.pos;
+        });
+        WriteContig(ref, current_contig, f_seq, f_pos, f_noise, f_noise_pos,
+                    f_order, f_rc, f_read_length, abs_pos);
+      }
+      if (!done) {
+        current_contig = {{current, p, rc, ord, rl}};
+        list_size = 1;
+      }
+    } else if (c == '1') {  // read found during rightward search
+      current_contig.push_back({current, p, rc, ord, rl});
+      list_size++;
+    }
+  }
+  f.close();
+  in_flag.close();
+  in_pos.close();
+  in_order.close();
+  in_rc.close();
+  in_read_length.close();
+  f_seq.close();
+  f_pos.close();
+  f_noise.close();
+  f_noise_pos.close();
+  f_order.close();
+  f_read_length.close();
+  f_rc.close();
+}
+
+// Wrapper function using DynamicScheduler
+template <size_t BitsetSize>
+void process_all_tasks(
+    const EncoderGlobal& eg, const EncoderGlobalB<BitsetSize>& egb,
+    std::vector<BbHashDict>& dict,
+    const std::vector<std::bitset<BitsetSize>>& mask1,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+    std::vector<std::bitset<BitsetSize>>& read, std::vector<uint32_t>& order_s,
+    std::vector<uint16_t>& read_lengths_s,
+    std::vector<uint8_t>& remaining_reads, std::vector<OmpLock>& read_lock,
+    std::vector<OmpLock>& dict_lock, const std::string& char_to_rev_char,
+    const int num_threads) {
+  // Create DynamicScheduler
+  DynamicScheduler scheduler(num_threads);
+
+  // Process all tasks
+  scheduler.run(eg.num_thr, [&](size_t task_id) {
+    process_task(task_id, eg, egb, dict, mask1, mask, read, order_s,
+                 read_lengths_s, remaining_reads, read_lock, dict_lock,
+                 char_to_rev_char);
+  });
+}
+
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
 void Encode(std::vector<std::bitset<BitsetSize>>& read,
             std::vector<BbHashDict>& dict, std::vector<uint32_t>& order_s,
             std::vector<uint16_t>& read_lengths_s, const EncoderGlobal& eg,
             const EncoderGlobalB<BitsetSize>& egb) {
-  static constexpr int thresh_s = kThresh_Encoder;
-  static constexpr int max_search = kMax_Search_Encoder;
-#ifdef GENIE_USE_OPENMP
   auto read_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
   auto dict_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
-#endif
   auto remaining_reads = std::vector<uint8_t>(eg.num_reads_s + eg.num_reads_n);
   std::fill(remaining_reads.begin(),
             remaining_reads.begin() + eg.num_reads_s + eg.num_reads_n, 1);
@@ -80,285 +360,9 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
   // good load balancing and benefits from parallelization.
   //
   std::cerr << "Encoding reads\n";
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(eg.num_thr) default(none)            \
-    shared(eg, egb, dict, mask1, mask, read, order_s, read_lengths_s, \
-               remaining_reads, read_lock, dict_lock, kCharToRevChar)
-#endif
-  {
-#ifdef GENIE_USE_OPENMP
-    int tid = omp_get_thread_num();
-#else
-    int tid = 0;
-#endif
-    std::ifstream f(eg.infile + '.' + std::to_string(tid), std::ios::binary);
-    UTILS_DIE_IF(!f, "Cannot open file to read: " + eg.infile + '.' +
-                         std::to_string(tid));
-    std::ifstream in_flag(eg.infile_flag + '.' + std::to_string(tid));
-    UTILS_DIE_IF(!in_flag, "Cannot open file to read: " + eg.infile_flag + '.' +
-                               std::to_string(tid));
-    std::ifstream in_pos(eg.infile_pos + '.' + std::to_string(tid),
-                         std::ios::binary);
-    UTILS_DIE_IF(!in_pos, "Cannot open file to read: " + eg.infile_pos + '.' +
-                              std::to_string(tid));
-    std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid),
-                           std::ios::binary);
-    UTILS_DIE_IF(!in_order, "Cannot open file to read: " + eg.infile_order +
-                                '.' + std::to_string(tid));
-    std::ifstream in_rc(eg.infile_rc + '.' + std::to_string(tid));
-    UTILS_DIE_IF(!in_rc, "Cannot open file to read: " + eg.infile_rc + '.' +
-                             std::to_string(tid));
-    std::ifstream in_read_length(
-        eg.infile_read_length + '.' + std::to_string(tid), std::ios::binary);
-    UTILS_DIE_IF(!in_read_length,
-                 "Cannot open file to read: " + eg.infile_read_length + '.' +
-                     std::to_string(tid));
-    std::ofstream f_seq(eg.outfile_seq + '.' + std::to_string(tid));
-    UTILS_DIE_IF(!f_seq, "Cannot open file to write: " + eg.outfile_seq + '.' +
-                             std::to_string(tid));
-    std::ofstream f_pos(eg.outfile_pos + '.' + std::to_string(tid),
-                        std::ios::binary);
-    UTILS_DIE_IF(!f_pos, "Cannot open file to write: " + eg.outfile_pos + '.' +
-                             std::to_string(tid));
-    std::ofstream f_noise(eg.outfile_noise + '.' + std::to_string(tid));
-    UTILS_DIE_IF(!f_noise, "Cannot open file to write: " + eg.outfile_noise +
-                               '.' + std::to_string(tid));
-    std::ofstream f_noise_pos(eg.outfile_noise_pos + '.' + std::to_string(tid),
-                              std::ios::binary);
-    UTILS_DIE_IF(!f_noise_pos,
-                 "Cannot open file to write: " + eg.outfile_noise_pos + '.' +
-                     std::to_string(tid));
-    std::ofstream f_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp",
-                          std::ios::binary);
-    UTILS_DIE_IF(!f_order, "Cannot open file to write: " + eg.infile_order +
-                               '.' + std::to_string(tid) + ".tmp");
-    std::ofstream f_rc(eg.infile_rc + '.' + std::to_string(tid) + ".tmp");
-    UTILS_DIE_IF(!f_rc, "Cannot open file to write: " + eg.infile_rc + '.' +
-                            std::to_string(tid) + ".tmp");
-    std::ofstream f_read_length(
-        eg.infile_read_length + '.' + std::to_string(tid) + ".tmp",
-        std::ios::binary);
-    UTILS_DIE_IF(!f_read_length,
-                 "Cannot open file to write: " + eg.infile_read_length + '.' +
-                     std::to_string(tid) + ".tmp");
-    // in the dict read_id array
-    uint64_t start_pos_idx;  // index in start_pos
-    uint64_t ull;
-    uint64_t abs_pos = 0;  // absolute position in reference (total length
-    // of all contigs till now)
-    bool flag = false;
-    // flag to check if match was found or not
-    std::string current, ref;
-    std::bitset<BitsetSize> forward_bitset, reverse_bitset, b;
-    char c = '0', rc = 'd';
-    std::list<ContigReads> current_contig;
-    int64_t p = 0;
-    uint16_t rl = 0;
-    uint32_t ord = 0,
-             list_size = 0;  // list_size variable introduced because
-    // list::Size() was running very slowly
-    // on UIUC machine
-    auto deleted_rids = std::vector<std::list<uint32_t>>(eg.num_dict_s);
-    bool done = false;
-    while (!done) {
-      if (!(in_flag >> c)) done = true;
-      if (!done) {
-        ReadDnaFromBits(current, f);
-        rc = static_cast<char>(in_rc.get());
-        in_pos.read(reinterpret_cast<char*>(&p), sizeof(int64_t));
-        in_order.read(reinterpret_cast<char*>(&ord), sizeof(uint32_t));
-        in_read_length.read(reinterpret_cast<char*>(&rl), sizeof(uint16_t));
-      }
-      if (c == '0' || done || list_size > 10000000) {  // limit on list Size so
-        // that memory doesn't get
-        // too large
-        if (list_size != 0) {
-          // sort contig according to pos
-          current_contig.sort([](const ContigReads& ar, const ContigReads& br) {
-            return ar.pos < br.pos;
-          });
-          // make first pos zero and shift all pos values accordingly
-          auto current_contig_it = current_contig.begin();
-          int64_t first_pos = current_contig_it->pos;
-          for (; current_contig_it != current_contig.end(); ++current_contig_it)
-            current_contig_it->pos -= first_pos;
-
-          ref = BuildContig(current_contig, list_size);
-          if (static_cast<int64_t>(ref.size()) >= eg.max_read_len &&
-              eg.num_reads_s + eg.num_reads_n > 0) {
-            // try to align the singleton reads to ref
-            // first create bitsets from first read_len positions of
-            // ref
-            forward_bitset.reset();
-            reverse_bitset.reset();
-            StringToBitset(ref.substr(0, eg.max_read_len),
-                           static_cast<uint16_t>(eg.max_read_len),
-                           forward_bitset, egb.base_mask);
-            StringToBitset(ReverseComplement(ref.substr(0, eg.max_read_len),
-                                             eg.max_read_len),
-                           static_cast<uint16_t>(eg.max_read_len),
-                           reverse_bitset, egb.base_mask);
-            for (int64_t j = 0;
-                 j < static_cast<int64_t>(ref.size()) - eg.max_read_len + 1;
-                 j++) {
-              // search for singleton reads
-              for (int rev = 0; rev < 2; rev++) {
-                for (int l = 0; l < eg.num_dict_s; l++) {
-                  int64_t dictidx[2];
-                  if (!rev)
-                    b = forward_bitset & mask1[l];
-                  else
-                    b = reverse_bitset & mask1[l];
-                  ull = (b >> 3 * dict[l].start_).to_ullong();
-                  start_pos_idx = dict[l].boo_hash_fun_->lookup(ull);
-                  if (start_pos_idx >= dict[l].num_keys_)  // not found
-                    continue;
-                  // check if any other thread is modifying
-                  // same dictpos
-#ifdef GENIE_USE_OPENMP
-                  if (!dict_lock[start_pos_idx].Test()) continue;
-#else
-                  // if we are single-threaded we do not need
-                  // to continue because nobody else could
-                  // possibly try to modify the same dictpos
-#endif
-                  dict[l].FindPos(dictidx, start_pos_idx);
-                  if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
-#ifdef GENIE_USE_OPENMP
-                    dict_lock[start_pos_idx].Unset();
-#endif
-                    continue;
-                  }
-                  uint64_t ull1 =
-                      ((read[dict[l].read_id_[dictidx[0]]] & mask1[l]) >>
-                       3 * dict[l].start_)
-                          .to_ullong();
-                  if (ull == ull1) {  // checking if ull is actually
-                                      // the key for this bin
-                    for (int64_t i = dictidx[1] - 1;
-                         i >= dictidx[0] && i >= dictidx[1] - max_search; i--) {
-                      auto rid = dict[l].read_id_[i];
-                      int hamming;
-                      if (!rev)
-                        hamming = static_cast<int>(
-                            ((forward_bitset ^ read[rid]) &
-                             mask[0][eg.max_read_len - read_lengths_s[rid]])
-                                .count());
-                      else
-                        hamming = static_cast<int>(
-                            ((reverse_bitset ^ read[rid]) &
-                             mask[0][eg.max_read_len - read_lengths_s[rid]])
-                                .count());
-                      if (hamming <= thresh_s) {
-#ifdef GENIE_USE_OPENMP
-                        read_lock[rid].Set();
-#endif
-                        if (remaining_reads[rid]) {
-                          remaining_reads[rid] = false;
-                          flag = true;
-                        }
-#ifdef GENIE_USE_OPENMP
-                        read_lock[rid].Unset();
-#endif
-                      }
-                      if (flag == 1) {  // match found
-                        flag = false;
-                        list_size++;
-                        char l_rc = rev ? 'r' : 'd';
-                        int64_t pos =
-                            rev ? (j + eg.max_read_len - read_lengths_s[rid])
-                                : j;
-                        std::string read_string =
-                            rev ? ReverseComplement(
-                                      BitsetToString<BitsetSize>(
-                                          read[rid], read_lengths_s[rid], egb),
-                                      read_lengths_s[rid])
-                                : BitsetToString<BitsetSize>(
-                                      read[rid], read_lengths_s[rid], egb);
-                        current_contig.push_back({read_string, pos, l_rc,
-                                                  order_s[rid],
-                                                  read_lengths_s[rid]});
-                        for (int l1 = 0; l1 < eg.num_dict_s; l1++) {
-                          if (read_lengths_s[rid] > dict[l1].end_)
-                            deleted_rids[l1].push_back(rid);
-                        }
-                      }
-                    }
-                  }
-#ifdef GENIE_USE_OPENMP
-                  dict_lock[start_pos_idx].Unset();
-#endif
-                  // delete from dictionaries
-                  for (int l1 = 0; l1 < eg.num_dict_s; l1++)
-                    for (auto it = deleted_rids[l1].begin();
-                         it != deleted_rids[l1].end();) {
-                      b = read[*it] & mask1[l1];
-                      ull = (b >> 3 * dict[l1].start_).to_ullong();
-                      start_pos_idx = dict[l1].boo_hash_fun_->lookup(ull);
-#ifdef GENIE_USE_OPENMP
-                      if (!dict_lock[start_pos_idx].Test()) {
-                        ++it;
-                        continue;
-                      }
-#else
-                    // nothing to be done
-#endif
-                      dict[l1].FindPos(dictidx, start_pos_idx);
-                      dict[l1].Remove(dictidx, start_pos_idx, *it);
-                      it = deleted_rids[l1].erase(it);
-#ifdef GENIE_USE_OPENMP
-                      dict_lock[start_pos_idx].Unset();
-#endif
-                    }
-                }
-              }
-              if (j != static_cast<int64_t>(ref.size()) -
-                           eg.max_read_len) {  // not at last
-                                               // position,shift
-                                               // bitsets
-                forward_bitset >>= 3;
-                forward_bitset = forward_bitset & mask[0][0];
-                forward_bitset |=
-                    egb.base_mask[eg.max_read_len - 1][static_cast<uint8_t>(
-                        ref[j + eg.max_read_len])];
-                reverse_bitset <<= 3;
-                reverse_bitset = reverse_bitset & mask[0][0];
-                reverse_bitset |= egb.base_mask[0][static_cast<uint8_t>(
-                    kCharToRevChar[static_cast<uint8_t>(
-                        ref[j + eg.max_read_len])])];
-              }
-            }  // end for
-          }  // end if
-          // sort contig according to pos
-          current_contig.sort([](const ContigReads& ar, const ContigReads& br) {
-            return ar.pos < br.pos;
-          });
-          WriteContig(ref, current_contig, f_seq, f_pos, f_noise, f_noise_pos,
-                      f_order, f_rc, f_read_length, abs_pos);
-        }
-        if (!done) {
-          current_contig = {{current, p, rc, ord, rl}};
-          list_size = 1;
-        }
-      } else if (c == '1') {  // read found during rightward search
-        current_contig.push_back({current, p, rc, ord, rl});
-        list_size++;
-      }
-    }
-    f.close();
-    in_flag.close();
-    in_pos.close();
-    in_order.close();
-    in_rc.close();
-    in_read_length.close();
-    f_seq.close();
-    f_pos.close();
-    f_noise.close();
-    f_noise_pos.close();
-    f_order.close();
-    f_read_length.close();
-    f_rc.close();
-  }  // end omp parallel
+  process_all_tasks(eg, egb, dict, mask1, mask, read, order_s, read_lengths_s,
+                    remaining_reads, read_lock, dict_lock, kCharToRevChar,
+                    eg.num_thr);
 
   auto file_len_seq_thr = std::vector<uint64_t>(eg.num_thr);
   for (int tid = 0; tid < eg.num_thr; tid++) {

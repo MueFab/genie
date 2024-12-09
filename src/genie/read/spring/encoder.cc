@@ -42,9 +42,6 @@ void Encoder::FlushIn(uint64_t& pos) {
   auto loc_cp = preprocessor_.cp;
   util::Watch watch;
   core::stats::PerfStats stats = preprocessor_.GetStats();
-#ifndef GENIE_USE_OPENMP
-  loc_cp.num_thr = 1;
-#endif
 
   watch.Reset();
   std::cerr << "Reordering ...\n";

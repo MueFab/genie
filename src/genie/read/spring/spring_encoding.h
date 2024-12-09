@@ -59,7 +59,7 @@ struct EncoderGlobal {
   uint32_t num_reads{};    //!< @brief Total number of reads.
   uint32_t num_reads_s{};  //!< @brief Number of singleton reads.
   uint32_t num_reads_n{};  //!< @brief Number of reads containing 'N' bases.
-  int num_dict_s = kNum_Dict_Encoder;  //!< @brief Number of hash dictionaries
+  int num_dict_s = kNumDictEncoder;  //!< @brief Number of hash dictionaries
                                        //!< used for encoding.
 
   int max_read_len{},

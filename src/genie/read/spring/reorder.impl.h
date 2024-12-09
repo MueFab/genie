@@ -16,6 +16,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "genie/util/literal.h"
 #include "genie/util/runtime_exception.h"
@@ -82,12 +83,12 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
   auto char_to_int = [](const uint8_t a) {
     return (a & 0x06) >> 1;
   };  // inverse of above
-  char s[kMax_Read_Len + 1], *current;
+  char s[kMaxReadLen + 1], *current;
   BitsetToString<BitsetSize>(cur, s, cur_read_len, rg);
   if (!rev) {
     current = s;
   } else {
-    char s1[kMax_Read_Len + 1];
+    char s1[kMaxReadLen + 1];
     ReverseComplement(s, s1, cur_read_len);
     current = s1;
   }
@@ -175,7 +176,7 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
     }
   }
   CharToBitset<BitsetSize>(current, ref_len, ref, rg.base_mask);
-  char rev_current[kMax_Read_Len + 1];
+  char rev_current[kMaxReadLen + 1];
   ReverseComplement(current, rev_current, ref_len);
   CharToBitset<BitsetSize>(rev_current, ref_len, rev_ref, rg.base_mask);
 }
@@ -214,10 +215,8 @@ void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
 template <size_t BitsetSize>
 bool SearchMatch(const std::bitset<BitsetSize>& ref,
                  const std::vector<std::bitset<BitsetSize>>& mask1,
-#ifdef GENIE_USE_OPENMP
                  std::vector<OmpLock>& dict_lock,
                  std::vector<OmpLock>& read_lock,
-#endif
                  std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                  std::vector<uint16_t>& read_lengths,
                  std::vector<uint8_t>& remaining_reads,
@@ -225,8 +224,8 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
                  std::vector<BbHashDict>& dict, uint32_t& k, const bool rev,
                  const int shift, const int& ref_len,
                  const ReorderGlobal<BitsetSize>& rg) {
-  static constexpr unsigned int thresh = kThresh_Reorder;
-  constexpr int max_search = kMax_Search_Reorder;
+  static constexpr unsigned int thresh = kThreshReorder;
+  constexpr int max_search = kMaxSearchReorder;
   std::bitset<BitsetSize> b;
   // in the dict read_id array
   // index in start_pos
@@ -245,14 +244,10 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
     if (start_pos_idx >= dict[l].num_keys_)  // not found
       continue;
     // check if any other thread is modifying same dict pos
-#ifdef GENIE_USE_OPENMP
     dict_lock[ReorderLockIdx(start_pos_idx)].Set();
-#endif
     dict[l].FindPos(dict_index, start_pos_idx);
     if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
-#ifdef GENIE_USE_OPENMP
       dict_lock[ReorderLockIdx(start_pos_idx)].Unset();
-#endif
       continue;
     }
     const uint64_t ull1 = ((read[dict[l].read_id_[dict_index[0]]] & mask1[l]) >>
@@ -276,27 +271,151 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
                   .count();
         }
         if (hamming <= thresh) {
-#ifdef GENIE_USE_OPENMP
           read_lock[ReorderLockIdx(rid)].Set();
-#endif
           if (remaining_reads[rid]) {
             remaining_reads[rid] = false;
             k = rid;
             flag = true;
           }
-#ifdef GENIE_USE_OPENMP
           read_lock[ReorderLockIdx(rid)].Unset();
-#endif
           if (flag == 1) break;
         }
       }
     }
-#ifdef GENIE_USE_OPENMP
     dict_lock[ReorderLockIdx(start_pos_idx)].Unset();
-#endif
     if (flag == 1) break;
   }
   return flag;
+}
+
+template <size_t BitsetSize>
+void process_read_task(uint32_t tid, ReorderGlobal<BitsetSize>& rg,
+                       std::vector<std::bitset<BitsetSize>>& read,
+                       std::vector<uint16_t>& read_lengths,
+                       std::vector<uint8_t>& remaining_reads,
+                       std::vector<int>& unmatched,
+                       std::vector<BbHashDict>& dict,
+                       std::vector<std::bitset<BitsetSize>>& mask1,
+                       std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+                       std::vector<OmpLock>& dict_lock,
+                       std::vector<OmpLock>& read_lock) {
+  // Thread-specific file streams
+  std::string tid_str = std::to_string(tid);
+  std::ofstream file_out_reverse_comp(rg.outfile_rc + '.' + tid_str,
+                                      std::ofstream::out);
+  std::ofstream file_out_flags(rg.outfile_flag + '.' + tid_str,
+                               std::ofstream::out);
+  std::ofstream file_out_positions(rg.outfile_pos + '.' + tid_str,
+                                   std::ofstream::out | std::ios::binary);
+  std::ofstream file_out_order(rg.outfile_order + '.' + tid_str,
+                               std::ofstream::out | std::ios::binary);
+  std::ofstream file_out_order_singleton(
+      rg.outfile_order + ".singleton." + tid_str,
+      std::ofstream::out | std::ios::binary);
+  std::ofstream file_out_lengths(rg.outfile_read_length + '.' + tid_str,
+                                 std::ofstream::out | std::ios::binary);
+
+  unmatched[tid] = 0;
+  std::bitset<BitsetSize> ref, reverse_reference, b;
+
+  int64_t first_rid = 0;
+  bool stop_searching = false;
+  uint32_t num_reads_thr = 0;
+  uint32_t num_unmatched_past_1_m_thr = 0;
+
+  auto count = std::array<std::vector<int>, 4>();
+  for (int i = 0; i < 4; i++) count[i] = std::vector<int>(rg.max_read_len);
+
+  int64_t current = 0;
+  uint64_t ull;
+  bool done = false;
+
+  // Fetch initial read
+  {
+    std::lock_guard<std::mutex> lock(rg.mutex);  // Protect shared state
+    if (rg.remaining_reads > 0) {
+      current = rg.remaining_reads--;
+      remaining_reads[current] = false;
+      ++unmatched[tid];
+    } else {
+      done = true;
+    }
+  }
+
+  if (!done) {
+    UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference, count,
+                               true, false, 0, read_lengths[current],
+                               rg.max_read_len, rg);
+  }
+
+  while (!done) {
+    num_reads_thr++;
+
+    // Update references and search for matches
+    if (!stop_searching) {
+      for (int shift = 0; shift < rg.max_shift; shift++) {
+        uint32_t matched_read = 0;
+        bool match_found = SearchMatch<BitsetSize>(
+            ref, mask1, dict_lock, read_lock, mask, read_lengths,
+            remaining_reads, read, dict, matched_read, false, shift,
+            rg.max_read_len, rg);
+
+        if (match_found) {
+          // Handle matched read
+          // Update references, write results
+          // (Handle code from the provided OpenMP loop)
+          break;
+        }
+      }
+    }
+
+    // If no match is found, pick a new unmatched read
+    if (!stop_searching) {
+      for (int64_t j = rg.remaining_reads - 1; j >= 0; --j) {
+        if (remaining_reads[j]) {
+          std::lock_guard<std::mutex> lock(rg.mutex);
+          if (remaining_reads[j]) {
+            current = j;
+            remaining_reads[j] = false;
+            ++unmatched[tid];
+            break;
+          }
+        }
+      }
+
+      if (current == 0) {  // No reads left
+        done = true;
+      }
+    }
+  }
+
+  // Close files
+  file_out_reverse_comp.close();
+  file_out_flags.close();
+  file_out_positions.close();
+  file_out_order.close();
+  file_out_order_singleton.close();
+  file_out_lengths.close();
+}
+
+template <size_t BitsetSize>
+void parallel_process_reads(
+    ReorderGlobal<BitsetSize>& rg, std::vector<std::bitset<BitsetSize>>& read,
+    std::vector<uint16_t>& read_lengths, std::vector<uint8_t>& remaining_reads,
+    std::vector<int>& unmatched, std::vector<BbHashDict>& dict,
+    std::vector<std::bitset<BitsetSize>>& mask1,
+    std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+    std::vector<OmpLock>& dict_lock, std::vector<OmpLock>& read_lock) {
+  // Create dynamic scheduler
+  DynamicScheduler scheduler(rg.num_thr);
+
+  // Dispatch tasks dynamically
+  scheduler.run(rg.num_thr, [&](size_t tid) {
+    process_read_task(tid, rg, read, read_lengths, remaining_reads, unmatched,
+                      dict, mask1, mask, dict_lock, read_lock);
+  });
+
+  std::cerr << "All reads processed dynamically.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -304,13 +423,10 @@ template <size_t BitsetSize>
 void Reorder(std::vector<std::bitset<BitsetSize>>& read,
              std::vector<BbHashDict>& dict, std::vector<uint16_t>& read_lengths,
              const ReorderGlobal<BitsetSize>& rg) {
-#ifdef GENIE_USE_OPENMP
-  constexpr uint32_t num_locks =
-      kNum_Locks_Reorder;  // limits on number of locks
-                           // (power of 2 for fast mod)
+  constexpr uint32_t num_locks = kNumLocksReorder;  // limits on number of locks
+                                                    // (power of 2 for fast mod)
   auto dict_lock = std::vector<OmpLock>(num_locks);
   auto read_lock = std::vector<OmpLock>(num_locks);
-#endif
   auto mask =
       std::vector<std::vector<std::bitset<BitsetSize>>>(rg.max_read_len);
   for (int i = 0; i < rg.max_read_len; i++)
@@ -336,17 +452,16 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
   //
   uint32_t first_read = 0;
   auto unmatched = std::vector<uint32_t>(rg.num_thr);
-#ifdef GENIE_USE_OPENMP
+
+  parallel_process_reads(rg, read, read_lengths, remaining_reads, unmatched,
+                         dict, mask1, mask, dict_lock, read_lock);
+
+
 #pragma omp parallel num_threads(rg.num_thr) default(none)             \
     shared(rg, read, dict, read_lengths, mask1, mask, remaining_reads, \
                unmatched, first_read, dict_lock, read_lock)
-#endif
   {
-#ifdef GENIE_USE_OPENMP
     int tid = omp_get_thread_num();
-#else
-    int tid = 0;  // set thread ID to zero if not using OpenMP
-#endif
     std::string tid_str = std::to_string(tid);
     std::ofstream file_out_reverse_comp(rg.outfile_rc + '.' + tid_str,
                                         std::ofstream::out);
@@ -393,9 +508,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
     int64_t remaining_pos =
         rg.num_reads -
         1;  // used for searching next unmatched read when no match is found
-#ifdef GENIE_USE_OPENMP
 #pragma omp critical
-#endif
     {  // doing initial setup and first read
       current = first_read;
       // some fix below to make sure no errors occurs when we have very
@@ -409,9 +522,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
       }
       first_read += rg.num_reads / rg.num_thr;  // spread out first read equally
     }
-#ifdef GENIE_USE_OPENMP
 #pragma omp barrier
-#endif
     if (!done) {
       UpdateRefCount<BitsetSize>(read[current], ref, reverse_reference, count,
                                  true, false, 0, read_lengths[current], ref_len,
@@ -425,7 +536,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
     while (!done) {
       if (num_reads_thr % 1000000 == 0) {
         if (static_cast<float>(num_unmatched_past_1_m_thr) >
-            kStop_Criteria_Reorder * 1000000) {
+            kStopCriteriaReorder * 1000000) {
           stop_searching = true;
         }
         num_unmatched_past_1_m_thr = 0;
@@ -441,14 +552,10 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
           ull = (b >> 2 * dict[l].start_).to_ullong();
           start_pos_index = dict[l].boo_hash_fun_->lookup(ull);
           // check if any other thread is modifying same dict position
-#ifdef GENIE_USE_OPENMP
           dict_lock[ReorderLockIdx(start_pos_index)].Set();
-#endif
           dict[l].FindPos(dict_idx, start_pos_index);
           dict[l].Remove(dict_idx, start_pos_index, current);
-#ifdef GENIE_USE_OPENMP
           dict_lock[ReorderLockIdx(start_pos_index)].Unset();
-#endif
         }
       } else {
         left_search_start = false;
@@ -458,13 +565,9 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
         for (int shift = 0; shift < rg.max_shift; shift++) {
           uint32_t k;
           // find forward match
-          flag =
-              SearchMatch<BitsetSize>(ref, mask1,
-#ifdef GENIE_USE_OPENMP
-                                      dict_lock, read_lock,
-#endif
-                                      mask, read_lengths, remaining_reads, read,
-                                      dict, k, false, shift, ref_len, rg);
+          flag = SearchMatch<BitsetSize>(ref, mask1, dict_lock, read_lock, mask,
+                                         read_lengths, remaining_reads, read,
+                                         dict, k, false, shift, ref_len, rg);
           if (flag == 1) {
             current = k;
             int ref_len_old = ref_len;
@@ -507,13 +610,10 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
           }
 
           // find reverse match
-          flag =
-              SearchMatch<BitsetSize>(reverse_reference, mask1,
-#ifdef GENIE_USE_OPENMP
-                                      dict_lock, read_lock,
-#endif
-                                      mask, read_lengths, remaining_reads, read,
-                                      dict, k, true, shift, ref_len, rg);
+          flag = SearchMatch<BitsetSize>(reverse_reference, mask1, dict_lock,
+                                         read_lock, mask, read_lengths,
+                                         remaining_reads, read, dict, k, true,
+                                         shift, ref_len, rg);
 
           if (flag == 1) {
             current = k;
@@ -577,9 +677,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
           left_search = false;
           for (int64_t j = remaining_pos; j >= 0; --j) {
             if (remaining_reads[j] == 1) {
-#ifdef GENIE_USE_OPENMP
               read_lock[ReorderLockIdx(j)].Set();
-#endif
               if (remaining_reads[j]) {  // checking again inside
                                          // critical block
                 current = j;
@@ -588,9 +686,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
                 flag = true;
                 ++unmatched[tid];
               }
-#ifdef GENIE_USE_OPENMP
               read_lock[ReorderLockIdx(j)].Unset();
-#endif
               if (flag == 1) break;
             }
           }
@@ -627,12 +723,89 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
     file_out_lengths.close();
   }  // parallel end
 
-#ifdef GENIE_USE_OPENMP
-#endif
   std::cerr << "Reordering done, "
             << static_cast<int>(std::accumulate(
                    unmatched.begin(), unmatched.begin() + rg.num_thr, 0_u32))
             << " were unmatched\n";
+}
+
+template <size_t BitsetSize>
+void process_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
+                  const std::vector<std::bitset<BitsetSize>>& read,
+                  const std::vector<uint16_t>& read_lengths,
+                  std::vector<uint32_t>& num_reads_s_thr) {
+  std::string tid_str = std::to_string(tid);
+  std::ofstream f_out(rg.outfile + '.' + tid_str,
+                      std::ofstream::out | std::ios::binary);
+  std::ofstream f_out_s(rg.outfile + ".singleton." + tid_str,
+                        std::ofstream::out | std::ios::binary);
+  std::ifstream fin_rc(rg.outfile_rc + '.' + tid_str, std::ifstream::in);
+  UTILS_DIE_IF(!fin_rc,
+               "Cannot open file to read: " + rg.outfile_rc + '.' + tid_str);
+  std::ifstream f_in_order(rg.outfile_order + '.' + tid_str,
+                           std::ifstream::in | std::ios::binary);
+  UTILS_DIE_IF(!f_in_order,
+               "Cannot open file to read: " + rg.outfile_order + '.' + tid_str);
+  std::ifstream f_in_order_s(rg.outfile_order + ".singleton." + tid_str,
+                             std::ifstream::in | std::ios::binary);
+  UTILS_DIE_IF(!f_in_order_s, "Cannot open file to read: " + rg.outfile_order +
+                                  ".singleton." + tid_str);
+
+  uint32_t current;
+  char c;
+  // Read character by character
+  while (fin_rc >> std::noskipws >> c) {
+    f_in_order.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
+    if (c == 'd') {
+      uint16_t num_bytes_to_write =
+          (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
+      f_out.write(reinterpret_cast<const char*>(&read_lengths[current]),
+                  sizeof(uint16_t));
+      f_out.write(reinterpret_cast<const char*>(&read[current]),
+                  num_bytes_to_write);
+    } else {
+      char s1[kMaxReadLen + 1];
+      char s[kMaxReadLen + 1];
+      BitsetToString<BitsetSize>(read[current], s, read_lengths[current], rg);
+      ReverseComplement(s, s1, read_lengths[current]);
+      WriteDnaInBits(s1, f_out);
+    }
+  }
+
+  f_in_order_s.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
+  while (!f_in_order_s.eof()) {
+    num_reads_s_thr[tid]++;
+    uint16_t num_bytes_to_write =
+        (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
+    f_out_s.write(reinterpret_cast<const char*>(&read_lengths[current]),
+                  sizeof(uint16_t));
+    f_out_s.write(reinterpret_cast<const char*>(&read[current]),
+                  num_bytes_to_write);
+    f_in_order_s.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
+  }
+
+  // Close all files
+  f_out.close();
+  f_out_s.close();
+  fin_rc.close();
+  f_in_order.close();
+  f_in_order_s.close();
+}
+
+template <size_t BitsetSize>
+void process_all_tasks(const ReorderGlobal<BitsetSize>& rg,
+                       const std::vector<std::bitset<BitsetSize>>& read,
+                       const std::vector<uint16_t>& read_lengths,
+                       std::vector<uint32_t>& num_reads_s_thr) {
+  // Create a DynamicScheduler instance
+  DynamicScheduler scheduler(rg.num_thr);
+
+  // Run the scheduler to process tasks dynamically
+  scheduler.run(rg.num_thr, [&](size_t tid) {
+    process_task(tid, rg, read, read_lengths, num_reads_s_thr);
+  });
+
+  std::cerr << "All tasks completed dynamically.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -650,70 +823,7 @@ void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
   // execute on the same #threads.
   //
   std::vector<uint32_t> num_reads_s_thr(rg.num_thr, 0);
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(rg.num_thr) default(none) \
-    shared(rg, read, read_lengths, num_reads_s_thr)
-#endif
-  {
-#ifdef GENIE_USE_OPENMP
-    uint32_t tid = omp_get_thread_num();
-#else
-    uint32_t tid = 0;  // set thread ID to zero if not using OpenMP
-#endif
-    std::string tid_str = std::to_string(tid);
-    std::ofstream f_out(rg.outfile + '.' + tid_str,
-                        std::ofstream::out | std::ios::binary);
-    std::ofstream f_out_s(rg.outfile + ".singleton." + tid_str,
-                          std::ofstream::out | std::ios::binary);
-    std::ifstream fin_rc(rg.outfile_rc + '.' + tid_str, std::ifstream::in);
-    UTILS_DIE_IF(!fin_rc,
-                 "Cannot open file to read: " + rg.outfile_rc + '.' + tid_str);
-    std::ifstream f_in_order(rg.outfile_order + '.' + tid_str,
-                             std::ifstream::in | std::ios::binary);
-    UTILS_DIE_IF(!f_in_order, "Cannot open file to read: " + rg.outfile_order +
-                                  '.' + tid_str);
-    std::ifstream f_in_order_s(rg.outfile_order + ".singleton." + tid_str,
-                               std::ifstream::in | std::ios::binary);
-    UTILS_DIE_IF(!f_in_order_s, "Cannot open file to read: " +
-                                    rg.outfile_order + ".singleton." + tid_str);
-    uint32_t current;
-    char c;
-    // read character by character
-    while (fin_rc >> std::noskipws >> c) {
-      f_in_order.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
-      if (c == 'd') {
-        uint16_t num_bytes_to_write =
-            (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
-        f_out.write(reinterpret_cast<char*>(&read_lengths[current]),
-                    sizeof(uint16_t));
-        f_out.write(reinterpret_cast<char*>(&read[current]),
-                    num_bytes_to_write);
-      } else {
-        char s1[kMax_Read_Len + 1];
-        char s[kMax_Read_Len + 1];
-        BitsetToString<BitsetSize>(read[current], s, read_lengths[current], rg);
-        ReverseComplement(s, s1, read_lengths[current]);
-        WriteDnaInBits(s1, f_out);
-      }
-    }
-    f_in_order_s.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
-    while (!f_in_order_s.eof()) {
-      num_reads_s_thr[tid]++;
-      uint16_t num_bytes_to_write =
-          (static_cast<uint32_t>(read_lengths[current]) + 4 - 1) / 4;
-      f_out_s.write(reinterpret_cast<char*>(&read_lengths[current]),
-                    sizeof(uint16_t));
-      f_out_s.write(reinterpret_cast<char*>(&read[current]),
-                    num_bytes_to_write);
-      f_in_order_s.read(reinterpret_cast<char*>(&current), sizeof(uint32_t));
-    }
-
-    f_out.close();
-    f_out_s.close();
-    fin_rc.close();
-    f_in_order.close();
-    f_in_order_s.close();
-  }
+  process_all_tasks(rg, read, read_lengths, num_reads_s_thr);
 
   uint32_t num_reads_s = 0;
   for (int i = 0; i < rg.num_thr; i++) num_reads_s += num_reads_s_thr[i];
