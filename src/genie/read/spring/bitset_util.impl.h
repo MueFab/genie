@@ -10,17 +10,13 @@
 
 // -----------------------------------------------------------------------------
 
-#ifdef GENIE_USE_OPENMP
-#include <omp.h>
-#endif
-
-#include <genie/util/runtime_exception.h>
-
 #include <algorithm>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "genie/read/spring/dynamic_scheduler.h"
 
 // -----------------------------------------------------------------------------
 
@@ -48,6 +44,231 @@ void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
 }
 
 // -----------------------------------------------------------------------------
+
+// Function to write keys for a specific task (dynamic scheduling replacement
+// for OpenMP loop)
+inline void write_keys_task_dynamic(const size_t task_id,
+                                    const std::vector<uint64_t>& ull,
+                                    const BbHashDict& dict,
+                                    const std::string& basedir,
+                                    const size_t num_threads) {
+  const uint64_t num_reads = dict.dict_num_reads_;
+  const uint64_t start =
+      static_cast<uint64_t>(task_id) * num_reads / num_threads;
+  uint64_t stop = (task_id + 1) * num_reads / num_threads;
+  if (task_id == num_threads - 1) {
+    stop = num_reads;
+  }
+
+  std::ofstream file_out_key(basedir + "/keys.bin." + std::to_string(task_id),
+                             std::ios::binary);
+  for (uint64_t i = start; i < stop; ++i) {
+    file_out_key.write(reinterpret_cast<const char*>(&ull[i]),
+                       sizeof(uint64_t));
+  }
+  file_out_key.close();
+}
+
+// -----------------------------------------------------------------------------
+
+// Function replacing OpenMP loop
+inline void parallel_write_keys_dynamic(const std::vector<uint64_t>& ull,
+                                        const BbHashDict& dict,
+                                        const std::string& basedir,
+                                        const size_t num_threads) {
+  // Create an instance of the DynamicScheduler
+  DynamicScheduler scheduler(num_threads);
+
+  // Run the dynamic scheduler with tasks
+  scheduler.run(num_threads, [&](const size_t task_id) {
+    write_keys_task_dynamic(task_id, ull, dict, basedir, num_threads);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+// Task to process keys and write hashes
+inline void process_keys_task(size_t task_id,
+                              const std::vector<BbHashDict>& dict,
+                              const std::string& basedir, size_t num_threads,
+                              int j) {
+  const uint64_t num_reads = dict[j].dict_num_reads_;
+  const uint64_t start = task_id * num_reads / num_threads;
+  uint64_t stop = (task_id + 1) * num_reads / num_threads;
+  if (task_id == num_threads - 1) stop = num_reads;
+
+  std::ifstream file_in_key(basedir + "/keys.bin." + std::to_string(task_id),
+                            std::ios::binary);
+  if (!file_in_key.is_open()) {
+    throw std::runtime_error("Cannot open file to read: " + basedir +
+                             "/keys.bin." + std::to_string(task_id));
+  }
+
+  std::ofstream file_out_hash(basedir + "/hash.bin." + std::to_string(task_id) +
+                                  '.' + std::to_string(j),
+                              std::ios::binary);
+
+  uint64_t current_key, current_hash;
+  for (uint64_t i = start; i < stop; ++i) {
+    file_in_key.read(reinterpret_cast<char*>(&current_key), sizeof(uint64_t));
+    current_hash = dict[j].boo_hash_fun_->lookup(current_key);
+    file_out_hash.write(reinterpret_cast<char*>(&current_hash),
+                        sizeof(uint64_t));
+  }
+
+  file_in_key.close();
+  std::remove((basedir + "/keys.bin." + std::to_string(task_id)).c_str());
+  file_out_hash.close();
+}
+
+// -----------------------------------------------------------------------------
+
+// Function replacing OpenMP loop
+inline void parallel_process_keys_dynamic(const std::vector<BbHashDict>& dict,
+                                          const std::string& basedir,
+                                          const int num_threads, const int j) {
+  // Create an instance of the DynamicScheduler
+  DynamicScheduler scheduler(num_threads);
+
+  // Run the dynamic scheduler with tasks
+  scheduler.run(num_threads, [&](const size_t task_id) {
+    process_keys_task(task_id, dict, basedir, num_threads, j);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+inline void deduplicate_and_construct_hash(std::vector<uint64_t>& ull,
+                                           BbHashDict& dict) {
+  // Deduplicate ull
+  std::sort(ull.begin(), ull.begin() + dict.dict_num_reads_);
+  uint32_t k = 0;
+  for (uint32_t i = 1; i < dict.dict_num_reads_; i++) {
+    if (ull[i] != ull[k]) {
+      ull[++k] = ull[i];
+    }
+  }
+  dict.num_keys_ = k + 1;
+
+  // Construct BooHash
+  auto data_iterator =
+      boomphf::range(static_cast<const uint64_t*>(ull.data()),
+                     static_cast<const uint64_t*>(ull.data() + dict.num_keys_));
+  double gamma_factor = 5.0;  // Balance between speed and memory
+  dict.boo_hash_fun_ = std::make_unique<BooHashFunType>(
+      dict.num_keys_, data_iterator, /*num_thr*/ 1, gamma_factor, true, false);
+}
+
+// -----------------------------------------------------------------------------
+
+inline void filter_keys_by_read_length(
+    const std::vector<uint16_t>& read_lengths, std::vector<uint64_t>& ull,
+    BbHashDict& dict, const uint32_t num_reads) {
+  dict.dict_num_reads_ = 0;  // Reset the count of reads for the dictionary
+  for (uint32_t i = 0; i < num_reads; i++) {
+    if (read_lengths[i] > dict.end_) {
+      ull[dict.dict_num_reads_] = ull[i];  // Retain the key
+      dict.dict_num_reads_++;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+template <size_t BitsetSize>
+void compute_keys(const std::vector<std::bitset<BitsetSize>>& read,
+                  const std::bitset<BitsetSize>& mask,
+                  std::vector<uint64_t>& ull, const BbHashDict& dict,
+                  const size_t num_reads, const int bpb) {
+  std::bitset<BitsetSize> b;
+  // Compute keys and store in ull
+  for (uint64_t i = 0; i < num_reads; i++) {
+    b = read[i] & mask;
+    ull[i] = (b >> (bpb * dict.start_)).to_ullong();  // NOLINT
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+inline void process_dict_task(size_t task_id, std::vector<BbHashDict>& dict,
+                              const std::string& basedir,
+                              const std::vector<uint16_t>& read_lengths,
+                              int num_threads) {
+  int j = static_cast<int>(task_id);
+
+  // Step 1: Fill start_pos_ by first storing numbers and then doing cumulative
+  // sum
+  dict[j].start_pos_ = std::vector<uint32_t>(dict[j].num_keys_ + 1);
+  uint64_t current_hash;
+  for (int tid = 0; tid < num_threads; tid++) {
+    std::ifstream fin_hash(
+        basedir + "/hash.bin." + std::to_string(tid) + '.' + std::to_string(j),
+        std::ios::binary);
+    if (!fin_hash.is_open()) {
+      throw std::runtime_error("Cannot open file to read: " + basedir +
+                               "/hash.bin." + std::to_string(tid) + '.' +
+                               std::to_string(j));
+    }
+    while (fin_hash.read(reinterpret_cast<char*>(&current_hash),
+                         sizeof(uint64_t))) {
+      dict[j].start_pos_[current_hash + 1]++;
+    }
+    fin_hash.close();
+  }
+
+  dict[j].empty_bin_ = std::vector<uint8_t>(dict[j].num_keys_);
+  for (uint32_t i = 1; i < dict[j].num_keys_; i++) {
+    dict[j].start_pos_[i] += dict[j].start_pos_[i - 1];
+  }
+
+  // Step 2: Insert elements in the dict array
+  dict[j].read_id_ = std::vector<uint32_t>(dict[j].dict_num_reads_);
+  uint32_t i = 0;
+  for (int tid = 0; tid < num_threads; tid++) {
+    std::ifstream fin_hash(
+        basedir + "/hash.bin." + std::to_string(tid) + '.' + std::to_string(j),
+        std::ios::binary);
+    if (!fin_hash.is_open()) {
+      throw std::runtime_error("Cannot open file to read: " + basedir +
+                               "/hash.bin." + std::to_string(tid) + '.' +
+                               std::to_string(j));
+    }
+    while (fin_hash.read(reinterpret_cast<char*>(&current_hash),
+                         sizeof(uint64_t))) {
+      while (read_lengths[i] <= dict[j].end_) i++;
+      dict[j].read_id_[dict[j].start_pos_[current_hash]++] = i;
+      i++;
+    }
+    fin_hash.close();
+    std::remove(
+        (basedir + "/hash.bin." + std::to_string(tid) + '.' + std::to_string(j))
+            .c_str());
+  }
+
+  // Step 3: Correcting start_pos array modified during insertion
+  for (int64_t key_num = dict[j].num_keys_; key_num >= 1; key_num--) {
+    dict[j].start_pos_[key_num] = dict[j].start_pos_[key_num - 1];
+  }
+  dict[j].start_pos_[0] = 0;
+}
+
+// -----------------------------------------------------------------------------
+
+inline void parallel_process_dicts_dynamic(
+    std::vector<BbHashDict>& dict, const std::string& basedir,
+    const std::vector<uint16_t>& read_lengths, const int num_threads,
+    const int num_dict) {
+  // Create an instance of the DynamicScheduler
+  DynamicScheduler scheduler(std::min(num_dict, num_threads));
+
+  // Run the dynamic scheduler with tasks
+  scheduler.run(num_dict, [&](const size_t task_id) {
+    process_dict_task(task_id, dict, basedir, read_lengths, num_threads);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
                          std::vector<BbHashDict>& dict,
@@ -59,223 +280,14 @@ void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
   GenerateIndexMasks<BitsetSize>(mask, dict, num_dict, bpb);
   for (int j = 0; j < num_dict; j++) {
     auto ull = std::vector<uint64_t>(num_reads);
-
-    //
-    // It is not worth putting parallel region here.
-    // This loop barely shows up on the execution profile.
-    //
-#if 0 && GENIE_USE_OPENMP
-#pragma omp parallel num_threads(num_threads)
-#endif
-    {
-      std::bitset<BitsetSize> b;
-#if 0 && GENIE_USE_OPENMP
-            int tid = omp_get_thread_num();
-                int num_thr = omp_get_num_threads();
-#else
-      int tid = 0;
-      int num_thr = 1;
-#endif
-      uint64_t i, stop;
-      i = static_cast<uint64_t>(tid) * num_reads / num_thr;
-      stop = static_cast<uint64_t>(tid + 1) * num_reads / num_thr;
-      if (tid == num_thr - 1) stop = num_reads;
-      // compute keys and store in ull
-      for (; i < stop; i++) {
-        b = read[i] & mask[j];
-        ull[i] = (b >> bpb * dict[j].start_).to_ullong();
-      }
-    }  // parallel end
-
-    // remove keys corresponding to reads shorter than dict_end[j]
-    dict[j].dict_num_reads_ = 0;
-    for (uint32_t i = 0; i < num_reads; i++) {
-      if (read_lengths[i] > dict[j].end_) {
-        ull[dict[j].dict_num_reads_] = ull[i];
-        dict[j].dict_num_reads_++;
-      }
-    }
-
-    //
-    // write ull to file
-    //
-    // This region must be executed in parallel with num_threads
-    // threads, for correctness.
-    //
-    // FIXME - make this a parallel for loop that can easily have
-    // the OpenMP directive commented out && parallelism disabled.
-    //
-#if GENIE_USE_OPENMP
-#pragma omp parallel num_threads(num_threads) default(none) \
-    shared(ull, dict, j, basedir)
-#endif
-    {
-#ifdef GENIE_USE_OPENMP
-      int tid = omp_get_thread_num();
-      int num_thr = omp_get_num_threads();
-#else
-      int tid = 0;
-      int num_thr = 1;
-#endif
-      std::ofstream file_out_key(
-          basedir + std::string("/keys.bin.") + std::to_string(tid),
-          std::ios::binary);
-      uint64_t i, stop;
-      i = static_cast<uint64_t>(tid) * dict[j].dict_num_reads_ / num_thr;
-      stop = static_cast<uint64_t>(tid + 1) * dict[j].dict_num_reads_ / num_thr;
-      if (tid == num_thr - 1) stop = dict[j].dict_num_reads_;
-      for (; i < stop; i++)
-        file_out_key.write(reinterpret_cast<char*>(&ull[i]), sizeof(uint64_t));
-      file_out_key.close();
-    }  // parallel end
-
-    // deduplicating ull
-    std::sort(ull.begin(), ull.begin() + dict[j].dict_num_reads_);
-    uint32_t k = 0;
-    for (uint32_t i = 1; i < dict[j].dict_num_reads_; i++)
-      if (ull[i] != ull[k]) ull[++k] = ull[i];
-    dict[j].num_keys_ = k + 1;
-    // construct boo hash
-    auto data_iterator = boomphf::range(
-        static_cast<const uint64_t*>(ull.data()),
-        static_cast<const uint64_t*>(ull.data() + dict[j].num_keys_));
-    double gamma_factor = 5.0;  // balance between speed and memory
-    dict[j].boo_hash_fun_ = std::make_unique<BooHashFunType>(
-        dict[j].num_keys_, data_iterator, /*num_thr*/ 1, gamma_factor, true,
-        false);
-
-    //
-    // compute hashes for all reads
-    //
-    // This region must be executed in parallel with num_threads
-    // threads, for correctness.
-    //
-    // FIXME - make this a parallel for loop that can easily have
-    // the OpenMP directive commented out && parallelism disabled.
-    //
-    // The boo lookup() call shows up in the execution profile,
-    // so there might be a small benefit from it being executed
-    // in parallel on large problem sizes.
-    //
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(num_threads) default(none) \
-    shared(dict, j, basedir, num_threads, num_dict)
-#endif
-    {
-#ifdef GENIE_USE_OPENMP
-      int tid = omp_get_thread_num();
-      int num_thr = omp_get_num_threads();
-#else
-      int tid = 0;
-      int num_thr = 1;
-#endif
-      std::ifstream file_in_key(
-          basedir + std::string("/keys.bin.") + std::to_string(tid),
-          std::ios::binary);
-      UTILS_DIE_IF(!file_in_key, "Cannot open file to read: " + basedir +
-                                     std::string("/keys.bin.") +
-                                     std::to_string(tid));
-      std::ofstream file_out_hash(basedir + std::string("/hash.bin.") +
-                                      std::to_string(tid) + '.' +
-                                      std::to_string(j),
-                                  std::ios::binary);
-      uint64_t current_key, current_hash;
-      uint64_t i, stop;
-      i = static_cast<uint64_t>(tid) * dict[j].dict_num_reads_ / num_thr;
-      stop = static_cast<uint64_t>(tid + 1) * dict[j].dict_num_reads_ / num_thr;
-      if (tid == num_thr - 1) stop = dict[j].dict_num_reads_;
-      for (; i < stop; i++) {
-        file_in_key.read(reinterpret_cast<char*>(&current_key),
-                         sizeof(uint64_t));
-        //
-        // the following line shows up on the execution profile
-        //
-        current_hash = dict[j].boo_hash_fun_->lookup(current_key);
-        file_out_hash.write(reinterpret_cast<char*>(&current_hash),
-                            sizeof(uint64_t));
-      }
-      file_in_key.close();
-      remove(
-          (basedir + std::string("/keys.bin.") + std::to_string(tid)).c_str());
-      file_out_hash.close();
-    }  // parallel end
+    compute_keys(read, mask[j], ull, dict[j], num_reads, bpb);
+    filter_keys_by_read_length(read_lengths, ull, dict[j], num_reads);
+    parallel_write_keys_dynamic(ull, dict[j], basedir, num_threads);
+    deduplicate_and_construct_hash(ull, dict[j]);
+    parallel_process_keys_dynamic(dict, basedir, num_threads, j);
   }
-
-  //
-  // for rest of the function, use num_dict threads to parallelize
-  //
-  // This loops must be executed in parallel with num_threads
-  // threads, for correctness.
-  //
-  // When this region shows up in the execution profile, it is always
-  // because of a file I/O operation.
-  //
-  {
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(std::min(num_dict, num_threads)) default( \
-        none) shared(dict, basedir, read_lengths, num_threads, num_dict)
-#endif
-    for (int j = 0; j < num_dict; j++) {
-      // fill start_pos by first storing numbers and then doing cumulative
-      // sum
-      dict[j].start_pos_ = std::vector<uint32_t>(
-          dict[j].num_keys_ + 1);  // 1 extra to store end pos of last key
-      uint64_t current_hash;
-      for (int tid = 0; tid < num_threads; tid++) {
-        std::ifstream fin_hash(basedir + std::string("/hash.bin.") +
-                                   std::to_string(tid) + '.' +
-                                   std::to_string(j),
-                               std::ios::binary);
-        UTILS_DIE_IF(!fin_hash, "Cannot open file to read: " + basedir +
-                                    std::string("/hash.bin.") +
-                                    std::to_string(tid) + '.' +
-                                    std::to_string(j));
-        fin_hash.read(reinterpret_cast<char*>(&current_hash), sizeof(uint64_t));
-        while (!fin_hash.eof()) {
-          dict[j].start_pos_[current_hash + 1]++;
-          fin_hash.read(reinterpret_cast<char*>(&current_hash),
-                        sizeof(uint64_t));
-        }
-        fin_hash.close();
-      }
-
-      dict[j].empty_bin_ = std::vector<uint8_t>(dict[j].num_keys_);
-      for (uint32_t i = 1; i < dict[j].num_keys_; i++)
-        dict[j].start_pos_[i] =
-            dict[j].start_pos_[i] + dict[j].start_pos_[i - 1];
-
-      // insert elements in the dict array
-      dict[j].read_id_ = std::vector<uint32_t>(dict[j].dict_num_reads_);
-      uint32_t i = 0;
-      for (int tid = 0; tid < num_threads; tid++) {
-        std::ifstream fin_hash(basedir + std::string("/hash.bin.") +
-                                   std::to_string(tid) + '.' +
-                                   std::to_string(j),
-                               std::ios::binary);
-        UTILS_DIE_IF(!fin_hash, "Cannot open file to read: " + basedir +
-                                    std::string("/hash.bin.") +
-                                    std::to_string(tid) + '.' +
-                                    std::to_string(j));
-        fin_hash.read(reinterpret_cast<char*>(&current_hash), sizeof(uint64_t));
-        while (!fin_hash.eof()) {
-          while (read_lengths[i] <= dict[j].end_) i++;
-          dict[j].read_id_[dict[j].start_pos_[current_hash]++] = i;
-          i++;
-          fin_hash.read(reinterpret_cast<char*>(&current_hash),
-                        sizeof(uint64_t));
-        }
-        fin_hash.close();
-        remove((basedir + std::string("/hash.bin.") + std::to_string(tid) +
-                '.' + std::to_string(j))
-                   .c_str());
-      }
-
-      // correcting start_pos array modified during insertion
-      for (int64_t key_num = dict[j].num_keys_; key_num >= 1; key_num--)
-        dict[j].start_pos_[key_num] = dict[j].start_pos_[key_num - 1];
-      dict[j].start_pos_[0] = 0;
-    }  // parallel for end
-  }
+  parallel_process_dicts_dynamic(dict, basedir, read_lengths, num_threads,
+                                 num_dict);
 }
 
 // -----------------------------------------------------------------------------
@@ -294,6 +306,7 @@ void GenerateMasks(std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void CharToBitset(
     const char* s, const int read_len, std::bitset<BitsetSize>& b,
