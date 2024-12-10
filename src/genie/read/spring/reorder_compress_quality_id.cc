@@ -248,8 +248,8 @@ void parallel_process_blocks_dynamic(
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(block_start.size(), [&](const size_t block_num) {
-    process_block_task(block_num, block_start, block_end, id_array,
+  scheduler.run(block_start.size(), [&](const SchedulerInfo& info) {
+    process_block_task(info.task_id, block_start, block_end, id_array,
                        file_order_id, name_coder, entropy, params, stat_vec,
                        write_raw, id_desc_prefix);
   });
@@ -352,8 +352,8 @@ void parallel_process_quality_blocks_dynamic(
 
   // Run the dynamic scheduler with tasks
   scheduler.run(
-      end_block_num - start_block_num, [&](const size_t relative_block_num) {
-        const size_t block_num = start_block_num + relative_block_num;
+      end_block_num - start_block_num, [&](const SchedulerInfo& info) {
+        const size_t block_num = start_block_num + info.task_id;
         process_quality_block_task(
             block_num, block_start, block_end, quality_array, qv_coder, entropy,
             params, stat_vec, write_raw, quality_desc_prefix, start_block_num);
@@ -538,8 +538,8 @@ void parallel_process_blocks_dynamic(
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(blocks, [&](const size_t block_num) {
-    process_block_task(block_num, num_reads_per_block, num_reads_bin,
+  scheduler.run(blocks, [&](const SchedulerInfo& info) {
+    process_block_task(info.task_id, num_reads_per_block, num_reads_bin,
                        start_read_bin, mode, str_array, name_coder, entropy,
                        params, stat_vec, write_raw, id_desc_prefix,
                        quality_desc_prefix, qv_coder);

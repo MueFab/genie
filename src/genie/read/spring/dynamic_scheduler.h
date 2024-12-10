@@ -15,6 +15,11 @@
 #include <thread>
 #include <vector>
 
+struct SchedulerInfo {
+  size_t thread_id;
+  size_t task_id;
+};
+
 class DynamicScheduler {
  public:
   explicit DynamicScheduler(const size_t num_threads)
@@ -26,7 +31,7 @@ class DynamicScheduler {
 
   // Run tasks with dynamic scheduling
   void run(const size_t total_tasks,
-           const std::function<void(size_t)>& task_function) {
+           const std::function<void(const SchedulerInfo&)>& task_function) {
     current_task_.store(0);  // Reset task counter
     threads_.clear();        // Clear any previously used threads
 
@@ -42,8 +47,9 @@ class DynamicScheduler {
             break;
           }
 
+          const SchedulerInfo info = {i, task_id};
           // Execute the task
-          task_function(task_id);
+          task_function(info);
         }
       });
     }

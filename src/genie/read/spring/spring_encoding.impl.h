@@ -331,8 +331,8 @@ void process_all_tasks(
   DynamicScheduler scheduler(num_threads);
 
   // Process all tasks
-  scheduler.run(eg.num_thr, [&](size_t task_id) {
-    process_task(task_id, eg, egb, dict, mask1, mask, read, order_s,
+  scheduler.run(eg.num_thr, [&](const SchedulerInfo& info) {
+    process_task(info.task_id, eg, egb, dict, mask1, mask, read, order_s,
                  read_lengths_s, remaining_reads, read_lock, dict_lock,
                  char_to_rev_char);
   });

@@ -587,11 +587,10 @@ void parallel_process_reads(
   std::cerr << "Running with " << rg.num_thr << " threads\n";
 
   // Dispatch tasks dynamically
-  scheduler.run(rg.num_thr, [&](size_t tid) {
-    process_read_task(tid, rg, read, read_lengths, remaining_reads, unmatched,
-    dict, mask1, mask, dict_lock, read_lock,  mutex,
-     first_read,
-     barrier);
+  scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
+    process_read_task(info.task_id, rg, read, read_lengths, remaining_reads,
+                      unmatched, dict, mask1, mask, dict_lock, read_lock, mutex,
+                      first_read, barrier);
   });
 }
 
@@ -711,8 +710,8 @@ void process_all_tasks(const ReorderGlobal<BitsetSize>& rg,
   DynamicScheduler scheduler(rg.num_thr);
 
   // Run the scheduler to process tasks dynamically
-  scheduler.run(rg.num_thr, [&](size_t tid) {
-    process_task(tid, rg, read, read_lengths, num_reads_s_thr);
+  scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
+    process_task(info.task_id, rg, read, read_lengths, num_reads_s_thr);
   });
 
   std::cerr << "All tasks completed dynamically.\n";
