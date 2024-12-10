@@ -17,7 +17,7 @@
 
 class DynamicScheduler {
  public:
-  explicit DynamicScheduler(const int num_threads)
+  explicit DynamicScheduler(const size_t num_threads)
       : num_threads_(num_threads), current_task_(0) {
     if (num_threads_ <= 0) {
       num_threads_ = std::max(1u, std::thread::hardware_concurrency());
@@ -31,7 +31,7 @@ class DynamicScheduler {
     threads_.clear();        // Clear any previously used threads
 
     // Launch threads
-    for (int i = 0; i < num_threads_; ++i) {
+    for (size_t i = 0; i < num_threads_; ++i) {
       threads_.emplace_back([&, i]() {
         while (true) {
           // Fetch the next task ID atomically
@@ -55,7 +55,7 @@ class DynamicScheduler {
   }
 
  private:
-  int num_threads_;                   // Number of threads
+  size_t num_threads_;                   // Number of threads
   std::atomic<size_t> current_task_;  // Atomic counter for tasks
   std::vector<std::thread> threads_;  // Thread pool
 };

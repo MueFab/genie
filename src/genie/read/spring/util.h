@@ -19,6 +19,7 @@
 
 // -----------------------------------------------------------------------------
 
+#include <array>
 #include <cstdint>
 #include <fstream>
 #include <string>
@@ -39,7 +40,7 @@ namespace genie::read::spring {
  *
  * Other characters in the ASCII range are mapped to 0.
  */
-static constexpr char kCharToRevChar[128] = {
+static constexpr std::array<char, 128> kCharToRevChar = {
     0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0,   0, 0, 0,
     0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0,   0, 0, 0,
     0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0,   0, 0, 'T',

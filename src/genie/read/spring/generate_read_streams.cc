@@ -5,6 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
+#include "genie/read/spring/generate_read_streams.h"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -17,11 +19,10 @@
 #include <utility>
 #include <vector>
 
-#include "genie/read/spring/dynamic_scheduler.h"
 #include "genie/core/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/read_encoder.h"
-#include "genie/read/spring/generate_read_streams.h"
+#include "genie/read/spring/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
 
 // -----------------------------------------------------------------------------
@@ -197,8 +198,8 @@ void parallel_process_blocks_dynamic(
 
   // Run the dynamic scheduler with tasks
   scheduler.run(blocks, [&](const size_t block_num) {
-    process_block_task(block_num, params, data, num_reads_per_block,
-                       write_raw, entropy_encoder, stat_vec, temp_dir);
+    process_block_task(block_num, params, data, num_reads_per_block, write_raw,
+                       entropy_encoder, stat_vec, temp_dir);
   });
 
   std::cerr << "All blocks have been processed in parallel using dynamic "
@@ -722,11 +723,8 @@ struct PeStatistics {
 
 // -----------------------------------------------------------------------------
 void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
-                       const uint64_t cur_block_num, PeStatistics* pest,
-                       core::AccessUnit& raw_au) {
-  const unsigned cur_thread_num = std::thread::hardware_concurrency();
-  UTILS_DIE_IF(cur_thread_num == 0, "Cannot get number of threads");
-
+                       const uint64_t cur_block_num, PeStatistics& pest,
+                       size_t cur_thread_num, core::AccessUnit& raw_au) {
   int64_t rc_to_int[128];
   rc_to_int[static_cast<uint8_t>('d')] = 0;
   rc_to_int[static_cast<uint8_t>('r')] = 1;
@@ -851,7 +849,7 @@ void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
             .Push(0);  // pair decoding case same_rec
         raw_au.Get(core::gen_sub::kPairSameRec)
             .Push(!read_1_first + 2 * delta);  // pair
-        pest->count_same_rec[cur_thread_num]++;
+        pest.count_same_rec[cur_thread_num]++;
       }
     } else {
       // only one read in genomic record
@@ -913,9 +911,9 @@ void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
       const bool same_block =
           block_data.block_num[current] == block_data.block_num[pair];
       if (same_block)
-        pest->count_split_same_au[cur_thread_num]++;
+        pest.count_split_same_au[cur_thread_num]++;
       else
-        pest->count_split_diff_au[cur_thread_num]++;
+        pest.count_split_diff_au[cur_thread_num]++;
 
       if (const bool read_1_first = current < pair;
           same_block && !read_1_first) {
@@ -953,7 +951,7 @@ void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
                         bool write_raw,
                         core::ReadEncoder::entropy_selector* entropy_encoder,
                         std::vector<core::stats::PerfStats>& stat_vec,
-                        const std::string& temp_dir) {
+                        const std::string& temp_dir, size_t cur_thread_num) {
   params[cur_block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
       core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
@@ -961,7 +959,7 @@ void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
       core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
   core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
-  GenerateStreamsPe(data, block_data, cur_block_num, &pest, au);
+  GenerateStreamsPe(data, block_data, cur_block_num, pest, cur_thread_num, au);
   num_reads_per_block[cur_block_num] = static_cast<uint32_t>(
       au.Get(core::gen_sub::kReverseComplement).GetNumSymbols());
   num_records_per_block[cur_block_num] =
@@ -1004,7 +1002,7 @@ void parallel_process_blocks_dynamic(
   scheduler.run(block_data.block_start.size(), [&](const size_t cur_block_num) {
     process_block_task(cur_block_num, block_data, params, pest, data,
                        num_reads_per_block, num_records_per_block, write_raw,
-                       entropy_encoder, stat_vec, temp_dir);
+                       entropy_encoder, stat_vec, temp_dir, num_threads);
   });
 }
 
