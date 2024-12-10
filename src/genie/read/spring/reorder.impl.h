@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "barrier.h"
+#include "genie/read/spring/barrier.h"
 #include "genie/util/literal.h"
 #include "genie/util/runtime_exception.h"
 
@@ -294,7 +294,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        std::vector<std::bitset<BitsetSize>>& read,
                        std::vector<uint16_t>& read_lengths,
                        std::vector<uint8_t>& remaining_reads,
-                       std::vector<int>& unmatched,
+                       std::vector<uint32_t>& unmatched,
                        std::vector<BbHashDict>& dict,
                        std::vector<std::bitset<BitsetSize>>& mask1,
                        std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
@@ -305,6 +305,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        Barrier& barrier) {
   // Thread-specific file streams
   std::string tid_str = std::to_string(tid);
+
   std::ofstream file_out_reverse_comp(rg.outfile_rc + '.' + tid_str,
                                       std::ofstream::out);
   std::ofstream file_out_flags(rg.outfile_flag + '.' + tid_str,
@@ -572,7 +573,7 @@ void parallel_process_reads(
     const ReorderGlobal<BitsetSize>& rg, std::vector<std::bitset<BitsetSize>>&
     read,
     std::vector<uint16_t>& read_lengths, std::vector<uint8_t>& remaining_reads,
-    std::vector<int>& unmatched, std::vector<BbHashDict>& dict,
+    std::vector<uint32_t>& unmatched, std::vector<BbHashDict>& dict,
     std::vector<std::bitset<BitsetSize>>& mask1,
     std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
     std::vector<OmpLock>& dict_lock, std::vector<OmpLock>& read_lock) {
@@ -580,8 +581,10 @@ void parallel_process_reads(
   DynamicScheduler scheduler(rg.num_thr);
 
   std::mutex mutex;
-  uint32_t first_read;
+  uint32_t first_read = 0;
   Barrier barrier(rg.num_thr);
+
+  std::cerr << "Running with " << rg.num_thr << " threads\n";
 
   // Dispatch tasks dynamically
   scheduler.run(rg.num_thr, [&](size_t tid) {
@@ -725,10 +728,6 @@ void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
   // that was used for the hot loop in reorder(), for correctness.
   // It also shows up in the execution profile, and is worth
   // parallelizing anyway.
-  //
-  // FIXME re-code the loop so that is doesn't necessarily need to
-  // execute on the same #threads.
-  //
   std::vector<uint32_t> num_reads_s_thr(rg.num_thr, 0);
   process_all_tasks(rg, read, read_lengths, num_reads_s_thr);
 

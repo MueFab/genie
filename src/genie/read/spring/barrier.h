@@ -18,7 +18,7 @@ class Barrier {
       : num_threads_(num_threads), count_(0), generation_(0) {}
 
   void wait() {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock lock(mutex_);
     int current_generation = generation_;
 
     if (++count_ == num_threads_) {

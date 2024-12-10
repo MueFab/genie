@@ -51,16 +51,19 @@ std::string BitsetToString(std::bitset<BitsetSize> b, const uint16_t read_len,
 }
 
 template <size_t BitsetSize>
-void process_task(
-    size_t task_id, const EncoderGlobal& eg,
-    const EncoderGlobalB<BitsetSize>& egb, std::vector<BbHashDict>& dict,
-    const std::vector<std::bitset<BitsetSize>>& mask1,
-    const std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-    std::vector<std::bitset<BitsetSize>>& read, std::vector<uint32_t>& order_s,
-    std::vector<uint16_t>& read_lengths_s,
-    std::vector<uint8_t>& remaining_reads, std::vector<OmpLock>& read_lock,
-    std::vector<OmpLock>& dict_lock, const std::string& char_to_rev_char) {
-  int tid = task_id;
+void process_task(size_t task_id, const EncoderGlobal& eg,
+                  const EncoderGlobalB<BitsetSize>& egb,
+                  std::vector<BbHashDict>& dict,
+                  const std::vector<std::bitset<BitsetSize>>& mask1,
+                  const std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+                  std::vector<std::bitset<BitsetSize>>& read,
+                  std::vector<uint32_t>& order_s,
+                  std::vector<uint16_t>& read_lengths_s,
+                  std::vector<uint8_t>& remaining_reads,
+                  std::vector<OmpLock>& read_lock,
+                  std::vector<OmpLock>& dict_lock,
+                  const std::array<char, 128>& char_to_rev_char) {
+  size_t tid = task_id;
   static constexpr int thresh_s = kThreshEncoder;
   static constexpr int max_search = kMaxSearchEncoder;
   std::ifstream f(eg.infile + '.' + std::to_string(tid), std::ios::binary);
@@ -176,7 +179,7 @@ void process_task(
             // search for singleton reads
             for (int rev = 0; rev < 2; rev++) {
               for (int l = 0; l < eg.num_dict_s; l++) {
-                int64_t dictidx[2];
+                int64_t dict_index[2];
                 if (!rev)
                   b = forward_bitset & mask1[l];
                 else
@@ -186,21 +189,22 @@ void process_task(
                 if (start_pos_idx >= dict[l].num_keys_)  // not found
                   continue;
                 // check if any other thread is modifying
-                // same dictpos
+                // same dict_pos
                 if (!dict_lock[start_pos_idx].Test()) continue;
-                dict[l].FindPos(dictidx, start_pos_idx);
+                dict[l].FindPos(dict_index, start_pos_idx);
                 if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
                   dict_lock[start_pos_idx].Unset();
                   continue;
                 }
                 uint64_t ull1 =
-                    ((read[dict[l].read_id_[dictidx[0]]] & mask1[l]) >>
+                    ((read[dict[l].read_id_[dict_index[0]]] & mask1[l]) >>
                      3 * dict[l].start_)
                         .to_ullong();
                 if (ull == ull1) {  // checking if ull is actually
                                     // the key for this bin
-                  for (int64_t i = dictidx[1] - 1;
-                       i >= dictidx[0] && i >= dictidx[1] - max_search; i--) {
+                  for (int64_t i = dict_index[1] - 1;
+                       i >= dict_index[0] && i >= dict_index[1] - max_search;
+                       i--) {
                     auto rid = dict[l].read_id_[i];
                     int hamming;
                     if (!rev)
@@ -256,8 +260,8 @@ void process_task(
                       ++it;
                       continue;
                     }
-                    dict[l1].FindPos(dictidx, start_pos_idx);
-                    dict[l1].Remove(dictidx, start_pos_idx, *it);
+                    dict[l1].FindPos(dict_index, start_pos_idx);
+                    dict[l1].Remove(dict_index, start_pos_idx, *it);
                     it = deleted_rids[l1].erase(it);
                     dict_lock[start_pos_idx].Unset();
                   }
@@ -321,8 +325,8 @@ void process_all_tasks(
     std::vector<std::bitset<BitsetSize>>& read, std::vector<uint32_t>& order_s,
     std::vector<uint16_t>& read_lengths_s,
     std::vector<uint8_t>& remaining_reads, std::vector<OmpLock>& read_lock,
-    std::vector<OmpLock>& dict_lock, const std::string& char_to_rev_char,
-    const int num_threads) {
+    std::vector<OmpLock>& dict_lock,
+    const std::array<char, 128>& char_to_rev_char, const int num_threads) {
   // Create DynamicScheduler
   DynamicScheduler scheduler(num_threads);
 
@@ -410,13 +414,13 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
     f_order << in_order.rdbuf();
     f_order.clear();  // clearStreamState error flag in case in_order is empty
     f_noise_pos << in_noise_pos.rdbuf();
-    f_noise_pos.clear();  // clearStreamState error flag in case in_noisepos
+    f_noise_pos.clear();  // clearStreamState error flag in case in_noise
                           // is empty
     f_noise << in_noise.rdbuf();
     f_noise.clear();  // clearStreamState error flag in case in_noise is empty
     f_read_length << in_read_length.rdbuf();
     f_read_length.clear();  // clearStreamState error flag in case
-                            // in_readlength is empty
+                            // in_read_length is empty
     f_rc << in_rc.rdbuf();
     f_rc.clear();  // clearStreamState error flag in case in_RC is empty
 
