@@ -80,8 +80,8 @@ inline void parallel_write_keys_dynamic(const std::vector<uint64_t>& ull,
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_threads, [&](const size_t task_id) {
-    write_keys_task_dynamic(task_id, ull, dict, basedir, num_threads);
+  scheduler.run(num_threads, [&](const SchedulerInfo& info) {
+    write_keys_task_dynamic(info.task_id, ull, dict, basedir, num_threads);
   });
 }
 
@@ -131,8 +131,8 @@ inline void parallel_process_keys_dynamic(const std::vector<BbHashDict>& dict,
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_threads, [&](const size_t task_id) {
-    process_keys_task(task_id, dict, basedir, num_threads, j);
+  scheduler.run(num_threads, [&](const SchedulerInfo& info) {
+    process_keys_task(info.task_id, dict, basedir, num_threads, j);
   });
 }
 
@@ -262,8 +262,8 @@ inline void parallel_process_dicts_dynamic(
   DynamicScheduler scheduler(std::min(num_dict, num_threads));
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_dict, [&](const size_t task_id) {
-    process_dict_task(task_id, dict, basedir, read_lengths, num_threads);
+  scheduler.run(num_dict, [&](const SchedulerInfo& info) {
+    process_dict_task(info.task_id, dict, basedir, read_lengths, num_threads);
   });
 }
 

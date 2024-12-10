@@ -197,13 +197,10 @@ void parallel_process_blocks_dynamic(
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(blocks, [&](const size_t block_num) {
-    process_block_task(block_num, params, data, num_reads_per_block, write_raw,
-                       entropy_encoder, stat_vec, temp_dir);
+  scheduler.run(blocks, [&](const SchedulerInfo& info) {
+    process_block_task(info.task_id, params, data, num_reads_per_block,
+                       write_raw, entropy_encoder, stat_vec, temp_dir);
   });
-
-  std::cerr << "All blocks have been processed in parallel using dynamic "
-               "scheduling.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -724,7 +721,7 @@ struct PeStatistics {
 // -----------------------------------------------------------------------------
 void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
                        const uint64_t cur_block_num, PeStatistics& pest,
-                       size_t cur_thread_num, core::AccessUnit& raw_au) {
+                       const size_t cur_thread_num, core::AccessUnit& raw_au) {
   int64_t rc_to_int[128];
   rc_to_int[static_cast<uint8_t>('d')] = 0;
   rc_to_int[static_cast<uint8_t>('r')] = 1;
@@ -999,10 +996,10 @@ void parallel_process_blocks_dynamic(
   DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(block_data.block_start.size(), [&](const size_t cur_block_num) {
-    process_block_task(cur_block_num, block_data, params, pest, data,
+  scheduler.run(block_data.block_start.size(), [&](const SchedulerInfo& info) {
+    process_block_task(info.task_id, block_data, params, pest, data,
                        num_reads_per_block, num_records_per_block, write_raw,
-                       entropy_encoder, stat_vec, temp_dir, num_threads);
+                       entropy_encoder, stat_vec, temp_dir, info.thread_id);
   });
 }
 
