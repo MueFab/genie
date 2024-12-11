@@ -41,7 +41,7 @@ void Encoder::FlushIn(uint64_t& pos) {
   std::vector<core::parameter::EncodingSet> params;
   auto loc_cp = preprocessor_.cp;
   util::Watch watch;
-  core::stats::PerfStats stats = preprocessor_.GetStats();
+  core::stats::PerfStats stats = preprocessor_.stats;
 
   watch.Reset();
   std::cerr << "Reordering ...\n";
