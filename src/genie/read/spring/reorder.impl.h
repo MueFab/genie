@@ -216,8 +216,8 @@ void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
 template <size_t BitsetSize>
 bool SearchMatch(const std::bitset<BitsetSize>& ref,
                  const std::vector<std::bitset<BitsetSize>>& mask1,
-                 std::vector<OmpLock>& dict_lock,
-                 std::vector<OmpLock>& read_lock,
+                 std::vector<std::mutex>& dict_lock,
+                 std::vector<std::mutex>& read_lock,
                  std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                  std::vector<uint16_t>& read_lengths,
                  std::vector<uint8_t>& remaining_reads,
@@ -245,10 +245,9 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
     if (start_pos_idx >= dict[l].num_keys_)  // not found
       continue;
     // check if any other thread is modifying same dict pos
-    dict_lock[ReorderLockIdx(start_pos_idx)].Set();
+    std::lock_guard dict_lock_guard(dict_lock[ReorderLockIdx(start_pos_idx)]);
     dict[l].FindPos(dict_index, start_pos_idx);
     if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
-      dict_lock[ReorderLockIdx(start_pos_idx)].Unset();
       continue;
     }
     const uint64_t ull1 = ((read[dict[l].read_id_[dict_index[0]]] & mask1[l]) >>
@@ -272,18 +271,16 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
                   .count();
         }
         if (hamming <= thresh) {
-          read_lock[ReorderLockIdx(rid)].Set();
+          std::lock_guard read_lock_guard(read_lock[ReorderLockIdx(rid)]);
           if (remaining_reads[rid]) {
             remaining_reads[rid] = false;
             k = rid;
             flag = true;
           }
-          read_lock[ReorderLockIdx(rid)].Unset();
           if (flag == 1) break;
         }
       }
     }
-    dict_lock[ReorderLockIdx(start_pos_idx)].Unset();
     if (flag == 1) break;
   }
   return flag;
@@ -298,11 +295,9 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        std::vector<BbHashDict>& dict,
                        std::vector<std::bitset<BitsetSize>>& mask1,
                        std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-                       std::vector<OmpLock>& dict_lock,
-                       std::vector<OmpLock>& read_lock,
-                       std::mutex &mutex,
-                       uint32_t &first_read,
-                       Barrier& barrier) {
+                       std::vector<std::mutex>& dict_lock,
+                       std::vector<std::mutex>& read_lock, std::mutex& mutex,
+                       uint32_t& first_read, Barrier& barrier) {
   // Thread-specific file streams
   std::string tid_str = std::to_string(tid);
 
@@ -400,10 +395,10 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
         ull = (b >> 2 * dict[l].start_).to_ullong();
         start_pos_index = dict[l].boo_hash_fun_->lookup(ull);
         // check if any other thread is modifying same dict position
-        dict_lock[ReorderLockIdx(start_pos_index)].Set();
+        std::lock_guard dict_lock_guard(
+            dict_lock[ReorderLockIdx(start_pos_index)]);
         dict[l].FindPos(dict_idx, start_pos_index);
         dict[l].Remove(dict_idx, start_pos_index, current);
-        dict_lock[ReorderLockIdx(start_pos_index)].Unset();
       }
     } else {
       left_search_start = false;
@@ -522,7 +517,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
         left_search = false;
         for (int64_t j = remaining_pos; j >= 0; --j) {
           if (remaining_reads[j] == 1) {
-            read_lock[ReorderLockIdx(j)].Set();
+            std::lock_guard read_lock_guard(read_lock[ReorderLockIdx(j)]);
             if (remaining_reads[j]) {  // checking again inside
                                        // critical block
               current = j;
@@ -531,7 +526,6 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
               flag = true;
               ++unmatched[tid];
             }
-            read_lock[ReorderLockIdx(j)].Unset();
             if (flag == 1) break;
           }
         }
@@ -570,13 +564,13 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
 
 template <size_t BitsetSize>
 void parallel_process_reads(
-    const ReorderGlobal<BitsetSize>& rg, std::vector<std::bitset<BitsetSize>>&
-    read,
+    const ReorderGlobal<BitsetSize>& rg,
+    std::vector<std::bitset<BitsetSize>>& read,
     std::vector<uint16_t>& read_lengths, std::vector<uint8_t>& remaining_reads,
     std::vector<uint32_t>& unmatched, std::vector<BbHashDict>& dict,
     std::vector<std::bitset<BitsetSize>>& mask1,
     std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-    std::vector<OmpLock>& dict_lock, std::vector<OmpLock>& read_lock) {
+    std::vector<std::mutex>& dict_lock, std::vector<std::mutex>& read_lock) {
   // Create dynamic scheduler
   DynamicScheduler scheduler(rg.num_thr);
 
@@ -601,8 +595,8 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
              const ReorderGlobal<BitsetSize>& rg) {
   constexpr uint32_t num_locks = kNumLocksReorder;  // limits on number of locks
                                                     // (power of 2 for fast mod)
-  auto dict_lock = std::vector<OmpLock>(num_locks);
-  auto read_lock = std::vector<OmpLock>(num_locks);
+  auto dict_lock = std::vector<std::mutex>(num_locks);
+  auto read_lock = std::vector<std::mutex>(num_locks);
   auto mask =
       std::vector<std::vector<std::bitset<BitsetSize>>>(rg.max_read_len);
   for (int i = 0; i < rg.max_read_len; i++)

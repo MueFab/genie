@@ -186,7 +186,6 @@ void process_block_task(size_t block_num,
 
 // -----------------------------------------------------------------------------
 
-// Function replacing OpenMP loop
 void parallel_process_blocks_dynamic(
     const size_t blocks, std::vector<core::parameter::EncodingSet>& params,
     const SeData& data, std::vector<uint32_t>& num_reads_per_block,

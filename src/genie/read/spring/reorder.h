@@ -29,6 +29,9 @@
 
 // -----------------------------------------------------------------------------
 
+namespace std {
+class mutex;
+}
 namespace genie::read::spring {
 
 /**
@@ -150,8 +153,8 @@ void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
 template <size_t BitsetSize>
 bool SearchMatch(const std::bitset<BitsetSize>& ref,
                  const std::vector<std::bitset<BitsetSize>>& mask1,
-                 std::vector<OmpLock>& dict_lock,
-                 std::vector<OmpLock>& read_lock,
+                 std::vector<std::mutex>& dict_lock,
+                 std::vector<std::mutex>& read_lock,
                  std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                  std::vector<uint16_t>& read_lengths,
                  std::vector<uint8_t>& remaining_reads,
