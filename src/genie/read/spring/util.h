@@ -56,19 +56,35 @@ static constexpr std::array<char, 128> kCharToRevChar = {
  * quality preservation, number of reads per block, and threading parameters.
  */
 struct CompressionParams {
-  bool paired_end;  //!< @brief Flag indicating if the reads are paired-end.
-  bool preserve_quality;  //!< @brief Flag indicating if quality values should
-                          //!< be preserved.
-  bool preserve_id;       //!< @brief Flag indicating if read IDs should be
-                          //!< preserved.
-  bool unaligned_reads_flag;     //!< @brief Flag for unaligned reads.
-  uint32_t num_reads;            //!< @brief Total number of reads.
-  uint32_t num_reads_clean[2];   //!< @brief Number of clean reads in each of
-                                 //!< the paired-end files.
-  uint32_t max_read_len;         //!< @brief Maximum read length.
-  uint32_t num_reads_per_block;  //!< @brief Number of reads per block.
-  int num_thr;                   //!< @brief Number of threads for compression.
-  uint32_t num_blocks;           //!< @brief Total number of blocks.
+  /// Flag indicating if the reads are paired-end.
+  bool paired_end;
+
+  /// Flag indicating if quality values should be preserved.
+  bool preserve_quality;
+
+  /// Flag indicating if read IDs should be preserved.
+  bool preserve_id;
+
+  /// Flag for unaligned reads.
+  bool unaligned_reads_flag;
+
+  /// Total number of reads.
+  uint32_t num_reads;
+
+  /// Number of clean reads in each of the paired-end files.
+  uint32_t num_reads_clean[2];
+
+  /// Maximum read length.
+  uint32_t max_read_len;
+
+  /// Number of reads per block.
+  uint32_t num_reads_per_block;
+
+  /// Number of threads for compression.
+  int num_thr;
+
+  /// Total number of blocks.
+  uint32_t num_blocks;
 };
 
 /**

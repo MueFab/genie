@@ -2,6 +2,7 @@ project("read-tests")
 
 set(source_files
         local-reference-test.cpp
+        spring-util-test.cc
 )
 
 add_executable(read-tests ${source_files})

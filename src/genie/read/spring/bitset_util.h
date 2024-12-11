@@ -99,11 +99,19 @@ template <size_t BitsetSize>
 void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
                         BbHashDict* dict, int num_dict, int bpb);
 
+
+struct SizeRange {
+  uint32_t start;
+  uint32_t end;
+};
+
+using DictSizes = std::array<SizeRange, 2>;
+
 /**
  * @brief Construct a dictionary using the given reads and parameters.
  * @tparam BitsetSize Size of the bitset.
  * @param read Array of reads in bitset format.
- * @param dict Pointer to the dictionary object.
+ * @param dict_sizes Dictionary sizes for the first two dictionaries.
  * @param read_lengths Array storing the lengths of each read.
  * @param num_dict Number of dictionaries.
  * @param num_reads Total number of reads.
@@ -112,11 +120,11 @@ void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
  * @param num_threads Number of threads to use for parallel processing.
  */
 template <size_t BitsetSize>
-void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
-                         std::vector<BbHashDict>& dict,
-                         const std::vector<uint16_t>& read_lengths,
-                         int num_dict, const uint32_t& num_reads, int bpb,
-                         const std::string& basedir, const int& num_threads);
+std::vector<BbHashDict> ConstructDictionary(
+    const std::vector<std::bitset<BitsetSize>>& read,
+    const std::vector<uint16_t>& read_lengths, int num_dict,
+    const uint32_t& num_reads,  int bpb, const std::string& basedir,
+    const int& num_threads, const DictSizes& dict_sizes);
 
 /**
  * @brief Generate masks for each base in the reads.
@@ -126,8 +134,8 @@ void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
  * @param bpb Bits per base (typically 2 for DNA sequences).
  */
 template <size_t BitsetSize>
-void GenerateMasks(std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-                   int max_read_len, int bpb);
+std::vector<std::vector<std::bitset<BitsetSize>>> GenerateMasks(
+  uint32_t max_read_len, uint8_t bpb);
 
 /**
  * @brief Convert a character array into a bitset based on base values.
@@ -138,8 +146,9 @@ void GenerateMasks(std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
  * @param base_mask Base masks to assist in conversion.
  */
 template <size_t BitsetSize>
-void CharToBitset(const char* s, int read_len, std::bitset<BitsetSize>& b,
-                  std::bitset<BitsetSize>** base_mask);
+std::bitset<BitsetSize> CharToBitset(
+    const std::string& s, size_t read_len,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask);
 
 // -----------------------------------------------------------------------------
 

@@ -10,6 +10,8 @@
 
 // -----------------------------------------------------------------------------
 
+#include <genie/util/runtime_exception.h>
+
 #include <algorithm>
 #include <fstream>
 #include <memory>
@@ -269,12 +271,18 @@ inline void parallel_process_dicts_dynamic(
 // -----------------------------------------------------------------------------
 
 template <size_t BitsetSize>
-void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
-                         std::vector<BbHashDict>& dict,
-                         const std::vector<uint16_t>& read_lengths,
-                         const int num_dict, const uint32_t& num_reads,
-                         const int bpb, const std::string& basedir,
-                         const int& num_threads) {
+std::vector<BbHashDict> ConstructDictionary(
+    const std::vector<std::bitset<BitsetSize>>& read,
+    const std::vector<uint16_t>& read_lengths, const int num_dict,
+    const uint32_t& num_reads, const int bpb, const std::string& basedir,
+    const int& num_threads, const DictSizes& dict_sizes) {
+  auto dict = std::vector<BbHashDict>(num_dict);
+  dict[0].start_ = dict_sizes[0].start;
+  dict[0].end_ = dict_sizes[0].end;
+  dict[1].start_ = dict_sizes[1].start;
+  dict[1].end_ = dict_sizes[1].end;
+
+  if (num_reads == 0) return dict;
   auto mask = std::vector<std::bitset<BitsetSize>>(num_dict);
   GenerateIndexMasks<BitsetSize>(mask, dict, num_dict, bpb);
   for (int j = 0; j < num_dict; j++) {
@@ -287,32 +295,53 @@ void ConstructDictionary(const std::vector<std::bitset<BitsetSize>>& read,
   }
   parallel_process_dicts_dynamic(dict, basedir, read_lengths, num_threads,
                                  num_dict);
+  return dict;
 }
 
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-void GenerateMasks(std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-                   const int max_read_len, const int bpb) {
-  // mask for zeroing the end bits (needed while reordering to compute Hamming
-  // distance between shifted reads)
-  for (int i = 0; i < max_read_len; i++) {
-    for (int j = 0; j < max_read_len; j++) {
-      mask[i][j].reset();
-      for (int k = bpb * i; k < bpb * max_read_len - bpb * j; k++)
-        mask[i][j][k] = 1;
+std::vector<std::vector<std::bitset<BitsetSize>>> GenerateMasks(
+    const uint32_t max_read_len, const uint8_t bpb) {
+  UTILS_DIE_IF(max_read_len == 0, "Max read length cannot be zero");
+  UTILS_DIE_IF(bpb == 0, "Bits per base cannot be zero");
+
+  // Initialize the 2D vector of bitsets
+  std::vector<std::vector<std::bitset<BitsetSize>>> mask(
+      max_read_len, std::vector<std::bitset<BitsetSize>>(max_read_len));
+
+  // Populate the masks
+  uint32_t row_idx = 0;
+  for (auto& row : mask) {
+    uint32_t col_idx = 0;
+    for (auto& cell : row) {
+      cell.reset();
+
+      // Calculate start and end bit positions
+      const uint32_t start = static_cast<uint32_t>(bpb) * row_idx;
+      const uint32_t end =
+          static_cast<uint32_t>(bpb) * max_read_len - bpb * col_idx;
+
+      // Set the appropriate bits
+      for (auto bit = start; bit < end; ++bit) {
+        cell.set(bit);
+      }
+      ++col_idx;  // Increment column index
     }
+    ++row_idx;  // Increment row index
   }
+  return mask;
 }
 
 // -----------------------------------------------------------------------------
 
 template <size_t BitsetSize>
-void CharToBitset(
-    const char* s, const int read_len, std::bitset<BitsetSize>& b,
+std::bitset<BitsetSize> CharToBitset(
+    const std::string& s, const size_t read_len,
     const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask) {
-  b.reset();
-  for (int i = 0; i < read_len; i++)
+  std::bitset<BitsetSize> b;
+  for (size_t i = 0; i < read_len; i++)
     b |= base_mask[i][static_cast<uint8_t>(s[i])];
+  return b;
 }
 
 // -----------------------------------------------------------------------------
