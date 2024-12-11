@@ -356,11 +356,7 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
 
   auto mask1 = std::vector<std::bitset<BitsetSize>>(eg.num_dict_s);
   GenerateIndexMasks<BitsetSize>(mask1, dict, eg.num_dict_s, 3);
-  auto mask =
-      std::vector<std::vector<std::bitset<BitsetSize>>>(eg.max_read_len);
-  for (int i = 0; i < eg.max_read_len; i++)
-    mask[i] = std::vector<std::bitset<BitsetSize>>(eg.max_read_len);
-  GenerateMasks<BitsetSize>(mask, eg.max_read_len, 3);
+  auto mask = GenerateMasks<BitsetSize>(eg.max_read_len, 3);
 
   //
   // This is the 3rd hottest parallel region in genie (behind gabac
@@ -631,23 +627,17 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
   remove(eg.infile_n.c_str());
   CorrectOrder(order_s, eg);
 
-  auto dict = std::vector<BbHashDict>(eg.num_dict_s);
+  DictSizes dict_sizes{};
   if (eg.max_read_len > 50) {
-    dict[0].start_ = 0;
-    dict[0].end_ = 20;
-    dict[1].start_ = 21;
-    dict[1].end_ = 41;
+    dict_sizes = {0, 20, 21, 41};
   } else {
-    dict[0].start_ = 0;
-    dict[0].end_ = 20 * eg.max_read_len / 50;
-    dict[1].start_ = 20 * eg.max_read_len / 50 + 1;
-    dict[1].end_ = 41 * eg.max_read_len / 50;
+    dict_sizes = {0, static_cast<uint32_t>(20 * eg.max_read_len / 50),
+                  static_cast<uint32_t>(20 * eg.max_read_len / 50 + 1),
+                  static_cast<uint32_t>(41 * eg.max_read_len / 50)};
   }
-
-  if (eg.num_reads_s + eg.num_reads_n > 0)
-    ConstructDictionary<BitsetSize>(read, dict, read_lengths_s, eg.num_dict_s,
-                                    eg.num_reads_s + eg.num_reads_n, 3,
-                                    eg.basedir, eg.num_thr);
+  auto dict = ConstructDictionary<BitsetSize>(
+      read, read_lengths_s, eg.num_dict_s, eg.num_reads_s + eg.num_reads_n, 3,
+      eg.basedir, eg.num_thr, dict_sizes);
 
   Encode<BitsetSize>(read, dict, order_s, read_lengths_s, eg, egb);
 }

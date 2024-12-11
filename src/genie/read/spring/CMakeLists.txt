@@ -11,7 +11,8 @@ set(source_files
         encoder.cc
         encoder_source.cc
         util.cc
-        barrier.h
+        ../../util/barrier.h
+        ../../util/barrier.cc
 )
 
 add_library(genie-spring ${source_files})

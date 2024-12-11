@@ -18,7 +18,8 @@
 #include <string>
 #include <vector>
 
-#include "genie/read/spring/barrier.h"
+#include "genie/read/spring/bitset_util.h"
+#include "genie/util/barrier.h"
 #include "genie/util/literal.h"
 #include "genie/util/runtime_exception.h"
 
@@ -176,10 +177,10 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
       current[i] = int_to_char[ind_max];
     }
   }
-  CharToBitset<BitsetSize>(current, ref_len, ref, rg.base_mask);
+  ref = CharToBitset<BitsetSize>(current, ref_len, rg.base_mask);
   char rev_current[kMaxReadLen + 1];
   ReverseComplement(current, rev_current, ref_len);
-  CharToBitset<BitsetSize>(rev_current, ref_len, rev_ref, rg.base_mask);
+  rev_ref = CharToBitset<BitsetSize>(rev_current, ref_len, rg.base_mask);
 }
 
 // -----------------------------------------------------------------------------
@@ -297,7 +298,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                        std::vector<std::mutex>& dict_lock,
                        std::vector<std::mutex>& read_lock, std::mutex& mutex,
-                       uint32_t& first_read, Barrier& barrier) {
+                       uint32_t& first_read, util::Barrier& barrier) {
   // Thread-specific file streams
   std::string tid_str = std::to_string(tid);
 
@@ -576,7 +577,7 @@ void parallel_process_reads(
 
   std::mutex mutex;
   uint32_t first_read = 0;
-  Barrier barrier(rg.num_thr);
+  util::Barrier barrier(rg.num_thr);
 
   std::cerr << "Running with " << rg.num_thr << " threads\n";
 
@@ -597,11 +598,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
                                                     // (power of 2 for fast mod)
   auto dict_lock = std::vector<std::mutex>(num_locks);
   auto read_lock = std::vector<std::mutex>(num_locks);
-  auto mask =
-      std::vector<std::vector<std::bitset<BitsetSize>>>(rg.max_read_len);
-  for (int i = 0; i < rg.max_read_len; i++)
-    mask[i] = std::vector<std::bitset<BitsetSize>>(rg.max_read_len);
-  GenerateMasks<BitsetSize>(mask, rg.max_read_len, 2);
+  auto mask = GenerateMasks<BitsetSize>(rg.max_read_len, 2);
   auto mask1 = std::vector<std::bitset<BitsetSize>>(rg.num_dict);
   GenerateIndexMasks<BitsetSize>(mask1, dict, rg.num_dict, 2);
   auto remaining_reads = std::vector<uint8_t>(rg.num_reads);
@@ -782,15 +779,6 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   rg.num_thr = cp.num_thr;
   rg.paired_end = cp.paired_end;
   rg.max_shift = rg.max_read_len / 2;
-  auto dict = std::vector<BbHashDict>(rg.num_dict);
-  dict[0].start_ = rg.max_read_len > 100
-                       ? rg.max_read_len / 2 - 32
-                       : rg.max_read_len / 2 - rg.max_read_len * 32 / 100;
-  dict[0].end_ = rg.max_read_len / 2 - 1;
-  dict[1].start_ = rg.max_read_len / 2;
-  dict[1].end_ = rg.max_read_len > 100
-                     ? rg.max_read_len / 2 - 1 + 32
-                     : rg.max_read_len / 2 - 1 + rg.max_read_len * 32 / 100;
 
   rg.num_reads = cp.num_reads_clean[0] + cp.num_reads_clean[1];
   rg.num_reads_array[0] = cp.num_reads_clean[0];
@@ -801,11 +789,24 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto read_lengths = std::vector<uint16_t>(rg.num_reads);
   std::cerr << "Reading file\n";
   ReadDnaFile<BitsetSize>(read, read_lengths, rg);
-  if (rg.num_reads > 0) {
-    std::cerr << "Constructing dictionaries\n";
-    ConstructDictionary<BitsetSize>(read, dict, read_lengths, rg.num_dict,
-                                    rg.num_reads, 2, rg.basedir, rg.num_thr);
+  std::cerr << "Constructing dictionaries\n";
+  DictSizes dict_sizes{};
+  if (rg.max_read_len > 100) {
+    dict_sizes = {static_cast<uint32_t>(rg.max_read_len / 2 - 32),
+                  static_cast<uint32_t>(rg.max_read_len / 2 - 1),
+                  static_cast<uint32_t>(rg.max_read_len / 2),
+                  static_cast<uint32_t>(rg.max_read_len / 2 - 1 + 32)};
+  } else {
+    dict_sizes = {
+        static_cast<uint32_t>(rg.max_read_len / 2 - rg.max_read_len * 32 / 100),
+        static_cast<uint32_t>(rg.max_read_len / 2 - 1),
+        static_cast<uint32_t>(rg.max_read_len / 2),
+        static_cast<uint32_t>(rg.max_read_len / 2 - 1 +
+                              rg.max_read_len * 32 / 100)};
   }
+  auto dict = ConstructDictionary<BitsetSize>(read, read_lengths, rg.num_dict,
+                                              rg.num_reads, 2, rg.basedir,
+                                              rg.num_thr, dict_sizes);
   std::cerr << "Reordering reads\n";
   Reorder<BitsetSize>(read, dict, read_lengths, rg);
   std::cerr << "Writing to file\n";

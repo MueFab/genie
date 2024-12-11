@@ -44,40 +44,40 @@ namespace genie::read::spring {
  */
 struct Preprocessor {
   CompressionParams
-      cp;  //!< @brief Compression parameters for the pre-processing step.
+      cp;  //!< Compression parameters for the pre-processing step.
 
-  std::string outfile_clean[2];  //!< @brief File paths for cleaned reads (one
+  std::string outfile_clean[2];  //!< File paths for cleaned reads (one
                                  //!< for each paired-end read).
   std::string
-      outfile_n[2];  //!< @brief File paths for reads containing `N` bases.
-  std::string outfile_order_n[2];  //!< @brief File paths for order of reads
+      outfile_n[2];  //!< File paths for reads containing `N` bases.
+  std::string outfile_order_n[2];  //!< File paths for order of reads
                                    //!< containing `N` bases.
-  std::string outfile_id;          //!< @brief File path for storing read IDs.
+  std::string outfile_id;          //!< File path for storing read IDs.
   std::string
-      outfile_quality[2];  //!< @brief File paths for storing quality values.
-  std::string outfile_read_length[2];  //!< @brief File paths for storing read
+      outfile_quality[2];  //!< File paths for storing quality values.
+  std::string outfile_read_length[2];  //!< File paths for storing read
                                        //!< lengths.
 
   std::ofstream
-      f_out_clean[2];  //!< @brief Output file streams for cleaned reads.
+      f_out_clean[2];  //!< Output file streams for cleaned reads.
   std::ofstream
-      f_out_n[2];  //!< @brief Output file streams for reads with `N` bases.
-  std::ofstream f_out_order_n[2];  //!< @brief Output file streams for order
+      f_out_n[2];  //!< Output file streams for reads with `N` bases.
+  std::ofstream f_out_order_n[2];  //!< Output file streams for order
                                    //!< of `N` reads.
-  std::ofstream f_out_id;          //!< @brief Output file stream for read IDs.
+  std::ofstream f_out_id;          //!< Output file stream for read IDs.
   std::ofstream
-      f_out_quality[2];  //!< @brief Output file streams for quality values.
+      f_out_quality[2];  //!< Output file streams for quality values.
 
-  std::string temp_dir;  //!< @brief Temporary directory for storing
+  std::string temp_dir;  //!< Temporary directory for storing
                          //!< intermediate files.
   std::string
-      working_dir;  //!< @brief Working directory for the pre-processing step.
+      working_dir;  //!< Working directory for the pre-processing step.
 
   util::OrderedLock
-      lock;  //!< @brief Synchronization lock for multithreaded processing.
+      lock;  //!< Synchronization lock for multithreaded processing.
 
   core::stats::PerfStats
-      stats;  //!< @brief Performance statistics for the pre-processing step.
+      stats;  //!< Performance statistics for the pre-processing step.
 
   /**
    * @brief Get the performance statistics.
@@ -86,7 +86,7 @@ struct Preprocessor {
   core::stats::PerfStats& GetStats();
 
   bool used =
-      false;  //!< @brief Flag to indicate if the preprocessor has been used.
+      false;  //!< Flag to indicate if the preprocessor has been used.
 
   /**
    * @brief Set up the preprocessor with the specified parameters.
