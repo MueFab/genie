@@ -39,10 +39,38 @@ static inline uint64_t Rans64MulHi(uint64_t a, uint64_t b)
 
 #elif defined(__GNUC__)
 
+/*
 static inline uint64_t Rans64MulHi(uint64_t a, uint64_t b)
 {
     return (uint64_t) (((unsigned __int128)a * b) >> 64);
 }
+*/
+
+// Workaround for -Wpedantic #1: suppress with __extension__
+static inline uint64_t Rans64MulHi(uint64_t a, uint64_t b)
+{
+    __extension__ unsigned __int128 res = (unsigned __int128) a * b;
+    return (uint64_t)(res >> 64);
+}
+
+/*
+// Workaround for -Wpedantic #2: manual implementation
+static inline uint64_t Rans64MulHi(uint64_t a, uint64_t b) {
+    const uint64_t mask = 0xffffffffULL;
+    uint64_t a_low = a & mask;
+    uint64_t a_high = a >> 32;
+    uint64_t b_low = b & mask;
+    uint64_t b_high = b >> 32;
+
+    uint64_t low_low = a_low * b_low;
+    uint64_t high_low = a_high * b_low;
+    uint64_t low_high = a_low * b_high;
+    uint64_t high_high = a_high * b_high;
+
+    uint64_t cross = (low_low >> 32) + (high_low & mask) + (low_high & mask);
+    return high_high + (high_low >> 32) + (low_high >> 32) + (cross >> 32);
+}
+*/
 
 #else
 
