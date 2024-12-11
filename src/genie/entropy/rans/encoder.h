@@ -39,7 +39,7 @@ public:
     * @param input The input stream containing uncompressed data.
     * @param output The output stream to write compressed data to.
     */
- void encode(std::istream &input, std::ostream &output);
+ void encode(std::istream& input, std::ostream& output, bool is_table_stored, uint32_t num_interleavings);
 private:
  uint32_t PROB_BITS = 14;
  uint32_t PROB_SCALE = 1 << PROB_BITS;

@@ -27,7 +27,7 @@ namespace genie::entropy::rans {
 class RANSDecoder {
 public:
   RANSDecoder();
-  void decode(std::istream &input, std::ostream &output);
+  void decode(std::istream& input, std::ostream& output, uint32_t num_interleavings);
 private:
   uint32_t PROB_BITS = 14;
   uint32_t PROB_SCALE = 1 << PROB_BITS;
