@@ -9,18 +9,12 @@
  * This file provides constants and utility functions used across the Spring
  * module in Genie It includes parameters for read lengths, dictionary sizes,
  * and other settings relevant to the encoding and reordering processes.
- * Additionally, it defines OpenMP lock handling for thread-safe operations when
- * OpenMP is enabled.
  *
  * This file is part of the Spring module within the GENIE project.
  */
 
 #ifndef SRC_GENIE_READ_SPRING_PARAMS_H_
 #define SRC_GENIE_READ_SPRING_PARAMS_H_
-
-// -----------------------------------------------------------------------------
-
-#include <omp.h>
 
 // -----------------------------------------------------------------------------
 
@@ -60,7 +54,6 @@ constexpr uint32_t kBinSizeCombinePairs =
     30000000;  //!< @brief Size of bins when combining paired reads in memory.
 
 // -----------------------------------------------------------------------------
-// OpenMP-specific configuration and utilities
 
 constexpr int kNumLocksReorder =
     0x10000;  //!< @brief Number of locks (must be a power of 2).
@@ -75,46 +68,6 @@ constexpr int kLocksReorderMask =
 inline uint64_t ReorderLockIdx(const uint64_t hash_value) {
   return hash_value & kLocksReorderMask;
 }
-
-/**
- * @class OmpLock
- * @brief A C++ wrapper for OpenMP locks.
- *
- * This class provides a simple wrapper around OpenMP locks for synchronization
- * purposes. It manages lock creation, destruction, setting, and unsetting
- * operations.
- */
-class OmpLock {
-  omp_lock_t lck_{};  //!< @brief The internal OpenMP lock.
-
- public:
-  /**
-   * @brief Constructor that initializes the lock.
-   */
-  OmpLock() { omp_init_lock(&lck_); }
-
-  /**
-   * @brief Destructor that destroys the lock.
-   */
-  ~OmpLock() { omp_destroy_lock(&lck_); }
-
-  /**
-   * @brief Sets the lock.
-   */
-  void Set() { omp_set_lock(&lck_); }
-
-  /**
-   * @brief Unsets the lock.
-   */
-  void Unset() { omp_unset_lock(&lck_); }
-
-  /**
-   * @brief Tests if the lock is available.
-   * @return Non-zero if the lock is successfully set, otherwise 0.
-   */
-  int Test() { return omp_test_lock(&lck_); }
-};
-
 
 // -----------------------------------------------------------------------------
 

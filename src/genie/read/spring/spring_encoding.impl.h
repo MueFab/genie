@@ -14,6 +14,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "genie/util/runtime_exception.h"
 
@@ -60,8 +61,8 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                   std::vector<uint32_t>& order_s,
                   std::vector<uint16_t>& read_lengths_s,
                   std::vector<uint8_t>& remaining_reads,
-                  std::vector<OmpLock>& read_lock,
-                  std::vector<OmpLock>& dict_lock,
+                  std::vector<std::mutex>& read_lock,
+                  std::vector<std::mutex>& dict_lock,
                   const std::array<char, 128>& char_to_rev_char) {
   size_t tid = task_id;
   static constexpr int thresh_s = kThreshEncoder;
@@ -190,65 +191,67 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                   continue;
                 // check if any other thread is modifying
                 // same dict_pos
-                if (!dict_lock[start_pos_idx].Test()) continue;
-                dict[l].FindPos(dict_index, start_pos_idx);
-                if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
-                  dict_lock[start_pos_idx].Unset();
-                  continue;
-                }
-                uint64_t ull1 =
-                    ((read[dict[l].read_id_[dict_index[0]]] & mask1[l]) >>
-                     3 * dict[l].start_)
-                        .to_ullong();
-                if (ull == ull1) {  // checking if ull is actually
-                                    // the key for this bin
-                  for (int64_t i = dict_index[1] - 1;
-                       i >= dict_index[0] && i >= dict_index[1] - max_search;
-                       i--) {
-                    auto rid = dict[l].read_id_[i];
-                    int hamming;
-                    if (!rev)
-                      hamming = static_cast<int>(
-                          ((forward_bitset ^ read[rid]) &
-                           mask[0][eg.max_read_len - read_lengths_s[rid]])
-                              .count());
-                    else
-                      hamming = static_cast<int>(
-                          ((reverse_bitset ^ read[rid]) &
-                           mask[0][eg.max_read_len - read_lengths_s[rid]])
-                              .count());
-                    if (hamming <= thresh_s) {
-                      read_lock[rid].Set();
-                      if (remaining_reads[rid]) {
-                        remaining_reads[rid] = false;
-                        flag = true;
+                {
+                  std::unique_lock dict_lock_guard(dict_lock[start_pos_idx],
+                                                   std::try_to_lock);
+                  if (!dict_lock_guard.owns_lock()) continue;
+                  dict[l].FindPos(dict_index, start_pos_idx);
+                  if (dict[l].empty_bin_[start_pos_idx]) {  // bin is empty
+                    continue;
+                  }
+                  uint64_t ull1 =
+                      ((read[dict[l].read_id_[dict_index[0]]] & mask1[l]) >>
+                       3 * dict[l].start_)
+                          .to_ullong();
+                  if (ull == ull1) {  // checking if ull is actually
+                    // the key for this bin
+                    for (int64_t i = dict_index[1] - 1;
+                         i >= dict_index[0] && i >= dict_index[1] - max_search;
+                         i--) {
+                      auto rid = dict[l].read_id_[i];
+                      int hamming;
+                      if (!rev)
+                        hamming = static_cast<int>(
+                            ((forward_bitset ^ read[rid]) &
+                             mask[0][eg.max_read_len - read_lengths_s[rid]])
+                                .count());
+                      else
+                        hamming = static_cast<int>(
+                            ((reverse_bitset ^ read[rid]) &
+                             mask[0][eg.max_read_len - read_lengths_s[rid]])
+                                .count());
+                      if (hamming <= thresh_s) {
+                        std::lock_guard read_lock_guard(read_lock[rid]);
+                        if (remaining_reads[rid]) {
+                          remaining_reads[rid] = false;
+                          flag = true;
+                        }
                       }
-                      read_lock[rid].Unset();
-                    }
-                    if (flag == 1) {  // match found
-                      flag = false;
-                      list_size++;
-                      char l_rc = rev ? 'r' : 'd';
-                      int64_t pos =
-                          rev ? (j + eg.max_read_len - read_lengths_s[rid]) : j;
-                      std::string read_string =
-                          rev ? ReverseComplement(
-                                    BitsetToString<BitsetSize>(
-                                        read[rid], read_lengths_s[rid], egb),
-                                    read_lengths_s[rid])
-                              : BitsetToString<BitsetSize>(
-                                    read[rid], read_lengths_s[rid], egb);
-                      current_contig.push_back({read_string, pos, l_rc,
-                                                order_s[rid],
-                                                read_lengths_s[rid]});
-                      for (int l1 = 0; l1 < eg.num_dict_s; l1++) {
-                        if (read_lengths_s[rid] > dict[l1].end_)
-                          deleted_rids[l1].push_back(rid);
+                      if (flag == 1) {  // match found
+                        flag = false;
+                        list_size++;
+                        char l_rc = rev ? 'r' : 'd';
+                        int64_t pos =
+                            rev ? (j + eg.max_read_len - read_lengths_s[rid])
+                                : j;
+                        std::string read_string =
+                            rev ? ReverseComplement(
+                                      BitsetToString<BitsetSize>(
+                                          read[rid], read_lengths_s[rid], egb),
+                                      read_lengths_s[rid])
+                                : BitsetToString<BitsetSize>(
+                                      read[rid], read_lengths_s[rid], egb);
+                        current_contig.push_back({read_string, pos, l_rc,
+                                                  order_s[rid],
+                                                  read_lengths_s[rid]});
+                        for (int l1 = 0; l1 < eg.num_dict_s; l1++) {
+                          if (read_lengths_s[rid] > dict[l1].end_)
+                            deleted_rids[l1].push_back(rid);
+                        }
                       }
                     }
                   }
                 }
-                dict_lock[start_pos_idx].Unset();
                 // delete from dictionaries
                 for (int l1 = 0; l1 < eg.num_dict_s; l1++)
                   for (auto it = deleted_rids[l1].begin();
@@ -256,14 +259,15 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                     b = read[*it] & mask1[l1];
                     ull = (b >> 3 * dict[l1].start_).to_ullong();
                     start_pos_idx = dict[l1].boo_hash_fun_->lookup(ull);
-                    if (!dict_lock[start_pos_idx].Test()) {
+                    std::unique_lock dict_lock_guard(dict_lock[start_pos_idx],
+                                                   std::try_to_lock);
+                    if (!dict_lock_guard.owns_lock()) {
                       ++it;
                       continue;
                     }
                     dict[l1].FindPos(dict_index, start_pos_idx);
                     dict[l1].Remove(dict_index, start_pos_idx, *it);
                     it = deleted_rids[l1].erase(it);
-                    dict_lock[start_pos_idx].Unset();
                   }
               }
             }
@@ -324,8 +328,8 @@ void process_all_tasks(
     const std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
     std::vector<std::bitset<BitsetSize>>& read, std::vector<uint32_t>& order_s,
     std::vector<uint16_t>& read_lengths_s,
-    std::vector<uint8_t>& remaining_reads, std::vector<OmpLock>& read_lock,
-    std::vector<OmpLock>& dict_lock,
+    std::vector<uint8_t>& remaining_reads, std::vector<std::mutex>& read_lock,
+    std::vector<std::mutex>& dict_lock,
     const std::array<char, 128>& char_to_rev_char, const int num_threads) {
   // Create DynamicScheduler
   DynamicScheduler scheduler(num_threads);
@@ -344,8 +348,8 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
             std::vector<BbHashDict>& dict, std::vector<uint32_t>& order_s,
             std::vector<uint16_t>& read_lengths_s, const EncoderGlobal& eg,
             const EncoderGlobalB<BitsetSize>& egb) {
-  auto read_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
-  auto dict_lock = std::vector<OmpLock>(eg.num_reads_s + eg.num_reads_n);
+  auto read_lock = std::vector<std::mutex>(eg.num_reads_s + eg.num_reads_n);
+  auto dict_lock = std::vector<std::mutex>(eg.num_reads_s + eg.num_reads_n);
   auto remaining_reads = std::vector<uint8_t>(eg.num_reads_s + eg.num_reads_n);
   std::fill(remaining_reads.begin(),
             remaining_reads.begin() + eg.num_reads_s + eg.num_reads_n, 1);

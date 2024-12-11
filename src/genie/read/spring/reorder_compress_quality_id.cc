@@ -234,7 +234,6 @@ void process_block_task(size_t block_num,
   f_order_id.close();
 }
 
-// Function replacing OpenMP loop
 void parallel_process_blocks_dynamic(
     const std::vector<uint32_t>& block_start,
     const std::vector<uint32_t>& block_end,
@@ -336,7 +335,6 @@ void process_quality_block_task(
   std::get<1>(encoded).Write(bw);
 }
 
-// Function replacing OpenMP loop
 void parallel_process_quality_blocks_dynamic(
     const std::vector<uint32_t>& block_start,
     const std::vector<uint32_t>& block_end,

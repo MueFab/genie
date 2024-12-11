@@ -123,7 +123,6 @@ inline void process_keys_task(size_t task_id,
 
 // -----------------------------------------------------------------------------
 
-// Function replacing OpenMP loop
 inline void parallel_process_keys_dynamic(const std::vector<BbHashDict>& dict,
                                           const std::string& basedir,
                                           const int num_threads, const int j) {
