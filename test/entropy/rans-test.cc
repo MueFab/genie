@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
-#include <random>
+#include <cstdlib> // For rand()
 #include "genie/entropy/rans/encoder.h"
 #include "genie/entropy/rans/decoder.h"
 #include "genie/entropy/rans/commons.h"
+
 
 class RANSTestCase : public ::testing::Test {
    protected:
@@ -49,31 +50,69 @@ class RANSTestCase : public ::testing::Test {
     // }
 };
 
-
-TEST_F(RANSTestCase, RANSEncodeDecodeTest) {  // NOLINT(cert-err58-cpp)
+TEST_F(RANSTestCase, RANSEncodeDecodeTest) {  // Non-Interleaved Test
     const size_t NrOfInputBytes = 100;
     std::vector<uint8_t> testDataUncompressed(NrOfInputBytes);
+
     for (size_t i = 0; i < NrOfInputBytes; ++i) {
         uint8_t byte = static_cast<uint8_t>(rand() % 256);
         testDataUncompressed[i] = byte;
     }
+
     std::stringstream uncompressed_input;
     std::stringstream compressed_output;
 
-	uncompressed_input.write(reinterpret_cast<const char*>(testDataUncompressed.data()), testDataUncompressed.size());
+    uncompressed_input.write(reinterpret_cast<const char*>(testDataUncompressed.data()), testDataUncompressed.size());
 
     genie::entropy::rans::RANSEncoder encoder;
-	genie::entropy::rans::RANSDecoder decoder;
-    encoder.encode(uncompressed_input, compressed_output);
+    genie::entropy::rans::RANSDecoder decoder;
+
+    // Encode without interleaving
+    const uint32_t num_interleaving = 1;
+    encoder.encode(uncompressed_input, compressed_output, false, num_interleaving);
 
     std::stringstream uncompressed_output;
-    decoder.decode(compressed_output, uncompressed_output);
-	std::string decoded_str = uncompressed_output.str();
+    decoder.decode(compressed_output, uncompressed_output, 1);
+    std::string decoded_str = uncompressed_output.str();
 
-    ASSERT_EQ(NrOfInputBytes, decoded_str.size()) << "Decoded data size does not match original.";
+    ASSERT_EQ(NrOfInputBytes, decoded_str.size()) << "Decoded data size does not match original (Without interleaving).";
     for (size_t i = 0; i < NrOfInputBytes; ++i) {
         uint8_t original_byte = testDataUncompressed.at(i);
         uint8_t decoded_byte = static_cast<uint8_t>(decoded_str.at(i));
-        EXPECT_EQ(original_byte, decoded_byte) << "Mismatch at byte index " << i;
+        EXPECT_EQ(original_byte, decoded_byte) << "Mismatch at byte index " << i << " (Without interleaving).";
+    }
+}
+
+TEST_F(RANSTestCase, RANSEncodeDecodeInterleavedTest) {  // Interleaved Test
+    const size_t NrOfInputBytes = 100;
+    std::vector<uint8_t> testDataUncompressed(NrOfInputBytes);
+
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        uint8_t byte = static_cast<uint8_t>(rand() % 256);
+        testDataUncompressed[i] = byte;
+    }
+
+    std::stringstream uncompressed_input;
+    std::stringstream compressed_output;
+
+    uncompressed_input.write(reinterpret_cast<const char*>(testDataUncompressed.data()), testDataUncompressed.size());
+
+    genie::entropy::rans::RANSEncoder encoder;
+    genie::entropy::rans::RANSDecoder decoder;
+
+    // Encode with interleaving
+    const uint32_t num_interleaving = 2;
+    encoder.encode(uncompressed_input, compressed_output, true, num_interleaving);
+
+    std::stringstream uncompressed_output;
+    decoder.decode(compressed_output, uncompressed_output, num_interleaving);
+    std::string decoded_str = uncompressed_output.str();
+
+    ASSERT_EQ(NrOfInputBytes, decoded_str.size()) << "Decoded data size does not match original (With interleaving).";
+
+    for (size_t i = 0; i < NrOfInputBytes; ++i) {
+        uint8_t original_byte = testDataUncompressed[i];
+        uint8_t decoded_byte = static_cast<uint8_t>(decoded_str[i]);
+        EXPECT_EQ(original_byte, decoded_byte) << "Mismatch at byte index " << i << " (With interleaving).";
     }
 }
