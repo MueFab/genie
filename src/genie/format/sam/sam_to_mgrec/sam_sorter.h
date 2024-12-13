@@ -6,7 +6,10 @@
 #define SAM_SORTER_H
 
 #define BUFFER_SIZE 1000000
+#define MAX_BUFFER_SIZE 1000
 
+#include <list>
+#include <mutex>
 #include <queue>
 #include <string>
 
@@ -14,6 +17,14 @@
 #include "sam_record.h"
 
 namespace genie::format::sam::sam_to_mgrec {
+
+struct CmpOpen {
+    bool operator()(std::vector<sam_to_mgrec::SamRecord>& a, std::vector<sam_to_mgrec::SamRecord>& b) const;
+};
+
+struct CmpCompete {
+    bool operator()(std::vector<sam_to_mgrec::SamRecord>& a, std::vector<sam_to_mgrec::SamRecord>& b) const;
+};
 
 class SamSorter {
 
@@ -25,28 +36,28 @@ class SamSorter {
 
     std::string sam_file_path;
     genie::format::sam::sam_to_mgrec::SamReader sam_reader;
-    // should be sorted by p_next
-    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>> open_reads;
-    // should be sorted by position of primary alignment
-    std::vector<std::vector<sam_to_mgrec::SamRecord>> completed_reads;
+    //!< @brief automatically sorted by p_next because priority queue
+    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>, CmpOpen> open_queries;
+    //!< @brief automatically sorted by position of primary alignment because priority queue
+    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>, CmpCompete> completed_queries;
     //!< @brief mapping position of the next ready query
-    int cur_alignment_position;
-
+    uint64_t cur_alignment_position = 0;
+    //!< @brief all positions of primary alignments
+    std::list<int> primary_alignment_positions;
 
 
     public:
     SamSorter(std::string& file_path);
 
-    /**
-     *
-     * @return vector of queries with size BUFFER_SIZE
-     */
+    void set_new_alignment_pos();
+
+    static bool isReadComplete(std::vector<sam_to_mgrec::SamRecord> read);
+
+    void try_appending_to_queries(std::vector<SamRecord> cur_query, std::vector<std::vector<sam_to_mgrec::SamRecord>>& queries);
+
     void addSamRead(std::vector<std::vector<sam_to_mgrec::SamRecord>>& queries, uint32_t num_threads);
 
-    bool isReadComplete(std::vector<sam_to_mgrec::SamRecord>& read);
-
-
-
+    void addSamRead_thread(std::mutex& lock, std::vector<std::vector<sam_to_mgrec::SamRecord>>& queries);
 
 };
 
