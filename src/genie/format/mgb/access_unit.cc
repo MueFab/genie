@@ -23,24 +23,26 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
-void AccessUnit::DebugPrint(const core::parameter::EncodingSet& ps) const {
+std::string AccessUnit::DebugPrint(const core::parameter::EncodingSet& ps)
+const {
+  std::stringstream ss;
   const std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
-  std::cerr << "AU " << header.GetId() << ": class "
+  ss << "AU " << header.GetId() << ": class "
             << lut[static_cast<int>(header.GetClass())];
   if (header.GetClass() != core::record::ClassType::kClassU) {
-    std::cerr << ", Position [" << header.GetAlignmentInfo().GetRefId() << "-"
+    ss << ", Position [" << header.GetAlignmentInfo().GetRefId() << "-"
               << header.GetAlignmentInfo().GetStartPos() << ":"
               << header.GetAlignmentInfo().GetEndPos() << "]";
   }
-  std::cerr << ", " << header.GetReadCount() << " records";
+  ss << ", " << header.GetReadCount() << " records";
 
   if (header.GetClass() == core::record::ClassType::kClassU) {
     if (!ps.IsComputedReference()) {
-      std::cerr << " (Low Latency)";
+      ss << " (Low Latency)";
     } else {
       if (ps.GetComputedRef().GetAlgorithm() ==
           core::parameter::ComputedRef::Algorithm::kGlobalAssembly) {
-        std::cerr << " (Global Assembly)";
+        ss << " (Global Assembly)";
       } else {
         UTILS_DIE("Computed ref not supported: " +
                   std::to_string(
@@ -49,11 +51,11 @@ void AccessUnit::DebugPrint(const core::parameter::EncodingSet& ps) const {
     }
   } else {
     if (!ps.IsComputedReference()) {
-      std::cerr << " (Reference)";
+      ss << " (Reference)";
     } else {
       if (ps.GetComputedRef().GetAlgorithm() ==
           core::parameter::ComputedRef::Algorithm::kLocalAssembly) {
-        std::cerr << " (Local Assembly)";
+        ss << " (Local Assembly)";
       } else {
         UTILS_DIE("Computed ref not supported: " +
                   std::to_string(
@@ -61,7 +63,7 @@ void AccessUnit::DebugPrint(const core::parameter::EncodingSet& ps) const {
       }
     }
   }
-  std::cerr << "..." << std::endl;
+  return ss.str();
 }
 
 // -----------------------------------------------------------------------------

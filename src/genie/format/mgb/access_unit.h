@@ -12,7 +12,7 @@
 
 #include <map>
 #include <vector>
-
+#include <string>
 #include "genie/format/mgb/access_unit_header.h"
 #include "genie/format/mgb/block.h"
 
@@ -23,12 +23,13 @@ namespace genie::format::mgb {
 /**
  * @brief
  */
-class AccessUnit : public core::parameter::DataUnit {
+class AccessUnit final : public core::parameter::DataUnit {
  public:
   /**
    * @brief
    */
-  void DebugPrint(const core::parameter::EncodingSet& ps) const;
+  [[nodiscard]] std::string DebugPrint(
+      const core::parameter::EncodingSet& ps) const;
 
   /**
    * @brief

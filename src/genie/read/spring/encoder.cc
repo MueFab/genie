@@ -17,10 +17,13 @@
 #include "genie/read/spring/encoder_source.h"
 #include "genie/read/spring/generate_read_streams.h"
 #include "genie/read/spring/reorder_compress_quality_id.h"
+#include "genie/util/log.h"
 #include "genie/util/stop_watch.h"
 #include "genie/util/thread_manager.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Spring";
 
 namespace genie::read::spring {
 
@@ -37,41 +40,41 @@ void Encoder::FlushIn(uint64_t& pos) {
     return;
   }
   preprocessor_.Finish(pos);
-
+  const std::string paired_end_str =
+      preprocessor_.cp.paired_end ? "(paired-end)" : "(single-end)";
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Preprocessing done " + paired_end_str);
   std::vector<core::parameter::EncodingSet> params;
   auto loc_cp = preprocessor_.cp;
   util::Watch watch;
   core::stats::PerfStats stats = preprocessor_.stats;
 
   watch.Reset();
-  std::cerr << "Reordering ...\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "Reordering");
   CallReorder(preprocessor_.temp_dir, loc_cp);
-  std::cerr << "Reordering done!\n";
   stats.AddDouble("time-spring-reorder", watch.Check());
 
   watch.Reset();
-  std::cerr << "Encoding ...\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "Encoding");
   CallEncoder(preprocessor_.temp_dir, loc_cp);
-  std::cerr << "Encoding done!\n";
   stats.AddDouble("time-spring-encoding", watch.Check());
 
   watch.Reset();
-  std::cerr << "Generating read streams ...\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "Generating read streams");
   GenerateReadStreams(preprocessor_.temp_dir, loc_cp, entropycoder_, params,
                       stats, write_out_streams_);
-  std::cerr << "Generating read streams done!\n";
   stats.AddDouble("time-spring-gen-reads", watch.Check());
 
   if (preprocessor_.cp.preserve_quality || preprocessor_.cp.preserve_id) {
     watch.Reset();
-    std::cerr << "Reordering and compressing quality and/or ids ...\n";
+
     ReorderCompressQualityId(preprocessor_.temp_dir, loc_cp, qvcoder_,
                              namecoder_, entropycoder_, params, stats,
                              write_out_streams_);
-    std::cerr << "Reordering and compressing quality and/or ids done!\n";
     stats.AddDouble("time-spring-quality-name", watch.Check());
   }
 
+  GENIE_LOG(util::Logger::Severity::INFO, "Writing encoded data to output");
   SpringSource src(this->preprocessor_.temp_dir, this->preprocessor_.cp, params,
                    stats);
   src.SetDrain(this->drain_);
@@ -87,14 +90,18 @@ void Encoder::FlushIn(uint64_t& pos) {
   preprocessor_.Setup(preprocessor_.working_dir, preprocessor_.cp.num_thr,
                       preprocessor_.cp.paired_end);
 
+  GENIE_LOG(util::Logger::Severity::INFO, "Finished!");
   FlushOut(pos);
 }
 
 // -----------------------------------------------------------------------------
-Encoder::Encoder(const std::string& working_dir, size_t num_thr,
-                 bool paired_end, bool write_raw)
-    : ReadEncoder(write_raw) {
+Encoder::Encoder(const std::string& working_dir, const size_t num_thr,
+                 const bool paired_end, const bool write_raw)
+    : ReadEncoder(write_raw), preprocess_progress_printed_(0) {
   preprocessor_.Setup(working_dir, num_thr, paired_end);
+  const std::string paired_end_str = paired_end ? "paired-end" : "single-end";
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Preprocessing (" + paired_end_str + ")");
 }
 
 // -----------------------------------------------------------------------------

@@ -148,20 +148,22 @@ void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
  * @param shift Amount to shift.
  * @param ref_len Reference length.
  * @param rg Global reorder settings.
+ * @param num_reads_remaining
+ * @param last_progress
+ * @param local_reads_used
  * @return True if a match is found, false otherwise.
  */
 template <size_t BitsetSize>
-bool SearchMatch(const std::bitset<BitsetSize>& ref,
-                 const std::vector<std::bitset<BitsetSize>>& mask1,
-                 std::vector<std::mutex>& dict_lock,
-                 std::vector<std::mutex>& read_lock,
-                 std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
-                 std::vector<uint16_t>& read_lengths,
-                 std::vector<uint8_t>& remaining_reads,
-                 std::vector<std::bitset<BitsetSize>>& read,
-                 std::vector<BbHashDict>& dict, uint32_t& k, bool rev,
-                 int shift, const int& ref_len,
-                 const ReorderGlobal<BitsetSize>& rg);
+bool SearchMatch(
+    const std::bitset<BitsetSize>& ref,
+    const std::vector<std::bitset<BitsetSize>>& mask1,
+    std::vector<std::mutex>& dict_lock, std::vector<std::mutex>& read_lock,
+    std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
+    std::vector<uint16_t>& read_lengths, std::vector<uint8_t>& remaining_reads,
+    std::vector<std::bitset<BitsetSize>>& read, std::vector<BbHashDict>& dict,
+    uint32_t& k, bool rev, int shift, const int& ref_len,
+    const ReorderGlobal<BitsetSize>& rg, uint32_t& num_reads_remaining,
+    float& last_progress, uint32_t& local_reads_used);
 
 /**
  * @brief Reorders the reads based on the reference sequence.

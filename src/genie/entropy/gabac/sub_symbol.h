@@ -20,11 +20,14 @@
 
 #include <cassert>
 #include <iostream>
-
+#include <string>
 #include "genie/entropy/gabac/context_tables.h"
 #include "genie/entropy/paramcabac/state_vars.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "GABAC";
 
 namespace genie::entropy::gabac {
 
@@ -107,11 +110,14 @@ struct Subsymbol {
    * @details Outputs the current state of the subsymbol to the console.
    */
   void PrintDebug() const {
-    std::cout << "Subsymbol Index: " << static_cast<int>(subsym_idx)
-              << "\nSubsymbol Value: " << subsym_value << "\nPrevious Values: ["
-              << prv_values[0] << ", " << prv_values[1] << "]"
-              << "\nLUT Max Elements: " << lut_num_max_elems
-              << "\nLUT Entry Index: " << lut_entry_idx << std::endl;
+    const std::string debug_text =
+        "Subsymbol Index: " + std::to_string(subsym_idx) +
+        "\nSubsymbol Value: " + std::to_string(subsym_value) +
+        "\nPrevious Values: [" + std::to_string(prv_values[0]) + ", " +
+        std::to_string(prv_values[1]) + "]" +
+        "\nLUT Max Elements: " + std::to_string(lut_num_max_elems) +
+        "\nLUT Entry Index: " + std::to_string(lut_entry_idx);
+    GENIE_LOG(util::Logger::Severity::INFO, debug_text);
   }
 };
 

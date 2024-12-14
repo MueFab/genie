@@ -115,10 +115,10 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
         // add compressed payload
         const auto [kFst, kSnd] = subdesc.GetId();
 
-        std::get<2>(ret).AddInteger("Size-gabac-total-raw",
+        std::get<2>(ret).AddInteger("size-gabac-total-raw",
                                     static_cast<int64_t>(subdesc.GetRawSize()));
         std::get<2>(ret).AddInteger(
-            "Size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name + "-" +
+            "size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name + "-" +
                 GetDescriptor(std::get<1>(ret).GetId()).sub_seqs[kSnd].name +
                 "-raw",
             static_cast<int64_t>(subdesc.GetRawSize()));
@@ -127,10 +127,10 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
 
         if (!std::get<1>(ret).Get(kSnd).IsEmpty()) {
           std::get<2>(ret).AddInteger(
-              "Size-gabac-total-comp",
+              "size-gabac-total-comp",
               static_cast<int64_t>(std::get<1>(ret).Get(kSnd).GetRawSize()));
           std::get<2>(ret).AddInteger(
-              "Size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name +
+              "size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name +
                   "-" +
                   GetDescriptor(std::get<1>(ret).GetId()).sub_seqs[kSnd].name +
                   "-comp",
@@ -155,16 +155,16 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
     config_set_.StoreParameters(std::get<1>(ret).GetId(), std::get<0>(ret));
 
     if (size) {
-      std::get<2>(ret).AddInteger("Size-gabac-total-raw",
+      std::get<2>(ret).AddInteger("size-gabac-total-raw",
                                   static_cast<int64_t>(size));
       std::get<2>(ret).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name + "-raw",
+          "size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name + "-raw",
           static_cast<int64_t>(size));
       std::get<2>(ret).AddInteger(
-          "Size-gabac-total-comp",
+          "size-gabac-total-comp",
           static_cast<int64_t>(std::get<1>(ret).begin()->GetRawSize()));
       std::get<2>(ret).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name +
+          "size-gabac-" + GetDescriptor(std::get<1>(ret).GetId()).name +
               "-comp",
           static_cast<int64_t>(std::get<1>(ret).begin()->GetRawSize()));
     }

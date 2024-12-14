@@ -22,10 +22,13 @@
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"
+#include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Spring";
 
 namespace genie::read::spring {
 
@@ -49,6 +52,9 @@ void Preprocessor::Setup(const std::string& working_dir_p, const size_t num_thr,
   cp.num_reads = 0;
   cp.num_reads_clean = {0u, 0u};
   cp.max_read_len = 0;
+  preprocess_progress_printed = 0;
+  cp.num_reads_per_block = kNumReadsPerBlock;
+  cp.num_blocks = 0;
 
   do {
     temp_dir = std::filesystem::path(working_dir) / ("tmp." + RandomString(10));
@@ -164,6 +170,16 @@ void Preprocessor::Preprocess(core::record::Chunk&& t,
   cp.num_reads += static_cast<uint32_t>(rec_index);
   cp.num_blocks++;
 
+  constexpr size_t print_progress = 1000000;
+  const std::string pair_end_str =
+      cp.paired_end ? " (paired-end)" : "(single-end)";
+  while (cp.num_reads - preprocess_progress_printed > print_progress) {
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "---- Preprocessed reads " + pair_end_str + ": " +
+                  std::to_string(preprocess_progress_printed));
+    preprocess_progress_printed += print_progress;
+  }
+
   // Validate processed reads
   UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");
 }
@@ -214,11 +230,13 @@ void Preprocessor::Finish(size_t id) {
 
   cp.num_reads = cp.paired_end ? cp.num_reads * 2 : cp.num_reads;
 
-  std::cerr << "Max Read length: " << cp.max_read_len << "\n";
-  std::cerr << "Total number of reads: " << cp.num_reads << "\n";
-
-  std::cerr << "Total number of reads without N: "
-            << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Max Read length: " + std::to_string(cp.max_read_len));
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Total number of reads: " + std::to_string(cp.num_reads));
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Total number of reads without N: " +
+                std::to_string(cp.num_reads_clean[0] + cp.num_reads_clean[1]));
 }
 
 // -----------------------------------------------------------------------------

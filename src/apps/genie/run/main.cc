@@ -33,6 +33,9 @@
 #include "genie/quality/qvwriteout/encoder_none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/stop_watch.h"
+#include "util/log.h"
+
+constexpr auto kLogModuleName = "App/Run";
 
 // -----------------------------------------------------------------------------
 
@@ -133,13 +136,14 @@ void AddFasta(const std::string& fasta_file_path,
   auto fasta_file = std::make_unique<std::ifstream>(fasta_file_path);
   UTILS_DIE_IF(!fasta_file, "Cannot open file to read: " + fasta_file_path);
   if (!std::filesystem::exists(fai)) {
-    std::cerr << "Indexing " << fasta_file_path << " ..." << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::INFO,
+              "Indexing " + fasta_file_path);
     std::ofstream fai_file(fai);
     genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
   }
   if (!std::filesystem::exists(sha)) {
-    std::cerr << "Calculating hashes " << fasta_file_path << " ..."
-              << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::INFO,
+              "Calculating hashes " + fasta_file_path);
     std::ofstream sha_file(sha);
     std::ifstream fai_file(fai);
     UTILS_DIE_IF(!fai_file, "Cannot open file to read: " + fai);
@@ -168,7 +172,7 @@ void AttachImporterMgrec(
   if (p_opts.inputFile.substr(0, 2) != "-.") {
     input_files.emplace_back(std::make_unique<std::ifstream>(p_opts.inputFile));
     UTILS_DIE_IF(!input_files.back(),
-                   "Cannot open file to read: " + p_opts.inputFile);
+                 "Cannot open file to read: " + p_opts.inputFile);
     in_ptr = input_files.back().get();
   }
 
@@ -193,7 +197,7 @@ void AttachImporterFastq(
   if (p_opts.inputFile.substr(0, 2) != "-.") {
     input_files.emplace_back(std::make_unique<std::ifstream>(p_opts.inputFile));
     UTILS_DIE_IF(!input_files.back(),
-                   "Cannot open file to read: " + p_opts.inputFile);
+                 "Cannot open file to read: " + p_opts.inputFile);
     file1 = input_files.back().get();
   }
   if (file_extension(p_opts.inputSupFile) == "fastq") {
@@ -314,13 +318,16 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
       UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme,
                    "Unknown URI scheme: " + uri);
       std::string path = uri.substr(scheme.length());
-      std::cerr << "Extracted reference URI: " << uri << std::endl;
+      GENIE_LOG(genie::util::Logger::Severity::INFO,
+                "Extracted reference URI " + uri);
       if (std::filesystem::exists(path)) {
-        std::cerr << "Reference URI valid." << std::endl;
+        GENIE_LOG(genie::util::Logger::Severity::INFO,
+                  "Reference URI valid" + uri);
         json_uri_path = path;
       } else {
-        std::cerr << "Reference URI invalid. Falling back to CLI reference."
-                  << std::endl;
+        GENIE_LOG(
+            genie::util::Logger::Severity::WARNING,
+            "Reference URI invalid. Falling back to CLI reference." + uri);
       }
     }
   }
@@ -334,13 +341,14 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
           "sha256";
       auto fasta_file = std::make_unique<std::ifstream>(json_uri_path);
       if (!std::filesystem::exists(fai)) {
-        std::cerr << "Indexing " << json_uri_path << " ..." << std::endl;
+        GENIE_LOG(genie::util::Logger::Severity::INFO,
+                  "Indexing " + json_uri_path);
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
       }
       if (!std::filesystem::exists(sha)) {
-        std::cerr << "Calculating hashes " << json_uri_path << " ..."
-                  << std::endl;
+        GENIE_LOG(genie::util::Logger::Severity::INFO,
+                  "Calculating hashes " + json_uri_path);
         std::ofstream sha_file(sha);
         std::ifstream fai_file(fai);
         UTILS_DIE_IF(!fai_file, "Cannot open file to read: " + fai);
@@ -413,15 +421,15 @@ int main(int argc, char* argv[]) {
     }
 
     auto stats = flow_graph->GetStats();
-    stats.AddDouble("time-total", watch.Check());
-    std::cerr << stats << std::endl;
+    stats.AddDouble("time-wallclock", watch.Check());
+    stats.print();
 
     return 0;
   } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error: Unknown" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }

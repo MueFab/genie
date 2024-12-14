@@ -10,9 +10,12 @@
 #include <iostream>
 
 #include "genie/entropy/paramcabac/binarization_parameters.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Gabac";
 
 namespace genie::entropy::paramcabac {
 
@@ -111,9 +114,9 @@ void StateVars::populate(
   } else {
     static bool print = false;
     if (!print) {
-      std::cerr << "coding_subsym_size = " +
-                       std::to_string(coding_subsym_size) + " not supported"
-                << std::endl;
+      GENIE_LOG(util::Logger::Severity::WARNING,
+                "coding_subsym_size = " + std::to_string(coding_subsym_size) +
+                    " not supported");
       print = true;
     }
   }

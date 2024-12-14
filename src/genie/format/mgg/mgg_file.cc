@@ -14,8 +14,11 @@
 #include <vector>
 
 #include "genie/format/mgg/file_header.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Mgg";
 
 namespace genie::format::mgg {
 
@@ -37,7 +40,8 @@ MggFile::MggFile(std::istream* file) : file_(file), reader_(*file_) {
       boxes_.emplace_back(
           std::make_unique<DatasetGroup>(*reader_, hdr.GetMinorVersion()));
     } else {
-      std::cout << "Unknown Box " << boxname << " on top level of file. Exit.";
+      GENIE_LOG(util::Logger::Severity::WARNING,
+                "Unknown Box " + boxname + " on top level of file. Skip.");
       break;
     }
   }

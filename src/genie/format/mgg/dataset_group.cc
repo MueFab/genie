@@ -43,8 +43,6 @@ DatasetGroup::DatasetGroup(util::BitReader& reader,
     read_box(reader, false);
   }
 
-  std::cout << std::to_string(end_pos - reader.GetStreamPosition())
-            << std::endl;
   UTILS_DIE_IF(header_ == std::nullopt, "Dataset group without header");
 }
 

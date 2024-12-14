@@ -37,6 +37,7 @@ namespace genie::read::spring {
 class Encoder final : public core::ReadEncoder {
   /// Handles preprocessing of input records and file management.
   Preprocessor preprocessor_;
+  size_t preprocess_progress_printed_;
 
  public:
   /**

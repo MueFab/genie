@@ -99,12 +99,12 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
     }
   }
 
-  GetStats().AddInteger("Size-fastq-sequence", static_cast<int64_t>(size_seq));
-  GetStats().AddInteger("Size-fastq-name", static_cast<int64_t>(size_name));
-  GetStats().AddInteger("Size-fastq-quality",
+  GetStats().AddInteger("size-fastq-sequence", static_cast<int64_t>(size_seq));
+  GetStats().AddInteger("size-fastq-name", static_cast<int64_t>(size_name));
+  GetStats().AddInteger("size-fastq-quality",
                         static_cast<int64_t>(size_qualities));
   GetStats().AddInteger(
-      "Size-fastq-total",
+      "size-fastq-total",
       static_cast<int64_t>(size_qualities + size_name + size_seq));
   GetStats().AddDouble("time-fastq-export", watch.Check());
 }

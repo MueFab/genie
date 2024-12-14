@@ -18,8 +18,11 @@
 #include "apps/genie/transcode-fasta/program_options.h"
 #include "genie/format/fasta/manager.h"
 #include "genie/format/mgb/raw_reference.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/TranscodeFasta";
 
 namespace genie_app::transcode_fasta {
 
@@ -98,10 +101,10 @@ int main(int argc, char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error - unknown exception" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }

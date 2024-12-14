@@ -21,6 +21,7 @@
 #include "genie/read/spring/bitset_util.h"
 #include "genie/util/barrier.h"
 #include "genie/util/literal.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
@@ -213,10 +214,31 @@ void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
   }
 }
 
+void display_progress(uint32_t& num_reads_remaining, float& last_progress,
+                      const std::vector<uint8_t>& remaining_reads,
+                      uint32_t& local_reads_used) {
+  static std::mutex mutex;
+  std::lock_guard lock(mutex);
+  num_reads_remaining -= local_reads_used;
+  local_reads_used = 0;
+  const float progress = 1.0 - (static_cast<float>(num_reads_remaining) /
+                                static_cast<float>(remaining_reads.size()));
+  while (progress - last_progress > 0.01) {
+    constexpr auto kLogModuleName = "Spring";
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Progress: " +
+                  std::to_string(static_cast<int>(last_progress * 100)) +
+                  "% - " + std::to_string(num_reads_remaining) +
+                  " reads remaining");
+    last_progress += 0.01;
+  }
+}
+
 // -----------------------------------------------------------------------------
 template <size_t BitsetSize>
-bool SearchMatch(const std::bitset<BitsetSize>& ref,
-                 const std::vector<std::bitset<BitsetSize>>& mask1,
+bool SearchMatch(
+    const std::bitset<BitsetSize>& ref,
+    const std::vector<std::bitset<BitsetSize>>& mask1,
                  std::vector<std::mutex>& dict_lock,
                  std::vector<std::mutex>& read_lock,
                  std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
@@ -225,7 +247,9 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
                  std::vector<std::bitset<BitsetSize>>& read,
                  std::vector<BbHashDict>& dict, uint32_t& k, const bool rev,
                  const int shift, const int& ref_len,
-                 const ReorderGlobal<BitsetSize>& rg) {
+                 const ReorderGlobal<BitsetSize>& rg,
+                 uint32_t& num_reads_remaining, float& last_progress,
+                 uint32_t& local_reads_used) {
   static constexpr unsigned int thresh = kThreshReorder;
   constexpr int max_search = kMaxSearchReorder;
   std::bitset<BitsetSize> b;
@@ -275,6 +299,11 @@ bool SearchMatch(const std::bitset<BitsetSize>& ref,
           std::lock_guard read_lock_guard(read_lock[ReorderLockIdx(rid)]);
           if (remaining_reads[rid]) {
             remaining_reads[rid] = false;
+            local_reads_used++;
+            if (local_reads_used > 10000) {
+              display_progress(num_reads_remaining, last_progress,
+                               remaining_reads, local_reads_used);
+            }
             k = rid;
             flag = true;
           }
@@ -298,7 +327,8 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                        std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
                        std::vector<std::mutex>& dict_lock,
                        std::vector<std::mutex>& read_lock, std::mutex& mutex,
-                       uint32_t& first_read, util::Barrier& barrier) {
+                       uint32_t& first_read, util::Barrier& barrier,
+                       uint32_t& num_reads_remaining, float& last_progress) {
   // Thread-specific file streams
   std::string tid_str = std::to_string(tid);
 
@@ -317,6 +347,8 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
                                  std::ofstream::out | std::ios::binary);
   unmatched[tid] = 0;
   std::bitset<BitsetSize> ref, reverse_reference, b;
+
+  uint32_t local_reads_used = 0;
 
   int64_t first_rid = 0;
   // first_rid represents first read of contig, used for left searching
@@ -359,6 +391,11 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
       done = true;
     } else {
       remaining_reads[current] = false;
+      local_reads_used++;
+      if (local_reads_used > 10000) {
+        display_progress(num_reads_remaining, last_progress,
+                         remaining_reads, local_reads_used);
+      }
       ++unmatched[tid];
     }
     first_read += rg.num_reads / rg.num_thr;  // spread out first read equally
@@ -377,6 +414,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
     prev_unmatched = true;
     prev = current;
   }
+
   while (!done) {
     if (num_reads_thr % 1000000 == 0) {
       if (static_cast<float>(num_unmatched_past_1_m_thr) >
@@ -386,6 +424,7 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
       num_unmatched_past_1_m_thr = 0;
     }
     num_reads_thr++;
+
     // delete the read from the corresponding dictionary bins (unless we
     // are starting left search)
     if (!left_search_start) {
@@ -409,9 +448,10 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
       for (int shift = 0; shift < rg.max_shift; shift++) {
         uint32_t k;
         // find forward match
-        flag = SearchMatch<BitsetSize>(ref, mask1, dict_lock, read_lock, mask,
-                                       read_lengths, remaining_reads, read,
-                                       dict, k, false, shift, ref_len, rg);
+        flag = SearchMatch<BitsetSize>(
+            ref, mask1, dict_lock, read_lock, mask, read_lengths,
+            remaining_reads, read, dict, k, false, shift, ref_len, rg,
+            num_reads_remaining, last_progress, local_reads_used);
         if (flag == 1) {
           current = k;
           int ref_len_old = ref_len;
@@ -455,7 +495,8 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
         // find reverse match
         flag = SearchMatch<BitsetSize>(
             reverse_reference, mask1, dict_lock, read_lock, mask, read_lengths,
-            remaining_reads, read, dict, k, true, shift, ref_len, rg);
+            remaining_reads, read, dict, k, true, shift, ref_len, rg,
+            num_reads_remaining, last_progress, local_reads_used);
 
         if (flag == 1) {
           current = k;
@@ -524,6 +565,11 @@ void process_read_task(uint32_t tid, const ReorderGlobal<BitsetSize>& rg,
               current = j;
               remaining_pos = j - 1;
               remaining_reads[j] = false;
+              local_reads_used++;
+              if (local_reads_used > 10000) {
+                display_progress(num_reads_remaining, last_progress,
+                                 remaining_reads, local_reads_used);
+              }
               flag = true;
               ++unmatched[tid];
             }
@@ -578,14 +624,14 @@ void parallel_process_reads(
   std::mutex mutex;
   uint32_t first_read = 0;
   util::Barrier barrier(rg.num_thr);
-
-  std::cerr << "Running with " << rg.num_thr << " threads\n";
+  uint32_t num_reads_remaining = rg.num_reads;
+  float last_progress = 0.0;
 
   // Dispatch tasks dynamically
   scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
     process_read_task(info.task_id, rg, read, read_lengths, remaining_reads,
                       unmatched, dict, mask1, mask, dict_lock, read_lock, mutex,
-                      first_read, barrier);
+                      first_read, barrier, num_reads_remaining, last_progress);
   });
 }
 
@@ -623,10 +669,12 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
                                      unmatched, dict, mask1, mask, dict_lock,
                                      read_lock);
 
-  std::cerr << "Reordering done, "
-            << static_cast<int>(std::accumulate(
-                   unmatched.begin(), unmatched.begin() + rg.num_thr, 0_u32))
-            << " were unmatched\n";
+  auto num_unmatched = static_cast<int>(std::accumulate(
+      unmatched.begin(), unmatched.begin() + rg.num_thr, 0_u32));
+
+  constexpr auto kLogModuleName = "Spring";
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "-------- Unmatched reads: " + std::to_string(num_unmatched));
 }
 
 template <size_t BitsetSize>
@@ -704,8 +752,6 @@ void process_all_tasks(const ReorderGlobal<BitsetSize>& rg,
   scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
     process_task(info.task_id, rg, read, read_lengths, num_reads_s_thr);
   });
-
-  std::cerr << "All tasks completed dynamically.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -787,9 +833,10 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   SetGlobalArrays(rg);
   auto read = std::vector<std::bitset<BitsetSize>>(rg.num_reads);
   auto read_lengths = std::vector<uint16_t>(rg.num_reads);
-  std::cerr << "Reading file\n";
+  constexpr auto kLogModuleName = "Spring";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Reading DNA file");
   ReadDnaFile<BitsetSize>(read, read_lengths, rg);
-  std::cerr << "Constructing dictionaries\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
   DictSizes dict_sizes{};
   if (rg.max_read_len > 100) {
     dict_sizes = {static_cast<uint32_t>(rg.max_read_len / 2 - 32),
@@ -807,11 +854,10 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto dict = ConstructDictionary<BitsetSize>(read, read_lengths, rg.num_dict,
                                               rg.num_reads, 2, rg.basedir,
                                               rg.num_thr, dict_sizes);
-  std::cerr << "Reordering reads\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Reordering reads");
   Reorder<BitsetSize>(read, dict, read_lengths, rg);
-  std::cerr << "Writing to file\n";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Writing to file");
   WriteToFile<BitsetSize>(read, read_lengths, rg);
-  std::cerr << "Done!\n";
 }
 
 // -----------------------------------------------------------------------------

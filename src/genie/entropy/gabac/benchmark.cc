@@ -19,9 +19,12 @@
 #include "genie/entropy/gabac/encode_desc_sub_seq.h"
 #include "genie/entropy/gabac/encode_transformed_sub_seq.h"
 #include "genie/entropy/gabac/stream_handler.h"
+#include "genie/util/log.h"
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/Gabac";
 
 namespace genie::entropy::gabac {
 
@@ -444,8 +447,9 @@ ResultFull BenchmarkFull(const std::string& input_file,
   bool new_file = !std::filesystem::exists("benchmark_total.csv");
   std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
   do {
-    std::cerr << "Optimizing transformation "
-              << static_cast<int>(config.GetTransform()) << "..." << std::endl;
+    GENIE_LOG(
+        util::Logger::Severity::INFO,
+        "Optimizing transformation " + std::to_string(config.GetTransform()));
     // Execute transformation
     std::vector<util::DataBlock> transformed_sub_seqs;
     transformed_sub_seqs.resize(1);
@@ -460,7 +464,8 @@ ResultFull BenchmarkFull(const std::string& input_file,
 
     // Optimize transformed sequences independently
     for (size_t i = 0; i < transformed_sub_seqs.size(); ++i) {
-      std::cerr << "Optimizing subsequence " << i << "..." << std::endl;
+      GENIE_LOG(util::Logger::Severity::INFO,
+                "Optimizing subsequence " + std::to_string(i) + "...");
       trans_results.emplace_back(OptimizeTransformedSequence(
           config.GetTransformedSeqs()[i], desc, transformed_sub_seqs[i],
           time_weight, i == transformed_sub_seqs.size() - 1,

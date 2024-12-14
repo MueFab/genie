@@ -192,10 +192,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
     }
 
     if (size) {
-      std::get<1>(desc).AddInteger("Size-gabac-total-comp",
+      std::get<1>(desc).AddInteger("size-gabac-total-comp",
                                    static_cast<int64_t>(size));
       std::get<1>(desc).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+          "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
               "-comp",
           static_cast<int64_t>(size));
     }
@@ -211,10 +211,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (size) {
       std::get<1>(desc).AddInteger(
-          "Size-gabac-total-raw",
+          "size-gabac-total-raw",
           static_cast<int64_t>(std::get<0>(desc).begin()->GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+          "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
               "-raw",
           static_cast<int64_t>(std::get<0>(desc).begin()->GetRawSize()));
     }
@@ -231,10 +231,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
       if (!sub_sequence.IsEmpty()) {
         std::get<1>(desc).AddInteger(
-            "Size-gabac-total-comp",
+            "size-gabac-total-comp",
             static_cast<int64_t>(sub_sequence.GetRawSize()));
         std::get<1>(desc).AddInteger(
-            "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+            "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
                 "-" +
                 GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name +
                 "-comp",
@@ -247,10 +247,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
       if (!std::get<0>(desc).Get(snd).IsEmpty()) {
         std::get<1>(desc).AddInteger(
-            "Size-gabac-total-raw",
+            "size-gabac-total-raw",
             static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
         std::get<1>(desc).AddInteger(
-            "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+            "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
                 "-" +
                 GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name +
                 "-raw",

@@ -373,10 +373,10 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
     }
   }
 
-  GetStats().AddInteger("Size-sam-seq", static_cast<int64_t>(size_seq));
-  GetStats().AddInteger("Size-sam-name", static_cast<int64_t>(size_name));
-  GetStats().AddInteger("Size-sam-qual", static_cast<int64_t>(size_qual));
-  GetStats().AddInteger("Size-sam-total",
+  GetStats().AddInteger("size-sam-seq", static_cast<int64_t>(size_seq));
+  GetStats().AddInteger("size-sam-name", static_cast<int64_t>(size_name));
+  GetStats().AddInteger("size-sam-qual", static_cast<int64_t>(size_qual));
+  GetStats().AddInteger("size-sam-total",
                         static_cast<int64_t>(size_qual + size_name + size_seq));
   GetStats().AddDouble("time-sam-export", watch.Check());
 }

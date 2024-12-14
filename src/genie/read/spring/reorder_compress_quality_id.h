@@ -158,7 +158,8 @@ void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
                      core::ReadEncoder::name_selector* name_coder,
                      core::ReadEncoder::entropy_selector* entropy,
                      std::vector<core::parameter::EncodingSet>& params,
-                     core::stats::PerfStats& stats, bool write_raw);
+                     core::stats::PerfStats& stats, bool write_raw, uint32_t
+                     num_reads);
 
 // -----------------------------------------------------------------------------
 

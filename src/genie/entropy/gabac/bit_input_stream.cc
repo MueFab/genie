@@ -9,7 +9,6 @@
 
 #include <cassert>
 #include <limits>
-
 #include "genie/util/data_block.h"
 
 // -----------------------------------------------------------------------------

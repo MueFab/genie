@@ -95,7 +95,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
       // add compressed payload
       const auto [kFst, kSnd] = sub_seq.GetId();
 
-      std::get<2>(ret).AddInteger("Size-lzma-total-raw",
+      std::get<2>(ret).AddInteger("size-lzma-total-raw",
                                   static_cast<int64_t>(sub_seq.GetRawSize()));
       auto sub_seq_name = std::string();
       if (GetDescriptor(std::get<1>(ret).GetId()).token_type) {
@@ -105,17 +105,17 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
             GetDescriptor(std::get<1>(ret).GetId()).name + "-" +
             GetDescriptor(std::get<1>(ret).GetId()).sub_seqs[kSnd].name;
       }
-      std::get<2>(ret).AddInteger("Size-lzma-" + sub_seq_name + "-raw",
+      std::get<2>(ret).AddInteger("size-lzma-" + sub_seq_name + "-raw",
                                   static_cast<int64_t>(sub_seq.GetRawSize()));
 
       std::get<1>(ret).Set(kSnd, Compress(std::move(sub_seq)));
 
       if (!std::get<1>(ret).Get(kSnd).IsEmpty()) {
         std::get<2>(ret).AddInteger(
-            "Size-lzma-total-comp",
+            "size-lzma-total-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(kSnd).GetRawSize()));
         std::get<2>(ret).AddInteger(
-            "Size-lzma-" + sub_seq_name + "-comp",
+            "size-lzma-" + sub_seq_name + "-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(kSnd).GetRawSize()));
       }
     } else {

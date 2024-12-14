@@ -11,9 +11,12 @@
 #include <iostream>
 #include <string>
 
+#include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Fasta";
 
 namespace genie::format::fasta {
 
@@ -61,10 +64,13 @@ bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
           ? ref_mgr_->GetLength(seq) % core::ReferenceManager::GetChunkSize()
           : string->length();
 
-  std::cerr << "Decompressing " << seq << " ["
-            << pos * core::ReferenceManager::GetChunkSize() << ", "
-            << pos * core::ReferenceManager::GetChunkSize() + actual_length
-            << "]" << std::endl;
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "Decompressing " + seq + " [" +
+                std::to_string(pos * core::ReferenceManager::GetChunkSize()) +
+                ", " +
+                std::to_string(pos * core::ReferenceManager::GetChunkSize() +
+                               actual_length) +
+                "]");
 
   [[maybe_unused]] util::OrderedSection out_sec(&output_lock_, loc_id);
   if (pos == 0) {

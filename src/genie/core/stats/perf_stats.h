@@ -101,6 +101,8 @@ class PerfStats {
    */
   [[nodiscard]] bool IsActive() const;
 
+  void print() const;
+
  private:
   bool active_{true};                 //!< @brief
   std::map<std::string, Stat> data_;  //!< @brief

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "genie/read/spring/dynamic_scheduler.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
 
@@ -225,6 +226,8 @@ inline void process_dict_task(size_t task_id, std::vector<BbHashDict>& dict,
   // Step 2: Insert elements in the dict array
   dict[j].read_id_ = std::vector<uint32_t>(dict[j].dict_num_reads_);
   uint32_t i = 0;
+  float last_progress = 0.0;
+
   for (int tid = 0; tid < num_threads; tid++) {
     std::ifstream fin_hash(
         basedir + "/hash.bin." + std::to_string(tid) + '.' + std::to_string(j),
@@ -238,6 +241,16 @@ inline void process_dict_task(size_t task_id, std::vector<BbHashDict>& dict,
                          sizeof(uint64_t))) {
       while (read_lengths[i] <= dict[j].end_) i++;
       dict[j].read_id_[dict[j].start_pos_[current_hash]++] = i;
+      float progress =
+          static_cast<float>(i) / static_cast<float>(read_lengths.size());
+      if (progress - last_progress > 0.1) {
+        constexpr auto kLogModuleName = "Spring";
+        GENIE_LOG(util::Logger::Severity::INFO,
+                  "------------ Progress (dictionary " + std::to_string(j + 1) +
+                      "/" + std::to_string(dict.size()) + "): " +
+                      std::to_string(static_cast<int>(progress * 100)) + "%");
+        last_progress += 0.1;
+      }
       i++;
     }
     fin_hash.close();
@@ -281,18 +294,33 @@ std::vector<BbHashDict> ConstructDictionary(
   dict[0].end_ = dict_sizes[0].end;
   dict[1].start_ = dict_sizes[1].start;
   dict[1].end_ = dict_sizes[1].end;
+  constexpr auto kLogModuleName = "Spring";
 
   if (num_reads == 0) return dict;
   auto mask = std::vector<std::bitset<BitsetSize>>(num_dict);
   GenerateIndexMasks<BitsetSize>(mask, dict, num_dict, bpb);
   for (int j = 0; j < num_dict; j++) {
     auto ull = std::vector<uint64_t>(num_reads);
+    const std::string dict_string =
+        std::to_string(j + 1) + "/" + std::to_string(num_dict);
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Computing keys for dict " + dict_string);
     compute_keys(read, mask[j], ull, dict[j], num_reads, bpb);
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Filtering keys for dict " + dict_string);
     filter_keys_by_read_length(read_lengths, ull, dict[j], num_reads);
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Writing keys for dict " + dict_string);
     parallel_write_keys_dynamic(ull, dict[j], basedir, num_threads);
+
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Constructing hashes for dict " + dict_string);
     deduplicate_and_construct_hash(ull, dict[j]);
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Processing hashes for dict " + dict_string);
     parallel_process_keys_dynamic(dict, basedir, num_threads, j);
   }
+  GENIE_LOG(util::Logger::Severity::INFO, "-------- Processing dictionaries");
   parallel_process_dicts_dynamic(dict, basedir, read_lengths, num_threads,
                                  num_dict);
   return dict;

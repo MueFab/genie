@@ -23,8 +23,11 @@
 #include "genie/core/record/segment.h"
 #include "genie/read/spring/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Spring";
 
 namespace genie::read::spring {
 
@@ -67,21 +70,21 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     // array to load ids and/or qualities into
 
     if (preserve_quality) {
-      std::cerr << "Compressing qualities\n";
+      GENIE_LOG(util::Logger::Severity::INFO, "Compressing qualities");
       uint32_t num_reads_per_file = num_reads;
       ReorderCompress(file_quality[0], temp_dir, num_reads_per_file, num_thr,
                       num_reads_per_block, str_array, str_array_size,
                       order_array, "quality", qv_coder, name_coder, entropy,
-                      params, stats, write_raw);
+                      params, stats, write_raw, num_reads);
       remove(file_quality[0].c_str());
     }
     if (preserve_id) {
-      std::cerr << "Compressing ids\n";
+      GENIE_LOG(util::Logger::Severity::INFO, "Compressing ids");
       uint32_t num_reads_per_file = num_reads;
       ReorderCompress(file_id, temp_dir, num_reads_per_file, num_thr,
                       num_reads_per_block, str_array, str_array_size,
                       order_array, "id", qv_coder, name_coder, entropy, params,
-                      stats, write_raw);
+                      stats, write_raw, num_reads);
       remove(file_id.c_str());
     }
 
@@ -93,6 +96,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     std::string file_blocks_id = basedir + "/blocks_id.bin";
     std::vector<uint32_t> block_start, block_end;
     if (preserve_quality) {
+      GENIE_LOG(util::Logger::Severity::INFO, "Compressing qualities");
       // read block start and end into vector
       ReadBlockStartEnd(file_blocks_quality, block_start, block_end);
       // read order into order_array
@@ -114,6 +118,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       block_end.clear();
     }
     if (preserve_id) {
+      GENIE_LOG(util::Logger::Severity::INFO, "Compressing ids");
       ReadBlockStartEnd(file_blocks_id, block_start, block_end);
       auto id_array = std::vector<std::string>(num_reads / 2);
       std::ifstream f_id(file_id);
@@ -179,6 +184,11 @@ void process_block_task(size_t block_num,
                         bool write_raw, const std::string& id_desc_prefix) {
   std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num),
                            std::ios::binary);
+
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Block " + std::to_string(block_num + 1) + "/" +
+                std::to_string(block_start.size()));
+
   if (!f_order_id.is_open()) {
     throw std::runtime_error("Cannot open file to read: " + file_order_id +
                              "." + std::to_string(block_num));
@@ -289,6 +299,11 @@ void process_quality_block_task(
     std::vector<core::parameter::EncodingSet>& params,
     std::vector<core::stats::PerfStats>& stat_vec, bool write_raw,
     const std::string& quality_desc_prefix, size_t start_block_num) {
+
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Block " + std::to_string(block_num + 1) + "/" +
+                std::to_string(block_start.size()));
+
   core::record::Chunk chunk;
   for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
     chunk.GetData().emplace_back(static_cast<uint8_t>(2),
@@ -424,7 +439,8 @@ void process_block_task(size_t block_num,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         bool write_raw, const std::string& id_desc_prefix,
                         const std::string& quality_desc_prefix,
-                        core::ReadEncoder::qv_selector* qv_coder) {
+                        core::ReadEncoder::qv_selector* qv_coder, uint32_t
+                        num_reads) {
   uint64_t block_num_offset = start_read_bin / num_reads_per_block;
   uint64_t start_read_num = block_num * num_reads_per_block;
   uint64_t end_read_num = (block_num + 1) * num_reads_per_block;
@@ -432,6 +448,13 @@ void process_block_task(size_t block_num,
     end_read_num = num_reads_bin;
   }
   auto num_reads_block = static_cast<uint32_t>(end_read_num - start_read_num);
+
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Block " + std::to_string(block_num_offset + block_num + 1) +
+                "/" +
+                std::to_string(static_cast<int>(
+                    std::ceil(static_cast<float>(num_reads) /
+                              static_cast<float>(num_reads_per_block)))));
 
   if (mode == "id") {
     core::record::Chunk chunk;
@@ -531,7 +554,8 @@ void parallel_process_blocks_dynamic(
     std::vector<core::parameter::EncodingSet>& params,
     std::vector<core::stats::PerfStats>& stat_vec, const bool write_raw,
     const std::string& id_desc_prefix, const std::string& quality_desc_prefix,
-    core::ReadEncoder::qv_selector* qv_coder, const int num_threads) {
+    core::ReadEncoder::qv_selector* qv_coder, const int num_threads,
+    const uint32_t num_reads) {
   // Create an instance of the DynamicScheduler
   DynamicScheduler scheduler(num_threads);
 
@@ -540,7 +564,7 @@ void parallel_process_blocks_dynamic(
     process_block_task(info.task_id, num_reads_per_block, num_reads_bin,
                        start_read_bin, mode, str_array, name_coder, entropy,
                        params, stat_vec, write_raw, id_desc_prefix,
-                       quality_desc_prefix, qv_coder);
+                       quality_desc_prefix, qv_coder, num_reads);
   });
 }
 
@@ -556,7 +580,8 @@ void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
                      core::ReadEncoder::name_selector* name_coder,
                      core::ReadEncoder::entropy_selector* entropy,
                      std::vector<core::parameter::EncodingSet>& params,
-                     core::stats::PerfStats& stats, bool write_raw) {
+                     core::stats::PerfStats& stats, bool write_raw, uint32_t
+                     num_reads) {
   const std::string id_desc_prefix = temp_dir + "/id_streams.";
   const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
   for (uint32_t index = 0; index <= num_reads_per_file / str_array_size;
@@ -602,7 +627,7 @@ void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
     parallel_process_blocks_dynamic(
         blocks, num_reads_per_block, num_reads_bin, start_read_bin, mode,
         str_array, name_coder, entropy, params, stat_vec, write_raw,
-        id_desc_prefix, quality_desc_prefix, qv_coder, num_thr);
+        id_desc_prefix, quality_desc_prefix, qv_coder, num_thr, num_reads);
 
     for (const auto& s : stat_vec) {
       stats.Add(s);

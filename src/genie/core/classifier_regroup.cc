@@ -14,9 +14,12 @@
 #include <utility>
 #include <vector>
 
+#include "genie/util/log.h"
 #include "record/alignment_split/same_rec.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Classifier";
 
 namespace genie::core {
 
@@ -146,14 +149,16 @@ record::Chunk ClassifierRegroup::GetChunk() {
             !IsWritten(seq, chunk_offset + ref_mode_full_chunk_id_)) {
           record::Chunk ref_chunk;
 
-          std::cerr << "Writing ref " << seq << " ["
-                    << std::max(fst, (chunk_offset + ref_mode_full_chunk_id_) *
-                                         ReferenceManager::GetChunkSize())
-                    << ", "
-                    << std::min(snd,
-                                (chunk_offset + ref_mode_full_chunk_id_ + 1) *
-                                    ReferenceManager::GetChunkSize())
-                    << "]" << std::endl;
+          GENIE_LOG(util::Logger::Severity::INFO,
+                    "Writing ref " + seq + " [" +
+                        std::to_string(std::max(
+                            fst, (chunk_offset + ref_mode_full_chunk_id_) *
+                                     ReferenceManager::GetChunkSize())) +
+                        ", " +
+                        std::to_string(std::min(
+                            snd, (chunk_offset + ref_mode_full_chunk_id_ + 1) *
+                                     ReferenceManager::GetChunkSize())) +
+                        "]");
 
           if (raw_ref_mode_) {
             ref_chunk.AddRefToWrite(
@@ -182,7 +187,8 @@ record::Chunk ClassifierRegroup::GetChunk() {
                 (chunk_offset + ref_mode_full_chunk_id_) *
                 ReferenceManager::GetChunkSize());
             if (ref_seq.empty()) {
-              std::cerr << "empty" << std::endl;
+              GENIE_LOG(util::Logger::Severity::WARNING,
+                        "Empty ref sequence for " + seq);
             }
             if (fst > (chunk_offset + ref_mode_full_chunk_id_) *
                           ReferenceManager::GetChunkSize()) {

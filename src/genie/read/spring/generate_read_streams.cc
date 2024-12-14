@@ -24,8 +24,11 @@
 #include "genie/core/read_encoder.h"
 #include "genie/read/spring/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Spring";
 
 namespace genie::read::spring {
 
@@ -153,6 +156,9 @@ void process_block_task(size_t block_num,
                         core::ReadEncoder::entropy_selector* entropy_encoder,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         const std::string& temp_dir) {
+  GENIE_LOG(util::Logger::Severity::INFO,
+          "-------- Processing block " + std::to_string(block_num) + "/" +
+              std::to_string(num_reads_per_block.size()));
   params[block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
       core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
@@ -948,6 +954,9 @@ void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
                         core::ReadEncoder::entropy_selector* entropy_encoder,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         const std::string& temp_dir, size_t cur_thread_num) {
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "-------- Processing block " + std::to_string(cur_block_num) + "/" +
+                std::to_string(block_data.block_start.size()));
   params[cur_block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
       core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
@@ -1050,18 +1059,21 @@ void GenerateReadStreamsPe(const std::string& temp_dir,
     stats.Add(s);
   }
 
-  std::cerr << "count_same_rec: "
-            << std::accumulate(pest.count_same_rec.begin(),
-                               pest.count_same_rec.end(), 0u)
-            << "\n";
-  std::cerr << "count_split_same_AU: "
-            << std::accumulate(pest.count_split_same_au.begin(),
-                               pest.count_split_same_au.end(), 0u)
-            << "\n";
-  std::cerr << "count_split_diff_AU: "
-            << std::accumulate(pest.count_split_diff_au.begin(),
-                               pest.count_split_diff_au.end(), 0u)
-            << "\n";
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Joint records: " +
+                std::to_string(std::accumulate(pest.count_same_rec.begin(),
+                                               pest.count_same_rec.end(), 0u)));
+
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Split records, same AU: " +
+                std::to_string(std::accumulate(pest.count_same_rec.begin(),
+                                               pest.count_same_rec.end(), 0u)));
+
+  GENIE_LOG(
+      util::Logger::Severity::INFO,
+      "---- Split records, diff AU: " +
+          std::to_string(std::accumulate(pest.count_split_diff_au.begin(),
+                                         pest.count_split_diff_au.end(), 0u)));
 
   // write num blocks, reads per block and records per block to a file
   const std::string block_info_file = temp_dir + "/block_info.bin";

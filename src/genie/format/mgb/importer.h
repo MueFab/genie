@@ -33,6 +33,8 @@ class Importer final : public core::FormatImporterCompressed,
   DataUnitFactory factory_;              //!< @brief
   core::ReferenceManager* ref_manager_;  //!< @brief
   core::RefDecoder* decoder_;            //!< @brief
+  uint64_t file_size_;                   //!< @brief
+  float last_progress_;                  //!< @brief
 
   /**
    * @brief

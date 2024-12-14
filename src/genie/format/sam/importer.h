@@ -62,7 +62,7 @@ class RefInfo {
    * @brief
    * @return
    */
-  genie::core::ReferenceManager* GetMgr() const;
+  [[nodiscard]] core::ReferenceManager* GetMgr() const;
 };
 
 struct CmpReaders {

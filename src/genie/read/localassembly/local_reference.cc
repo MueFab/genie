@@ -12,13 +12,17 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <sstream>
 #include <string>
 
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment_split/same_rec.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "LocalAssembly";
 
 namespace genie::read::localassembly {
 
@@ -232,13 +236,14 @@ char LocalReference::MajorityVote(const uint32_t offset_to_first) const {
 // -----------------------------------------------------------------------------
 void LocalReference::PrintWindow() const {
   const uint64_t min_pos = GetWindowBorder();
-
   for (size_t i = 0; i < sequences_.size(); ++i) {
     const uint64_t total_offset = sequence_positions_[i] - min_pos;
+    std::stringstream ss;
     for (size_t s = 0; s < total_offset; ++s) {
-      std::cerr << ".";
+      ss << ".";
     }
-    std::cerr << sequences_[i] << std::endl;
+    ss << sequences_[i];
+    GENIE_LOG(util::Logger::Severity::INFO, ss.str());
   }
 }
 

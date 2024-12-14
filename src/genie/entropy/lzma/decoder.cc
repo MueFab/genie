@@ -97,9 +97,9 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                     GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name;
     }
     if (!subseq.IsEmpty()) {
-      std::get<1>(desc).AddInteger("Size-lzma-total-comp",
+      std::get<1>(desc).AddInteger("size-lzma-total-comp",
                                    static_cast<int64_t>(subseq.GetRawSize()));
-      std::get<1>(desc).AddInteger("Size-lzma-" + subseq_name + "-comp",
+      std::get<1>(desc).AddInteger("size-lzma-" + subseq_name + "-comp",
                                    static_cast<int64_t>(subseq.GetRawSize()));
     }
 
@@ -107,10 +107,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (!std::get<0>(desc).Get(snd).IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-lzma-total-raw",
+          "size-lzma-total-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-lzma-" + subseq_name + "-raw",
+          "size-lzma-" + subseq_name + "-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
     }
   }

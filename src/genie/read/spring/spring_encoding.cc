@@ -19,6 +19,8 @@
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Spring";
+
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
@@ -120,10 +122,15 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
   eg.num_reads = num_reads_clean - eg.num_reads_s;
   eg.num_reads_n = num_reads_total - num_reads_clean;
 
-  std::cerr << "Maximum Read length: " << eg.max_read_len << std::endl;
-  std::cerr << "Number of non-singleton reads: " << eg.num_reads << std::endl;
-  std::cerr << "Number of singleton reads: " << eg.num_reads_s << std::endl;
-  std::cerr << "Number of reads with N: " << eg.num_reads_n << std::endl;
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Maximum Read length: " + std::to_string(cp.max_read_len));
+  GENIE_LOG(
+      util::Logger::Severity::INFO,
+      "---- Number of non-singleton reads: " + std::to_string(eg.num_reads));
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Number of singleton reads: " +
+                                              std::to_string(eg.num_reads_s));
+  GENIE_LOG(util::Logger::Severity::INFO,
+            "---- Number of reads with N: " + std::to_string(eg.num_reads_n));
 }
 
 // -----------------------------------------------------------------------------

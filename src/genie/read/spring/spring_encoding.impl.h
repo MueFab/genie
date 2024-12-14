@@ -51,6 +51,45 @@ std::string BitsetToString(std::bitset<BitsetSize> b, const uint16_t read_len,
   return s;
 }
 
+inline std::string size_string(const std::uintmax_t f_size) {
+  size_t exponent = 0;
+  auto size = static_cast<double>(f_size);
+  while (size / 1024.0 > 1.0) {
+    size = size / 1024.0;
+    ++exponent;
+  }
+  const std::vector<std::string> units = {"B",   "KiB", "MiB",
+                                          "GiB", "TiB", "PiB"};
+  UTILS_DIE_IF(exponent >= units.size(),
+               "Filesize >= 1 exbibyte not supported");
+  std::string number = std::to_string(size);
+  number = number.substr(0, 4);
+  if (number.back() == '.') {
+    number = number.substr(0, 3);
+  }
+  return number + units[exponent];
+}
+
+inline void display_progress(const uint64_t additional_file_size,
+                             uint64_t& current_file_size,
+                             const uint64_t total_file_size,
+                             float& last_progress) {
+  static std::mutex display_mutex;
+  std::lock_guard lock(display_mutex);
+  current_file_size += additional_file_size;
+  float progress = static_cast<float>(current_file_size) /
+                   static_cast<float>(total_file_size);
+  while (progress - last_progress > 0.01) {
+    constexpr auto kLogModuleName = "Spring";
+    GENIE_LOG(util::Logger::Severity::INFO,
+              "-------- Progress: " +
+                  std::to_string(static_cast<int>(last_progress * 100)) +
+                  "% - " + size_string(current_file_size) + " / " +
+                  size_string(total_file_size) + " DNA data encoded");
+    last_progress += 0.01;
+  }
+}
+
 template <size_t BitsetSize>
 void process_task(size_t task_id, const EncoderGlobal& eg,
                   const EncoderGlobalB<BitsetSize>& egb,
@@ -63,11 +102,14 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                   std::vector<uint8_t>& remaining_reads,
                   std::vector<std::mutex>& read_lock,
                   std::vector<std::mutex>& dict_lock,
-                  const std::array<char, 128>& char_to_rev_char) {
+                  const std::array<char, 128>& char_to_rev_char, uint64_t&
+                  processed_file_size, uint64_t total_file_size, float&
+                  last_progress) {
   size_t tid = task_id;
   static constexpr int thresh_s = kThreshEncoder;
   static constexpr int max_search = kMaxSearchEncoder;
   std::ifstream f(eg.infile + '.' + std::to_string(tid), std::ios::binary);
+  auto last_file_size = f.tellg();
   UTILS_DIE_IF(
       !f, "Cannot open file to read: " + eg.infile + '.' + std::to_string(tid));
   std::ifstream in_flag(eg.infile_flag + '.' + std::to_string(tid));
@@ -140,6 +182,12 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
     if (!(in_flag >> c)) done = true;
     if (!done) {
       ReadDnaFromBits(current, f);
+      auto new_data_read = f.tellg() - last_file_size;
+      if (new_data_read > 1000000) {
+        display_progress(new_data_read, processed_file_size,
+                        total_file_size, last_progress);
+        last_file_size = f.tellg();
+      }
       rc = static_cast<char>(in_rc.get());
       in_pos.read(reinterpret_cast<char*>(&p), sizeof(int64_t));
       in_order.read(reinterpret_cast<char*>(&ord), sizeof(uint32_t));
@@ -334,11 +382,25 @@ void process_all_tasks(
   // Create DynamicScheduler
   DynamicScheduler scheduler(num_threads);
 
+  uint64_t total_file_size = 0;
+  for (int tid = 0; tid < eg.num_thr; tid++) {
+    std::ifstream in(eg.infile + '.' + std::to_string(tid),
+                     std::ios::binary | std::ios::ate);
+    UTILS_DIE_IF(!in, "Cannot open file to read: " + eg.infile + '.' +
+                          std::to_string(tid));
+    total_file_size += in.tellg();
+    in.close();
+  }
+
+  uint64_t processed_file_size = 0;
+  float last_progress = 0.0;
+
   // Process all tasks
   scheduler.run(eg.num_thr, [&](const SchedulerInfo& info) {
     process_task(info.task_id, eg, egb, dict, mask1, mask, read, order_s,
                  read_lengths_s, remaining_reads, read_lock, dict_lock,
-                 char_to_rev_char);
+                 char_to_rev_char, processed_file_size, total_file_size,
+                 last_progress);
   });
 }
 
@@ -363,7 +425,6 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
   // parallelization and 3rd parallel region in reorder.h).  It shows
   // good load balancing and benefits from parallelization.
   //
-  std::cerr << "Encoding reads\n";
   process_all_tasks(eg, egb, dict, mask1, mask, read, order_s, read_lengths_s,
                     remaining_reads, read_lock, dict_lock, kCharToRevChar,
                     eg.num_thr);
@@ -504,9 +565,11 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
   }
   file_out_pos.close();
 
-  std::cerr << "Encoding done:\n";
-  std::cerr << matched_s << " singleton reads were aligned\n";
-  std::cerr << matched_n << " reads with N were aligned\n";
+  constexpr auto kLogModuleName = "Spring";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_s) +
+                                            " singleton reads were aligned");
+  GENIE_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_n) +
+                                            " reads with N were aligned");
 }
 
 // -----------------------------------------------------------------------------
@@ -623,8 +686,11 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
       std::vector<std::bitset<BitsetSize>>(eg.num_reads_s + eg.num_reads_n);
   auto order_s = std::vector<uint32_t>(eg.num_reads_s + eg.num_reads_n);
   auto read_lengths_s = std::vector<uint16_t>(eg.num_reads_s + eg.num_reads_n);
+  constexpr auto kLogModuleName = "Spring";
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Reading singletons");
   ReadSingletons<BitsetSize>(read, order_s, read_lengths_s, eg, egb);
   remove(eg.infile_n.c_str());
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Correcting singletons order");
   CorrectOrder(order_s, eg);
 
   DictSizes dict_sizes{};
@@ -635,10 +701,12 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
                   static_cast<uint32_t>(20 * eg.max_read_len / 50 + 1),
                   static_cast<uint32_t>(41 * eg.max_read_len / 50)};
   }
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
   auto dict = ConstructDictionary<BitsetSize>(
       read, read_lengths_s, eg.num_dict_s, eg.num_reads_s + eg.num_reads_n, 3,
       eg.basedir, eg.num_thr, dict_sizes);
 
+  GENIE_LOG(util::Logger::Severity::INFO, "---- Encoding reads");
   Encode<BitsetSize>(read, dict, order_s, read_lengths_s, eg, egb);
 }
 
