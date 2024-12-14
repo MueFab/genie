@@ -23,20 +23,14 @@
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default_setup.h"
 #include "genie/util/stop_watch.h"
+#include "util/log.h"
+
+constexpr auto kLogModuleName = "App/TranscodeFastq";
 
 // -----------------------------------------------------------------------------
 
 namespace genie_app::transcode_fastq {
 
-// -----------------------------------------------------------------------------
-std::string file_extension(const std::string& path) {
-  const auto pos = path.find_last_of('.');
-  std::string ext = path.substr(pos + 1);
-  for (auto& c : ext) {
-    c = static_cast<char>(std::tolower(c));
-  }
-  return ext;
-}
 
 // -----------------------------------------------------------------------------
 enum class OperationCase { UNKNOWN = 0, CONVERT = 3 };
@@ -176,15 +170,15 @@ int main(const int argc, char* argv[]) {
     flow_graph->Run();
 
     auto stats = flow_graph->GetStats();
-    stats.AddDouble("time-total", watch.Check());
-    std::cerr << stats << std::endl;
+    stats.AddDouble("time-wallclock", watch.Check());
+    stats.print();
 
     return 0;
   } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error - Unknown" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Error - Unknown");
     return 1;
   }
 }

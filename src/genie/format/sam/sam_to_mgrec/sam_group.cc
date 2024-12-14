@@ -20,9 +20,12 @@
 #include "genie/core/record/alignment_split/other_rec.h"
 #include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "TranscoderSam";
 
 namespace genie::format::sam::sam_to_mgrec {
 
@@ -260,9 +263,9 @@ void SamRecordGroup::RemoveAmbiguousSecondaryAlignments() {
       !data_[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
             [static_cast<uint8_t>(MappingType::NONPRIMARY)]
                 .empty()) {
-    std::cerr << "Warning: Secondary alignments without read ordering are "
-                 "discarded"
-              << std::endl;
+    GENIE_LOG(
+        util::Logger::Severity::WARNING,
+        "Warning: Secondary alignments without read ordering are discarded");
     data_[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
          [static_cast<uint8_t>(MappingType::NONPRIMARY)]
              .clear();

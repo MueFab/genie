@@ -13,9 +13,12 @@
 #include <ostream>
 #include <string>
 
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Stats";
 
 namespace genie::core::stats {
 
@@ -96,6 +99,22 @@ void PerfStats::SetActive(const bool active) { active_ = active; }
 
 // -----------------------------------------------------------------------------
 bool PerfStats::IsActive() const { return active_; }
+
+void PerfStats::print() const {
+  for (const auto& [fst, snd] : *this) {
+    std::stringstream stream;
+    stream << std::setw(40) << std::left << fst;
+    if (snd.is_integer) {
+      stream << "sum: " << std::setw(16) << std::left << std::fixed
+             << snd.sum.i_data;
+    } else {
+      stream << "sum: " << std::setw(16) << std::left << std::fixed
+             << snd.sum.f_data;
+    }
+    GENIE_LOG(genie::util::Logger::Severity::INFO, stream.str());
+  }
+}
+
 
 // -----------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& stream, const PerfStats& stats) {

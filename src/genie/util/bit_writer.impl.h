@@ -52,6 +52,7 @@ void BitWriter::WriteAlignedInt(T val) {
   }
 
   stream_.write(reinterpret_cast<char*>(&val), NUM_BYTES);
+  total_bits_written_ += NUM_BYTES * 8;
 }
 
 // -----------------------------------------------------------------------------

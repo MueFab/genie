@@ -20,9 +20,11 @@
 #include "apps/genie/gabac/program_options.h"
 #include "genie/entropy/gabac/benchmark.h"
 #include "genie/entropy/gabac/gabac.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "App/Gabac";
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
@@ -72,10 +74,10 @@ int main(int argc, char* argv[]) {
       UTILS_DIE("Invalid task: " + std::string(program_options.task_));
     }
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (...) {
-    std::cerr << "Unkown error occurred" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error occurred");
     return EXIT_FAILURE;
   }
 

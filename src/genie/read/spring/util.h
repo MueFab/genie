@@ -72,7 +72,7 @@ struct CompressionParams {
   uint32_t num_reads;
 
   /// Number of clean reads in each of the paired-end files.
-  std::array<uint32_t,2> num_reads_clean;
+  std::array<uint32_t, 2> num_reads_clean;
 
   /// Maximum read length.
   uint32_t max_read_len;

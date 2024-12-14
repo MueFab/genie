@@ -74,6 +74,8 @@ struct Preprocessor {
   util::OrderedLock lock;
   core::stats::PerfStats stats;
 
+  size_t preprocess_progress_printed;
+
   bool used = false;
 
   core::stats::PerfStats& GetStats() const;

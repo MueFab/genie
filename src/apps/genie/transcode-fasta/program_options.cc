@@ -15,8 +15,11 @@
 
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime_exception.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/TranscodeFasta";
 
 namespace genie_app::transcode_fasta {
 
@@ -52,7 +55,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    std::cerr << app.help() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -175,28 +178,26 @@ void ProgramOptions::validate() {
   if (inputFile.substr(0, 2) != "-.") {
     inputFile = std::filesystem::canonical(inputFile).string();
     std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
-    std::cerr << "Input file: " << inputFile << " with Size "
-              << size_string(std::filesystem::file_size(inputFile))
-              << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::INFO,
+              "Input file: " + inputFile + " with size " +
+                  size_string(std::filesystem::file_size(inputFile)));
   } else {
-    std::cerr << "Input file: stdin" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
-
-  std::cerr << std::endl;
 
   ValidateOutputFile(outputFile, forceOverwrite);
   if (outputFile.substr(0, 2) != "-.") {
     outputFile = std::filesystem::weakly_canonical(outputFile).string();
     std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
-    std::cerr << "Output file: " << outputFile << " with "
-              << size_string(
-                     std::filesystem::space(parent_dir(outputFile)).available)
-              << " available" << std::endl;
+    GENIE_LOG(
+        genie::util::Logger::Severity::INFO,
+        "Output file: " + outputFile + " with " +
+            size_string(
+                std::filesystem::space(parent_dir(outputFile)).available) +
+            " available");
   } else {
-    std::cerr << "Output file: stdout" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
-
-  std::cerr << std::endl;
 }
 
 // -----------------------------------------------------------------------------

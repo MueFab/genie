@@ -20,8 +20,11 @@
 #include "genie/format/sam/importer.h"
 #include "genie/module/default_setup.h"
 #include "genie/util/stop_watch.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/TranscodeSam";
 
 namespace genie_app::transcode_sam {
 
@@ -173,16 +176,16 @@ int main(const int argc, char* argv[]) {
     flow_graph->Run();
 
     auto stats = flow_graph->GetStats();
-    stats.AddDouble("time-total", watch.Check());
-    std::cerr << stats << std::endl;
+    stats.AddDouble("time-wallclock", watch.Check());
+    stats.print();
   } catch (const genie::util::Exception& e) {
-    std::cerr << "Genie error: " << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (const std::runtime_error& e) {
-    std::cerr << "Std error: " << e.what() << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (...) {
-    std::cerr << "Unknown error!" << std::endl;
+    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error!");
     return EXIT_FAILURE;
   }
 

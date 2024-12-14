@@ -76,10 +76,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
     }
     if (!sub_sequence.IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-zstd-total-comp",
+          "size-zstd-total-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-zstd-" + sub_seq_name + "-comp",
+          "size-zstd-" + sub_seq_name + "-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
     }
 
@@ -87,10 +87,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (!std::get<0>(desc).Get(snd).IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-zstd-total-raw",
+          "size-zstd-total-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-zstd-" + sub_seq_name + "-raw",
+          "size-zstd-" + sub_seq_name + "-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
     }
   }

@@ -16,6 +16,8 @@
 
 namespace genie_app::transcode_fastq {
 
+std::string file_extension(const std::string& path);
+
 /**
  * @brief
  */

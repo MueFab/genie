@@ -14,8 +14,11 @@
 #include <utility>
 
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "LocalAssembly";
 
 namespace genie::read::localassembly {
 
@@ -34,24 +37,26 @@ void Encoder::PrintDebug(const LaEncodingState& state, const std::string& ref1,
   if (!debug_) {
     return;
   }
+  std::stringstream ss;
   state.ref_coder.PrintWindow();
-  std::cerr << "pair!" << std::endl;
-  std::cerr << "ref1: " << std::endl;
+  ss << "pair!" << std::endl;
+  ss << "ref1: " << std::endl;
   for (size_t i = 0; i < r.GetAlignments().front().GetPosition() -
                              state.ref_coder.GetWindowBorder();
        ++i) {
-    std::cerr << " ";
+    ss << " ";
   }
-  std::cerr << ref1 << std::endl;
+  ss << ref1 << std::endl;
 
-  std::cerr << "ref2: " << std::endl;
+  ss << "ref2: " << std::endl;
   for (size_t i = 0; i < r.GetAlignments().front().GetPosition() -
                              state.ref_coder.GetWindowBorder();
        ++i) {
-    std::cerr << " ";
+    ss << " ";
   }
-  std::cerr << ref2 << std::endl;
-  std::cerr << std::endl;
+  ss << ref2 << std::endl;
+  ss << std::endl;
+  GENIE_LOG(util::Logger::Severity::INFO, ss.str());
 }
 
 // -----------------------------------------------------------------------------
