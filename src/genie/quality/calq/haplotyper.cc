@@ -18,10 +18,12 @@
 #include <vector>
 
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/error_exception_reporter.h"
-#include "genie/quality/calq/log.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Calq";
 
 namespace genie::quality::calq {
 
@@ -43,28 +45,28 @@ Haplotyper::Haplotyper(const size_t sigma, const size_t ploidy,
       debug_(debug),
       squashed_activity_(squashed) {
   if (filter_type == FilterType::GAUSS) {
-    GaussKernel kernel(static_cast<double>(sigma));
+    util::GaussKernel kernel(static_cast<double>(sigma));
     constexpr double threshold = 0.0000001;
     const size_t size = kernel.CalcMinSize(threshold, filter_cut_off * 2 + 1);
 
-    buffer_ = FilterBuffer(
+    buffer_ = util::FilterBuffer(
         [kernel](const size_t pos, const size_t kernel_size) -> double {
           return kernel.CalcValue(pos, kernel_size);
         },
         size);
     local_distortion_ = kernel.CalcValue((size - 1) / 2, size);
   } else if (filter_type == FilterType::RECTANGLE) {
-    RectangleKernel kernel(static_cast<double>(sigma));
+    util::RectangleKernel kernel(static_cast<double>(sigma));
     const size_t size = kernel.CalcMinSize(filter_cut_off * 2 + 1);
 
-    buffer_ = FilterBuffer(
+    buffer_ = util::FilterBuffer(
         [kernel](const size_t pos, const size_t kernel_size) -> double {
           return kernel.CalcValue(pos, kernel_size);
         },
         size);
     local_distortion_ = kernel.CalcValue((size - 1) / 2, size);
   } else {
-    THROW_ERROR_EXCEPTION("FilterType not supported by haplotyper");
+    UTILS_DIE("FilterType not supported by haplotyper");
   }
 }
 
@@ -207,7 +209,7 @@ size_t Haplotyper::push(const std::string& seq_pile,
   const size_t quant = GetQuantizerIndex(activity);
 
   if (debug_) {
-    static CircularBuffer<std::string> debug(this->GetOffset(), "\n");
+    static util::CircularBuffer<std::string> debug(this->GetOffset(), "\n");
     std::stringstream s;
 
     s << reference << " " << seq_pile << " ";
@@ -227,10 +229,7 @@ size_t Haplotyper::push(const std::string& seq_pile,
       s << high_quality_soft_clips << " soft clips detected!" << std::endl;
     }
 
-    std::string line;
-    while (std::getline(s, line)) {
-      GetLogging().error_out(line);
-    }
+    UTILS_LOG(util::Logger::Severity::INFO, s.str());
   }
 
   return quant;

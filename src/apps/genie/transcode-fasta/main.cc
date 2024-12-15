@@ -101,10 +101,10 @@ int main(int argc, char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }

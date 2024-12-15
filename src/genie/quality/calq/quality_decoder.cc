@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/quality/calq/quality_encoder.h"
 
 // -----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void QualityDecoder::DecodeMappedRecordFromBlock(
       case '[':
         break;  // ignore first clip char
       default:
-        THROW_ERROR_EXCEPTION("Bad CIGAR string");
+        UTILS_DIE("Bad CIGAR string");
     }
     op_len = 0;
   }

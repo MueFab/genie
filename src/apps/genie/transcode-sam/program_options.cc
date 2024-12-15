@@ -89,7 +89,7 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, app.help());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help_ = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -239,11 +239,11 @@ void ProgramOptions::validate() {
   if (input_file_.substr(0, 2) != "-.") {
     input_file_ = std::filesystem::canonical(input_file_).string();
     std::replace(input_file_.begin(), input_file_.end(), '\\', '/');
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Input file: " + input_file_ + " with size " +
                   size_string(std::filesystem::file_size(input_file_)));
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
 
   ValidateOutputFile(output_file_, force_overwrite_);
@@ -251,20 +251,20 @@ void ProgramOptions::validate() {
     output_file_ = std::filesystem::weakly_canonical(output_file_).string();
     std::replace(output_file_.begin(), output_file_.end(), '\\', '/');
 
-    GENIE_LOG(
+    UTILS_LOG(
         genie::util::Logger::Severity::INFO,
         "Output file: " + output_file_ + " with " +
             size_string(
                 std::filesystem::space(parent_dir(output_file_)).available) +
             " available");
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 
   ValidateWorkingDir(tmp_dir_path_);
   tmp_dir_path_ = std::filesystem::canonical(tmp_dir_path_).string();
   std::replace(tmp_dir_path_.begin(), tmp_dir_path_.end(), '\\', '/');
-  GENIE_LOG(genie::util::Logger::Severity::INFO,
+  UTILS_LOG(genie::util::Logger::Severity::INFO,
             "Working directory: " + tmp_dir_path_ + " with " +
                 size_string(std::filesystem::space(tmp_dir_path_).available) +
                 " available");
@@ -275,7 +275,7 @@ void ProgramOptions::validate() {
         "Invalid number of threads: " + std::to_string(num_threads_) +
             ". Your system supports between 1 and " +
             std::to_string(std::thread::hardware_concurrency()) + " threads.");
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Threads: " + std::to_string(num_threads_) + " with " +
                   std::to_string(std::thread::hardware_concurrency()) +
                   " supported");
@@ -283,7 +283,7 @@ void ProgramOptions::validate() {
     UTILS_DIE_IF(!num_threads_,
                  "Could not detect hardware concurrency level. Please provide "
                  "a number of threads manually.");
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Threads: " + std::to_string(num_threads_) +
                   " (could not detected supported number automatically)");
   }

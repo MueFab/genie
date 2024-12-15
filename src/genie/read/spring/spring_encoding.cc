@@ -122,14 +122,14 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
   eg.num_reads = num_reads_clean - eg.num_reads_s;
   eg.num_reads_n = num_reads_total - num_reads_clean;
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Maximum Read length: " + std::to_string(cp.max_read_len));
-  GENIE_LOG(
+  UTILS_LOG(
       util::Logger::Severity::INFO,
       "---- Number of non-singleton reads: " + std::to_string(eg.num_reads));
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Number of singleton reads: " +
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Number of singleton reads: " +
                                               std::to_string(eg.num_reads_s));
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Number of reads with N: " + std::to_string(eg.num_reads_n));
 }
 

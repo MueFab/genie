@@ -447,7 +447,7 @@ ResultFull BenchmarkFull(const std::string& input_file,
   bool new_file = !std::filesystem::exists("benchmark_total.csv");
   std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
   do {
-    GENIE_LOG(
+    UTILS_LOG(
         util::Logger::Severity::INFO,
         "Optimizing transformation " + std::to_string(config.GetTransform()));
     // Execute transformation
@@ -464,7 +464,7 @@ ResultFull BenchmarkFull(const std::string& input_file,
 
     // Optimize transformed sequences independently
     for (size_t i = 0; i < transformed_sub_seqs.size(); ++i) {
-      GENIE_LOG(util::Logger::Severity::INFO,
+      UTILS_LOG(util::Logger::Severity::INFO,
                 "Optimizing subsequence " + std::to_string(i) + "...");
       trans_results.emplace_back(OptimizeTransformedSequence(
           config.GetTransformedSeqs()[i], desc, transformed_sub_seqs[i],

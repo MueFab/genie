@@ -225,7 +225,7 @@ void display_progress(uint32_t& num_reads_remaining, float& last_progress,
                                 static_cast<float>(remaining_reads.size()));
   while (progress - last_progress > 0.01) {
     constexpr auto kLogModuleName = "Spring";
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Progress: " +
                   std::to_string(static_cast<int>(last_progress * 100)) +
                   "% - " + std::to_string(num_reads_remaining) +
@@ -673,7 +673,7 @@ void Reorder(std::vector<std::bitset<BitsetSize>>& read,
       unmatched.begin(), unmatched.begin() + rg.num_thr, 0_u32));
 
   constexpr auto kLogModuleName = "Spring";
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "-------- Unmatched reads: " + std::to_string(num_unmatched));
 }
 
@@ -834,9 +834,9 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto read = std::vector<std::bitset<BitsetSize>>(rg.num_reads);
   auto read_lengths = std::vector<uint16_t>(rg.num_reads);
   constexpr auto kLogModuleName = "Spring";
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Reading DNA file");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Reading DNA file");
   ReadDnaFile<BitsetSize>(read, read_lengths, rg);
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
   DictSizes dict_sizes{};
   if (rg.max_read_len > 100) {
     dict_sizes = {static_cast<uint32_t>(rg.max_read_len / 2 - 32),
@@ -854,9 +854,9 @@ void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto dict = ConstructDictionary<BitsetSize>(read, read_lengths, rg.num_dict,
                                               rg.num_reads, 2, rg.basedir,
                                               rg.num_thr, dict_sizes);
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Reordering reads");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Reordering reads");
   Reorder<BitsetSize>(read, dict, read_lengths, rg);
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Writing to file");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Writing to file");
   WriteToFile<BitsetSize>(read, read_lengths, rg);
 }
 

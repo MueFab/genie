@@ -21,8 +21,8 @@
  * signals.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_FILTER_BUFFER_H_
-#define SRC_GENIE_QUALITY_CALQ_FILTER_BUFFER_H_
+#ifndef SRC_GENIE_UTIL_FILTER_BUFFER_H_
+#define SRC_GENIE_UTIL_FILTER_BUFFER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -30,11 +30,11 @@
 #include <functional>
 #include <vector>
 
-#include "genie/quality/calq/circular_buffer.h"
+#include "genie/util/circular_buffer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief Represents a Gaussian kernel used for signal processing.
@@ -211,7 +211,11 @@ class FilterBuffer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
-#endif  // SRC_GENIE_QUALITY_CALQ_FILTER_BUFFER_H_
+
+#endif  // SRC_GENIE_UTIL_FILTER_BUFFER_H_
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

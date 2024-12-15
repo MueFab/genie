@@ -149,7 +149,7 @@ record::Chunk ClassifierRegroup::GetChunk() {
             !IsWritten(seq, chunk_offset + ref_mode_full_chunk_id_)) {
           record::Chunk ref_chunk;
 
-          GENIE_LOG(util::Logger::Severity::INFO,
+          UTILS_LOG(util::Logger::Severity::INFO,
                     "Writing ref " + seq + " [" +
                         std::to_string(std::max(
                             fst, (chunk_offset + ref_mode_full_chunk_id_) *
@@ -187,7 +187,7 @@ record::Chunk ClassifierRegroup::GetChunk() {
                 (chunk_offset + ref_mode_full_chunk_id_) *
                 ReferenceManager::GetChunkSize());
             if (ref_seq.empty()) {
-              GENIE_LOG(util::Logger::Severity::WARNING,
+              UTILS_LOG(util::Logger::Severity::WARNING,
                         "Empty ref sequence for " + seq);
             }
             if (fst > (chunk_offset + ref_mode_full_chunk_id_) *

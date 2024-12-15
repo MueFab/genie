@@ -44,7 +44,7 @@ void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   }
   if (!ref.IsEmpty()) {
     for (auto& r : ref) {
-      GENIE_LOG(util::Logger::Severity::INFO,
+      UTILS_LOG(util::Logger::Severity::INFO,
                 "Writing Ref " + std::to_string(r.GetSeqId()) + ":" +
                     std::to_string(r.GetStart()) + "-" +
                     std::to_string(r.GetEnd()));
@@ -66,7 +66,7 @@ void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   }
 
   if (!found) {
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "Writing parameter set " +
                   std::to_string(static_cast<uint32_t>(out_set.GetId())));
     out_set.Write(writer);
@@ -103,7 +103,7 @@ void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
               std::move(data.Get(static_cast<core::GenDesc>(descriptor)))));
   }
 
-  GENIE_LOG(util::Logger::Severity::INFO, "Writing access unit " +
+  UTILS_LOG(util::Logger::Severity::INFO, "Writing access unit " +
     au.DebugPrint(
       parameter_stash[au.GetHeader().GetParameterId()].GetEncodingSet()));
 

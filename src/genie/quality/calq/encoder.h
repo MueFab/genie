@@ -27,7 +27,7 @@
 
 #include "genie/core/qv_encoder.h"
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/uniform_min_max_quantizer.h"
+#include "genie/util/uniform_min_max_quantizer.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 
 // -----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ class Encoder final : public core::QvEncoder {
    */
   static void AddQualities(const core::record::Segment& s,
                            core::AccessUnit::Descriptor& desc,
-                           const UniformMinMaxQuantizer& quantizer);
+                           const util::UniformMinMaxQuantizer& quantizer);
 
   /**
    * @brief Encodes quality values for unaligned sequences.

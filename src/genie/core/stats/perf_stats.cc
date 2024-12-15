@@ -111,7 +111,7 @@ void PerfStats::print() const {
       stream << "sum: " << std::setw(16) << std::left << std::fixed
              << snd.sum.f_data;
     }
-    GENIE_LOG(genie::util::Logger::Severity::INFO, stream.str());
+    UTILS_LOG(genie::util::Logger::Severity::INFO, stream.str());
   }
 }
 

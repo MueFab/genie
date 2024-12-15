@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -15,12 +15,14 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/quality/calq/error_exception_reporter.h"
-#include "genie/quality/calq/log.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+constexpr auto kLogModuleName = "Util";
+
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -38,27 +40,22 @@ Quantizer::~Quantizer() = default;
 // -----------------------------------------------------------------------------
 
 int Quantizer::ValueToIndex(const int& value) const {
-  if (lut_.find(value) == lut_.end()) {
-    THROW_ERROR_EXCEPTION("Value out of range");
-  }
+  UTILS_DIE_IF(lut_.find(value) == lut_.end(), "Value out of range");
   return lut_.at(value).first;
 }
 
 // -----------------------------------------------------------------------------
 
 int Quantizer::IndexToReconstructionValue(const int& index) const {
-  if (inverse_lut_.find(index) == inverse_lut_.end()) {
-    THROW_ERROR_EXCEPTION("Index not found");
-  }
+  UTILS_DIE_IF(inverse_lut_.find(index) == inverse_lut_.end(),
+               "Index not found");
   return inverse_lut_.at(index);
 }
 
 // -----------------------------------------------------------------------------
 
 int Quantizer::ValueToReconstructionValue(const int& value) const {
-  if (lut_.find(value) == lut_.end()) {
-    THROW_ERROR_EXCEPTION("Value out of range");
-  }
+  UTILS_DIE_IF(lut_.find(value) == lut_.end(), "Value out of range");
 
   return lut_.at(value).second;
 }
@@ -86,15 +83,12 @@ void Quantizer::print() const {
     stream << snd << std::endl;
   }
 
-  std::string line;
-  while (std::getline(stream, line)) {
-    GetLogging().standard_out(line);
-  }
+  UTILS_LOG(Logger::Severity::INFO, stream.str());
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

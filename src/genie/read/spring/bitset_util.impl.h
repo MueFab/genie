@@ -245,7 +245,7 @@ inline void process_dict_task(size_t task_id, std::vector<BbHashDict>& dict,
           static_cast<float>(i) / static_cast<float>(read_lengths.size());
       if (progress - last_progress > 0.1) {
         constexpr auto kLogModuleName = "Spring";
-        GENIE_LOG(util::Logger::Severity::INFO,
+        UTILS_LOG(util::Logger::Severity::INFO,
                   "------------ Progress (dictionary " + std::to_string(j + 1) +
                       "/" + std::to_string(dict.size()) + "): " +
                       std::to_string(static_cast<int>(progress * 100)) + "%");
@@ -303,24 +303,24 @@ std::vector<BbHashDict> ConstructDictionary(
     auto ull = std::vector<uint64_t>(num_reads);
     const std::string dict_string =
         std::to_string(j + 1) + "/" + std::to_string(num_dict);
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Computing keys for dict " + dict_string);
     compute_keys(read, mask[j], ull, dict[j], num_reads, bpb);
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Filtering keys for dict " + dict_string);
     filter_keys_by_read_length(read_lengths, ull, dict[j], num_reads);
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Writing keys for dict " + dict_string);
     parallel_write_keys_dynamic(ull, dict[j], basedir, num_threads);
 
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Constructing hashes for dict " + dict_string);
     deduplicate_and_construct_hash(ull, dict[j]);
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Processing hashes for dict " + dict_string);
     parallel_process_keys_dynamic(dict, basedir, num_threads, j);
   }
-  GENIE_LOG(util::Logger::Severity::INFO, "-------- Processing dictionaries");
+  UTILS_LOG(util::Logger::Severity::INFO, "-------- Processing dictionaries");
   parallel_process_dicts_dynamic(dict, basedir, read_lengths, num_threads,
                                  num_dict);
   return dict;

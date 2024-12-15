@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/quality/calq/filter_buffer.h"
+#include "genie/util/filter_buffer.h"
 #include "genie/quality/calq/genotyper.h"
 #include "genie/quality/calq/soft_clip_spreader.h"
 
@@ -51,7 +51,7 @@ enum struct FilterType;
  * local smoothing using various filter types.
  */
 class Haplotyper {
-  FilterBuffer
+  util::FilterBuffer
       buffer_;  //!< @brief Filter buffer for smoothing activity scores.
   SoftClipSpreader spreader_;  //!< @brief Manages the propagation of
                                //!< high-quality soft clips.

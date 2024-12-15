@@ -23,19 +23,19 @@
  * given distribution.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
+#define SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
 #include <vector>
 
-#include "genie/quality/calq/probability_distribution.h"
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/probability_distribution.h"
+#include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 /**
@@ -120,11 +120,11 @@ class LloydMaxQuantizer final : public Quantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

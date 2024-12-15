@@ -175,10 +175,10 @@ int main(const int argc, char* argv[]) {
 
     return 0;
   } catch (std::exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Error - Unknown");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Error - Unknown");
     return 1;
   }
 }

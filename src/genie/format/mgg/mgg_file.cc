@@ -40,7 +40,7 @@ MggFile::MggFile(std::istream* file) : file_(file), reader_(*file_) {
       boxes_.emplace_back(
           std::make_unique<DatasetGroup>(*reader_, hdr.GetMinorVersion()));
     } else {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "Unknown Box " + boxname + " on top level of file. Skip.");
       break;
     }

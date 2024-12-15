@@ -179,13 +179,13 @@ int main(const int argc, char* argv[]) {
     stats.AddDouble("time-wallclock", watch.Check());
     stats.print();
   } catch (const genie::util::Exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (const std::runtime_error& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error!");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error!");
     return EXIT_FAILURE;
   }
 

@@ -142,7 +142,7 @@ void Encoder::EncodeAligned(const core::record::Chunk& chunk,
 // -----------------------------------------------------------------------------
 void Encoder::AddQualities(const core::record::Segment& s,
                            core::AccessUnit::Descriptor& desc,
-                           const UniformMinMaxQuantizer& quantizer) {
+                           const util::UniformMinMaxQuantizer& quantizer) {
   auto& subsequence = desc.Get(static_cast<uint16_t>(desc.GetSize()) - 1);
 
   for (const auto& q : s.GetQualities()) {
@@ -158,7 +158,7 @@ void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
                               paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
   // create quantizer
-  const UniformMinMaxQuantizer quantizer(33, 126, 8);
+  const util::UniformMinMaxQuantizer quantizer(33, 126, 8);
 
   // set codebook
   std::vector<uint8_t> codebook_vec;

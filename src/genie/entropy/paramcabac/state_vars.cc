@@ -114,7 +114,7 @@ void StateVars::populate(
   } else {
     static bool print = false;
     if (!print) {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "coding_subsym_size = " + std::to_string(coding_subsym_size) +
                     " not supported");
       print = true;

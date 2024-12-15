@@ -47,7 +47,7 @@ void encapsulate(ProgramOptions& options) {
   std::stringstream stream;
   mgg_file.print_debug(stream, 100);
 
-  GENIE_LOG(genie::util::Logger::Severity::INFO, stream.str());
+  UTILS_LOG(genie::util::Logger::Severity::INFO, stream.str());
 
   mgg_file.Write(writer);
 }
@@ -90,13 +90,13 @@ int main(const int argc, char* argv[]) {
       decapsulate(p_opts);
     }
   } catch (genie::util::RuntimeException& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.Msg());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.Msg());
     return -1;
   } catch (std::runtime_error& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return -1;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return -1;
   }
   return 0;

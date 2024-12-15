@@ -243,7 +243,7 @@ void LocalReference::PrintWindow() const {
       ss << ".";
     }
     ss << sequences_[i];
-    GENIE_LOG(util::Logger::Severity::INFO, ss.str());
+    UTILS_LOG(util::Logger::Severity::INFO, ss.str());
   }
 }
 

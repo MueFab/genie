@@ -263,7 +263,7 @@ void SamRecordGroup::RemoveAmbiguousSecondaryAlignments() {
       !data_[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
             [static_cast<uint8_t>(MappingType::NONPRIMARY)]
                 .empty()) {
-    GENIE_LOG(
+    UTILS_LOG(
         util::Logger::Severity::WARNING,
         "Warning: Secondary alignments without read ordering are discarded");
     data_[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]

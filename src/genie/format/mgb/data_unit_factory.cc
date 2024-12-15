@@ -52,7 +52,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
         auto r = RawReference(bit_reader, true);
         for (auto& ref : r) {
           pos += 12;
-          GENIE_LOG(util::Logger::Severity::INFO,
+          UTILS_LOG(util::Logger::Severity::INFO,
                     "Found ref(raw) " + std::to_string(ref.GetSeqId()) + ":[" +
                         std::to_string(ref.GetStart()) + ", " +
                         std::to_string(ref.GetEnd()) + "] ...");
@@ -67,7 +67,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
       }
       case core::parameter::DataUnit::DataUnitType::kParameterSet: {
         auto p = core::parameter::ParameterSet(bit_reader);
-        GENIE_LOG(util::Logger::Severity::INFO,
+        UTILS_LOG(util::Logger::Severity::INFO,
                   "Found PS " + std::to_string(p.GetId()) + "...");
         parameters_.insert(
             std::make_pair(p.GetId(), std::move(p.GetEncodingSet())));
@@ -79,7 +79,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
             AccessUnit::DatasetType::kReference) {
           const auto& ref = ret.GetHeader().GetRefCfg();
           refmgr_->ValidateRefId(ref.GetSeqId());
-          GENIE_LOG(util::Logger::Severity::INFO,
+          UTILS_LOG(util::Logger::Severity::INFO,
                     "Found ref(compressed) " + std::to_string(ref.GetSeqId()) +
                         ":[" + std::to_string(ref.GetStart()) + ", " +
                         std::to_string(ref.GetEnd()) + "] ...");
@@ -98,7 +98,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
             UTILS_DIE_IF(ret.GetHeader().GetClass() ==
                              genie::core::record::ClassType::kClassHm,
                          "Class HM not supported");
-            GENIE_LOG(util::Logger::Severity::INFO,
+            UTILS_LOG(util::Logger::Severity::INFO,
                       ret.DebugPrint(
                           parameters_.at(ret.GetHeader().GetParameterId())));
             return ret;

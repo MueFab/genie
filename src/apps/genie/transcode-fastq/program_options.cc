@@ -69,7 +69,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, app.help());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -211,11 +211,11 @@ void ProgramOptions::validate() {
   if (inputFile.substr(0, 2) != "-.") {
     inputFile = std::filesystem::canonical(inputFile).string();
     std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Input file 1: " + inputFile + " with size " +
                   size_string(std::filesystem::file_size(inputFile)));
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
 
   if (!inputSupFile.empty()) {
@@ -223,7 +223,7 @@ void ProgramOptions::validate() {
     ValidatePairedFiles(inputFile, inputSupFile);
     inputSupFile = std::filesystem::canonical(inputSupFile).string();
     std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Input file 2: " + inputSupFile + " with Size " +
                   size_string(std::filesystem::file_size(inputSupFile)));
   }
@@ -232,14 +232,14 @@ void ProgramOptions::validate() {
   if (outputFile.substr(0, 2) != "-.") {
     outputFile = std::filesystem::weakly_canonical(outputFile).string();
     std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
-    GENIE_LOG(
+    UTILS_LOG(
         genie::util::Logger::Severity::INFO,
         "Output file: " + outputFile + " with " +
             size_string(
                 std::filesystem::space(parent_dir(outputFile)).available) +
             " available");
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 
   if (!outputSupFile.empty()) {
@@ -247,7 +247,7 @@ void ProgramOptions::validate() {
     ValidatePairedFiles(outputFile, outputSupFile);
     outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
     std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
-    GENIE_LOG(
+    UTILS_LOG(
         genie::util::Logger::Severity::INFO,
         "Output supplementary file: " + outputSupFile + " with " +
             size_string(
@@ -262,7 +262,7 @@ void ProgramOptions::validate() {
         "Invalid number of threads: " + std::to_string(numberOfThreads) +
             ". Your system supports between 1 and " +
             std::to_string(std::thread::hardware_concurrency()) + " threads.");
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Threads: " + std::to_string(numberOfThreads) + " with " +
                   std::to_string(std::thread::hardware_concurrency()) +
                   " supported");
@@ -270,7 +270,7 @@ void ProgramOptions::validate() {
     UTILS_DIE_IF(!numberOfThreads,
                  "Could not detect hardware concurrency level. Please provide "
                  "a number of threads manually.");
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Threads: " + std::to_string(numberOfThreads) +
                   " (could not detected supported number automatically)");
   }

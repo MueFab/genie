@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ class QualityDecoder {
 
   std::vector<size_t>
       qvi_idx_;  //!< @brief Indexes of the quantizer values used for decoding.
-  std::vector<Quantizer>
+  std::vector<util::Quantizer>
       quantizers_;  //!< @brief The quantizers used to Decode quality values for
                     //!< different segments.
 

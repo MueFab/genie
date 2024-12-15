@@ -64,7 +64,7 @@ bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
           ? ref_mgr_->GetLength(seq) % core::ReferenceManager::GetChunkSize()
           : string->length();
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "Decompressing " + seq + " [" +
                 std::to_string(pos * core::ReferenceManager::GetChunkSize()) +
                 ", " +

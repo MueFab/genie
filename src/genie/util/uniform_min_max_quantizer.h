@@ -19,16 +19,16 @@
  * compression, ensuring that all scores fall within the given bounds.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
+#define SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
-#include "genie/quality/calq/uniform_quantizer.h"
+#include "genie/util/uniform_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief A specialized uniform quantizer with configurable value range.
@@ -80,11 +80,11 @@ class UniformMinMaxQuantizer final : public UniformQuantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

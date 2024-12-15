@@ -85,7 +85,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
 
   while (progress - last_progress_ > 0.05) {  // NOLINT
     last_progress_ += 0.05;
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "Progress reading files: " +
                   std::to_string(static_cast<int>(last_progress_ * 100)) + "%");
   }
@@ -130,7 +130,7 @@ std::vector<std::array<std::string, kLinesPerRecord>> Importer::ReadData(
     for (size_t cur_line = 0; cur_line < kLinesPerRecord; ++cur_line) {
       if (!std::getline(*file_list[cur_file], data[cur_file][cur_line])) {
         if (cur_line != 0 || cur_file != 0) {
-          GENIE_LOG(util::Logger::Severity::WARNING,
+          UTILS_LOG(util::Logger::Severity::WARNING,
                     "Unexpected end of file in fastq");
         }
         data.clear();

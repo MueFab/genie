@@ -136,13 +136,13 @@ void AddFasta(const std::string& fasta_file_path,
   auto fasta_file = std::make_unique<std::ifstream>(fasta_file_path);
   UTILS_DIE_IF(!fasta_file, "Cannot open file to read: " + fasta_file_path);
   if (!std::filesystem::exists(fai)) {
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Indexing " + fasta_file_path);
     std::ofstream fai_file(fai);
     genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
   }
   if (!std::filesystem::exists(sha)) {
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Calculating hashes " + fasta_file_path);
     std::ofstream sha_file(sha);
     std::ifstream fai_file(fai);
@@ -318,14 +318,14 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
       UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme,
                    "Unknown URI scheme: " + uri);
       std::string path = uri.substr(scheme.length());
-      GENIE_LOG(genie::util::Logger::Severity::INFO,
+      UTILS_LOG(genie::util::Logger::Severity::INFO,
                 "Extracted reference URI " + uri);
       if (std::filesystem::exists(path)) {
-        GENIE_LOG(genie::util::Logger::Severity::INFO,
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
                   "Reference URI valid" + uri);
         json_uri_path = path;
       } else {
-        GENIE_LOG(
+        UTILS_LOG(
             genie::util::Logger::Severity::WARNING,
             "Reference URI invalid. Falling back to CLI reference." + uri);
       }
@@ -341,13 +341,13 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
           "sha256";
       auto fasta_file = std::make_unique<std::ifstream>(json_uri_path);
       if (!std::filesystem::exists(fai)) {
-        GENIE_LOG(genie::util::Logger::Severity::INFO,
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
                   "Indexing " + json_uri_path);
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
       }
       if (!std::filesystem::exists(sha)) {
-        GENIE_LOG(genie::util::Logger::Severity::INFO,
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
                   "Calculating hashes " + json_uri_path);
         std::ofstream sha_file(sha);
         std::ifstream fai_file(fai);
@@ -426,10 +426,10 @@ int main(int argc, char* argv[]) {
 
     return 0;
   } catch (std::exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }
