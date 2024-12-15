@@ -36,7 +36,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, app.help());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help_ = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -120,12 +120,12 @@ void ProgramOptions::validate() const {
 
   for (const auto& f : files) {
     ValidateInputFile(f);
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Input file: " + f + " with Size " +
                   size_string(std::filesystem::file_size(f)));
   }
 
-  GENIE_LOG(
+  UTILS_LOG(
       genie::util::Logger::Severity::INFO,
       "Output file: " + output_file_ + " with " +
           size_string(

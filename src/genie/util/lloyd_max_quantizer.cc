@@ -5,7 +5,7 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/lloyd_max_quantizer.h"
+#include "genie/util/lloyd_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ void LloydMaxQuantizer::build(const ProbabilityDistribution& pdf) {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -8,7 +8,6 @@
 #include "genie/read/spring/generate_read_streams.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -156,7 +155,7 @@ void process_block_task(size_t block_num,
                         core::ReadEncoder::entropy_selector* entropy_encoder,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         const std::string& temp_dir) {
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
           "-------- Processing block " + std::to_string(block_num) + "/" +
               std::to_string(num_reads_per_block.size()));
   params[block_num] = core::parameter::EncodingSet(
@@ -954,7 +953,7 @@ void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
                         core::ReadEncoder::entropy_selector* entropy_encoder,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         const std::string& temp_dir, size_t cur_thread_num) {
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "-------- Processing block " + std::to_string(cur_block_num) + "/" +
                 std::to_string(block_data.block_start.size()));
   params[cur_block_num] = core::parameter::EncodingSet(
@@ -1059,17 +1058,17 @@ void GenerateReadStreamsPe(const std::string& temp_dir,
     stats.Add(s);
   }
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Joint records: " +
                 std::to_string(std::accumulate(pest.count_same_rec.begin(),
                                                pest.count_same_rec.end(), 0u)));
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Split records, same AU: " +
                 std::to_string(std::accumulate(pest.count_same_rec.begin(),
                                                pest.count_same_rec.end(), 0u)));
 
-  GENIE_LOG(
+  UTILS_LOG(
       util::Logger::Severity::INFO,
       "---- Split records, diff AU: " +
           std::to_string(std::accumulate(pest.count_split_diff_au.begin(),

@@ -5,11 +5,11 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/uniform_min_max_quantizer.h"
+#include "genie/util/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ UniformMinMaxQuantizer::~UniformMinMaxQuantizer() = default;
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

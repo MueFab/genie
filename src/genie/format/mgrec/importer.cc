@@ -133,7 +133,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
     const auto progress = static_cast<float>(reader_.GetStreamPosition()) /
                           static_cast<float>(file_size_);
     while (progress - last_progress_ > 0.05) {  // NOLINT
-      GENIE_LOG(
+      UTILS_LOG(
           util::Logger::Severity::INFO,
           "Progress in file: " +
               std::to_string(static_cast<int>(std::round(progress * 100))) +
@@ -156,28 +156,28 @@ void Importer::PrintStats() const {
   if (discarded_splices_ + discarded_hm_ + discarded_long_distance_ +
           discarded_missing_pair_u_ ==
       0) {
-    GENIE_LOG(util::Logger::Severity::INFO, "No reads were dropped");
+    UTILS_LOG(util::Logger::Severity::INFO, "No reads were dropped");
     return;
   }
 
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             "The following number of reads were dropped:");
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             std::to_string(discarded_splices_) + " containing splices");
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             std::to_string(discarded_hm_) + " class HM reads");
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             std::to_string(discarded_long_distance_) +
                 " aligned, paired reads with mapping distance too big");
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             std::to_string(discarded_missing_pair_u_) +
                 " unaligned reads with missing pair");
-  GENIE_LOG(
+  UTILS_LOG(
       util::Logger::Severity::WARNING,
       std::to_string(discarded_splices_ + discarded_hm_ +
                      discarded_long_distance_ + discarded_missing_pair_u_) +
           " in total");
-  GENIE_LOG(util::Logger::Severity::WARNING,
+  UTILS_LOG(util::Logger::Severity::WARNING,
             std::to_string(missing_additional_alignments_) +
                 " additional alignments were dropped");
 }

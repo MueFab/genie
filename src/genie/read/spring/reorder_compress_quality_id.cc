@@ -70,7 +70,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     // array to load ids and/or qualities into
 
     if (preserve_quality) {
-      GENIE_LOG(util::Logger::Severity::INFO, "Compressing qualities");
+      UTILS_LOG(util::Logger::Severity::INFO, "Compressing qualities");
       uint32_t num_reads_per_file = num_reads;
       ReorderCompress(file_quality[0], temp_dir, num_reads_per_file, num_thr,
                       num_reads_per_block, str_array, str_array_size,
@@ -79,7 +79,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       remove(file_quality[0].c_str());
     }
     if (preserve_id) {
-      GENIE_LOG(util::Logger::Severity::INFO, "Compressing ids");
+      UTILS_LOG(util::Logger::Severity::INFO, "Compressing ids");
       uint32_t num_reads_per_file = num_reads;
       ReorderCompress(file_id, temp_dir, num_reads_per_file, num_thr,
                       num_reads_per_block, str_array, str_array_size,
@@ -96,7 +96,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
     std::string file_blocks_id = basedir + "/blocks_id.bin";
     std::vector<uint32_t> block_start, block_end;
     if (preserve_quality) {
-      GENIE_LOG(util::Logger::Severity::INFO, "Compressing qualities");
+      UTILS_LOG(util::Logger::Severity::INFO, "Compressing qualities");
       // read block start and end into vector
       ReadBlockStartEnd(file_blocks_quality, block_start, block_end);
       // read order into order_array
@@ -118,7 +118,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
       block_end.clear();
     }
     if (preserve_id) {
-      GENIE_LOG(util::Logger::Severity::INFO, "Compressing ids");
+      UTILS_LOG(util::Logger::Severity::INFO, "Compressing ids");
       ReadBlockStartEnd(file_blocks_id, block_start, block_end);
       auto id_array = std::vector<std::string>(num_reads / 2);
       std::ifstream f_id(file_id);
@@ -185,7 +185,7 @@ void process_block_task(size_t block_num,
   std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num),
                            std::ios::binary);
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Block " + std::to_string(block_num + 1) + "/" +
                 std::to_string(block_start.size()));
 
@@ -300,7 +300,7 @@ void process_quality_block_task(
     std::vector<core::stats::PerfStats>& stat_vec, bool write_raw,
     const std::string& quality_desc_prefix, size_t start_block_num) {
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Block " + std::to_string(block_num + 1) + "/" +
                 std::to_string(block_start.size()));
 
@@ -449,7 +449,7 @@ void process_block_task(size_t block_num,
   }
   auto num_reads_block = static_cast<uint32_t>(end_read_num - start_read_num);
 
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "---- Block " + std::to_string(block_num_offset + block_num + 1) +
                 "/" +
                 std::to_string(static_cast<int>(

@@ -167,7 +167,7 @@ class Logger {
  * @param message The log message.
  * @param module_name The module name for context (optional).
  */
-#define GENIE_LOG(severity, message)                                        \
+#define UTILS_LOG(severity, message)                                        \
   genie::util::Logger::GetInstance().Log(severity, message, kLogModuleName, \
                                          __FILE__, __LINE__)
 

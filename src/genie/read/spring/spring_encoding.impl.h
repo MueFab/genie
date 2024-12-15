@@ -81,7 +81,7 @@ inline void display_progress(const uint64_t additional_file_size,
                    static_cast<float>(total_file_size);
   while (progress - last_progress > 0.01) {
     constexpr auto kLogModuleName = "Spring";
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Progress: " +
                   std::to_string(static_cast<int>(last_progress * 100)) +
                   "% - " + size_string(current_file_size) + " / " +
@@ -566,9 +566,9 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
   file_out_pos.close();
 
   constexpr auto kLogModuleName = "Spring";
-  GENIE_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_s) +
+  UTILS_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_s) +
                                             " singleton reads were aligned");
-  GENIE_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_n) +
+  UTILS_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_n) +
                                             " reads with N were aligned");
 }
 
@@ -687,10 +687,10 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto order_s = std::vector<uint32_t>(eg.num_reads_s + eg.num_reads_n);
   auto read_lengths_s = std::vector<uint16_t>(eg.num_reads_s + eg.num_reads_n);
   constexpr auto kLogModuleName = "Spring";
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Reading singletons");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Reading singletons");
   ReadSingletons<BitsetSize>(read, order_s, read_lengths_s, eg, egb);
   remove(eg.infile_n.c_str());
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Correcting singletons order");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Correcting singletons order");
   CorrectOrder(order_s, eg);
 
   DictSizes dict_sizes{};
@@ -701,12 +701,12 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
                   static_cast<uint32_t>(20 * eg.max_read_len / 50 + 1),
                   static_cast<uint32_t>(41 * eg.max_read_len / 50)};
   }
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Constructing dictionaries");
   auto dict = ConstructDictionary<BitsetSize>(
       read, read_lengths_s, eg.num_dict_s, eg.num_reads_s + eg.num_reads_n, 3,
       eg.basedir, eg.num_thr, dict_sizes);
 
-  GENIE_LOG(util::Logger::Severity::INFO, "---- Encoding reads");
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Encoding reads");
   Encode<BitsetSize>(read, dict, order_s, read_lengths_s, eg, egb);
 }
 

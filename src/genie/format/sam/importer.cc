@@ -485,7 +485,7 @@ void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id,
     {
       std::lock_guard guard(lock);
       this_chunk = chunk_id++;
-      GENIE_LOG(util::Logger::Severity::INFO,
+      UTILS_LOG(util::Logger::Severity::INFO,
                 "Processing chunk " + std::to_string(this_chunk) + "...");
       for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
         queries.emplace_back();
@@ -587,21 +587,21 @@ std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(
 
   if (options.clean_) {
     if (stats.hm_recs) {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "HM records dealigned: " + std::to_string(stats.hm_recs));
     }
     if (stats.distance) {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "I records split because of large mapping distance: " +
                     std::to_string(stats.distance));
     }
     if (stats.additional_alignments) {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "Additional alignments removed: " +
                     std::to_string(stats.additional_alignments));
     }
     if (stats.splice_recs) {
-      GENIE_LOG(util::Logger::Severity::WARNING,
+      UTILS_LOG(util::Logger::Severity::WARNING,
                 "Records dealigned because of splices: " +
                     std::to_string(stats.splice_recs));
     }
@@ -612,7 +612,7 @@ std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(
 }
 
 void Importer::setup_merge(const int num_chunks) {
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "Merging " + std::to_string(num_chunks) + " chunks...");
 
   if (!input_ref_file.empty()) {
@@ -645,7 +645,7 @@ void Importer::setup_merge(const int num_chunks) {
         tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
     if (!readers.back()->GetRecord()) {
       auto path = readers.back()->GetPath();
-      GENIE_LOG(util::Logger::Severity::INFO, path + " depleted");
+      UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
       readers.pop_back();
       std::remove(path.c_str());
     } else {
@@ -705,7 +705,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
           reader_prio.push(reader);
         } else {
           auto path = reader->GetPath();
-          GENIE_LOG(util::Logger::Severity::INFO, path + " depleted");
+          UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
           for (auto it = readers.begin(); it != readers.end(); ++it) {
             if (it->get() == reader) {
               readers.erase(it);
@@ -739,7 +739,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
 void sam_to_mgrec_phase2(
     Config& options, int num_chunks,
     const std::vector<std::pair<std::string, size_t>>& refs) {
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "Merging " + std::to_string(num_chunks) + " chunks...");
   RefInfo refinf(options.fasta_file_path_);
   size_t removed_unsupported_base = 0;
@@ -787,7 +787,7 @@ void sam_to_mgrec_phase2(
         options.tmp_dir_path_ + "/" + std::to_string(i) + PHASE1_EXT));
     if (!readers.back()->GetRecord()) {
       auto path = readers.back()->GetPath();
-      GENIE_LOG(util::Logger::Severity::INFO, path + " depleted");
+      UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
       readers.pop_back();
       std::remove(path.c_str());
     } else {
@@ -813,7 +813,7 @@ void sam_to_mgrec_phase2(
         heap.push(reader);
       } else {
         auto path = reader->GetPath();
-        GENIE_LOG(util::Logger::Severity::INFO, path + " depleted");
+        UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
         for (auto it = readers.begin(); it != readers.end(); ++it) {
           if (it->get() == reader) {
             readers.erase(it);
@@ -832,9 +832,9 @@ void sam_to_mgrec_phase2(
   total_output_writer.FlushBits();
   out_stream->flush();
 
-  GENIE_LOG(util::Logger::Severity::INFO, "Finished merging!");
+  UTILS_LOG(util::Logger::Severity::INFO, "Finished merging!");
   if (removed_unsupported_base > 0) {
-    GENIE_LOG(util::Logger::Severity::WARNING,
+    UTILS_LOG(util::Logger::Severity::WARNING,
               std::to_string(removed_unsupported_base) +
                   " records removed because of unsupported bases.");
   }

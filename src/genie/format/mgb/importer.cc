@@ -54,7 +54,7 @@ bool Importer::Pump(uint64_t& id, std::mutex&) {
                            static_cast<float>(file_size_);
     while (progress - last_progress_ > 0.05) {  // NOLINT
       last_progress_ += 0.05;
-      GENIE_LOG(util::Logger::Severity::INFO,
+      UTILS_LOG(util::Logger::Severity::INFO,
                 "Progress: " +
                     std::to_string(
                         static_cast<int>(std::round(last_progress_ * 100))) +

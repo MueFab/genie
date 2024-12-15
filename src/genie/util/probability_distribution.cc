@@ -5,13 +5,13 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/probability_distribution.h"
+#include "genie/util/probability_distribution.h"
 
-#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -25,8 +25,9 @@ ProbabilityDistribution::ProbabilityDistribution(const size_t range_min,
 
 void ProbabilityDistribution::AddToPdf(const size_t qual_score,
                                        const size_t number) {
-  if (qual_score < range_min_ || qual_score > range_min_ + pdf_.size() - 1)
-    THROW_ERROR_EXCEPTION("PDF: Score not in range");
+  UTILS_DIE_IF(
+      qual_score < range_min_ || qual_score > range_min_ + pdf_.size() - 1,
+      "PDF: Score not in range");
   pdf_[qual_score - range_min_] += number;
 }
 
@@ -39,15 +40,15 @@ void ProbabilityDistribution::ResetPdf() {
 // -----------------------------------------------------------------------------
 
 size_t ProbabilityDistribution::GetCount(const size_t value) const {
-  if (value < range_min_ || value > range_min_ + pdf_.size() - 1)
-    THROW_ERROR_EXCEPTION("PDF: Value not in range");
+  UTILS_DIE_IF(value < range_min_ || value > range_min_ + pdf_.size() - 1,
+               "PDF: Value not in range");
   return value;
 }
 
 // -----------------------------------------------------------------------------
 
 size_t ProbabilityDistribution::operator[](const size_t index) const {
-  if (index >= pdf_.size()) THROW_ERROR_EXCEPTION("PDF: Index not in range");
+  UTILS_DIE_IF(index >= pdf_.size(), "PDF: Index not in range");
   return pdf_[index];
 }
 
@@ -67,7 +68,7 @@ size_t ProbabilityDistribution::GetRangeMax() const {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

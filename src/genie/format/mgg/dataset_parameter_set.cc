@@ -7,7 +7,6 @@
 
 #include "genie/format/mgg/dataset_parameter_set.h"
 
-#include <sstream>
 #include <string>
 #include <utility>
 

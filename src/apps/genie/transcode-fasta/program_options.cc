@@ -55,7 +55,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, app.help());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -178,25 +178,25 @@ void ProgramOptions::validate() {
   if (inputFile.substr(0, 2) != "-.") {
     inputFile = std::filesystem::canonical(inputFile).string();
     std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
-    GENIE_LOG(genie::util::Logger::Severity::INFO,
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
               "Input file: " + inputFile + " with size " +
                   size_string(std::filesystem::file_size(inputFile)));
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
 
   ValidateOutputFile(outputFile, forceOverwrite);
   if (outputFile.substr(0, 2) != "-.") {
     outputFile = std::filesystem::weakly_canonical(outputFile).string();
     std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
-    GENIE_LOG(
+    UTILS_LOG(
         genie::util::Logger::Severity::INFO,
         "Output file: " + outputFile + " with " +
             size_string(
                 std::filesystem::space(parent_dir(outputFile)).available) +
             " available");
   } else {
-    GENIE_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 }
 

@@ -40,10 +40,10 @@ void ThreadManager::Action(size_t) {
       }
     }
   } catch (Exception& e) {
-    GENIE_LOG(util::Logger::Severity::ERROR, e.Msg());
+    UTILS_LOG(util::Logger::Severity::ERROR, e.Msg());
     throw;
   } catch (std::exception& e) {
-    GENIE_LOG(util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(util::Logger::Severity::ERROR, e.what());
     throw;
   }
 }

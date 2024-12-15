@@ -42,7 +42,7 @@ void Encoder::FlushIn(uint64_t& pos) {
   preprocessor_.Finish(pos);
   const std::string paired_end_str =
       preprocessor_.cp.paired_end ? "(paired-end)" : "(single-end)";
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "Preprocessing done " + paired_end_str);
   std::vector<core::parameter::EncodingSet> params;
   auto loc_cp = preprocessor_.cp;
@@ -50,17 +50,17 @@ void Encoder::FlushIn(uint64_t& pos) {
   core::stats::PerfStats stats = preprocessor_.stats;
 
   watch.Reset();
-  GENIE_LOG(util::Logger::Severity::INFO, "Reordering");
+  UTILS_LOG(util::Logger::Severity::INFO, "Reordering");
   CallReorder(preprocessor_.temp_dir, loc_cp);
   stats.AddDouble("time-spring-reorder", watch.Check());
 
   watch.Reset();
-  GENIE_LOG(util::Logger::Severity::INFO, "Encoding");
+  UTILS_LOG(util::Logger::Severity::INFO, "Encoding");
   CallEncoder(preprocessor_.temp_dir, loc_cp);
   stats.AddDouble("time-spring-encoding", watch.Check());
 
   watch.Reset();
-  GENIE_LOG(util::Logger::Severity::INFO, "Generating read streams");
+  UTILS_LOG(util::Logger::Severity::INFO, "Generating read streams");
   GenerateReadStreams(preprocessor_.temp_dir, loc_cp, entropycoder_, params,
                       stats, write_out_streams_);
   stats.AddDouble("time-spring-gen-reads", watch.Check());
@@ -74,7 +74,7 @@ void Encoder::FlushIn(uint64_t& pos) {
     stats.AddDouble("time-spring-quality-name", watch.Check());
   }
 
-  GENIE_LOG(util::Logger::Severity::INFO, "Writing encoded data to output");
+  UTILS_LOG(util::Logger::Severity::INFO, "Writing encoded data to output");
   SpringSource src(this->preprocessor_.temp_dir, this->preprocessor_.cp, params,
                    stats);
   src.SetDrain(this->drain_);
@@ -90,7 +90,7 @@ void Encoder::FlushIn(uint64_t& pos) {
   preprocessor_.Setup(preprocessor_.working_dir, preprocessor_.cp.num_thr,
                       preprocessor_.cp.paired_end);
 
-  GENIE_LOG(util::Logger::Severity::INFO, "Finished!");
+  UTILS_LOG(util::Logger::Severity::INFO, "Finished!");
   FlushOut(pos);
 }
 
@@ -100,7 +100,7 @@ Encoder::Encoder(const std::string& working_dir, const size_t num_thr,
     : ReadEncoder(write_raw), preprocess_progress_printed_(0) {
   preprocessor_.Setup(working_dir, num_thr, paired_end);
   const std::string paired_end_str = paired_end ? "paired-end" : "single-end";
-  GENIE_LOG(util::Logger::Severity::INFO,
+  UTILS_LOG(util::Logger::Severity::INFO,
             "Preprocessing (" + paired_end_str + ")");
 }
 

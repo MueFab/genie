@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/quality/calq/circular_buffer.h"
+#include "genie/util/circular_buffer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ class SoftClipSpreader {
   std::vector<std::pair<size_t, double>>
       forward_spread_;  //!< @brief Forward spread buffer to propagate scores
                         //!< ahead.
-  CircularBuffer<double>
+  util::CircularBuffer<double>
       buffer_;  //!< @brief Buffer to manage activity scores for past positions.
-  CircularBuffer<double>
+  util::CircularBuffer<double>
       original_;  //!< @brief Circular buffer to keep track of raw scores.
 
   const size_t max_propagation_;  //!< @brief Maximum distance over which scores

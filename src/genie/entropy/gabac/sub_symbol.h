@@ -117,7 +117,7 @@ struct Subsymbol {
         std::to_string(prv_values[1]) + "]" +
         "\nLUT Max Elements: " + std::to_string(lut_num_max_elems) +
         "\nLUT Entry Index: " + std::to_string(lut_entry_idx);
-    GENIE_LOG(util::Logger::Severity::INFO, debug_text);
+    UTILS_LOG(util::Logger::Severity::INFO, debug_text);
   }
 };
 

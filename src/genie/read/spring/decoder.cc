@@ -282,7 +282,7 @@ Decoder::Decoder(const std::string& working_dir, const bool comb_p,
   }
   UTILS_DIE_IF(!std::filesystem::create_directory(basedir_),
                "Cannot create temporary directory.");
-  GENIE_LOG(util::Logger::Severity::INFO, "Temporary directory: " + basedir_);
+  UTILS_LOG(util::Logger::Severity::INFO, "Temporary directory: " + basedir_);
   cp_.unaligned_reads_flag = false;
   cp_.paired_end = paired_end;
   // temporary files for combine pairs case
@@ -470,7 +470,7 @@ void Decoder::FlushIn(uint64_t& pos) {
   double time_name_sorting = 0;
   double time_record_sorting = 0;
   if (!cp_.unaligned_reads_flag && cp_.paired_end && combine_pairs_) {
-    GENIE_LOG(util::Logger::Severity::INFO, "Order unmatched decoded reads...");
+    UTILS_LOG(util::Logger::Severity::INFO, "Order unmatched decoded reads...");
     file_out_unmatched1_.close();
     file_out_unmatched2_.close();
     file_out_unmatched_read_names_1_.close();
@@ -480,7 +480,7 @@ void Decoder::FlushIn(uint64_t& pos) {
     if (unmatched_record_index_[0] != unmatched_record_index_[1])
       UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
     uint32_t size_unmatched = unmatched_record_index_[0];
-    GENIE_LOG(util::Logger::Severity::INFO,
+    UTILS_LOG(util::Logger::Severity::INFO,
               "Pairs to match: " + std::to_string(size_unmatched));
 
     std::string file_unmatched_read_names_1_sorted =
@@ -489,10 +489,10 @@ void Decoder::FlushIn(uint64_t& pos) {
         file_unmatched_read_names_2_ + ".sorted";
 
     if (size_unmatched > 0) {
-      GENIE_LOG(util::Logger::Severity::INFO,
+      UTILS_LOG(util::Logger::Severity::INFO,
                 "Processing " + std::to_string(size_unmatched) +
                     " unmatched reads...");
-      GENIE_LOG(util::Logger::Severity::INFO, "---- Sorting read names");
+      UTILS_LOG(util::Logger::Severity::INFO, "---- Sorting read names");
       util::Watch sort_watch;
       // first sort f_out_unmatched_read_n_ames_* using disk-based merge
       // sort from fork of https://github.com/arq5x/kway-mergesort

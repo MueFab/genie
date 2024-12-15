@@ -16,7 +16,7 @@
 
 #include "genie/quality/calq/genotyper.h"
 #include "genie/quality/calq/haplotyper.h"
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/quantizer.h"
 #include "genie/quality/calq/record_pileup.h"
 
 // -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ struct EncodingRead {
 class QualityEncoder {
  public:
   explicit QualityEncoder(const EncodingOptions& options,
-                          const std::map<int, Quantizer>& quant,
+                          const std::map<int, util::Quantizer>& quant,
                           DecodingBlock* output);
   ~QualityEncoder();
   void AddMappedRecordToBlock(EncodingRecord& record);
@@ -77,7 +77,7 @@ class QualityEncoder {
   DecodingBlock* out_;
 
   // Quantizers
-  std::map<int, Quantizer> quantizers_;
+  std::map<int, util::Quantizer> quantizers_;
 };
 
 // -----------------------------------------------------------------------------

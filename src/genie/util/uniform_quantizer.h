@@ -18,16 +18,16 @@
  * is roughly uniform and doesn't have distinct clusters or peaks.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_UNIFORM_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_UNIFORM_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_UNIFORM_QUANTIZER_H_
+#define SRC_GENIE_UTIL_UNIFORM_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief The `UniformQuantizer` class provides a simple uniform quantization
@@ -69,11 +69,11 @@ class UniformQuantizer : public Quantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_UNIFORM_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_UNIFORM_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

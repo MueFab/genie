@@ -74,10 +74,10 @@ int main(int argc, char* argv[]) {
       UTILS_DIE("Invalid task: " + std::string(program_options.task_));
     }
   } catch (const std::exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error occurred");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error occurred");
     return EXIT_FAILURE;
   }
 

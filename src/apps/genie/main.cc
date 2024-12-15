@@ -31,7 +31,7 @@ static void PrintCmdLine(const int argc, char* argv[]) {
     cmd_line += argv[i];
     cmd_line += " ";
   }
-  GENIE_LOG(genie::util::Logger::Severity::INFO, "Command: " + cmd_line);
+  UTILS_LOG(genie::util::Logger::Severity::INFO, "Command: " + cmd_line);
 }
 
 // -----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 
 // -----------------------------------------------------------------------------
 int help(int, char*[]) {
-  GENIE_LOG(genie::util::Logger::Severity::ERROR,
+  UTILS_LOG(genie::util::Logger::Severity::ERROR,
             "Usage: \ngenie <operation> <operation specific options> \n\nList "
             "of operations:\n"
             "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
@@ -56,7 +56,7 @@ int main(const int argc, char* argv[]) {
  / / __/ _ \/ __ \/ / _ \
 / /_/ /  __/ / / / /  __/
 \____/\___/_/ /_/_/\___/)";
-  GENIE_LOG(genie::util::Logger::Severity::INFO, genie);
+  UTILS_LOG(genie::util::Logger::Severity::INFO, genie);
   PrintCmdLine(argc, argv);
   genie::module::detect();
   try {
@@ -94,10 +94,10 @@ int main(const int argc, char* argv[]) {
                 "! Type \"genie help\" for a list of operations.");
     }
   } catch (const genie::util::Exception& e) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, e.what());
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return -1;
   } catch (...) {
-    GENIE_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return -1;
   }
   return 0;

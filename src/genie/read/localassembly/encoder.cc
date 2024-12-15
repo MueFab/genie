@@ -56,7 +56,7 @@ void Encoder::PrintDebug(const LaEncodingState& state, const std::string& ref1,
   }
   ss << ref2 << std::endl;
   ss << std::endl;
-  GENIE_LOG(util::Logger::Severity::INFO, ss.str());
+  UTILS_LOG(util::Logger::Severity::INFO, ss.str());
 }
 
 // -----------------------------------------------------------------------------

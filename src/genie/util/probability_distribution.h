@@ -21,8 +21,8 @@
  * within a specific interval and for constructing probability models.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
-#define SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
+#ifndef SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
+#define SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief A class for tracking and manipulating a discrete probability
@@ -131,11 +131,11 @@ class ProbabilityDistribution {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
+#endif  // SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

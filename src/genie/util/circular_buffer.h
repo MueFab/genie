@@ -20,8 +20,8 @@
  * data storage.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_CIRCULAR_BUFFER_H_
-#define SRC_GENIE_QUALITY_CALQ_CIRCULAR_BUFFER_H_
+#ifndef SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
+#define SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief A fixed-Size buffer implemented in a circular manner.
@@ -165,7 +165,7 @@ class CircularBuffer {
 };
 
 // -----------------------------------------------------------------------------
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
-#endif  // SRC_GENIE_QUALITY_CALQ_CIRCULAR_BUFFER_H_
+#endif  // SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_

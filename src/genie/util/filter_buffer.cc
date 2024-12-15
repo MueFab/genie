@@ -5,16 +5,16 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/filter_buffer.h"
+#include "genie/util/filter_buffer.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -70,9 +70,7 @@ FilterBuffer::FilterBuffer(
     const std::function<double(size_t, size_t)>& kernel_builder,
     const size_t kernel_size)
     : buffer_(kernel_size, 0.0) {
-  if (!(kernel_size % 2)) {
-    THROW_ERROR_EXCEPTION("Kernel Size must be an odd number");
-  }
+  UTILS_DIE_IF(!(kernel_size % 2), "Kernel Size must be an odd number");
   kernel_.resize(kernel_size, 0.0);
 
   for (size_t i = 0; i < kernel_.size(); ++i) {
@@ -112,7 +110,7 @@ size_t RectangleKernel::CalcMinSize(const size_t maximum) const {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
