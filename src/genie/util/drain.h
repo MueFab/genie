@@ -42,10 +42,14 @@ namespace genie::util {
  * are preserved or discarded as needed.
  */
 struct Section {
-  size_t start;      //!< @brief ID of the first record in the section.
-  size_t length;     //!< @brief Number of records in this section.
-  bool strong_skip;  //!< @brief Indicates if this section should be strongly
-                     //!< skipped in branching pipelines.
+  /// ID of the first record in the section.
+  size_t start;
+
+  /// Number of records in this section.
+  size_t length;
+
+  /// Indicates if section should be strongly skipped in branching pipelines.
+  bool strong_skip;
 };
 
 /**

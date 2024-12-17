@@ -34,13 +34,17 @@ namespace genie::util {
  * @brief Controlled output to a std::ostream. Allows to write single bits.
  */
 class BitWriter {
-  std::ostream&
-      stream_;          //!< @brief Where to direct output. A file for example.
-  uint64_t held_bits_;  //!< @brief Contains bits which cannot be written yet,
-                        //!< as no byte is full.
-  uint8_t num_held_bits_;  //!< @brief How many bits there are in heldBits.
-  uint64_t total_bits_written_;  //!< @brief Counts number of written bits for
-                                 //!< statistical usages.
+  /// Where to direct output. A file for example.
+  std::ostream& stream_;
+
+  /// Contains bits which cannot be written yet, as no byte is full.
+  uint64_t held_bits_;
+
+  /// How many bits there are in heldBits.
+  uint8_t num_held_bits_;
+
+  /// Counts number of written bits for statistical usages.
+  uint64_t total_bits_written_;
 
  public:
   /**

@@ -1,6 +1,20 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file lloyd_max_quantizer.cc
+ *
+ * @brief Implementation file for the LloydMaxQuantizer class.
+ *
+ * This file provides the implementation of the `LloydMaxQuantizer` class,
+ * which performs Lloyd-Max quantization on a range of values. The class
+ * calculates optimal quantization intervals and representative values
+ * using the Lloyd-Max algorithm.
+ *
+ * @details The `LloydMaxQuantizer` class is useful for quantization tasks
+ * where the distribution of values is known. It includes methods for
+ * initializing the quantizer, calculating centroids, decision thresholds,
+ * and filling quantization tables.
+ *
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

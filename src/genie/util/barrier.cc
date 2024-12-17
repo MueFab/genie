@@ -1,6 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file barrier.cc
+ * @brief Implementation of the Barrier synchronization primitive for multiple
+ * threads.
+ *
+ * This file contains the implementation of the Barrier class, which is used to
+ * synchronize multiple threads.
+ *
+ * @details The Barrier class provides a mechanism for multiple threads to wait
+ * until all threads have reached a certain point in their execution. It uses a
+ * mutex and a condition variable to achieve this synchronization.
+ *
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

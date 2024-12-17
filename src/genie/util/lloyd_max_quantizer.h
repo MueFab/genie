@@ -49,11 +49,14 @@ namespace genie::util {
  * of probability characteristics compared to uniform quantizers.
  */
 class LloydMaxQuantizer final : public Quantizer {
-  std::vector<double> borders_;  //!< @brief Decision thresholds for each
-                                 //!< quantization interval.
-  std::vector<double> values_;   //!< @brief Representative values (centroids)
-                                 //!< for each interval.
-  size_t steps_;                 //!< @brief Number of quantization steps.
+  /// Decision thresholds for each quantization interval.
+  std::vector<double> borders_;
+
+  /// Representative values (centroids) for each interval.
+  std::vector<double> values_;
+
+  /// Number of quantization steps.
+  size_t steps_;
 
   /**
    * @brief Fills the lookup table (LUT) based on the provided probability

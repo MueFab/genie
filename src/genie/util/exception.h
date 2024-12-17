@@ -91,8 +91,8 @@ class Exception : public std::exception {
   [[nodiscard]] const char* what() const noexcept override;
 
  protected:
-  std::string
-      msg_;  //!< @brief The exception message stored as a standard string.
+  /// The exception message stored as a standard string.
+  std::string msg_;
 };
 
 // -----------------------------------------------------------------------------

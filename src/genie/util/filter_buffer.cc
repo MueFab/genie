@@ -1,6 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file filter_buffer.cc
+ * @brief Implementation file for the FilterBuffer class and kernel classes.
+ *
+ * This file provides the implementation of the `FilterBuffer` class, which
+ * applies a specified filter kernel to an input signal using a circular buffer
+ * structure. It also includes the `GaussKernel` and `RectangleKernel` classes
+ * for Gaussian and rectangular filtering.
+ *
+ * @details The `FilterBuffer` class allows for smoothing and filtering of
+ * signals based on the selected kernel and buffer configuration. The
+ * `GaussKernel` and `RectangleKernel` classes provide methods for calculating
+ * kernel values and determining the minimal buffer size required.
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

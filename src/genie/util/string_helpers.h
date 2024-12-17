@@ -32,9 +32,8 @@
 
 namespace genie::util {
 
-// -----------------------------------------------------------------------------
-static auto kWs = " \t\n\r\f\v";  //!< @brief Defines all known whitespace
-                                  //!< characters for trimming operations.
+/// Defines all known whitespace characters for trimming operations.
+static const auto kWs = " \t\n\r\f\v";
 
 /**
  * @brief Removes specified characters from the right side of a string.

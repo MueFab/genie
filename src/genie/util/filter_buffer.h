@@ -9,8 +9,8 @@
  * class for signal processing.
  *
  * This file provides the declarations of the `GaussKernel` and
- * `RectangleKernel` classes, which represent different types of filter kernels
- * used for signal processing in the CALQ module. Additionally, it defines the
+ * `RectangleKernel` classes, which represent different types of filter kernels.
+ * Additionally, it defines the
  * `FilterBuffer` class, which is used to apply these kernels to a signal using
  * a circular buffer structure.
  *
@@ -45,13 +45,17 @@ namespace genie::util {
  * buffer Size required to capture significant values.
  */
 class GaussKernel {
-  const double
-      sigma_;  //!< @brief The standard deviation of the Gaussian distribution.
-  constexpr static double pi_ = 3.14159265359;  //!< @brief The value of π (pi).
-  constexpr static double euler_ =
-      2.71828182846;  //!< @brief The value of Euler's number (e).
-  const double inv_sqrt_sigma_2_pi_;  //!< @brief Precomputed constant for
-                                      //!< Gaussian function.
+  /// The standard deviation of the Gaussian distribution.
+  const double sigma_;
+
+  /// The value of π (pi).
+  constexpr static double pi_ = 3.14159265359;
+
+  /// The value of Euler's number (e).
+  constexpr static double euler_ = 2.71828182846;
+
+  /// Precomputed constant for Gaussian function.
+  const double inv_sqrt_sigma_2_pi_;
 
  public:
   /**

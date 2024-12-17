@@ -40,11 +40,14 @@ namespace genie::util {
  * is larger than a byte.
  */
 struct BlockStepper {
-  uint8_t* curr;  //!< @brief Pointer to the current position in the data block.
-  uint8_t* end;   //!< @brief Pointer to the end of the data block (first
-                  //!< invalid position).
-  uint8_t
-      word_size;  //!< @brief Size in bytes of each element in the data block.
+  /// Pointer to the current position in the data block.
+  uint8_t* curr;
+
+  /// Pointer to the end of the data block (first invalid position).
+  uint8_t* end;
+
+  /// Size in bytes of each element in the data block.
+  uint8_t word_size;
 
   /**
    * @brief Constructs a BlockStepper object for iterating over a data block.

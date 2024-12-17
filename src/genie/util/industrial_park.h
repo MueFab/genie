@@ -49,16 +49,8 @@ namespace genie::util {
  * creation.
  */
 class IndustrialPark {
-  /**
-   * @brief Stores the registered factory instances.
-   *
-   * The `factories` map uses `std::type_index` as the key to uniquely
-   * identify each factory type. The value is a `std::unique_ptr` to a
-   * `GenericFactory` object, enabling polymorphic storage of different
-   * factory types.
-   */
-  std::map<std::type_index, std::unique_ptr<GenericFactory>>
-      factories_;  //!< @brief Map of factory instances.
+  /// Map of factory instances.
+  std::map<std::type_index, std::unique_ptr<GenericFactory>> factories_;
 
   /**
    * @brief Finds or creates a factory of the specified type.

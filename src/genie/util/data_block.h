@@ -51,10 +51,11 @@ struct BlockStepper;  //!< Forward declaration of the BlockStepper utility
  * for accessing the elements.
  */
 class DataBlock {
-  uint8_t lg_word_size_;  //!< @brief log2 of the word size. The word Size is
-                          //!< defined as 1 << lgWordSize.
-  std::vector<uint8_t>
-      data_;  //!< @brief The raw data stored as a vector of bytes.
+  /// log2 of the word size. The word Size is defined as 1 << lgWordSize.
+  uint8_t lg_word_size_;
+
+  /// The raw data stored as a vector of bytes.
+  std::vector<uint8_t> data_;
 
  public:
   /**
@@ -183,8 +184,11 @@ class DataBlock {
    */
   template <typename T>
   class ProxyCore {
-    T stream_;         //!< @brief The `DataBlock` being referred to.
-    size_t position_;  //!< @brief The position inside the `DataBlock`.
+    /// The `DataBlock` being referred to.
+    T stream_;
+
+    /// The position inside the `DataBlock`.
+    size_t position_;
 
    public:
     /**
@@ -233,9 +237,11 @@ class DataBlock {
    */
   template <typename T>
   class IteratorCore {
-    T stream_;         //!< @brief The `DataBlock` being iterated over.
-    size_t position_;  //!< @brief The position of the current element
-                       //!< inside the `DataBlock`.
+    /// The `DataBlock` being iterated over.
+    T stream_;
+
+    /// The position of the current element inside the `DataBlock`.
+    size_t position_;
 
    public:
     /**
@@ -513,15 +519,15 @@ class DataBlock {
    * This function inserts a range of elements into the `DataBlock` at the
    * specified position.
    *
-   * @tparam IT1 The type of the iterator for the insertion position.
-   * @tparam IT2 The type of the iterator for the range of elements.
+   * @tparam It1 The type of the iterator for the insertion position.
+   * @tparam It2 The type of the iterator for the range of elements.
    * @param pos The position at which to insert the elements.
    * @param start The start of the range of elements to be inserted.
    * @param end The end of the range of elements to be inserted.
    */
-  template <typename IT1, typename IT2>
-  [[maybe_unused]] void Insert(const IT1& pos, const IT2& start,
-                               const IT2& end);
+  template <typename It1, typename It2>
+  [[maybe_unused]] void Insert(const It1& pos, const It2& start,
+                               const It2& end);
 
   /**
    * @brief Creates a `DataBlock` with a specified initial Size and word size.
