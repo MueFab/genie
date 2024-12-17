@@ -77,8 +77,8 @@ void SelectorHead<Tin>::SetOperation(std::function<size_t(const Tin& t)> s) {
 template <typename Tin>
 void SelectorHead<Tin>::FlowIn(Tin&& t, const Section& id) {
   Tin in = std::move(t);
-  const size_t kDest = select_(in);
-  Route(std::move(in), kDest, id);
+  const size_t dest = select_(in);
+  Route(std::move(in), dest, id);
 }
 
 // -----------------------------------------------------------------------------

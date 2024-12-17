@@ -128,11 +128,11 @@ class Quantizer {
   void print() const;
 
  protected:
-  std::map<int, std::pair<int, int>>
-      lut_;  //!< @brief Maps quality values to (index, reconstruction value)
-             //!< pairs.
-  std::map<std::size_t, int>
-      inverse_lut_;  //!< @brief Maps indices to reconstruction values.
+  /// Maps quality values to (index, reconstruction value) pairs.
+  std::map<int, std::pair<int, int>> lut_;
+
+  /// Maps indices to reconstruction values.
+  std::map<std::size_t, int> inverse_lut_;
 };
 
 // -----------------------------------------------------------------------------

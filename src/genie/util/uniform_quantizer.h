@@ -5,11 +5,7 @@
  * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  * @brief Header file for the UniformQuantizer class.
  *
- * This file defines the `UniformQuantizer` class, which is used in the CALQ
- * quality value compression framework to perform uniform quantization of
- * quality values. Uniform quantization is a technique where the range of
- * quality values is divided into equal-sized steps, making it easier to reduce
- * the representation Size of quality values in bioinformatics data.
+ * This file defines the `UniformQuantizer` class.
  *
  * @details The `UniformQuantizer` inherits from the base `Quantizer` class and
  * implements a uniform quantization scheme. This is a simpler quantization

@@ -46,10 +46,11 @@ namespace genie::util {
  */
 template <typename Tout>
 class SelectorTail final : public Source<Tout>, public Drain<Tout> {
-  size_t dry_ctr_;  //!< @brief Counter for tracking the number of branches
-                    //!< that have finished sending data.
-  size_t mod_num_;  //!< @brief Total number of branches connected to this
-                    //!< selector tail.
+  /// Counter for tracking the number of branches that have finished sending.
+  size_t dry_ctr_;
+
+  /// Total number of branches connected to this selector tail.
+  size_t mod_num_;
 
  public:
   /**
@@ -112,7 +113,7 @@ class SelectorTail final : public Source<Tout>, public Drain<Tout> {
 
 // -----------------------------------------------------------------------------
 
-#include "genie/util/selector_tail.impl.h"
+#include "genie/util/selector_tail.impl.h"  // NOLINT
 
 // -----------------------------------------------------------------------------
 

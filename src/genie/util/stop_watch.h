@@ -40,10 +40,14 @@ namespace genie::util {
  * @see std::chrono::steady_clock
  */
 class Watch {
-  std::chrono::steady_clock::time_point
-      start_;        //!< @brief When the current period of time started.
-  double offset_{};  //!< @brief Elapsed time from previous time periods.
-  bool paused_;      //!< @brief If the time is currently measured.
+  /// When the current period of time started.
+  std::chrono::steady_clock::time_point start_;
+
+  /// Elapsed time from previous time periods.
+  double offset_{};
+
+  /// If the time is currently measured.
+  bool paused_;
 
  public:
   /**

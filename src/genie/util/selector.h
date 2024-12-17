@@ -52,10 +52,11 @@ namespace genie::util {
  */
 template <typename Tin, typename Tout>
 class Selector final : public Drain<Tin>, public Source<Tout> {
-  SelectorHead<Tin>
-      head_;  //!< @brief Manages the input branches for the selector.
-  SelectorTail<Tout>
-      tail_;  //!< @brief Manages the output branches for the selector.
+  /// Manages the input branches for the selector.
+  SelectorHead<Tin> head_;
+
+  /// Manages the output branches for the selector.
+  SelectorTail<Tout> tail_;
 
  public:
   /**
@@ -158,7 +159,7 @@ class Selector final : public Drain<Tin>, public Source<Tout> {
 
 // -----------------------------------------------------------------------------
 
-#include "genie/util/selector.impl.h"
+#include "genie/util/selector.impl.h"  // NOLINT
 
 // -----------------------------------------------------------------------------
 

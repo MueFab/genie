@@ -46,29 +46,48 @@ class Logger {
    * @brief Severity levels for log messages.
    */
   enum class Severity {
-    DEBUG = 0,    //!< Debug messages for detailed information.
-    INFO = 1,     //!< Informational messages.
-    WARNING = 2,  //!< Warnings that may indicate potential issues.
-    ERROR = 3     //!< Errors that indicate a failure or problem.
+    /// Debug messages for detailed information.
+    DEBUG = 0,
+
+    /// Informational messages.
+    INFO = 1,
+
+    /// Warnings that may indicate potential issues.
+    WARNING = 2,
+
+    /// Errors that indicate a failure or problem.
+    ERROR = 3
   };
 
   /**
    * @brief Location levels for log messages.
    */
   enum class LocationLevel {
-    NONE,    //!< No location information.
-    MODULE,  //!< Module-level information.
-    EXACT    //!< Exact file and line number.
+    /// No location information.
+    NONE,
+
+    /// Module-level information.
+    MODULE,
+
+    /// Exact file and line number.
+    EXACT
   };
 
   /**
    * @brief Time settings for log messages.
    */
   enum class TimeSetting {
-    NONE,       //!< No time information.
-    WALLCLOCK,  //!< Wall-clock time.
-    RUNTIME,    //!< Runtime since application start.
-    BOTH        //!< Both wall-clock and runtime.
+    /// No time information.
+    NONE,
+
+    /// Wall-clock time.
+    WALLCLOCK,
+
+    /// Runtime since application start.
+    RUNTIME,
+
+    /// Both wall-clock and runtime.
+    BOTH
   };
 
   /**
@@ -145,14 +164,36 @@ class Logger {
    */
   Logger();
 
-  std::ostream* output_stream_;   //!< The output stream for logging messages.
-  std::mutex log_mutex_;          //!< Mutex for thread-safe logging.
-  LocationLevel location_level_;  //!< Controls the level of location info.
-  TimeSetting time_setting_;      //!< Controls the inclusion of time info.
-  Severity severity_level_;       //!< The current severity level for logging.
-  std::chrono::steady_clock::time_point
-      start_time_;  //!< Application start time.
+  /// The output stream for logging messages.
+  std::ostream* output_stream_;
 
+  /// Mutex for thread-safe logging.
+  std::mutex log_mutex_;
+
+  /// Controls the level of location info.
+  LocationLevel location_level_;
+
+  /// Controls the inclusion of time info.
+  TimeSetting time_setting_;
+
+  /// The current severity level for logging.
+  Severity severity_level_;
+
+  /// Application start time.
+  std::chrono::steady_clock::time_point start_time_;
+
+  /**
+   * @brief Logs a message with detailed information.
+   *
+   * This method formats the message with the severity level, module name,
+   * file name, and line number, and writes it to the output stream.
+   *
+   * @param severity The severity level of the message.
+   * @param message The message to log.
+   * @param module_name The name of the module logging the message.
+   * @param file The source file name.
+   * @param line The source line number.
+   */
   void LogLine(Severity severity, const std::string& message,
                const std::string& module_name, const std::string& file,
                int line) const;

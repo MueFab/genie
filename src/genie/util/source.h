@@ -47,8 +47,8 @@ namespace genie::util {
 template <typename Type>
 class Source {
  protected:
-  Drain<Type>* drain_{nullptr};  //!< @brief Pointer to the downstream `Drain`
-                                 //!< where output data will be sent.
+  /// Pointer to the downstream `Drain` where output data will be sent.
+  Drain<Type>* drain_{nullptr};
 
   /**
    * @brief Propagates a data chunk to the connected drain.

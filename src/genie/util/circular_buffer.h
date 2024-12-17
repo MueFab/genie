@@ -44,9 +44,11 @@ namespace genie::util {
  */
 template <typename T>
 class CircularBuffer {
-  std::vector<T>
-      data_;    //!< @brief The underlying data storage for the circular buffer.
-  size_t pos_;  //!< @brief The current position of the buffer's oldest element.
+  /// The underlying data storage for the circular buffer.
+  std::vector<T> data_;
+
+  /// The current position of the buffer's oldest element.
+  size_t pos_;
 
  public:
   /**
@@ -59,9 +61,7 @@ class CircularBuffer {
    * @param size The Size of the buffer.
    * @param val The initial value to fill the buffer with.
    */
-  CircularBuffer(size_t size, const T& val) : pos_(0) {
-    data_.resize(size, val);
-  }
+  CircularBuffer(size_t size, const T& val);
 
   /**
    * @brief Retrieves an element at the specified index.
@@ -74,9 +74,7 @@ class CircularBuffer {
    * @param index The index of the element to retrieve.
    * @return A reference to the element at the specified index.
    */
-  T& operator[](const size_t index) {
-    return data_[(pos_ + index) % data_.size()];
-  }
+  T& operator[](size_t index);
 
   /**
    * @brief Retrieves a constant element at the specified index.
@@ -87,9 +85,7 @@ class CircularBuffer {
    * @param index The index of the element to retrieve.
    * @return A constant reference to the element at the specified index.
    */
-  const T& operator[](const size_t index) const {
-    return data_[(pos_ + index) % data_.size()];
-  }
+  const T& operator[](size_t index) const;
 
   /**
    * @brief Retrieves the oldest element in the buffer.
@@ -100,7 +96,7 @@ class CircularBuffer {
    *
    * @return A reference to the oldest element in the buffer.
    */
-  T& back() { return (*this)[pos_]; }
+  T& back();
 
   /**
    * @brief Retrieves the oldest element in the buffer (const version).
@@ -110,7 +106,7 @@ class CircularBuffer {
    *
    * @return A constant reference to the oldest element in the buffer.
    */
-  [[nodiscard]] const T& back() const { return (*this)[pos_]; }
+  [[nodiscard]] const T& back() const;
 
   /**
    * @brief Retrieves the newest element in the buffer.
@@ -120,9 +116,7 @@ class CircularBuffer {
    *
    * @return A reference to the newest element in the buffer.
    */
-  [[nodiscard]] T& front() {
-    return (*this)[(pos_ + data_.size() - 1) % data_.size()];
-  }
+  [[nodiscard]] T& front();
 
   /**
    * @brief Retrieves the newest element in the buffer (const version).
@@ -132,9 +126,7 @@ class CircularBuffer {
    *
    * @return A constant reference to the newest element in the buffer.
    */
-  [[nodiscard]] const T& front() const {
-    return (*this)[(pos_ + data_.size() - 1) % data_.size()];
-  }
+  [[nodiscard]] const T& front() const;
 
   /**
    * @brief Gets the Size of the circular buffer.
@@ -144,7 +136,7 @@ class CircularBuffer {
    *
    * @return The Size of the buffer.
    */
-  [[nodiscard]] size_t size() const { return data_.size(); }
+  [[nodiscard]] size_t size() const;
 
   /**
    * @brief Adds a new element to the buffer, overwriting the oldest element.
@@ -156,16 +148,20 @@ class CircularBuffer {
    * @param val The new value to insert into the buffer.
    * @return The old value that was overwritten.
    */
-  T push(const T& val) {
-    T old_val = data_[pos_];
-    data_[pos_] = val;
-    pos_ = (pos_ + 1) % data_.size();
-    return old_val;
-  }
+  T push(const T& val);
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::util
 
 // -----------------------------------------------------------------------------
+
+#include "genie/util/circular_buffer.impl.h"  // NOLINT
+
+// -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

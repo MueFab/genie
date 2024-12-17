@@ -43,11 +43,14 @@ namespace genie::util {
  * ensures that threads access the critical section in a predefined order.
  */
 class OrderedLock {
-  size_t counter_;  //!< @brief Tracks the thread identifier currently allowed
-                    //!< to execute.
-  std::mutex m_;    //!< @brief Mutex for protecting the internal state.
-  std::condition_variable cond_var_;  //!< @brief Condition variable for
-                                      //!< managing thread synchronization.
+  /// Tracks the thread identifier currently allowed
+  size_t counter_;
+
+  /// Mutex for protecting the internal state.
+  std::mutex m_;
+
+  /// Condition variable for managing thread synchronization.
+  std::condition_variable cond_var_;
 
  public:
   /**

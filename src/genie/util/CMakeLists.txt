@@ -15,6 +15,7 @@ set(source_files
         literal.h
         log.h
         log.cc
+        circular_buffer.impl.h
 )
 
 add_library(genie-util ${source_files})

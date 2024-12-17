@@ -1,6 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file barrier.h
+ * @brief Barrier synchronization primitive for multiple threads.
+ *
+ * This file contains the definition of the Barrier class, which is used to
+ * synchronize multiple threads.
+ *
+ * @details The Barrier class provides a mechanism for multiple threads to wait
+ * until all threads have reached a certain point in their execution. It uses a
+ * mutex and a condition variable to achieve this synchronization.
+ *
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
@@ -35,12 +44,20 @@ class Barrier {
   void wait();
 
  private:
-  std::mutex mutex_;  //!< @brief Mutex for synchronization.
-  /// @brief Condition variable for synchronization.
+  /// Mutex for synchronization.
+  std::mutex mutex_;
+
+  /// Condition variable for synchronization.
   std::condition_variable cond_;
-  int num_threads_;  //!< @brief Number of threads to synchronize.
-  int count_;       //!< @brief Number of threads that have reached the barrier.
-  int generation_;  //!< @brief Barrier generation counter.
+
+  /// Number of threads to synchronize.
+  int num_threads_;
+
+  /// Number of threads that have reached the barrier.
+  int count_;
+
+  /// Barrier generation counter.
+  int generation_;
 };
 
 // -----------------------------------------------------------------------------

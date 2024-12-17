@@ -44,10 +44,11 @@ namespace genie::util {
  * genomic data.
  */
 class ProbabilityDistribution {
-  std::vector<size_t> pdf_;  //!< @brief The probability distribution function
-                             //!< (PDF) represented as a vector of counts.
-  size_t range_min_;         //!< @brief The minimum value in the range of the
-                             //!< distribution.
+  /// The probability distribution (PDF) represented as vector of counts.
+  std::vector<size_t> pdf_;
+
+  /// The minimum value in the range of the distribution.
+  size_t range_min_;
 
  public:
   /**

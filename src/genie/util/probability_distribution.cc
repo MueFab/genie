@@ -1,6 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file probability_distribution.cc
+ * @brief Implementation file for the ProbabilityDistribution class.
+ *
+ * This file provides the implementation of the `ProbabilityDistribution` class,
+ * which handles and manipulates probability distributions. The class allows for
+ * constructing, modifying, and querying discrete probability distributions.
+ *
+ * @details The `ProbabilityDistribution` class operates on a range of values
+ * specified during instantiation. It maintains a vector of counts for each
+ * value within this range and supports incrementing and resetting these counts.
+ * The class is primarily used for analyzing the distribution of quality scores
+ * within a specific interval and for constructing probability models.
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

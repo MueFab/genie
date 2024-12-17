@@ -6,8 +6,7 @@
  * @brief Header file for the UniformMinMaxQuantizer class.
  *
  * This file defines the `UniformMinMaxQuantizer` class, which is a specialized
- * version of the `UniformQuantizer` used in the CALQ (Compression Algorithms
- * for Lossless Quality values) quality encoding scheme. The
+ * version of the `UniformQuantizer`. The
  * `UniformMinMaxQuantizer` class provides a uniform quantization strategy
  * within a specified minimum and maximum value range, offering flexibility and
  * control over quantization intervals.
@@ -45,7 +44,7 @@ namespace genie::util {
  * ### Example Usage
  * @code
  * // Create a uniform quantizer with range [0, 40] and 10 quantization steps
- * genie::quality::calq::UniformMinMaxQuantizer quantizer(0, 40, 10);
+ * genie::util::UniformMinMaxQuantizer quantizer(0, 40, 10);
  *
  * // Perform quantization on a quality value
  * int quantized_value = quantizer.valueToIndex(35);

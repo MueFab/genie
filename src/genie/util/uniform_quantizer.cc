@@ -1,6 +1,18 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file uniform_quantizer.cc
+ * @brief Implementation file for the UniformQuantizer class.
+ *
+ * This file provides the implementation of the `UniformQuantizer` class, which
+ * performs uniform quantization on a range of values. The class divides the
+ * range into evenly spaced steps and assigns representative values to each
+ * step.
+ *
+ * @details The `UniformQuantizer` class is useful for simple quantization tasks
+ * where the distribution of values is roughly uniform. It includes methods for
+ * initializing the quantizer, computing step sizes, and filling quantization
+ * tables.
+ *
  * @copyright This file is part of Genie See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
