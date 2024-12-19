@@ -45,16 +45,28 @@ using BooHashFunType = boomphf::mphf<uint64_t, HashObj>;
  */
 class BbHashDict {
  public:
-  std::unique_ptr<BooHashFunType> boo_hash_fun_;  //!< BooPHF hash function
-  int start_;                //!< Starting position for the dictionary
-  int end_;                  //!< Ending position for the dictionary
-  uint32_t num_keys_;        //!< Number of keys in the dictionary
-  uint32_t dict_num_reads_;  //!< Number of reads in this dictionary (for
-                             //!< variable length)
-  std::vector<uint32_t> start_pos_;  //!< Start positions for reads
-  std::vector<uint32_t> read_id_;    //!< Read IDs for tracking
-  std::vector<uint8_t>
-      empty_bin_;  //!< Flags indicating empty bins in the dictionary
+  /// BooPHF hash function
+  std::unique_ptr<BooHashFunType> boo_hash_fun_;
+
+  /// Starting position for the dictionary
+  int start_;
+
+  /// Ending position for the dictionary
+  int end_;
+  /// Number of keys in the dictionary
+  uint32_t num_keys_;
+
+  /// Number of reads in this dictionary (for variable length)
+  uint32_t dict_num_reads_;
+
+  /// Start positions for reads
+  std::vector<uint32_t> start_pos_;
+
+  /// Read IDs for tracking
+  std::vector<uint32_t> read_id_;
+
+  /// Flags indicating empty bins in the dictionary
+  std::vector<uint8_t> empty_bin_;
 
   /**
    * @brief Find the position of a given key.
@@ -99,7 +111,6 @@ template <size_t BitsetSize>
 void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
                         BbHashDict* dict, int num_dict, int bpb);
 
-
 struct SizeRange {
   uint32_t start;
   uint32_t end;
@@ -123,7 +134,7 @@ template <size_t BitsetSize>
 std::vector<BbHashDict> ConstructDictionary(
     const std::vector<std::bitset<BitsetSize>>& read,
     const std::vector<uint16_t>& read_lengths, int num_dict,
-    const uint32_t& num_reads,  int bpb, const std::string& basedir,
+    const uint32_t& num_reads, int bpb, const std::string& basedir,
     const int& num_threads, const DictSizes& dict_sizes);
 
 /**
@@ -135,7 +146,7 @@ std::vector<BbHashDict> ConstructDictionary(
  */
 template <size_t BitsetSize>
 std::vector<std::vector<std::bitset<BitsetSize>>> GenerateMasks(
-  uint32_t max_read_len, uint8_t bpb);
+    uint32_t max_read_len, uint8_t bpb);
 
 /**
  * @brief Convert a character array into a bitset based on base values.

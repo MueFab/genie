@@ -9,7 +9,7 @@
  * @details The user-defined literals allow for easy and explicit
  * conversion of integer literals to specific fixed-width integer types
  * such as std::uint8_t, std::uint16_t, std::uint32_t, and std::uint64_t.
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

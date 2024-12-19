@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file qv_coding_config_1.cc
+ * @brief Implementation of the QualityValues1 class for QV coding in the Genie
+ * framework.
+ *
+ * This file contains the implementation of the `QualityValues1` class within
+ * the `paramqv1` namespace. The class handles the encoding, decoding, and
+ * management of quality values (QV) in sequencing data, supporting both preset
+ * and custom parameter configurations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

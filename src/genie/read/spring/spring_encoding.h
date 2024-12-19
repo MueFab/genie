@@ -60,49 +60,89 @@ struct EncoderGlobalB {
  * @brief Global configuration and file paths for the Spring encoder.
  */
 struct EncoderGlobal {
-  uint32_t num_reads{};              //!< Total number of reads.
-  uint32_t num_reads_s{};            //!< Number of singleton reads.
-  uint32_t num_reads_n{};            //!< Number of reads containing 'N' bases.
-  int num_dict_s = kNumDictEncoder;  //!< Number of hash dictionaries
-                                     //!< used for encoding.
+  /// Total number of reads.
+  uint32_t num_reads{};
 
-  int max_read_len{},
-      num_thr{};  //!< Maximum read length and number of threads.
+  /// Number of singleton reads.
+  uint32_t num_reads_s{};
+
+  /// Number of reads containing 'N' bases.
+  uint32_t num_reads_n{};
+
+  /// Number of hash dictionaries used for encoding.
+  int num_dict_s = kNumDictEncoder;
+
+  /// Maximum read length and number of threads.
+  int max_read_len{}, num_thr{};
 
   // File paths for various inputs and outputs
-  std::string basedir;             //!< Base directory for input/output files.
-  std::string infile;              //!< Input file for sequences.
-  std::string infile_flag;         //!< Input file for flags.
-  std::string infile_pos;          //!< Input file for positions.
-  std::string infile_seq;          //!< Input file for sequences.
-  std::string infile_rc;           //!< Input file for reverse complement flags.
-  std::string infile_read_length;  //!< Input file for read lengths.
-  std::string infile_n;            //!< Input file for reads with 'N'.
-  std::string outfile_unaligned;   //!< Output file for unaligned reads.
-  std::string outfile_seq;         //!< Output file for sequences.
-  std::string outfile_pos;         //!< Output file for positions.
-  std::string outfile_noise;       //!< Output file for noisy reads.
-  std::string outfile_noise_pos;   //!< Output file for noisy positions.
-  std::string infile_order;        //!< Input file for order of sequences.
-  std::string infile_order_n;      //!< Input file for order of 'N' sequences.
+  /// Base directory for input/output files.
+  std::string basedir;
 
-  char enc_noise[128][128]{};  //!< Encoded noise data.
+  /// Input file for sequences.
+  std::string infile;
 
-  /**
-   * @brief Default constructor to initialize all fields.
-   */
-  EncoderGlobal() = default;
+  /// Input file for flags.
+  std::string infile_flag;
+
+  /// Input file for positions.
+  std::string infile_pos;
+
+  /// Input file for sequences.
+  std::string infile_seq;
+
+  /// Input file for reverse complement flags.
+  std::string infile_rc;
+
+  /// Input file for read lengths.
+  std::string infile_read_length;
+
+  /// Input file for reads with 'N'.
+  std::string infile_n;
+
+  /// Output file for unaligned reads.
+  std::string outfile_unaligned;
+
+  /// Output file for sequences.
+  std::string outfile_seq;
+
+  /// Output file for positions.
+  std::string outfile_pos;
+
+  /// Output file for noisy reads.
+  std::string outfile_noise;
+
+  /// Output file for noisy positions.
+  std::string outfile_noise_pos;
+
+  /// Input file for order of sequences.
+  std::string infile_order;
+
+  /// Input file for order of 'N' sequences.
+  std::string infile_order_n;
+
+  /// Encoded noise data.
+  char enc_noise[128][128]{};
 };
 
 /**
  * @brief Structure representing a contig read.
  */
 struct ContigReads {
-  std::string read;      //!< Read sequence.
-  int64_t pos;           //!< Position of the read.
-  char rc;               //!< Reverse complement flag.
-  uint32_t order;        //!< Order of the read in the original data.
-  uint16_t read_length;  //!< Length of the read.
+  /// Read sequence.
+  std::string read;
+
+  /// Position of the read.
+  int64_t pos;
+
+  /// Reverse complement flag.
+  char rc;
+
+  /// Order of the read in the original data.
+  uint32_t order;
+
+  /// Length of the read.
+  uint16_t read_length;
 };
 
 /**

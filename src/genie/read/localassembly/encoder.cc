@@ -1,7 +1,14 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the LocalAssembly encoder for the Genie framework.
+ *
+ * This file contains the implementation of the `Encoder` class within the
+ * `localassembly` namespace. The encoder handles sequencing reads and generates
+ * Access Units (AUs) using local assembly for reference generation.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

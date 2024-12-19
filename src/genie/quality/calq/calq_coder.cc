@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file calq_coder.cc
+ *
+ * @brief Implements the core encoding and decoding functions for genomic
+ * quality values in Calq.
+ *
+ * This file is part of the Genie project, designed to compress and reconstruct
+ * quality values associated with genomic sequences. The `calq_coder.cpp` file
+ * provides essential functionality for both encoding and decoding workflows,
+ * supporting multiple quantization techniques.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -10,10 +19,10 @@
 #include <map>
 #include <utility>
 
-#include "genie/util/runtime_exception.h"
-#include "genie/util/lloyd_max_quantizer.h"
 #include "genie/quality/calq/quality_decoder.h"
 #include "genie/quality/calq/quality_encoder.h"
+#include "genie/util/lloyd_max_quantizer.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/util/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
@@ -24,8 +33,8 @@ namespace genie::quality::calq {
 
 void encode(const EncodingOptions& opt, const SideInformation& side_information,
             const EncodingBlock& input, DecodingBlock* output) {
-  util::ProbabilityDistribution pdf(opt.quality_value_min, opt
-  .quality_value_max);
+  util::ProbabilityDistribution pdf(opt.quality_value_min,
+                                    opt.quality_value_max);
 
   // Check quality value range
   for (const auto& sam_record : input.quality_values) {
@@ -49,7 +58,7 @@ void encode(const EncodingOptions& opt, const SideInformation& side_information,
       quantizers.insert(std::pair<int, util::Quantizer>(
           static_cast<const int&>(i - opt.quantization_min), quantizer));
     } else if (opt.quantizer_type == QuantizerType::LLOYD_MAX) {
-     util:: LloydMaxQuantizer quantizer(static_cast<size_t>(i));
+      util::LloydMaxQuantizer quantizer(static_cast<size_t>(i));
       quantizer.build(pdf);
       quantizers.insert(std::pair<int, util::Quantizer>(
           static_cast<const int&>(i - opt.quantization_min), quantizer));

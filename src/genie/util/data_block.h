@@ -37,8 +37,6 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
-struct BlockStepper;  //!< Forward declaration of the BlockStepper utility
-                      //!< class.
 
 /**
  * @brief Memory-efficient data structure similar to `std::vector` with support

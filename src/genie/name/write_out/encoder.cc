@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the Encoder class for writing out read names.
+ *
+ * This file contains the implementation of the `Encoder::Process` method,
+ * which processes a chunk of genomic records to generate access unit
+ * descriptors and performance statistics for the "Read Name" component. It
+ * makes use of utilities like the `StopWatch` for measuring performance and
+ * handles the encoding of read names into subsequences for downstream
+ * processing.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

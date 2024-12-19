@@ -1,8 +1,18 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file generate_read_streams.cc
+ * @brief Implementation of functions for generating read streams in the Spring
+ * module of Genie.
+ *
+ * This file contains the implementation of functions that generate encoded read
+ * streams from temporary directory files. It utilizes the `CompressionParams`
+ * structure and various encoders provided by the GENIE core. The resulting read
+ * streams are written in a format that can be used for efficient encoding and
+ * compression within the Spring module.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
+ *
  */
 
 #include "genie/read/spring/generate_read_streams.h"
@@ -21,7 +31,7 @@
 #include "genie/core/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/read_encoder.h"
-#include "genie/read/spring/dynamic_scheduler.h"
+#include "genie/util/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/log.h"
 
@@ -156,8 +166,8 @@ void process_block_task(size_t block_num,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         const std::string& temp_dir) {
   UTILS_LOG(util::Logger::Severity::INFO,
-          "-------- Processing block " + std::to_string(block_num) + "/" +
-              std::to_string(num_reads_per_block.size()));
+            "-------- Processing block " + std::to_string(block_num) + "/" +
+                std::to_string(num_reads_per_block.size()));
   params[block_num] = core::parameter::EncodingSet(
       core::parameter::ParameterSet::DatasetType::kNonAligned,
       core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
@@ -198,10 +208,10 @@ void parallel_process_blocks_dynamic(
     std::vector<core::stats::PerfStats>& stat_vec, const std::string& temp_dir,
     const int num_threads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(blocks, [&](const SchedulerInfo& info) {
+  scheduler.run(blocks, [&](const util::DynamicScheduler::SchedulerInfo& info) {
     process_block_task(info.task_id, params, data, num_reads_per_block,
                        write_raw, entropy_encoder, stat_vec, temp_dir);
   });
@@ -1000,14 +1010,16 @@ void parallel_process_blocks_dynamic(
     std::vector<core::stats::PerfStats>& stat_vec, const std::string& temp_dir,
     const int num_threads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(block_data.block_start.size(), [&](const SchedulerInfo& info) {
-    process_block_task(info.task_id, block_data, params, pest, data,
-                       num_reads_per_block, num_records_per_block, write_raw,
-                       entropy_encoder, stat_vec, temp_dir, info.thread_id);
-  });
+  scheduler.run(block_data.block_start.size(),
+                [&](const util::DynamicScheduler::SchedulerInfo& info) {
+                  process_block_task(
+                      info.task_id, block_data, params, pest, data,
+                      num_reads_per_block, num_records_per_block, write_raw,
+                      entropy_encoder, stat_vec, temp_dir, info.thread_id);
+                });
 }
 
 // -----------------------------------------------------------------------------

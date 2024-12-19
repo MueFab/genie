@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file token.cc
+ *
+ * @brief Implements the SingleToken class and related utilities for handling
+ * tokenized genomic data.
+ *
+ * This file is part of the Genie project, offering tools for efficient genome
+ * data compression and processing. The `token.cpp` file defines and manipulates
+ * tokens used to represent segmented parts of genomic data names, offering
+ * support for comparisons, patching, and token metadata.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

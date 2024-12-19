@@ -1,10 +1,19 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file reorder_compress_quality_id.cc
+ *
+ * @brief Implementation of functions for reordering and compressing quality
+ * scores and read IDs in paired-end reads.
+ *
+ * This file contains the implementation of functions defined in
+ * `reorder_compress_quality_id.h` for handling reordering and compression of
+ * quality scores and read identifiers for paired-end genomic reads using
+ * different compression methods. It includes functions to manage read ordering,
+ * block segmentation, and integration with entropy encoding modules.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
-
 
 // -----------------------------------------------------------------------------
 
@@ -21,7 +30,7 @@
 #include "genie/core/read_encoder.h"
 #include "genie/core/record/chunk.h"
 #include "genie/core/record/segment.h"
-#include "genie/read/spring/dynamic_scheduler.h"
+#include "genie/util/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/log.h"
 
@@ -254,14 +263,16 @@ void parallel_process_blocks_dynamic(
     std::vector<core::stats::PerfStats>& stat_vec, const bool write_raw,
     const std::string& id_desc_prefix, const int num_threads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(block_start.size(), [&](const SchedulerInfo& info) {
-    process_block_task(info.task_id, block_start, block_end, id_array,
-                       file_order_id, name_coder, entropy, params, stat_vec,
-                       write_raw, id_desc_prefix);
-  });
+  scheduler.run(block_start.size(),
+                [&](const util::DynamicScheduler::SchedulerInfo& info) {
+                  process_block_task(info.task_id, block_start, block_end,
+                                     id_array, file_order_id, name_coder,
+                                     entropy, params, stat_vec, write_raw,
+                                     id_desc_prefix);
+                });
 }
 
 // -----------------------------------------------------------------------------
@@ -299,7 +310,6 @@ void process_quality_block_task(
     std::vector<core::parameter::EncodingSet>& params,
     std::vector<core::stats::PerfStats>& stat_vec, bool write_raw,
     const std::string& quality_desc_prefix, size_t start_block_num) {
-
   UTILS_LOG(util::Logger::Severity::INFO,
             "---- Block " + std::to_string(block_num + 1) + "/" +
                 std::to_string(block_start.size()));
@@ -361,16 +371,17 @@ void parallel_process_quality_blocks_dynamic(
     const std::string& quality_desc_prefix, const size_t start_block_num,
     const size_t end_block_num, const int num_threads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(
-      end_block_num - start_block_num, [&](const SchedulerInfo& info) {
-        const size_t block_num = start_block_num + info.task_id;
-        process_quality_block_task(
-            block_num, block_start, block_end, quality_array, qv_coder, entropy,
-            params, stat_vec, write_raw, quality_desc_prefix, start_block_num);
-      });
+  scheduler.run(end_block_num - start_block_num,
+                [&](const util::DynamicScheduler::SchedulerInfo& info) {
+                  const size_t block_num = start_block_num + info.task_id;
+                  process_quality_block_task(
+                      block_num, block_start, block_end, quality_array,
+                      qv_coder, entropy, params, stat_vec, write_raw,
+                      quality_desc_prefix, start_block_num);
+                });
 }
 
 // -----------------------------------------------------------------------------
@@ -429,9 +440,9 @@ void ReorderCompressQualityPe(std::string file_quality[2],
 }
 
 // Task to process a single block
-void process_block_task(size_t block_num,
-                        uint64_t num_reads_per_block, uint64_t num_reads_bin,
-                        uint64_t start_read_bin, const std::string& mode,
+void process_block_task(size_t block_num, uint64_t num_reads_per_block,
+                        uint64_t num_reads_bin, uint64_t start_read_bin,
+                        const std::string& mode,
                         std::vector<std::string>& str_array,
                         core::ReadEncoder::name_selector* name_coder,
                         core::ReadEncoder::entropy_selector* entropy,
@@ -439,8 +450,8 @@ void process_block_task(size_t block_num,
                         std::vector<core::stats::PerfStats>& stat_vec,
                         bool write_raw, const std::string& id_desc_prefix,
                         const std::string& quality_desc_prefix,
-                        core::ReadEncoder::qv_selector* qv_coder, uint32_t
-                        num_reads) {
+                        core::ReadEncoder::qv_selector* qv_coder,
+                        uint32_t num_reads) {
   uint64_t block_num_offset = start_read_bin / num_reads_per_block;
   uint64_t start_read_num = block_num * num_reads_per_block;
   uint64_t end_read_num = (block_num + 1) * num_reads_per_block;
@@ -557,10 +568,10 @@ void parallel_process_blocks_dynamic(
     core::ReadEncoder::qv_selector* qv_coder, const int num_threads,
     const uint32_t num_reads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(blocks, [&](const SchedulerInfo& info) {
+  scheduler.run(blocks, [&](const util::DynamicScheduler::SchedulerInfo& info) {
     process_block_task(info.task_id, num_reads_per_block, num_reads_bin,
                        start_read_bin, mode, str_array, name_coder, entropy,
                        params, stat_vec, write_raw, id_desc_prefix,
@@ -569,19 +580,16 @@ void parallel_process_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
-void ReorderCompress(const std::string& file_name, const std::string& temp_dir,
-                     const uint32_t& num_reads_per_file, const int& num_thr,
-                     const uint32_t& num_reads_per_block,
-                     std::vector<std::string>& str_array,
-                     const uint32_t& str_array_size,
-                     const std::vector<uint32_t>& order_array,
-                     const std::string& mode,
-                     core::ReadEncoder::qv_selector* qv_coder,
-                     core::ReadEncoder::name_selector* name_coder,
-                     core::ReadEncoder::entropy_selector* entropy,
-                     std::vector<core::parameter::EncodingSet>& params,
-                     core::stats::PerfStats& stats, bool write_raw, uint32_t
-                     num_reads) {
+void ReorderCompress(
+    const std::string& file_name, const std::string& temp_dir,
+    const uint32_t& num_reads_per_file, const int& num_thr,
+    const uint32_t& num_reads_per_block, std::vector<std::string>& str_array,
+    const uint32_t& str_array_size, const std::vector<uint32_t>& order_array,
+    const std::string& mode, core::ReadEncoder::qv_selector* qv_coder,
+    core::ReadEncoder::name_selector* name_coder,
+    core::ReadEncoder::entropy_selector* entropy,
+    std::vector<core::parameter::EncodingSet>& params,
+    core::stats::PerfStats& stats, bool write_raw, uint32_t num_reads) {
   const std::string id_desc_prefix = temp_dir + "/id_streams.";
   const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
   for (uint32_t index = 0; index <= num_reads_per_file / str_array_size;

@@ -1,7 +1,18 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file genotyper.cc
+ *
+ * @brief Implements the Genotyper class for calculating genotype likelihoods
+ * and confidence scores.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression and analysis. The `Genotyper` class is responsible for
+ * computing allele likelihoods, genotype likelihoods, and entropy based on
+ * input sequence and quality pileups. It provides the foundation for
+ * determining genotypes and quantizer indices in genomic data processing
+ * workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,8 +34,8 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/util/runtime_exception.h"
 #include "genie/util/log.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 

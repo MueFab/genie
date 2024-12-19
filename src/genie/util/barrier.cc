@@ -11,7 +11,7 @@
  * until all threads have reached a certain point in their execution. It uses a
  * mutex and a condition variable to achieve this synchronization.
  *
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

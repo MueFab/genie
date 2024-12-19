@@ -37,7 +37,8 @@ namespace genie::read::localassembly {
  * correctly encode the record data in the GENIE framework.
  */
 class Encoder final : public basecoder::EncoderStub {
-  bool debug_;  //!< @brief Flag for enabling debug output during encoding.
+  /// Flag for enabling debug output during encoding.
+  bool debug_;
 
   /**
    * @brief Internal encoding state (not exposed publicly).
@@ -50,7 +51,9 @@ class Encoder final : public basecoder::EncoderStub {
      */
     explicit LaEncodingState(const core::record::Chunk& data,
                              uint32_t cr_buf_max_size);
-    LocalReference ref_coder;  //!< @brief Local assembly handler.
+
+    /// Local assembly handler.
+    LocalReference ref_coder;
   };
 
   /**

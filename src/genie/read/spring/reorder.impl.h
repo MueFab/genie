@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file reorder.impl.h
+ *
+ * @brief Implementation of the spring reorder functionality
+ * for the Genie project.
+ *
+ * This file contains the implementation of various functions and templates
+ * used for reordering and compressing DNA read sequences in the Genie project.
+ * It includes functions for reading DNA files, updating reference counts,
+ * searching for matches, and writing reordered sequences to files.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -619,7 +628,7 @@ void parallel_process_reads(
     std::vector<std::vector<std::bitset<BitsetSize>>>& mask,
     std::vector<std::mutex>& dict_lock, std::vector<std::mutex>& read_lock) {
   // Create dynamic scheduler
-  DynamicScheduler scheduler(rg.num_thr);
+  util::DynamicScheduler scheduler(rg.num_thr);
 
   std::mutex mutex;
   uint32_t first_read = 0;
@@ -628,11 +637,13 @@ void parallel_process_reads(
   float last_progress = 0.0;
 
   // Dispatch tasks dynamically
-  scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
-    process_read_task(info.task_id, rg, read, read_lengths, remaining_reads,
-                      unmatched, dict, mask1, mask, dict_lock, read_lock, mutex,
-                      first_read, barrier, num_reads_remaining, last_progress);
-  });
+  scheduler.run(
+      rg.num_thr, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+        process_read_task(info.task_id, rg, read, read_lengths, remaining_reads,
+                          unmatched, dict, mask1, mask, dict_lock, read_lock,
+                          mutex, first_read, barrier, num_reads_remaining,
+                          last_progress);
+      });
 }
 
 // -----------------------------------------------------------------------------
@@ -746,12 +757,13 @@ void process_all_tasks(const ReorderGlobal<BitsetSize>& rg,
                        const std::vector<uint16_t>& read_lengths,
                        std::vector<uint32_t>& num_reads_s_thr) {
   // Create a DynamicScheduler instance
-  DynamicScheduler scheduler(rg.num_thr);
+  util::DynamicScheduler scheduler(rg.num_thr);
 
   // Run the scheduler to process tasks dynamically
-  scheduler.run(rg.num_thr, [&](const SchedulerInfo& info) {
-    process_task(info.task_id, rg, read, read_lengths, num_reads_s_thr);
-  });
+  scheduler.run(
+      rg.num_thr, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+        process_task(info.task_id, rg, read, read_lengths, num_reads_s_thr);
+      });
 }
 
 // -----------------------------------------------------------------------------

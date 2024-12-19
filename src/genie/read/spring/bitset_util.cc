@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file bitset_util.cc
+ *
+ * @brief Implementation of bitset utilities and BbHashDict operations for
+ * Spring framework.
+ *
+ * This file contains the implementation of utility functions related to bitset
+ * operations and the BbHashDict class in the Spring framework. These utilities
+ * support key functionalities such as position finding, removal of entries, and
+ * bin management for dictionary-based data structures used in sequencing
+ * workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

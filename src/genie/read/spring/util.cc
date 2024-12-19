@@ -1,7 +1,14 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file util.cc
+ * @brief Implementation of utility functions for the Spring module.
+ *
+ * This file contains the implementation of various utility functions used in
+ * the Spring module for DNA sequence manipulation, including reading vectors
+ * from files, generating reverse complements, creating random DNA strings, and
+ * encoding/decoding DNA sequences in binary format.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

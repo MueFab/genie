@@ -23,6 +23,8 @@
 #include <string>
 #include <utility>
 
+#include "genie/util/stop_watch.h"
+
 // -----------------------------------------------------------------------------
 
 namespace genie::read::basecoder {

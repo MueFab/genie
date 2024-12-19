@@ -51,23 +51,29 @@ enum struct FilterType;
  * local smoothing using various filter types.
  */
 class Haplotyper {
-  util::FilterBuffer
-      buffer_;  //!< @brief Filter buffer for smoothing activity scores.
-  SoftClipSpreader spreader_;  //!< @brief Manages the propagation of
-                               //!< high-quality soft clips.
-  Genotyper
-      genotyper_;  //!< @brief Computes genotype likelihoods for given pileups.
+  /// Filter buffer for smoothing activity scores.
+  util::FilterBuffer buffer_;
 
-  size_t nr_quantizers_;  //!< @brief Number of quantizers available for quality
-                          //!< value encoding.
-  size_t polyploidy_;     //!< @brief Ploidy level of the organism (e.g., 2 for
-                          //!< diploid).
-  const bool debug_;      //!< @brief Flag for enabling debug output.
+  /// Manages the propagation of high-quality soft clips.
+  SoftClipSpreader spreader_;
 
-  const bool squashed_activity_;  //!< @brief Indicates if activity values are
-                                  //!< squashed between 0.0 and 1.0.
-  double local_distortion_;  //!< @brief Measures the local distortion based on
-                             //!< genotype likelihoods.
+  /// Computes genotype likelihoods for given pileups.
+  Genotyper genotyper_;
+
+  /// Number of quantizers available for quality value encoding.
+  size_t nr_quantizers_;
+
+  /// Ploidy level of the organism (e.g., 2 for diploid).
+  size_t polyploidy_;
+
+  /// Flag for enabling debug output.
+  const bool debug_;
+
+  /// Indicates if activity values are squashed between 0.0 and 1.0.
+  const bool squashed_activity_;
+
+  /// Measures the local distortion based on genotype likelihoods.
+  double local_distortion_;
 
   /**
    * @brief Computes the index of the quantizer based on the activity score.

@@ -1,7 +1,21 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder_source.cc
+ * @brief Implementation of the SpringSource class for managing encoded read
+ * sequences and access units.
+ *
+ * This file contains the implementation of the SpringSource class, which
+ * handles the generation and encoding of read sequences into access units for
+ * the Spring module. It includes functions for reading preprocessed files,
+ * organizing them into access units, and managing performance statistics.
+ *
+ * @details The SpringSource class reads temporary files generated during
+ * preprocessing, organizes them into access units, and handles the encoding of
+ * read sequences according to the provided parameters. It ensures that the
+ * encoding process follows the constraints defined in the compression
+ * parameters and tracks performance statistics.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

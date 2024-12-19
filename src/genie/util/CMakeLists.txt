@@ -16,6 +16,7 @@ set(source_files
         log.h
         log.cc
         circular_buffer.impl.h
+        dynamic_scheduler.cc
 )
 
 add_library(genie-util ${source_files})

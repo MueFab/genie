@@ -66,8 +66,8 @@ class Decoder final : public basecoder::DecoderStub {
    * @brief Specialized state structure for local assembly decoding.
    */
   struct LaDecodingState final : DecodingState {
-    LocalReference
-        ref_encoder;  //!< @brief Handles local reference sequence management.
+    /// Handles local reference sequence management.
+    LocalReference ref_encoder;
 
     /**
      * @brief Constructs the decoding state with the provided access unit.
@@ -88,7 +88,11 @@ class Decoder final : public basecoder::DecoderStub {
   ~Decoder() override = default;
 };
 
+// -----------------------------------------------------------------------------
+
 }  // namespace genie::read::localassembly
+
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_READ_LOCALASSEMBLY_DECODER_H_
 

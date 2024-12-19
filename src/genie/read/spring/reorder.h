@@ -29,9 +29,6 @@
 
 // -----------------------------------------------------------------------------
 
-namespace std {
-class mutex;
-}
 namespace genie::read::spring {
 
 /**
@@ -46,30 +43,56 @@ namespace genie::read::spring {
  */
 template <size_t BitsetSize>
 struct ReorderGlobal {
-  uint32_t num_reads{};           //!< Number of reads.
-  uint32_t num_reads_array[2]{};  //!< Number of reads per file.
+  /// Number of reads.
+  uint32_t num_reads{};
 
-  int max_shift{}, num_thr{},
-      max_read_len{};  //!< Maximum shift, number of
-                       //!< threads, and maximum read length.
-  const int num_dict =
-      kNumDictReorder;  //!< Number of dictionaries for reordering.
+  /// Number of reads per file.
+  uint32_t num_reads_array[2]{};
 
-  std::string basedir;        //!< Base directory for input/output files.
-  std::string infile[2];      //!< Input files for paired-end reads.
-  std::string outfile;        //!< Output file for reordered reads.
-  std::string outfile_rc;     //!< Output file for read orientations.
-  std::string outfile_flag;   //!< Output file for flags.
-  std::string outfile_pos;    //!< Output file for positions.
-  std::string outfile_order;  //!< Output file for read order.
-  std::string outfile_read_length;  //!< Output file for read lengths.
+  /// Maximum shift
+  int max_shift{};
 
-  bool paired_end{};  //!< Indicates if the reads are paired-end.
+  /// Number of threads
+  int num_thr{};
 
-  std::vector<std::vector<std::bitset<BitsetSize>>>
-      base_mask;  //!< Bitset masks for base representation.
-  std::bitset<BitsetSize>
-      mask64;  //!< Bitset mask with 64 bits set to 1.
+  /// Maximum read length.
+  int max_read_len{};
+
+  /// Number of dictionaries for reordering.
+  const int num_dict = kNumDictReorder;
+
+  /// Base directory for input/output files.
+  std::string basedir;
+
+  /// Input files for paired-end reads.
+  std::string infile[2];
+
+  /// Output file for reordered reads.
+  std::string outfile;
+
+  /// Output file for read orientations.
+  std::string outfile_rc;
+
+  /// Output file for flags.
+  std::string outfile_flag;
+
+  /// Output file for positions.
+  std::string outfile_pos;
+
+  /// Output file for read order.
+  std::string outfile_order;
+
+  /// Output file for read lengths.
+  std::string outfile_read_length;
+
+  /// Indicates if the reads are paired-end.
+  bool paired_end{};
+
+  /// Bitset masks for base representation.
+  std::vector<std::vector<std::bitset<BitsetSize>>> base_mask;
+
+  /// Bitset mask with 64 bits set to 1.
+  std::bitset<BitsetSize> mask64;
 
   /**
    * @brief Constructor for the reorder_global structure.

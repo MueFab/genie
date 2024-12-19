@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implementation of the reference-based decoder for the Genie framework.
+ *
+ * This file contains the implementation of the Decoder class in the `refcoder`
+ * namespace. The Decoder is responsible for extracting reference substrings
+ * from sequencing data during decoding, supporting both single-segment and
+ * multi-segment reads.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

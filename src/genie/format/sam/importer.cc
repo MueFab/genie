@@ -1,6 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file importer.cc
+ *
+ * @brief Implements SAM to MPEG-G format importer for genomic data processing.
+ *
+ * This file is part of the Genie project and provides the implementation of the
+ * `Importer` class, which handles the conversion of SAM and FASTQ files into
+ * the MPEG-G record (MGREC) format. The file includes multiple phases of
+ * processing, such as reading, cleaning, splitting, and merging genomic data,
+ * with support for references and quality validation.
+ *
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
@@ -35,7 +44,7 @@ constexpr auto kLogModuleName = "TranscoderSam";
 namespace genie::format::sam {
 
 RefInfo::RefInfo(const std::string& fasta_name)
-    : refMgr(std::make_unique<core::ReferenceManager>(4)), valid(false) {
+    : ref_mgr_(std::make_unique<core::ReferenceManager>(4)), valid_(false) {
   if (!std::filesystem::exists(fasta_name)) {
     return;
   }
@@ -60,33 +69,33 @@ RefInfo::RefInfo(const std::string& fasta_name)
     fasta::FastaReader::hash(faifile, fasta_in, sha_out);
   }
 
-  fastaFile = std::make_unique<std::ifstream>(fasta_name);
-  UTILS_DIE_IF(!fastaFile, "Cannot open file to read: " + fasta_name);
-  faiFile = std::make_unique<std::ifstream>(fai_name);
-  UTILS_DIE_IF(!faiFile, "Cannot open file to read: " + fai_name);
-  shaFile = std::make_unique<std::ifstream>(sha_name);
-  UTILS_DIE_IF(!shaFile, "Cannot open file to read: " + sha_name);
+  fasta_file_ = std::make_unique<std::ifstream>(fasta_name);
+  UTILS_DIE_IF(!fasta_file_, "Cannot open file to read: " + fasta_name);
+  fai_file_ = std::make_unique<std::ifstream>(fai_name);
+  UTILS_DIE_IF(!fai_file_, "Cannot open file to read: " + fai_name);
+  sha_file_ = std::make_unique<std::ifstream>(sha_name);
+  UTILS_DIE_IF(!sha_file_, "Cannot open file to read: " + sha_name);
 
-  fastaMgr = std::make_unique<fasta::Manager>(*fastaFile, *faiFile, *shaFile,
-                                              refMgr.get(), fasta_name);
-  valid = true;
+  fasta_mgr_ = std::make_unique<fasta::Manager>(
+      *fasta_file_, *fai_file_, *sha_file_, ref_mgr_.get(), fasta_name);
+  valid_ = true;
 }
 
 // -----------------------------------------------------------------------------
-bool RefInfo::IsValid() const { return valid; }
+bool RefInfo::IsValid() const { return valid_; }
 
 // -----------------------------------------------------------------------------
-core::ReferenceManager* RefInfo::GetMgr() const { return refMgr.get(); }
+core::ReferenceManager* RefInfo::GetMgr() const { return ref_mgr_.get(); }
 
 // -----------------------------------------------------------------------------
 Importer::Importer(const size_t block_size, std::string input, std::string ref)
-    : blockSize(block_size),
-      input_sam_file(std::move(input)),
-      input_ref_file(std::move(ref)),
-      nref(0),
-      phase1_complete(false),
-      reader_prio(CmpReaders()),
-      refinf(input_ref_file) {}
+    : block_size_(block_size),
+      input_sam_file_(std::move(input)),
+      input_ref_file_(std::move(ref)),
+      nref_(0),
+      phase1_complete_(false),
+      reader_prio_(CmpReaders()),
+      refinf_(input_ref_file_) {}
 
 // -----------------------------------------------------------------------------
 bool CmpReaders::operator()(const sam_to_mgrec::SubfileReader* a,
@@ -607,20 +616,20 @@ std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(
     }
   }
 
-  refs = sam_reader.GetRefs();
-  return refs;
+  refs_ = sam_reader.GetRefs();
+  return refs_;
 }
 
 void Importer::setup_merge(const int num_chunks) {
   UTILS_LOG(util::Logger::Severity::INFO,
             "Merging " + std::to_string(num_chunks) + " chunks...");
 
-  if (!input_ref_file.empty()) {
-    for (const auto& [fst, snd] : refs) {
+  if (!input_ref_file_.empty()) {
+    for (const auto& [fst, snd] : refs_) {
       bool found = false;
-      for (size_t j = 0; j < refinf.GetMgr()->GetSequences().size(); ++j) {
-        if (fst == refinf.GetMgr()->GetSequences().at(j)) {
-          sam_hdr_to_fasta_lut.push_back(j);
+      for (size_t j = 0; j < refinf_.GetMgr()->GetSequences().size(); ++j) {
+        if (fst == refinf_.GetMgr()->GetSequences().at(j)) {
+          sam_hdr_to_fasta_lut_.push_back(j);
           found = true;
           break;
         }
@@ -628,8 +637,8 @@ void Importer::setup_merge(const int num_chunks) {
       UTILS_DIE_IF(!found, "Did not find ref " + fst);
     }
   } else {
-    for (size_t i = 0; i < refs.size(); ++i) {
-      sam_hdr_to_fasta_lut.push_back(i);
+    for (size_t i = 0; i < refs_.size(); ++i) {
+      sam_hdr_to_fasta_lut_.push_back(i);
     }
   }
 
@@ -637,32 +646,32 @@ void Importer::setup_merge(const int num_chunks) {
   // std::ostream* out_stream = &std::cout;
   // genie::util::BitWriter total_output_writer(*out_stream);
 
-  readers.reserve(num_chunks);
+  readers_.reserve(num_chunks);
 
   const std::string tmp_dir_path("/tmp");
   for (int i = 0; i < num_chunks; ++i) {
-    readers.emplace_back(std::make_unique<sam_to_mgrec::SubfileReader>(
+    readers_.emplace_back(std::make_unique<sam_to_mgrec::SubfileReader>(
         tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
-    if (!readers.back()->GetRecord()) {
-      auto path = readers.back()->GetPath();
+    if (!readers_.back()->GetRecord()) {
+      auto path = readers_.back()->GetPath();
       UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
-      readers.pop_back();
+      readers_.pop_back();
       std::remove(path.c_str());
     } else {
-      reader_prio.push(readers.back().get());
+      reader_prio_.push(readers_.back().get());
     }
   }
 }
 
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
-  if (!phase1_complete) {
+  if (!phase1_complete_) {
     Config options;
-    options.input_file_ = input_sam_file;
-    options.fasta_file_path_ = input_ref_file;
+    options.input_file_ = input_sam_file_;
+    options.fasta_file_path_ = input_ref_file_;
     options.clean_ = true;
-    sam_to_mgrec_phase1(options, nref);
-    phase1_complete = true;
-    setup_merge(nref);  // beginning of phase 2
+    sam_to_mgrec_phase1(options, nref_);
+    phase1_complete_ = true;
+    setup_merge(nref_);  // beginning of phase 2
   }
   // rest of phase 2
   util::Watch watch;
@@ -673,47 +682,47 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
   std::optional<size_t> current_ref_id;
   bool eof = false;
   {
-    if (!reader_prio.empty()) {
+    if (!reader_prio_.empty()) {
       for (int i = 0; i < 100000; ++i) {
-        auto* reader = reader_prio.top();
+        auto* reader = reader_prio_.top();
         if (reader->GetRecord()->GetClassId() !=
             core::record::ClassType::kClassU) {
           if (current_ref_id.has_value()) {
             if (current_ref_id.value() !=
-                sam_hdr_to_fasta_lut[reader->GetRecord()
-                                         ->GetAlignmentSharedData()
-                                         .GetSeqId()]) {
+                sam_hdr_to_fasta_lut_[reader->GetRecord()
+                                          ->GetAlignmentSharedData()
+                                          .GetSeqId()]) {
               break;
             }
           } else {
-            current_ref_id = sam_hdr_to_fasta_lut
+            current_ref_id = sam_hdr_to_fasta_lut_
                 [reader->GetRecord()->GetAlignmentSharedData().GetSeqId()];
           }
         }
-        reader_prio.pop();
+        reader_prio_.pop();
         auto rec = reader->MoveRecord();
         rec.PatchRefId(
-            sam_hdr_to_fasta_lut[rec.GetAlignmentSharedData().GetSeqId()]);
+            sam_hdr_to_fasta_lut_[rec.GetAlignmentSharedData().GetSeqId()]);
 
-        if (fix_ecigar(rec, refs, refinf)) {
+        if (fix_ecigar(rec, refs_, refinf_)) {
           chunk.GetData().push_back(std::move(rec));
         } else {
-          removed_unsupported_base++;
+          removed_unsupported_base_++;
         }
 
         if (reader->GetRecord()) {
-          reader_prio.push(reader);
+          reader_prio_.push(reader);
         } else {
           auto path = reader->GetPath();
           UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
-          for (auto it = readers.begin(); it != readers.end(); ++it) {
+          for (auto it = readers_.begin(); it != readers_.end(); ++it) {
             if (it->get() == reader) {
-              readers.erase(it);
+              readers_.erase(it);
               break;
             }
           }
           std::remove(path.c_str());
-          if (reader_prio.empty()) {
+          if (reader_prio_.empty()) {
             eof = true;
             break;
           }
@@ -734,110 +743,6 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
   chunk.GetStats().AddDouble("time-sam-import", watch.Check());
   classifier->Add(std::move(chunk));
   return !eof;
-}
-
-void sam_to_mgrec_phase2(
-    Config& options, int num_chunks,
-    const std::vector<std::pair<std::string, size_t>>& refs) {
-  UTILS_LOG(util::Logger::Severity::INFO,
-            "Merging " + std::to_string(num_chunks) + " chunks...");
-  RefInfo refinf(options.fasta_file_path_);
-  size_t removed_unsupported_base = 0;
-
-  std::vector<size_t> sam_hdr_to_fasta_lut;
-  if (!options.no_ref_) {
-    for (const auto& [fst, snd] : refs) {
-      bool found = false;
-      for (size_t j = 0; j < refinf.GetMgr()->GetSequences().size(); ++j) {
-        if (fst == refinf.GetMgr()->GetSequences().at(j)) {
-          sam_hdr_to_fasta_lut.push_back(j);
-          found = true;
-          break;
-        }
-      }
-      UTILS_DIE_IF(!found, "Did not find ref " + fst);
-    }
-  } else {
-    for (size_t i = 0; i < refs.size(); ++i) {
-      sam_hdr_to_fasta_lut.push_back(i);
-    }
-  }
-
-  std::unique_ptr<std::ostream> total_output;
-  std::ostream* out_stream = &std::cout;
-  if (options.output_file_.substr(0, 2) != "-.") {
-    total_output = std::make_unique<std::ofstream>(
-        options.output_file_, std::ios::binary | std::ios::trunc);
-    out_stream = total_output.get();
-  }
-  util::BitWriter total_output_writer(*out_stream);
-
-  std::vector<std::unique_ptr<sam_to_mgrec::SubfileReader>> readers;
-  readers.reserve(num_chunks);
-  auto cmp = [&](const sam_to_mgrec::SubfileReader* a,
-                 const sam_to_mgrec::SubfileReader* b) {
-    return !sam_to_mgrec::compare(a->GetRecord().value(),
-                                  b->GetRecord().value());
-  };
-  std::priority_queue<sam_to_mgrec::SubfileReader*,
-                      std::vector<sam_to_mgrec::SubfileReader*>, decltype(cmp)>
-      heap(cmp);
-  for (int i = 0; i < num_chunks; ++i) {
-    readers.emplace_back(std::make_unique<sam_to_mgrec::SubfileReader>(
-        options.tmp_dir_path_ + "/" + std::to_string(i) + PHASE1_EXT));
-    if (!readers.back()->GetRecord()) {
-      auto path = readers.back()->GetPath();
-      UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
-      readers.pop_back();
-      std::remove(path.c_str());
-    } else {
-      heap.push(readers.back().get());
-    }
-  }
-
-  if (!heap.empty()) {
-    while (true) {
-      auto* reader = heap.top();
-      heap.pop();
-      auto rec = reader->MoveRecord();
-      rec.PatchRefId(
-          sam_hdr_to_fasta_lut[rec.GetAlignmentSharedData().GetSeqId()]);
-
-      if (fix_ecigar(rec, refs, refinf)) {
-        rec.Write(total_output_writer);
-      } else {
-        removed_unsupported_base++;
-      }
-
-      if (reader->GetRecord()) {
-        heap.push(reader);
-      } else {
-        auto path = reader->GetPath();
-        UTILS_LOG(util::Logger::Severity::INFO, path + " depleted");
-        for (auto it = readers.begin(); it != readers.end(); ++it) {
-          if (it->get() == reader) {
-            readers.erase(it);
-            break;
-          }
-        }
-        std::remove(path.c_str());
-
-        if (heap.empty()) {
-          break;
-        }
-      }
-    }
-  }
-
-  total_output_writer.FlushBits();
-  out_stream->flush();
-
-  UTILS_LOG(util::Logger::Severity::INFO, "Finished merging!");
-  if (removed_unsupported_base > 0) {
-    UTILS_LOG(util::Logger::Severity::WARNING,
-              std::to_string(removed_unsupported_base) +
-                  " records removed because of unsupported bases.");
-  }
 }
 
 // -----------------------------------------------------------------------------

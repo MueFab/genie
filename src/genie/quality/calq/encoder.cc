@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implements the Encoder class for encoding quality values in genomic
+ * data.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression. The `Encoder` class plays a key role in encoding both
+ * aligned and unaligned genomic sequences' quality values, leveraging advanced
+ * quantization and encoding techniques to compress the data while maintaining
+ * its integrity. It integrates seamlessly with Calq compression algorithms.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

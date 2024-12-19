@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file codebook.cc
+ *
+ * @brief Implementation of the Codebook class for quality value (QV)
+ * representation in the Genie framework.
+ *
+ * This file contains the implementation of the `Codebook` class within the
+ * `paramqv1` namespace. The class provides functionality for managing quality
+ * value reconstruction entries and their serialization.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

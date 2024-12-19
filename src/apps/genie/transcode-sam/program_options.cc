@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
@@ -45,9 +45,6 @@ genie::format::sam::Config ProgramOptions::ToConfig() const {
   config.tmp_dir_path_ = tmp_dir_path_;
   config.fasta_file_path_ = fasta_file_path_;
   config.input_file_ = input_file_;
-  config.output_file_ = output_file_;
-  config.force_overwrite_ = force_overwrite_;
-  config.no_ref_ = no_ref_;
   config.clean_ = clean_;
   config.num_threads_ = num_threads_;
   return config;

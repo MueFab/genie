@@ -52,17 +52,20 @@ namespace genie::quality::calq {
  * accurate and consistent encoding of genomic data.
  */
 class RecordPileup {
-  std::vector<EncodingRecord> records_;  //!< @brief List of genomic records.
-  std::vector<std::vector<std::string>>
-      preprocessed_qvalues_;  //!< @brief Pre-processed quality values for each
-                              //!< record.
-  std::vector<std::vector<std::string>>
-      preprocessed_sequences_;  //!< @brief Pre-processed sequences for each
-                                //!< record.
-  uint64_t
-      min_pos_;  //!< @brief Minimum genomic position of records in the pileup.
-  uint64_t
-      max_pos_;  //!< @brief Maximum genomic position of records in the pileup.
+  /// List of genomic records.
+  std::vector<EncodingRecord> records_;
+
+  /// Pre-processed quality values for each record.
+  std::vector<std::vector<std::string>> preprocessed_qvalues_;
+
+  /// Pre-processed sequences for each record.
+  std::vector<std::vector<std::string>> preprocessed_sequences_;
+
+  /// Minimum genomic position of records in the pileup.
+  uint64_t min_pos_;
+
+  /// Maximum genomic position of records in the pileup.
+  uint64_t max_pos_;
 
  public:
   /**

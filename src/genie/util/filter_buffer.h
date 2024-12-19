@@ -102,8 +102,8 @@ class GaussKernel {
  * Size required.
  */
 class RectangleKernel {
-  const double
-      size_;  //!< @brief The Size parameter of the rectangular distribution.
+  /// The Size parameter of the rectangular distribution.
+  const double size_;
 
  public:
   /**

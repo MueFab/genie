@@ -84,7 +84,8 @@ T BitReader::ReadAlignedInt() {
   // Extend sign bit if necessary for signed types
   if constexpr (std::is_signed_v<T>) {
     if (NumBytes < sizeof(T) &&
-        (reinterpret_cast<unsigned char*>(&result)[NumBytes - 1] & 0x80)) {
+        (reinterpret_cast<unsigned char*>(&result)[NumBytes - 1] &
+         0x80)) {  // NOLINT
       for (size_t i = NumBytes; i < sizeof(T); ++i) {
         reinterpret_cast<unsigned char*>(&result)[i] =
             static_cast<unsigned char>(0xFF);
