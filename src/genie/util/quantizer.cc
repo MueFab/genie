@@ -16,7 +16,7 @@
  * to reconstruction values, facilitating compact storage and quick lookup
  * during the quantization process.
  *
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

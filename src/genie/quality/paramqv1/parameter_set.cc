@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file parameter_set.cc
+ *
+ * @brief Implementation of the ParameterSet class for quality value (QV)
+ * management in Genie framework.
+ *
+ * This file contains the implementation of the `ParameterSet` class within the
+ * `paramqv1` namespace. The class provides functionality for managing and
+ * serializing parameter sets, including QV codebooks.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

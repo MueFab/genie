@@ -13,7 +13,7 @@
  * initializing the quantizer, computing step sizes, and filling quantization
  * tables.
  *
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

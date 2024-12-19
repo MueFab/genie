@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the Quality Value Writeout encoder for the Genie
+ * framework.
+ *
+ * This file contains the implementation of the `Encoder` class within the
+ * `qvwriteout` namespace. The encoder processes sequencing quality values (QV)
+ * and writes them into Access Units (AUs) with customizable quality value
+ * configurations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

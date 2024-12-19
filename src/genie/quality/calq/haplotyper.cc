@@ -1,7 +1,18 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file haplotyper.cc
+ *
+ * @brief Implements the Haplotyper class for estimating haplotypes and activity
+ * scores in genomic data.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression and processing. The `Haplotyper` class is responsible for
+ * calculating haplotype-related activities, activity scores, and quantizer
+ * indices for genomic data. It incorporates advanced filtering techniques,
+ * activity calculation, and likelihood-based estimations to enable accurate
+ * analysis of polyploid and heterozygous sequences.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,8 +29,8 @@
 #include <vector>
 
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/util/runtime_exception.h"
 #include "genie/util/log.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 

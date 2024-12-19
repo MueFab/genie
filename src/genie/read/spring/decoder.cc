@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implementation of the Spring Decoder module for processing sequencing
+ * data.
+ *
+ * This file contains the implementation of the decoder for the Spring
+ * framework, including functions for reading, decoding, and managing paired and
+ * unpaired sequencing records. The module handles complex pairing logic,
+ * mismatch resolution, and temporary file management for efficient processing.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

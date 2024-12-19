@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file call_template_functions.cc
+ *
+ * @brief Template function invocations for Spring's reordering and encoding
+ * workflows.
+ *
+ * This file contains implementations for invoking specialized template
+ * functions for the reordering and encoding steps in the Spring framework,
+ * based on the maximum read length provided in the compression parameters. The
+ * functions leverage template specialization to optimize performance for
+ * specific bitset sizes.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

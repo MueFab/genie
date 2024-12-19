@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implements the Decoder class for reconstructing quality values from
+ * compressed genomic data.
+ *
+ * This file is part of the Genie project, which specializes in efficient
+ * genomic data compression and decompression workflows. The `Decoder` class is
+ * responsible for reversing the compression process by reconstructing quality
+ * values from encoded representations, supporting both aligned and unaligned
+ * genomic data.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

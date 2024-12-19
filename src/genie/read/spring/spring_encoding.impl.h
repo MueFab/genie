@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file spring_encoding.impl.h
+ *
+ * This file contains the implementation of the Spring encoding algorithm
+ * for DNA sequences, including functions for encoding and decoding DNA
+ * sequences, handling singletons, and managing bitset operations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -12,9 +17,9 @@
 
 #include <iostream>
 #include <list>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
 
 #include "genie/util/runtime_exception.h"
 
@@ -77,10 +82,10 @@ inline void display_progress(const uint64_t additional_file_size,
   static std::mutex display_mutex;
   std::lock_guard lock(display_mutex);
   current_file_size += additional_file_size;
-  float progress = static_cast<float>(current_file_size) /
+  const float progress = static_cast<float>(current_file_size) /
                    static_cast<float>(total_file_size);
   while (progress - last_progress > 0.01) {
-    constexpr auto kLogModuleName = "Spring";
+    constexpr auto kLogModuleName = "Spring";  // NOLINT
     UTILS_LOG(util::Logger::Severity::INFO,
               "-------- Progress: " +
                   std::to_string(static_cast<int>(last_progress * 100)) +
@@ -102,9 +107,9 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                   std::vector<uint8_t>& remaining_reads,
                   std::vector<std::mutex>& read_lock,
                   std::vector<std::mutex>& dict_lock,
-                  const std::array<char, 128>& char_to_rev_char, uint64_t&
-                  processed_file_size, uint64_t total_file_size, float&
-                  last_progress) {
+                  const std::array<char, 128>& char_to_rev_char,
+                  uint64_t& processed_file_size, uint64_t total_file_size,
+                  float& last_progress) {
   size_t tid = task_id;
   static constexpr int thresh_s = kThreshEncoder;
   static constexpr int max_search = kMaxSearchEncoder;
@@ -182,10 +187,10 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
     if (!(in_flag >> c)) done = true;
     if (!done) {
       ReadDnaFromBits(current, f);
-      auto new_data_read = f.tellg() - last_file_size;
-      if (new_data_read > 1000000) {
-        display_progress(new_data_read, processed_file_size,
-                        total_file_size, last_progress);
+      if (auto new_data_read = f.tellg() - last_file_size;
+          new_data_read > 1000000) {
+        display_progress(new_data_read, processed_file_size, total_file_size,
+                         last_progress);
         last_file_size = f.tellg();
       }
       rc = static_cast<char>(in_rc.get());
@@ -308,7 +313,7 @@ void process_task(size_t task_id, const EncoderGlobal& eg,
                     ull = (b >> 3 * dict[l1].start_).to_ullong();
                     start_pos_idx = dict[l1].boo_hash_fun_->lookup(ull);
                     std::unique_lock dict_lock_guard(dict_lock[start_pos_idx],
-                                                   std::try_to_lock);
+                                                     std::try_to_lock);
                     if (!dict_lock_guard.owns_lock()) {
                       ++it;
                       continue;
@@ -380,7 +385,7 @@ void process_all_tasks(
     std::vector<std::mutex>& dict_lock,
     const std::array<char, 128>& char_to_rev_char, const int num_threads) {
   // Create DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   uint64_t total_file_size = 0;
   for (int tid = 0; tid < eg.num_thr; tid++) {
@@ -396,12 +401,13 @@ void process_all_tasks(
   float last_progress = 0.0;
 
   // Process all tasks
-  scheduler.run(eg.num_thr, [&](const SchedulerInfo& info) {
-    process_task(info.task_id, eg, egb, dict, mask1, mask, read, order_s,
-                 read_lengths_s, remaining_reads, read_lock, dict_lock,
-                 char_to_rev_char, processed_file_size, total_file_size,
-                 last_progress);
-  });
+  scheduler.run(
+      eg.num_thr, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+        process_task(info.task_id, eg, egb, dict, mask1, mask, read, order_s,
+                     read_lengths_s, remaining_reads, read_lock, dict_lock,
+                     char_to_rev_char, processed_file_size, total_file_size,
+                     last_progress);
+      });
 }
 
 // -----------------------------------------------------------------------------
@@ -567,9 +573,9 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
 
   constexpr auto kLogModuleName = "Spring";
   UTILS_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_s) +
-                                            " singleton reads were aligned");
-  UTILS_LOG(util::Logger::Severity::INFO, "---- " + std::to_string(matched_n) +
-                                            " reads with N were aligned");
+                                              " singleton reads were aligned");
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "---- " + std::to_string(matched_n) + " reads with N were aligned");
 }
 
 // -----------------------------------------------------------------------------
@@ -686,7 +692,7 @@ void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
       std::vector<std::bitset<BitsetSize>>(eg.num_reads_s + eg.num_reads_n);
   auto order_s = std::vector<uint32_t>(eg.num_reads_s + eg.num_reads_n);
   auto read_lengths_s = std::vector<uint16_t>(eg.num_reads_s + eg.num_reads_n);
-  constexpr auto kLogModuleName = "Spring";
+  constexpr auto kLogModuleName = "Spring";  // NOLINT
   UTILS_LOG(util::Logger::Severity::INFO, "---- Reading singletons");
   ReadSingletons<BitsetSize>(read, order_s, read_lengths_s, eg, egb);
   remove(eg.infile_n.c_str());

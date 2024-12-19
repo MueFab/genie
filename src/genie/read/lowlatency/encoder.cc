@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the low-latency encoder for the Genie framework.
+ *
+ * This file contains the implementation of the Encoder class within the
+ * `lowlatency` namespace. The encoder processes sequencing data into Access
+ * Units (AUs) with low-latency considerations, supporting both reference-based
+ * and non-reference workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

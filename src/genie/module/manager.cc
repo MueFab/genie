@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file manager.cc
+ *
+ * @brief Implements the module manager responsible for registering decoders and
+ * quality value handlers.
+ *
+ * This file is part of the Genie project, which is designed for advanced
+ * genomic data handling such as compression and reconstruction. The
+ * `manager.cpp` file focuses on organizing and registering components like
+ * entropy decoders and quality value handlers in the global configuration.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

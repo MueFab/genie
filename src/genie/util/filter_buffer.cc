@@ -12,7 +12,7 @@
  * signals based on the selected kernel and buffer configuration. The
  * `GaussKernel` and `RectangleKernel` classes provide methods for calculating
  * kernel values and determining the minimal buffer size required.
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

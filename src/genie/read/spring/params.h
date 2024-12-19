@@ -23,42 +23,55 @@ namespace genie::read::spring {
 // -----------------------------------------------------------------------------
 // Constants for Spring module configuration
 
-constexpr uint16_t kMaxReadLen =
-    511;  //!< Maximum supported read length.
-constexpr uint32_t kMaxReadLenUnalignedReads =
-    4294967290;  //!< Maximum read length for unaligned reads. May not be
-                 //!< supported in MPEG-G.
-constexpr uint32_t kMaxNumReads =
-    4294967290;  //!< Maximum number of reads supported.
-constexpr int kNumDictReorder =
-    2;  //!< Number of dictionaries used for reordering.
-constexpr int kMaxSearchReorder =
-    1000;  //!< Maximum search iterations during reordering.
-constexpr int kThreshReorder = 4;  //!< Threshold for reordering.
-constexpr float kStopCriteriaReorder =
-    0.5;  //!< Stop criterion for reordering (fraction of unmatched
-          //!< reads).
-constexpr int kNumDictEncoder =
-    2;  //!< Number of dictionaries used for encoding.
-constexpr int kMaxSearchEncoder =
-    1000;  //!< Maximum search iterations during encoding.
-constexpr int kThreshEncoder = 24;  //!< Threshold for encoding.
-constexpr int kNumReadsPerBlock =
-    256000;  //!< Number of reads per block during compression.
-constexpr int kNumReadsPerBlockUnalignedReads =
-    256000;  //!< Number of reads per block for unaligned reads (longer
-             //!< reads).
-constexpr uint32_t kMaxNumTokensId =
-    1024;  //!< Maximum number of tokens for read IDs.
-constexpr uint32_t kBinSizeCombinePairs =
-    30000000;  //!< Size of bins when combining paired reads in memory.
+/// Maximum supported read length.
+constexpr uint16_t kMaxReadLen = 511;
+
+/// Maximum read length for unaligned reads. May not be supported in MPEG-G.
+constexpr uint32_t kMaxReadLenUnalignedReads = 4294967290;
+
+/// Maximum number of reads supported.
+constexpr uint32_t kMaxNumReads = 4294967290;
+
+/// Number of dictionaries used for reordering.
+constexpr int kNumDictReorder = 2;
+
+/// Maximum search iterations during reordering.
+constexpr int kMaxSearchReorder = 1000;
+
+/// Threshold for reordering.
+constexpr int kThreshReorder = 4;
+
+/// Stop criterion for reordering (fraction of unmatched reads).
+constexpr float kStopCriteriaReorder = 0.5;
+
+/// Number of dictionaries used for encoding.
+constexpr int kNumDictEncoder = 2;
+
+/// Maximum search iterations during encoding.
+constexpr int kMaxSearchEncoder = 1000;
+
+/// Threshold for encoding.
+constexpr int kThreshEncoder = 24;
+
+/// Number of reads per block during compression.
+constexpr int kNumReadsPerBlock = 256000;
+
+/// Number of reads per block for unaligned reads (longer reads).
+constexpr int kNumReadsPerBlockUnalignedReads = 256000;
+
+/// Maximum number of tokens for read IDs.
+constexpr uint32_t kMaxNumTokensId = 1024;
+
+/// Size of bins when combining paired reads in memory.
+constexpr uint32_t kBinSizeCombinePairs = 30000000;
 
 // -----------------------------------------------------------------------------
 
-constexpr int kNumLocksReorder =
-    0x10000;  //!< Number of locks (must be a power of 2).
-constexpr int kLocksReorderMask =
-    0xffff;  //!< Mask used for lock indexing.
+/// Number of locks (must be a power of 2).
+constexpr int kNumLocksReorder = 0x10000;
+
+/// Mask used for lock indexing.
+constexpr int kLocksReorderMask = 0xffff;
 
 /**
  * @brief Computes the lock index for a given hash value.

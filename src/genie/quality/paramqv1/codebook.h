@@ -42,8 +42,8 @@ namespace genie::quality::paramqv1 {
  * codebooks, and allows for dynamic addition of new entries.
  */
 class Codebook final {
-  std::vector<uint8_t>
-      qv_recon_;  //!< @brief The list of quality value reconstruction entries.
+  /// The list of quality value reconstruction entries.
+  std::vector<uint8_t> qv_recon_;
 
  public:
   /**

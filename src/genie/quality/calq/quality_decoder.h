@@ -30,15 +30,12 @@
 #include <string>
 #include <vector>
 
+#include "genie/quality/calq/calq_coder.h"
 #include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
 namespace genie::quality::calq {
-
-struct DecodingRead;
-struct EncodingBlock;
-struct DecodingBlock;
 
 /**
  * @brief Stores metadata for decoding a specific read.
@@ -48,10 +45,11 @@ struct DecodingBlock;
  * corresponding CIGAR string that describes the alignment of the read.
  */
 struct DecodingRead {
-  uint64_t
-      pos_min;  //!< @brief The 1-based leftmost mapping position of the read.
-  std::string cigar;  //!< @brief The CIGAR string for the read, describing
-                      //!< alignment operations.
+  /// The 1-based leftmost mapping position of the read.
+  uint64_t pos_min;
+
+  /// The CIGAR string for the read, describing alignment operations.
+  std::string cigar;
 };
 
 /**
@@ -63,21 +61,23 @@ struct DecodingRead {
  * to the specified quantization strategy.
  */
 class QualityDecoder {
-  uint64_t pos_offset_;  //!< @brief Offset for read positions to handle global
-                         //!< positions correctly.
-  int quality_value_offset_;  //!< @brief The offset applied to quality values
-                              //!< (e.g., 33 for ASCII format).
+  /// Offset for read positions to handle global positions correctly.
+  uint64_t pos_offset_;
 
-  std::vector<size_t>
-      qvi_idx_;  //!< @brief Indexes of the quantizer values used for decoding.
-  std::vector<util::Quantizer>
-      quantizers_;  //!< @brief The quantizers used to Decode quality values for
-                    //!< different segments.
+  /// The offset applied to quality values (e.g., 33 for ASCII format).
+  int quality_value_offset_;
 
-  EncodingBlock* out_;       //!< @brief Pointer to the output structure where
-                             //!< decoded quality values are stored.
-  const DecodingBlock& in_;  //!< @brief The input encoded block containing
-                             //!< compressed quality values.
+  /// Indexes of the quantizer values used for decoding.
+  std::vector<size_t> qvi_idx_;
+
+  /// The quantizers used to Decode quality values for different segments.
+  std::vector<util::Quantizer> quantizers_;
+
+  /// Pointer to the output structure where decoded quality values are stored.
+  EncodingBlock* out_;
+
+  /// The input encoded block containing compressed quality values.
+  const DecodingBlock& in_;
 
  public:
   /**

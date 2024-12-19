@@ -12,7 +12,7 @@
  * value within this range and supports incrementing and resetting these counts.
  * The class is primarily used for analyzing the distribution of quality scores
  * within a specific interval and for constructing probability models.
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -42,10 +42,6 @@ QualityEncoder::QualityEncoder(const EncodingOptions& options,
       out_(output),
 
       quantizers_(quant) {}
-
-// -----------------------------------------------------------------------------
-
-QualityEncoder::~QualityEncoder() = default;
 
 // -----------------------------------------------------------------------------
 

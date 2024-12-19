@@ -1,7 +1,20 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ * @brief Implementation of the Encoder class for the Spring module.
+ *
+ * This file contains the implementation of the Encoder class, which manages
+ * the encoding process for read sequences in the Spring module. It handles
+ * preprocessing, organizing records into chunks, and managing the multithreaded
+ * flow of data during the encoding process.
+ *
+ * @details The Encoder class utilizes the Preprocessor class to preprocess
+ * input records and generates the final encoded access units that can be stored
+ * or further processed. It includes functions for setting up file paths,
+ * processing read segments and records, and managing temporary files and
+ * directories.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

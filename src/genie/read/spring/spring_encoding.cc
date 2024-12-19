@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file spring_encoding.cc
+ *
+ * @brief Spring encoding implementation for the Genie project.
+ *
+ * This file contains the implementation of the Spring encoder used in the Genie
+ * project. It includes functions for building contigs, writing contigs,
+ * retrieving data parameters, correcting read orders, and other encoding
+ * operations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

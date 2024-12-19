@@ -37,9 +37,14 @@ namespace genie::read::spring {
  * process.
  */
 struct Record {
-  std::string name;  //!< Name of the record.
-  std::string seq;   //!< Sequence data of the record.
-  std::string qv;    //!< Quality values of the record.
+  /// Name of the record.
+  std::string name;
+
+  /// Sequence data of the record.
+  std::string seq;
+
+  /// Quality values of the record.
+  std::string qv;
 };
 
 /**
@@ -72,9 +77,12 @@ void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
  * records using the `util::OrderedLock` mechanism.
  */
 class Decoder final : public core::ReadDecoder {
-  CompressionParams cp_{};  //!< Compression parameters.
-  bool combine_pairs_;      //!< Flag for combined pairs decoding.
-  util::OrderedLock lock_;  //!< Lock for multithreaded decoding.
+  /// Compression parameters.
+  CompressionParams cp_{};
+  /// Flag for combined pairs decoding.
+  bool combine_pairs_;
+  /// Lock for multithreaded decoding.
+  util::OrderedLock lock_;
   /// Output stream for unmatched
   std::ofstream file_out_unmatched1_;
   /// Output stream for unmatched reads (2nd file).

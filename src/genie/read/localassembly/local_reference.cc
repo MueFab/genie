@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file local_reference.cc
+ *
+ * Implementation of the LocalReference class for local sequence assembly in the
+ * Genie framework.
+ *
+ * This file contains the implementation of the `LocalReference` class within
+ * the `localassembly` namespace. The class manages local references for
+ * assembly operations, including the handling of sequencing reads, their
+ * alignments, and the generation of reference sequences using majority voting.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

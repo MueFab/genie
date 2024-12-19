@@ -15,7 +15,7 @@
  * and filling quantization tables.
  *
  * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implements the Decoder class for decoding tokenized genomic record
+ * names.
+ *
+ * This file is part of the Genie project, designed to handle efficient genomic
+ * data compression and decompression. The `decoder.cpp` file focuses on
+ * reconstructing original record names from tokenized and encoded sequences.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

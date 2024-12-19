@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file record_pileup.cc
+ *
+ * @brief Implementation of the RecordPileup class for managing genomic read
+ * pileups.
+ *
+ * This source file implements the `RecordPileup` class, which is part of the
+ * GENIE quality value coding module. The `RecordPileup` class handles
+ * preprocessing and management of genomic read pileups, facilitating quality
+ * value encoding and decoding.
+ *
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

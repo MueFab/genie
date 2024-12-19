@@ -65,16 +65,6 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
 /**
  * @brief
  * @param options
- * @param num_chunks
- * @param refs
- */
-void sam_to_mgrec_phase2(
-    Config& options, int num_chunks,
-    const std::vector<std::pair<std::string, size_t>>& refs);
-
-/**
- * @brief
- * @param options
  * @param nref
  */
 void clean_phase1_files(Config& options, int& nref);

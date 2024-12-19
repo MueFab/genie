@@ -49,15 +49,32 @@ class EncoderStub : public core::ReadEncoder {
      */
     explicit EncodingState(const core::record::Chunk& data);
 
-    Encoder read_coder;  //!< @brief Object handling read encoding.
-    bool paired_end;     //!< @brief Indicates if records are paired-end.
-    size_t read_length;  //!< @brief Length of the read being encoded.
-    core::record::ClassType class_type;  //!< @brief Class type of the record.
-    uint64_t min_pos;             //!< @brief Minimum position in the chunk.
-    uint64_t max_pos;             //!< @brief Maximum position in the chunk.
-    uint16_t ref;                 //!< @brief Reference sequence ID.
-    uint64_t read_num;            //!< @brief Number of segments in the chunk.
-    uint64_t last_read_position;  //!< @brief Last processed read position.
+    /// Object handling read encoding.
+    Encoder read_coder;
+
+    /// Indicates if records are paired-end.
+    bool paired_end;
+
+    /// Length of the read being encoded.
+    size_t read_length;
+
+    /// Class type of the record.
+    core::record::ClassType class_type;
+
+    /// Minimum position in the chunk.
+    uint64_t min_pos;
+
+    /// Maximum position in the chunk.
+    uint64_t max_pos;
+
+    /// Reference sequence ID.
+    uint16_t ref;
+
+    /// Number of segments in the chunk.
+    uint64_t read_num;
+
+    /// Last processed read position.
+    uint64_t last_read_position;
 
     /**
      * @brief Virtual destructor for the state structure.

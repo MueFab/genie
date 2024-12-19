@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file default_setup.cc
+ *
+ * @brief Implements default setups for encoding, decoding, and converting
+ * genomic data.
+ *
+ * This file is part of the Genie project, which provides advanced tools for
+ * genomic data compression, encoding, and decoding. The `default_setup.cpp`
+ * file configures default pipelines for processing genomic data, including
+ * encoders, decoders, and converters for various data components such as reads,
+ * quality values, names, and entropy.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

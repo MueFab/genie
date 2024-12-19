@@ -1,7 +1,23 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ *
+ * @file preprocess.cc
+ * @brief Implementation of the preprocessor for genomic reads in the Spring
+ * module.
+ *
+ * This file contains the implementation of the Preprocessor class, which
+ * handles the initial pre-processing of genomic reads before further encoding
+ * and compression steps. It includes functions for setting up file paths,
+ * processing read segments and records, and managing temporary files and
+ * directories.
+ *
+ * @details The Preprocessor class is responsible for tasks such as cleaning
+ * reads, separating reads with 'N' bases, and managing file outputs for
+ * different categories of read data. It interacts with the Spring compression
+ * module to prepare the data for efficient storage and analysis.
+ *
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

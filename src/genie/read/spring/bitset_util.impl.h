@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file bitset_util.impl.h
+ *
+ * @brief Implementation of utility functions for bitset operations in Spring
+ * framework.
+ *
+ * This header file provides implementations for various utility functions that
+ * operate on bitsets within the Spring framework. These functions are designed
+ * to handle tasks such as bitset manipulation, key generation, dictionary
+ * construction, and parallel processing, optimizing the performance of
+ * sequencing data workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/read/spring/dynamic_scheduler.h"
+#include "genie/util/dynamic_scheduler.h"
 #include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
@@ -80,12 +90,13 @@ inline void parallel_write_keys_dynamic(const std::vector<uint64_t>& ull,
                                         const std::string& basedir,
                                         const size_t num_threads) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_threads, [&](const SchedulerInfo& info) {
-    write_keys_task_dynamic(info.task_id, ull, dict, basedir, num_threads);
-  });
+  scheduler.run(
+      num_threads, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+        write_keys_task_dynamic(info.task_id, ull, dict, basedir, num_threads);
+      });
 }
 
 // -----------------------------------------------------------------------------
@@ -130,12 +141,13 @@ inline void parallel_process_keys_dynamic(const std::vector<BbHashDict>& dict,
                                           const std::string& basedir,
                                           const int num_threads, const int j) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(num_threads);
+  util::DynamicScheduler scheduler(num_threads);
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_threads, [&](const SchedulerInfo& info) {
-    process_keys_task(info.task_id, dict, basedir, num_threads, j);
-  });
+  scheduler.run(
+      num_threads, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+        process_keys_task(info.task_id, dict, basedir, num_threads, j);
+      });
 }
 
 // -----------------------------------------------------------------------------
@@ -244,7 +256,7 @@ inline void process_dict_task(size_t task_id, std::vector<BbHashDict>& dict,
       float progress =
           static_cast<float>(i) / static_cast<float>(read_lengths.size());
       if (progress - last_progress > 0.1) {
-        constexpr auto kLogModuleName = "Spring";
+        constexpr auto kLogModuleName = "Spring";  // NOLINT
         UTILS_LOG(util::Logger::Severity::INFO,
                   "------------ Progress (dictionary " + std::to_string(j + 1) +
                       "/" + std::to_string(dict.size()) + "): " +
@@ -273,12 +285,14 @@ inline void parallel_process_dicts_dynamic(
     const std::vector<uint16_t>& read_lengths, const int num_threads,
     const int num_dict) {
   // Create an instance of the DynamicScheduler
-  DynamicScheduler scheduler(std::min(num_dict, num_threads));
+  util::DynamicScheduler scheduler(std::min(num_dict, num_threads));
 
   // Run the dynamic scheduler with tasks
-  scheduler.run(num_dict, [&](const SchedulerInfo& info) {
-    process_dict_task(info.task_id, dict, basedir, read_lengths, num_threads);
-  });
+  scheduler.run(num_dict,
+                [&](const util::DynamicScheduler::SchedulerInfo& info) {
+                  process_dict_task(info.task_id, dict, basedir, read_lengths,
+                                    num_threads);
+                });
 }
 
 // -----------------------------------------------------------------------------

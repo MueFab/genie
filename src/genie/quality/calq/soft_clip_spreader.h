@@ -45,19 +45,23 @@ namespace genie::quality::calq {
  * the propagation of the variant signal.
  */
 class SoftClipSpreader {
-  std::vector<std::pair<size_t, double>>
-      forward_spread_;  //!< @brief Forward spread buffer to propagate scores
-                        //!< ahead.
-  util::CircularBuffer<double>
-      buffer_;  //!< @brief Buffer to manage activity scores for past positions.
-  util::CircularBuffer<double>
-      original_;  //!< @brief Circular buffer to keep track of raw scores.
+  /// Forward spread buffer to propagate scores ahead.
+  std::vector<std::pair<size_t, double>> forward_spread_;
 
-  const size_t max_propagation_;  //!< @brief Maximum distance over which scores
-                                  //!< are spread.
-  const size_t min_hq_soft_clips_;  //!< @brief Minimum number of high-quality
-                                    //!< soft clips to trigger spread.
-  bool squashed_;  //!< @brief Whether to squash scores between 0 and 1.
+  /// Buffer to manage activity scores for past positions.
+  util::CircularBuffer<double> buffer_;
+
+  /// Circular buffer to keep track of raw scores.
+  util::CircularBuffer<double> original_;
+
+  /// Maximum distance over which scores are spread.
+  const size_t max_propagation_;
+
+  /// Minimum number of high-quality soft clips to trigger spread.
+  const size_t min_hq_soft_clips_;
+
+  /// Whether to squash scores between 0 and 1.
+  bool squashed_;
 
   /**
    * @brief Squashes the activity score between 0 and 1.

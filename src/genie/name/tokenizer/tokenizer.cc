@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file tokenizer.cc
+ *
+ * @brief Implements the TokenState class for tokenizing and encoding genomic
+ * data names.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression and processing. The `tokenizer.cpp` file provides essential
+ * functionalities to tokenize genomic data names into different patterns such
+ * as alphabetic sequences, numbers, and special characters, while supporting
+ * matching and delta encoding for optimization.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

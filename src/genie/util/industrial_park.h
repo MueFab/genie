@@ -127,7 +127,7 @@ class IndustrialPark {
 
 // -----------------------------------------------------------------------------
 
-#include "genie/util/industrial_park.impl.h"
+#include "genie/util/industrial_park.impl.h"  // NOLINT
 
 // -----------------------------------------------------------------------------
 
