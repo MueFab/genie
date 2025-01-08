@@ -62,7 +62,7 @@ class Annotation {
     std::map<std::string, InfoField> attributeInfo;
 
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
-    genie::core::record::annotation_parameter_set::Record annotationParameterSet;
+    std::vector<genie::core::record::annotation_parameter_set::Record> annotationParameterSet;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
 
     GenoAnnotation genoAnnotation;

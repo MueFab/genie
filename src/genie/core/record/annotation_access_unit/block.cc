@@ -7,6 +7,7 @@
 #include "genie/core/record/annotation_access_unit/block.h"
 #include <algorithm>
 #include <string>
+#include <iostream>
 #include <utility>
 #include "genie/util/bitreader.h"
 #include "genie/util/make-unique.h"
@@ -39,8 +40,11 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
 }
 
 void Block::write(core::Writer& writer) const {
+    std::cerr << "block " << AnnotDescToString(block_header.getDescriptorID()) << std::endl;
     block_header.write(writer);
+    std::cerr << "payload...";
     block_payload.write(writer);
+    std::cerr << "end" << std::endl;
 }
 
 void Block::set(BlockVectorData blockData) {
