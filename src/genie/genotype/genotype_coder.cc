@@ -445,13 +445,12 @@ void bin_mat_from_bytes(
 // TODO (Yeremia,Stefanie): Move and refactor this function to the parsing funciton
 
 void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t block_size, EncodingBlock& block) {
-    uint8_t AttributeID = 22;
+    // starting number 
+    uint8_t AttributeID = 25;
 
     // fill all attribute data
     for (const auto& format : recs.at(0).getFormats()) {
         const auto& formatName = format.getFormat();
-        block.attributeData[formatName].resize(block_size);
-        block.attributeData[formatName];
         block.attributeData[formatName].resize(block_size);
         block.attributeInfo[formatName] = core::record::annotation_parameter_set::AttributeData(
             static_cast<uint8_t>(formatName.size()), formatName, format.getType(), format.getArrayLength(),

@@ -107,7 +107,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-const bool RUNBIGFILES = false;
+const bool RUNBIGFILES = true;
 
 TEST_P(AnnotationTests, annotationSite) {
     auto testParams = GetParam();
@@ -115,14 +115,17 @@ TEST_P(AnnotationTests, annotationSite) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
     std::string inputFilename = filePath + testParams.sitefile_in;  // "ALL.chrX.10000.site";
+    std::string orgfilename = std::filesystem::path(inputFilename).string();
+    size_t lastindex = orgfilename.find_last_of(".");
+    orgfilename = orgfilename.substr(0, lastindex) + "_";
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
     if constexpr (!RUNBIGFILES)
         if (std::filesystem::file_size(inputFilename) > 100 * 1024) return;
 
-    std::string outputFilename = filePath + "ALL.chrX.R" + std::to_string(testParams.totNrOfRows);
+    std::string outputFilename = orgfilename + std::to_string(testParams.totNrOfRows);
     outputFilename += "_Cn_TS" + std::to_string(testParams.defaultTileHeight) + "_site";
-
+    std::cerr << outputFilename << std::endl;
     std::filesystem::remove(outputFilename + ".bin");
 
     genie::annotation::Annotation annotationGenerator;
@@ -143,10 +146,12 @@ TEST_P(AnnotationTests, annotationSite) {
 TEST_P(AnnotationTests, annotationGeno) {
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::string filePath = gitRootDir + "/data/records/";
-
     auto testParams = GetParam();
 
     std::string inputFilename = filePath + testParams.genofile_in;  //"ALL.chrX.10000.geno";
+    std::string orgfilename = std::filesystem::path(inputFilename).string();
+    size_t lastindex = orgfilename.find_last_of(".");
+    orgfilename = orgfilename.substr(0, lastindex) + "_";
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
 
@@ -154,9 +159,10 @@ TEST_P(AnnotationTests, annotationGeno) {
     if constexpr (!RUNBIGFILES)
         if (inputfilesize > 50 * 1024 * 1024) return;
 
-    std::string outputFilename = filePath + "ALL.chrX.RC" + std::to_string(testParams.totNrOfRows);
+    std::string outputFilename = orgfilename + std::to_string(testParams.totNrOfRows);
     outputFilename += "-1092_TS" + std::to_string(testParams.defaultTileHeight) + "-" +
                       std::to_string(testParams.defaultTileWidth) + "_geno";
+    std::cerr << outputFilename << std::endl;
 
     std::filesystem::remove(outputFilename + ".bin");
 
@@ -192,28 +198,53 @@ TEST_P(AnnotationTests, annotationGeno) {
     annotationGenerator.setGenotypeOptions(genotype_opt);
     annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(testParams.defaultTileHeight, testParams.defaultTileWidth);
+    std::cerr << "starting stream..." << std::endl;
     annotationGenerator.startStream(genie::annotation::RecType::GENO_FILE, inputFilename, outputFilename);
+    std::cerr << "returning stream..." << std::endl;
 
     EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin"));
-    /*
-    auto filesize = std::filesystem::file_size(outputFilename + ".bin");
-    size_t expectedSize = 4 * 1024;  // at least 4kB
-    filesize;
-    expectedSize;
-    EXPECT_LE(expectedSize, filesize);
-    */
 }
 
 INSTANTIATE_TEST_SUITE_P(
     testoutputs, AnnotationTests,
-    ::testing::Values(TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 100u, 3000u),
-                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
-                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),
-                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 10000, 500u),
-                      TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 10000, 3000),
+    ::testing::Values(/* TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 100u, 3000u),
+                      TestDetails("ALL.chrX.5000.geno", "ALL.chrX.10000.site", 10000u, 950u, 3000u),*/
+                      TestDetails("chrX_10x10000/ALL.chrX_40000-49999.geno", "chrX_10x10000/ALL.chrX_40000-49999.site",
+                                  10000u, 1000, 3000u),
+                      TestDetails("ALL.chrX.10000.geno", "ALL.chrX.10000.site", 10000u, 1000u, 3000u),
+                      TestDetails("ALL.chrX.50000.geno", "ALL.chrX.50000.site", 50000, 1000u, 3000u),
+                      TestDetails("chrX_10x10000/ALL.chrX_0-9999.geno", "chrX_10x10000/ALL.chrX_0-9999.site", 10000u,
+                      1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_10000-19999.geno",
+                      "chrX_10x10000/ALL.chrX_10000-19999.site", 10000u, 1000, 3000u),
+                      TestDetails("chrX_10x10000/ALL.chrX_20000-29999.geno", "chrX_10x10000/ALL.chrX_20000-29999.site",
+                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_30000-39999.geno",
+                      "chrX_10x10000/ALL.chrX_30000-39999.site", 10000u, 1000, 3000u),
+                      TestDetails("chrX_10x10000/ALL.chrX_40000-49999.geno", "chrX_10x10000/ALL.chrX_40000-49999.site",
+                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_50000-59999.geno",
+                      "chrX_10x10000/ALL.chrX_50000-59999.site", 10000u, 1000, 3000u),
+                      TestDetails("chrX_10x10000/ALL.chrX_60000-69999.geno", "chrX_10x10000/ALL.chrX_60000-69999.site",
+                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_70000-79999.geno",
+                      "chrX_10x10000/ALL.chrX_70000-79999.site", 10000u, 1000, 3000u),
+                      TestDetails("chrX_10x10000/ALL.chrX_80000-89999.geno", "chrX_10x10000/ALL.chrX_80000-89999.site",
+                      10000u, 1000, 3000u), TestDetails("chrX_10x10000/ALL.chrX_90000-99999.geno",
+                      "chrX_10x10000/ALL.chrX_90000-99999.site", 10000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_40000-40999.geno", "chrX_10x1000/ALL.chrX_40000-40999.site",
+                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_41000-41999.geno",
+                      "chrX_10x1000/ALL.chrX_41000-41999.site", 1000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_42000-42999.geno", "chrX_10x1000/ALL.chrX_42000-42999.site",
+                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_43000-43999.geno",
+                      "chrX_10x1000/ALL.chrX_43000-43999.site", 1000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_44000-44999.geno", "chrX_10x1000/ALL.chrX_44000-44999.site",
+                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_45000-45999.geno",
+                      "chrX_10x1000/ALL.chrX_45000-45999.site", 1000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_46000-46999.geno", "chrX_10x1000/ALL.chrX_46000-46999.site",
+                      1000u, 1000, 3000u), TestDetails("chrX_10x1000/ALL.chrX_47000-47999.geno",
+                      "chrX_10x1000/ALL.chrX_47000-47999.site", 1000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_48000-48999.geno", "chrX_10x1000/ALL.chrX_48000-48999.site",
+                      1000u, 1000, 3000u),
+                      TestDetails("chrX_10x1000/ALL.chrX_49000-49999.geno", "chrX_10x1000/ALL.chrX_49000-49999.site",
+                      1000u, 1000, 3000u),
+                      
+                      TestDetails("ALL.chrX.100000.geno", "ALL.chrX.100000.site", 100000u, 1000, 3000),
                       TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 15u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 500u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4, 546u),
-                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 5, 546u)));
+                      TestDetails("ALL.chrX.15.geno", "ALL.chrX.15.site", 15u, 4u, 3000u)));

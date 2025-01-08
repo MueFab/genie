@@ -27,24 +27,38 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
     // read file - determine type
 
     if (recType == RecType::GENO_FILE) {
+        std::vector<std::pair<uint64_t, uint8_t>> numBitPlanes;
+        std::string num_bit_plane_filename =  outputFileName+"_numBitPlane";
+        if (std::filesystem::exists(num_bit_plane_filename)) std::filesystem::remove(num_bit_plane_filename);
         genoAnnotation.setCompressors(compressors);
         genoAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
-        auto dataunits = genoAnnotation.parseGenotype(inputfile);
-        annotationParameterSet = dataunits.annotationParameterSet;
-        annotationAccessUnit = dataunits.annotationAccessUnit;
+        //auto dataunits = genoAnnotation.parseGenotype(inputfile);
+        auto dataunits = genoAnnotation.parseGenotype(inputfile, numBitPlanes);
+        std::ofstream nbp_file;
+        nbp_file.open(num_bit_plane_filename + ".txt", std::ios::out);
+        for (auto& nbp : numBitPlanes)   {
+            nbp_file << std::to_string(nbp.first) << "," << std::to_string(nbp.second) << std::endl;
+        }
+        for (auto& dataunit : dataunits) {
+            annotationParameterSet.push_back(dataunit.annotationParameterSet);
+            annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
+                                        dataunit.annotationAccessUnit.end());
+        }
 
     } else if (recType == RecType::SITE_FILE) {
         siteAnnotation.setCompressors(compressors);
         siteAnnotation.parseInfoTags(recordInputFileName);
         auto dataunits = siteAnnotation.parseSite(inputfile);
-        annotationParameterSet = dataunits.annotationParameterSet;
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
         annotationAccessUnit = dataunits.annotationAccessUnit;
-    } else { // contact matrix
+    } else {  // contact matrix
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = cmAnnotation.parseContact(inputfile);
     }
     if (inputfile.is_open()) inputfile.close();
+
+    std::cout << "writing to file..." << std::endl;
 
     writeToFile(outputFileName);
 }
@@ -57,13 +71,16 @@ void Annotation::writeToFile(std::string& outputFileName) {
     std::ofstream txtfile;
     txtfile.open(filename + ".txt", std::ios::out);
     genie::core::Writer txtwriter(&txtfile, true);
+    uint64_t sizeSofar = 0;
 
-    genie::core::record::data_unit::Record APS_dataUnit(annotationParameterSet);
-    auto sizeSofar = APS_dataUnit.write(testwriter);
-
-    APS_dataUnit.write(txtwriter, sizeSofar);
-
+    for (auto& pars : annotationParameterSet) {
+        genie::core::record::data_unit::Record APS_dataUnit(pars);
+        sizeSofar = APS_dataUnit.write(testwriter);
+        std::cerr << "writing APS" << std::endl;
+        APS_dataUnit.write(txtwriter, sizeSofar);
+    }
     for (auto& aau : annotationAccessUnit) {
+        std::cerr << "writing AAU" << std::endl;
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         sizeSofar = AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter, sizeSofar);

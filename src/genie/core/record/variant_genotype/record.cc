@@ -3,6 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+#include <iostream>
 
 #include <algorithm>
 #include <string>
@@ -39,6 +40,13 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
       format(),
       alleles(),
       phasings() {
+    if (!bitreader.isGood()) {
+        std::cerr << "return from VariantGenotype1..." << std::endl;
+
+        return;
+    }
+
+   // std::cout << "format_count...";
     auto format_count = bitreader.readBypassBE<uint8_t>();
     for (uint8_t i = 0; i < format_count; i++) {
         format.emplace_back(bitreader, sample_count);
@@ -48,6 +56,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
     bool likelihood_present = bitreader.read<bool>(8);
 
     if (genotype_present) {
+       // std::cout << "allele...";
         auto n_alleles_per_sample = bitreader.read<uint8_t>(8);
         UTILS_DIE_IF(n_alleles_per_sample == 0, "Invalid n_alleles_per_sample!");
 
@@ -60,7 +69,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
                 allele = bitreader.readBypassBE<int8_t>();
             }
         }
-
+        //std::cout << "phasings...";
         if (n_alleles_per_sample - 1 > 0) {
             for (auto& phasings_sample : phasings) {
                 for (auto& phasing : phasings_sample) {
@@ -71,6 +80,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
     }
 
     if (likelihood_present) {
+       // std::cout << "likelihood...";
         auto n_likelihoods = bitreader.readBypassBE<uint8_t>();
         UTILS_DIE_IF(n_likelihoods == 0, "Invalid n_likelihoods!");
 
@@ -82,7 +92,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
             }
         }
     }
-
+    std::cout << std::endl;
     auto linked_record = bitreader.read<bool>(8);
     if (linked_record) {
         link_record = LinkRecord(bitreader);

@@ -64,6 +64,9 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
         tiles[genie::core::AnnotDesc::LINKNAME].write(variantSite.getLinkName());
         tiles[genie::core::AnnotDesc::LINKID].write(variantSite.getReferenceBoxID(), 8);
     } else {
+  //      std::string emptystr = "";
+   //     tiles[genie::core::AnnotDesc::LINKNAME].write(emptystr);
+
         tiles[genie::core::AnnotDesc::LINKNAME].emptyForRow();
         tiles[genie::core::AnnotDesc::LINKID].write((uint8_t)255, 8);
     }

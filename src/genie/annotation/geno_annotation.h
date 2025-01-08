@@ -10,6 +10,7 @@
 #include <fstream>
 #include <list>
 #include <map>
+#include <utility>
 #include <sstream>
 #include "genie/core/constants.h"
 
@@ -39,9 +40,10 @@ class GenoAnnotation {
     void setTileSize(uint32_t _defaultTileSizeHeight, uint32_t _defaultTileSizeWidth) {
         defaultTileSizeHeight = _defaultTileSizeHeight;
         defaultTileSizeWidth = _defaultTileSizeWidth;
-    } 
+    }
 
-    GenoUnits parseGenotype(std::ifstream& inputfile);
+    std::vector<GenoUnits> parseGenotype(std::ifstream& inputfile);
+    std::vector<GenoUnits> parseGenotype(std::ifstream& inputfile, std::vector<std::pair<uint64_t, uint8_t>>& numBitPlanes);
     void setCompressors(genie::annotation::Compressor& _compressors) { compressors = _compressors; }
 
  private:
@@ -67,6 +69,9 @@ class GenoAnnotation {
         genie::likelihood::EncodingBlock likelihoodDatablock;
         uint32_t numSamples;
         uint8_t formatCount;
+        RecData()
+            : rowStart(0), colStart(0), genotypeDatablock(), likelihoodDatablock(), numSamples(0), formatCount(0) {}
+
         RecData(uint32_t _rowStart, uint32_t _colStart, genie::genotype::EncodingBlock _genotypeDatablock,
                 genie::likelihood::EncodingBlock _likelihoodDatablock, uint32_t _numSamples, uint8_t _formatCount)
             : rowStart(_rowStart),
@@ -75,13 +80,30 @@ class GenoAnnotation {
               likelihoodDatablock(_likelihoodDatablock),
               numSamples(_numSamples),
               formatCount(_formatCount) {}
-    };
-    size_t readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize, const uint32_t& colTilesize,
-                      genie::genotype::GenotypeParameters& genotypeParameters,
-                      genie::likelihood::LikelihoodParameters& likelihoodParameters, std::vector<RecData>& recData);
 
-    std::vector<genie::core::record::VariantGenotype> splitOnRows(genie::core::record::VariantGenotype& rec,
-                                                                  uint32_t colWidth);
+        void set(uint32_t _rowStart, uint32_t _colStart, genie::genotype::EncodingBlock _genotypeDatablock,
+                 genie::likelihood::EncodingBlock _likelihoodDatablock, uint32_t _numSamples, uint8_t _formatCount) {
+            rowStart = _rowStart;
+            colStart = _colStart;
+            genotypeDatablock = _genotypeDatablock;
+            likelihoodDatablock = _likelihoodDatablock;
+            numSamples = _numSamples;
+            formatCount = _formatCount;
+        }
+    };
+
+    struct ParsBlocks {
+        genie::genotype::GenotypeParameters genotypePars;
+        genie::likelihood::LikelihoodParameters likelihoodPars;
+        std::vector<RecData> blocks;
+        uint32_t rows;
+    };
+
+    size_t readBlocks(std::ifstream& inputfile, const uint32_t& rowTileSize, std::vector<ParsBlocks>& blocksWPars);
+
+    size_t readOneBlock(genie::util::BitReader& reader, const uint32_t& rowTileSize,
+                        genie::genotype::GenotypeParameters& genotypeParameters,
+                        genie::likelihood::LikelihoodParameters& likelihoodParameters, RecData& recData);
 };
 
 }  // namespace annotation

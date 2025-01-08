@@ -63,7 +63,7 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
       genie::variant_site::ParameterSetComposer encodeParameters;
-
+    /*
      auto annotationParameterSet2 =
           encodeParameters.setParameterSet(descrList, parser.getAttributes().getInfo(),
                                           compressors.getCompressorParameters(), defaultTileSizeHeight, AT_ID);
@@ -71,7 +71,7 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
      if (annotationParameterSet.getParameterSetID() == annotationParameterSet2.getParameterSetID()) {
          temp = true;
      }
-
+     */
     genie::variant_site::AccessUnitComposer accessUnit;
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
