@@ -181,16 +181,20 @@ class Reader {
   void Reset();
 
  private:
-  BitInputStream m_bit_input_stream_;  //!< @brief Input bitstream for reading.
-  BinaryArithmeticDecoder
-      m_dec_bin_cabac_;  //!< @brief CABAC decoder for arithmetic coding.
+  /// Input bitstream for reading.
+  BitInputStream m_bit_input_stream_;
 
-  bool m_bypass_flag_;       //!< @brief Indicates if bypass mode is enabled.
-  uint64_t m_num_contexts_;  //!< @brief Number of contexts available for
-                             //!< CABAC decoding.
+  /// CABAC decoder for arithmetic coding.
+  BinaryArithmeticDecoder m_dec_bin_cabac_;
 
-  std::vector<ContextModel>
-      m_context_models_;  //!< @brief Context models for CABAC decoding.
+  /// Indicates if bypass mode is enabled.
+  bool m_bypass_flag_;
+
+  /// Number of contexts available for CABAC decoding.
+  uint64_t m_num_contexts_;
+
+  /// Context models for CABAC decoding.
+  std::vector<ContextModel> m_context_models_;
 };
 
 // -----------------------------------------------------------------------------

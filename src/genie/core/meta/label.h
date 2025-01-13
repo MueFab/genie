@@ -23,9 +23,11 @@ namespace genie::core::meta {
  * @brief Label metadata
  */
 class Label {
-  std::string label_id_;  //!< @brief Name of the label
-  std::vector<Region>
-      regions_;  //!< @brief Regions in the genome the label applies to
+  /// Name of the label
+  std::string label_id_;
+
+  /// Regions in the genome the label applies to
+  std::vector<Region>regions_;
 
  public:
   /**

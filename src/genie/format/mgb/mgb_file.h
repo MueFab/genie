@@ -28,12 +28,18 @@ namespace genie::format::mgb {
  * @brief
  */
 class MgbFile {
+  ///
   std::vector<std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>>
-      units_;                                //!< @brief
-  std::istream* file_;                       //!< @brief
-  std::unique_ptr<util::BitReader> reader_;  //!< @brief
+      units_;
 
-  std::map<size_t, core::parameter::EncodingSet> parameter_sets_;  //!< @brief
+  ///
+  std::istream* file_;
+
+  ///
+  std::unique_ptr<util::BitReader> reader_;
+
+  ///
+  std::map<size_t, core::parameter::EncodingSet> parameter_sets_;
 
   /**
    * @brief
