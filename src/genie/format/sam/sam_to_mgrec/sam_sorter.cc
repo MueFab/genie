@@ -2,44 +2,34 @@
 
 #include <fcntl.h>
 #include <genie/util/runtime-exception.h>
-#include <unistd.h>
 
 #include <algorithm>
 #include <iostream>
 #include <mutex>
-#include <ostream>
 #include <thread>
-
 
 namespace genie::format::sam::sam_to_mgrec {
 
-
 /** compare function for open reads **/
-bool CmpOpen::operator()(std::vector<sam_to_mgrec::SamRecord>& a, std::vector<sam_to_mgrec::SamRecord>& b) const {
-    UTILS_DIE_IF(a.empty() || b.empty(),"emtpy sam read in open list");
-    if (a.at(a.size() -1).mate_pos == b.at(b.size() -1).mate_pos) {
-        return a.at(a.size() -1).qname > b.at(b.size() -1).qname;
-    }
-    return a.at(a.size() -1).mate_pos > b.at(b.size() -1).mate_pos;
+bool CmpOpen::operator()(const std::vector<sam_to_mgrec::SamRecord>& a,
+                         const std::vector<sam_to_mgrec::SamRecord>& b) const {
+    UTILS_DIE_IF(a.empty() || b.empty(), "emtpy sam read in open list");
+    return a.at(a.size() - 1).mate_pos > b.at(b.size() - 1).mate_pos;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/** compare function for compete reads **/
-bool CmpCompete::operator()(std::vector<sam_to_mgrec::SamRecord>& a, std::vector<sam_to_mgrec::SamRecord>& b) const {
-    UTILS_DIE_IF(a.empty() || b.empty(),"emtpy sam read in closed list");
+/** compare function for complete reads **/
+bool CmpCompete::operator()(const std::vector<sam_to_mgrec::SamRecord>& a,
+                            const std::vector<sam_to_mgrec::SamRecord>& b) const {
+    UTILS_DIE_IF(a.empty() || b.empty(), "emtpy sam read in closed list");
     return a.at(0).pos > b.at(0).pos;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamSorter::SamSorter(std::string& file_path) :
-    sam_file_path(std::move(file_path)),
-    sam_reader(genie::format::sam::sam_to_mgrec::SamReader(sam_file_path)),
-    open_queries(CmpOpen()),
-    completed_queries(CmpCompete()) {
-    UTILS_DIE_IF(!sam_reader.isReady(), "Cannot open SAM file.");
-}
+SamSorter::SamSorter(uint32_t max_waiting_distance)
+    : open_queries(CmpOpen()), completed_queries(CmpCompete()), max_distance(max_waiting_distance) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,20 +38,22 @@ void SamSorter::set_new_alignment_pos() {
     if (!open_queries.empty()) {
         UTILS_DIE_IF(primary_alignment_positions.size() > open_queries.size(), "too many positions");
         UTILS_DIE_IF(primary_alignment_positions.size() > open_queries.size(), "not enough positions");
-        cur_alignment_position = *std::min_element(primary_alignment_positions.begin(), primary_alignment_positions.end());
+        cur_alignment_position =
+            *std::min_element(primary_alignment_positions.begin(), primary_alignment_positions.end());
     } else {
-        cur_alignment_position = INT64_MAX;
+        cur_alignment_position = std::numeric_limits<int64_t>::max();
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SamSorter::try_appending_to_queries(std::vector<SamRecord> cur_query, std::vector<std::vector<sam_to_mgrec::SamRecord>>& queries) {
+/** checks if cur query is allowed on queries or needs to be put on completed **/
+void SamSorter::try_appending_to_queries(std::vector<SamRecord> cur_query) {
     /** cur_query is complete, try appending to queries **/
     if (cur_alignment_position >= cur_query.at(0).pos) {
         /** allowed to append to queries **/
         queries.emplace_back();
-        queries.back() =  cur_query;
+        queries.back() = cur_query;
     } else {
         /** not allowed to append to queries, append to complete_reads **/
         completed_queries.push(cur_query);
@@ -71,101 +63,93 @@ void SamSorter::try_appending_to_queries(std::vector<SamRecord> cur_query, std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SamSorter::isReadComplete(std::vector<sam_to_mgrec::SamRecord> read) {
-    return read.at(read.size()-1).mate_pos == read.at(0).pos;
+    return (read.at(read.size() - 1).mate_pos == read.at(0).pos);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SamSorter::addSamRead_thread(std::mutex& lock, std::vector<std::vector<sam_to_mgrec::SamRecord>>& data) {
-    int ret = 0;
+void SamSorter::addSamRead(const sam_to_mgrec::SamRecord& record) {
+    /** this part checks if the top element on open_queries can be removed, because it's mate was not found **/
+    while (!open_queries.empty() && record.pos > open_queries.top().at(open_queries.top().size() - 1).mate_pos) {
+        try_appending_to_queries(open_queries.top());
+        primary_alignment_positions.remove(open_queries.top().at(0).pos);
+        open_queries.pop();
+    }
 
-    // reading data from sam file
-    {
-        std::lock_guard<std::mutex> guard(lock);
-        std::cerr << "reading file" << std::endl;
-        for (int i = 0; i < BUFFER_SIZE; ++i) {
-            data.emplace_back();
-            ret = sam_reader.readSamQuery(data.back());
-            if (ret == EOF) {
-                if (data.back().empty()) {
-                    data.pop_back();
-                }
-                break;
-            }
-            UTILS_DIE_IF(ret, "Error reading sam query: " + std::string(strerror(ret)));
+    /** this part checks where to put the new record **/
+    if ((uint64_t)record.mate_pos > (uint64_t)record.pos + (uint64_t)max_distance) {
+        /** mate is to far away, record gets treated as complete **/
+        try_appending_to_queries({record});
+    } else {
+        /** here the record is not complete yet **/
+        /** get all candidates that could be a match for new record **/
+        std::vector<std::vector<SamRecord>> candidate_reads;
+        auto candidate_pos = open_queries.empty() ? 0 : open_queries.top().at(open_queries.top().size() - 1).mate_pos;
+        while (!open_queries.empty() &&
+               open_queries.top().at(open_queries.top().size() - 1).mate_pos == candidate_pos) {
+            candidate_reads.emplace_back();
+            candidate_reads.back() = open_queries.top();
+            open_queries.pop();
         }
-    }
-}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SamSorter::addSamRead(std::vector<std::vector<sam_to_mgrec::SamRecord>>& queries, uint32_t num_threads) {
-    // get new data from sam reader
-    std::mutex lock;
-    std::vector<std::thread> threads;
-    std::vector<std::vector<sam_to_mgrec::SamRecord>> data;
-    threads.reserve(num_threads);
-    for (uint32_t i = 0; i < num_threads; ++i) {
-        threads.emplace_back(
-            [&]() { addSamRead_thread(lock, data); });
-    }
-    for (auto& t : threads) {
-        t.join();
-    }
-
-    /** TODO: Sometimes there are multiple open queries that wait for the same mate position. When top returns the "wrong" one of them, they can't be matched. */
-
-    // sorting data
-    std::cerr << "start with sorting data" << std::endl;
-
-    for (std::vector<sam_to_mgrec::SamRecord> &query : data) {
-        for (sam_to_mgrec::SamRecord &record: query) {
-
-            /** is it still okay to wait for top element? **/
-            while (!open_queries.empty() && record.pos >= open_queries.top().at(open_queries.top().size() - 1).mate_pos &&
-                record.qname != open_queries.top().at(0).qname){
-                /** couldn't finde mate of open_queries.top() **/
-                queries.emplace_back();
-                queries.back() =  open_queries.top();
-                primary_alignment_positions.erase(primary_alignment_positions.begin());
-                open_queries.pop();
-            }
-
-            /** check if read does not belong to existing query **/
-            if (open_queries.empty() || record.qname != open_queries.top().at(0).qname) {
-                if (std::vector<sam_to_mgrec::SamRecord> cur_query = {record}; isReadComplete(cur_query)) {
-                    try_appending_to_queries(cur_query, queries);
-                } else {
-                    /** cur_query is not complete yet, put to open_queries again **/
-                    open_queries.push(cur_query);
-                    primary_alignment_positions.push_back(record.pos);
-                }
-            } else {
-                /** record belongs to an already existing query **/
-                std::vector<SamRecord> cur_query = open_queries.top();
-                open_queries.pop();
+        /** check if new record belongs to any query in candidates **/
+        for (auto& candidate : candidate_reads) {
+            if (record.qname == candidate.at(0).qname) {
+                std::vector<SamRecord> cur_query = candidate;
                 cur_query.push_back(record);
                 if (isReadComplete(cur_query)) {
-                    try_appending_to_queries(cur_query, queries);
-                    primary_alignment_positions.erase(primary_alignment_positions.begin());
+                    try_appending_to_queries(cur_query);
+                    primary_alignment_positions.remove(cur_query.at(0).pos);
+                    candidate_pos = 1;
                 } else {
                     /** query is still not complete **/
                     open_queries.push(cur_query);
                 }
+            } else {
+                open_queries.push(candidate);
             }
+        }
 
-            set_new_alignment_pos();
-
-            /** check if any completed queries can be put to queries **/
-            while (!completed_queries.empty() && cur_alignment_position >= completed_queries.top().at(0).pos) {
-                queries.emplace_back();
-                queries.back() = completed_queries.top();
-                completed_queries.pop();
+        /** new record didn't match any candidate **/
+        if (candidate_pos != 1) {
+            if (record.pos <= record.mate_pos) {
+                open_queries.push({record});
+                primary_alignment_positions.push_back(record.pos);
+            } else {
+                try_appending_to_queries({record});
             }
         }
     }
+    set_new_alignment_pos();
 
-    std::cerr << "sorting complete" << std::endl;
+    /** check if any completed queries can be put to queries **/
+    while (!completed_queries.empty() && cur_alignment_position >= completed_queries.top().at(0).pos) {
+        queries.emplace_back();
+        queries.back() = completed_queries.top();
+        completed_queries.pop();
+    }
+}
+
+std::vector<std::vector<sam_to_mgrec::SamRecord>> SamSorter::getQueries() {
+    std::vector<std::vector<sam_to_mgrec::SamRecord>> ret = queries;
+    queries.clear();
+    return ret;
+}
+
+void SamSorter::endFile() {
+    /** mark all records on open list as complete **/
+    while (!open_queries.empty()) {
+        try_appending_to_queries(open_queries.top());
+        primary_alignment_positions.remove(open_queries.top().at(0).pos);
+        open_queries.pop();
+    }
+
+    /** append everything from complete_queries to queries **/
+    while (!completed_queries.empty()) {
+        queries.emplace_back();
+        queries.back() = completed_queries.top();
+        completed_queries.pop();
+    }
 }
 
 }  // namespace genie::format::sam::sam_to_mgrec
