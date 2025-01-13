@@ -25,17 +25,20 @@ constexpr auto kLogModuleName = "Mgb";
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr,
                                  Importer* importer, const bool ref)
     : refmgr_(mgr), importer_(importer), reference_only_(ref) {}
 
 // -----------------------------------------------------------------------------
+
 const core::parameter::EncodingSet& DataUnitFactory::GetParams(
     const size_t id) const {
   return parameters_.at(id);
 }
 
 // -----------------------------------------------------------------------------
+
 std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
   int i = 0;
   do {
@@ -115,6 +118,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::map<size_t, core::parameter::EncodingSet>&
 DataUnitFactory::GetParams() const {
   return parameters_;

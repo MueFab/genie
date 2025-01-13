@@ -20,9 +20,11 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 const uint64_t ReferenceManager::chunk_size_ = 1 * 1024 * 1024;  //!
 
 // -----------------------------------------------------------------------------
+
 void ReferenceManager::Touch(const std::string& name, size_t num) {
   if (cache_info_.size() < cache_size_) {
     cache_info_.emplace_front(name, num);

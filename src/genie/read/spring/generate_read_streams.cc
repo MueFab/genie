@@ -42,6 +42,7 @@ constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 struct SeData {
   CompressionParams cp{};
   std::vector<bool> flag_arr;
@@ -58,6 +59,7 @@ struct SeData {
 };
 
 // -----------------------------------------------------------------------------
+
 void GenerateSubSeqs(const SeData& data, const uint64_t block_num,
                      core::AccessUnit& raw_au) {
   int64_t rc_to_int[128];
@@ -218,6 +220,7 @@ void parallel_process_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateAndCompressSe(const std::string& temp_dir, const SeData& data,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
                            std::vector<core::parameter::EncodingSet>& params,
@@ -251,6 +254,7 @@ void GenerateAndCompressSe(const std::string& temp_dir, const SeData& data,
 }
 
 // -----------------------------------------------------------------------------
+
 void LoadSeData(const CompressionParams& cp, const std::string& temp_dir,
                 SeData* data) {
   const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -379,6 +383,7 @@ void LoadSeData(const CompressionParams& cp, const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreamsSe(const std::string& temp_dir,
                            const CompressionParams& cp,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
@@ -393,6 +398,7 @@ void GenerateReadStreamsSe(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void LoadPeData(const CompressionParams& cp, const std::string& temp_dir,
                 SeData* data) {
   const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -532,6 +538,7 @@ void LoadPeData(const CompressionParams& cp, const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 struct PeBlockData {
   std::vector<uint32_t> block_start;
   std::vector<uint32_t> block_end;  // block start and end positions wrt
@@ -543,6 +550,7 @@ struct PeBlockData {
 };
 
 // -----------------------------------------------------------------------------
+
 void GenerateBlocksPe(const SeData& data, PeBlockData* block_data) {
   block_data->block_num = std::vector<uint32_t>(data.cp.num_reads);
 
@@ -653,6 +661,7 @@ void GenerateBlocksPe(const SeData& data, PeBlockData* block_data) {
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateQualityIdPaired(const std::string& temp_dir,
                              const PeBlockData& block_data,
                              uint32_t num_reads) {
@@ -726,6 +735,7 @@ void GenerateQualityIdPaired(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 struct PeStatistics {
   std::vector<uint32_t> count_same_rec;
   std::vector<uint32_t> count_split_same_au;
@@ -733,6 +743,7 @@ struct PeStatistics {
 };
 
 // -----------------------------------------------------------------------------
+
 void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
                        const uint64_t cur_block_num, PeStatistics& pest,
                        const size_t cur_thread_num, core::AccessUnit& raw_au) {
@@ -1023,6 +1034,7 @@ void parallel_process_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreamsPe(const std::string& temp_dir,
                            const CompressionParams& cp,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
@@ -1100,6 +1112,7 @@ void GenerateReadStreamsPe(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreams(const std::string& temp_dir,
                          const CompressionParams& cp,
                          core::ReadEncoder::entropy_selector* entropy_encoder,

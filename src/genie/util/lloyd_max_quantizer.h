@@ -38,6 +38,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Implements the Lloyd-Max quantizer for quality value compression.
  *

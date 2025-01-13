@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 GabacSeqConfSet::GabacSeqConfSet() {
   // One configuration per subsequence
   for (const auto& desc : core::GetDescriptors()) {
@@ -29,6 +30,7 @@ GabacSeqConfSet::GabacSeqConfSet() {
 }
 
 // -----------------------------------------------------------------------------
+
 const EncodingConfiguration& GabacSeqConfSet::GetConfAsGabac(
     core::GenSubIndex sub) const {
   return conf_[static_cast<uint8_t>(sub.first)]
@@ -36,6 +38,7 @@ const EncodingConfiguration& GabacSeqConfSet::GetConfAsGabac(
 }
 
 // -----------------------------------------------------------------------------
+
 EncodingConfiguration& GabacSeqConfSet::GetConfAsGabac(core::GenSubIndex sub) {
   if (GetDescriptor(sub.first).token_type) {
     return conf_[static_cast<uint8_t>(sub.first)][0];
@@ -45,6 +48,7 @@ EncodingConfiguration& GabacSeqConfSet::GetConfAsGabac(core::GenSubIndex sub) {
 }
 
 // -----------------------------------------------------------------------------
+
 void GabacSeqConfSet::SetConfAsGabac(core::GenSubIndex sub,
                                      DescriptorSubsequenceCfg&& subseq_cfg) {
   conf_[static_cast<uint8_t>(sub.first)][static_cast<uint8_t>(sub.second)]
@@ -52,6 +56,7 @@ void GabacSeqConfSet::SetConfAsGabac(core::GenSubIndex sub,
 }
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] void GabacSeqConfSet::StoreParameters(
     ParameterSet& parameter_set) const {
   for (const auto& desc : core::GetDescriptors()) {
@@ -79,6 +84,7 @@ void GabacSeqConfSet::SetConfAsGabac(core::GenSubIndex sub,
 }
 
 // -----------------------------------------------------------------------------
+
 void GabacSeqConfSet::StoreParameters(
     core::GenDesc desc,
     core::parameter::DescriptorSubSequenceCfg& parameter_set) const {
@@ -101,6 +107,7 @@ void GabacSeqConfSet::StoreParameters(
 }
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] void GabacSeqConfSet::LoadParameters(
     const ParameterSet& parameter_set) {
   for (const auto& desc : core::GetDescriptors()) {

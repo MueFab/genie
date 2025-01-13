@@ -28,6 +28,7 @@
 namespace genie::name::write_out {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     core::AccessUnit::Descriptor& desc) {
   std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;

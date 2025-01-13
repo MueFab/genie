@@ -1,6 +1,10 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file transformed_sub_seq.cc
+ * @brief Implementation of CABAC transformed subsequences for Genie.
+ *
+ * Defines the `TransformedSubSeq` class for handling transformation parameters,
+ * CABAC binarization, state variables, and JSON serialization.
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

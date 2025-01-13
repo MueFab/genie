@@ -21,12 +21,14 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 const std::string& GetMpegVersionString(MpegMinorVersion v) {
   static const std::string lut[] = {"1900", "2000"};
   return lut[static_cast<uint8_t>(v)];
 }
 
 // -----------------------------------------------------------------------------
+
 MpegMinorVersion GetMpegVersion(const std::string& v) {
   for (auto ret = MpegMinorVersion::kV1900; ret < MpegMinorVersion::kUnknown;
        ret = static_cast<MpegMinorVersion>(static_cast<uint8_t>(ret) + 1)) {
@@ -38,6 +40,7 @@ MpegMinorVersion GetMpegVersion(const std::string& v) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<GenomicDescriptorProperties>& GetDescriptors() {
   static const std::vector<GenomicDescriptorProperties> prop = {
       {GenDesc::kPosition,
@@ -355,11 +358,13 @@ const std::vector<GenomicDescriptorProperties>& GetDescriptors() {
 }
 
 // -----------------------------------------------------------------------------
+
 const GenomicDescriptorProperties& GetDescriptor(GenDesc desc) {
   return GetDescriptors()[static_cast<uint8_t>(desc)];
 }
 
 // -----------------------------------------------------------------------------
+
 const GenomicSubDescriptorProperties& GetSubsequence(GenSubIndex idx) {
   if (GetDescriptors()[static_cast<uint8_t>(idx.first)].token_type) {
     return GetDescriptors()[static_cast<uint8_t>(idx.first)].sub_seqs[0];
@@ -369,6 +374,7 @@ const GenomicSubDescriptorProperties& GetSubsequence(GenSubIndex idx) {
 }
 
 // -----------------------------------------------------------------------------
+
 const Alphabet& GetAlphabetProperties(AlphabetId id) {
   static const auto prop = []() -> std::vector<Alphabet> {
     std::vector<Alphabet> loc;
@@ -392,18 +398,21 @@ const Alphabet& GetAlphabetProperties(AlphabetId id) {
 }
 
 // -----------------------------------------------------------------------------
+
 const GenomicSubDescriptorProperties& GenomicDescriptorProperties::GetSubSeq(
     const uint8_t sub) const {
   return sub_seqs[sub];
 }
 
 // -----------------------------------------------------------------------------
+
 bool Alphabet::IsIncluded(char c) const {
   return std::any_of(lut.begin(), lut.end(),
                      [c](const char lc) { return lc == c; });
 }
 
 // -----------------------------------------------------------------------------
+
 const CigarFormatInfo& GetECigarInfo() {
   static const auto format_info = []() -> CigarFormatInfo {
     const auto ref_step2 = []() -> std::vector<uint8_t> {
@@ -442,6 +451,7 @@ const CigarFormatInfo& GetECigarInfo() {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t Bits2Bytes(const uint8_t bits) {
   auto bytes = static_cast<uint8_t>(std::ceil(static_cast<float>(bits) / 8.0f));
   bytes = static_cast<uint8_t>(std::pow(2, std::ceil(log2(bytes))));
@@ -449,6 +459,7 @@ uint8_t Bits2Bytes(const uint8_t bits) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t Range2Bytes(const std::pair<int64_t, int64_t>& range) {
   auto bits =
       static_cast<uint8_t>(std::ceil(std::log2(std::abs(range.first) + 1)));

@@ -14,14 +14,17 @@
 namespace genie::core::record::alignment_external {
 
 // -----------------------------------------------------------------------------
+
 None::None() : AlignmentExternal(Type::kNone) {}
 
 // -----------------------------------------------------------------------------
+
 void None::Write(util::BitWriter& writer) const {
   AlignmentExternal::Write(writer);
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<AlignmentExternal> None::Clone() const {
   auto ret = std::make_unique<None>();
   return ret;

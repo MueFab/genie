@@ -19,11 +19,13 @@
 namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
+
 bool EncodingSet::SignatureCfg::operator==(const SignatureCfg& cfg) const {
   return signature_length == cfg.signature_length;
 }
 
 // -----------------------------------------------------------------------------
+
 EncodingSet::EncodingSet(util::BitReader& bit_reader) {
   dataset_type_ = bit_reader.Read<DataUnit::DatasetType>(4);
   alphabet_id_ = bit_reader.Read<AlphabetId>();
@@ -100,6 +102,7 @@ EncodingSet::EncodingSet(const DataUnit::DatasetType dataset_type,
       qv_coding_configs_(0) {}
 
 // -----------------------------------------------------------------------------
+
 EncodingSet::EncodingSet()
     : dataset_type_(DataUnit::DatasetType::kAligned),
       alphabet_id_(AlphabetId::kAcgtn),

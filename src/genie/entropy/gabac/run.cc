@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 uint64_t Run(const IoConfiguration& conf, const EncodingConfiguration& en_conf,
              const bool decode) {
   if (decode) {

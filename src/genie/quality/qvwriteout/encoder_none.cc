@@ -26,6 +26,7 @@
 namespace genie::quality::qvwriteout {
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded NoneEncoder::Process(const core::record::Chunk&) {
   auto param = std::make_unique<paramqv1::QualityValues1>(
       paramqv1::QualityValues1::QualityParametersPresetId::ASCII, false);

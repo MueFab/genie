@@ -222,7 +222,9 @@ class QualityValues1 final : public core::parameter::QualityValues {
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::paramqv1
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_PARAMQV1_QV_CODING_CONFIG_1_H_

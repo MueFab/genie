@@ -33,6 +33,7 @@ constexpr auto kLogModuleName = "App/Capsulator";
 namespace genie_app::capsulator {
 
 // -----------------------------------------------------------------------------
+
 void encapsulate(ProgramOptions& options) {
   auto version = genie::core::MpegMinorVersion::kV2000;
 
@@ -53,6 +54,7 @@ void encapsulate(ProgramOptions& options) {
 }
 
 // -----------------------------------------------------------------------------
+
 void decapsulate(ProgramOptions& options) {
   genie::format::mgg::encapsulator::DecapsulatedFile ret(options.input_file_);
   std::string global_output_prefix =
@@ -76,6 +78,7 @@ void decapsulate(ProgramOptions& options) {
 }
 
 // -----------------------------------------------------------------------------
+
 int main(const int argc, char* argv[]) {
   ProgramOptions p_opts(argc, argv);
 

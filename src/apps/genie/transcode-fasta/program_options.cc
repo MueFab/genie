@@ -24,6 +24,7 @@ constexpr auto kLogModuleName = "App/TranscodeFasta";
 namespace genie_app::transcode_fasta {
 
 // -----------------------------------------------------------------------------
+
 std::string parent_dir(const std::string& path) {
   std::string ret;
 
@@ -40,6 +41,7 @@ std::string parent_dir(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   CLI::App app("Genie MPEG-G reference encoder\n");
 
@@ -66,6 +68,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);
@@ -86,6 +89,7 @@ std::string size_string(const std::uintmax_t f_size) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateInputFile(const std::string& file) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -100,6 +104,7 @@ void ValidateInputFile(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string random_string(const size_t length) {
   // Define the character set
   constexpr char charset[] =
@@ -124,6 +129,7 @@ std::string random_string(const size_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateWorkingDir(const std::string& dir) {
   UTILS_DIE_IF(!std::filesystem::exists(dir),
                "Directory does not exist: " + dir);
@@ -149,6 +155,7 @@ void ValidateWorkingDir(const std::string& dir) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateOutputFile(const std::string& file, const bool forced) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -173,6 +180,7 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::validate() {
   ValidateInputFile(inputFile);
   if (inputFile.substr(0, 2) != "-.") {

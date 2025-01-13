@@ -27,6 +27,7 @@
 namespace genie::read::refcoder {
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::GetReferences(
     const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
   std::vector<std::string> ret;
@@ -55,12 +56,14 @@ std::vector<std::string> Decoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<basecoder::DecoderStub::DecodingState>
 Decoder::CreateDecodingState(core::AccessUnit& t) {
   return std::make_unique<RefDecodingState>(t);
 }
 
 // -----------------------------------------------------------------------------
+
 Decoder::RefDecodingState::RefDecodingState(core::AccessUnit& t_data)
     : DecodingState(t_data), ref_excerpt(t_data.GetReferenceExcerpt()) {}
 

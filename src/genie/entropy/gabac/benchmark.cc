@@ -29,6 +29,7 @@ constexpr auto kLogModuleName = "App/Gabac";
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 paramcabac::Binarization ConfigSearchBinarization::GetBinarization(
     const bool bypass, const uint8_t output_bits,
     const uint8_t sub_symbol_size) const {
@@ -42,6 +43,7 @@ paramcabac::Binarization ConfigSearchBinarization::GetBinarization(
 }
 
 // -----------------------------------------------------------------------------
+
 ConfigSearchBinarization::ConfigSearchBinarization(
     const std::pair<int64_t, int64_t>& range, uint8_t split_size)
     : binarization_search_idx_(0), binarization_parameter_search_idx_(0) {
@@ -95,6 +97,7 @@ ConfigSearchBinarization::ConfigSearchBinarization(
 }
 
 // -----------------------------------------------------------------------------
+
 bool ConfigSearchBinarization::Increment() {
   binarization_parameter_search_idx_++;
   if (binarization_parameter_search_idx_ ==
@@ -110,6 +113,7 @@ bool ConfigSearchBinarization::Increment() {
 }
 
 // -----------------------------------------------------------------------------
+
 void ConfigSearchBinarization::Mutate(std::mt19937& rd,
                                       std::normal_distribution<>& d) {
   binarization_search_idx_ =
@@ -120,6 +124,7 @@ void ConfigSearchBinarization::Mutate(std::mt19937& rd,
 }
 
 // -----------------------------------------------------------------------------
+
 bool ConfigSearchTransformedSeq::LutValid() const {
   return output_bits_ / GetSplitRatio() <= 8 &&
          coding_order_.GetIndex(coding_order_search_idx_) > 0;

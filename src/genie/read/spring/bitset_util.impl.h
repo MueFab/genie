@@ -36,6 +36,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void StringToBitset(
     const std::string& s, const uint16_t read_length,
@@ -46,6 +47,7 @@ void StringToBitset(
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
                         std::vector<BbHashDict>& dict, const int num_dict,
@@ -341,6 +343,7 @@ std::vector<BbHashDict> ConstructDictionary(
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 std::vector<std::vector<std::bitset<BitsetSize>>> GenerateMasks(
     const uint32_t max_read_len, const uint8_t bpb) {

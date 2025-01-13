@@ -16,6 +16,7 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 meta::Dataset FlowGraph::GetMeta() const {
   return {0, std::make_unique<meta::block_header::Enabled>(false, false), "",
           ""};

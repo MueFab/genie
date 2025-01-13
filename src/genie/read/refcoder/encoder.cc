@@ -27,12 +27,14 @@
 namespace genie::read::refcoder {
 
 // -----------------------------------------------------------------------------
+
 Encoder::RefEncodingState::RefEncodingState(const core::record::Chunk& data)
     : EncodingState(data) {
   excerpt = data.GetRef();
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<std::string, std::string> Encoder::GetReferences(
     const core::record::Record& r, EncodingState& state) {
   std::pair<std::string, std::string> ret;
@@ -62,6 +64,7 @@ std::pair<std::string, std::string> Encoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
     const core::record::Chunk& data) const {
   return std::make_unique<RefEncodingState>(data);

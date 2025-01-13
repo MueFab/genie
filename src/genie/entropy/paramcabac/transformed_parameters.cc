@@ -1,6 +1,10 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file transformed_parameters.cc
+ * @brief Implementation of transformed parameters for CABAC in Genie.
+ *
+ * Defines the `TransformedParameters` class for managing transformation types,
+ * parameters for match, RLE, and merge coding, and serialization support.
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

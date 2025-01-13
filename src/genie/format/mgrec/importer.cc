@@ -24,6 +24,7 @@ constexpr auto kLogModuleName = "Mgrec";
 namespace genie::format::mgrec {
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(const size_t block_size, std::istream& file_1,
                    std::ostream& unsupported, const bool check_support)
     : block_size_(block_size),
@@ -40,6 +41,7 @@ Importer::Importer(const size_t block_size, std::istream& file_1,
 }
 
 // -----------------------------------------------------------------------------
+
 bool IsECigarSupported(const std::string& e_cigar) {
   // Splices not supported
   if (e_cigar.find_first_of('*') != std::string::npos ||
@@ -51,6 +53,7 @@ bool IsECigarSupported(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::IsRecordSupported(const core::record::Record& rec) {
   if (!check_support_) {
     return true;
@@ -92,6 +95,7 @@ bool Importer::IsRecordSupported(const core::record::Record& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
   const util::Watch watch;
   core::record::Chunk chunk;
@@ -152,6 +156,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Importer::PrintStats() const {
   if (discarded_splices_ + discarded_hm_ + discarded_long_distance_ +
           discarded_missing_pair_u_ ==
@@ -183,6 +188,7 @@ void Importer::PrintStats() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Importer::FlushIn(uint64_t& pos) {
   FormatImporter::FlushIn(pos);
   PrintStats();

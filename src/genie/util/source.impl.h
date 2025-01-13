@@ -1,6 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file source.impl.h
+ *
+ * @brief Implementation of the Source class template for data flow management.
+ *
+ * Defines methods for interacting with a Drain instance, including data
+ * transfer, flushing, skipping sections, and setting the Drain.
+ *
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

@@ -26,6 +26,7 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
   std::string ret;
   for (const auto& st : rec) {
@@ -62,6 +63,7 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t Pull32BigEndian(core::AccessUnit::Subsequence& seq) {
   uint32_t ret = 0;
   ret |= seq.Pull() << 24;
@@ -72,6 +74,7 @@ uint32_t Pull32BigEndian(core::AccessUnit::Subsequence& seq) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     core::AccessUnit::Descriptor& desc) {
   std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;

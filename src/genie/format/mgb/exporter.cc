@@ -23,9 +23,11 @@ constexpr auto kLogModuleName = "Mgb";
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(std::ostream* file) : writer(*file), id_ctr(0) {}
 
 // -----------------------------------------------------------------------------
+
 void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   util::Watch watch;
   core::AccessUnit data = std::move(t);
@@ -113,6 +115,7 @@ void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Exporter::SkipIn(const util::Section& id) {
   [[maybe_unused]] util::OrderedSection sec(&lock, id);
 }

@@ -27,6 +27,7 @@
 namespace genie::read::lowlatency {
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   util::Watch watch;
   core::record::Chunk data = std::move(t);
@@ -107,6 +108,7 @@ void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit Encoder::pack(
     const util::Section& id, const uint8_t qv_depth,
     std::unique_ptr<core::parameter::QualityValues> quality_value_params,

@@ -37,6 +37,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Configuration structure for I/O settings used during GABAC encoding.
  *

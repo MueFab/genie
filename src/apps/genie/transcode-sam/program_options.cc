@@ -26,6 +26,7 @@ constexpr auto kLogModuleName = "App/TranscodeSam";
 namespace genie_app::transcode_sam {
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(const int argc, char* argv[])
     : verbosity_level_(0),
       force_overwrite_(false),
@@ -37,9 +38,11 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[])
 }
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::~ProgramOptions() = default;
 
 // -----------------------------------------------------------------------------
+
 genie::format::sam::Config ProgramOptions::ToConfig() const {
   genie::format::sam::Config config;
   config.tmp_dir_path_ = tmp_dir_path_;
@@ -51,6 +54,7 @@ genie::format::sam::Config ProgramOptions::ToConfig() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
   CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
@@ -97,6 +101,7 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateInputFile(const std::string& file) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -111,6 +116,7 @@ void ValidateInputFile(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateReference(const std::string& file) {
   UTILS_DIE_IF(!std::filesystem::exists(file),
                "Reference file does not exist: " + file);
@@ -122,6 +128,7 @@ void ValidateReference(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateOutputFile(const std::string& file, const bool forced) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -146,6 +153,7 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);
@@ -166,6 +174,7 @@ std::string size_string(const std::uintmax_t f_size) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string parent_dir(const std::string& path) {
   std::string ret;
 
@@ -182,6 +191,7 @@ std::string parent_dir(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string random_string(const size_t length) {
   // Define the character set
   constexpr char charset[] =
@@ -206,6 +216,7 @@ std::string random_string(const size_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateWorkingDir(const std::string& dir) {
   UTILS_DIE_IF(!std::filesystem::exists(dir),
                "Directory does not exist: " + dir);
@@ -231,6 +242,7 @@ void ValidateWorkingDir(const std::string& dir) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::validate() {
   ValidateInputFile(input_file_);
   if (input_file_.substr(0, 2) != "-.") {

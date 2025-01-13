@@ -23,6 +23,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 std::string AccessUnit::DebugPrint(const core::parameter::EncodingSet& ps)
 const {
   std::stringstream ss;
@@ -67,6 +68,7 @@ const {
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::LoadPayload(util::BitReader& bit_reader) {
   for (size_t i = 0; i < header.GetNumBlocks(); ++i) {
     blocks.emplace_back(qv_payloads, bit_reader);
@@ -74,9 +76,11 @@ void AccessUnit::LoadPayload(util::BitReader& bit_reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t AccessUnit::GetPayloadSize() const { return payloadbytes; }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(
     const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
     util::BitReader& bit_reader, const bool lazy_payload)
@@ -103,6 +107,7 @@ AccessUnit::AccessUnit(
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(const uint32_t access_unit_id,
                        const uint8_t parameter_set_id,
                        const core::record::ClassType au_type,
@@ -134,6 +139,7 @@ AccessUnit::AccessUnit(const uint32_t access_unit_id,
 }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::SetMmCfg(const MmCfg& cfg) {
   if (!mm_cfg_) {
     UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
@@ -142,6 +148,7 @@ void AuHeader::SetMmCfg(const MmCfg& cfg) {
 }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::SetRefCfg(const RefCfg& cfg) {
   if (!ref_cfg_) {
     UTILS_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
@@ -150,9 +157,11 @@ void AuHeader::SetRefCfg(const RefCfg& cfg) {
 }
 
 // -----------------------------------------------------------------------------
+
 const RefCfg& AuHeader::GetRefCfg() const { return ref_cfg_.value(); }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::SetAuTypeCfg(AuTypeCfg&& cfg) {
   if (!au_type_u_cfg_) {
     UTILS_THROW_RUNTIME_EXCEPTION(
@@ -162,6 +171,7 @@ void AuHeader::SetAuTypeCfg(AuTypeCfg&& cfg) {
 }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::SetSignatureCfg(SignatureCfg&& cfg) {
   if (!signature_config_) {
     UTILS_THROW_RUNTIME_EXCEPTION(
@@ -171,27 +181,35 @@ void AuHeader::SetSignatureCfg(SignatureCfg&& cfg) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<Block>& AccessUnit::GetBlocks() { return blocks; }
 
 // -----------------------------------------------------------------------------
+
 AuHeader& AccessUnit::GetHeader() { return header; }
 
 // -----------------------------------------------------------------------------
+
 uint32_t AuHeader::GetId() const { return access_unit_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t AuHeader::GetParameterId() const { return parameter_set_id_; }
 
 // -----------------------------------------------------------------------------
+
 const AuTypeCfg& AuHeader::GetAlignmentInfo() const { return *au_type_u_cfg_; }
 
 // -----------------------------------------------------------------------------
+
 uint32_t AuHeader::GetReadCount() const { return reads_count_; }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType AuHeader::GetClass() const { return au_type_; }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::Write(util::BitWriter& writer) const {
   DataUnit::Write(writer);
   writer.WriteBits(0, 3);
@@ -220,15 +238,18 @@ void AccessUnit::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::AddBlock(Block block) {
   header.BlockAdded();
   blocks.push_back(std::move(block));
 }
 
 // -----------------------------------------------------------------------------
+
 const AuHeader& AccessUnit::GetHeader() const { return header; }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
   output << "* Access Unit " << header.GetId() << " ";
   switch (header.GetClass()) {
@@ -267,6 +288,7 @@ void AccessUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(AuHeader h, std::vector<Block> b)
     : DataUnit(DataUnitType::kAccessUnit),
       header(std::move(h)),

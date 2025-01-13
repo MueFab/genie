@@ -23,6 +23,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void DoSubsequenceTransform(
     const paramcabac::Subsequence& sub_seq_cfg,
     std::vector<util::DataBlock>* transformed_sub_seqs) {
@@ -48,6 +49,7 @@ void DoSubsequenceTransform(
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t EncodeDescSubsequence(const IoConfiguration& conf,
                                const EncodingConfiguration& en_conf) {
   conf.Validate();

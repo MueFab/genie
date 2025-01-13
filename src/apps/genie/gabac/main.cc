@@ -28,6 +28,7 @@ constexpr auto kLogModuleName = "App/Gabac";
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     if (ProgramOptions program_options(argc, argv);

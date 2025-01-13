@@ -18,6 +18,7 @@
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<std::string, std::string>> Sha256File::read(
     std::istream& file) {
   std::vector<std::pair<std::string, std::string>> ret;
@@ -35,6 +36,7 @@ std::vector<std::pair<std::string, std::string>> Sha256File::read(
 }
 
 // -----------------------------------------------------------------------------
+
 void Sha256File::Write(
     std::ostream& file,
     const std::vector<std::pair<std::string, std::string>>& val) {
@@ -47,6 +49,7 @@ void Sha256File::Write(
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Sha256File::Hex2Bytes(const std::string& hex) {
   const int len = static_cast<int>(hex.length());
   std::string new_string;
@@ -60,6 +63,7 @@ std::string Sha256File::Hex2Bytes(const std::string& hex) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Sha256File::hash(std::istream& file, const size_t pos_start,
                              size_t length) {
   file.seekg(static_cast<std::streamoff>(pos_start));

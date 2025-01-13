@@ -31,6 +31,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 SpringSource::SpringSource(const std::string& temp_dir,
                            const CompressionParams& cp,
                            std::vector<core::parameter::EncodingSet>& p,
@@ -65,6 +66,7 @@ SpringSource::SpringSource(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 bool SpringSource::Pump(uint64_t& id, std::mutex& lock) {
   core::AccessUnit au(core::parameter::EncodingSet(), 0);
   util::Section sec{};  // NOLINT
@@ -118,6 +120,7 @@ bool SpringSource::Pump(uint64_t& id, std::mutex& lock) {
 }
 
 // -----------------------------------------------------------------------------
+
 void SpringSource::FlushIn(uint64_t& pos) { FlushOut(pos); }
 
 // -----------------------------------------------------------------------------

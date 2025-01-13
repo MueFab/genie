@@ -82,12 +82,15 @@ RefInfo::RefInfo(const std::string& fasta_name)
 }
 
 // -----------------------------------------------------------------------------
+
 bool RefInfo::IsValid() const { return valid_; }
 
 // -----------------------------------------------------------------------------
+
 core::ReferenceManager* RefInfo::GetMgr() const { return ref_mgr_.get(); }
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(const size_t block_size, std::string input, std::string ref)
     : block_size_(block_size),
       input_sam_file_(std::move(input)),
@@ -98,6 +101,7 @@ Importer::Importer(const size_t block_size, std::string input, std::string ref)
       refinf_(input_ref_file_) {}
 
 // -----------------------------------------------------------------------------
+
 bool CmpReaders::operator()(const sam_to_mgrec::SubfileReader* a,
                             const sam_to_mgrec::SubfileReader* b) const {
   return !sam_to_mgrec::compare(a->GetRecord().value(), b->GetRecord().value());
@@ -111,6 +115,7 @@ struct CleanStatistics {
 };
 
 // -----------------------------------------------------------------------------
+
 std::string patch_ecigar(const std::string& ref, const std::string& seq,
                          const std::string& e_cigar) {
   std::string fixed_cigar;
@@ -176,6 +181,7 @@ std::string patch_ecigar(const std::string& ref, const std::string& seq,
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType ClassifyEcigar(const std::string&) {
   return core::record::ClassType::kClassI;
   /*
@@ -199,6 +205,7 @@ core::record::ClassType ClassifyEcigar(const std::string&) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
   return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
     return alphabet.IsIncluded(c);
@@ -206,6 +213,7 @@ bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool fix_ecigar(core::record::Record& r,
                 const std::vector<std::pair<std::string, size_t>>&,
                 const RefInfo& ref) {
@@ -478,6 +486,7 @@ std::pair<std::vector<core::record::Record>, CleanStatistics> CleanRecord(
 }
 
 // -----------------------------------------------------------------------------
+
 void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id,
                    const std::string& tmp_path, bool clean, std::mutex& lock,
                    CleanStatistics& stats) {
@@ -573,6 +582,7 @@ void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id,
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<std::string, size_t>> Importer::sam_to_mgrec_phase1(
     const Config& options, int& chunk_id) {
   auto sam_reader = sam_to_mgrec::SamReader(options.input_file_);

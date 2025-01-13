@@ -24,6 +24,7 @@ constexpr auto kLogModuleName = "Classifier";
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 bool ClassifierRegroup::IsCovered(const size_t start, const size_t end) const {
   size_t position = start;
 

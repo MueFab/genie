@@ -14,6 +14,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 bool AuHeader::operator==(const AuHeader& other) const {
   return access_unit_id_ == other.access_unit_id_ &&
          num_blocks_ == other.num_blocks_ &&
@@ -25,6 +26,7 @@ bool AuHeader::operator==(const AuHeader& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::Write(util::BitWriter& writer,
                      const bool write_signatures) const {
   writer.WriteBits(access_unit_id_, 32);
@@ -50,12 +52,15 @@ void AuHeader::Write(util::BitWriter& writer,
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t AuHeader::GetNumBlocks() const { return num_blocks_; }
 
 // -----------------------------------------------------------------------------
+
 void AuHeader::BlockAdded() { num_blocks_++; }
 
 // -----------------------------------------------------------------------------
+
 AuHeader::AuHeader(
     util::BitReader& bit_reader,
     const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
@@ -102,12 +107,14 @@ AuHeader::AuHeader(
 }
 
 // -----------------------------------------------------------------------------
+
 AuHeader::AuHeader()
     : AuHeader(0, 0, core::record::ClassType::kNone, 0,
                core::parameter::ParameterSet::DatasetType::kNonAligned, 0,
                false, core::AlphabetId::kAcgtn) {}
 
 // -----------------------------------------------------------------------------
+
 AuHeader::AuHeader(
     const uint32_t access_unit_id, const uint8_t parameter_set_id,
     const core::record::ClassType au_type, const uint32_t reads_count,

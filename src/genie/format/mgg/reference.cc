@@ -21,6 +21,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool Reference::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -33,6 +34,7 @@ bool Reference::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 Reference::Reference(util::BitReader& reader,
                      const core::MpegMinorVersion version)
     : ref_version_(0, 0, 0) {
@@ -55,6 +57,7 @@ Reference::Reference(util::BitReader& reader,
 }
 
 // -----------------------------------------------------------------------------
+
 Reference::Reference(const uint8_t group_id, const uint8_t ref_id,
                      std::string ref_name, const reference::Version ref_version,
                      std::unique_ptr<reference::Location> location,
@@ -67,33 +70,40 @@ Reference::Reference(const uint8_t group_id, const uint8_t ref_id,
       version_(version) {}
 
 // -----------------------------------------------------------------------------
+
 uint8_t Reference::GetDatasetGroupId() const { return dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t Reference::GetReferenceId() const { return reference_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Reference::GetReferenceName() const {
   return reference_name_;
 }
 
 // -----------------------------------------------------------------------------
+
 const reference::Version& Reference::GetRefVersion() const {
   return ref_version_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<reference::Sequence>& Reference::GetSequences() const {
   return sequences_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Reference::GetKey() const {
   static const std::string key = "rfgn";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 void Reference::AddSequence(reference::Sequence seq, std::string checksum) {
   sequences_.emplace_back(std::move(seq));
   if (reference_location_->IsExternal()) {
@@ -103,11 +113,13 @@ void Reference::AddSequence(reference::Sequence seq, std::string checksum) {
 }
 
 // -----------------------------------------------------------------------------
+
 const reference::Location& Reference::GetLocation() const {
   return *reference_location_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Reference::BoxWrite(util::BitWriter& writer) const {
   writer.WriteAlignedInt(dataset_group_id_);
   writer.WriteAlignedInt(reference_id_);
@@ -122,11 +134,13 @@ void Reference::BoxWrite(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Reference::PatchId(const uint8_t group_id) {
   dataset_group_id_ = group_id;
 }
 
 // -----------------------------------------------------------------------------
+
 void Reference::PatchRefId(const uint8_t old, const uint8_t _new) {
   if (reference_id_ == old) {
     reference_id_ = _new;
@@ -134,6 +148,7 @@ void Reference::PatchRefId(const uint8_t old, const uint8_t _new) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::meta::Reference Reference::decapsulate(std::string meta) {
   std::unique_ptr<core::meta::RefBase> location =
       reference_location_->decapsulate();
@@ -148,6 +163,7 @@ core::meta::Reference Reference::decapsulate(std::string meta) {
 }
 
 // -----------------------------------------------------------------------------
+
 Reference::Reference(const uint8_t dataset_group_id, const uint8_t reference_id,
                      core::meta::Reference ref,
                      const core::MpegMinorVersion version)
@@ -166,6 +182,7 @@ Reference::Reference(const uint8_t dataset_group_id, const uint8_t reference_id,
 }
 
 // -----------------------------------------------------------------------------
+
 void Reference::PrintDebug(std::ostream& output, const uint8_t depth,
                             const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Reference");

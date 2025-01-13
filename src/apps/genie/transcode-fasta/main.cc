@@ -27,6 +27,7 @@ constexpr auto kLogModuleName = "App/TranscodeFasta";
 namespace genie_app::transcode_fasta {
 
 // -----------------------------------------------------------------------------
+
 std::string file_extension(const std::string& path) {
   const auto pos = path.find_last_of('.');
   std::string ext = path.substr(pos + 1);
@@ -37,6 +38,7 @@ std::string file_extension(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     ProgramOptions p_opts(argc, argv);

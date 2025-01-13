@@ -18,6 +18,7 @@
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 SubfileReader::SubfileReader(const std::string& fpath)
     : reader_(fpath, std::ios::binary), bitreader_(reader_), path_(fpath) {
   UTILS_DIE_IF(!reader_, "Cannot open file to read: " + fpath);
@@ -27,12 +28,14 @@ SubfileReader::SubfileReader(const std::string& fpath)
 }
 
 // -----------------------------------------------------------------------------
+
 SubfileReader::~SubfileReader() {
   bitreader_.FlushHeldBits();
   reader_.close();
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record SubfileReader::MoveRecord() {
   UTILS_DIE_IF(!rec_, "No record available.");
   auto ret = std::move(rec_.value());
@@ -45,11 +48,13 @@ core::record::Record SubfileReader::MoveRecord() {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::optional<core::record::Record>& SubfileReader::GetRecord() const {
   return rec_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool SubfileReader::good() { return reader_.good() && reader_.peek() != EOF; }
 
 // -----------------------------------------------------------------------------

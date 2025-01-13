@@ -14,6 +14,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 bool RefCfg::operator==(const RefCfg& other) const {
   return ref_sequence_id_ == other.ref_sequence_id_ &&
          ref_start_position_ == other.ref_start_position_ &&
@@ -22,15 +23,19 @@ bool RefCfg::operator==(const RefCfg& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t RefCfg::GetSeqId() const { return ref_sequence_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t RefCfg::GetStart() const { return ref_start_position_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t RefCfg::GetEnd() const { return ref_end_position_; }
 
 // -----------------------------------------------------------------------------
+
 void RefCfg::Write(util::BitWriter& writer) const {
   writer.WriteBits(ref_sequence_id_, 16);
   writer.WriteBits(ref_start_position_, pos_size_);
@@ -38,6 +43,7 @@ void RefCfg::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 RefCfg::RefCfg(const uint16_t ref_sequence_id,
                const uint64_t ref_start_position,
                const uint64_t ref_end_position, const uint8_t pos_size)
@@ -47,9 +53,11 @@ RefCfg::RefCfg(const uint16_t ref_sequence_id,
       pos_size_(pos_size) {}
 
 // -----------------------------------------------------------------------------
+
 RefCfg::RefCfg(const uint8_t pos_size) : RefCfg(0, 0, 0, pos_size) {}
 
 // -----------------------------------------------------------------------------
+
 RefCfg::RefCfg(const uint8_t pos_size, util::BitReader& reader)
     : pos_size_(pos_size) {
   ref_sequence_id_ = reader.Read<uint16_t>();

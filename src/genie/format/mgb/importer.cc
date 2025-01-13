@@ -20,6 +20,7 @@ constexpr auto kLogModuleName = "Mgb";
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(std::istream& file, core::ReferenceManager* manager,
                    core::RefDecoder* ref_decoder, const bool ref_only)
     : ReferenceSource(manager),
@@ -36,6 +37,7 @@ Importer::Importer(std::istream& file, core::ReferenceManager* manager,
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::Pump(uint64_t& id, std::mutex&) {
   // util::Watch watch; TODO(fabian): Statistics
   std::optional<AccessUnit> unit;
@@ -66,6 +68,7 @@ bool Importer::Pump(uint64_t& id, std::mutex&) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Importer::GetRef(const bool raw, const size_t f_pos,
                              const size_t start, const size_t end) {
   AccessUnit au(0, 0, core::record::ClassType::kNone, 0,
@@ -96,6 +99,7 @@ std::string Importer::GetRef(const bool raw, const size_t f_pos,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit Importer::ConvertAu(AccessUnit&& au) const {
   auto unit = std::move(au);
   auto paramset = factory_.GetParams(unit.GetHeader().GetParameterId());

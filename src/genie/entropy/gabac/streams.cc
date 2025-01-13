@@ -15,39 +15,48 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] FileBuffer::FileBuffer(FILE* f) : fileptr_(f) {}
 
 // -----------------------------------------------------------------------------
+
 int FileBuffer::overflow(const int c) { return fputc(c, fileptr_); }
 
 // -----------------------------------------------------------------------------
+
 std::streamsize FileBuffer::xsputn(const char* s, const std::streamsize n) {
   return static_cast<std::streamsize>(
       fwrite(s, 1, static_cast<size_t>(n), fileptr_));
 }
 
 // -----------------------------------------------------------------------------
+
 int FileBuffer::sync() { return fflush(fileptr_); }
 
 // -----------------------------------------------------------------------------
+
 std::streamsize FileBuffer::xsgetn(char* s, const std::streamsize n) {
   return static_cast<std::streamsize>(
       fread(s, 1, static_cast<size_t>(n), fileptr_));
 }
 
 // -----------------------------------------------------------------------------
+
 int FileBuffer::underflow() { return fgetc(fileptr_); }
 
 // -----------------------------------------------------------------------------
+
 DataBlockBuffer::DataBlockBuffer(util::DataBlock* d, const size_t pos_i)
     : block_(0, 1), pos_(pos_i) {
   block_.Swap(d);
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DataBlockBuffer::Size() const { return block_.GetRawSize(); }
 
 // -----------------------------------------------------------------------------
+
 int DataBlockBuffer::overflow(const int c) {
   block_.PushBack(static_cast<uint64_t>(c));
   return c;

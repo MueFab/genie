@@ -28,6 +28,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 EncoderGlobalB<BitsetSize>::EncoderGlobalB(const int max_read_len_param) {
   max_read_len = max_read_len_param;
@@ -38,6 +39,7 @@ EncoderGlobalB<BitsetSize>::EncoderGlobalB(const int max_read_len_param) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 std::string BitsetToString(std::bitset<BitsetSize> b, const uint16_t read_len,
                            const EncoderGlobalB<BitsetSize>& egb) {
@@ -411,6 +413,7 @@ void process_all_tasks(
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void Encode(std::vector<std::bitset<BitsetSize>>& read,
             std::vector<BbHashDict>& dict, std::vector<uint32_t>& order_s,
@@ -579,6 +582,7 @@ void Encode(std::vector<std::bitset<BitsetSize>>& read,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void SetGlobalArrays(EncoderGlobal& eg, EncoderGlobalB<BitsetSize>& egb) {
   for (int i = 0; i < 63; i++) egb.mask63[i] = 1;
@@ -624,6 +628,7 @@ void SetGlobalArrays(EncoderGlobal& eg, EncoderGlobalB<BitsetSize>& egb) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void ReadSingletons(std::vector<std::bitset<BitsetSize>>& read,
                     std::vector<uint32_t>& order_s,
@@ -663,6 +668,7 @@ void ReadSingletons(std::vector<std::bitset<BitsetSize>>& read,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void EncoderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto egb = EncoderGlobalB<BitsetSize>(cp.max_read_len);

@@ -33,12 +33,15 @@ namespace genie_app::transcode_fastq {
 
 
 // -----------------------------------------------------------------------------
+
 enum class OperationCase { UNKNOWN = 0, CONVERT = 3 };
 
 // -----------------------------------------------------------------------------
+
 enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 
 // -----------------------------------------------------------------------------
+
 FileType GetType(const std::string& ext) {
   if (ext == "fastq" || ext == "mgrec") {
     return FileType::THIRD_PARTY;
@@ -50,6 +53,7 @@ FileType GetType(const std::string& ext) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const FileType in, const FileType out) {
   if (in == FileType::THIRD_PARTY && out == FileType::THIRD_PARTY) {
     return OperationCase::CONVERT;
@@ -58,6 +62,7 @@ OperationCase GetOperation(const FileType in, const FileType out) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const std::string& filename_in,
                            const std::string& filename_out) {
   return GetOperation(GetType(file_extension(filename_in)),
@@ -65,6 +70,7 @@ OperationCase GetOperation(const std::string& filename_in,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ofstream>>& output_files) {
@@ -97,6 +103,7 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -135,6 +142,7 @@ void AttachImporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildConverter(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -146,6 +154,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildConverter(
 }
 
 // -----------------------------------------------------------------------------
+
 int main(const int argc, char* argv[]) {
   try {
     const ProgramOptions p_opts(argc, argv);

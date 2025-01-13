@@ -18,6 +18,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void TransformMatchCoding(
     const paramcabac::Subsequence& sub_sequence_cfg,
     std::vector<util::DataBlock>* transformed_sub_sequences) {
@@ -80,6 +81,7 @@ void TransformMatchCoding(
 }
 
 // -----------------------------------------------------------------------------
+
 void InverseTransformMatchCoding(
     std::vector<util::DataBlock>* transformed_sub_sequences) {
   assert(transformed_sub_sequences != nullptr);

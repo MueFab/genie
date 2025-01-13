@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool AccessUnit::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -27,10 +28,12 @@ bool AccessUnit::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(AccessUnitHeader h, const core::MpegMinorVersion version)
     : header_(std::move(h)), version_(version) {}
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(
     util::BitReader& reader,
     const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
@@ -70,45 +73,55 @@ AccessUnit::AccessUnit(
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::AddBlock(Block b) { blocks_.emplace_back(std::move(b)); }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Block>& AccessUnit::GetBlocks() const { return blocks_; }
 
 // -----------------------------------------------------------------------------
+
 const AccessUnitHeader& AccessUnit::GetHeader() const { return header_; }
 
 // -----------------------------------------------------------------------------
+
 bool AccessUnit::HasInformation() const {
   return au_information_ != std::nullopt;
 }
 
 // -----------------------------------------------------------------------------
+
 bool AccessUnit::HasProtection() const {
   return au_protection_ != std::nullopt;
 }
 
 // -----------------------------------------------------------------------------
+
 const AuInformation& AccessUnit::GetInformation() const {
   return *au_information_;
 }
 
 // -----------------------------------------------------------------------------
+
 const AuProtection& AccessUnit::GetProtection() const {
   return *au_protection_;
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::SetInformation(AuInformation au) {
   au_information_ = std::move(au);
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::SetProtection(AuProtection au) {
   au_protection_ = std::move(au);
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::BoxWrite(util::BitWriter& bit_writer) const {
   header_.Write(bit_writer);
   if (au_information_ != std::nullopt) {
@@ -123,12 +136,14 @@ void AccessUnit::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& AccessUnit::GetKey() const {
   static const std::string key = "aucn";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::PrintDebug(std::ostream& output, const uint8_t depth,
                              const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Access Unit");
@@ -145,12 +160,15 @@ void AccessUnit::PrintDebug(std::ostream& output, const uint8_t depth,
 }
 
 // -----------------------------------------------------------------------------
+
 AuInformation& AccessUnit::GetInformation() { return *au_information_; }
 
 // -----------------------------------------------------------------------------
+
 AuProtection& AccessUnit::GetProtection() { return *au_protection_; }
 
 // -----------------------------------------------------------------------------
+
 mgb::AccessUnit AccessUnit::Decapsulate() {
   std::vector<mgb::Block> new_blocks;
   new_blocks.reserve(blocks_.size());
@@ -161,6 +179,7 @@ mgb::AccessUnit AccessUnit::Decapsulate() {
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::AccessUnit(mgb::AccessUnit au, const bool mit,
                        const core::MpegMinorVersion version)
     : header_(std::move(au.GetHeader()), mit), version_(version) {

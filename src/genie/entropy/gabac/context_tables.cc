@@ -14,6 +14,7 @@
 namespace genie::entropy::gabac::contexttables {
 
 // -----------------------------------------------------------------------------
+
 std::vector<ContextModel> BuildContextTable(const uint64_t num_contexts) {
   return std::vector<ContextModel>(num_contexts);
 }

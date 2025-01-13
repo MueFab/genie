@@ -18,12 +18,14 @@
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(const int argc, char* argv[])
     : fast_benchmark_(false), blocksize_(0), desc_id_(0), subseq_id_(0) {
   ProcessCommandLine(argc, argv);
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
   CLI::App app{"Gabacify - GABAC entropy encoder application"};
 
@@ -63,6 +65,7 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::validate() const {
   // Do stuff depending on the task
   if (this->task_ == "encode" || this->task_ == "Decode") {

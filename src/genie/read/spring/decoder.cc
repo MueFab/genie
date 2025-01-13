@@ -43,6 +43,7 @@ constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                    std::array<std::vector<Record>, 2>& matched_records,
                    std::array<std::vector<Record>, 2>& unmatched_records,
@@ -276,6 +277,7 @@ void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 }
 
 // -----------------------------------------------------------------------------
+
 Decoder::Decoder(const std::string& working_dir, const bool comb_p,
                  const bool paired_end)
     : combine_pairs_(comb_p), unmatched_record_index_{} {
@@ -311,6 +313,7 @@ Decoder::Decoder(const std::string& working_dir, const bool comb_p,
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   core::record::Chunk chunk;
   core::AccessUnit au = EntropyCodeAu(std::move(t), true);
@@ -439,6 +442,7 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::ReadRec(std::ifstream& i, Record& r) {
   UTILS_DIE_IF(!std::getline(i, r.name), "Error reading tmp file");
   UTILS_DIE_IF(!std::getline(i, r.seq), "Error reading tmp file");
@@ -446,6 +450,7 @@ void Decoder::ReadRec(std::ifstream& i, Record& r) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::Add(core::record::Chunk& chunk, core::record::Record&& r,
                   uint64_t& pos) {
   chunk.GetData().push_back(std::move(r));
@@ -458,6 +463,7 @@ void Decoder::Add(core::record::Chunk& chunk, core::record::Record&& r,
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlushIn(uint64_t& pos) {
   core::record::Chunk chunk;
 
@@ -649,6 +655,7 @@ void Decoder::FlushIn(uint64_t& pos) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::SkipIn(const util::Section& id) {
   {
     util::OrderedSection sec(&lock_, id);  // NOLINT

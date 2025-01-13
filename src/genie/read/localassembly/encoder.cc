@@ -30,6 +30,7 @@ constexpr auto kLogModuleName = "LocalAssembly";
 namespace genie::read::localassembly {
 
 // -----------------------------------------------------------------------------
+
 Encoder::LaEncodingState::LaEncodingState(const core::record::Chunk& data,
                                           const uint32_t cr_buf_max_size)
     : EncodingState(data), ref_coder(cr_buf_max_size) {
@@ -38,6 +39,7 @@ Encoder::LaEncodingState::LaEncodingState(const core::record::Chunk& data,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::PrintDebug(const LaEncodingState& state, const std::string& ref1,
                          const std::string& ref2,
                          const core::record::Record& r) const {
@@ -67,6 +69,7 @@ void Encoder::PrintDebug(const LaEncodingState& state, const std::string& ref1,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
                                core::AccessUnit::Descriptor read_name,
                                EncodingState& state) {
@@ -82,6 +85,7 @@ core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<std::string, std::string> Encoder::GetReferences(
     const core::record::Record& r, EncodingState& state) {
   std::pair<std::string, std::string> ret;
@@ -119,6 +123,7 @@ std::pair<std::string, std::string> Encoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
     const core::record::Chunk& data) const {
   constexpr uint32_t reads_per_assembly = 10;
@@ -138,10 +143,12 @@ std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const bool debug, const bool write_raw)
     : EncoderStub(write_raw), debug_(debug) {}
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   core::record::Chunk d = std::move(t);
 

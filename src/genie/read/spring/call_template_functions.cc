@@ -29,6 +29,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void CallReorder(const std::string& temp_dir, const CompressionParams& cp) {
   switch ((2 * cp.max_read_len - 1) / 64 * 64 + 64) {
     case 64:
@@ -85,6 +86,7 @@ void CallReorder(const std::string& temp_dir, const CompressionParams& cp) {
 }
 
 // -----------------------------------------------------------------------------
+
 void CallEncoder(const std::string& temp_dir, const CompressionParams& cp) {
   switch ((3 * cp.max_read_len - 1) / 64 * 64 + 64) {
     case 64:

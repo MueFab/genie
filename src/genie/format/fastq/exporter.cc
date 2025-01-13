@@ -18,13 +18,16 @@
 namespace genie::format::fastq {
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(std::ostream& file_1) : file_{&file_1} {}
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(std::ostream& file_1, std::ostream& file_2)
     : file_{&file_1, &file_2} {}
 
 // -----------------------------------------------------------------------------
+
 void Exporter::SkipIn(const util::Section& id) {
   [[maybe_unused]] util::OrderedSection sec(&lock_, id);
 }

@@ -37,6 +37,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void Factory<T>::RegisterType(
     uint8_t id,
@@ -46,6 +47,7 @@ void Factory<T>::RegisterType(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 std::unique_ptr<T> Factory<T>::Create(uint8_t id, core::GenDesc desc,
                                       BitReader& reader) {

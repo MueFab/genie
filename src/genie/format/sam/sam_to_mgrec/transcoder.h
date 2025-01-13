@@ -29,6 +29,7 @@
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 #define PHASE1_EXT ".phase1.mgrec"
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"

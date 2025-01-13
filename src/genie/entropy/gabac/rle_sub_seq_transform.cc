@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void TransformRleCoding(const paramcabac::Subsequence& subseq_cfg,
                         std::vector<util::DataBlock>* transformed_subseqs) {
   assert(transformed_subseqs != nullptr);
@@ -79,6 +80,7 @@ void TransformRleCoding(const paramcabac::Subsequence& subseq_cfg,
 }
 
 // -----------------------------------------------------------------------------
+
 void InverseTransformRleCoding(
     const paramcabac::Subsequence& subseq_cfg,
     std::vector<util::DataBlock>* transformed_subseqs) {

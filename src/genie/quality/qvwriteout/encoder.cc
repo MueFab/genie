@@ -29,6 +29,7 @@
 namespace genie::quality::qvwriteout {
 
 // -----------------------------------------------------------------------------
+
 void Encoder::SetUpParameters(const core::record::Chunk& rec,
                               paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
@@ -54,6 +55,7 @@ void Encoder::SetUpParameters(const core::record::Chunk& rec,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeAlignedSegment(const core::record::Segment& s,
                                    const std::string& e_cigar,
                                    core::AccessUnit::Descriptor& desc) {
@@ -79,6 +81,7 @@ void Encoder::EncodeAlignedSegment(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeUnalignedSegment(const core::record::Segment& s,
                                      core::AccessUnit::Descriptor& desc) {
   for (const auto& q : s.GetQualities()) {
@@ -90,6 +93,7 @@ void Encoder::EncodeUnalignedSegment(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& rec) {
   const util::Watch watch;
   auto param = std::make_unique<paramqv1::QualityValues1>(
@@ -134,6 +138,7 @@ core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::qvwriteout
 
 // -----------------------------------------------------------------------------

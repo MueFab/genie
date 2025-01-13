@@ -27,11 +27,15 @@
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
+
+// -----------------------------------------------------------------------------
 
 using ClassType = core::record::ClassType;
 
 // -----------------------------------------------------------------------------
+
 paramqv1::Codebook CodebookFromVector(const std::vector<unsigned char>& vec) {
   paramqv1::Codebook codebook(vec[0], vec[1]);
   for (size_t i = 2; i < vec.size(); ++i) {
@@ -41,12 +45,14 @@ paramqv1::Codebook CodebookFromVector(const std::vector<unsigned char>& vec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::GenSubIndex get_qv_steps(const size_t i) {
   UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
   return std::make_pair(core::GenDesc::kQv, static_cast<uint16_t>(i + 2));
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FillCalqStructures(const core::record::Chunk& chunk,
                                  EncodingOptions& opt,
                                  SideInformation& side_information,
@@ -114,6 +120,7 @@ void Encoder::FillCalqStructures(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeAligned(const core::record::Chunk& chunk,
                             paramqv1::QualityValues1& param,
                             core::AccessUnit::Descriptor& desc) {
@@ -150,6 +157,7 @@ void Encoder::EncodeAligned(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::AddQualities(const core::record::Segment& s,
                            core::AccessUnit::Descriptor& desc,
                            const util::UniformMinMaxQuantizer& quantizer) {
@@ -164,6 +172,7 @@ void Encoder::AddQualities(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
                               paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
@@ -194,6 +203,7 @@ void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& chunk) {
   const util::Watch watch;
   auto param = std::make_unique<paramqv1::QualityValues1>(
@@ -214,6 +224,7 @@ core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& chunk) {
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------

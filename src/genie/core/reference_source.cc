@@ -19,9 +19,11 @@ namespace genie::core {
 using util::operator""_u16;
 
 // -----------------------------------------------------------------------------
+
 ReferenceSource::ReferenceSource(ReferenceManager* mgr) : ref_mgr_(mgr) {}
 
 // -----------------------------------------------------------------------------
+
 meta::Reference ReferenceSource::GetMeta() const {
   return {
       "",           0, 0, 0, std::make_unique<meta::InternalRef>(0_u16, 0_u16),

@@ -18,38 +18,46 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& FileHeader::GetMajorBrand() const { return major_brand_; }
 
 // -----------------------------------------------------------------------------
+
 core::MpegMinorVersion FileHeader::GetMinorVersion() const {
   return minor_version_;
 }
 
 // -----------------------------------------------------------------------------
+
 void FileHeader::AddCompatibleBrand(std::string brand) {
   compatible_brands_.emplace_back(std::move(brand));
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::string>& FileHeader::GetCompatibleBrands() const {
   return compatible_brands_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& FileHeader::GetKey() const {
   static const std::string key = "flhd";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 FileHeader::FileHeader()
     : major_brand_("MPEG-G"), minor_version_(core::MpegMinorVersion::kV2000) {}
 
 // -----------------------------------------------------------------------------
+
 FileHeader::FileHeader(const core::MpegMinorVersion minor_version)
     : major_brand_("MPEG-G"), minor_version_(minor_version) {}
 
 // -----------------------------------------------------------------------------
+
 FileHeader::FileHeader(util::BitReader& bit_reader)
     : major_brand_(6, '\0'), minor_version_() {
   const auto start_pos = bit_reader.GetStreamPosition() - 4;
@@ -69,6 +77,7 @@ FileHeader::FileHeader(util::BitReader& bit_reader)
 }
 
 // -----------------------------------------------------------------------------
+
 void FileHeader::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedBytes(major_brand_.data(), major_brand_.length());
   const auto tmp = GetMpegVersionString(minor_version_);
@@ -79,6 +88,7 @@ void FileHeader::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool FileHeader::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -90,6 +100,7 @@ bool FileHeader::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void FileHeader::PrintDebug(std::ostream& output, const uint8_t depth,
                              const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* File Header");

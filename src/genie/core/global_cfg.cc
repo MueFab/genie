@@ -12,9 +12,11 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 util::IndustrialPark& GlobalCfg::GetIndustrialPark() { return fpark_; }
 
 // -----------------------------------------------------------------------------
+
 GlobalCfg& GlobalCfg::GetSingleton() {
   static GlobalCfg cfg;
   return cfg;

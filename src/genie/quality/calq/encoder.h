@@ -31,6 +31,7 @@
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
 
 /**
@@ -122,7 +123,9 @@ class Encoder final : public core::QvEncoder {
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_CALQ_ENCODER_H_

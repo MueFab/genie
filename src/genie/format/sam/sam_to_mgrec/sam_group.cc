@@ -30,6 +30,7 @@ constexpr auto kLogModuleName = "TranscoderSam";
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<bool, uint8_t> SamRecordGroup::ConvertFlags2Mpeg(
     const uint16_t flags) {
   uint8_t flags_mpeg = 0;
@@ -44,6 +45,7 @@ std::tuple<bool, uint8_t> SamRecordGroup::ConvertFlags2Mpeg(
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::AddAlignment(core::record::Record& rec, SamRecord* r1,
                                   SamRecord* r2, const bool paired_end,
                                   const bool force_split) {  // NOLINT
@@ -116,12 +118,14 @@ void SamRecordGroup::AddAlignment(core::record::Record& rec, SamRecord* r1,
 }
 
 // -----------------------------------------------------------------------------
+
 SamRecordGroup::SamRecordGroup()
     : data_(static_cast<size_t>(TemplateType::TOTAL_INDICES),
             std::vector<std::list<SamRecord>>(
                 static_cast<size_t>(MappingType::TOTAL_INDICES))) {}
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::AddRecord(SamRecord&& rec) {
   auto template_type = [&rec] {
     if (!rec.IsPaired()) {
@@ -152,6 +156,7 @@ void SamRecordGroup::AddRecord(SamRecord&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool SamRecordGroup::CheckIfPaired() const {
   size_t count_single_end = 0;
   size_t count_paired_end = 0;
@@ -176,6 +181,7 @@ bool SamRecordGroup::CheckIfPaired() const {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType SamRecordGroup::CheckClassTypeSingle() {
   const size_t primary_count =
       data_[static_cast<uint8_t>(TemplateType::SINGLE)]
@@ -215,6 +221,7 @@ core::record::ClassType SamRecordGroup::CheckClassTypeSingle() {
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::RemoveDuplicatesPaired(TemplateType temp_type,
                                             MappingType map_type) {
   while (data_[static_cast<uint8_t>(temp_type)][static_cast<uint8_t>(map_type)]
@@ -232,6 +239,7 @@ void SamRecordGroup::RemoveDuplicatesPaired(TemplateType temp_type,
 }
 
 // -----------------------------------------------------------------------------
+
 size_t SamRecordGroup::PrimaryTemplateCount(TemplateType temp_type) const {
   return data_[static_cast<uint8_t>(temp_type)]
               [static_cast<uint8_t>(MappingType::PRIMARY)]
@@ -242,6 +250,7 @@ size_t SamRecordGroup::PrimaryTemplateCount(TemplateType temp_type) const {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t SamRecordGroup::MappingCount(MappingType map_type) const {  // NOLINT
   return data_[static_cast<uint8_t>(TemplateType::PAIRED_1)]
               [static_cast<uint8_t>(map_type)]
@@ -255,6 +264,7 @@ size_t SamRecordGroup::MappingCount(MappingType map_type) const {  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::RemoveAmbiguousSecondaryAlignments() {
   // Get rid of unknown pair index
   if (data_[static_cast<uint8_t>(TemplateType::PAIRED_UNKNOWN)]
@@ -273,6 +283,7 @@ void SamRecordGroup::RemoveAmbiguousSecondaryAlignments() {
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::MoveSecondaryAlignments() {
   // Move secondary alignments which can be associated with a primary read
   auto s1 = std::move(data_[static_cast<uint8_t>(TemplateType::PAIRED_1)]
@@ -314,6 +325,7 @@ void SamRecordGroup::MoveSecondaryAlignments() {
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::GuessUnknownReadOrder(size_t& unknown_count,
                                            size_t& read_1_count,
                                            size_t& read_2_count) {
@@ -363,6 +375,7 @@ void SamRecordGroup::GuessUnknownReadOrder(size_t& unknown_count,
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType SamRecordGroup::CheckClassTypePaired() {
   RemoveDuplicatesPaired(TemplateType::PAIRED_1, MappingType::PRIMARY);
   RemoveDuplicatesPaired(TemplateType::PAIRED_1, MappingType::UNMAPPED);
@@ -398,6 +411,7 @@ core::record::ClassType SamRecordGroup::CheckClassTypePaired() {
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<bool, core::record::ClassType> SamRecordGroup::validate() {
   if (const bool paired = CheckIfPaired(); !paired) {
     return std::make_pair(false, CheckClassTypeSingle());
@@ -406,6 +420,7 @@ std::pair<bool, core::record::ClassType> SamRecordGroup::validate() {
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<SamRecord*, SamRecord*> SamRecordGroup::GetReadTuple() {
   SamRecord* r1 = nullptr;
   SamRecord* r2 = nullptr;
@@ -453,6 +468,7 @@ std::pair<SamRecord*, SamRecord*> SamRecordGroup::GetReadTuple() {
 }
 
 // -----------------------------------------------------------------------------
+
 bool SamRecordGroup::IsR1First(
     const std::pair<bool, core::record::ClassType>& cls) const {
   if (cls.second == core::record::ClassType::kClassU || !cls.first ||
@@ -477,6 +493,7 @@ bool SamRecordGroup::IsR1First(
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::AddSegment(core::record::Record& rec, SamRecord* r1) {
   if (r1) {
     core::record::Segment seg(r1->MoveSeq());
@@ -490,6 +507,7 @@ void SamRecordGroup::AddSegment(core::record::Record& rec, SamRecord* r1) {
 }
 
 // -----------------------------------------------------------------------------
+
 void SamRecordGroup::convert(std::list<core::record::Record>& records, bool) {
   auto cls = validate();
   if (cls.second == core::record::ClassType::kNone) {

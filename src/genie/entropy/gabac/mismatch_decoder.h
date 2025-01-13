@@ -121,4 +121,5 @@ class MismatchDecoder : public core::MismatchDecoder {
 #endif  // SRC_GENIE_ENTROPY_GABAC_MISMATCH_DECODER_H_
 
 // -----------------------------------------------------------------------------
+
 // -------------------

@@ -37,6 +37,7 @@
 namespace genie::read::basecoder {
 
 // -----------------------------------------------------------------------------
+
 Decoder::Decoder(core::AccessUnit&& au, const size_t segments, const size_t pos)
     : container_(std::move(au)),
       position_(pos),
@@ -45,6 +46,7 @@ Decoder::Decoder(core::AccessUnit&& au, const size_t segments, const size_t pos)
       number_template_segments_(segments) {}
 
 // -----------------------------------------------------------------------------
+
 core::record::Record Decoder::Pull(uint16_t ref, std::vector<std::string>&& vec,
                                    const SegmentMeta& meta) {
   std::vector<std::string> sequences = std::move(vec);
@@ -113,6 +115,7 @@ core::record::Record Decoder::Pull(uint16_t ref, std::vector<std::string>&& vec,
 }
 
 // -----------------------------------------------------------------------------
+
 Decoder::SegmentMeta Decoder::ReadSegmentMeta() {
   SegmentMeta meta{};
   meta.position[0] =
@@ -143,6 +146,7 @@ Decoder::SegmentMeta Decoder::ReadSegmentMeta() {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
     size_t clip_offset, std::string&& seq, std::string&& cigar) {
   auto sequence = std::move(seq);
@@ -192,6 +196,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::Decode(
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Decoder::ContractECigar(const std::string& cigar_long) {
   char cur_tok = cigar_long.front();
   size_t count = 0;
@@ -236,6 +241,7 @@ std::string Decoder::ContractECigar(const std::string& cigar_long) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::DecodeAdditional(
     const size_t softclip_offset, std::string&& seq, std::string&& cigar,
     uint16_t delta_pos,
@@ -261,6 +267,7 @@ void Decoder::DecodeAdditional(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<int32_t> Decoder::NumberDeletions(const size_t number) {
   std::vector counters(number, 0);
   if (container_.Get(core::gen_sub::kMismatchPosTerminator).IsEmpty() ||
@@ -285,6 +292,7 @@ std::vector<int32_t> Decoder::NumberDeletions(const size_t number) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::DecodeMismatches(const size_t clip_offset, std::string& sequence,
                                std::string& cigar_extended) {
   uint64_t mismatch_position = 0;
@@ -348,6 +356,7 @@ void Decoder::DecodeMismatches(const size_t clip_offset, std::string& sequence,
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<size_t, size_t> Decoder::DecodeClips(
     std::vector<std::string>& sequences,
     std::vector<std::string>& cigar_extended) {
@@ -406,6 +415,7 @@ std::tuple<size_t, size_t> Decoder::DecodeClips(
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::Clear() { this->container_.Clear(); }
 
 // -----------------------------------------------------------------------------

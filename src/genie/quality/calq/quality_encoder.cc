@@ -130,6 +130,7 @@ void QualityEncoder::FinishBlock() {
 size_t QualityEncoder::NrMappedRecords() const { return nr_mapped_records_; }
 
 // -----------------------------------------------------------------------------
+
 void QualityEncoder::EncodeMappedQuality(const std::string& quality_values,
                                          const std::string& cigar,
                                          const uint64_t pos) const {

@@ -86,6 +86,7 @@ class BbHashDict {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Convert a string into a bitset based on character values.
  * @tparam BitsetSize Size of the bitset.

@@ -14,6 +14,7 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<AccessUnit::Descriptor, stats::PerfStats> NameEncoderNone::Process(
     const record::Chunk&) {
   return std::make_tuple(AccessUnit::Descriptor(GenDesc::kReadName),

@@ -29,33 +29,40 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 bool TokenState::more() const { return cur_it_ != end_it_; }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::step() { ++cur_it_; }
 
 // -----------------------------------------------------------------------------
+
 char TokenState::get() const { return *cur_it_; }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::PushToken(Tokens t, uint32_t param) {
   cur_rec_.emplace_back(t, param, "");
   token_pos_++;
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::PushToken(const SingleToken& t) {
   cur_rec_.emplace_back(t);
   token_pos_++;
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::PushTokenString(const std::string& param) {
   cur_rec_.emplace_back(Tokens::STRING, 0, param);
   token_pos_++;
 }
 
 // -----------------------------------------------------------------------------
+
 const SingleToken& TokenState::GetOldToken() const {
   static const SingleToken invalid(Tokens::NONE, 0, "");
   if (old_rec_.size() > token_pos_) {
@@ -65,6 +72,7 @@ const SingleToken& TokenState::GetOldToken() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::alphabetic() {
   SingleToken tok(Tokens::STRING, 0, "");
   while (more() && isalpha(get())) {
@@ -82,6 +90,7 @@ void TokenState::alphabetic() {
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::zeros() {
   SingleToken tok(Tokens::STRING, 0, "");
   while (more() && get() == '0') {
@@ -98,6 +107,7 @@ void TokenState::zeros() {
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::number() {
   constexpr uint32_t max_number = 1 << 26;  // 8 digits + 1 digit fetched below
   SingleToken tok(Tokens::DIGITS, 0, "");
@@ -120,6 +130,7 @@ void TokenState::number() {
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::character() {
   const SingleToken tok(Tokens::CHAR, *cur_it_, "");
   step();
@@ -133,6 +144,7 @@ void TokenState::character() {
 }
 
 // -----------------------------------------------------------------------------
+
 TokenState::TokenState(const std::vector<SingleToken>& old,
                        const std::string& input)
     : token_pos_(0),
@@ -141,6 +153,7 @@ TokenState::TokenState(const std::vector<SingleToken>& old,
       end_it_(input.end()) {}
 
 // -----------------------------------------------------------------------------
+
 std::vector<SingleToken>&& TokenState::run() {
   if (GetOldToken().token == Tokens::DIFF) {
     PushToken(Tokens::DIFF, 1);
@@ -166,6 +179,7 @@ std::vector<SingleToken>&& TokenState::run() {
 }
 
 // -----------------------------------------------------------------------------
+
 void Push32BigEndian(core::AccessUnit::Subsequence& seq, const uint32_t value) {
   seq.Push(value >> 24 & 0xff);
   seq.Push(value >> 16 & 0xff);
@@ -174,6 +188,7 @@ void Push32BigEndian(core::AccessUnit::Subsequence& seq, const uint32_t value) {
 }
 
 // -----------------------------------------------------------------------------
+
 void TokenState::encode(const std::vector<SingleToken>& tokens,
                         core::AccessUnit::Descriptor& streams) {
   UTILS_DIE_IF(tokens.size() > std::numeric_limits<uint16_t>::max(),

@@ -25,6 +25,7 @@
 constexpr auto kLogModuleName = "App";
 
 // -----------------------------------------------------------------------------
+
 static void PrintCmdLine(const int argc, char* argv[]) {
   std::string cmd_line;
   for (int i = 0; i < argc; i++) {
@@ -35,9 +36,11 @@ static void PrintCmdLine(const int argc, char* argv[]) {
 }
 
 // -----------------------------------------------------------------------------
+
 int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 
 // -----------------------------------------------------------------------------
+
 int help(int, char*[]) {
   UTILS_LOG(genie::util::Logger::Severity::ERROR,
             "Usage: \ngenie <operation> <operation specific options> \n\nList "
@@ -49,6 +52,7 @@ int help(int, char*[]) {
 }
 
 // -----------------------------------------------------------------------------
+
 int main(const int argc, char* argv[]) {
   const std::string genie =
       R"(   ______           _

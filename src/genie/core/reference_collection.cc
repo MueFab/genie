@@ -18,6 +18,7 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 std::string ReferenceCollection::GetSequence(const std::string& name,
                                              const uint64_t start,
                                              const uint64_t end) const {
@@ -63,11 +64,13 @@ std::string ReferenceCollection::GetSequence(const std::string& name,
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceCollection::RegisterRef(std::unique_ptr<Reference> ref) {
   refs_[ref->GetName()].emplace_back(std::move(ref));
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceCollection::RegisterRef(
     std::vector<std::unique_ptr<Reference>>&& ref) {
   auto vec = std::move(ref);
@@ -77,6 +80,7 @@ void ReferenceCollection::RegisterRef(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<size_t, size_t>> ReferenceCollection::GetCoverage(
     const std::string& name) const {
   std::vector<std::pair<size_t, size_t>> ret;
@@ -91,6 +95,7 @@ std::vector<std::pair<size_t, size_t>> ReferenceCollection::GetCoverage(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> ReferenceCollection::GetSequences() const {
   std::vector<std::string> ret;
   ret.reserve(refs_.size());

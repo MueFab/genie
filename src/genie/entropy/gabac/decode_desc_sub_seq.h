@@ -38,12 +38,14 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 struct EncodingConfiguration;  // Forward declaration of the
                                // EncodingConfiguration structure.
 struct IoConfiguration;        // Forward declaration of the IOConfiguration
                                // structure.
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Performs the inverse transformation on a given subsequence.
  *
@@ -63,6 +65,7 @@ void DoInverseSubsequenceTransform(
     std::vector<util::DataBlock>* transformed_sub_sequence);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Decodes a descriptor subsequence using the given input and encoding
  * configurations.

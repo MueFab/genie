@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DataSetMappingTableList::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -27,16 +28,19 @@ bool DataSetMappingTableList::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DataSetMappingTableList::GetKey() const {
   static const std::string key = "dmtl";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DataSetMappingTableList::DataSetMappingTableList(const uint8_t ds_group_id)
     : dataset_group_ID(ds_group_id) {}
 
 // -----------------------------------------------------------------------------
+
 DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -50,11 +54,13 @@ DataSetMappingTableList::DataSetMappingTableList(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void DataSetMappingTableList::AddDatasetMappingTableSid(uint16_t sid) {
   dataset_mapping_table_SID.emplace_back(sid);
 }
 
 // -----------------------------------------------------------------------------
+
 void DataSetMappingTableList::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedInt(dataset_group_ID);
   for (const auto& s : dataset_mapping_table_SID) {
@@ -63,11 +69,13 @@ void DataSetMappingTableList::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DataSetMappingTableList::GetDatasetGroupId() const {
   return dataset_group_ID;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint16_t>&
 DataSetMappingTableList::GetDatasetMappingTableSiDs() const {
   return dataset_mapping_table_SID;

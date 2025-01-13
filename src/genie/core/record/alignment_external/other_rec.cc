@@ -17,28 +17,34 @@
 namespace genie::core::record::alignment_external {
 
 // -----------------------------------------------------------------------------
+
 OtherRec::OtherRec(const uint64_t next_pos, const uint16_t next_seq_id)
     : AlignmentExternal(Type::kOtherRec),
       next_pos_(next_pos),
       next_seq_id_(next_seq_id) {}
 
 // -----------------------------------------------------------------------------
+
 OtherRec::OtherRec(util::BitReader& reader)
     : AlignmentExternal(Type::kOtherRec),
       next_pos_(reader.ReadAlignedInt<uint64_t, 5>()),
       next_seq_id_(reader.ReadAlignedInt<uint16_t>()) {}
 
 // -----------------------------------------------------------------------------
+
 OtherRec::OtherRec()
     : AlignmentExternal(Type::kOtherRec), next_pos_(0), next_seq_id_(0) {}
 
 // -----------------------------------------------------------------------------
+
 uint64_t OtherRec::GetNextPos() const { return next_pos_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t OtherRec::GetNextSeq() const { return next_seq_id_; }
 
 // -----------------------------------------------------------------------------
+
 void OtherRec::Write(util::BitWriter& writer) const {
   AlignmentExternal::Write(writer);
   writer.WriteAlignedInt<uint64_t, 5>(next_pos_);
@@ -46,6 +52,7 @@ void OtherRec::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<AlignmentExternal> OtherRec::Clone() const {
   auto ret = std::make_unique<OtherRec>();
   ret->next_pos_ = this->next_pos_;

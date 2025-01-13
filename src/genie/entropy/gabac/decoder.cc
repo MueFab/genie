@@ -26,6 +26,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Descriptor DecompressTokens(
     const EncodingConfiguration& conf0, const EncodingConfiguration&,
     core::AccessUnit::Subsequence&& data) {
@@ -131,6 +132,7 @@ core::AccessUnit::Descriptor DecompressTokens(
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Decoder::Decompress(
     const EncodingConfiguration& conf, core::AccessUnit::Subsequence&& data,
     bool mm_coder_enabled) {
@@ -176,6 +178,7 @@ core::AccessUnit::Subsequence Decoder::Decompress(
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, bool mm_coder_enabled) {

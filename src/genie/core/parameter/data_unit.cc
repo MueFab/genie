@@ -12,19 +12,23 @@
 namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
+
 DataUnit::DataUnit(const DataUnitType& t) : data_unit_type_(t) {}
 
 // -----------------------------------------------------------------------------
+
 void DataUnit::Write(util::BitWriter& writer) const {
   writer.WriteBits(static_cast<uint64_t>(data_unit_type_), 8);
 }
 
 // -----------------------------------------------------------------------------
+
 DataUnit::DataUnitType DataUnit::GetDataUnitType() const {
   return data_unit_type_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DataUnit::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
   output << "* Data Unit: ";
   switch (data_unit_type_) {

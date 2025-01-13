@@ -12,6 +12,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::BlockHeader(util::BitReader& reader) {
   reserved1_ = reader.Read<bool>(1);
   descriptor_id_ = reader.Read<core::GenDesc>(7);
@@ -20,15 +21,19 @@ BlockHeader::BlockHeader(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::GenDesc BlockHeader::GetDescriptorId() const { return descriptor_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint32_t BlockHeader::GetPayloadSize() const { return block_payload_size_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t BlockHeader::GetLength() { return 1 + 4; }  /// 1 + 7 + 3 + 29}
 
 // -----------------------------------------------------------------------------
+
 void BlockHeader::Write(util::BitWriter& writer) const {
   writer.WriteBits(reserved1_, 1);
   writer.WriteBits(static_cast<uint8_t>(descriptor_id_), 7);
@@ -37,6 +42,7 @@ void BlockHeader::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::BlockHeader(const bool reserved1, const core::GenDesc desc_id,
                          const uint8_t reserved2, const uint32_t payload_size)
     : reserved1_(reserved1),
@@ -45,12 +51,15 @@ BlockHeader::BlockHeader(const bool reserved1, const core::GenDesc desc_id,
       block_payload_size_(payload_size) {}
 
 // -----------------------------------------------------------------------------
+
 bool BlockHeader::GetReserved1() const { return reserved1_; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t BlockHeader::GetReserved2() const { return reserved2_; }
 
 // -----------------------------------------------------------------------------
+
 bool BlockHeader::operator==(const BlockHeader& other) const {
   return reserved1_ == other.reserved1_ &&
          descriptor_id_ == other.descriptor_id_ &&

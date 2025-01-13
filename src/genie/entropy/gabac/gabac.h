@@ -21,9 +21,11 @@
 #define SRC_GENIE_ENTROPY_GABAC_GABAC_H_
 
 // -----------------------------------------------------------------------------
+
 #ifdef __cplusplus  // Ensure compatibility with C++ compilers.
 
 // -----------------------------------------------------------------------------
+
 /* Encode / Decode */
 #include "genie/entropy/gabac/configuration.h"
 #include "genie/entropy/gabac/run.h"
