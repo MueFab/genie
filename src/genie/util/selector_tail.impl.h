@@ -33,22 +33,26 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 SelectorTail<Tout>::SelectorTail() : dry_ctr_(0), mod_num_(0) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::AddMod() {
   mod_num_++;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::FlowIn(Tout&& t, const Section& id) {
   Source<Tout>::FlowOut(std::move(t), id);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::FlushIn(uint64_t& pos) {
   if (const size_t num = ++dry_ctr_; num == mod_num_) {
@@ -59,6 +63,7 @@ void SelectorTail<Tout>::FlushIn(uint64_t& pos) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::SkipIn(const Section& id) {
   if (id.strong_skip) {

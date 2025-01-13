@@ -20,10 +20,12 @@
 namespace genie::core::meta::external_ref {
 
 // -----------------------------------------------------------------------------
+
 Raw::Raw(std::string ref_uri, const ChecksumAlgorithm check)
     : ExternalRef(std::move(ref_uri), check, ReferenceType::kRawRef) {}
 
 // -----------------------------------------------------------------------------
+
 Raw::Raw(const nlohmann::json& json) : ExternalRef(json) {
   for (const auto& s : json["ref_type_other_checksums"]) {
     ref_type_other_checksums_.push_back(util::FromHex(s));
@@ -32,21 +34,25 @@ Raw::Raw(const nlohmann::json& json) : ExternalRef(json) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::string>& Raw::GetChecksums() const {
   return ref_type_other_checksums_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Raw::AddChecksum(std::string checksum) {
   ref_type_other_checksums_.emplace_back(std::move(checksum));
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string>& Raw::GetChecksums() {
   return ref_type_other_checksums_;
 }
 
 // -----------------------------------------------------------------------------
+
 nlohmann::json Raw::ToJson() const {
   auto ret = ExternalRef::ToJson();
   std::vector<std::string> hexed = ref_type_other_checksums_;
@@ -58,6 +64,7 @@ nlohmann::json Raw::ToJson() const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<RefBase> Raw::Clone() const {
   auto ret = std::make_unique<Raw>(GetUri(), GetChecksumAlgo());
   for (auto& c : ref_type_other_checksums_) {

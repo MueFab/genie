@@ -17,12 +17,14 @@
 namespace genie::format::mgg::dataset_header {
 
 // -----------------------------------------------------------------------------
+
 bool ReferenceOptions::operator==(const ReferenceOptions& other) const {
   return reference_id_ == other.reference_id_ && seq_id_ == other.seq_id_ &&
          seq_blocks_ == other.seq_blocks_;
 }
 
 // -----------------------------------------------------------------------------
+
 ReferenceOptions::ReferenceOptions(util::BitReader& reader) {
   const auto seq_count = reader.Read<uint16_t>();
   if (!seq_count) {
@@ -39,6 +41,7 @@ ReferenceOptions::ReferenceOptions(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceOptions::Write(util::BitWriter& writer) const {
   writer.WriteBits(seq_id_.size(), 16);
   if (seq_id_.empty()) {
@@ -56,10 +59,12 @@ void ReferenceOptions::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 ReferenceOptions::ReferenceOptions()
     : reference_id_(std::numeric_limits<uint8_t>::max()) {}
 
 // -----------------------------------------------------------------------------
+
 void ReferenceOptions::AddSeq(const uint8_t reference_id, const uint16_t seq_id,
                               const uint32_t blocks) {
   UTILS_DIE_IF(reference_id != reference_id_ && !seq_id_.empty(),
@@ -70,19 +75,23 @@ void ReferenceOptions::AddSeq(const uint8_t reference_id, const uint16_t seq_id,
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint16_t>& ReferenceOptions::GetSeqIDs() const {
   return seq_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint32_t>& ReferenceOptions::GetSeqBlocks() const {
   return seq_blocks_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t ReferenceOptions::GetReferenceId() const { return reference_id_; }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceOptions::PatchRefId(const uint8_t old_id, const uint8_t new_id) {
   if (reference_id_ == old_id || reference_id_ == 255) {
     reference_id_ = new_id;

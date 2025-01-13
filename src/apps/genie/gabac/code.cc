@@ -22,6 +22,7 @@
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
+
 void code(const std::string& input_file_path,
           const std::string& output_file_path, const std::string& config_path,
           size_t blocksize, uint8_t desc_id, uint8_t subseq_id, bool decode,

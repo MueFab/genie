@@ -23,6 +23,7 @@
 namespace genie::entropy::lzma {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
   const auto id = data.GetId();
 
@@ -75,6 +76,7 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {

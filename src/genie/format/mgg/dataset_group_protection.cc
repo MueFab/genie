@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroupProtection::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -28,12 +29,14 @@ bool DatasetGroupProtection::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroupProtection::GetKey() const {
   static const std::string key = "dgpr";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupProtection::DatasetGroupProtection(
     util::BitReader& bitreader, const core::MpegMinorVersion version)
     : version_(version) {
@@ -52,6 +55,7 @@ DatasetGroupProtection::DatasetGroupProtection(
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupProtection::DatasetGroupProtection(
     const uint8_t dataset_group_id, std::string dg_protection_value,
     const core::MpegMinorVersion version)
@@ -60,6 +64,7 @@ DatasetGroupProtection::DatasetGroupProtection(
       dg_protection_value_(std::move(dg_protection_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupProtection::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -69,21 +74,25 @@ void DatasetGroupProtection::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetGroupProtection::GetDatasetGroupId() const {
   return dataset_group_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroupProtection::GetProtection() const {
   return dg_protection_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 std::string DatasetGroupProtection::decapsulate() {
   return std::move(dg_protection_value_);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupProtection::PatchId(const uint8_t group_id) {
   dataset_group_id_ = group_id;
 }

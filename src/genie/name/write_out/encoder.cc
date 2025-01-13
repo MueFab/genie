@@ -27,6 +27,7 @@
 namespace genie::name::write_out {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Encoder::Process(const core::record::Chunk& recs) {
   const util::Watch watch;

@@ -17,11 +17,13 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamProtection::DescriptorStreamProtection(
     std::string ds_protection_value)
     : DSProtectionValue(std::move(ds_protection_value)) {}
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamProtection::DescriptorStreamProtection(
     util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
@@ -33,23 +35,27 @@ DescriptorStreamProtection::DescriptorStreamProtection(
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DescriptorStreamProtection::GetProtectionValue() const {
   return DSProtectionValue;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DescriptorStreamProtection::GetKey() const {
   static const std::string key = "dspr";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStreamProtection::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedBytes(DSProtectionValue.data(),
                               DSProtectionValue.size());
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStreamProtection::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -59,6 +65,7 @@ bool DescriptorStreamProtection::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string DescriptorStreamProtection::decapsulate() {
   return std::move(DSProtectionValue);
 }

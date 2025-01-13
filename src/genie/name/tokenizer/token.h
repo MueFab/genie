@@ -37,6 +37,7 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 constexpr uint8_t kTypeSeq =
     0;  /// Constant representing a sequence type for encoding.
 

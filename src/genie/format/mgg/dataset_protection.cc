@@ -17,12 +17,14 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetProtection::GetKey() const {
   static const std::string key = "dtpr";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetProtection::DatasetProtection(util::BitReader& bitreader,
                                      const core::MpegMinorVersion version)
     : version_(version) {
@@ -43,6 +45,7 @@ DatasetProtection::DatasetProtection(util::BitReader& bitreader,
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetProtection::DatasetProtection(const uint8_t dataset_group_id,
                                      const uint16_t dataset_id,
                                      std::string dg_protection_value,
@@ -53,6 +56,7 @@ DatasetProtection::DatasetProtection(const uint8_t dataset_group_id,
       dg_protection_value_(std::move(dg_protection_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void DatasetProtection::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -63,19 +67,23 @@ void DatasetProtection::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetProtection::GetDatasetGroupId() const {
   return dataset_group_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t DatasetProtection::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetProtection::GetProtection() const {
   return dg_protection_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DatasetProtection::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -88,11 +96,13 @@ bool DatasetProtection::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string DatasetProtection::Decapsulate() {
   return std::move(dg_protection_value_);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetProtection::PatchId(const uint8_t group_id, const uint16_t set_id) {
   dataset_group_id_ = group_id;
   dataset_id_ = set_id;

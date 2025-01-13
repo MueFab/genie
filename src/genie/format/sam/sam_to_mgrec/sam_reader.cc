@@ -21,6 +21,7 @@
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 SamReader::SamReader(const std::string& fpath)
     : sam_file_(nullptr),           // open bam file
       sam_header(nullptr),          // read header
@@ -34,6 +35,7 @@ SamReader::SamReader(const std::string& fpath)
 }
 
 // -----------------------------------------------------------------------------
+
 SamReader::~SamReader() {
   bam_destroy1(sam_alignment_);
   bam_hdr_destroy(sam_header);
@@ -42,6 +44,7 @@ SamReader::~SamReader() {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<std::string, size_t>> SamReader::GetRefs() const {
   std::vector<std::pair<std::string, size_t>> ret;
   const auto num_ref = sam_hdr_nref(sam_header);
@@ -54,6 +57,7 @@ std::vector<std::pair<std::string, size_t>> SamReader::GetRefs() const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool SamReader::IsReady() {
   if (!sam_file_) {
     return false;
@@ -68,6 +72,7 @@ bool SamReader::IsReady() {
 }
 
 // -----------------------------------------------------------------------------
+
 bool SamReader::IsValid() {
   /// Find out if records are sorted by query name
   UTILS_DIE_IF(sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0 ||
@@ -79,6 +84,7 @@ bool SamReader::IsValid() {
 }
 
 // -----------------------------------------------------------------------------
+
 int SamReader::ReadSamQuery(std::vector<SamRecord>& sr) {
   sr.clear();
   if (buffered_rec_) {

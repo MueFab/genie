@@ -24,6 +24,7 @@ constexpr auto kLogModuleName = "App/Capsulator";
 namespace genie_app::capsulator {
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
   CLI::App app("Genie MPEG-G capsulator\n");
 
@@ -47,6 +48,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help_(false) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string parent_dir(const std::string& path) {
   std::string ret;
 
@@ -63,6 +65,7 @@ std::string parent_dir(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);
@@ -83,6 +86,7 @@ std::string size_string(const std::uintmax_t f_size) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateInputFile(const std::string& file) {
   UTILS_DIE_IF(!std::filesystem::exists(file),
                "Input file does not exist: " + file);
@@ -94,6 +98,7 @@ void ValidateInputFile(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateOutputFile(const std::string& file, const bool forced) {
   UTILS_DIE_IF(std::filesystem::exists(file) && !forced,
                "Output file already existing and no force flag set: " + file);
@@ -115,6 +120,7 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::validate() const {
   auto files = genie::util::Tokenize(input_file_, ';');
 

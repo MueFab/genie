@@ -34,6 +34,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::AddBranch(Drain<Tin>* entry, Source<Tout>* out) {
   head_.Add(entry);
@@ -42,6 +43,7 @@ void Selector<Tin, Tout>::AddBranch(Drain<Tin>* entry, Source<Tout>* out) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::SetBranch(Drain<Tin>* entry, Source<Tout>* out,
                                     size_t index) {
@@ -50,30 +52,35 @@ void Selector<Tin, Tout>::SetBranch(Drain<Tin>* entry, Source<Tout>* out,
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::SetOperation(std::function<size_t(const Tin& t)> s) {
   head_.SetOperation(s);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::FlowIn(Tin&& t, const Section& id) {
   head_.FlowIn(std::move(t), id);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::FlushIn(uint64_t& pos) {
   head_.FlushIn(pos);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::SkipIn(const Section& id) {
   head_.SkipIn(id);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::SetDrain(Drain<Tout>* d) {
   tail_.SetDrain(d);

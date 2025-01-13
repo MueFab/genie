@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file param_decoder.h
  * @brief Header file for the ZSTD entropy decoder parameter module.
  * @details This file declares the `DecoderRegular` class, which provides
  * configuration handling for the ZSTD entropy decoding process. It handles

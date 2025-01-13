@@ -30,28 +30,33 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 size_t SideSelector<Coder, Ret, Args...>::DefaultSelect(Args...) {
   return 0;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 SideSelector<Coder, Ret, Args...>::SideSelector() : select_(&DefaultSelect) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 void SideSelector<Coder, Ret, Args...>::SetMod(Coder* mod, size_t index) {
   mods_[index] = mod;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 void SideSelector<Coder, Ret, Args...>::AddMod(Coder* mod) {
   mods_.emplace_back(mod);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 void SideSelector<Coder, Ret, Args...>::SetSelection(
     std::function<size_t(Args...)> select) {
@@ -59,6 +64,7 @@ void SideSelector<Coder, Ret, Args...>::SetSelection(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Coder, typename Ret, typename... Args>
 Ret SideSelector<Coder, Ret, Args...>::Process(Args... param) {
   size_t index = select_(param...);

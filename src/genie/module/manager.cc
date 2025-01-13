@@ -29,6 +29,7 @@
 namespace genie::module {
 
 // -----------------------------------------------------------------------------
+
 void detect() {
   auto& ind_park = core::GlobalCfg::GetSingleton().GetIndustrialPark();
   ind_park.RegisterConstructor<core::parameter::desc_pres::DecoderRegular>(

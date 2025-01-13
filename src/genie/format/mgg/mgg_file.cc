@@ -23,6 +23,7 @@ constexpr auto kLogModuleName = "Mgg";
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 MggFile::MggFile(std::istream* file) : file_(file), reader_(*file_) {
   while (true) {
     std::string boxname(4, '\0');
@@ -50,17 +51,21 @@ MggFile::MggFile(std::istream* file) : file_(file), reader_(*file_) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::unique_ptr<Box>>& MggFile::GetBoxes() { return boxes_; }
 
 // -----------------------------------------------------------------------------
+
 MggFile::MggFile() : file_(nullptr) {}
 
 // -----------------------------------------------------------------------------
+
 void MggFile::AddBox(std::unique_ptr<Box> box) {
   boxes_.emplace_back(std::move(box));
 }
 
 // -----------------------------------------------------------------------------
+
 void MggFile::Write(util::BitWriter& writer) const {
   for (const auto& b : boxes_) {
     b->Write(writer);
@@ -68,6 +73,7 @@ void MggFile::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void MggFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
   for (const auto& b : boxes_) {
     b->PrintDebug(output, 0, max_depth);

@@ -54,6 +54,7 @@
 namespace genie::module {
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
     size_t threads, const std::string& working_dir, size_t block_size,
     core::ClassifierRegroup::RefMode external_ref, bool raw_ref,
@@ -119,6 +120,7 @@ std::unique_ptr<core::FlowGraphEncode> BuildDefaultEncoder(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::FlowGraphDecode> build_default_decoder(
     size_t threads, const std::string& working_dir, bool combine_pairs_flag) {
   auto ret = std::make_unique<core::FlowGraphDecode>(threads);
@@ -208,6 +210,7 @@ std::unique_ptr<core::FlowGraphDecode> build_default_decoder(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::FlowGraphConvert> build_default_converter(
     size_t threads) {
   auto ret = std::make_unique<core::FlowGraphConvert>(threads);

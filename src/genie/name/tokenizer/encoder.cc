@@ -26,6 +26,7 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Encoder::Process(const core::record::Chunk& recs) {
   const util::Watch watch;

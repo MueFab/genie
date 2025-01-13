@@ -25,20 +25,24 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 SingleToken::SingleToken(const Tokens t, const uint32_t p, std::string ps)
     : token(t), param(p), param_string(std::move(ps)) {}
 
 // -----------------------------------------------------------------------------
+
 bool SingleToken::operator==(const SingleToken& t) const {
   return token == t.token && param == t.param && param_string == t.param_string;
 }
 
 // -----------------------------------------------------------------------------
+
 bool SingleToken::operator!=(const SingleToken& t) const {
   return !(*this == t);
 }
 
 // -----------------------------------------------------------------------------
+
 const TokenInfo& GetTokenInfo(Tokens t) {
   static auto info = []() -> std::vector<TokenInfo> {
     std::vector<TokenInfo> ret = {{"DUP", sizeof(uint32_t)},
@@ -59,6 +63,7 @@ const TokenInfo& GetTokenInfo(Tokens t) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<SingleToken> patch(const std::vector<SingleToken>& old_string,
                                const std::vector<SingleToken>& new_string) {
   std::vector ret(new_string.size(), SingleToken(Tokens::DUP, 0, ""));

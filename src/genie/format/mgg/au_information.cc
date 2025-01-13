@@ -17,12 +17,14 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& AuInformation::GetKey() const {
   static const std::string key = "auin";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 AuInformation::AuInformation(util::BitReader& bitreader,
                              const core::MpegMinorVersion version)
     : version_(version) {
@@ -43,6 +45,7 @@ AuInformation::AuInformation(util::BitReader& bitreader,
 }
 
 // -----------------------------------------------------------------------------
+
 AuInformation::AuInformation(const uint8_t dataset_group_id,
                              const uint16_t dataset_id,
                              std::string au_information_value,
@@ -53,6 +56,7 @@ AuInformation::AuInformation(const uint8_t dataset_group_id,
       au_information_value_(std::move(au_information_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void AuInformation::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -63,17 +67,21 @@ void AuInformation::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t AuInformation::GetDatasetGroupId() const { return dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t AuInformation::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& AuInformation::GetInformation() const {
   return au_information_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool AuInformation::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -87,6 +95,7 @@ bool AuInformation::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string AuInformation::decapsulate() {
   return std::move(au_information_value_);
 }

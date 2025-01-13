@@ -18,6 +18,7 @@
 namespace genie::format::mgg::encapsulator {
 
 // -----------------------------------------------------------------------------
+
 DecapsulatedFile::DecapsulatedFile(const std::string& input_file)
     : reader(input_file), mpegg_file(&reader) {
   mpegg_file.print_debug(std::cout, 2);
@@ -33,6 +34,7 @@ DecapsulatedFile::DecapsulatedFile(const std::string& input_file)
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<DecapsulatedDatasetGroup>& DecapsulatedFile::GetGroups() {
   return groups;
 }

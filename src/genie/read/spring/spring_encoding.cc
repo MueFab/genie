@@ -32,6 +32,7 @@ constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 std::string BuildContig(std::list<ContigReads>& current_contig,
                         const uint32_t& list_size) {
   static constexpr char long_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
@@ -78,6 +79,7 @@ std::string BuildContig(std::list<ContigReads>& current_contig,
 }
 
 // -----------------------------------------------------------------------------
+
 void WriteContig(const std::string& ref, std::list<ContigReads>& current_contig,
                  std::ofstream& f_seq, std::ofstream& f_pos,
                  std::ofstream& f_noise, std::ofstream& f_noise_pos,
@@ -112,6 +114,7 @@ void WriteContig(const std::string& ref, std::list<ContigReads>& current_contig,
 }
 
 // -----------------------------------------------------------------------------
+
 void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
   const uint32_t num_reads_clean =
       cp.num_reads_clean[0] + cp.num_reads_clean[1];
@@ -142,6 +145,7 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
 }
 
 // -----------------------------------------------------------------------------
+
 void CorrectOrder(std::vector<uint32_t>& order_s, const EncoderGlobal& eg) {
   uint32_t num_reads_total = eg.num_reads + eg.num_reads_s + eg.num_reads_n;
   auto read_flag_n = std::vector<uint8_t>(num_reads_total);

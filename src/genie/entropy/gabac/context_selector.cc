@@ -14,13 +14,16 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 ContextSelector::ContextSelector(const paramcabac::StateVars& state_vars)
     : state_vars_(state_vars) {}
 
 // -----------------------------------------------------------------------------
+
 ContextSelector::ContextSelector(const ContextSelector& src) = default;
 
 // -----------------------------------------------------------------------------
+
 unsigned int ContextSelector::GetContextIdxOrder0(
     const uint8_t subsym_idx) const {
   return static_cast<unsigned int>(subsym_idx *
@@ -28,6 +31,7 @@ unsigned int ContextSelector::GetContextIdxOrder0(
 }
 
 // -----------------------------------------------------------------------------
+
 unsigned int ContextSelector::GetContextIdxOrderGt0(
     const uint8_t subsym_idx, const uint8_t prv_idx,
     const std::vector<Subsymbol>& subsymbols,

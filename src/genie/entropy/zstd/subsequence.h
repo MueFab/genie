@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file subsequence.h
  * @brief Header file defining the `Subsequence` class for the ZSTD entropy
  * coding module.
  * @details This file is part of the ZSTD entropy parameter configuration and

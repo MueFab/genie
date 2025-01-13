@@ -29,6 +29,7 @@
 #include <vector>
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
 
 /**
@@ -111,6 +112,7 @@ enum struct QuantizerType {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Enumeration for filter types used in CALQ V2.
  *
@@ -125,6 +127,7 @@ enum struct FilterType {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Enumeration for CALQ versions.
  *
@@ -139,6 +142,7 @@ enum struct Version {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Options for encoding quality values.
  *
@@ -200,6 +204,7 @@ struct EncodingOptions {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Options for decoding quality values.
  *
@@ -210,6 +215,7 @@ struct EncodingOptions {
 struct DecodingOptions {};
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Encoded streams for decoding by CALQ.
  *
@@ -228,6 +234,7 @@ struct DecodingBlock {
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Decodes quality values using the provided decoding options and side
  * information.
@@ -241,6 +248,7 @@ void decode(const DecodingOptions& opt, const SideInformation& side_information,
             const DecodingBlock& input, EncodingBlock* output);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Encodes quality values using the provided encoding options and side
  * information.
@@ -254,6 +262,7 @@ void encode(const EncodingOptions& opt, const SideInformation& side_information,
             const EncodingBlock& input, DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Encodes unaligned quality values using the provided encoding options.
  *
@@ -268,7 +277,9 @@ void EncodeUnaligned(const EncodingOptions& opt, const EncodingBlock& input,
                      DecodingBlock* output);
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_CALQ_CALQ_CODER_H_

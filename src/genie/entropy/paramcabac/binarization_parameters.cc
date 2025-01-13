@@ -1,6 +1,11 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file binarization_parameters.cc
+ * @brief Implementation of CABAC binarization parameters for Genie.
+ *
+ * Manages binarization configurations, serialization, JSON conversion,
+ * and parameter handling for different binarization modes.
+ *
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */

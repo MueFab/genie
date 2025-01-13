@@ -27,6 +27,7 @@ namespace genie::entropy::gabac {
 using BinFunc = void (Writer::*)(uint64_t, const std::vector<unsigned int>&);
 
 // -----------------------------------------------------------------------------
+
 static BinFunc GetBinarizationWriter(
     const uint8_t output_symbol_size, const bool bypass_flag,
     const paramcabac::BinarizationParameters::BinarizationId bin_id,
@@ -110,6 +111,7 @@ static BinFunc GetBinarizationWriter(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t EncodeTransformSubSeqOrder0(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     util::DataBlock* symbols, size_t max_size) {
@@ -202,6 +204,7 @@ size_t EncodeTransformSubSeqOrder0(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t EncodeTransformSubSeqOrder1(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     util::DataBlock* symbols, util::DataBlock* const dep_symbols,
@@ -339,6 +342,7 @@ size_t EncodeTransformSubSeqOrder1(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t EncodeTransformSubSeqOrder2(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     util::DataBlock* symbols, size_t max_size) {
@@ -458,6 +462,7 @@ size_t EncodeTransformSubSeqOrder2(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t EncodeTransformSubSeq(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     util::DataBlock* symbols, util::DataBlock* dep_symbols,

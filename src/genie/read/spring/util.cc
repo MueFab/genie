@@ -28,6 +28,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 std::vector<int64_t> ReadVectorFromFile(const std::string& file_name) {
   std::ifstream f_in(file_name, std::ios::binary);
   UTILS_DIE_IF(!f_in, "Cannot open file to read: " + file_name);
@@ -43,6 +44,7 @@ std::vector<int64_t> ReadVectorFromFile(const std::string& file_name) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ReverseComplement(const char* s, char* s1, const int read_len) {
   for (int j = 0; j < read_len; j++)
     s1[j] = kCharToRevChar[static_cast<uint8_t>(s[read_len - j - 1])];
@@ -50,6 +52,7 @@ void ReverseComplement(const char* s, char* s1, const int read_len) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ReverseComplement(const std::string& s, const int read_len) {
   std::string s1;
   s1.resize(read_len);
@@ -59,6 +62,7 @@ std::string ReverseComplement(const std::string& s, const int read_len) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string RandomString(const size_t length) {
   static constexpr char charset[] =
       "0123456789"
@@ -79,6 +83,7 @@ std::string RandomString(const size_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 void WriteDnaInBits(const std::string& read, std::ofstream& f_out) {
   uint8_t dna2_int[128];
   dna2_int[static_cast<uint8_t>('A')] = 0;
@@ -109,6 +114,7 @@ void WriteDnaInBits(const std::string& read, std::ofstream& f_out) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ReadDnaFromBits(std::string& read, std::ifstream& fin) {
   uint16_t read_len;
   uint8_t bitarray[128];
@@ -136,6 +142,7 @@ void ReadDnaFromBits(std::string& read, std::ifstream& fin) {
 }
 
 // -----------------------------------------------------------------------------
+
 void WriteDnaNInBits(const std::string& read, std::ofstream& f_out) {
   uint8_t dna2_int[128];
   dna2_int[static_cast<uint8_t>('A')] = 0;
@@ -167,6 +174,7 @@ void WriteDnaNInBits(const std::string& read, std::ofstream& f_out) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ReadDnaNFromBits(std::string& read, std::ifstream& fin) {
   uint16_t read_len = 0;
   uint8_t bitarray[256]{};

@@ -1,6 +1,11 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file decoder.cc
+ * @brief Implementation of Zstd-based entropy decoding for Genie.
+ *
+ * Provides functionality to decompress subsequences and process descriptors
+ * using the Zstd library, ensuring efficient entropy decoding with performance
+ * tracking.
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
@@ -23,6 +28,7 @@
 namespace genie::entropy::zstd {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
   const auto id = data.GetId();
 
@@ -52,6 +58,7 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {

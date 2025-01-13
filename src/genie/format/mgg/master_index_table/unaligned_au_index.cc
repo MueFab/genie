@@ -18,6 +18,7 @@
 namespace genie::format::mgg::master_index_table {
 
 // -----------------------------------------------------------------------------
+
 bool UnalignedAuIndex::operator==(const UnalignedAuIndex& other) const {
   return au_byte_offset_ == other.au_byte_offset_ &&
          ref_cfg_ == other.ref_cfg_ && sig_cfg_ == other.sig_cfg_ &&
@@ -28,11 +29,13 @@ bool UnalignedAuIndex::operator==(const UnalignedAuIndex& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint64_t>& UnalignedAuIndex::GetBlockOffsets() const {
   return block_byte_offset_;
 }
 
 // -----------------------------------------------------------------------------
+
 UnalignedAuIndex::UnalignedAuIndex(
     util::BitReader& reader, const uint8_t byte_offset_size,
     const uint8_t position_size,
@@ -62,6 +65,7 @@ UnalignedAuIndex::UnalignedAuIndex(
 }
 
 // -----------------------------------------------------------------------------
+
 void UnalignedAuIndex::Write(util::BitWriter& writer) const {
   writer.WriteBits(au_byte_offset_, byte_offset_size_);
   if (ref_cfg_ != std::nullopt) {
@@ -77,9 +81,11 @@ void UnalignedAuIndex::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t UnalignedAuIndex::GetAuOffset() const { return au_byte_offset_; }
 
 // -----------------------------------------------------------------------------
+
 void UnalignedAuIndex::AddBlockOffset(uint64_t offset) {
   UTILS_DIE_IF(
       !block_byte_offset_.empty() && block_byte_offset_.back() > offset,
@@ -88,6 +94,7 @@ void UnalignedAuIndex::AddBlockOffset(uint64_t offset) {
 }
 
 // -----------------------------------------------------------------------------
+
 UnalignedAuIndex::UnalignedAuIndex(const uint64_t au_byte_offset,
                                    const uint8_t byte_offset_size,
                                    const int8_t position_size,
@@ -98,27 +105,33 @@ UnalignedAuIndex::UnalignedAuIndex(const uint64_t au_byte_offset,
       signature_size_(signature_size) {}
 
 // -----------------------------------------------------------------------------
+
 bool UnalignedAuIndex::IsReference() const { return ref_cfg_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const mgb::RefCfg& UnalignedAuIndex::GetReferenceInfo() const {
   return *ref_cfg_;
 }
 
 // -----------------------------------------------------------------------------
+
 void UnalignedAuIndex::SetReferenceInfo(const mgb::RefCfg& ref_cfg) {
   ref_cfg_ = ref_cfg;
 }
 
 // -----------------------------------------------------------------------------
+
 bool UnalignedAuIndex::HasSignature() const { return sig_cfg_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const mgb::SignatureCfg& UnalignedAuIndex::GetSignatureInfo() const {
   return *sig_cfg_;
 }
 
 // -----------------------------------------------------------------------------
+
 void UnalignedAuIndex::SetSignatureInfo(
     const mgb::SignatureCfg& signature_cfg) {
   sig_cfg_ = signature_cfg;

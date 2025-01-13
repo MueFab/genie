@@ -112,4 +112,5 @@ class Encoder final : public core::QvEncoder {
 }  // namespace genie::quality::qvwriteout
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_H_

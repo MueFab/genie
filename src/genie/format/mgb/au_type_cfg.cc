@@ -16,6 +16,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 bool AuTypeCfg::operator==(const AuTypeCfg& other) const {
   return sequence_ID == other.sequence_ID &&
          AU_start_position == other.AU_start_position &&
@@ -24,6 +25,7 @@ bool AuTypeCfg::operator==(const AuTypeCfg& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void AuTypeCfg::Write(util::BitWriter& writer) const {
   writer.WriteBits(sequence_ID, 16);
   writer.WriteBits(AU_start_position, posSize);
@@ -34,6 +36,7 @@ void AuTypeCfg::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 AuTypeCfg::AuTypeCfg(const uint16_t sequence_id,
                      const uint64_t au_start_position,
                      const uint64_t au_end_position, const uint8_t pos_size)
@@ -43,9 +46,11 @@ AuTypeCfg::AuTypeCfg(const uint16_t sequence_id,
       posSize(pos_size) {}
 
 // -----------------------------------------------------------------------------
+
 AuTypeCfg::AuTypeCfg(const uint8_t pos_size) : AuTypeCfg(0, 0, 0, pos_size) {}
 
 // -----------------------------------------------------------------------------
+
 AuTypeCfg::AuTypeCfg(const uint8_t pos_size, const bool multiple_alignments,
                      util::BitReader& reader)
     : posSize(pos_size) {
@@ -58,17 +63,21 @@ AuTypeCfg::AuTypeCfg(const uint8_t pos_size, const bool multiple_alignments,
 }
 
 // -----------------------------------------------------------------------------
+
 void AuTypeCfg::SetExtendedAu(ExtendedAu&& extended_au) {
   extended_AU = std::move(extended_au);
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t AuTypeCfg::GetRefId() const { return sequence_ID; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t AuTypeCfg::GetStartPos() const { return AU_start_position; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t AuTypeCfg::GetEndPos() const { return AU_end_position; }
 
 // -----------------------------------------------------------------------------

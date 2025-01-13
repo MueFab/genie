@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 TransformedSymbolsDecoder::TransformedSymbolsDecoder(
     util::DataBlock* bitstream,
     const paramcabac::TransformedSubSeq& transformed_sub_seq_conf,
@@ -80,10 +81,12 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(
 }
 
 // -----------------------------------------------------------------------------
+
 TransformedSymbolsDecoder::TransformedSymbolsDecoder(
     const TransformedSymbolsDecoder& transformed_sub_seq_decoder) = default;
 
 // -----------------------------------------------------------------------------
+
 uint64_t TransformedSymbolsDecoder::DecodeNextSymbol(
     const uint64_t* dep_symbol) {
   if (SymbolsAvail() <= 0) UTILS_DIE("No more transformed symbols available.");
@@ -101,6 +104,7 @@ uint64_t TransformedSymbolsDecoder::DecodeNextSymbol(
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder0() {
   uint64_t symbol_value = 0;
   if (num_decoded_symbols_ < num_encoded_symbols_) {
@@ -130,6 +134,7 @@ uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder0() {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder1(
     const uint64_t* dep_symbol) {
   uint64_t symbol_value = 0;
@@ -186,6 +191,7 @@ uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder1(
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder2() {
   uint64_t symbol_value = 0;
   if (num_decoded_symbols_ < num_encoded_symbols_) {
@@ -233,6 +239,7 @@ uint64_t TransformedSymbolsDecoder::DecodeNextSymbolOrder2() {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t TransformedSymbolsDecoder::SymbolsAvail() const {
   return num_encoded_symbols_ - num_decoded_symbols_;
 }

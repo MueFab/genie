@@ -30,6 +30,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 // Optimized for wordsize 1. In place for equality flags
 static void TransformEqualityCoding0(util::DataBlock* const values,
                                      util::DataBlock* const equality_flags) {
@@ -57,6 +58,7 @@ static void TransformEqualityCoding0(util::DataBlock* const values,
 }
 
 // -----------------------------------------------------------------------------
+
 // Optimized for wordsize 1 > 0. In place for values
 static void TransformEqualityCoding1(util::DataBlock* const values,
                                      util::DataBlock* const equality_flags) {
@@ -85,6 +87,7 @@ static void TransformEqualityCoding1(util::DataBlock* const values,
 }
 
 // -----------------------------------------------------------------------------
+
 void TransformEqualityCoding(
     std::vector<util::DataBlock>* transformed_subseqs) {
   // Prepare internal and the output data structures
@@ -108,6 +111,7 @@ void TransformEqualityCoding(
 }
 
 // -----------------------------------------------------------------------------
+
 void InverseTransformEqualityCoding(
     std::vector<util::DataBlock>* transformed_subseqs) {
   assert(transformed_subseqs != nullptr);

@@ -19,12 +19,14 @@
 namespace genie::core::parameter::desc_pres {
 
 // -----------------------------------------------------------------------------
+
 DescriptorPresent::DescriptorPresent()
     : Descriptor(kPresent), decoder_configuration_(nullptr) {
   decoder_configuration_ = nullptr;
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorPresent::DescriptorPresent(const GenDesc desc,
                                      util::BitReader& reader)
     : Descriptor(kPresent) {
@@ -43,6 +45,7 @@ DescriptorPresent::DescriptorPresent(const GenDesc desc,
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorPresent::Equals(const Descriptor* desc) const {
   return Descriptor::Equals(desc) &&
          decoder_configuration_->Equals(
@@ -51,6 +54,7 @@ bool DescriptorPresent::Equals(const Descriptor* desc) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Descriptor> DescriptorPresent::Clone() const {
   auto ret = std::make_unique<DescriptorPresent>();
   ret->dec_cfg_preset_ = dec_cfg_preset_;
@@ -59,6 +63,7 @@ std::unique_ptr<Descriptor> DescriptorPresent::Clone() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorPresent::Write(util::BitWriter& writer) const {
   Descriptor::Write(writer);
   if (dec_cfg_preset_ != kPresent) {
@@ -68,11 +73,13 @@ void DescriptorPresent::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorPresent::SetDecoder(std::unique_ptr<Decoder> conf) {
   decoder_configuration_ = std::move(conf);
 }
 
 // -----------------------------------------------------------------------------
+
 const Decoder& DescriptorPresent::GetDecoder() const {
   return *decoder_configuration_;
 }

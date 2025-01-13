@@ -12,6 +12,7 @@
 namespace genie::format::mgg::dataset_parameter_set {
 
 // -----------------------------------------------------------------------------
+
 bool UpdateInfo::operator==(const UpdateInfo& other) const {
   return multiple_alignment_flag_ == other.multiple_alignment_flag_ &&
          pos_40_bits_flag_ == other.pos_40_bits_flag_ &&
@@ -20,6 +21,7 @@ bool UpdateInfo::operator==(const UpdateInfo& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 UpdateInfo::UpdateInfo(const bool multiple_alignment_flag,
                        const bool pos_40_bits_flag,
                        const core::AlphabetId alphabet_id)
@@ -28,6 +30,7 @@ UpdateInfo::UpdateInfo(const bool multiple_alignment_flag,
       alphabet_id_(alphabet_id) {}
 
 // -----------------------------------------------------------------------------
+
 UpdateInfo::UpdateInfo(util::BitReader& reader) {
   multiple_alignment_flag_ = reader.Read<bool>(1);
   pos_40_bits_flag_ = reader.Read<bool>(1);
@@ -39,6 +42,7 @@ UpdateInfo::UpdateInfo(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void UpdateInfo::Write(util::BitWriter& writer) const {
   writer.WriteBits(multiple_alignment_flag_, 1);
   writer.WriteBits(pos_40_bits_flag_, 1);
@@ -51,25 +55,31 @@ void UpdateInfo::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void UpdateInfo::AddUSignature(USignature signature) {
   u_signature_ = signature;
 }
 
 // -----------------------------------------------------------------------------
+
 bool UpdateInfo::GetMultipleAlignmentFlag() const {
   return multiple_alignment_flag_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool UpdateInfo::GetPos40BitsFlag() const { return pos_40_bits_flag_; }
 
 // -----------------------------------------------------------------------------
+
 core::AlphabetId UpdateInfo::GetAlphabetId() const { return alphabet_id_; }
 
 // -----------------------------------------------------------------------------
+
 bool UpdateInfo::HasUSignature() const { return u_signature_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const USignature& UpdateInfo::GetUSignature() const { return *u_signature_; }
 
 // -----------------------------------------------------------------------------

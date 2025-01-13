@@ -33,9 +33,11 @@
 #include "genie/quality/calq/soft_clip_spreader.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Enumeration of the filter types for activity score calculation.
  */

@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file context.h
  * @brief Defines the `Context` class for handling CABAC context parameters in
  * Genie
  * @details The `Context` class encapsulates the parameters for CABAC

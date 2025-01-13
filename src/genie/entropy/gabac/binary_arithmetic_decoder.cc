@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 BinaryArithmeticDecoder::BinaryArithmeticDecoder(
     const BitInputStream& bit_input_stream)
     : bit_input_stream_(bit_input_stream),
@@ -25,6 +26,7 @@ BinaryArithmeticDecoder::BinaryArithmeticDecoder(
       value_(0) {}
 
 // -----------------------------------------------------------------------------
+
 inline unsigned int BinaryArithmeticDecoder::DecodeBin(
     ContextModel* context_model) {
   assert(context_model != nullptr);
@@ -64,6 +66,7 @@ inline unsigned int BinaryArithmeticDecoder::DecodeBin(
 }
 
 // -----------------------------------------------------------------------------
+
 unsigned int BinaryArithmeticDecoder::DecodeBinsEp(unsigned int num_bins) {
   unsigned int bins = 0;
   unsigned int scaled_range;
@@ -102,6 +105,7 @@ unsigned int BinaryArithmeticDecoder::DecodeBinsEp(unsigned int num_bins) {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticDecoder::DecodeBinTrm() {
   range_ -= 2;
   unsigned int scaled_range = range_ << 7u;
@@ -121,9 +125,11 @@ void BinaryArithmeticDecoder::DecodeBinTrm() {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticDecoder::Reset() { DecodeBinTrm(); }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticDecoder::Start() {
   assert(bit_input_stream_.GetNumBitsUntilByteAligned() == 0);
 
@@ -134,6 +140,7 @@ void BinaryArithmeticDecoder::Start() {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t BinaryArithmeticDecoder::Close() {
   DecodeBinTrm();
   return bit_input_stream_.GetNumBytesRead();

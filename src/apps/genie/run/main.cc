@@ -42,6 +42,7 @@ constexpr auto kLogModuleName = "App/Run";
 namespace genie_app::run {
 
 // -----------------------------------------------------------------------------
+
 std::string file_extension(const std::string& path) {
   const auto pos = path.find_last_of('.');
   std::string ext = path.substr(pos + 1);
@@ -52,12 +53,15 @@ std::string file_extension(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 enum class OperationCase { UNKNOWN = 0, ENCODE = 1, DECODE = 2, CAPSULATE = 4 };
 
 // -----------------------------------------------------------------------------
+
 enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 
 // -----------------------------------------------------------------------------
+
 FileType GetType(const std::string& ext) {
   if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam") {
     return FileType::THIRD_PARTY;
@@ -69,6 +73,7 @@ FileType GetType(const std::string& ext) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const FileType in, const FileType out) {
   if (in == FileType::THIRD_PARTY && out == FileType::MPEG) {
     return OperationCase::ENCODE;
@@ -83,6 +88,7 @@ OperationCase GetOperation(const FileType in, const FileType out) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const std::string& filename_in,
                            const std::string& filename_out) {
   return GetOperation(GetType(file_extension(filename_in)),
@@ -90,6 +96,7 @@ OperationCase GetOperation(const std::string& filename_in,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ofstream>>& output_files) {
@@ -125,6 +132,7 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 void AddFasta(const std::string& fasta_file_path,
               genie::core::FlowGraphEncode* flow,
               std::vector<std::unique_ptr<std::ifstream>>& input_files) {
@@ -163,6 +171,7 @@ void AddFasta(const std::string& fasta_file_path,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporterMgrec(
     T& flow, const ProgramOptions& p_opts,
@@ -188,6 +197,7 @@ void AttachImporterMgrec(
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporterFastq(
     T& flow, const ProgramOptions& p_opts,
@@ -232,6 +242,7 @@ void AttachImporterSam(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -297,6 +308,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -385,6 +397,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
 }
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     ProgramOptions p_opts(argc, argv);

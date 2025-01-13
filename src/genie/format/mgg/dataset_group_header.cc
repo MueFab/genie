@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroupHeader::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -27,20 +28,24 @@ bool DatasetGroupHeader::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupHeader::DatasetGroupHeader() : DatasetGroupHeader(0, 0) {}
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupHeader::DatasetGroupHeader(const uint8_t id,
                                        const uint8_t version)
     : id_(id), version_(version) {}
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroupHeader::GetKey() const {
   static const std::string key = "dghd";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupHeader::DatasetGroupHeader(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -57,25 +62,31 @@ DatasetGroupHeader::DatasetGroupHeader(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetGroupHeader::GetId() const { return id_; }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupHeader::SetId(const uint8_t id) { id_ = id; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetGroupHeader::GetVersion() const { return version_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint16_t>& DatasetGroupHeader::GetDatasetIDs() const {
   return dataset_i_ds_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupHeader::AddDatasetId(uint8_t id) {
   dataset_i_ds_.emplace_back(id);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupHeader::BoxWrite(util::BitWriter& writer) const {
   writer.WriteAlignedInt<uint8_t>(id_);
   writer.WriteAlignedInt<uint8_t>(version_);
@@ -85,9 +96,11 @@ void DatasetGroupHeader::BoxWrite(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupHeader::PatchId(const uint8_t group_id) { id_ = group_id; }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupHeader::PrintDebug(std::ostream& output, const uint8_t depth,
                                      const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Dataset Group Header");

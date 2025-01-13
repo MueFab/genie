@@ -12,9 +12,11 @@
 namespace genie::core::meta {
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::BlockHeader(const HeaderType type) : type_(type) {}
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::HeaderType BlockHeader::GetType() const { return type_; }
 
 // -----------------------------------------------------------------------------

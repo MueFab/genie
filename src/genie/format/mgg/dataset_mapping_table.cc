@@ -17,12 +17,14 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& DataSetMappingTable::GetKey() const {
   static const std::string key = "dmtb";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 void DataSetMappingTable::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedInt(dataset_id_);
   for (const auto& s : streams_) {
@@ -31,23 +33,28 @@ void DataSetMappingTable::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t DataSetMappingTable::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<DataStream>& DataSetMappingTable::GetDataStreams() const {
   return streams_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DataSetMappingTable::AddDataStream(DataStream d) {
   streams_.emplace_back(d);
 }
 
 // -----------------------------------------------------------------------------
+
 DataSetMappingTable::DataSetMappingTable(const uint16_t dataset_id)
     : dataset_id_(dataset_id) {}
 
 // -----------------------------------------------------------------------------
+
 DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -61,6 +68,7 @@ DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DataSetMappingTable::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;

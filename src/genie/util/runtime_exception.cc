@@ -27,6 +27,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 RuntimeException::RuntimeException(const std::string& file,
                                    const std::string& function, const int line,
                                    const std::string& msg) noexcept
@@ -39,6 +40,7 @@ RuntimeException::RuntimeException(const std::string& file,
 }
 
 // -----------------------------------------------------------------------------
+
 RuntimeException::RuntimeException(const RuntimeException& e) noexcept
     : Exception(e.what()) {}
 

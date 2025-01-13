@@ -12,16 +12,19 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool GenInfo::operator==(const GenInfo& info) const {
   return GetKey() == info.GetKey();
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t GenInfo::GetHeaderLength() {
   return sizeof(uint64_t) + sizeof(char) * 4;
 }
 
 // -----------------------------------------------------------------------------
+
 void GenInfo::Write(util::BitWriter& bit_writer) const {
   const int64_t begin = bit_writer.GetStreamPosition();
   bit_writer.WriteAlignedBytes(GetKey().data(), GetKey().length());

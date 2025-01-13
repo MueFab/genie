@@ -35,6 +35,7 @@ constexpr auto kLogModuleName = "TranscoderSam";
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 RefInfo::RefInfo(const std::string& fasta_name)
     : ref_mgr_(std::make_unique<core::ReferenceManager>(4)), valid_(false) {
   if (!std::filesystem::exists(fasta_name)) {
@@ -73,12 +74,15 @@ RefInfo::RefInfo(const std::string& fasta_name)
 }
 
 // -----------------------------------------------------------------------------
+
 bool RefInfo::IsValid() const { return valid_; }
 
 // -----------------------------------------------------------------------------
+
 core::ReferenceManager* RefInfo::GetMgr() const { return ref_mgr_.get(); }
 
 // -----------------------------------------------------------------------------
+
 std::vector<core::record::Record> SplitRecord(core::record::Record&& rec) {
   auto input = std::move(rec);
   std::vector<core::record::Record> ret;
@@ -160,6 +164,7 @@ std::vector<core::record::Record> SplitRecord(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record UnalignRecord(core::record::Record&& rec) {
   auto input = std::move(rec);
   core::record::Record ret(
@@ -175,6 +180,7 @@ core::record::Record UnalignRecord(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record StripAdditionalAlignments(core::record::Record&& rec) {
   if (rec.GetClassId() == core::record::ClassType::kClassU ||
       rec.GetAlignments().size() < 2) {
@@ -198,6 +204,7 @@ core::record::Record StripAdditionalAlignments(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool IsECigarSupported(const std::string& e_cigar) {
   // Splices not supported
   if (e_cigar.find_first_of('*') != std::string::npos ||
@@ -209,6 +216,7 @@ bool IsECigarSupported(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 struct CleanStatistics {
   size_t hm_recs{};
   size_t splice_recs{};
@@ -267,6 +275,7 @@ std::pair<std::vector<core::record::Record>, CleanStatistics> CleanRecord(
 }
 
 // -----------------------------------------------------------------------------
+
 void phase1_thread(SamReader& sam_reader, int& chunk_id,
                    const std::string& tmp_path, bool clean, std::mutex& lock,
                    CleanStatistics& stats) {
@@ -360,6 +369,7 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id,
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
     const Config& options, int& chunk_id) {
   auto sam_reader = SamReader(options.input_file_);
@@ -408,6 +418,7 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
 }
 
 // -----------------------------------------------------------------------------
+
 std::string patch_e_cigar(const std::string& ref, const std::string& seq,
                           const std::string& e_cigar) {
   std::string fixed_cigar;
@@ -473,6 +484,7 @@ std::string patch_e_cigar(const std::string& ref, const std::string& seq,
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType ClassifyECigar(const std::string& cigar) {
   auto ret = core::record::ClassType::kClassP;
   for (const auto& c : cigar) {
@@ -494,6 +506,7 @@ core::record::ClassType ClassifyECigar(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
   return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
     return alphabet.IsIncluded(c);
@@ -501,6 +514,7 @@ bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool fix_e_cigar(core::record::Record& r,
                  const std::vector<std::pair<std::string, size_t>>&,
                  const RefInfo& ref) {
@@ -597,6 +611,7 @@ bool fix_e_cigar(core::record::Record& r,
 }
 
 // -----------------------------------------------------------------------------
+
 char ConvertECigar2CigarChar(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -617,6 +632,7 @@ char ConvertECigar2CigarChar(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 int StepRef(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -636,6 +652,7 @@ int StepRef(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t MappedLength(const std::string& cigar) {
   if (cigar == "*") {
     return 0;
@@ -654,6 +671,7 @@ uint64_t MappedLength(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ECigar2Cigar(const std::string& e_cigar) {
   std::string cigar;
   cigar.reserve(e_cigar.size());
@@ -691,6 +709,7 @@ std::string ECigar2Cigar(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t ComputeSamFlags(const size_t s, const size_t a,
                          const core::record::Record& record) {
   uint16_t flags = 0;
@@ -730,6 +749,7 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessFirstMappedSegment(const size_t s, const size_t a,
                                const core::record::Record& record,
                                std::string& read_name, std::string& pos,
@@ -779,6 +799,7 @@ void ProcessFirstMappedSegment(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessSecondMappedSegment(const size_t s,
                                 const core::record::Record& record,
                                 int64_t& template_length, uint16_t& flags,
@@ -840,6 +861,7 @@ void ProcessSecondMappedSegment(const size_t s,
 }
 
 // -----------------------------------------------------------------------------
+
 bool compare(const core::record::Record& r1, const core::record::Record& r2) {
   if (r1.GetAlignments().empty()) {
     return false;

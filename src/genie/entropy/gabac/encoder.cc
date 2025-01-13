@@ -18,6 +18,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Descriptor Encoder::CompressTokens(
     const EncodingConfiguration& conf0, core::AccessUnit::Descriptor&& in) {
   auto desc = std::move(in);
@@ -58,6 +59,7 @@ core::AccessUnit::Descriptor Encoder::CompressTokens(
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Encoder::Compress(
     const EncodingConfiguration& conf, core::AccessUnit::Subsequence&& in) {
   // Interface to GABAC library
@@ -103,6 +105,7 @@ core::AccessUnit::Subsequence Encoder::Compress(
 }
 
 // -----------------------------------------------------------------------------
+
 core::EntropyEncoder::entropy_coded Encoder::Process(
     core::AccessUnit::Descriptor& desc) {
   entropy_coded ret;

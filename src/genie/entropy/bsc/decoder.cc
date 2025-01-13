@@ -21,6 +21,7 @@
 namespace genie::entropy::bsc {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Decompress(core::AccessUnit::Subsequence&& data) {
   const auto id = data.GetId();
 
@@ -51,6 +52,7 @@ core::AccessUnit::Subsequence Decompress(core::AccessUnit::Subsequence&& data) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {

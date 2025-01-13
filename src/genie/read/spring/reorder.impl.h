@@ -40,6 +40,7 @@ namespace genie::read::spring {
 using util::operator""_u32;
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 ReorderGlobal<BitsetSize>::ReorderGlobal(const int max_read_len_param) {
   base_mask =
@@ -49,6 +50,7 @@ ReorderGlobal<BitsetSize>::ReorderGlobal(const int max_read_len_param) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void BitsetToString(std::bitset<BitsetSize> b, char* s, const uint16_t read_len,
                     const ReorderGlobal<BitsetSize>& rg) {
@@ -66,6 +68,7 @@ void BitsetToString(std::bitset<BitsetSize> b, char* s, const uint16_t read_len,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void SetGlobalArrays(ReorderGlobal<BitsetSize>& rg) {
   for (int i = 0; i < 64; i++) rg.mask64[i] = 1;
@@ -82,6 +85,7 @@ void SetGlobalArrays(ReorderGlobal<BitsetSize>& rg) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
                     std::bitset<BitsetSize>& rev_ref,
@@ -194,6 +198,7 @@ void UpdateRefCount(std::bitset<BitsetSize>& cur, std::bitset<BitsetSize>& ref,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void ReadDnaFile(std::vector<std::bitset<BitsetSize>>& read,
                  std::vector<uint16_t>& read_lengths,
@@ -244,6 +249,7 @@ void display_progress(uint32_t& num_reads_remaining, float& last_progress,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 bool SearchMatch(
     const std::bitset<BitsetSize>& ref,
@@ -647,6 +653,7 @@ void parallel_process_reads(
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void Reorder(std::vector<std::bitset<BitsetSize>>& read,
              std::vector<BbHashDict>& dict, std::vector<uint16_t>& read_lengths,
@@ -767,6 +774,7 @@ void process_all_tasks(const ReorderGlobal<BitsetSize>& rg,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
                  std::vector<uint16_t>& read_lengths,
@@ -818,6 +826,7 @@ void WriteToFile(std::vector<std::bitset<BitsetSize>>& read,
 }
 
 // -----------------------------------------------------------------------------
+
 template <size_t BitsetSize>
 void ReorderMain(const std::string& temp_dir, const CompressionParams& cp) {
   auto rg_pointer =

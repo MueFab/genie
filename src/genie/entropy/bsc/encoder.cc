@@ -23,6 +23,7 @@
 namespace genie::entropy::bsc {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void FillDecoder(const core::GenomicDescriptorProperties& desc,
                  T& decoder_config) {
@@ -36,6 +37,7 @@ void FillDecoder(const core::GenomicDescriptorProperties& desc,
 }
 
 // -----------------------------------------------------------------------------
+
 void StoreParameters(core::GenDesc desc,
                      core::parameter::DescriptorSubSequenceCfg& parameter_set) {
   auto descriptor_configuration =
@@ -50,6 +52,7 @@ void StoreParameters(core::GenDesc desc,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Compress(core::AccessUnit::Subsequence&& in) {
   const size_t num_symbols = in.GetNumSymbols();
   util::DataBlock input_buffer = in.Move();
@@ -74,6 +77,7 @@ core::AccessUnit::Subsequence Compress(core::AccessUnit::Subsequence&& in) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::EntropyEncoder::entropy_coded Encoder::Process(
     core::AccessUnit::Descriptor& desc) {
   entropy_coded ret;
@@ -122,6 +126,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const bool write_out_streams)
     : writeOutStreams(write_out_streams) {}
 

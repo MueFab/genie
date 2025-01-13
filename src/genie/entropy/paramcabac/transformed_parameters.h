@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file transformed_parameters.h
  * @brief Defines the `TransformedParameters` class for managing CABAC transform
  * parameters in entropy coding.
  * @details This class is used to represent and manage the various transform

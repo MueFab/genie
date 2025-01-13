@@ -18,9 +18,11 @@
 namespace genie::format::mgrec {
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(std::ostream& file_1) : writer_(file_1) {}
 
 // -----------------------------------------------------------------------------
+
 void Exporter::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   core::record::Chunk data = std::move(t);
   [[maybe_unused]] util::OrderedSection section(&lock_, id);

@@ -12,12 +12,15 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 stats::PerfStats& FormatExporterCompressed::GetStats() { return stats_; }
 
 // -----------------------------------------------------------------------------
+
 void FormatExporterCompressed::SkipIn(const util::Section&) {}
 
 // -----------------------------------------------------------------------------
+
 void FormatExporterCompressed::FlushIn(uint64_t&) {}
 
 // -----------------------------------------------------------------------------

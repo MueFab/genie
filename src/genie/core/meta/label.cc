@@ -18,9 +18,11 @@
 namespace genie::core::meta {
 
 // -----------------------------------------------------------------------------
+
 Label::Label(std::string id) : label_id_(std::move(id)) {}
 
 // -----------------------------------------------------------------------------
+
 Label::Label(const nlohmann::json& json) : label_id_(json["label_ID"]) {
   for (const auto& r : json["regions"]) {
     regions_.emplace_back(r);
@@ -29,6 +31,7 @@ Label::Label(const nlohmann::json& json) : label_id_(json["label_ID"]) {
 }
 
 // -----------------------------------------------------------------------------
+
 nlohmann::json Label::ToJson() const {
   nlohmann::json ret;
   ret["label_ID"] = label_id_;
@@ -39,12 +42,15 @@ nlohmann::json Label::ToJson() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Label::AddRegion(Region r) { regions_.emplace_back(std::move(r)); }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Label::GetId() const { return label_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Region>& Label::GetRegions() const { return regions_; }
 
 // -----------------------------------------------------------------------------

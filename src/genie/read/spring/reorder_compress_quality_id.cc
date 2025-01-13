@@ -41,6 +41,7 @@ constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void ReorderCompressQualityId(const std::string& temp_dir,
                               const CompressionParams& cp,
                               core::ReadEncoder::qv_selector* qv_coder,
@@ -150,6 +151,7 @@ void ReorderCompressQualityId(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void ReadBlockStartEnd(const std::string& file_blocks,
                        std::vector<uint32_t>& block_start,
                        std::vector<uint32_t>& block_end) {
@@ -167,6 +169,7 @@ void ReadBlockStartEnd(const std::string& file_blocks,
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateOrder(const std::string& file_order,
                    std::vector<uint32_t>& order_array,
                    const uint32_t& num_reads) {
@@ -276,6 +279,7 @@ void parallel_process_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
+
 void ReorderCompressIdPe(const std::vector<std::string>& id_array,
                          const std::string& temp_dir,
                          const std::string& file_order_id,
@@ -385,6 +389,7 @@ void parallel_process_quality_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
+
 void ReorderCompressQualityPe(std::string file_quality[2],
                               const std::string& temp_dir,
                               std::vector<std::string>& quality_array,
@@ -580,6 +585,7 @@ void parallel_process_blocks_dynamic(
 }
 
 // -----------------------------------------------------------------------------
+
 void ReorderCompress(
     const std::string& file_name, const std::string& temp_dir,
     const uint32_t& num_reads_per_file, const int& num_thr,

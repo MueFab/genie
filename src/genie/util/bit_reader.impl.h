@@ -25,6 +25,7 @@
 #define SRC_GENIE_UTIL_BIT_READER_IMPL_H_
 
 // -----------------------------------------------------------------------------
+
 // Suppress MSVC warning about constants in template if-conditions
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -40,6 +41,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 // Extract static assertions to a separate function to reduce redundancy
 
 template <typename T>

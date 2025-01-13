@@ -27,14 +27,17 @@
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
+
 bool Decoder::IsAligned(const core::AccessUnit::Descriptor& desc) {
   return desc.GetSize() != 3;
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::DecodeAligned(
     const paramqv1::QualityValues1& param,
     const std::vector<std::string>& e_cigar_vec,
@@ -60,6 +63,7 @@ std::vector<std::string> Decoder::DecodeAligned(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::DecodeUnaligned(
     const paramqv1::QualityValues1& param_casted,
     const std::vector<std::string>& e_cigar_vec,
@@ -86,6 +90,7 @@ std::vector<std::string> Decoder::DecodeUnaligned(
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FillInput(DecodingBlock& input,
                         core::AccessUnit::Descriptor& desc,
                         const paramqv1::QualityValues1& param) {
@@ -109,6 +114,7 @@ void Decoder::FillInput(DecodingBlock& input,
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     const core::parameter::QualityValues& param,
     const std::vector<std::string>& e_cigar_vec,
@@ -136,4 +142,8 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

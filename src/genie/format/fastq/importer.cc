@@ -22,6 +22,7 @@ constexpr auto kLogModuleName = "FastQ";
 namespace genie::format::fastq {
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(const size_t block_size, std::istream& file_1)
     : block_size_(block_size), file_list_{&file_1} {
   const auto pos = this->file_list_.front()->tellg();
@@ -31,6 +32,7 @@ Importer::Importer(const size_t block_size, std::istream& file_1)
 }
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(const size_t block_size, std::istream& file_1,
                    std::istream& file_2)
     : block_size_(block_size), file_list_{&file_1, &file_2} {
@@ -41,6 +43,7 @@ Importer::Importer(const size_t block_size, std::istream& file_1,
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
   util::Watch watch;
   core::record::Chunk chunk;
@@ -106,6 +109,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record Importer::BuildRecord(
     std::vector<std::array<std::string, kLinesPerRecord>> data) {
   auto ret = core::record::Record(static_cast<uint8_t>(data.size()),
@@ -123,6 +127,7 @@ core::record::Record Importer::BuildRecord(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::array<std::string, kLinesPerRecord>> Importer::ReadData(
     const std::vector<std::istream*>& file_list) {
   std::vector<std::array<std::string, kLinesPerRecord>> data(file_list.size());
@@ -144,6 +149,7 @@ std::vector<std::array<std::string, kLinesPerRecord>> Importer::ReadData(
 }
 
 // -----------------------------------------------------------------------------
+
 void Importer::SanityCheck(
     const std::array<std::string, kLinesPerRecord>& data) {
   constexpr char id_token = '@';

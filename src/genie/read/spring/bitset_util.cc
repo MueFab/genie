@@ -24,6 +24,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void BbHashDict::FindPos(int64_t* dict_idx,
                          const uint64_t& start_pos_idx) const {
   dict_idx[0] = start_pos_[start_pos_idx];
@@ -42,6 +43,7 @@ void BbHashDict::FindPos(int64_t* dict_idx,
 }
 
 // -----------------------------------------------------------------------------
+
 void BbHashDict::Remove(const int64_t* dict_idx, const uint64_t& start_pos_idx,
                         const int64_t current) {
   const auto size = dict_idx[1] - dict_idx[0];

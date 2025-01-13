@@ -36,6 +36,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 Factory<T>* IndustrialPark::FindAndCreate() {
   auto type = std::type_index(typeid(T));
@@ -48,6 +49,7 @@ Factory<T>* IndustrialPark::FindAndCreate() {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 Factory<T>* IndustrialPark::FindAndFail() const {
   const auto type = std::type_index(typeid(T));
@@ -57,6 +59,7 @@ Factory<T>* IndustrialPark::FindAndFail() const {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void IndustrialPark::RegisterConstructor(
     uint8_t id,
@@ -66,6 +69,7 @@ void IndustrialPark::RegisterConstructor(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 std::unique_ptr<T> IndustrialPark::Construct(uint8_t id, core::GenDesc desc,
                                              BitReader& reader) const {

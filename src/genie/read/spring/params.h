@@ -21,6 +21,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 // Constants for Spring module configuration
 
 /// Maximum supported read length.

@@ -12,6 +12,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 ContextModel::ContextModel(const unsigned char init_state) {
   const unsigned char val_mps = init_state >= 64;
   state_ = ((val_mps ? init_state - 64 : 63 - init_state) << 1) + val_mps;

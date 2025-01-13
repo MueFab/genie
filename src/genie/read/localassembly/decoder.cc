@@ -25,6 +25,7 @@
 namespace genie::read::localassembly {
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::GetReferences(
     const basecoder::Decoder::SegmentMeta& meta, DecodingState& state) {
   std::vector<std::string> ret;
@@ -42,18 +43,21 @@ std::vector<std::string> Decoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<basecoder::DecoderStub::DecodingState>
 Decoder::CreateDecodingState(core::AccessUnit& t) {
   return std::make_unique<LaDecodingState>(t);
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::RecordDecodedHook(DecodingState& state,
                                 const core::record::Record& rec) {
   dynamic_cast<LaDecodingState&>(state).ref_encoder.AddRead(rec);
 }
 
 // -----------------------------------------------------------------------------
+
 Decoder::LaDecodingState::LaDecodingState(core::AccessUnit& t_data)
     : DecodingState(t_data),
       ref_encoder(t_data.GetParameters()

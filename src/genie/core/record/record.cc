@@ -28,15 +28,18 @@
 namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
+
 void Record::PatchRefId(const size_t ref_id) {
   shared_alignment_info_ = AlignmentSharedData(
       static_cast<uint16_t>(ref_id), shared_alignment_info_.GetAsDepth());
 }
 
 // -----------------------------------------------------------------------------
+
 Record::Record() : alignment_info_(0), more_alignment_info_(nullptr) {}
 
 // -----------------------------------------------------------------------------
+
 Record::Record(const uint8_t number_of_template_segments,
                const ClassType au_type_cfg, std::string&& read_name,
                std::string&& read_group, const uint8_t flags,
@@ -51,6 +54,7 @@ Record::Record(const uint8_t number_of_template_segments,
       more_alignment_info_(std::make_unique<alignment_external::None>()) {}
 
 // -----------------------------------------------------------------------------
+
 Record::Record(util::BitReader& reader)
     : number_of_template_segments_(reader.ReadAlignedInt<uint8_t>()),
       reads_(reader.ReadAlignedInt<uint8_t>()),
@@ -84,12 +88,15 @@ Record::Record(util::BitReader& reader)
 }
 
 // -----------------------------------------------------------------------------
+
 Record::Record(const Record& rec) { *this = rec; }
 
 // -----------------------------------------------------------------------------
+
 Record::Record(Record&& rec) noexcept { *this = std::move(rec); }
 
 // -----------------------------------------------------------------------------
+
 Record& Record::operator=(const Record& rec) {
   if (this == &rec) {
     return *this;
@@ -109,6 +116,7 @@ Record& Record::operator=(const Record& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 Record& Record::operator=(Record&& rec) noexcept {
   this->number_of_template_segments_ = rec.number_of_template_segments_;
   this->class_id_ = rec.class_id_;
@@ -125,6 +133,7 @@ Record& Record::operator=(Record&& rec) noexcept {
 }
 
 // -----------------------------------------------------------------------------
+
 void Record::AddSegment(Segment&& rec) {
   UTILS_DIE_IF(reads_.size() == number_of_template_segments_,
                "Record already full");
@@ -137,6 +146,7 @@ void Record::AddSegment(Segment&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Record::AddAlignment(const uint16_t seq_id, AlignmentBox&& rec) {
   if (alignment_info_.empty()) {
     shared_alignment_info_ = AlignmentSharedData(
@@ -156,12 +166,15 @@ void Record::AddAlignment(const uint16_t seq_id, AlignmentBox&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Segment>& Record::GetSegments() const { return reads_; }
 
 // -----------------------------------------------------------------------------
+
 std::vector<Segment>& Record::GetSegments() { return reads_; }
 
 // -----------------------------------------------------------------------------
+
 void Record::SwapSegmentOrder() {
   if (reads_.size() != 2) {
     return;
@@ -172,11 +185,13 @@ void Record::SwapSegmentOrder() {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t Record::GetNumberOfTemplateSegments() const {
   return number_of_template_segments_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<AlignmentBox>& Record::GetAlignments() const {
   return alignment_info_;
 }

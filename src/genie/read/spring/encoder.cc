@@ -41,12 +41,14 @@ constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   preprocessor_.Preprocess(std::move(t), id);
   SkipOut(id);
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FlushIn(uint64_t& pos) {
   if (!preprocessor_.used) {
     FlushOut(pos);
@@ -108,6 +110,7 @@ void Encoder::FlushIn(uint64_t& pos) {
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const std::string& working_dir, const size_t num_thr,
                  const bool paired_end, const bool write_raw)
     : ReadEncoder(write_raw), preprocess_progress_printed_(0) {
@@ -118,6 +121,7 @@ Encoder::Encoder(const std::string& working_dir, const size_t num_thr,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::SkipIn(const util::Section& id) {
   preprocessor_.Skip(id);
   SkipOut(id);

@@ -12,21 +12,27 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 uint16_t PacketHeader::GetSid() const { return sid_; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t PacketHeader::GetReserved() const { return reserved_; }
 
 // -----------------------------------------------------------------------------
+
 bool PacketHeader::GetMarkerBit() const { return marker_bit_; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t PacketHeader::GetSequenceNumber() const { return sequence_number_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t PacketHeader::GetPacketSize() const { return packet_size_; }
 
 // -----------------------------------------------------------------------------
+
 PacketHeader::PacketHeader(const uint16_t sid, const uint8_t reserved,
                            const bool marker_bit,
                            const uint8_t sequence_number,
@@ -38,6 +44,7 @@ PacketHeader::PacketHeader(const uint16_t sid, const uint8_t reserved,
       packet_size_(packet_size) {}
 
 // -----------------------------------------------------------------------------
+
 PacketHeader::PacketHeader(util::BitReader& reader) {
   sid_ = reader.Read<uint16_t>(13);
   reserved_ = reader.Read<uint8_t>(3);
@@ -47,6 +54,7 @@ PacketHeader::PacketHeader(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void PacketHeader::Write(util::BitWriter& writer) const {
   writer.WriteBits(sid_, 13);
   writer.WriteBits(reserved_, 3);
@@ -56,6 +64,7 @@ void PacketHeader::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t PacketHeader::GetLength() { return 5; }
 
 // -----------------------------------------------------------------------------

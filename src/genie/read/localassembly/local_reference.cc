@@ -36,10 +36,12 @@ constexpr auto kLogModuleName = "LocalAssembly";
 namespace genie::read::localassembly {
 
 // -----------------------------------------------------------------------------
+
 LocalReference::LocalReference(const uint32_t cr_buf_max_size)
     : cr_buf_max_size_(cr_buf_max_size), cr_buf_size_(0) {}
 
 // -----------------------------------------------------------------------------
+
 std::string LocalReference::preprocess(const std::string& read,
                                        const std::string& cigar) {
   std::string result;
@@ -100,6 +102,7 @@ std::string LocalReference::preprocess(const std::string& read,
 }
 
 // -----------------------------------------------------------------------------
+
 void LocalReference::AddSingleRead(const std::string& record,
                                    const std::string& ecigar,
                                    const uint64_t position) {
@@ -121,6 +124,7 @@ void LocalReference::AddSingleRead(const std::string& record,
 }
 
 // -----------------------------------------------------------------------------
+
 void LocalReference::AddRead(const core::record::Record& s) {
   const auto& seq1 = s.GetSegments()[0].GetSequence();
   const auto& cigar1 = s.GetAlignments().front().GetAlignment().GetECigar();
@@ -147,6 +151,7 @@ void LocalReference::AddRead(const core::record::Record& s) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string LocalReference::GenerateRef(const uint32_t offset,
                                         const uint32_t len) const {
   std::string ref;
@@ -157,6 +162,7 @@ std::string LocalReference::GenerateRef(const uint32_t offset,
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t LocalReference::LengthFromCigar(const std::string& cigar) {
   uint32_t len = 0;
   uint32_t count = 0;
@@ -196,18 +202,21 @@ uint32_t LocalReference::LengthFromCigar(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string LocalReference::GetReference(const uint32_t pos_offset,
                                          const std::string& cigar) const {
   return GenerateRef(pos_offset, LengthFromCigar(cigar));
 }
 
 // -----------------------------------------------------------------------------
+
 std::string LocalReference::GetReference(const uint32_t pos_offset,
                                          const uint32_t len) const {
   return GenerateRef(pos_offset, len);
 }
 
 // -----------------------------------------------------------------------------
+
 char LocalReference::MajorityVote(const uint32_t offset_to_first) const {
   std::map<char, uint16_t> votes;
 
@@ -243,6 +252,7 @@ char LocalReference::MajorityVote(const uint32_t offset_to_first) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void LocalReference::PrintWindow() const {
   const uint64_t min_pos = GetWindowBorder();
   for (size_t i = 0; i < sequences_.size(); ++i) {
@@ -257,6 +267,7 @@ void LocalReference::PrintWindow() const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t LocalReference::GetWindowBorder() const {
   uint64_t min_pos = std::numeric_limits<uint64_t>::max();
   for (auto& p : sequence_positions_) {
@@ -266,6 +277,7 @@ uint64_t LocalReference::GetWindowBorder() const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t LocalReference::GetMaxBufferSize() const { return cr_buf_max_size_; }
 
 // -----------------------------------------------------------------------------

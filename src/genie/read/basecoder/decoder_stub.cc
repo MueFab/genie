@@ -34,6 +34,7 @@
 namespace genie::read::basecoder {
 
 // -----------------------------------------------------------------------------
+
 DecoderStub::DecodingState::DecodingState(core::AccessUnit& t_data) {
   num_records = t_data.GetNumReads();
   num_segments = t_data.GetParameters().GetNumberTemplateSegments();
@@ -44,6 +45,7 @@ DecoderStub::DecodingState::DecodingState(core::AccessUnit& t_data) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Chunk DecoderStub::DecodeSequences(DecodingState& state,
                                                  core::AccessUnit& t_data) {
   util::Watch watch;
@@ -68,6 +70,7 @@ core::record::Chunk DecoderStub::DecodeSequences(DecodingState& state,
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderStub::DecodeNames(DecodingState& state,
                               core::record::Chunk& chunk) {
   const std::tuple<std::vector<std::string>, core::stats::PerfStats> names =
@@ -79,6 +82,7 @@ void DecoderStub::DecodeNames(DecodingState& state,
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderStub::DecodeQualities(DecodingState& state,
                                   core::record::Chunk& chunk) {
   auto qvs = qvcoder_->Process(*state.qv_param, state.e_cigars, state.positions,
@@ -107,6 +111,7 @@ void DecoderStub::DecodeQualities(DecodingState& state,
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderStub::AddECigar(const core::record::Record& rec,
                             std::vector<std::string>& cig_vec,
                             std::vector<uint64_t>& pos_vec) {
@@ -141,10 +146,12 @@ void DecoderStub::AddECigar(const core::record::Record& rec,
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderStub::RecordDecodedHook(DecodingState&,
                                     const core::record::Record&) {}
 
 // -----------------------------------------------------------------------------
+
 void DecoderStub::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   auto t_data = std::move(t);
   t_data = EntropyCodeAu(std::move(t_data), true);

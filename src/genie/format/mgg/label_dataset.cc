@@ -15,15 +15,18 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool LabelDataset::operator==(const LabelDataset& other) const {
   return dataset_id_ == other.dataset_id_ &&
          dataset_regions_ == other.dataset_regions_;
 }
 
 // -----------------------------------------------------------------------------
+
 LabelDataset::LabelDataset(const uint16_t ds_id) : dataset_id_(ds_id) {}
 
 // -----------------------------------------------------------------------------
+
 LabelDataset::LabelDataset(util::BitReader& reader) {
   // dataset_IDs u(16)
   dataset_id_ = reader.Read<uint16_t>();
@@ -37,14 +40,17 @@ LabelDataset::LabelDataset(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelDataset::AddDatasetRegion(LabelRegion ds_region) {
   dataset_regions_.emplace_back(std::move(ds_region));
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t LabelDataset::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t LabelDataset::GetBitLength() const {
   // dataset_IDs u(16)
   uint64_t bit_length = 16;
@@ -61,6 +67,7 @@ uint64_t LabelDataset::GetBitLength() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelDataset::Write(util::BitWriter& bit_writer) const {
   // dataset_IDs u(16)
   bit_writer.WriteBits(dataset_id_, 16);
@@ -75,6 +82,7 @@ void LabelDataset::Write(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<core::meta::Region> LabelDataset::Decapsulate(
     const uint16_t dataset) {
   std::vector<core::meta::Region> ret;
@@ -89,6 +97,7 @@ std::vector<core::meta::Region> LabelDataset::Decapsulate(
 }
 
 // -----------------------------------------------------------------------------
+
 LabelDataset::LabelDataset(const uint16_t dataset_id,
                            const core::meta::Label& labels)
     : dataset_id_(dataset_id) {

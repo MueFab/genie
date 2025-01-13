@@ -80,6 +80,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);

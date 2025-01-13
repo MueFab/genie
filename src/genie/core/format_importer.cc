@@ -14,11 +14,13 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 void FormatImporter::SetClassifier(Classifier* classifier) {
   classifier_ = classifier;
 }
 
 // -----------------------------------------------------------------------------
+
 bool FormatImporter::Pump(uint64_t& id, std::mutex& lock) {
   record::Chunk chunk;
   util::Section sec{};
@@ -55,6 +57,7 @@ bool FormatImporter::Pump(uint64_t& id, std::mutex& lock) {
 }
 
 // -----------------------------------------------------------------------------
+
 void FormatImporter::FlushIn(uint64_t& pos) { FlushOut(pos); }
 
 // -----------------------------------------------------------------------------

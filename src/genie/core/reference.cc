@@ -20,15 +20,19 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 const std::string& Reference::GetName() const { return name_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Reference::GetStart() const { return start_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Reference::GetEnd() const { return end_; }
 
 // -----------------------------------------------------------------------------
+
 Reference::Reference(std::string name, const uint64_t start, const uint64_t end)
     : name_(std::move(name)), start_(start), end_(end) {}
 

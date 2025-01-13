@@ -28,6 +28,7 @@
 namespace genie::read::lowlatency {
 
 // -----------------------------------------------------------------------------
+
 core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
   util::Watch watch;
   core::record::Chunk ret;
@@ -114,11 +115,13 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   FlowOut(decode_common(std::move(t)), id);
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Decoder::Decode(core::AccessUnit&& t) {
   return decode_common(std::move(t))
       .GetData()

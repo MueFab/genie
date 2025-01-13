@@ -31,6 +31,7 @@
 #include "genie/util/bit_writer.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::paramqv1 {
 
 /**
@@ -113,7 +114,9 @@ class Codebook final {
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::paramqv1
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_PARAMQV1_CODEBOOK_H_

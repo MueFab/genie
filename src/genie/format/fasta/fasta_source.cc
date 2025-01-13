@@ -21,6 +21,7 @@ constexpr auto kLogModuleName = "Fasta";
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 FastaSource::FastaSource(std::ostream* outfile, core::ReferenceManager* ref_mgr)
     : outfile_(outfile), ref_mgr_(ref_mgr), line_length_(0) {
   auto seqs = ref_mgr_->GetSequences();
@@ -34,6 +35,7 @@ FastaSource::FastaSource(std::ostream* outfile, core::ReferenceManager* ref_mgr)
 }
 
 // -----------------------------------------------------------------------------
+
 bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
   util::Section loc_id = {0, 1, false};
   {
@@ -99,6 +101,7 @@ bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
 }
 
 // -----------------------------------------------------------------------------
+
 void FastaSource::FlushIn(uint64_t&) {}
 
 // -----------------------------------------------------------------------------

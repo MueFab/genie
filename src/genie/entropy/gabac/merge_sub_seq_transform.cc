@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void TransformMergeCoding(const paramcabac::Subsequence& sub_seq_cfg,
                           std::vector<util::DataBlock>* transformed_sub_seqs) {
   assert(transformed_sub_seqs != nullptr);
@@ -78,6 +79,7 @@ void TransformMergeCoding(const paramcabac::Subsequence& sub_seq_cfg,
 }
 
 // -----------------------------------------------------------------------------
+
 void InverseTransformMergeCoding(
     const paramcabac::Subsequence& sub_seq_cfg,
     std::vector<util::DataBlock>* transformed_sub_seqs) {

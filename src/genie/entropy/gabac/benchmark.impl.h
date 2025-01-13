@@ -20,12 +20,14 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 SearchSpace<Type>::SearchSpaceIterator::SearchSpaceIterator(Type value,
                                                             Type stride)
     : value_(value), stride_(stride) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 template <typename Ret>
 Ret SearchSpace<Type>::SearchSpaceIterator::Get() const {
@@ -33,6 +35,7 @@ Ret SearchSpace<Type>::SearchSpaceIterator::Get() const {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator&
 SearchSpace<Type>::SearchSpaceIterator::operator-=(int64_t idx) {
@@ -41,6 +44,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator-=(int64_t idx) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator
 SearchSpace<Type>::SearchSpaceIterator::operator+(int64_t idx) const {
@@ -50,6 +54,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator+(int64_t idx) const {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator
 SearchSpace<Type>::SearchSpaceIterator::operator-(int64_t idx) const {
@@ -59,6 +64,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator-(int64_t idx) const {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 int64_t SearchSpace<Type>::SearchSpaceIterator::operator-(
     SearchSpaceIterator& other) const {
@@ -66,6 +72,7 @@ int64_t SearchSpace<Type>::SearchSpaceIterator::operator-(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator&
 SearchSpace<Type>::SearchSpaceIterator::operator++() {
@@ -73,6 +80,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator++() {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator&
 SearchSpace<Type>::SearchSpaceIterator::operator--() {
@@ -80,6 +88,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator--() {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 bool SearchSpace<Type>::SearchSpaceIterator::operator==(
     const SearchSpaceIterator& other) const {
@@ -87,6 +96,7 @@ bool SearchSpace<Type>::SearchSpaceIterator::operator==(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 bool SearchSpace<Type>::SearchSpaceIterator::operator!=(
     const SearchSpaceIterator& other) const {
@@ -94,6 +104,7 @@ bool SearchSpace<Type>::SearchSpaceIterator::operator!=(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 typename SearchSpace<Type>::SearchSpaceIterator&
 SearchSpace<Type>::SearchSpaceIterator::operator+=(int64_t idx) {
@@ -102,6 +113,7 @@ SearchSpace<Type>::SearchSpaceIterator::operator+=(int64_t idx) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Type>
 SearchSpace<Type>::SearchSpace() : SearchSpace(0, 0, 1) {}
 

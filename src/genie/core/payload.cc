@@ -14,6 +14,7 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 util::DataBlock Payload::InternalLoadPayload(util::BitReader& reader) const {
   const auto pos = reader.GetStreamPosition();
   reader.SetStreamPosition(payload_position_);
@@ -25,6 +26,7 @@ util::DataBlock Payload::InternalLoadPayload(util::BitReader& reader) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Payload::GetPayloadSize() const {
   if (IsPayloadLoaded()) {
     return block_payload_.GetRawSize();
@@ -33,30 +35,36 @@ uint64_t Payload::GetPayloadSize() const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Payload::LoadPayload() {
   block_payload_ = InternalLoadPayload(*internal_reader_);
   payload_loaded_ = true;
 }
 
 // -----------------------------------------------------------------------------
+
 void Payload::UnloadPayload() {
   payload_loaded_ = false;
   block_payload_.Clear();
 }
 
 // -----------------------------------------------------------------------------
+
 bool Payload::IsPayloadLoaded() const { return payload_loaded_; }
 
 // -----------------------------------------------------------------------------
+
 const util::DataBlock& Payload::GetPayload() const { return block_payload_; }
 
 // -----------------------------------------------------------------------------
+
 util::DataBlock&& Payload::MovePayload() {
   payload_loaded_ = false;
   return std::move(block_payload_);
 }
 
 // -----------------------------------------------------------------------------
+
 Payload::Payload(util::DataBlock payload)
     : payload_loaded_(true),
       payload_position_(0),
@@ -66,6 +74,7 @@ Payload::Payload(util::DataBlock payload)
 }
 
 // -----------------------------------------------------------------------------
+
 Payload::Payload(util::BitReader& reader, const uint64_t size)
     : payload_loaded_(false),
       payload_position_(reader.GetStreamPosition()),
@@ -75,6 +84,7 @@ Payload::Payload(util::BitReader& reader, const uint64_t size)
 }
 
 // -----------------------------------------------------------------------------
+
 void Payload::Write(util::BitWriter& writer) const {
   if (!IsPayloadLoaded() && internal_reader_) {
     auto tmp = InternalLoadPayload(*internal_reader_);
@@ -86,6 +96,7 @@ void Payload::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Payload::operator==(const Payload& other) const {
   return payload_size_ == other.payload_size_ &&
          payload_position_ == other.payload_position_ &&
