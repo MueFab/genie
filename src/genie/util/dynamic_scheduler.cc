@@ -23,6 +23,8 @@
 
 #include "genie/util/dynamic_scheduler.h"
 
+#include <algorithm>
+
 // -----------------------------------------------------------------------------
 
 namespace genie::util {

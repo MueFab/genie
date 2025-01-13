@@ -19,8 +19,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_READ_SPRING_DYNAMIC_SCHEDULER_H_
-#define SRC_GENIE_READ_SPRING_DYNAMIC_SCHEDULER_H_
+#ifndef SRC_GENIE_UTIL_DYNAMIC_SCHEDULER_H_
+#define SRC_GENIE_UTIL_DYNAMIC_SCHEDULER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ class DynamicScheduler {
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_READ_SPRING_DYNAMIC_SCHEDULER_H_
+#endif  // SRC_GENIE_UTIL_DYNAMIC_SCHEDULER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
