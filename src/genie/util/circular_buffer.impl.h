@@ -15,8 +15,8 @@
  * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
  */
 
-#ifndef CIRCULAR_BUFFER_IMPL_H
-#define CIRCULAR_BUFFER_IMPL_H
+#ifndef SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
+#define SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
 
 // -----------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ T CircularBuffer<T>::push(const T& val) {
 
 // -----------------------------------------------------------------------------
 
-#endif  // CIRCULAR_BUFFER_IMPL_H
+#endif  // SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
