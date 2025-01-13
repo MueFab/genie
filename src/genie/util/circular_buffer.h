@@ -20,8 +20,8 @@
  * data storage.
  */
 
-#ifndef SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
-#define SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
+#ifndef SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
+#define SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
 
 // -----------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ class CircularBuffer {
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_CIRCULAR_BUFFER_H_
+#endif  // SRC_GENIE_UTIL_CIRCULAR_BUFFER_IMPL_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
