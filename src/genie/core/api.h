@@ -284,224 +284,357 @@ struct Hierarchy {
    * @brief
    */
   struct DatasetGroup {
-    uint64_t id;                        //!< @brief
-    std::vector<uint64_t> dataset_ids;  //!< @brief
+    ///
+    uint64_t id;
+
+    ///
+    std::vector<uint64_t> dataset_ids;
   };
-  std::vector<DatasetGroup> groups;  //!< @brief
+  std::vector<DatasetGroup> groups;
 };
 
 /**
  * @brief
  */
 struct HexCode {
-  std::string value;  //!< @brief
+  ///
+  std::string value;
 };
 
 /**
  * @brief
  */
 struct GenTag {
-  char key[2];  //!< @brief
+  ///
+  char key[2];
+
+  ///
   std::variant<int32_t, std::string, uint8_t, int8_t, uint16_t, int16_t,
                uint32_t, HexCode, float, double>
-      value;  //!< @brief
+      value;
 };
 
 /**
  * @brief
  */
 struct GenAux {
-  std::vector<GenTag> aux_fields;  //!< @brief
+  ///
+  std::vector<GenTag> aux_fields;
 };
 
 /**
  * @brief
  */
 struct GenAuxRecord {
-  std::vector<GenAux> aux_set;  //!< @brief [numberOfGenAux]
+  /// [numberOfGenAux]
+  std::vector<GenAux> aux_set;
 };
 
 /**
  * @brief
  */
 struct Records {
-  uint64_t dataset_group_id;            //!< @brief
-  uint64_t dataset_id;                  //!< @brief
-  std::vector<record::Record> records;  //!< @brief [recordsCount]
-  std::vector<GenAuxRecord> aux_info;   //!< @brief [recordsCount]
+  ///
+  uint64_t dataset_group_id;
+
+  ///
+  uint64_t dataset_id;
+
+  /// [recordsCount]
+  std::vector<record::Record> records;
+
+  /// [recordsCount]
+  std::vector<GenAuxRecord> aux_info;
 };
 
 /**
  * @brief
  */
 struct Sequence {
-  std::string seq_name;      //!< @brief
-  uint64_t seq_start;        //!< @brief
-  uint64_t seq_end;          //!< @brief
-  std::string ref_sequence;  //!< @brief
+  ///
+  std::string seq_name;
+
+  ///
+  uint64_t seq_start;
+
+  ///
+  uint64_t seq_end;
+
+  ///
+  std::string ref_sequence;
 };
 
 /**
  * @brief
  */
 struct OutReference {
-  std::vector<Sequence> sequences;  //!< @brief
+  ///
+  std::vector<Sequence> sequences;
 };
 
 /**
  * @brief
  */
 struct RegionProtection {
-  std::string sequence_name;           //!< @brief
-  uint64_t start_pos;                  //!< @brief
-  uint64_t end_pos;                    //!< @brief
-  uint64_t class_id;                   //!< @brief
-  std::vector<std::string> key_names;  //!< @brief
+  ///
+  std::string sequence_name;
+
+  ///
+  uint64_t start_pos;
+
+  ///
+  uint64_t end_pos;
+
+  ///
+  uint64_t class_id;
+
+  ///
+  std::vector<std::string> key_names;
 };
 
 /**
  * @brief
  */
 struct SimpleSegmentStatistics {
-  uint64_t reads_number;  //!< @brief
-  std::vector<uint64_t>
-      segments_number_reads_distribution;      //!< @brief [GENIE_MAX_SEGMENTS]
-  uint64_t quality_check_failed_reads_number;  //!< @brief
+  ///
+  uint64_t reads_number;
+
+  /// [GENIE_MAX_SEGMENTS]
+  std::vector<uint64_t> segments_number_reads_distribution;
+
+  ///
+  uint64_t quality_check_failed_reads_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      segment_length;  //!< @brief
+      segment_length;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>
-      mapped_strand_segment_distribution;  //!< @brief
-  uint64_t properly_paired_number;         //!< @brief
+      mapped_strand_segment_distribution;
+
+  ///
+  uint64_t properly_paired_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StrandPaired::kCount)>
-      mapped_strand_pair_distribution;  //!< @brief
-  uint64_t max_alignments;              //!< @brief
-  std::vector<uint64_t>
-      multiple_alignment_segment_distribution;  //!< @brief
-                                                //!< [GENIE_MAX_ALIGNMENTS
-                                                //!< + 1];
+      mapped_strand_pair_distribution;
+
+  ///
+  uint64_t max_alignments;
+
+  /// [GENIE_MAX_ALIGNMENTS + 1];
+  std::vector<uint64_t> multiple_alignment_segment_distribution;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)> coverage;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      coverage;  //!< @brief
+      weighted_coverage;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      weighted_coverage;  //!< @brief
+      errors_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      errors_number;  //!< @brief
+      substitutions_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      substitutions_number;  //!< @brief
+      insertions_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      insertions_number;  //!< @brief
+      insertions_length;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      insertions_length;  //!< @brief
+      deletions_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      deletions_number;  //!< @brief
+      deletions_length;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      deletions_length;  //!< @brief
+      splices_number;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      splices_number;  //!< @brief
+      splices_length;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      splices_length;  //!< @brief
-  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
-      alignment_score;  //!< @brief
+      alignment_score;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(record::ClassType::kCount)>
-      class_segment_distribution;  //!< @brief
+      class_segment_distribution;
+
+  ///
   std::array<uint64_t, static_cast<uint8_t>(ClipTypeCombination::kCount)>
-      clipped_segment_distribution;    //!< @brief
-  uint64_t optical_duplicates_number;  //!< @brief
-  uint64_t chimeras_number;            //!< @brief
+      clipped_segment_distribution;
+
+  ///
+  uint64_t optical_duplicates_number;
+
+  ///
+  uint64_t chimeras_number;
 };
 
 /**
  * @brief
  */
 struct ExtendedSegmentStatistics {
-  std::vector<uint64_t>
-      mapped_bases_number_distribution;     //!< @brief [segmentLength[1] + 1]
-  std::vector<uint64_t> coverage;           //!< @brief [endPos – startPos + 1]
-  std::vector<uint64_t> weighted_coverage;  //!< @brief [endPos – startPos + 1]
-  std::vector<uint64_t>
-      errors_number_distribution;  //!< @brief [errorsNumber[1] + 1]
-  std::vector<uint64_t>
-      errors_position_distribution;  //!< @brief [segmentLength[1]]
-  std::vector<uint64_t>
-      substitutions_number_distribution;  //!< @brief [substitutionsNumber[1]
-                                          //!< + 1]
+  /// [segmentLength[1] + 1]
+  std::vector<uint64_t> mapped_bases_number_distribution;
+
+  /// [endPos – startPos + 1]
+  std::vector<uint64_t> coverage;
+
+  /// [endPos – startPos + 1]
+  std::vector<uint64_t> weighted_coverage;
+
+  /// [errorsNumber[1] + 1]
+  std::vector<uint64_t> errors_number_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> errors_position_distribution;
+
+  /// [substitutionsNumber[1] + 1]
+  std::vector<uint64_t> substitutions_number_distribution;
+
+  /// [segmentLength[1]]
   std::vector<std::array<std::array<uint64_t, kAcgtn_Size>, kAcgtn_Size>>
-      substitutions_transition_distribution;  //!< @brief [segmentLength[1]]
-  std::vector<uint64_t>
-      substitutions_position_distribution;  //!< @brief segmentLength[1]
-  std::vector<uint64_t>
-      insertions_number_distribution;  //!< @brief [insertionsNumber[1] + 1]
-  std::vector<uint64_t>
-      insertions_length_distribution;  //!< @brief [insertionsLength[1] + 1]
-  std::vector<uint64_t>
-      insertions_position_distribution;  //!< @brief [segmentLength[1]]
-  std::vector<uint64_t>
-      deletions_number_distribution;  //!< @brief [deletionsNumber[1] + 1]
-  std::vector<uint64_t>
-      deletions_length_distribution;  //!< @brief[deletionsLength[1] + 1]
-  std::vector<uint64_t>
-      deletions_position_distribution;  //!< @brief [segmentLength[1]]
+      substitutions_transition_distribution;
+
+  /// segmentLength[1]
+  std::vector<uint64_t> substitutions_position_distribution;
+
+  /// [insertionsNumber[1] + 1]
+  std::vector<uint64_t> insertions_number_distribution;
+
+  /// [insertionsLength[1] + 1]
+  std::vector<uint64_t> insertions_length_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> insertions_position_distribution;
+
+  ///  [deletionsNumber[1] + 1]
+  std::vector<uint64_t> deletions_number_distribution;
+
+  /// [deletionsLength[1] + 1]
+  std::vector<uint64_t> deletions_length_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> deletions_position_distribution;
+
+  /// [splicesNumber[1] + 1]
   std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
-      splices_number_distribution;  //!< @brief [splicesNumber[1] + 1],
+      splices_number_distribution;
+
+  /// [splicesLength[1] + 1]
   std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
-      splices_length_distribution;  //!< @brief [splicesLength[1] + 1],
+      splices_length_distribution;
+
+  /// [segmentLength[1]]
   std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
-      splices_position_distribution;  //!< @brief [segmentLength[1]],
-  std::vector<uint64_t>
-      alignment_score_value_distribution;  //!< @brief [alignmentScore[1] + 1]
+      splices_position_distribution;
+
+  /// [alignmentScore[1] + 1]
+  std::vector<uint64_t> alignment_score_value_distribution;
+
+  /// [segmentLength[1]]
   std::vector<
       std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>>
-      alignment_score_segment_length_distribution;  //!< @brief
-                                                    //!< [segmentLength[1]]
-  std::vector<std::array<uint64_t, kAcgtn_Size>>
-      bases_position_distribution;  //!< @brief [segmentLength[1]]
-  std::array<uint64_t, 101>
-      gc_content_value_distribution;  //!< @brief GC content in percent 0-100
-  std::vector<uint64_t>
-      quality_score_distribution;  //!< @brief [maxQualityScore + 1]
+      alignment_score_segment_length_distribution;
+
+  ///  [segmentLength[1]]
+  std::vector<std::array<uint64_t, kAcgtn_Size>> bases_position_distribution;
+
+  /// GC content in percent 0-100
+  std::array<uint64_t, 101> gc_content_value_distribution;
+
+  /// [maxQualityScore + 1]
+  std::vector<uint64_t> quality_score_distribution;
+
+  /// [segmentLength[1]]
   std::vector<
       std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>>
-      quality_score_position_distribution;  //!< @brief [segmentLength[1]]
+      quality_score_position_distribution;
+
+  /// [segmentLength[1]]
   std::vector<std::array<uint64_t, static_cast<uint8_t>(PhredBins::kCount)>>
       quality_score_position_percentiles_distribution;
-  //!< @brief
-  //!< [segmentLength[1]],
 };
 
 /**
  * @brief
  */
 struct AdvancedSegmentStatistics {
+  ///
   std::array<SimpleSegmentStatistics,
              static_cast<uint8_t>(StrandStrict::kCount)>
-      simple_statistics;  //!< @brief
+      simple_statistics;
+
+  ///
   std::array<ExtendedSegmentStatistics,
              static_cast<uint8_t>(StrandStrict::kCount)>
-      extended_statistics;  //!< @brief
+      extended_statistics;
 };
 
 /**
  * @brief
  */
 struct SimpleFilter {
-  std::vector<std::string> group_names;  //!< @brief
-  std::array<bool, static_cast<uint8_t>(record::ClassType::kCount)>
-      class_id;          //!< @brief
-  uint64_t sequence_id;  //!< @brief
-  uint64_t start_pos;    //!< @brief
-  uint64_t end_pos;      //!< @brief
-  std::array<bool, static_cast<uint8_t>(Strand::kCount)>
-      single_ends_strand;  //!< @brief
+  ///
+  std::vector<std::string> group_names;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(record::ClassType::kCount)> class_id;
+
+  ///
+  uint64_t sequence_id;
+
+  ///
+  uint64_t start_pos;
+
+  ///
+  uint64_t end_pos;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(Strand::kCount)> single_ends_strand;
+
+  ///
   std::array<bool, static_cast<uint8_t>(StrandPaired::kCount)>
-      paired_ends_strand;  //!< @brief
+      paired_ends_strand;
+
+  ///
   std::array<bool, static_cast<uint8_t>(ClipType::kCount)>
-      include_clipped_reads;          //!< @brief
-  bool include_multiple_alignments;   //!< @brief
-  bool include_optical_duplicates;    //!< @brief
-  bool include_quality_check_failed;  //!< @brief
-  bool include_aux_records;           //!< @brief
-  bool include_read_names;            //!< @brief
-  bool include_quality_values;        //!< @brief
-  bool mismatches_include_ns;         //!< @brief
+      include_clipped_reads;
+
+  ///
+  bool include_multiple_alignments;
+
+  ///
+  bool include_optical_duplicates;
+
+  ///
+  bool include_quality_check_failed;
+
+  ///
+  bool include_aux_records;
+
+  ///
+  bool include_read_names;
+
+  ///
+  bool include_quality_values;
+
+  ///
+  bool mismatches_include_ns;
 };
 
 /**
@@ -514,40 +647,86 @@ struct SegmentFilter {
    */
   template <typename T>
   struct Range {
-    T min;  //!< @brief
-    T max;  //!< @brief
+    ///
+    T min;
+
+    ///
+    T max;
   };
 
-  std::array<bool, static_cast<uint8_t>(SegmentType::kCount)>
-      filter_scope;                               //!< @brief
-  Range<uint64_t> mapped_bases_range;             //!< @brief
-  Range<float> mapped_fraction_range;             //!< @brief
-  Range<uint64_t> errors_range;                   //!< @brief
-  Range<float> errors_fraction_range;             //!< @brief
-  Range<uint64_t> substitutions_range;            //!< @brief
-  Range<float> substitutions_fraction_range;      //!< @brief
-  Range<uint64_t> insertions_range;               //!< @brief
-  Range<float> insertions_fraction_range;         //!< @brief
-  Range<uint64_t> insertions_length_range;        //!< @brief
-  Range<float> insertions_length_fraction_range;  //!< @brief
-  Range<uint64_t> deletions_range;                //!< @brief
-  Range<float> deletions_fraction_range;          //!< @brief
-  Range<uint64_t> deletions_length_range;         //!< @brief
-  Range<float> deletions_length_fraction_range;   //!< @brief
-  Range<uint64_t> splices_range;                  //!< @brief
-  Range<float> splices_fraction_range;            //!< @brief
-  Range<uint64_t> splices_length_range;           //!< @brief
-  int splices_direction_as_end;                   //!< @brief
-  Range<float> alignment_score_range;             //!< @brief
-  Range<uint64_t> quality_score_range;            //!< @brief
+  ///
+  std::array<bool, static_cast<uint8_t>(SegmentType::kCount)> filter_scope;
+
+  ///
+  Range<uint64_t> mapped_bases_range;
+
+  ///
+  Range<float> mapped_fraction_range;
+
+  ///
+  Range<uint64_t> errors_range;
+
+  ///
+  Range<float> errors_fraction_range;
+
+  ///
+  Range<uint64_t> substitutions_range;
+
+  ///
+  Range<float> substitutions_fraction_range;
+
+  ///
+  Range<uint64_t> insertions_range;
+
+  ///
+  Range<float> insertions_fraction_range;
+
+  ///
+  Range<uint64_t> insertions_length_range;
+
+  ///
+  Range<float> insertions_length_fraction_range;
+
+  ///
+  Range<uint64_t> deletions_range;
+
+  ///
+  Range<float> deletions_fraction_range;
+
+  ///
+  Range<uint64_t> deletions_length_range;
+
+  ///
+  Range<float> deletions_length_fraction_range;
+
+  ///
+  Range<uint64_t> splices_range;
+
+  ///
+  Range<float> splices_fraction_range;
+
+  ///
+  Range<uint64_t> splices_length_range;
+
+  ///
+  int splices_direction_as_end;
+
+  ///
+  Range<float> alignment_score_range;
+
+  ///
+  Range<uint64_t> quality_score_range;
 };
 
 /**
  * @brief
  */
 struct AdvancedFilter {
-  SimpleFilter filter;                         //!< @brief
-  std::vector<SegmentFilter> segment_filters;  //!< @brief
+  ///
+  SimpleFilter filter;
+
+  ///
+  std::vector<SegmentFilter> segment_filters;
 };
 
 /**

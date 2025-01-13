@@ -22,9 +22,14 @@ namespace genie::core::meta {
  * @brief Reference sequence information
  */
 class Sequence {
-  std::string name_;  //!< @brief Sequence name
-  uint64_t length_;   //!< @brief Sequence length
-  uint16_t id_;       //!< @brief Sequence ID
+  /// Sequence name
+  std::string name_;
+
+  /// Sequence length
+  uint64_t length_;
+
+  /// Sequence ID
+  uint16_t id_;
 
  public:
   /**

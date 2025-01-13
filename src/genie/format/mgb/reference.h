@@ -26,9 +26,14 @@ class Importer;
  * @brief
  */
 class Reference final : public core::Reference {
-  Importer* mgr_;  //!< @brief
-  size_t f_pos_;   //!< @brief
-  bool raw_;       //!< @brief
+  ///
+  Importer* mgr_;
+
+  ///
+  size_t f_pos_;
+
+  ///
+  bool raw_;
 
  public:
   /**

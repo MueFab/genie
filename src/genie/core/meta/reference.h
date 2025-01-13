@@ -26,15 +26,26 @@ namespace genie::core::meta {
  * @brief Reference metadata
  */
 class Reference {
-  std::string reference_name_;        //!< @brief Name of the full reference
-  uint32_t reference_major_version_;  //!< @brief Major version level
-  uint32_t reference_minor_version_;  //!< @brief Minor version level
-  uint32_t reference_patch_version_;  //!< @brief Patch level
-  std::vector<Sequence> seqs_;        //!< @brief List of reference sequences
-  std::unique_ptr<RefBase>
-      ref_;  //!< @brief Reference type specific information
-  std::string
-      reference_metadata_value_;  //!< @brief MPEG-G part 3 meta information
+  /// Name of the full reference
+  std::string reference_name_;
+
+  /// Major version level
+  uint32_t reference_major_version_;
+
+  /// Minor version level
+  uint32_t reference_minor_version_;
+
+  /// Patch level
+  uint32_t reference_patch_version_;
+
+  /// List of reference sequences
+  std::vector<Sequence> seqs_;
+
+  /// Reference type specific information
+  std::unique_ptr<RefBase> ref_;
+
+  /// MPEG-G part 3 meta information
+  std::string reference_metadata_value_;
 
  public:
   /**

@@ -23,11 +23,14 @@ namespace genie::core::meta {
  * @brief Region on the genome, spanning many loci
  */
 class Region {
-  uint16_t seq_id_;  //!< @brief Sequence ID name
-  std::vector<record::ClassType>
-      classes_;         //!< @brief Record classes the region applies to
-  uint64_t start_pos_;  //!< @brief Start position of region
-  uint64_t end_pos_;    //!< @brief End position of region
+  /// Sequence ID name
+  uint16_t seq_id_;
+  /// Record classes the region applies to
+  std::vector<record::ClassType> classes_;
+  /// Start position of region
+  uint64_t start_pos_;
+  /// End position of region
+  uint64_t end_pos_;
 
  public:
   /**

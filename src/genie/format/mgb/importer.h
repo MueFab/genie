@@ -28,13 +28,26 @@ namespace genie::format::mgb {
  */
 class Importer final : public core::FormatImporterCompressed,
                        public core::ReferenceSource {
-  util::BitReader reader_;               //!< @brief
-  std::mutex lock_;                      //!< @brief
-  DataUnitFactory factory_;              //!< @brief
-  core::ReferenceManager* ref_manager_;  //!< @brief
-  core::RefDecoder* decoder_;            //!< @brief
-  uint64_t file_size_;                   //!< @brief
-  float last_progress_;                  //!< @brief
+  ///
+  util::BitReader reader_;
+
+  ///
+  std::mutex lock_;
+
+  ///
+  DataUnitFactory factory_;
+
+  ///
+  core::ReferenceManager* ref_manager_;
+
+  ///
+  core::RefDecoder* decoder_;
+
+  ///
+  uint64_t file_size_;
+
+  ///
+  float last_progress_;
 
   /**
    * @brief
