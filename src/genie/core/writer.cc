@@ -10,7 +10,5 @@
 namespace genie {
 namespace core {
 
-
-
 }  // namespace core
 }  // namespace genie

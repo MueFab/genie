@@ -16,7 +16,7 @@
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/genotype/ParameterSetComposer.h"
+//#include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"

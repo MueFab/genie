@@ -14,6 +14,32 @@
 
 namespace genie {
 namespace core {
+class FilePos {
+ public:
+    typedef std::pair<uint64_t, uint8_t> Pos;
+
+    static Pos add(const Pos a, const Pos b) {
+        Pos added = {a.first + b.first, a.second + b.second};
+        if (added.second > 8) {
+            added.second -= 8;
+            added.first++;
+        }
+        return added;
+    }
+
+    static Pos sub(Pos a, Pos b) {
+        Pos substracted = {0, 0};
+        if (a.first < b.first || (a.first == b.first && a.second <= b.second)) return substracted;
+        substracted.first = a.first - b.first;
+        if (a.second < b.second) {
+            substracted.first--;
+            substracted.second = (8 + a.second - b.second);
+        } else {
+            substracted.second = a.second - b.second;
+        }
+        return substracted;
+    }
+};
 
 class Writer {
  private:
@@ -28,8 +54,9 @@ class Writer {
     Writer() : logwriter(nullptr), writingLog(false), getWriteSize(true), writeBitSize(0) {}
 
     explicit Writer(std::ostream* writer, bool log = false)
-        : logwriter(writer), binwriter{writer}, writingLog(log), getWriteSize(false), writeBitSize(0) {}
+        : logwriter(writer), binwriter(writer), writingLog(log), getWriteSize(false), writeBitSize(0) {}
 
+    bool isLogWriter() const { return writingLog; }
     util::BitWriter& getBinWriter() { return binwriter; }
     /**
      * @brief Write a specified number of bits, reserved are not written to log
@@ -40,8 +67,7 @@ class Writer {
         if (getWriteSize) {
             writeBitSize += bits;
         } else if (reserved) {
-            if (!writingLog)
-                write(value, bits);
+            if (!writingLog) write(value, bits);
         } else {
             write(value, bits);
         }
@@ -120,8 +146,13 @@ class Writer {
             return 0;
         }
     }
-};
 
+      /**
+     * @brief Reveals stream object.
+     */
+    std::ostream* getStreamObj() { return logwriter; }
+
+};
 }  // namespace core
 }  // namespace genie
 #endif  // SRC_GENIE_CORE_WRITER_H_

@@ -11,7 +11,7 @@ add_library(genie-rans ${source_files})
 target_link_libraries(genie-rans PUBLIC genie-core)
 target_link_libraries(genie-rans PUBLIC genie-util)
 
-target_compile_options(genie-rans PRIVATE -Wno-pedantic -Wno-sign-compare -Wno-unused-function)
+#target_compile_options(genie-rans PRIVATE -Wno-pedantic -Wno-sign-compare -Wno-unused-function)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../../ ABSOLUTE)

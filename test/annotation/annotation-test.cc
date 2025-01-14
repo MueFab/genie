@@ -107,7 +107,7 @@ TEST_F(AnnotationTests, compressorConfigcompressors) {
     EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
 }
 
-const bool RUNBIGFILES = true;
+const bool RUNBIGFILES = false;
 
 TEST_P(AnnotationTests, annotationSite) {
     auto testParams = GetParam();

@@ -49,7 +49,7 @@ void AccessUnitComposer::setAccessUnit(
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     AT_ID = _AT_ID;
     AG_class = _AG_class;
-    if (AG_class == 0)
+    if (AG_class == 0 || AG_class == 2) //genotype or contact
         tile_index_2_exists = true;
     else
         tile_index_2_exists = false;

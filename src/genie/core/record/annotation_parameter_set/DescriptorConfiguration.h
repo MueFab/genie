@@ -39,7 +39,7 @@ class DescriptorConfiguration {
     genie::genotype::GenotypeParameters genotype_parameters;
     genie::likelihood::LikelihoodParameters likelihood_parameters;
     genie::contact::ContactMatrixParameters contact_matrix_parameters;
-    genie::contact::SubcontactMatrixParameters subcontract_matrix_parameters;
+    std::vector<genie::contact::SubcontactMatrixParameters> subcontract_matrix_parameters;
     AlgorithmParameters algorithm_parameters;
 
  public:
@@ -50,7 +50,7 @@ class DescriptorConfiguration {
 
     DescriptorConfiguration(genie::likelihood::LikelihoodParameters likelihood_parameters);
 
-    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters, genie::contact::SubcontactMatrixParameters _subconstract_matrix_parameters);
+    DescriptorConfiguration(genie::contact::ContactMatrixParameters _contact_matrix_parameters, std::vector<genie::contact::SubcontactMatrixParameters> _subconstract_matrix_parameters);
 
     DescriptorConfiguration(AnnotDesc descriptor_ID, AlgoID encoding_mode_ID, AlgorithmParameters algorithm_parameters);
 
@@ -63,7 +63,7 @@ class DescriptorConfiguration {
     genie::genotype::GenotypeParameters getGenotypeParameters() const { return genotype_parameters; }
     genie::likelihood::LikelihoodParameters getLikelihoodParameters() const { return likelihood_parameters; }
     genie::contact::ContactMatrixParameters getContactMatrixParameters() const { return contact_matrix_parameters; }
-    genie::contact::SubcontactMatrixParameters getSubcontractMatrixParameters() const {
+    std::vector<genie::contact::SubcontactMatrixParameters> getSubcontractMatrixParameters() const {
         return subcontract_matrix_parameters;
     }
     AlgorithmParameters getAlgorithmParameters() const { return algorithm_parameters; }

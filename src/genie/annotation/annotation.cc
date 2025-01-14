@@ -32,7 +32,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         if (std::filesystem::exists(num_bit_plane_filename)) std::filesystem::remove(num_bit_plane_filename);
         genoAnnotation.setCompressors(compressors);
         genoAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
-        //auto dataunits = genoAnnotation.parseGenotype(inputfile);
         auto dataunits = genoAnnotation.parseGenotype(inputfile, numBitPlanes);
         std::ofstream nbp_file;
         nbp_file.open(num_bit_plane_filename + ".txt", std::ios::out);
@@ -44,7 +43,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
             annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
                                         dataunit.annotationAccessUnit.end());
         }
-
     } else if (recType == RecType::SITE_FILE) {
         siteAnnotation.setCompressors(compressors);
         siteAnnotation.parseInfoTags(recordInputFileName);
@@ -55,6 +53,8 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         cmAnnotation.setCompressors(compressors);
         cmAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = cmAnnotation.parseContact(inputfile);
+        annotationParameterSet.push_back(dataunits.annotationParameterSet);
+        annotationAccessUnit = dataunits.annotationAccessUnit;
     }
     if (inputfile.is_open()) inputfile.close();
 
