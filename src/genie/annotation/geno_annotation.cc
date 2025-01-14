@@ -213,7 +213,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
             accessUnitcomposer.setAccessUnit(
                 descriptorStream, attributeTDStream, combined.blocks.at(blockIndex).genotypeDatablock.attributeInfo,
                 dataunit.annotationParameterSet, dataunit.annotationAccessUnit.at(blockIndex), AG_class, AT_ID,
-                combined.blocks.at(blockIndex).rowStart, combined.blocks.at(blockIndex).colStart);
+                blockIndex, combined.blocks.at(blockIndex).colStart);
             blockIndex++;
         
    //     AT_ID++;
