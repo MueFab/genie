@@ -26,6 +26,12 @@
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
+
+#include "genie/contact/contact_matrix_parameters.h"
+#include "genie/likelihood/likelihood_parameters.h"
+#include "genie/genotype/genotype_parameters.h"
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

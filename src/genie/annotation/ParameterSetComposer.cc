@@ -21,10 +21,6 @@
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
 
-#include "genie/genotype/genotype_parameters.h"
-#include "genie/likelihood/likelihood_parameters.h"
-#include "genie/variantsite/ParameterSetComposer.h"
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

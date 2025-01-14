@@ -45,24 +45,24 @@ TEST_F(AnnotationContactTests, contactparameterset) {
 
     ASSERT_TRUE(std::filesystem::exists(inputFilename));
 
-    std::string outputFilename = inputFilename + "-output.bin";
+    std::string outputFilename = inputFilename + "-output";
+    std::filesystem::remove(outputFilename+ ".bin");
 
 
     genie::annotation::Compressor compressors;
-    std::string comment = "# 23fnv0-33 bla";
-    std::string set1 = "compressor 1 1 BSC";
-    std::string set2 = "compressor 2 2 LZMA";
+    std::string comment = "# with parameters";
+    std::string set1 = "compressor 1 1 BSC {32 128 1 1}";
+    std::string set2 = "compressor 3 2 LZMA {8 16777216 3 0 2 32}";
+    std::string set3 = "compressor 1 2 ZSTD {0 0}";
     std::stringstream config;
-    config << set1 << '\n' << set2 << '\n';
-    compressors.parseConfig(config);
-    EXPECT_EQ(compressors.getNrOfCompressorIDs(), 2);
+    config << set1 << '\n' << set2 << '\n' << set3 << '\n';
 
     genie::annotation::ContactMatrixParameters cmParameters;
 
     genie::annotation::Annotation annotationGenerator;
-    annotationGenerator.setCompressorConfig(config);
     annotationGenerator.setTileSize(100, 3000);
     annotationGenerator.setContactOptions(cmParameters);
+    annotationGenerator.setCompressorConfig(config);
     annotationGenerator.startStream(genie::annotation::RecType::CM_FILE, inputFilename, outputFilename);
-
+    EXPECT_TRUE(std::filesystem::exists(outputFilename + ".bin")) << outputFilename + ".bin";
 }

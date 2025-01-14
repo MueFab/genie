@@ -8,6 +8,8 @@
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime-exception.h"
 
+#include "genie/core/constants.h"
+
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 #include "genie/variantsite/AccessUnitComposer.h"
 
@@ -15,12 +17,19 @@
 
 #include "AnnotationEncoder.h"
 #include "ParameterSetComposer.h"
+#include "genie/genotype/genotype_payload.h"
+
+#include "genie/entropy/bsc/encoder.h"
+#include "genie/entropy/jbig/encoder.h"
+#include "genie/entropy/lzma/encoder.h"
+#include "genie/entropy/zstd/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace annotation {
 
+/*
 std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile) {
     std::vector<GenoUnits> dataunits;
     likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
@@ -83,10 +92,10 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile) {
                 likelihoodPayload.write(writer);
             }
             // add LINK_ID default values
-            /* for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < rowsRead; ++j, ++linkIdRowCnt) {
-                const char val = '\xFF';
-                descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
-            }*/
+            // for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < rowsRead; ++j, ++linkIdRowCnt) {
+            //    const char val = '\xFF';
+            //    descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
+            //}
 
             accessUnitcomposer.setAccessUnit(
                 descriptorStream, attributeTDStream, parWBlocks.blocks.at(i).genotypeDatablock.attributeInfo,
@@ -99,19 +108,20 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile) {
 
     return dataunits;
 }
+*/
 
 std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
                                                      std::vector<std::pair<uint64_t, uint8_t>>& numBitPlanes) {
+    uint8_t AT_ID = 1;
+    constexpr uint8_t AG_class = 0;
+
     // workaround for different num_bit_plane
     std::vector<GenoUnits> dataunits;
     likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
 
-    uint8_t AT_ID = 1;
-    constexpr uint8_t AG_class = 0;
 
     std::vector<ParsBlocks> blocksWPars;
 
-    //size_t rowsRead =
         readBlocks(inputfile, defaultTileSizeHeight, blocksWPars);
     
         GenoUnits dataunit;
@@ -121,14 +131,36 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
         for (auto i = 1; i < blocksWPars.size(); ++i) {
             combined.blocks.push_back(blocksWPars.at(i).blocks.at(0));
         }
+        AnnotationEncoder encodingPars;
+
+            genie::entropy::bsc::BSCParameters bscParameters;
+            auto BSCalgorithmParameters = bscParameters.convertToAlgorithmParameters();
+
+            encodingPars.setDescriptorParameters(genie::core::AnnotDesc::LINKID, genie::core::AlgoID::BSC,
+                                        BSCalgorithmParameters);
+        encodingPars.setCompressors(compressors);
+        encodingPars.setGenotypeParameters(combined.genotypePars);
+        encodingPars.setLikelihoodParameters(combined.likelihoodPars);
+        encodingPars.setAttributes(combined.blocks.at(0).genotypeDatablock.attributeInfo);
+        auto annotationEncodingParameters = encodingPars.Compose();
+
+        /*
         genie::genotype::ParameterSetComposer parameterSetComposer;
         parameterSetComposer.setGenotypeParameters(combined.genotypePars);
         parameterSetComposer.setGenotypeParameters(combined.genotypePars);
         parameterSetComposer.setLikelihoodParameters(combined.likelihoodPars);
         parameterSetComposer.setCompressors(compressors);
-        dataunit.annotationParameterSet =
+
+        dataunit.annotationParameterSet = 
             parameterSetComposer.Build(AT_ID, combined.blocks.at(0).genotypeDatablock.attributeInfo,
                                        {defaultTileSizeHeight, defaultTileSizeWidth});
+        */
+
+        ParameterSetComposer parameterset;
+
+        dataunit.annotationParameterSet = parameterset.Compose(
+            AT_ID, AG_class, {defaultTileSizeHeight, defaultTileSizeWidth}, annotationEncodingParameters);
+
         dataunit.annotationAccessUnit.resize(combined.blocks.size());
     }
 

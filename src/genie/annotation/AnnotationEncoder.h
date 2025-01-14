@@ -10,15 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
 #include <iostream>
-// #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
-// #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
-// #include "genie/util/bitreader.h"
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
@@ -85,7 +82,7 @@ class AnnotationEncoder {
         descriptorConfigurations.emplace_back(_parameters);
     }
     void setContactParameters(contact::ContactMatrixParameters _parameters,
-                              contact::SubcontactMatrixParameters _subparameters) {
+                              std::vector<contact::SubcontactMatrixParameters> _subparameters) {
         descriptorConfigurations.emplace_back(_parameters, _subparameters);
     }
     void setLikelihoodParameters(likelihood::LikelihoodParameters _parameters) {
