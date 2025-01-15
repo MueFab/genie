@@ -28,6 +28,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
