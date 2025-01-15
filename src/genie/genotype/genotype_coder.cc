@@ -163,15 +163,15 @@ void binarize_bit_plane(Int8MatDtype& allele_mat, const ConcatAxis concat_axis, 
     bin_mats.resize(num_bit_planes);
 
     for (uint8_t k = 0; k < num_bit_planes; k++) {
-        bin_mats[k] = xt::cast<bool>(allele_mat & (1 << k));
+        bin_mats[k] = xt::eval(xt::cast<bool>(allele_mat & (1 << k)));
     }
 
     if (concat_axis != ConcatAxis::DO_NOT_CONCAT) {
         for (uint8_t k = 1; k < num_bit_planes; k++) {
             if (concat_axis == ConcatAxis::CONCAT_ROW_DIR) {
-                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 0);
+                bin_mats[0] = xt::eval(xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 0));
             } else if (concat_axis == ConcatAxis::CONCAT_COL_DIR) {
-                bin_mats[0] = xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1);
+                bin_mats[0]  = xt::eval(xt::concatenate(xt::xtuple(bin_mats[0], bin_mats[k]), 1));
             }
         }
         // Clean-up the remaining bin_mats
