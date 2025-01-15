@@ -23,19 +23,32 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # GNU Compiler Collection
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
     target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wshadow")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wextra")
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wundef")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wconversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
-endif ()
+endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
+# Create an interface library for xtensor with suppressed warnings
+add_library(xtensor_no_warnings INTERFACE)
+target_link_libraries(xtensor_no_warnings INTERFACE xtensor)
+target_compile_options(xtensor_no_warnings INTERFACE
+        -Wno-undef
+        -Wno-shadow
+        -Wno-pedantic
+        -Wno-unused-local-typedefs
+        -Wno-sign-compare
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-but-set-variable
+        -Wno-implicit-fallthrough
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-core)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
