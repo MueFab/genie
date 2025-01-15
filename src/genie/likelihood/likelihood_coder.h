@@ -73,7 +73,7 @@ struct EncodingBlock {
         serialized_mat << other.serialized_mat.rdbuf();
         serialized_arr << other.serialized_arr.rdbuf();
     }
-    EncodingBlock& operator=(EncodingBlock& other) {
+    EncodingBlock& operator=(const EncodingBlock& other) {
         nrows = other.nrows;
         ncols = other.ncols;
         likelihood_mat = other.likelihood_mat;
