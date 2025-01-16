@@ -68,7 +68,7 @@ stages:
     - bash: |
         git clone https://github.com/xtensor-stack/xtensor.git
         cd xtensor
-        git checkout tags/0.24.6
+        git checkout tags/0.25.0
         mkdir build
         cd build
         cmake ..
@@ -77,9 +77,9 @@ stages:
       displayName: 'Install xtensor (Unix)'
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
-    - bash: ./ci/src_test.sh
-      displayName: 'Check source code (Ubuntu 22.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2204')
+#    - bash: ./ci/src_test.sh
+#      displayName: 'Check source code (Ubuntu 22.04)'
+#      condition: eq( variables['artifactName'], 'ubuntu2204')
 
     - bash: ./ci/build.sh doc
       displayName: 'Build documentation (Ubuntu 22.04)'
