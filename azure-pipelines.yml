@@ -88,7 +88,7 @@ stages:
     - bash: |
         mkdir -p cmake-build-debug-manual
         cd cmake-build-debug-manual
-        cmake ..-DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
+        cmake .. -DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
         make -j
       displayName: 'Genie build (non-bash script)'
 
