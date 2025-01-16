@@ -27,7 +27,8 @@ fi
 git_root_dir="$(git rev-parse --show-toplevel)"
 echo "Checking source code:"
 echo "Cpplint..."
-cpplint --recursive --quiet --linelength=120 --filter=-runtime/references,-build/c++11 $git_root_dir/src || { echo 'Cpplint failed!' ; exit 1; }
+cd $git_root_dir/src
+cpplint --recursive --quiet --linelength=80 --filter=-whitespace/indent_namespace,-runtime/references $git_root_dir/src || { echo 'Cpplint failed!' ; exit 1; }
 echo "Cppcheck..."
-#cppcheck -q --error-exitcode=1 -DGENIE_USE_OPENMP $git_root_dir/src || { echo 'Cppcheck failed!' ; exit 1; }
+cppcheck -q --error-exitcode=1 -DGENIE_USE_OPENMP $git_root_dir/src || { echo 'Cppcheck failed!' ; exit 1; }
 echo "Source code is clean!"
