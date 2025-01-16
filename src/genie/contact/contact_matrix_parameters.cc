@@ -64,8 +64,10 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     auto num_samples = reader.readBypassBE<uint16_t>();
     for (uint16_t i = 0; i<num_samples; i++){
         auto ID = reader.readBypassBE<uint16_t>();
+
         std::string name;
-        reader.readBypass_null_terminated(name);
+        name.resize(reader.readBypassBE<uint8_t>());
+        reader.readBypass(&name[0], name.size());
 
         SampleInformation sample_info = {
             ID,
@@ -79,7 +81,8 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     for (uint8_t i = 0; i<num_chrs; i++){
         auto ID = reader.readBypassBE<uint8_t>();
         std::string name;
-        reader.readBypass_null_terminated(name);
+        name.resize(reader.readBypassBE<uint8_t>());
+        reader.readBypass(&name[0], name.size());
         auto length = reader.readBypassBE<uint64_t>();
 
         ChromosomeInformation chr_info = {
@@ -102,7 +105,8 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     for (uint8_t i = 0; i<num_norm_methods; i++){
         auto ID = reader.readBypassBE<uint8_t>();
         std::string name;
-        reader.readBypass_null_terminated(name);
+        name.resize(reader.readBypassBE<uint8_t>());
+        reader.readBypass(&name[0], name.size());
         bool mult_flag = reader.readBypassBE<uint8_t>();
 
         NormalizationMethodInformation norm_method_info = {
@@ -118,7 +122,8 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
     for (uint8_t i = 0; i<num_norm_matrices; i++){
         auto ID = reader.readBypassBE<uint8_t>();
         std::string name;
-        reader.readBypass_null_terminated(name);
+        name.resize(reader.readBypassBE<uint8_t>());
+        reader.readBypass(&name[0], name.size());
 
         NormalizedMatrixInformations norm_mat_info = {
             ID,
