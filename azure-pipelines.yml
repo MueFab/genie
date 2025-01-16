@@ -1,116 +1,116 @@
 stages:
 - stage: 'Building'
   jobs:
-  - job: 'Debug'
-    strategy:
-      matrix:
-        ubuntu2204:
-          imageName: 'ubuntu-22.04'
-          artifactName: 'ubuntu2204'
-          binDir: 'bin'
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
+#  - job: 'Debug'
+#    strategy:
+#      matrix:
+#        ubuntu2204:
+#          imageName: 'ubuntu-22.04'
+#          artifactName: 'ubuntu2204'
 #          binDir: 'bin'
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          binDir: 'bin'
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - bash: |
-        export PATH="$HOME/.local/bin:$PATH"
-        pip3 install --upgrade pip
-        sudo pip3 install cpplint
-        sudo apt-get update
-        sudo apt-get install cppcheck
-        sudo apt-get install doxygen
-      displayName: 'Install prerequisites (Ubuntu 22.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2204')
-
-    - bash: brew install libomp
-      displayName: 'Openmp installation (OSX)'
-      condition: eq( variables['Agent.OS'], 'Darwin' )
-
-    - bash: |
-        git clone https://github.com/samtools/htslib.git
-        cd htslib
-        git checkout tags/1.12
-        git submodule update --init --recursive
-        autoreconf -i
-        ./configure
-        make -j
-        sudo make install
-      displayName: 'Install HTSLib (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-    - bash: |
-        git clone https://github.com/xtensor-stack/xtl.git
-        cd xtl
-        git checkout tags/0.7.5
-        mkdir build
-        cd build
-        cmake ..
-        make -j
-        sudo make install
-      displayName: 'Install xtl (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-    - bash: |
-        git clone https://github.com/xtensor-stack/xtensor.git
-        cd xtensor
-        git checkout tags/0.24.6
-        mkdir build
-        cd build
-        cmake ..
-        make -j
-        sudo make install
-      displayName: 'Install xtensor (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-    - bash: ./ci/src_test.sh
-      displayName: 'Check source code (Ubuntu 22.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2204')
-
-    - bash: ./ci/build.sh doc
-      displayName: 'Build documentation (Ubuntu 22.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2204')
-
-    - bash: |
-        mkdir -p cmake-build-debug-manual
-        cd cmake-build-debug-manual
-        cmake ..-DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
-        make -j
-      displayName: 'Genie build (non-bash script)'
-
-
-    - bash: ./ci/build.sh debug
-      displayName: 'Genie build'
-
-    - task: VSBuild@1
-      inputs:
-        solution: 'cmake-build-debug\genie.sln'
-        msbuildArgs: '-m' 
-      displayName: 'Genie build (MSVC)'
-      condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-    - publish: cmake-build-debug/$(binDir)
-      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Publish binaries'
-
-    - publish: cmake-build-debug/documentation/html
-      artifact: 'genie-documentation-$(Build.SourceVersion)'
-      displayName: 'Publish documentation (ubuntu2204)'
-      condition: eq( variables['artifactName'], 'ubuntu2204')
+##        macos1200:
+##          imageName: 'macos-12'
+##          artifactName: 'macos1200'
+##          binDir: 'bin'
+##        macos1100:
+##          imageName: 'macos-11'
+##          artifactName: 'macos1100'
+##          binDir: 'bin'
+##        windows2022:
+##          imageName: 'windows-2022'
+##          artifactName: 'windows2022'
+##          binDir: 'bin/Debug'
+##        windows2019:
+##          imageName: 'windows-2019'
+##          artifactName: 'windows2019'
+##          binDir: 'bin/Debug'
+#    pool:
+#      vmImage: $(imageName)
+#    steps:
+#    - bash: |
+#        export PATH="$HOME/.local/bin:$PATH"
+#        pip3 install --upgrade pip
+#        sudo pip3 install cpplint
+#        sudo apt-get update
+#        sudo apt-get install cppcheck
+#        sudo apt-get install doxygen
+#      displayName: 'Install prerequisites (Ubuntu 22.04)'
+#      condition: eq( variables['artifactName'], 'ubuntu2204')
+#
+#    - bash: brew install libomp
+#      displayName: 'Openmp installation (OSX)'
+#      condition: eq( variables['Agent.OS'], 'Darwin' )
+#
+#    - bash: |
+#        git clone https://github.com/samtools/htslib.git
+#        cd htslib
+#        git checkout tags/1.12
+#        git submodule update --init --recursive
+#        autoreconf -i
+#        ./configure
+#        make -j
+#        sudo make install
+#      displayName: 'Install HTSLib (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - bash: |
+#        git clone https://github.com/xtensor-stack/xtl.git
+#        cd xtl
+#        git checkout tags/0.7.5
+#        mkdir build
+#        cd build
+#        cmake ..
+#        make -j
+#        sudo make install
+#      displayName: 'Install xtl (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - bash: |
+#        git clone https://github.com/xtensor-stack/xtensor.git
+#        cd xtensor
+#        git checkout tags/0.24.6
+#        mkdir build
+#        cd build
+#        cmake ..
+#        make -j
+#        sudo make install
+#      displayName: 'Install xtensor (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - bash: ./ci/src_test.sh
+#      displayName: 'Check source code (Ubuntu 22.04)'
+#      condition: eq( variables['artifactName'], 'ubuntu2204')
+#
+#    - bash: ./ci/build.sh doc
+#      displayName: 'Build documentation (Ubuntu 22.04)'
+#      condition: eq( variables['artifactName'], 'ubuntu2204')
+#
+#    - bash: |
+#        mkdir -p cmake-build-debug-manual
+#        cd cmake-build-debug-manual
+#        cmake ..-DGENIE_USE_OPENMP=OFF -DGENIE_SAM_SUPPORT=OFF -DBUILD_TESTS=ON -DGENIE_WERROR=ON
+#        make -j
+#      displayName: 'Genie build (non-bash script)'
+#
+#
+#    - bash: ./ci/build.sh debug
+#      displayName: 'Genie build'
+#
+#    - task: VSBuild@1
+#      inputs:
+#        solution: 'cmake-build-debug\genie.sln'
+#        msbuildArgs: '-m'
+#      displayName: 'Genie build (MSVC)'
+#      condition: eq( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - publish: cmake-build-debug/$(binDir)
+#      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+#      displayName: 'Publish binaries'
+#
+#    - publish: cmake-build-debug/documentation/html
+#      artifact: 'genie-documentation-$(Build.SourceVersion)'
+#      displayName: 'Publish documentation (ubuntu2204)'
+#      condition: eq( variables['artifactName'], 'ubuntu2204')
 
   - job: 'Release'
     strategy:
@@ -130,16 +130,16 @@ stages:
 #          artifactName: 'macos1100'
 #          architecture: ''
 #          binDir: 'bin'
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
@@ -190,14 +190,14 @@ stages:
 #          imageName: 'macos-11'
 #          artifactName: 'macos1100'
 #          fileExt: ''
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          fileExt: '.exe'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          fileExt: '.exe'
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          fileExt: '.exe'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -290,85 +290,85 @@ stages:
 #      displayName: 'Genie run memory tests'
 
 
-  - job: 'Conformance_Roundtrip'
-    strategy:
-      matrix:
-        ubuntu2204:
-          imageName: 'ubuntu-22.04'
-          artifactName: 'ubuntu2204'
-          fileExt: ''
-#        macos1200:
-#          imageName: 'macos-12'
-#          artifactName: 'macos1200'
+#  - job: 'Conformance_Roundtrip'
+#    strategy:
+#      matrix:
+#        ubuntu2204:
+#          imageName: 'ubuntu-22.04'
+#          artifactName: 'ubuntu2204'
 #          fileExt: ''
-#        macos1100:
-#          imageName: 'macos-11'
-#          artifactName: 'macos1100'
-#          fileExt: ''
-        windows2022:
-          imageName: 'windows-2022'
-          artifactName: 'windows2022'
-          binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - bash: | 
-        brew install libomp
-        brew install gnu-time
-      displayName: 'Openmp installation (OSX)'
-      condition: eq( variables['Agent.OS'], 'Darwin' )
-
-    - bash: |
-        git clone https://github.com/samtools/htslib.git
-        cd htslib
-        git checkout tags/1.12
-        git submodule update --init --recursive
-        autoreconf -i
-        ./configure
-        make -j
-        sudo make install
-      displayName: 'Install HTSLib (Unix)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-    - bash: |
-        mkdir ref-decoder
-        cd ref-decoder
-        git config --global init.defaultBranch master
-        git config --global pull.ff only
-        git init
-        git config user.email "mitogen-group@gmail.com"
-        git config user.name "Azure test script"
-        git pull http://${USERNAME}:${PASSWORD}@mpegx.int-evry.fr/software/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
-      displayName: 'Reference decoder checkout'
-      env:
-        USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
-        PASSWORD: $(EPFL_SCI-STI-MM_GITLAB_PASSWORD)
-    - bash: |
-        cd ref-decoder
-        cmake .
-      displayName: 'Reference decoder cmake'
-    - bash: |
-        cd ref-decoder
-        make --jobs 
-      displayName: 'Reference decoder build (make)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-    - download: current
-      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-
-    - bash: |
-        mkdir cmake-build-release
-        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
-        chmod +x cmake-build-release/bin/*
-      displayName: 'Copy binaries'
-
-    - bash: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
-      displayName: 'Genie run conformance tests'
+##        macos1200:
+##          imageName: 'macos-12'
+##          artifactName: 'macos1200'
+##          fileExt: ''
+##        macos1100:
+##          imageName: 'macos-11'
+##          artifactName: 'macos1100'
+##          fileExt: ''
+#        windows2022:
+#          imageName: 'windows-2022'
+#          artifactName: 'windows2022'
+#          binDir: 'bin/Debug'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          binDir: 'bin/Debug'
+#    pool:
+#      vmImage: $(imageName)
+#    steps:
+#    - bash: |
+#        brew install libomp
+#        brew install gnu-time
+#      displayName: 'Openmp installation (OSX)'
+#      condition: eq( variables['Agent.OS'], 'Darwin' )
+#
+#    - bash: |
+#        git clone https://github.com/samtools/htslib.git
+#        cd htslib
+#        git checkout tags/1.12
+#        git submodule update --init --recursive
+#        autoreconf -i
+#        ./configure
+#        make -j
+#        sudo make install
+#      displayName: 'Install HTSLib (Unix)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - bash: |
+#        mkdir ref-decoder
+#        cd ref-decoder
+#        git config --global init.defaultBranch master
+#        git config --global pull.ff only
+#        git init
+#        git config user.email "mitogen-group@gmail.com"
+#        git config user.name "Azure test script"
+#        git pull http://${USERNAME}:${PASSWORD}@mpegx.int-evry.fr/software/MPEG/Genomic_Information_Representation/mpegg-reference-sw.git Fix_LA
+#      displayName: 'Reference decoder checkout'
+#      env:
+#        USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
+#        PASSWORD: $(EPFL_SCI-STI-MM_GITLAB_PASSWORD)
+#    - bash: |
+#        cd ref-decoder
+#        cmake .
+#      displayName: 'Reference decoder cmake'
+#    - bash: |
+#        cd ref-decoder
+#        make --jobs
+#      displayName: 'Reference decoder build (make)'
+#      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+#
+#    - download: current
+#      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+#      displayName: 'Download binaries'
+#
+#    - bash: |
+#        mkdir cmake-build-release
+#        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
+#        chmod +x cmake-build-release/bin/*
+#      displayName: 'Copy binaries'
+#
+#    - bash: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
+#      displayName: 'Genie run conformance tests'
 
 - stage: 'Deployment'
   jobs:
