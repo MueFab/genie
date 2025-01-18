@@ -56,11 +56,11 @@ void get_samfile_thread(
     std::cerr << "sorting file" << std::endl;
     for (auto& query : data) {
       for (auto& record : query) {
-        sam_sorter.addSamRead(record);
+        sam_sorter.AddSamRead(record);
       }
     }
     std::cerr << "getting queries" << std::endl;
-    data = sam_sorter.getQueries();
+    data = sam_sorter.GetQueries();
     queries.insert(queries.end(), data.begin(), data.end());
     std::cerr << "done" << std::endl;
   }
@@ -80,7 +80,6 @@ int main(int argc, char** argv) {
   auto sam_reader =
       genie::format::sam::sam_to_mgrec::SamReader(input_file_path);
   UTILS_DIE_IF(!sam_reader.IsReady(), "Cannot open SAM file.");
-  auto num_threads = std::thread::hardware_concurrency();
 
   // here starts the reading of the file
   std::mutex lock_read;
@@ -88,9 +87,9 @@ int main(int argc, char** argv) {
   std::vector<std::thread> threads;
   std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>> queries;
   auto sam_sorter = genie::format::sam::sam_to_mgrec::SamSorter(100000);
-  threads.reserve(num_threads);
-  for (int i = 0; i < num_threads; ++i) {
-    threads.emplace_back([&]() {
+  threads.reserve(1);
+  for (int i = 0; i < 1; ++i) {
+    threads.emplace_back([&] {
       get_samfile_thread(lock_read, lock_sort, queries, sam_reader, sam_sorter);
     });
   }
