@@ -1,101 +1,123 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
 #define SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <optional>
-#include "genie/core/parameter/computed_ref_extended.h"
-#include "genie/util/bit-reader.h"
-#include "genie/util/bit-writer.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/core/parameter/computed_ref_extended.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core::parameter {
 
 /**
  * @brief
  */
-class ComputedRef {
+class ComputedRef final {
  public:
-    /**
-     * @brief
-     */
-    enum class Algorithm : uint8_t {
-        RESERVED = 0,
-        REF_TRANSFORM = 1,
-        PUSH_IN = 2,
-        LOCAL_ASSEMBLY = 3,
-        GLOBAL_ASSEMBLY = 4
-    };
+  /**
+   * @brief
+   */
+  enum class Algorithm : uint8_t {
+    kReserved = 0,
+    kRefTransform = 1,
+    kPushIn = 2,
+    kLocalAssembly = 3,
+    kGlobalAssembly = 4
+  };
 
  private:
-    Algorithm cr_alg_ID;                           //!< @brief
-    std::optional<ComputedRefExtended> extension;  //!< @brief
+  Algorithm cr_alg_id_;                           //!< @brief
+  std::optional<ComputedRefExtended> extension_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param cr
-     * @return
-     */
-    bool operator==(const ComputedRef &cr) const;
+  /**
+   * @brief
+   * @param cr
+   * @return
+   */
+  bool operator==(const ComputedRef& cr) const;
 
-    /**
-     * @brief
-     * @param _cr_alg_ID
-     */
-    explicit ComputedRef(Algorithm _cr_alg_ID);
+  /**
+   *
+   */
+  ComputedRef(ComputedRef&&) = default;
 
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit ComputedRef(util::BitReader &reader);
+  /**
+   *
+   */
+  ComputedRef(const ComputedRef&) = default;
 
-    /**
-     * @brief
-     */
-    virtual ~ComputedRef() = default;
+  /**
+   *
+   */
+  ComputedRef& operator=(ComputedRef&&) = default;
 
-    /**
-     * @brief
-     * @param _crps_info
-     */
-    void setExtension(ComputedRefExtended &&_crps_info);
+  /**
+   *
+   */
+  ComputedRef& operator=(const ComputedRef&) = default;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const ComputedRefExtended &getExtension() const;
+  /**
+   * @brief
+   * @param cr_alg_id
+   */
+  explicit ComputedRef(Algorithm cr_alg_id);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] Algorithm getAlgorithm() const;
+  /**
+   * @brief
+   * @param reader
+   */
+  explicit ComputedRef(util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param bw
-     */
-    virtual void write(util::BitWriter &bw) const;
+  /**
+   * @brief
+   */
+  ~ComputedRef() = default;
+
+  /**
+   * @brief
+   * @param computed_reference
+   */
+  void SetExtension(ComputedRefExtended&& computed_reference);
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const ComputedRefExtended& GetExtension() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] Algorithm GetAlgorithm() const;
+
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::parameter
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

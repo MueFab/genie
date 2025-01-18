@@ -1,80 +1,68 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_SAM_EXPORTER_H_
 #define SRC_GENIE_FORMAT_SAM_EXPORTER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-
-
+// -----------------------------------------------------------------------------
 
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
-#include "genie/core/format-exporter.h"
+
+#include "genie/core/format_exporter.h"
 #include "genie/core/record/chunk.h"
-#include "genie/core/stats/perf-stats.h"
 #include "genie/util/drain.h"
-#include "genie/util/ordered-lock.h"
-#include "genie/util/ordered-section.h"
+#include "genie/util/ordered_lock.h"
 
-
-
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::sam {
 
 /**
  * @brief Module to export MPEG-G record to sam files
  */
-class Exporter : public core::FormatExporter {
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
-    std::string fasta_file_path;
-    std::string outputFilePath;
-    std::optional<std::ofstream> output_stream;
-    std::ostream *output_file = &std::cout;
-    bool output_set = false;
+class Exporter final : public core::FormatExporter {
+  util::OrderedLock lock_;  //!< @brief Lock to ensure in order execution
+  std::string fasta_file_path_;
+  std::string output_file_path_;
+  std::optional<std::ofstream> output_stream_;
+  std::ostream* output_file_ = &std::cout;
+  bool output_set_ = false;
 
  public:
-    /**
-     * @brief Unpaired mode
-     * @param _file_1 Output file
-     */
-    explicit Exporter(std::string refFile, std::string output_file);
+  /**
+   * @brief
+   * @param ref_file
+   * @param output_file
+   */
+  explicit Exporter(std::string ref_file, std::string output_file);
 
-    /**
-     * @brief Paired mode
-     * @param _file_1 Output file #1
-     * @param _file_2 Output file #2
-     */
-    Exporter();
+  /**
+   * @brief
+   * @param id
+   */
+  void SkipIn(const util::Section& id) override;
 
-    /**
-     * @brief
-     * @param id
-     */
-    void skipIn(const util::Section &id) override;
-
-    /**
-     * @brief Process one chunk of MPEGG records
-     * @param records Input records
-     * @param id Block identifier (for multithreading)
-     */
-    void flowIn(core::record::Chunk &&records, const util::Section &id) override;
+  /**
+   * @brief Process one chunk of MPEGG records
+   * @param records Input records
+   * @param id Block identifier (for multithreading)
+   */
+  void FlowIn(core::record::Chunk&& records, const util::Section& id) override;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::sam
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_SAM_EXPORTER_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

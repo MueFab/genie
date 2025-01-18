@@ -1,17 +1,28 @@
-//
-// Created by sophie on 04.12.24.
-//
+/**
+ * Copyright 2018-2024 The Genie Authors.
+ * @file
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
+ */
 
 #ifndef SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
 #define SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
-#include <format/sam/sam_to_mgrec/sam_record.h>
+
+// -----------------------------------------------------------------------------
 
 #include <string>
 #include <vector>
 
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+
+// -----------------------------------------------------------------------------
+
 namespace genieapp::sam_sort_test {
 
-std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>> get_sam_file(const std::string& file_path);
+// -----------------------------------------------------------------------------
+
+std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>>
+get_sam_file(const std::string& file_path);
 
 /**
  * @brief
@@ -21,6 +32,13 @@ std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>> get_sam_fi
  */
 int main(int argc, char* argv[]);
 
-} // genieapp::sam_sort_test
+// -----------------------------------------------------------------------------
 
-#endif //SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
+}  // namespace genieapp::sam_sort_test
+
+// -----------------------------------------------------------------------------
+
+#endif  // SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

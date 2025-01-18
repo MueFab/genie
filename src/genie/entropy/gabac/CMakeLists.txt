@@ -1,32 +1,34 @@
 project("genie-gabac")
 
 set(source_files
-        bit-input-stream.cc
-        config-manual.cc
+        bit_input_stream.cc
+        bit_input_stream.h
+        config_manual.cc
         configuration.cc
-        context-model.cc
-        context-selector.cc
-        context-tables.cc
-        luts-subsymbol-transform.cc
-        equality-subseq-transform.cc
-        match-subseq-transform.cc
-        mismatch-decoder.cc
-        merge-subseq-transform.cc
-        rle-subseq-transform.cc
-        decode-transformed-subseq.cc
-        decode-transformed-symbols.cc
-        decode-desc-subseq.cc
+        context_model.cc
+        context_selector.cc
+        context_tables.cc
+        luts_sub_symbol_transform.cc
+        equality_sub_seq_transform.cc
+        match_sub_seq_transform.cc
+        mismatch_decoder.cc
+        merge_sub_seq_transform.cc
+        rle_sub_seq_transform.cc
+        decode_transformed_sub_seq.cc
+        decode_transformed_symbols.cc
+        decode_desc_sub_seq.cc
         decoder.cc
-        encode-transformed-subseq.cc
-        encode-desc-subseq.cc
+        encode_transformed_sub_seq.cc
+        encode_desc_sub_seq.cc
         encoder.cc
-        gabac-seq-conf-set.cc
+        gabac_seq_conf_set.cc
         run.cc
-        stream-handler.cc
+        stream_handler.cc
         streams.cc
         reader.cc
         writer.cc
-        benchmark.h benchmark.cc benchmark.impl.h)
+        benchmark.h benchmark.cc benchmark.impl.h
+        gabac_seq_conf_set.impl.h)
 
 if (${GABAC_BUILD_SHARED_LIB})
     add_library(genie-gabac SHARED ${source_files})

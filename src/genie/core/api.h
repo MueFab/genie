@@ -1,480 +1,732 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_API_H_
 #define SRC_GENIE_CORE_API_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <array>
 #include <cstdint>
 #include <string>
 #include <variant>
 #include <vector>
+
 #include "genie/core/constants.h"
 #include "genie/core/record/record.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::api {
 
 /**
  * @brief
  */
-class ExceptionPartiallyAuthorized : public genie::util::RuntimeException {
+class ExceptionPartiallyAuthorized final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionNotAuthorized : public genie::util::RuntimeException {
+class ExceptionNotAuthorized final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionVerificationFailed : public genie::util::RuntimeException {
+class ExceptionVerificationFailed final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionDecryptionFailed : public genie::util::RuntimeException {
+class ExceptionDecryptionFailed final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionDatasetGroupNotFound : public genie::util::RuntimeException {
+class ExceptionDatasetGroupNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionDatasetNotFound : public genie::util::RuntimeException {
+class ExceptionDatasetNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionAccessUnitNotFound : public genie::util::RuntimeException {
+class ExceptionAccessUnitNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionReferenceNotFound : public genie::util::RuntimeException {
+class ExceptionReferenceNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionSequenceNotFound : public genie::util::RuntimeException {
+class ExceptionSequenceNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionMetadataFieldNotFound : public genie::util::RuntimeException {
+class ExceptionMetadataFieldNotFound final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionMetadataInvalid : public genie::util::RuntimeException {
+class ExceptionMetadataInvalid final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionReferenceInvalid : public genie::util::RuntimeException {
+class ExceptionReferenceInvalid final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionParameterInvalid : public genie::util::RuntimeException {
+class ExceptionParameterInvalid final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-class ExceptionBitstreamInvalid : public genie::util::RuntimeException {
+class ExceptionBitstreamInvalid final : public util::RuntimeException {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] std::string msg() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::string Msg() const override;
 };
 
 /**
  * @brief
  */
-constexpr size_t ACGTN_SIZE = 5;
+constexpr size_t kAcgtn_Size = 5;
 
 /**
  * @brief
  */
-enum class SegmentType : uint8_t { SINGLE = 0, FIRST = 1, SECOND = 2, COUNT = 3 };
+enum class SegmentType : uint8_t {
+  kSingle = 0,
+  kFirst = 1,
+  kSecond = 2,
+  kCount = 3
+};
 
 /**
  * @brief
  */
-enum class StatisticsIndex : uint8_t { MINIMUM = 0, MAXIMUM = 1, AVERAGE = 2, COUNT = 3 };
+enum class StatisticsIndex : uint8_t {
+  kMinimum = 0,
+  kMaximum = 1,
+  kAverage = 2,
+  kCount = 3
+};
 
 /**
  * @brief
  */
-enum class Strand : uint8_t { UNMAPPED_UNKNOWN = 0, FORWARD = 1, REVERSE = 2, COUNT = 3 };
+enum class Strand : uint8_t {
+  kUnmappedUnknown = 0,
+  kForward = 1,
+  kReverse = 2,
+  kCount = 3
+};
 
 /**
  * @brief
  */
-enum class StrandStrict : uint8_t { FORWARD = 0, REVERSE = 1, COUNT = 2 };
+enum class StrandStrict : uint8_t { kForward = 0, kReverse = 1, kCount = 2 };
 
 /**
  * @brief
  */
 enum class StrandPaired : uint8_t {
-    UNMAPPED_UNMAPPED = 0,
-    UNMAPPED_FORWARD = 1,
-    UNMAPPED_REVERSE = 2,
-    FORWARD_UNMAPPED = 3,
-    REVERSE_UNMAPPED = 4,
-    FORWARD_FORWARD = 5,
-    FORWARD_REVERSE = 6,
-    REVERSE_FORWARD = 7,
-    REVERSE_REVERSE = 8,
-    COUNT = 9
+  kUnmappedUnmapped = 0,
+  kUnmappedForward = 1,
+  kUnmappedReverse = 2,
+  kForwardUnmapped = 3,
+  kReverseUnmapped = 4,
+  kForwardForward = 5,
+  kForwardReverse = 6,
+  kReverseForward = 7,
+  kReverseReverse = 8,
+  kCount = 9
 };
 
 /**
  * @brief
  */
-enum class ClipType : uint8_t { SOFT = 0, HARD = 1, COUNT = 2 };
+enum class ClipType : uint8_t { kSoft = 0, kHard = 1, kCount = 2 };
 
 /**
  * @brief
  */
-enum class ClipTypeCombination : uint8_t { NONE = 0, SOFT = 1, SOFT_HARD = 2, COUNT = 3 };
+enum class ClipTypeCombination : uint8_t {
+  kNone = 0,
+  kSoft = 1,
+  kSoftHard = 2,
+  kCount = 3
+};
 
 /**
  * @brief
  */
 enum class PhredBins : uint8_t {
-    BIN_0_10 = 0,
-    BIN_10_25 = 1,
-    BIN_25_50 = 2,
-    BIN_50_75 = 3,
-    BIN_75_90 = 4,
-    BIN_90_10 = 5,
-    COUNT = 6
+  kBin010 = 0,
+  kBin1025 = 1,
+  kBin2550 = 2,
+  kBin5075 = 3,
+  kBin7590 = 4,
+  kBin9010 = 5,
+  kCount = 6
 };
 
 /**
  * @brief
  */
 struct Hierarchy {
-    /**
-     * @brief
-     */
-    struct DatasetGroup {
-        uint64_t id;                        //!< @brief
-        std::vector<uint64_t> dataset_ids;  //!< @brief
-    };
-    std::vector<DatasetGroup> groups;  //!< @brief
+  /**
+   * @brief
+   */
+  struct DatasetGroup {
+    ///
+    uint64_t id;
+
+    ///
+    std::vector<uint64_t> dataset_ids;
+  };
+  std::vector<DatasetGroup> groups;
 };
 
 /**
  * @brief
  */
 struct HexCode {
-    std::string value;  //!< @brief
+  ///
+  std::string value;
 };
 
 /**
  * @brief
  */
 struct GenTag {
-    char key[2];  //!< @brief
-    std::variant<int32_t, std::string, uint8_t, int8_t, uint16_t, int16_t, uint32_t, HexCode, float, double>
-        value;  //!< @brief
+  ///
+  char key[2];
+
+  ///
+  std::variant<int32_t, std::string, uint8_t, int8_t, uint16_t, int16_t,
+               uint32_t, HexCode, float, double>
+      value;
 };
 
 /**
  * @brief
  */
 struct GenAux {
-    std::vector<GenTag> auxFields;  //!< @brief
+  ///
+  std::vector<GenTag> aux_fields;
 };
 
 /**
  * @brief
  */
 struct GenAuxRecord {
-    std::vector<GenAux> auxSet;  //!< @brief [numberOfGenAux]
+  /// [numberOfGenAux]
+  std::vector<GenAux> aux_set;
 };
 
 /**
  * @brief
  */
 struct Records {
-    uint64_t datasetGroupID;                           //!< @brief
-    uint64_t datasetID;                                //!< @brief
-    std::vector<genie::core::record::Record> records;  //!< @brief [recordsCount]
-    std::vector<GenAuxRecord> auxInfo;                 //!< @brief [recordsCount]
+  ///
+  uint64_t dataset_group_id;
+
+  ///
+  uint64_t dataset_id;
+
+  /// [recordsCount]
+  std::vector<record::Record> records;
+
+  /// [recordsCount]
+  std::vector<GenAuxRecord> aux_info;
 };
 
 /**
  * @brief
  */
 struct Sequence {
-    std::string seqName;      //!< @brief
-    uint64_t seqStart;        //!< @brief
-    uint64_t seqEnd;          //!< @brief
-    std::string refSequence;  //!< @brief
+  ///
+  std::string seq_name;
+
+  ///
+  uint64_t seq_start;
+
+  ///
+  uint64_t seq_end;
+
+  ///
+  std::string ref_sequence;
 };
 
 /**
  * @brief
  */
 struct OutReference {
-    std::vector<Sequence> sequences;  //!< @brief
+  ///
+  std::vector<Sequence> sequences;
 };
 
 /**
  * @brief
  */
 struct RegionProtection {
-    std::string sequenceName;           //!< @brief
-    uint64_t startPos;                  //!< @brief
-    uint64_t endPos;                    //!< @brief
-    uint64_t classID;                   //!< @brief
-    std::vector<std::string> keyNames;  //!< @brief
+  ///
+  std::string sequence_name;
+
+  ///
+  uint64_t start_pos;
+
+  ///
+  uint64_t end_pos;
+
+  ///
+  uint64_t class_id;
+
+  ///
+  std::vector<std::string> key_names;
 };
 
 /**
  * @brief
  */
 struct SimpleSegmentStatistics {
-    uint64_t readsNumber;                                                             //!< @brief
-    std::vector<uint64_t> segmentsNumberReadsDistribution;                            //!< @brief [GENIE_MAX_SEGMENTS]
-    uint64_t qualityCheckFailedReadsNumber;                                           //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> segmentLength;              //!< @brief
-    std::array<uint64_t, uint8_t(Strand::COUNT)> mappedStrandSegmentDistribution;     //!< @brief
-    uint64_t properlyPairedNumber;                                                    //!< @brief
-    std::array<uint64_t, uint8_t(StrandPaired::COUNT)> mappedStrandPairDistribution;  //!< @brief
-    uint64_t maxAlignments;                                                           //!< @brief
-    std::vector<uint64_t> multipleAlignmentSegmentDistribution;                 //!< @brief [GENIE_MAX_ALIGNMENTS + 1];
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> coverage;             //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> weightedCoverage;     //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> errorsNumber;         //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> substitutionsNumber;  //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> insertionsNumber;     //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> insertionsLength;     //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> deletionsNumber;      //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> deletionsLength;      //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> splicesNumber;        //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> splicesLength;        //!< @brief
-    std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> alignmentScore;       //!< @brief
-    std::array<uint64_t, uint8_t(genie::core::record::ClassType::COUNT)> classSegmentDistribution;  //!< @brief
-    std::array<uint64_t, uint8_t(ClipTypeCombination::COUNT)> clippedSegmentDistribution;           //!< @brief
-    uint64_t opticalDuplicatesNumber;                                                               //!< @brief
-    uint64_t chimerasNumber;                                                                        //!< @brief
+  ///
+  uint64_t reads_number;
+
+  /// [GENIE_MAX_SEGMENTS]
+  std::vector<uint64_t> segments_number_reads_distribution;
+
+  ///
+  uint64_t quality_check_failed_reads_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      segment_length;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>
+      mapped_strand_segment_distribution;
+
+  ///
+  uint64_t properly_paired_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StrandPaired::kCount)>
+      mapped_strand_pair_distribution;
+
+  ///
+  uint64_t max_alignments;
+
+  /// [GENIE_MAX_ALIGNMENTS + 1];
+  std::vector<uint64_t> multiple_alignment_segment_distribution;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)> coverage;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      weighted_coverage;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      errors_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      substitutions_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      insertions_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      insertions_length;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      deletions_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      deletions_length;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      splices_number;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      splices_length;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>
+      alignment_score;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(record::ClassType::kCount)>
+      class_segment_distribution;
+
+  ///
+  std::array<uint64_t, static_cast<uint8_t>(ClipTypeCombination::kCount)>
+      clipped_segment_distribution;
+
+  ///
+  uint64_t optical_duplicates_number;
+
+  ///
+  uint64_t chimeras_number;
 };
 
 /**
  * @brief
  */
 struct ExtendedSegmentStatistics {
-    std::vector<uint64_t> mappedBasesNumberDistribution;    //!< @brief [segmentLength[1] + 1]
-    std::vector<uint64_t> coverage;                         //!< @brief [endPos – startPos + 1]
-    std::vector<uint64_t> weightedCoverage;                 //!< @brief [endPos – startPos + 1]
-    std::vector<uint64_t> errorsNumberDistribution;         //!< @brief [errorsNumber[1] + 1]
-    std::vector<uint64_t> errorsPositionDistribution;       //!< @brief [segmentLength[1]]
-    std::vector<uint64_t> substitutionsNumberDistribution;  //!< @brief [substitutionsNumber[1] + 1]
-    std::vector<std::array<std::array<uint64_t, ACGTN_SIZE>, ACGTN_SIZE>>
-        substitutionsTransitionDistribution;                  //!< @brief [segmentLength[1]]
-    std::vector<uint64_t> substitutionsPositionDistribution;  //!< @brief segmentLength[1]
-    std::vector<uint64_t> insertionsNumberDistribution;       //!< @brief [insertionsNumber[1] + 1]
-    std::vector<uint64_t> insertionsLengthDistribution;       //!< @brief [insertionsLength[1] + 1]
-    std::vector<uint64_t> insertionsPositionDistribution;     //!< @brief [segmentLength[1]]
-    std::vector<uint64_t> deletionsNumberDistribution;        //!< @brief [deletionsNumber[1] + 1]
-    std::vector<uint64_t> deletionsLengthDistribution;        //!< @brief[deletionsLength[1] + 1]
-    std::vector<uint64_t> deletionsPositionDistribution;      //!< @brief [segmentLength[1]]
-    std::vector<std::array<uint64_t, uint8_t(Strand::COUNT)>>
-        splicesNumberDistribution;  //!< @brief [splicesNumber[1] + 1],
-    std::vector<std::array<uint64_t, uint8_t(Strand::COUNT)>>
-        splicesLengthDistribution;  //!< @brief [splicesLength[1] + 1],
-    std::vector<std::array<uint64_t, uint8_t(Strand::COUNT)>>
-        splicesPositionDistribution;                        //!< @brief [segmentLength[1]],
-    std::vector<uint64_t> alignmentScoreValueDistribution;  //!< @brief [alignmentScore[1] + 1]
-    std::vector<std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)>>
-        alignmentScoreSegmentLengthDistribution;                              //!< @brief [segmentLength[1]]
-    std::vector<std::array<uint64_t, ACGTN_SIZE>> basesPositionDistribution;  //!< @brief [segmentLength[1]]
-    std::array<uint64_t, 101> gcContentValueDistribution;                     //!< @brief GC content in percent 0-100
-    std::vector<uint64_t> qualityScoreDistribution;                           //!< @brief [maxQualityScore + 1]
-    std::vector<std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)>>
-        qualityScorePositionDistribution;  //!< @brief [segmentLength[1]]
-    std::vector<std::array<uint64_t, uint8_t(PhredBins::COUNT)>>
-        qualityScorePositionPercentilesDistribution;  //!< @brief [segmentLength[1]],
+  /// [segmentLength[1] + 1]
+  std::vector<uint64_t> mapped_bases_number_distribution;
+
+  /// [endPos – startPos + 1]
+  std::vector<uint64_t> coverage;
+
+  /// [endPos – startPos + 1]
+  std::vector<uint64_t> weighted_coverage;
+
+  /// [errorsNumber[1] + 1]
+  std::vector<uint64_t> errors_number_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> errors_position_distribution;
+
+  /// [substitutionsNumber[1] + 1]
+  std::vector<uint64_t> substitutions_number_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<std::array<std::array<uint64_t, kAcgtn_Size>, kAcgtn_Size>>
+      substitutions_transition_distribution;
+
+  /// segmentLength[1]
+  std::vector<uint64_t> substitutions_position_distribution;
+
+  /// [insertionsNumber[1] + 1]
+  std::vector<uint64_t> insertions_number_distribution;
+
+  /// [insertionsLength[1] + 1]
+  std::vector<uint64_t> insertions_length_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> insertions_position_distribution;
+
+  ///  [deletionsNumber[1] + 1]
+  std::vector<uint64_t> deletions_number_distribution;
+
+  /// [deletionsLength[1] + 1]
+  std::vector<uint64_t> deletions_length_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<uint64_t> deletions_position_distribution;
+
+  /// [splicesNumber[1] + 1]
+  std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
+      splices_number_distribution;
+
+  /// [splicesLength[1] + 1]
+  std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
+      splices_length_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<std::array<uint64_t, static_cast<uint8_t>(Strand::kCount)>>
+      splices_position_distribution;
+
+  /// [alignmentScore[1] + 1]
+  std::vector<uint64_t> alignment_score_value_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<
+      std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>>
+      alignment_score_segment_length_distribution;
+
+  ///  [segmentLength[1]]
+  std::vector<std::array<uint64_t, kAcgtn_Size>> bases_position_distribution;
+
+  /// GC content in percent 0-100
+  std::array<uint64_t, 101> gc_content_value_distribution;
+
+  /// [maxQualityScore + 1]
+  std::vector<uint64_t> quality_score_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<
+      std::array<uint64_t, static_cast<uint8_t>(StatisticsIndex::kCount)>>
+      quality_score_position_distribution;
+
+  /// [segmentLength[1]]
+  std::vector<std::array<uint64_t, static_cast<uint8_t>(PhredBins::kCount)>>
+      quality_score_position_percentiles_distribution;
 };
 
 /**
  * @brief
  */
 struct AdvancedSegmentStatistics {
-    std::array<SimpleSegmentStatistics, uint8_t(StrandStrict::COUNT)> simpleStatistics;      //!< @brief
-    std::array<ExtendedSegmentStatistics, uint8_t(StrandStrict::COUNT)> extendedStatistics;  //!< @brief
+  ///
+  std::array<SimpleSegmentStatistics,
+             static_cast<uint8_t>(StrandStrict::kCount)>
+      simple_statistics;
+
+  ///
+  std::array<ExtendedSegmentStatistics,
+             static_cast<uint8_t>(StrandStrict::kCount)>
+      extended_statistics;
 };
 
 /**
  * @brief
  */
 struct SimpleFilter {
-    std::vector<std::string> groupNames;                                //!< @brief
-    std::array<bool, uint8_t(core::record::ClassType::COUNT)> classID;  //!< @brief
-    uint64_t sequenceID;                                                //!< @brief
-    uint64_t startPos;                                                  //!< @brief
-    uint64_t endPos;                                                    //!< @brief
-    std::array<bool, uint8_t(Strand::COUNT)> singleEndsStrand;          //!< @brief
-    std::array<bool, uint8_t(StrandPaired::COUNT)> pairedEndsStrand;    //!< @brief
-    std::array<bool, uint8_t(ClipType::COUNT)> includeClippedReads;     //!< @brief
-    bool includeMultipleAlignments;                                     //!< @brief
-    bool includeOpticalDuplicates;                                      //!< @brief
-    bool includeQualityCheckFailed;                                     //!< @brief
-    bool includeAuxRecords;                                             //!< @brief
-    bool includeReadNames;                                              //!< @brief
-    bool includeQualityValues;                                          //!< @brief
-    bool mismatchesIncludeNs;                                           //!< @brief
+  ///
+  std::vector<std::string> group_names;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(record::ClassType::kCount)> class_id;
+
+  ///
+  uint64_t sequence_id;
+
+  ///
+  uint64_t start_pos;
+
+  ///
+  uint64_t end_pos;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(Strand::kCount)> single_ends_strand;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(StrandPaired::kCount)>
+      paired_ends_strand;
+
+  ///
+  std::array<bool, static_cast<uint8_t>(ClipType::kCount)>
+      include_clipped_reads;
+
+  ///
+  bool include_multiple_alignments;
+
+  ///
+  bool include_optical_duplicates;
+
+  ///
+  bool include_quality_check_failed;
+
+  ///
+  bool include_aux_records;
+
+  ///
+  bool include_read_names;
+
+  ///
+  bool include_quality_values;
+
+  ///
+  bool mismatches_include_ns;
 };
 
 /**
  * @brief
  */
 struct SegmentFilter {
-    /**
-     * @brief
-     * @tparam T
-     */
-    template <typename T>
-    struct Range {
-        T min;  //!< @brief
-        T max;  //!< @brief
-    };
+  /**
+   * @brief
+   * @tparam T
+   */
+  template <typename T>
+  struct Range {
+    ///
+    T min;
 
-    std::array<bool, uint8_t(SegmentType::COUNT)> filterScope;  //!< @brief
-    Range<uint64_t> mappedBasesRange;                           //!< @brief
-    Range<float> mappedFractionRange;                           //!< @brief
-    Range<uint64_t> errorsRange;                                //!< @brief
-    Range<float> errorsFractionRange;                           //!< @brief
-    Range<uint64_t> substitutionsRange;                         //!< @brief
-    Range<float> substitutionsFractionRange;                    //!< @brief
-    Range<uint64_t> insertionsRange;                            //!< @brief
-    Range<float> insertionsFractionRange;                       //!< @brief
-    Range<uint64_t> insertionsLengthRange;                      //!< @brief
-    Range<float> insertionsLengthFractionRange;                 //!< @brief
-    Range<uint64_t> deletionsRange;                             //!< @brief
-    Range<float> deletionsFractionRange;                        //!< @brief
-    Range<uint64_t> deletionsLengthRange;                       //!< @brief
-    Range<float> deletionsLengthFractionRange;                  //!< @brief
-    Range<uint64_t> splicesRange;                               //!< @brief
-    Range<float> splicesFractionRange;                          //!< @brief
-    Range<uint64_t> splicesLengthRange;                         //!< @brief
-    int splicesDirectionAsEnd;                                  //!< @brief
-    Range<float> alignmentScoreRange;                           //!< @brief
-    Range<uint64_t> qualityScoreRange;                          //!< @brief
+    ///
+    T max;
+  };
+
+  ///
+  std::array<bool, static_cast<uint8_t>(SegmentType::kCount)> filter_scope;
+
+  ///
+  Range<uint64_t> mapped_bases_range;
+
+  ///
+  Range<float> mapped_fraction_range;
+
+  ///
+  Range<uint64_t> errors_range;
+
+  ///
+  Range<float> errors_fraction_range;
+
+  ///
+  Range<uint64_t> substitutions_range;
+
+  ///
+  Range<float> substitutions_fraction_range;
+
+  ///
+  Range<uint64_t> insertions_range;
+
+  ///
+  Range<float> insertions_fraction_range;
+
+  ///
+  Range<uint64_t> insertions_length_range;
+
+  ///
+  Range<float> insertions_length_fraction_range;
+
+  ///
+  Range<uint64_t> deletions_range;
+
+  ///
+  Range<float> deletions_fraction_range;
+
+  ///
+  Range<uint64_t> deletions_length_range;
+
+  ///
+  Range<float> deletions_length_fraction_range;
+
+  ///
+  Range<uint64_t> splices_range;
+
+  ///
+  Range<float> splices_fraction_range;
+
+  ///
+  Range<uint64_t> splices_length_range;
+
+  ///
+  int splices_direction_as_end;
+
+  ///
+  Range<float> alignment_score_range;
+
+  ///
+  Range<uint64_t> quality_score_range;
 };
 
 /**
  * @brief
  */
 struct AdvancedFilter {
-    SimpleFilter filter;                        //!< @brief
-    std::vector<SegmentFilter> segmentFilters;  //!< @brief
+  ///
+  SimpleFilter filter;
+
+  ///
+  std::vector<SegmentFilter> segment_filters;
 };
 
 /**
@@ -482,137 +734,148 @@ struct AdvancedFilter {
  */
 class GenieState {
  public:
-    /**
-     * @brief
-     * @return
-     */
-    static Hierarchy getHierarchy();
+  /**
+   * @brief
+   * @return
+   */
+  static Hierarchy GetHierarchy();
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param filter
-     * @return
-     */
-    static std::vector<Records> getDataBySimpleFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                                      const SimpleFilter& filter);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param filter
+   * @return
+   */
+  static std::vector<Records> GetDataBySimpleFilter(uint64_t dataset_group_id,
+                                                    uint64_t dataset_id,
+                                                    const SimpleFilter& filter);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param filter
-     * @return
-     */
-    static std::vector<Records> getDataByAdvancedFilter(uint64_t datasetGroupID, uint64_t datasetID,
-                                                        const AdvancedFilter& filter);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param filter
+   * @return
+   */
+  static std::vector<Records> GetDataByAdvancedFilter(
+      uint64_t dataset_group_id, uint64_t dataset_id,
+      const AdvancedFilter& filter);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param signature
-     * @return
-     */
-    static std::vector<Records> getDataBySignature(uint64_t datasetGroupID, uint64_t datasetID, const char* signature);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param signature
+   * @return
+   */
+  static std::vector<Records> GetDataBySignature(uint64_t dataset_group_id,
+                                                 uint64_t dataset_id,
+                                                 const char* signature);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param labelID
-     * @return
-     */
-    static std::vector<Records> getDataByLabel(uint64_t datasetGroupID, const std::string& labelID);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param label_id
+   * @return
+   */
+  static std::vector<Records> GetDataByLabel(uint64_t dataset_group_id,
+                                             const std::string& label_id);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @return
-     */
-    static std::vector<std::string> getMetadataFields(uint64_t datasetGroupID, uint64_t datasetID);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @return
+   */
+  static std::vector<std::string> GetMetadataFields(uint64_t dataset_group_id,
+                                                    uint64_t dataset_id);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param fieldName
-     * @return
-     */
-    static std::string getMetadataContent(uint64_t datasetGroupID, uint64_t datasetID, const std::string& fieldName);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param field_name
+   * @return
+   */
+  static std::string GetMetadataContent(uint64_t dataset_group_id,
+                                        uint64_t dataset_id,
+                                        const std::string& field_name);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @return
-     */
-    static std::string getDatasetGroupProtection(uint64_t datasetGroupID);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @return
+   */
+  static std::string GetDatasetGroupProtection(uint64_t dataset_group_id);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @return
-     */
-    static std::string getDatasetProtection(uint64_t datasetGroupID, uint64_t datasetID);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @return
+   */
+  static std::string GetDatasetProtection(uint64_t dataset_group_id,
+                                          uint64_t dataset_id);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param sequenceID
-     * @param startPos
-     * @param endPos
-     * @return
-     */
-    static std::vector<RegionProtection> getDatasetRegionProtection(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                    uint64_t sequenceID, uint64_t startPos,
-                                                                    uint64_t endPos);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param sequence_id
+   * @param start_pos
+   * @param end_pos
+   * @return
+   */
+  static std::vector<RegionProtection> GetDatasetRegionProtection(
+      uint64_t dataset_group_id, uint64_t dataset_id, uint64_t sequence_id,
+      uint64_t start_pos, uint64_t end_pos);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param includeSequences
-     * @return
-     */
-    static OutReference getDatasetReference(uint64_t datasetGroupID, uint64_t datasetID, bool includeSequences);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param include_sequences
+   * @return
+   */
+  static OutReference GetDatasetReference(uint64_t dataset_group_id,
+                                          uint64_t dataset_id,
+                                          bool include_sequences);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param sequenceID
-     * @param startPos
-     * @param endPos
-     * @return
-     */
-    static std::vector<SimpleSegmentStatistics> getSimpleStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                    uint64_t sequenceID, uint64_t startPos,
-                                                                    uint64_t endPos);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param sequence_id
+   * @param start_pos
+   * @param end_pos
+   * @return
+   */
+  static std::vector<SimpleSegmentStatistics> GetSimpleStatistics(
+      uint64_t dataset_group_id, uint64_t dataset_id, uint64_t sequence_id,
+      uint64_t start_pos, uint64_t end_pos);
 
-    /**
-     * @brief
-     * @param datasetGroupID
-     * @param datasetID
-     * @param sequenceID
-     * @param startPos
-     * @param endPos
-     * @return
-     */
-    static std::vector<AdvancedSegmentStatistics> getAdvancedStatistics(uint64_t datasetGroupID, uint64_t datasetID,
-                                                                        uint64_t sequenceID, uint64_t startPos,
-                                                                        uint64_t endPos);
+  /**
+   * @brief
+   * @param dataset_group_id
+   * @param dataset_id
+   * @param sequence_id
+   * @param start_pos
+   * @param end_pos
+   * @return
+   */
+  static std::vector<AdvancedSegmentStatistics> GetAdvancedStatistics(
+      uint64_t dataset_group_id, uint64_t dataset_id, uint64_t sequence_id,
+      uint64_t start_pos, uint64_t end_pos);
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::api
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_API_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
