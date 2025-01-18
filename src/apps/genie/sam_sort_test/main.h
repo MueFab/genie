@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
-#define SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
+#ifndef SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H_
+#define SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H_
 
 // -----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]);
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H
+#endif  // SRC_APPS_GENIE_SAM_SORT_TEST_MAIN_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
