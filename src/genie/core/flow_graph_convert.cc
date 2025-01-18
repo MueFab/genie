@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,18 +16,22 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 FlowGraphConvert::FlowGraphConvert(const size_t threads) : mgr_(threads) {}
 
 // -----------------------------------------------------------------------------
+
 ReferenceManager& FlowGraphConvert::GetRefMgr() const { return *ref_mgr_; }
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphConvert::AddImporter(std::unique_ptr<FormatImporter> dat) {
   importers_.emplace_back();
   SetImporter(std::move(dat), importers_.size() - 1);
 }
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphConvert::SetClassifier(std::unique_ptr<Classifier> classifier) {
   classifier_ = std::move(classifier);
 
@@ -37,6 +41,7 @@ void FlowGraphConvert::SetClassifier(std::unique_ptr<Classifier> classifier) {
 }
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphConvert::SetImporter(std::unique_ptr<FormatImporter> dat,
                                    const size_t index) {
   importers_[index] = std::move(dat);

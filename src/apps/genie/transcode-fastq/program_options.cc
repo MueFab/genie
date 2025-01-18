@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,6 +16,9 @@
 
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime_exception.h"
+#include "util/log.h"
+
+constexpr auto kLogModuleName = "App/TranscodeFastq";
 
 // -----------------------------------------------------------------------------
 
@@ -66,7 +69,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    std::cerr << app.help() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -77,6 +80,7 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[]) : help(false) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);
@@ -189,60 +193,68 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 
 // -----------------------------------------------------------------------------
 
+std::string file_extension(const std::string& path) {
+  const auto pos = path.find_last_of('.');
+  std::string ext = path.substr(pos + 1);
+  for (auto& c : ext) {
+    c = static_cast<char>(std::tolower(c));
+  }
+  return ext;
+}
+
+void ValidatePairedFiles(const std::string& file1, const std::string& file2) {
+  UTILS_DIE_IF(file_extension(file1) != file_extension(file2),
+               "Input files do not have the same type.");
+}
+
 void ProgramOptions::validate() {
   ValidateInputFile(inputFile);
   if (inputFile.substr(0, 2) != "-.") {
     inputFile = std::filesystem::canonical(inputFile).string();
     std::replace(inputFile.begin(), inputFile.end(), '\\', '/');
-    std::cerr << "Input file: " << inputFile << " with Size "
-              << size_string(std::filesystem::file_size(inputFile))
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Input file 1: " + inputFile + " with size " +
+                  size_string(std::filesystem::file_size(inputFile)));
   } else {
-    std::cerr << "Input file: stdin" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
 
   if (!inputSupFile.empty()) {
     ValidateInputFile(inputSupFile);
-    if (inputSupFile.substr(0, 2) != "-.") {
-      inputSupFile = std::filesystem::canonical(inputSupFile).string();
-      std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
-      std::cerr << "Input supplementary file: " << inputSupFile << " with Size "
-                << size_string(std::filesystem::file_size(inputSupFile))
-                << std::endl;
-    } else {
-      std::cerr << "Input supplementary file: stdin" << std::endl;
-    }
+    ValidatePairedFiles(inputFile, inputSupFile);
+    inputSupFile = std::filesystem::canonical(inputSupFile).string();
+    std::replace(inputSupFile.begin(), inputSupFile.end(), '\\', '/');
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Input file 2: " + inputSupFile + " with Size " +
+                  size_string(std::filesystem::file_size(inputSupFile)));
   }
-
-  std::cerr << std::endl;
 
   ValidateOutputFile(outputFile, forceOverwrite);
   if (outputFile.substr(0, 2) != "-.") {
     outputFile = std::filesystem::weakly_canonical(outputFile).string();
     std::replace(outputFile.begin(), outputFile.end(), '\\', '/');
-    std::cerr << "Output file: " << outputFile << " with "
-              << size_string(
-                     std::filesystem::space(parent_dir(outputFile)).available)
-              << " available" << std::endl;
+    UTILS_LOG(
+        genie::util::Logger::Severity::INFO,
+        "Output file: " + outputFile + " with " +
+            size_string(
+                std::filesystem::space(parent_dir(outputFile)).available) +
+            " available");
   } else {
-    std::cerr << "Output file: stdout" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 
   if (!outputSupFile.empty()) {
     ValidateOutputFile(outputSupFile, forceOverwrite);
-    if (outputSupFile.substr(0, 2) != "-.") {
-      outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
-      std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
-      std::cerr << "Output supplementary file: " << outputSupFile << " with "
-                << size_string(std::filesystem::space(parent_dir(outputSupFile))
-                                   .available)
-                << " available" << std::endl;
-    } else {
-      std::cerr << "Output supplementary file: stdout" << std::endl;
-    }
+    ValidatePairedFiles(outputFile, outputSupFile);
+    outputSupFile = std::filesystem::weakly_canonical(outputSupFile).string();
+    std::replace(outputSupFile.begin(), outputSupFile.end(), '\\', '/');
+    UTILS_LOG(
+        genie::util::Logger::Severity::INFO,
+        "Output supplementary file: " + outputSupFile + " with " +
+            size_string(
+                std::filesystem::space(parent_dir(outputSupFile)).available) +
+            " available");
   }
-
-  std::cerr << std::endl;
 
   if (std::thread::hardware_concurrency()) {
     UTILS_DIE_IF(
@@ -251,16 +263,17 @@ void ProgramOptions::validate() {
         "Invalid number of threads: " + std::to_string(numberOfThreads) +
             ". Your system supports between 1 and " +
             std::to_string(std::thread::hardware_concurrency()) + " threads.");
-    std::cerr << "Threads: " << numberOfThreads << " with "
-              << std::thread::hardware_concurrency() << " supported"
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Threads: " + std::to_string(numberOfThreads) + " with " +
+                  std::to_string(std::thread::hardware_concurrency()) +
+                  " supported");
   } else {
     UTILS_DIE_IF(!numberOfThreads,
-                 "Could not detect hardware concurrency level. Please "
-                 "provide a number of threads manually.");
-    std::cerr << "Threads: " << numberOfThreads
-              << " (could not detected supported number automatically)"
-              << std::endl;
+                 "Could not detect hardware concurrency level. Please provide "
+                 "a number of threads manually.");
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Threads: " + std::to_string(numberOfThreads) +
+                  " (could not detected supported number automatically)");
   }
 }
 

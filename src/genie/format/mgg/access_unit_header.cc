@@ -16,6 +16,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 void AccessUnitHeader::PrintDebug(std::ostream& output, const uint8_t depth,
                                    const uint8_t max_depth) const {
   static const std::string class_lut[] = {"NONE", "P",  "N", "M",
@@ -48,6 +49,7 @@ void AccessUnitHeader::PrintDebug(std::ostream& output, const uint8_t depth,
 }
 
 // -----------------------------------------------------------------------------
+
 bool AccessUnitHeader::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -57,16 +59,20 @@ bool AccessUnitHeader::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const mgb::AuHeader& AccessUnitHeader::GetHeader() const { return header_; }
 
 // -----------------------------------------------------------------------------
+
 mgb::AuHeader& AccessUnitHeader::GetHeader() { return header_; }
 
 // -----------------------------------------------------------------------------
+
 AccessUnitHeader::AccessUnitHeader()
     : AccessUnitHeader(mgb::AuHeader(), false) {}
 
 // -----------------------------------------------------------------------------
+
 AccessUnitHeader::AccessUnitHeader(
     util::BitReader& reader,
     const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
@@ -80,15 +86,18 @@ AccessUnitHeader::AccessUnitHeader(
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnitHeader::AccessUnitHeader(mgb::AuHeader header, const bool mit_flag)
     : header_(std::move(header)), mit_flag_(mit_flag) {}
 
 // -----------------------------------------------------------------------------
+
 void AccessUnitHeader::BoxWrite(util::BitWriter& bit_writer) const {
   header_.Write(bit_writer, !mit_flag_);
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& AccessUnitHeader::GetKey() const {
   static const std::string key = "auhd";
   return key;

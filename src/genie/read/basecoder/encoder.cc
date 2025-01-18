@@ -37,6 +37,7 @@
 namespace genie::read::basecoder {
 
 // -----------------------------------------------------------------------------
+
 Encoder::CodingState::CodingState(const std::string& read_seq,
                                   const std::string& ref_name,
                                   const core::record::ClassType c_type)
@@ -50,12 +51,14 @@ Encoder::CodingState::CodingState(const std::string& read_seq,
       type(c_type) {}
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const uint64_t starting_mapping_pos)
     : container_(core::parameter::EncodingSet(), 0),
       pos_(starting_mapping_pos),
       read_counter_(0) {}
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
   // TODO(Fabian): Splices
   const auto& alignment =
@@ -99,6 +102,7 @@ void Encoder::EncodeFirstSegment(const core::record::Record& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 const core::record::alignment_split::SameRec& Encoder::ExtractPairedAlignment(
     const core::record::Record& rec) {
   // TODO(Fabian): More than 2 split alignments (even supported by standard?)
@@ -115,6 +119,7 @@ const core::record::alignment_split::SameRec& Encoder::ExtractPairedAlignment(
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeAdditionalSegment(
     const size_t length,
     const core::record::alignment_split::SameRec& split_rec,
@@ -142,6 +147,7 @@ void Encoder::EncodeAdditionalSegment(
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::Add(const core::record::Record& rec, const std::string& ref1,
                   const std::string& ref2) {
   std::pair<ClipInformation, ClipInformation> clips;

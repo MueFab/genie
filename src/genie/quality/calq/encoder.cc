@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implements the Encoder class for encoding quality values in genomic
+ * data.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression. The `Encoder` class plays a key role in encoding both
+ * aligned and unaligned genomic sequences' quality values, leveraging advanced
+ * quantization and encoding techniques to compress the data while maintaining
+ * its integrity. It integrates seamlessly with Calq compression algorithms.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,11 +27,15 @@
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
+
+// -----------------------------------------------------------------------------
 
 using ClassType = core::record::ClassType;
 
 // -----------------------------------------------------------------------------
+
 paramqv1::Codebook CodebookFromVector(const std::vector<unsigned char>& vec) {
   paramqv1::Codebook codebook(vec[0], vec[1]);
   for (size_t i = 2; i < vec.size(); ++i) {
@@ -31,12 +45,14 @@ paramqv1::Codebook CodebookFromVector(const std::vector<unsigned char>& vec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::GenSubIndex get_qv_steps(const size_t i) {
   UTILS_DIE_IF(i > 7, "QV_STEPS index out of range");
   return std::make_pair(core::GenDesc::kQv, static_cast<uint16_t>(i + 2));
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FillCalqStructures(const core::record::Chunk& chunk,
                                  EncodingOptions& opt,
                                  SideInformation& side_information,
@@ -104,6 +120,7 @@ void Encoder::FillCalqStructures(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeAligned(const core::record::Chunk& chunk,
                             paramqv1::QualityValues1& param,
                             core::AccessUnit::Descriptor& desc) {
@@ -140,9 +157,10 @@ void Encoder::EncodeAligned(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::AddQualities(const core::record::Segment& s,
                            core::AccessUnit::Descriptor& desc,
-                           const UniformMinMaxQuantizer& quantizer) {
+                           const util::UniformMinMaxQuantizer& quantizer) {
   auto& subsequence = desc.Get(static_cast<uint16_t>(desc.GetSize()) - 1);
 
   for (const auto& q : s.GetQualities()) {
@@ -154,11 +172,12 @@ void Encoder::AddQualities(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
                               paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
   // create quantizer
-  const UniformMinMaxQuantizer quantizer(33, 126, 8);
+  const util::UniformMinMaxQuantizer quantizer(33, 126, 8);
 
   // set codebook
   std::vector<uint8_t> codebook_vec;
@@ -184,6 +203,7 @@ void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
 }
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& chunk) {
   const util::Watch watch;
   auto param = std::make_unique<paramqv1::QualityValues1>(
@@ -204,6 +224,7 @@ core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& chunk) {
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
 
 // -----------------------------------------------------------------------------

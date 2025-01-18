@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file calq_coder.cc
+ *
+ * @brief Implements the core encoding and decoding functions for genomic
+ * quality values in Calq.
+ *
+ * This file is part of the Genie project, designed to compress and reconstruct
+ * quality values associated with genomic sequences. The `calq_coder.cpp` file
+ * provides essential functionality for both encoding and decoding workflows,
+ * supporting multiple quantization techniques.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -10,11 +19,11 @@
 #include <map>
 #include <utility>
 
-#include "genie/quality/calq/error_exception_reporter.h"
-#include "genie/quality/calq/lloyd_max_quantizer.h"
 #include "genie/quality/calq/quality_decoder.h"
 #include "genie/quality/calq/quality_encoder.h"
-#include "genie/quality/calq/uniform_min_max_quantizer.h"
+#include "genie/util/lloyd_max_quantizer.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
@@ -24,42 +33,37 @@ namespace genie::quality::calq {
 
 void encode(const EncodingOptions& opt, const SideInformation& side_information,
             const EncodingBlock& input, DecodingBlock* output) {
-  ProbabilityDistribution pdf(opt.quality_value_min, opt.quality_value_max);
+  util::ProbabilityDistribution pdf(opt.quality_value_min,
+                                    opt.quality_value_max);
 
   // Check quality value range
   for (const auto& sam_record : input.quality_values) {
     for (const auto& read : sam_record) {
       for (const auto& q : read) {
-        if (static_cast<int>(q) - opt.quality_value_offset <
-            opt.quality_value_min) {
-          THROW_ERROR_EXCEPTION("Quality value too small");
-        }
-        if (static_cast<int>(q) - opt.quality_value_offset >
-            opt.quality_value_max) {
-          THROW_ERROR_EXCEPTION("Quality value too large");
-        }
+        UTILS_DIE_IF(q < opt.quality_value_min || q > opt.quality_value_max,
+                     "Quality value out of range");
         pdf.AddToPdf(static_cast<size_t>(q) - opt.quality_value_offset);
       }
     }
   }
 
-  std::map<int, Quantizer> quantizers;
+  std::map<int, util::Quantizer> quantizers;
 
   for (auto i = static_cast<int>(opt.quantization_min);
        i <= static_cast<int>(opt.quantization_max); ++i) {
     if (opt.quantizer_type == QuantizerType::UNIFORM) {
-      UniformMinMaxQuantizer quantizer(
+      util::UniformMinMaxQuantizer quantizer(
           static_cast<const int&>(opt.quality_value_min),
           static_cast<const int&>(opt.quality_value_max), i);
-      quantizers.insert(std::pair<int, Quantizer>(
+      quantizers.insert(std::pair<int, util::Quantizer>(
           static_cast<const int&>(i - opt.quantization_min), quantizer));
     } else if (opt.quantizer_type == QuantizerType::LLOYD_MAX) {
-      LloydMaxQuantizer quantizer(static_cast<size_t>(i));
+      util::LloydMaxQuantizer quantizer(static_cast<size_t>(i));
       quantizer.build(pdf);
-      quantizers.insert(std::pair<int, Quantizer>(
+      quantizers.insert(std::pair<int, util::Quantizer>(
           static_cast<const int&>(i - opt.quantization_min), quantizer));
     } else {
-      THROW_ERROR_EXCEPTION("Quantization Type not supported");
+      UTILS_DIE("Quantization Type not supported");
     }
   }
 

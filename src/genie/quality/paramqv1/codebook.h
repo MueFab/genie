@@ -31,6 +31,7 @@
 #include "genie/util/bit_writer.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::paramqv1 {
 
 /**
@@ -42,8 +43,8 @@ namespace genie::quality::paramqv1 {
  * codebooks, and allows for dynamic addition of new entries.
  */
 class Codebook final {
-  std::vector<uint8_t>
-      qv_recon_;  //!< @brief The list of quality value reconstruction entries.
+  /// The list of quality value reconstruction entries.
+  std::vector<uint8_t> qv_recon_;
 
  public:
   /**
@@ -113,7 +114,9 @@ class Codebook final {
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::paramqv1
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_PARAMQV1_CODEBOOK_H_

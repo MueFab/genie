@@ -1,7 +1,11 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file subsequence.cc
+ * @brief Implementation of CABAC subsequence handling for Genie.
+ *
+ * Defines the `Subsequence` class for managing transformed parameters,
+ * descriptor subsequence IDs, token type flags, and JSON conversion.
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,6 +22,7 @@
 namespace genie::entropy::paramcabac {
 
 // -----------------------------------------------------------------------------
+
 Subsequence::Subsequence()
     : Subsequence(TransformedParameters(), 0, false,
                   std::vector({TransformedSubSeq()})) {}

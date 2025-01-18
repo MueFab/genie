@@ -144,26 +144,35 @@ class Genotyper {
                                   const std::string& qual_pileup,
                                   const size_t& depth);
 
-  const std::vector<char> allele_alphabet_ = {
-      'A', 'C', 'G', 'T'};  //!< @brief The alphabet of valid alleles.
-  static constexpr size_t allele_alphabet_size_ =
-      4;  //!< @brief The Size of the allele alphabet.
+  /// The alphabet of valid alleles.
+  const std::vector<char> allele_alphabet_ = {'A', 'C', 'G', 'T'};
 
-  const std::vector<char>
-      current_allele_alphabet_;  //!< @brief The active allele alphabet.
-  std::map<char, double> allele_likelihoods_;  //!< @brief Map of alleles to
-                                               //!< their likelihood values.
-  std::vector<std::string>
-      genotype_alphabet_;  //!< @brief List of possible genotypes.
-  std::map<std::string, double>
-      genotype_likelihoods_;  //!< @brief Map of genotypes to their likelihood
-                              //!< values.
-  const int nr_quantizers_;   //!< @brief Number of quantizers available.
-  const int
-      polyploidy_;  //!< @brief Ploidy of the organism (number of alleles).
-  const int
-      qual_offset_;   //!< @brief Quality value offset (e.g., 33 for Phred+33).
-  const bool debug_;  //!< @brief Flag for enabling debug output.
+  /// The Size of the allele alphabet.
+  static constexpr size_t allele_alphabet_size_ = 4;
+
+  /// The active allele alphabet.
+  const std::vector<char> current_allele_alphabet_;
+
+  /// Map of alleles to their likelihood values.
+  std::map<char, double> allele_likelihoods_;
+
+  /// List of possible genotypes.
+  std::vector<std::string> genotype_alphabet_;
+
+  /// Map of genotypes to their likelihood values.
+  std::map<std::string, double> genotype_likelihoods_;
+
+  /// Number of quantizers available.
+  const int nr_quantizers_;
+
+  /// Ploidy of the organism (number of alleles).
+  const int polyploidy_;
+
+  /// Quality value offset (e.g., 33 for Phred+33).
+  const int qual_offset_;
+
+  /// Flag for enabling debug output.
+  const bool debug_;
 };
 
 // -----------------------------------------------------------------------------

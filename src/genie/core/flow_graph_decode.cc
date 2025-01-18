@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,28 +17,34 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphDecode::AddReferenceSource(std::unique_ptr<ReferenceSource> dat) {
   ref_sources_.push_back(std::move(dat));
 }
 
 // -----------------------------------------------------------------------------
+
 ReferenceManager& FlowGraphDecode::GetRefMgr() const { return *ref_mgr_; }
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphDecode::SetRefDecoder(RefDecoder* ref_decoder) {
   ref_decoder_ = ref_decoder;
 }
 
 // -----------------------------------------------------------------------------
+
 RefDecoder* FlowGraphDecode::GetRefDecoder() const { return ref_decoder_; }
 
 // -----------------------------------------------------------------------------
+
 FlowGraphDecode::FlowGraphDecode(const size_t threads) : mgr_(threads) {
   read_selector_.SetDrain(&exporter_selector_);
   ref_mgr_ = std::make_unique<ReferenceManager>(16);
 }
 
 // -----------------------------------------------------------------------------
+
 void FlowGraphDecode::AddImporter(
     std::unique_ptr<FormatImporterCompressed> dat) {
   importers_.emplace_back();

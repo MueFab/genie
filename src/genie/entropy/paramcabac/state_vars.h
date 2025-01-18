@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file state_vars.h
  * @brief Defines the `StateVars` class, which manages various state variables
  * for CABAC entropy coding.
  * @details This class provides a structure to hold and compute necessary

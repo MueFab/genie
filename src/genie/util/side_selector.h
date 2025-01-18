@@ -50,11 +50,11 @@ namespace genie::util {
  */
 template <typename Coder, typename Ret, typename... Args>
 class SideSelector {
-  std::vector<Coder*>
-      mods_;  //!< @brief List of available modules for selection.
-  std::function<size_t(Args...)>
-      select_;  //!< @brief Selection function that returns the index of the
-                //!< selected module.
+  /// List of available modules for selection.
+  std::vector<Coder*> mods_;
+
+  /// Selection function that returns the index of the selected module.
+  std::function<size_t(Args...)> select_;
 
   /**
    * @brief Default selection function for the `SideSelector`.
@@ -63,7 +63,7 @@ class SideSelector {
    * function is provided. It always returns zero, meaning that the first
    * module in the list will be used.
    *
-   * @param ... Parameters required by the module interface (unused).
+   * @param Args Parameters required by the module interface (unused).
    * @return The index of the selected module (always zero for the default
    * selector).
    */

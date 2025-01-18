@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,6 +19,7 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence& AccessUnit::Subsequence::operator=(
     const Subsequence& sub) {
   data_ = sub.data_;
@@ -31,6 +32,7 @@ AccessUnit::Subsequence& AccessUnit::Subsequence::operator=(
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence& AccessUnit::Subsequence::operator=(
     Subsequence&& sub) noexcept {
   data_ = std::move(sub.data_);
@@ -43,14 +45,17 @@ AccessUnit::Subsequence& AccessUnit::Subsequence::operator=(
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence::Subsequence(const Subsequence& sub) { *this = sub; }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence::Subsequence(Subsequence&& sub) noexcept {
   *this = std::move(sub);
 }
 
 // -----------------------------------------------------------------------------
+
 util::DataBlock* AccessUnit::Subsequence::GetDependency() {
   if (id_ == gen_sub::kMismatchTypeSubstBase ||
       id_ == gen_sub::kRefTransTransform)
@@ -59,6 +64,7 @@ util::DataBlock* AccessUnit::Subsequence::GetDependency() {
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence AccessUnit::Subsequence::AttachMismatchDecoder(
     std::unique_ptr<MismatchDecoder> mm) {
   mm_decoder_ = std::move(mm);
@@ -66,40 +72,49 @@ AccessUnit::Subsequence AccessUnit::Subsequence::AttachMismatchDecoder(
 }
 
 // -----------------------------------------------------------------------------
+
 MismatchDecoder* AccessUnit::Subsequence::GetMismatchDecoder() const {
   return mm_decoder_.get();
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence::Subsequence(const uint8_t word_size, GenSubIndex id)
     : data_(0, word_size), id_(std::move(id)), dependency_(0, word_size) {}
 
 // -----------------------------------------------------------------------------
+
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex id)
     : id_(std::move(id)), dependency_(0, d.GetWordSize()) {
   data_ = std::move(d);
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::Subsequence::Push(const uint64_t val) { data_.PushBack(val); }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::Subsequence::PushDependency(const uint64_t val) {
   dependency_.PushBack(val);
 }
 
 // -----------------------------------------------------------------------------
+
 void AccessUnit::Subsequence::Inc() { position_++; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t AccessUnit::Subsequence::Get(const size_t lookahead) const {
   return data_.Get(position_ + lookahead);
 }
 
 // -----------------------------------------------------------------------------
+
 bool AccessUnit::Subsequence::end() const { return data_.Size() <= position_; }
 
 // -----------------------------------------------------------------------------
+
 util::DataBlock&& AccessUnit::Subsequence::Move() { return std::move(data_); }
 
 // -----------------------------------------------------------------------------

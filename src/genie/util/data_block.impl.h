@@ -34,33 +34,40 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 inline uint8_t DataBlock::GetWordSize() const { return 1 << lg_word_size_; }
 
 // -----------------------------------------------------------------------------
+
 inline uint64_t DataBlock::MulByWordSize(const uint64_t val) const {
   return val << lg_word_size_;
 }
 
 // -----------------------------------------------------------------------------
+
 inline uint64_t DataBlock::DivByWordSize(const uint64_t val) const {
   return val >> lg_word_size_;
 }
 
 // -----------------------------------------------------------------------------
+
 inline uint64_t DataBlock::ModByWordSize(const uint64_t val) const {
-  return val & ((1 << lg_word_size_) - 1);
+  return val & ((1 << lg_word_size_) - 1);  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 size_t DataBlock::IteratorCore<T>::operator-(const IteratorCore& offset) const {
   return position_ - offset.position_;
 }
 
 // -----------------------------------------------------------------------------
+
 inline size_t DataBlock::GetRawSize() const { return GetWordSize() * Size(); }
 
 // -----------------------------------------------------------------------------
+
 inline uint64_t DataBlock::Get(const size_t index) const {
   switch (lg_word_size_) {
     case 0:
@@ -77,6 +84,7 @@ inline uint64_t DataBlock::Get(const size_t index) const {
 }
 
 // -----------------------------------------------------------------------------
+
 inline void DataBlock::Set(const size_t index, const uint64_t val) {
   switch (lg_word_size_) {
     case 0:
@@ -99,22 +107,27 @@ inline void DataBlock::Set(const size_t index, const uint64_t val) {
 }
 
 // -----------------------------------------------------------------------------
+
 inline DataBlock::ConstIterator DataBlock::begin() const { return {this, 0}; }
 
 // -----------------------------------------------------------------------------
+
 inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
 // -----------------------------------------------------------------------------
+
 inline DataBlock::ConstIterator DataBlock::end() const {
   return {this, DivByWordSize(data_.size())};
 }
 
 // -----------------------------------------------------------------------------
+
 inline DataBlock::Iterator DataBlock::end() {
   return {this, DivByWordSize(data_.size())};
 }
 
 // -----------------------------------------------------------------------------
+
 inline void DataBlock::PushBack(const uint64_t val) {
   data_.resize(data_.size() + GetWordSize());
   switch (lg_word_size_) {
@@ -137,17 +150,21 @@ inline void DataBlock::PushBack(const uint64_t val) {
 }
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] inline void DataBlock::EmplaceBack(const uint64_t val) {
   PushBack(val);
 }
 
 // -----------------------------------------------------------------------------
+
 inline const void* DataBlock::GetData() const { return data_.data(); }
 
 // -----------------------------------------------------------------------------
+
 inline void* DataBlock::GetData() { return data_.data(); }
 
 // -----------------------------------------------------------------------------
+
 inline void DataBlock::SetWordSize(const uint8_t size) {
   switch (size) {
     case 1:
@@ -171,17 +188,20 @@ inline void DataBlock::SetWordSize(const uint8_t size) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
-DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos)
+DataBlock::ProxyCore<T>::ProxyCore(T str, const size_t pos)
     : stream_(str), position_(pos) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::ProxyCore<T>::operator uint64_t() const {
   return stream_->Get(position_);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::ProxyCore<T>& DataBlock::ProxyCore<T>::operator=(uint64_t val) {
   stream_->Set(position_, val);
@@ -189,11 +209,13 @@ DataBlock::ProxyCore<T>& DataBlock::ProxyCore<T>::operator=(uint64_t val) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
-DataBlock::IteratorCore<T>::IteratorCore(T str, size_t pos)
+DataBlock::IteratorCore<T>::IteratorCore(T str, const size_t pos)
     : stream_(str), position_(pos) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(
     const size_t offset) const {
@@ -201,6 +223,7 @@ DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(
     const size_t offset) const {
@@ -208,6 +231,7 @@ DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator++() {
   *this = *this + 1;
@@ -215,6 +239,7 @@ DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator++() {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator--() {
   *this = *this + 1;
@@ -222,46 +247,53 @@ DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator--() {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(int) {
   IteratorCore ret = *this;
-  ++(*this);
+  ++*this;
   return ret;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(int) {
   IteratorCore ret = *this;
-  ++(*this);
+  --*this;
   return ret;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 [[maybe_unused]] size_t DataBlock::IteratorCore<T>::GetOffset() const {
   return position_;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const {
   return DataBlock::ProxyCore<T>(stream_, position_);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 bool DataBlock::IteratorCore<T>::operator==(const IteratorCore& c) const {
   return this->stream_ == c.stream_ && this->position_ == c.position_;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 bool DataBlock::IteratorCore<T>::operator!=(const IteratorCore& c) const {
   return !(*this == c);  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename It1, typename It2>
 [[maybe_unused]] void DataBlock::Insert(const It1& pos, const It2& start,
                                         const It2& end) {
@@ -274,13 +306,14 @@ template <typename It1, typename It2>
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 DataBlock::DataBlock(std::vector<T>* vec) : lg_word_size_(0) {
   SetWordSize(sizeof(T));
-  const size_t kSize = vec->size() * sizeof(T);
-  this->data_.resize(kSize);
+  const size_t size = vec->size() * sizeof(T);
+  this->data_.resize(size);
   this->data_.shrink_to_fit();
-  std::memcpy(this->data_.data(), vec->data(), kSize);
+  std::memcpy(this->data_.data(), vec->data(), size);
   vec->clear();
 }
 

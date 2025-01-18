@@ -1,7 +1,23 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ *
+ * @file preprocess.cc
+ * @brief Implementation of the preprocessor for genomic reads in the Spring
+ * module.
+ *
+ * This file contains the implementation of the Preprocessor class, which
+ * handles the initial pre-processing of genomic reads before further encoding
+ * and compression steps. It includes functions for setting up file paths,
+ * processing read segments and records, and managing temporary files and
+ * directories.
+ *
+ * @details The Preprocessor class is responsible for tasks such as cleaning
+ * reads, separating reads with 'N' bases, and managing file outputs for
+ * different categories of read data. It interacts with the Spring compression
+ * module to prepare the data for efficient storage and analysis.
+ *
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -22,12 +38,20 @@
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"
+#include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Spring";
+
 namespace genie::read::spring {
+
+void OpenFile(std::ofstream& file, const std::string& path) {
+  file.open(path, std::ios::binary);
+  UTILS_DIE_IF(!file.is_open(), "Failed to open file: " + path);
+}
 
 // -----------------------------------------------------------------------------
 
@@ -39,49 +63,98 @@ void Preprocessor::Setup(const std::string& working_dir_p, const size_t num_thr,
   working_dir = working_dir_p;
   used = false;
 
-  lock.Reset();
-
   cp.paired_end = paired_end;
   cp.unaligned_reads_flag = false;
   cp.num_reads = 0;
-  cp.num_reads_clean[0] = 0;
-  cp.num_reads_clean[1] = 0;
+  cp.num_reads_clean = {0u, 0u};
   cp.max_read_len = 0;
-  cp.num_reads_per_block = kNum_Reads_Per_Block;
+  preprocess_progress_printed = 0;
+  cp.num_reads_per_block = kNumReadsPerBlock;
   cp.num_blocks = 0;
-  // generate random temp directory in the working directory
 
-  while (true) {
-    std::string random_str = "tmp." + RandomString(10);
-    temp_dir = working_dir + "/" + random_str;
-    if (!std::filesystem::exists(temp_dir)) break;
-  }
+  do {
+    temp_dir = std::filesystem::path(working_dir) / ("tmp." + RandomString(10));
+  } while (std::filesystem::exists(temp_dir));
+
   UTILS_DIE_IF(!std::filesystem::create_directory(temp_dir),
-               "Cannot create temporary directory.");
-  std::cerr << "Temporary directory: " << temp_dir << "\n";
+               "Cannot create temporary directory: " + temp_dir);
 
-  outfile_clean[0] = temp_dir + "/input_clean_1.dna";
-  outfile_clean[1] = temp_dir + "/input_clean_2.dna";
-  outfile_n[0] = temp_dir + "/input_N.dna";
-  outfile_n[1] = temp_dir + "/input_N.dna.2";
-  outfile_order_n[0] = temp_dir + "/read_order_N.bin";
-  outfile_order_n[1] = temp_dir + "/read_order_N.bin.2";
+  // File paths setup
+  outfile_clean = {temp_dir + "/input_clean_1.dna",
+                   temp_dir + "/input_clean_2.dna"};
+  outfile_n = {temp_dir + "/input_N.dna", temp_dir + "/input_N.dna.2"};
+  outfile_order_n = {temp_dir + "/read_order_N.bin",
+                     temp_dir + "/read_order_N.bin.2"};
   outfile_id = temp_dir + "/id_1";
-  outfile_quality[0] = temp_dir + "/quality_1";
-  outfile_quality[1] = temp_dir + "/quality_2";
+  outfile_quality = {temp_dir + "/quality_1", temp_dir + "/quality_2"};
 
-  for (int j = 0; j < 2; j++) {
+  // Open file streams
+  for (size_t j = 0; j < outfile_clean.size(); ++j) {
     if (j == 1 && !cp.paired_end) continue;
-    f_out_clean[j].open(outfile_clean[j], std::ios::binary);
-    f_out_n[j].open(outfile_n[j], std::ios::binary);
-    f_out_order_n[j].open(outfile_order_n[j], std::ios::binary);
-    if (cp.preserve_quality)                      // NOLINT
-      f_out_quality[j].open(outfile_quality[j]);  // NOLINT
+    OpenFile(f_out_clean[j], outfile_clean[j]);
+    OpenFile(f_out_n[j], outfile_n[j]);
+    OpenFile(f_out_order_n[j], outfile_order_n[j]);
+    if (cp.preserve_quality) {  // NOLINT
+      OpenFile(f_out_quality[j], outfile_quality[j]);
+    }
   }
-  if (cp.preserve_id) f_out_id.open(outfile_id);  // NOLINT
+  if (cp.preserve_id) {  // NOLINT
+    OpenFile(f_out_id, outfile_id);
+  }
+}
+
+void Preprocessor::preprocess_segment(const core::record::Segment& seg,
+                                      const size_t seg_index,
+                                      const size_t rec_index) {
+  const auto& sequence = seg.GetSequence();
+  const auto& qualities = seg.GetQualities();
+
+  // Validate read length
+  UTILS_DIE_IF(sequence.size() > kMaxReadLen,
+               "Global assembly maximum read length " +
+                   std::to_string(kMaxReadLen) + " exceeded.");
+
+  // Update maximum read length
+  cp.max_read_len =
+      std::max(cp.max_read_len, static_cast<uint32_t>(sequence.size()));
+
+  if (sequence.find('N') != std::string::npos) {
+    // Write sequences with 'N'
+    WriteDnaNInBits(sequence, f_out_n[seg_index]);
+    const auto pos_n = static_cast<uint32_t>(cp.num_reads + rec_index);
+    f_out_order_n[seg_index].write(reinterpret_cast<const char*>(&pos_n),
+                                   sizeof(uint32_t));
+  } else {
+    // Write clean sequences
+    WriteDnaInBits(sequence, f_out_clean[seg_index]);
+    cp.num_reads_clean[seg_index]++;
+  }
+
+  // Write quality scores if available
+  if (!qualities.empty()) {
+    f_out_quality[seg_index] << qualities.front() << "\n";
+  }
 }
 
 // -----------------------------------------------------------------------------
+
+void Preprocessor::preprocess_record(const core::record::Record& rec,
+                                     const size_t record_index) {
+  UTILS_DIE_IF(
+      rec.GetSegments().size() != static_cast<std::size_t>(cp.paired_end + 1),
+      "Number of segments differs between global assembly data chunks.");
+
+  std::size_t seg_index = 0;
+
+  // Process each segment
+  for (const auto& seg : rec.GetSegments()) {
+    preprocess_segment(seg, seg_index, record_index);
+    seg_index++;
+  }
+
+  // Write read ID
+  f_out_id << rec.GetName() << "\n";
+}
 
 void Preprocessor::Preprocess(core::record::Chunk&& t,
                               const util::Section& id) {
@@ -89,47 +162,41 @@ void Preprocessor::Preprocess(core::record::Chunk&& t,
 
   [[maybe_unused]] util::OrderedSection lock_sec(&lock, id);
   used = true;
+
+  // Update performance statistics
   stats.Add(data.GetStats());
 
+  // Validate read limits
   UTILS_DIE_IF(
       data.GetData().front().GetNumberOfTemplateSegments() *
               (data.GetData().size() + cp.num_reads) >
-          kMax_Num_Reads,
+          kMaxNumReads,
       "Too many reads in the input. Global assembly only supports up to " +
-          std::to_string(kMax_Num_Reads) + " reads.");
+          std::to_string(kMaxNumReads) + " reads.");
 
-  size_t rec_index = 0;
-  for (auto& rec : data.GetData()) {
-    UTILS_DIE_IF(
-        rec.GetSegments().size() != static_cast<size_t>(cp.paired_end + 1),
-        "Number of segments differs between global assembly data chunks.");
-    size_t seg_index = 0;
-    for (auto& seq : rec.GetSegments()) {
-      UTILS_DIE_IF(seq.GetSequence().size() > kMax_Read_Len,
-                   "Global assembly maximum read length " +
-                       std::to_string(kMax_Read_Len) + " exceeded.");
-      cp.max_read_len = std::max(
-          cp.max_read_len, static_cast<uint32_t>(seq.GetSequence().length()));
-      if (seq.GetSequence().find('N') != std::string::npos) {
-        WriteDnaNInBits(seq.GetSequence(), f_out_n[seg_index]);
-        auto pos_n = static_cast<uint32_t>(cp.num_reads + rec_index);
-        f_out_order_n[seg_index].write(reinterpret_cast<char*>(&pos_n),
-                                       sizeof(uint32_t));
-      } else {
-        WriteDnaInBits(seq.GetSequence(), f_out_clean[seg_index]);
-        cp.num_reads_clean[seg_index]++;
-      }
-      if (!seq.GetQualities().empty()) {
-        f_out_quality[seg_index] << seq.GetQualities().front() << "\n";
-      }
-      ++seg_index;
-    }
-    f_out_id << rec.GetName() << "\n";
+  std::size_t rec_index = 0;
+
+  // Process each record
+  for (const auto& rec : data.GetData()) {
+    preprocess_record(rec, rec_index);
     ++rec_index;
   }
+
+  // Update read and block counters
   cp.num_reads += static_cast<uint32_t>(rec_index);
   cp.num_blocks++;
 
+  constexpr size_t print_progress = 1000000;
+  const std::string pair_end_str =
+      cp.paired_end ? " (paired-end)" : "(single-end)";
+  while (cp.num_reads - preprocess_progress_printed > print_progress) {
+    UTILS_LOG(util::Logger::Severity::INFO,
+              "---- Preprocessed reads " + pair_end_str + ": " +
+                  std::to_string(preprocess_progress_printed));
+    preprocess_progress_printed += print_progress;
+  }
+
+  // Validate processed reads
   UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");
 }
 
@@ -179,16 +246,14 @@ void Preprocessor::Finish(size_t id) {
 
   cp.num_reads = cp.paired_end ? cp.num_reads * 2 : cp.num_reads;
 
-  std::cerr << "Max Read length: " << cp.max_read_len << "\n";
-  std::cerr << "Total number of reads: " << cp.num_reads << "\n";
-
-  std::cerr << "Total number of reads without N: "
-            << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Max Read length: " + std::to_string(cp.max_read_len));
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Total number of reads: " + std::to_string(cp.num_reads));
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Total number of reads without N: " +
+                std::to_string(cp.num_reads_clean[0] + cp.num_reads_clean[1]));
 }
-
-// -----------------------------------------------------------------------------
-
-core::stats::PerfStats& Preprocessor::GetStats() { return stats; }
 
 // -----------------------------------------------------------------------------
 

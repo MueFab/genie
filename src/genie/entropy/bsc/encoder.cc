@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,6 +23,7 @@
 namespace genie::entropy::bsc {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void FillDecoder(const core::GenomicDescriptorProperties& desc,
                  T& decoder_config) {
@@ -36,6 +37,7 @@ void FillDecoder(const core::GenomicDescriptorProperties& desc,
 }
 
 // -----------------------------------------------------------------------------
+
 void StoreParameters(core::GenDesc desc,
                      core::parameter::DescriptorSubSequenceCfg& parameter_set) {
   auto descriptor_configuration =
@@ -50,6 +52,7 @@ void StoreParameters(core::GenDesc desc,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Compress(core::AccessUnit::Subsequence&& in) {
   const size_t num_symbols = in.GetNumSymbols();
   util::DataBlock input_buffer = in.Move();
@@ -74,6 +77,7 @@ core::AccessUnit::Subsequence Compress(core::AccessUnit::Subsequence&& in) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::EntropyEncoder::entropy_coded Encoder::Process(
     core::AccessUnit::Descriptor& desc) {
   entropy_coded ret;
@@ -85,7 +89,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
       const auto [kFst, kSnd] = sub_descriptor.GetId();
 
       std::get<2>(ret).AddInteger(
-          "Size-bsc-total-raw",
+          "size-bsc-total-raw",
           static_cast<int64_t>(sub_descriptor.GetRawSize()));
       auto sub_seq_name = std::string();
       if (GetDescriptor(std::get<1>(ret).GetId()).token_type) {
@@ -96,17 +100,17 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
             GetDescriptor(std::get<1>(ret).GetId()).sub_seqs[kSnd].name;
       }
       std::get<2>(ret).AddInteger(
-          "Size-bsc-" + sub_seq_name + "-raw",
+          "size-bsc-" + sub_seq_name + "-raw",
           static_cast<int64_t>(sub_descriptor.GetRawSize()));
 
       std::get<1>(ret).Set(kSnd, Compress(std::move(sub_descriptor)));
 
       if (!std::get<1>(ret).Get(kSnd).IsEmpty()) {
         std::get<2>(ret).AddInteger(
-            "Size-bsc-total-comp",
+            "size-bsc-total-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(kSnd).GetRawSize()));
         std::get<2>(ret).AddInteger(
-            "Size-bsc-" + sub_seq_name + "-comp",
+            "size-bsc-" + sub_seq_name + "-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(kSnd).GetRawSize()));
       }
     } else {
@@ -122,6 +126,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const bool write_out_streams)
     : writeOutStreams(write_out_streams) {}
 

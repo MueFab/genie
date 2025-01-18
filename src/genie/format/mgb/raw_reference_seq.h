@@ -25,10 +25,17 @@ namespace genie::format::mgb {
  * @brief
  */
 class RawReferenceSequence final {
-  uint16_t sequence_id_;      //!< @brief
-  uint64_t seq_start_;        //!< @brief
-  uint64_t seq_end_;          //!< @brief
-  std::string ref_sequence_;  //!< @brief
+  ///
+  uint16_t sequence_id_;
+
+  ///
+  uint64_t seq_start_;
+
+  ///
+  uint64_t seq_end_;
+
+  ///
+  std::string ref_sequence_;
 
  public:
   /**

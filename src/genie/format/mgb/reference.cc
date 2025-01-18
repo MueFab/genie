@@ -16,6 +16,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 std::string Reference::GetSequence(const uint64_t start, const uint64_t end) {
   return mgr_->GetRef(raw_, f_pos_, start, end);
 }

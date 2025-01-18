@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implements the Encoder class for processing and encoding genomic
+ * record names.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression and processing. The `encoder.cpp` file handles the
+ * tokenization and encoding of record names into compressed data streams,
+ * enabling optimized storage and processing workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,6 +26,7 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Encoder::Process(const core::record::Chunk& recs) {
   const util::Watch watch;

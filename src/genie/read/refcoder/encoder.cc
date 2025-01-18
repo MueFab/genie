@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the reference-based encoder for the Genie framework.
+ *
+ * This file contains the implementation of the Encoder class in the `refcoder`
+ * namespace. The Encoder facilitates reference-based encoding for sequencing
+ * data, extracting reference sequences based on alignment information and
+ * managing encoding states.
+ *
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,12 +27,14 @@
 namespace genie::read::refcoder {
 
 // -----------------------------------------------------------------------------
+
 Encoder::RefEncodingState::RefEncodingState(const core::record::Chunk& data)
     : EncodingState(data) {
   excerpt = data.GetRef();
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<std::string, std::string> Encoder::GetReferences(
     const core::record::Record& r, EncodingState& state) {
   std::pair<std::string, std::string> ret;
@@ -53,6 +64,7 @@ std::pair<std::string, std::string> Encoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
     const core::record::Chunk& data) const {
   return std::make_unique<RefEncodingState>(data);

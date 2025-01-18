@@ -25,13 +25,17 @@
 #include "genie/format/sam/sam_to_mgrec/sam_group.h"
 #include "genie/format/sam/sam_to_mgrec/sam_reader.h"
 #include "genie/format/sam/sam_to_mgrec/sorter.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "TranscoderSam";
+
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 RefInfo::RefInfo(const std::string& fasta_name)
     : ref_mgr_(std::make_unique<core::ReferenceManager>(4)), valid_(false) {
   if (!std::filesystem::exists(fasta_name)) {
@@ -70,12 +74,15 @@ RefInfo::RefInfo(const std::string& fasta_name)
 }
 
 // -----------------------------------------------------------------------------
+
 bool RefInfo::IsValid() const { return valid_; }
 
 // -----------------------------------------------------------------------------
+
 core::ReferenceManager* RefInfo::GetMgr() const { return ref_mgr_.get(); }
 
 // -----------------------------------------------------------------------------
+
 std::vector<core::record::Record> SplitRecord(core::record::Record&& rec) {
   auto input = std::move(rec);
   std::vector<core::record::Record> ret;
@@ -157,6 +164,7 @@ std::vector<core::record::Record> SplitRecord(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record UnalignRecord(core::record::Record&& rec) {
   auto input = std::move(rec);
   core::record::Record ret(
@@ -172,6 +180,7 @@ core::record::Record UnalignRecord(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::Record StripAdditionalAlignments(core::record::Record&& rec) {
   if (rec.GetClassId() == core::record::ClassType::kClassU ||
       rec.GetAlignments().size() < 2) {
@@ -195,6 +204,7 @@ core::record::Record StripAdditionalAlignments(core::record::Record&& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool IsECigarSupported(const std::string& e_cigar) {
   // Splices not supported
   if (e_cigar.find_first_of('*') != std::string::npos ||
@@ -206,6 +216,7 @@ bool IsECigarSupported(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 struct CleanStatistics {
   size_t hm_recs{};
   size_t splice_recs{};
@@ -264,6 +275,7 @@ std::pair<std::vector<core::record::Record>, CleanStatistics> CleanRecord(
 }
 
 // -----------------------------------------------------------------------------
+
 void phase1_thread(SamReader& sam_reader, int& chunk_id,
                    const std::string& tmp_path, bool clean, std::mutex& lock,
                    CleanStatistics& stats) {
@@ -280,7 +292,8 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id,
     {
       std::lock_guard guard(lock);
       this_chunk = chunk_id++;
-      std::cerr << "Processing chunk " << this_chunk << "..." << std::endl;
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Processing chunk " + std::to_string(this_chunk) + "...");
       for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
         queries.emplace_back();
         ret = sam_reader.ReadSamQuery(queries.back());
@@ -356,6 +369,7 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id,
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
     const Config& options, int& chunk_id) {
   auto sam_reader = SamReader(options.input_file_);
@@ -378,13 +392,25 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
   }
 
   if (options.clean_) {
-    std::cerr << "HM records unaligned: " << stats.hm_recs << std::endl;
-    std::cerr << "I records split because of large mapping distance: "
-              << stats.distance << std::endl;
-    std::cerr << "Additional alignments removed: "
-              << stats.additional_alignments << std::endl;
-    std::cerr << "Records unaligned because of splices: " << stats.splice_recs
-              << std::endl;
+    if (stats.hm_recs) {
+      UTILS_LOG(util::Logger::Severity::WARNING,
+                "HM records unaligned: " + std::to_string(stats.hm_recs));
+    }
+    if (stats.splice_recs) {
+      UTILS_LOG(util::Logger::Severity::WARNING,
+                "Records unaligned because of splices: " +
+                    std::to_string(stats.splice_recs));
+    }
+    if (stats.distance) {
+      UTILS_LOG(util::Logger::Severity::WARNING,
+                "I records split because of large mapping distance: " +
+                    std::to_string(stats.distance));
+    }
+    if (stats.additional_alignments) {
+      UTILS_LOG(util::Logger::Severity::WARNING,
+                "Additional alignments removed: " +
+                    std::to_string(stats.additional_alignments));
+    }
   }
 
   auto refs = sam_reader.GetRefs();
@@ -392,6 +418,7 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
 }
 
 // -----------------------------------------------------------------------------
+
 std::string patch_e_cigar(const std::string& ref, const std::string& seq,
                           const std::string& e_cigar) {
   std::string fixed_cigar;
@@ -457,6 +484,7 @@ std::string patch_e_cigar(const std::string& ref, const std::string& seq,
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType ClassifyECigar(const std::string& cigar) {
   auto ret = core::record::ClassType::kClassP;
   for (const auto& c : cigar) {
@@ -478,6 +506,7 @@ core::record::ClassType ClassifyECigar(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
   return std::all_of(seq.begin(), seq.end(), [&alphabet](const char& c) {
     return alphabet.IsIncluded(c);
@@ -485,6 +514,7 @@ bool ValidateBases(const std::string& seq, const core::Alphabet& alphabet) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool fix_e_cigar(core::record::Record& r,
                  const std::vector<std::pair<std::string, size_t>>&,
                  const RefInfo& ref) {
@@ -581,114 +611,7 @@ bool fix_e_cigar(core::record::Record& r,
 }
 
 // -----------------------------------------------------------------------------
-void sam_to_mgrec_phase2(
-    Config& options, int num_chunks,
-    const std::vector<std::pair<std::string, size_t>>& refs) {
-  std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
-  RefInfo reference_info(options.fasta_file_path_);
-  size_t removed_unsupported_base = 0;
 
-  std::vector<size_t> sam_hdr_to_fasta_lut;
-  if (!options.no_ref_) {
-    for (const auto& [fst, snd] : refs) {
-      bool found = false;
-      for (size_t j = 0; j < reference_info.GetMgr()->GetSequences().size();
-           ++j) {
-        if (fst == reference_info.GetMgr()->GetSequences().at(j)) {
-          sam_hdr_to_fasta_lut.push_back(j);
-          found = true;
-          break;
-        }
-      }
-      UTILS_DIE_IF(!found, "Did not find ref " + fst);
-    }
-  } else {
-    for (size_t i = 0; i < refs.size(); ++i) {
-      sam_hdr_to_fasta_lut.push_back(i);
-    }
-  }
-
-  std::unique_ptr<std::ostream> total_output;
-  std::ostream* out_stream = &std::cout;
-  if (options.output_file_.substr(0, 2) != "-.") {
-    total_output = std::make_unique<std::ofstream>(
-        options.output_file_, std::ios::binary | std::ios::trunc);
-    out_stream = total_output.get();
-  }
-  util::BitWriter total_output_writer(*out_stream);
-
-  std::vector<std::unique_ptr<SubfileReader>> readers;
-  readers.reserve(num_chunks);
-  auto cmp = [&](const SubfileReader* a, const SubfileReader* b) {
-    return !compare(a->GetRecord().value(), b->GetRecord().value());
-  };
-  std::priority_queue<SubfileReader*, std::vector<SubfileReader*>,
-                      decltype(cmp)>
-      heap(cmp);
-  for (int i = 0; i < num_chunks; ++i) {
-    readers.emplace_back(std::make_unique<SubfileReader>(
-        options.tmp_dir_path_ + "/" + std::to_string(i) + PHASE1_EXT));
-    if (!readers.back()->GetRecord()) {
-      auto path = readers.back()->GetPath();
-      std::cerr << path << " depleted" << std::endl;
-      readers.pop_back();
-      std::remove(path.c_str());
-    } else {
-      heap.push(readers.back().get());
-    }
-  }
-
-  if (!heap.empty()) {
-    while (true) {
-      auto* reader = heap.top();
-      heap.pop();
-      auto rec = reader->MoveRecord();
-      rec.PatchRefId(
-          sam_hdr_to_fasta_lut[rec.GetAlignmentSharedData().GetSeqId()]);
-
-      if (fix_e_cigar(rec, refs, reference_info)) {
-        rec.Write(total_output_writer);
-      } else {
-        removed_unsupported_base++;
-      }
-
-      if (reader->GetRecord()) {
-        heap.push(reader);
-      } else {
-        auto path = reader->GetPath();
-        std::cerr << path << " depleted" << std::endl;
-        for (auto it = readers.begin(); it != readers.end(); ++it) {
-          if (it->get() == reader) {
-            readers.erase(it);
-            break;
-          }
-        }
-        std::remove(path.c_str());
-
-        if (heap.empty()) {
-          break;
-        }
-      }
-    }
-  }
-
-  total_output_writer.FlushBits();
-  out_stream->flush();
-
-  std::cerr << "Finished merging!" << std::endl;
-  std::cerr << removed_unsupported_base
-            << " records removed because of unsupported bases." << std::endl;
-}
-
-// -----------------------------------------------------------------------------
-void TranscodeSam2Mpg(Config& options) {
-  int num_references;
-
-  const auto refs = sam_to_mgrec_phase1(options, num_references);
-  sam_to_mgrec_phase2(options, num_references, refs);
-}
-
-// -----------------------------------------------------------------------------
 char ConvertECigar2CigarChar(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -709,6 +632,7 @@ char ConvertECigar2CigarChar(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 int StepRef(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -728,6 +652,7 @@ int StepRef(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t MappedLength(const std::string& cigar) {
   if (cigar == "*") {
     return 0;
@@ -746,6 +671,7 @@ uint64_t MappedLength(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ECigar2Cigar(const std::string& e_cigar) {
   std::string cigar;
   cigar.reserve(e_cigar.size());
@@ -783,6 +709,7 @@ std::string ECigar2Cigar(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t ComputeSamFlags(const size_t s, const size_t a,
                          const core::record::Record& record) {
   uint16_t flags = 0;
@@ -822,6 +749,7 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessFirstMappedSegment(const size_t s, const size_t a,
                                const core::record::Record& record,
                                std::string& read_name, std::string& pos,
@@ -871,6 +799,7 @@ void ProcessFirstMappedSegment(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessSecondMappedSegment(const size_t s,
                                 const core::record::Record& record,
                                 int64_t& template_length, uint16_t& flags,
@@ -932,119 +861,7 @@ void ProcessSecondMappedSegment(const size_t s,
 }
 
 // -----------------------------------------------------------------------------
-void TranscodeMpg2Sam(Config& options) {
-  std::istream* input_file = &std::cin;
-  std::ostream* output_file = &std::cout;
 
-  RefInfo reference_info(options.fasta_file_path_);
-
-  if (options.input_file_.substr(0, 2) != "-.") {
-    std::optional<std::ifstream> input_stream;
-    input_stream = std::ifstream(options.input_file_);
-    UTILS_DIE_IF(!input_stream,
-                 "Cannot open file to read: " + options.input_file_);
-    input_file = &input_stream.value();
-  }
-
-  if (options.output_file_.substr(0, 2) != "-.") {
-    std::optional<std::ofstream> output_stream;
-    output_stream = std::ofstream(options.output_file_);
-    output_file = &output_stream.value();
-  }
-
-  util::BitReader reader(*input_file);
-
-  *output_file << "@HD\tVN:1.6" << std::endl;
-  for (const auto& s : reference_info.GetMgr()->GetSequences()) {
-    *output_file << "@SQ\tSN:" << s << "\tLN:"
-                 << std::to_string(reference_info.GetMgr()->GetLength(s))
-                 << std::endl;
-  }
-
-  while (reader.IsStreamGood()) {
-    core::record::Record record(reader);
-    // One line per segment and alignment
-    for (size_t s = 0; s < record.GetSegments().size(); ++s) {
-      for (size_t a = 0;
-           a < std::max(record.GetAlignments().size(), static_cast<size_t>(1));
-           ++a) {
-        std::string sam_record = record.GetName() + "\t";
-
-        uint16_t flags = ComputeSamFlags(s, a, record);
-        bool mapped = !(flags & 0x4);
-        bool other_mapped = !(flags & 0x8);
-
-        std::string reference_name = "*";
-        std::string pos = "0";
-        std::string mapping_quality = "0";
-        std::string cigar = "*";
-        std::string reference_next = "*";
-        std::string position_next = "0";
-        int64_t template_length = 0;
-        if (mapped) {
-          // First segment is mapped
-          ProcessFirstMappedSegment(s, a, record, reference_name, pos,
-                                    template_length, mapping_quality, cigar,
-                                    flags, reference_info);
-        } else if (record.GetClassId() == core::record::ClassType::kClassHm) {
-          // According to SAM standard, HM-like records should have
-          // same position for the unmapped part, too
-          pos = std::to_string(record.GetAlignments()[a].GetPosition() + 1);
-          reference_name =
-              reference_info.IsValid()
-                  ? reference_info.GetMgr()->Id2Ref(
-                        record.GetAlignmentSharedData().GetSeqId())
-                  : std::to_string(record.GetAlignmentSharedData().GetSeqId());
-          if (a > 0) {
-            // No need to write unmapped records for secondary
-            // alignment
-            continue;
-          }
-        }
-
-        if (other_mapped && record.GetNumberOfTemplateSegments() == 2) {
-          ProcessSecondMappedSegment(s, record, template_length, flags,
-                                     position_next, reference_next,
-                                     reference_info);
-        } else {
-          reference_next = reference_name;
-          position_next = pos;
-          template_length = 0;
-        }
-
-        // Use "=" shorthand
-        if (reference_next == reference_name && reference_next != "*") {
-          reference_next = "=";
-        }
-
-        if (record.GetClassId() == core::record::ClassType::kClassHm ||
-            record.GetClassId() == core::record::ClassType::kClassU) {
-          template_length = 0;
-        }
-
-        sam_record += std::to_string(flags) + "\t";
-        sam_record += reference_name + "\t";
-        sam_record += pos + "\t";
-        sam_record += mapping_quality + "\t";
-        sam_record += cigar + "\t";
-        sam_record += reference_next + "\t";
-        sam_record += position_next + "\t";
-        sam_record += std::to_string(template_length) + "\t";
-        sam_record += record.GetSegments()[s].GetSequence() + "\t";
-        if (record.GetSegments()[s].GetQualities().empty()) {
-          sam_record += "*\n";
-        } else {
-          sam_record += record.GetSegments()[s].GetQualities()[0] + "\n";
-        }
-
-        output_file->write(sam_record.c_str(),
-                           static_cast<std::streamsize>(sam_record.length()));
-      }
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
 bool compare(const core::record::Record& r1, const core::record::Record& r2) {
   if (r1.GetAlignments().empty()) {
     return false;

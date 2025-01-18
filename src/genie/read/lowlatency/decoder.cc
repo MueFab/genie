@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implementation of the low-latency decoder for the Genie framework.
+ *
+ * This file contains the implementation of the Decoder class within the
+ * `lowlatency` namespace. The decoder processes sequencing data from Access
+ * Units (AUs) back into record chunks, supporting low-latency operations for
+ * unaligned reads.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,6 +28,7 @@
 namespace genie::read::lowlatency {
 
 // -----------------------------------------------------------------------------
+
 core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
   util::Watch watch;
   core::record::Chunk ret;
@@ -106,11 +115,13 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   FlowOut(decode_common(std::move(t)), id);
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Decoder::Decode(core::AccessUnit&& t) {
   return decode_common(std::move(t))
       .GetData()

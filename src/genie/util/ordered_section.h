@@ -48,10 +48,11 @@ namespace genie::util {
  * concurrent threads.
  */
 class OrderedSection {
-  OrderedLock* lock_;  //!< @brief Pointer to the underlying `OrderedLock`
-                       //!< object for synchronization.
-  size_t length_;  //!< @brief The number of blocks/threads that this section
-                   //!< encompasses.
+  /// Pointer to the underlying `OrderedLock` object for synchronization.
+  OrderedLock* lock_;
+
+  /// The number of blocks/threads that this section encompasses.
+  size_t length_;
 
  public:
   /**

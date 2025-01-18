@@ -1,7 +1,18 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file genotyper.cc
+ *
+ * @brief Implements the Genotyper class for calculating genotype likelihoods
+ * and confidence scores.
+ *
+ * This file is part of the Genie project, which focuses on efficient genomic
+ * data compression and analysis. The `Genotyper` class is responsible for
+ * computing allele likelihoods, genotype likelihoods, and entropy based on
+ * input sequence and quality pileups. It provides the foundation for
+ * determining genotypes and quantizer indices in genomic data processing
+ * workflows.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,10 +34,12 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/quality/calq/error_exception_reporter.h"
-#include "genie/quality/calq/log.h"
+#include "genie/util/log.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Calq";
 
 namespace genie::quality::calq {
 
@@ -69,15 +82,9 @@ Genotyper::Genotyper(const int polyploidy, const int qual_offset,
       polyploidy_(polyploidy),
       qual_offset_(qual_offset),
       debug_(debug) {
-  if (nr_quantizers < 1) {
-    THROW_ERROR_EXCEPTION("nrQuantizers must be greater than zero");
-  }
-  if (polyploidy < 1) {
-    THROW_ERROR_EXCEPTION("Polyploidy must be greater than zero");
-  }
-  if (qual_offset < 0) {
-    THROW_ERROR_EXCEPTION("qualOffset must not be negative");
-  }
+  UTILS_DIE_IF(nr_quantizers < 1, "nrQuantizers must be greater than zero");
+  UTILS_DIE_IF(polyploidy < 1, "polyploidy must be greater than zero");
+  UTILS_DIE_IF(qual_offset < 0, "qualOffset must not be negative");
 
   InitLikelihoods();
 }
@@ -92,9 +99,8 @@ double Genotyper::ComputeEntropy(const std::string& seq_pileup,
                                  const std::string& qual_pileup) {
   const size_t depth = seq_pileup.length();
 
-  if (depth != qual_pileup.length()) {
-    THROW_ERROR_EXCEPTION("Lengths of seqPileup and qualPileup differ");
-  }
+  UTILS_DIE_IF(depth != qual_pileup.length(),
+               "Lengths of seqPileup and qualPileup differ");
 
   if (depth == 0) {
     return -1.0;  // computation of entropy not possible
@@ -120,9 +126,8 @@ int Genotyper::ComputeQuantizerIndex(const std::string& seq_pileup,
                                      const std::string& qual_pileup) {
   const size_t depth = seq_pileup.length();
 
-  if (depth != qual_pileup.length()) {
-    THROW_ERROR_EXCEPTION("Lengths of seqPileup and qualPileup differ");
-  }
+  UTILS_DIE_IF(depth != qual_pileup.length(),
+               "Lengths of seqPileup and qualPileup differ");
 
   if (depth == 0) {
     return nr_quantizers_;  // computation of quantizer index not possible
@@ -160,10 +165,7 @@ int Genotyper::ComputeQuantizerIndex(const std::string& seq_pileup,
     s << " " << std::fixed << std::setw(6) << std::setprecision(4)
       << std::setfill('0') << 1 - confidence << " " << quant << std::endl;
 
-    std::string line;
-    while (std::getline(s, line)) {
-      GetLogging().error_out(line);
-    }
+    UTILS_LOG(util::Logger::Severity::INFO, s.str());
   }
 
   return quant;

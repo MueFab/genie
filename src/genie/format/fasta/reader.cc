@@ -23,6 +23,7 @@
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 FastaReader::FastaReader(std::istream& fasta_file, std::istream& fai_file,
                          std::istream& sha256_file, std::string path)
     : hash_file_(sha256_file),
@@ -31,16 +32,19 @@ FastaReader::FastaReader(std::istream& fasta_file, std::istream& fai_file,
       path_(std::move(path)) {}
 
 // -----------------------------------------------------------------------------
+
 std::map<size_t, std::string> FastaReader::GetSequences() const {
   return fai_.GetSequences();
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t FastaReader::GetLength(const std::string& name) const {
   return fai_.GetLength(name);
 }
 
 // -----------------------------------------------------------------------------
+
 std::string FastaReader::LoadSection(const std::string& sequence,
                                      uint64_t start, const uint64_t end) const {
   const auto start_pos = fai_.GetFilePosition(sequence, start);
@@ -64,6 +68,7 @@ std::string FastaReader::LoadSection(const std::string& sequence,
 }
 
 // -----------------------------------------------------------------------------
+
 void FastaReader::index(std::istream& fasta, std::ostream& fai) {
   std::string buffer;
   FaiFile fai_file;
@@ -104,6 +109,7 @@ void FastaReader::index(std::istream& fasta, std::ostream& fai) {
 }
 
 // -----------------------------------------------------------------------------
+
 void FastaReader::hash(const FaiFile& fai, std::istream& fasta,
                        std::ostream& hash) {
   std::vector<std::pair<std::string, std::string>> hashes;
@@ -117,6 +123,7 @@ void FastaReader::hash(const FaiFile& fai, std::istream& fasta,
 }
 
 // -----------------------------------------------------------------------------
+
 core::meta::Reference FastaReader::GetMeta() const {
   const std::string basename =
       path_.substr(path_.find_last_of('/') + 1,

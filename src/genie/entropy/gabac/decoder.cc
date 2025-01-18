@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -26,6 +26,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Descriptor DecompressTokens(
     const EncodingConfiguration& conf0, const EncodingConfiguration&,
     core::AccessUnit::Subsequence&& data) {
@@ -131,6 +132,7 @@ core::AccessUnit::Descriptor DecompressTokens(
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Decoder::Decompress(
     const EncodingConfiguration& conf, core::AccessUnit::Subsequence&& data,
     bool mm_coder_enabled) {
@@ -176,6 +178,7 @@ core::AccessUnit::Subsequence Decoder::Decompress(
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, bool mm_coder_enabled) {
@@ -192,10 +195,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
     }
 
     if (size) {
-      std::get<1>(desc).AddInteger("Size-gabac-total-comp",
+      std::get<1>(desc).AddInteger("size-gabac-total-comp",
                                    static_cast<int64_t>(size));
       std::get<1>(desc).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+          "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
               "-comp",
           static_cast<int64_t>(size));
     }
@@ -211,10 +214,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (size) {
       std::get<1>(desc).AddInteger(
-          "Size-gabac-total-raw",
+          "size-gabac-total-raw",
           static_cast<int64_t>(std::get<0>(desc).begin()->GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+          "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
               "-raw",
           static_cast<int64_t>(std::get<0>(desc).begin()->GetRawSize()));
     }
@@ -231,10 +234,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
       if (!sub_sequence.IsEmpty()) {
         std::get<1>(desc).AddInteger(
-            "Size-gabac-total-comp",
+            "size-gabac-total-comp",
             static_cast<int64_t>(sub_sequence.GetRawSize()));
         std::get<1>(desc).AddInteger(
-            "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+            "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
                 "-" +
                 GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name +
                 "-comp",
@@ -247,10 +250,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
       if (!std::get<0>(desc).Get(snd).IsEmpty()) {
         std::get<1>(desc).AddInteger(
-            "Size-gabac-total-raw",
+            "size-gabac-total-raw",
             static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
         std::get<1>(desc).AddInteger(
-            "Size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
+            "size-gabac-" + GetDescriptor(std::get<0>(desc).GetId()).name +
                 "-" +
                 GetDescriptor(std::get<0>(desc).GetId()).sub_seqs[snd].name +
                 "-raw",

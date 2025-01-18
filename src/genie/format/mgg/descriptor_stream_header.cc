@@ -16,30 +16,37 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStreamHeader::GetReserved() const { return reserved_; }
 
 // -----------------------------------------------------------------------------
+
 core::GenDesc DescriptorStreamHeader::GetDescriptorId() const {
   return descriptor_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 core::record::ClassType DescriptorStreamHeader::GetClassType() const {
   return class_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t DescriptorStreamHeader::GetNumBlocks() const { return num_blocks_; }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStreamHeader::AddBlock() { num_blocks_++; }
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamHeader::DescriptorStreamHeader()
     : DescriptorStreamHeader(false, static_cast<core::GenDesc>(0),
                              core::record::ClassType::kNone, 0) {}
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamHeader::DescriptorStreamHeader(
     const bool reserved, const core::GenDesc gen_desc,
     const core::record::ClassType class_id, const uint32_t num_blocks)
@@ -49,6 +56,7 @@ DescriptorStreamHeader::DescriptorStreamHeader(
       num_blocks_(num_blocks) {}
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStreamHeader::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteBits(reserved_, 1);
   bit_writer.WriteBits(static_cast<uint8_t>(descriptor_id_), 7);
@@ -58,6 +66,7 @@ void DescriptorStreamHeader::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -71,12 +80,14 @@ DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DescriptorStreamHeader::GetKey() const {
   static const std::string key = "dshd";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStreamHeader::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;

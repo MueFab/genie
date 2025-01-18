@@ -24,11 +24,13 @@
 namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(std::string ref_file, std::string output_file)
     : fasta_file_path_(std::move(ref_file)),
       output_file_path_(std::move(output_file)) {}
 
 // -----------------------------------------------------------------------------
+
 int StepRef(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -48,6 +50,7 @@ int StepRef(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t MappedLength(const std::string& cigar) {
   if (cigar == "*") {
     return 0;
@@ -66,6 +69,7 @@ uint64_t MappedLength(const std::string& cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 char ConvertECigar2CigarChar(const char token) {
   static const auto lut_loc = []() -> std::string {  // NOLINT
     std::string lut(128, 0);
@@ -86,6 +90,7 @@ char ConvertECigar2CigarChar(const char token) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ECigar2Cigar(const std::string& ecigar) {
   std::string cigar;
   cigar.reserve(ecigar.size());
@@ -123,6 +128,7 @@ std::string ECigar2Cigar(const std::string& ecigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessSecondMappedSegment(const size_t s,
                                 const core::record::Record& record,
                                 int64_t& tlen, uint16_t& flags,
@@ -179,6 +185,7 @@ void ProcessSecondMappedSegment(const size_t s,
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t ComputeSamFlags(const size_t s, const size_t a,
                          const core::record::Record& record) {
   uint16_t flags = 0;
@@ -218,6 +225,7 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void ProcessFirstMappedSegment(const size_t s, const size_t a,
                                const core::record::Record& record,
                                std::string& rname, std::string& pos,
@@ -265,6 +273,7 @@ void ProcessFirstMappedSegment(const size_t s, const size_t a,
 }
 
 // -----------------------------------------------------------------------------
+
 void Exporter::SkipIn(const util::Section& id) {
   [[maybe_unused]] util::OrderedSection sec(&lock_, id);
 }
@@ -373,10 +382,10 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
     }
   }
 
-  GetStats().AddInteger("Size-sam-seq", static_cast<int64_t>(size_seq));
-  GetStats().AddInteger("Size-sam-name", static_cast<int64_t>(size_name));
-  GetStats().AddInteger("Size-sam-qual", static_cast<int64_t>(size_qual));
-  GetStats().AddInteger("Size-sam-total",
+  GetStats().AddInteger("size-sam-seq", static_cast<int64_t>(size_seq));
+  GetStats().AddInteger("size-sam-name", static_cast<int64_t>(size_name));
+  GetStats().AddInteger("size-sam-qual", static_cast<int64_t>(size_qual));
+  GetStats().AddInteger("size-sam-total",
                         static_cast<int64_t>(size_qual + size_name + size_seq));
   GetStats().AddDouble("time-sam-export", watch.Check());
 }

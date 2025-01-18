@@ -51,17 +51,10 @@ namespace genie::util {
  */
 template <typename T>
 class Factory final : public GenericFactory {
-  /**
-   * @brief A map storing factory functions for different types.
-   *
-   * The `factories` map associates a unique identifier (`uint8_t`) with a
-   * factory function. Each factory function is responsible for creating a
-   * `std::unique_ptr` to an object of type `T` using the given parameters.
-   */
+  /// Stores the registered factory functions for each type ID
   std::map<uint8_t,
            std::function<std::unique_ptr<T>(core::GenDesc desc, BitReader&)>>
-      factories_;  //!< @brief Stores the registered factory functions for
-                   //!< each type ID.
+      factories_;
 
  public:
   /**

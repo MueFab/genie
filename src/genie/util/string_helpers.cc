@@ -32,23 +32,27 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 std::string& Rtrim(std::string& s, const char* t) {
   s.erase(s.find_last_not_of(t) + 1);
   return s;
 }
 
 // -----------------------------------------------------------------------------
+
 std::string& Ltrim(std::string& s, const char* t) {
   s.erase(0, s.find_first_not_of(t));
   return s;
 }
 
 // -----------------------------------------------------------------------------
+
 std::string& Trim(std::string& s, const char* t) {
   return Ltrim(Rtrim(s, t), t);
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Tokenize(const std::string& str, const char delim) {
   size_t start;
   size_t end = 0;
@@ -61,6 +65,7 @@ std::vector<std::string> Tokenize(const std::string& str, const char delim) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ToHex(const std::string& bin) {
   static constexpr char lut[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                                  '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -73,6 +78,7 @@ std::string ToHex(const std::string& bin) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string FromHex(const std::string& hex) {
   static constexpr std::array<char, 256> lut = []() -> std::array<char, 256> {
     std::array<char, 256> ret{};

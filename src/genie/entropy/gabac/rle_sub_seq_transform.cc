@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,6 +17,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void TransformRleCoding(const paramcabac::Subsequence& subseq_cfg,
                         std::vector<util::DataBlock>* transformed_subseqs) {
   assert(transformed_subseqs != nullptr);
@@ -79,6 +80,7 @@ void TransformRleCoding(const paramcabac::Subsequence& subseq_cfg,
 }
 
 // -----------------------------------------------------------------------------
+
 void InverseTransformRleCoding(
     const paramcabac::Subsequence& subseq_cfg,
     std::vector<util::DataBlock>* transformed_subseqs) {

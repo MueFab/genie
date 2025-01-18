@@ -46,19 +46,23 @@ namespace genie::util {
  * and that the pipeline can be safely stopped when required.
  */
 class ThreadManager {
-  uint64_t
-      counter_;  //!< @brief Counter for tracking the next block identifier.
-  std::vector<std::thread>
-      threads_;  //!< @brief Storage for all active threads in the pipeline.
-  std::atomic<bool>
-      stop_flag_;    //!< @brief Indicates whether the threads should stop after
-                     //!< completing current blocks.
-  bool abort_flag_;  //!< @brief If true, signals to skip final data flushing
-                     //!< and terminate immediately.
-  std::vector<OriginalSource*>
-      source_;  //!< @brief Entry points for feeding data into the pipeline.
-  std::mutex lock_;  //!< @brief Mutex for synchronizing access to the
-                     //!< `counter` variable.
+  /// Counter for tracking the next block identifier.
+  uint64_t counter_;
+
+  /// Storage for all active threads in the pipeline.
+  std::vector<std::thread>threads_;
+
+  /// Indicates whether the threads should stop after completing current blocks.
+  std::atomic<bool> stop_flag_;
+
+  /// If true, signals to skip final data flushing and terminate immediately.
+  bool abort_flag_;
+
+  /// Entry points for feeding data into the pipeline.
+  std::vector<OriginalSource*> source_;
+
+  /// Mutex for synchronizing access to the `counter` variable.
+  std::mutex lock_;
 
   /**
    * @brief Executes the main logic for each thread in the pipeline.

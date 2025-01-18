@@ -19,6 +19,7 @@
 namespace genie::format::mgg::reference::location::external {
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::meta::RefBase> Fasta::decapsulate() {
   auto ret = std::make_unique<core::meta::external_ref::Fasta>(
       std::move(GetUri()),
@@ -32,11 +33,13 @@ std::unique_ptr<core::meta::RefBase> Fasta::decapsulate() {
 }
 
 // -----------------------------------------------------------------------------
+
 Fasta::Fasta(const uint8_t reserved, std::string uri,
              const ChecksumAlgorithm algo)
     : External(reserved, std::move(uri), algo, RefType::FASTA_REF) {}
 
 // -----------------------------------------------------------------------------
+
 Fasta::Fasta(util::BitReader& reader, const size_t seq_count)
     : External(reader) {
   for (size_t i = 0; i < seq_count; ++i) {
@@ -48,6 +51,7 @@ Fasta::Fasta(util::BitReader& reader, const size_t seq_count)
 }
 
 // -----------------------------------------------------------------------------
+
 Fasta::Fasta(util::BitReader& reader, const uint8_t reserved, std::string uri,
              const ChecksumAlgorithm algo, const size_t seq_count)
     : External(reserved, std::move(uri), algo, RefType::FASTA_REF) {
@@ -60,11 +64,13 @@ Fasta::Fasta(util::BitReader& reader, const uint8_t reserved, std::string uri,
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::string>& Fasta::GetSeqChecksums() const {
   return seq_checksums_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Fasta::AddSeqChecksum(std::string checksum) {
   UTILS_DIE_IF(
       checksum.size() !=
@@ -74,6 +80,7 @@ void Fasta::AddSeqChecksum(std::string checksum) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Fasta::Write(util::BitWriter& writer) {
   External::Write(writer);
   for (const auto& s : seq_checksums_) {
@@ -82,6 +89,7 @@ void Fasta::Write(util::BitWriter& writer) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Fasta::AddChecksum(std::string checksum) {
   UTILS_DIE_IF(
       checksum.size() !=

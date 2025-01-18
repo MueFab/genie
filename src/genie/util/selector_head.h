@@ -43,12 +43,12 @@ namespace genie::util {
  * @tparam Tin The type of incoming data to be routed.
  */
 template <typename Tin>
-class SelectorHead : public Drain<Tin> {
-  std::vector<Drain<Tin>*> mods_;  //!< @brief Stores the downstream modules
-                                   //!< (branches) to which data is routed.
-  std::function<size_t(const Tin& t)>
-      select_;  //!< @brief The selection operation used to choose the
-                //!< appropriate branch.
+class SelectorHead final : public Drain<Tin> {
+  /// Stores the downstream modules (branches) to which data is routed.
+  std::vector<Drain<Tin>*> mods_;
+
+  /// The selection operation used to choose the appropriate branch.
+  std::function<size_t(const Tin& t)> select_;
 
  protected:
   /**
@@ -65,7 +65,7 @@ class SelectorHead : public Drain<Tin> {
    * @param global_id The global section identifier for tracking the data
    * flow.
    */
-  virtual void Route(Tin&& t, size_t mod_id, Section global_id);
+  void Route(Tin&& t, size_t mod_id, Section global_id);
 
   /**
    * @brief Default selection operation for routing data.
@@ -165,7 +165,7 @@ class SelectorHead : public Drain<Tin> {
 
 // -----------------------------------------------------------------------------
 
-#include "genie/util/selector_head.impl.h"
+#include "genie/util/selector_head.impl.h"  // NOLINT
 
 // -----------------------------------------------------------------------------
 

@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implementation of the Decoder class for parsing and extracting read
+ * names.
+ *
+ * This file contains the implementation of the `Decoder::Process` method,
+ * which decodes access unit descriptors to extract read names and generates
+ * performance statistics. It efficiently processes the encoded subsequences,
+ * reconstructing the original read names into a vector of strings.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,6 +28,7 @@
 namespace genie::name::write_out {
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     core::AccessUnit::Descriptor& desc) {
   std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;

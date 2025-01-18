@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file support_values.cc
+ * @brief Implementation of CABAC support values for Genie.
+ *
+ * Provides the `SupportValues` class to manage parameters like output symbol
+ * size, coding subsymbol size, coding order, and flags for shared subsymbol
+ * LUTs and PRVs. Includes methods for serialization and JSON conversion.
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -14,9 +19,11 @@
 namespace genie::entropy::paramcabac {
 
 // -----------------------------------------------------------------------------
+
 SupportValues::SupportValues() : SupportValues(8, 8, 0) {}
 
 // -----------------------------------------------------------------------------
+
 SupportValues::SupportValues(const uint8_t output_symbol_size,
                              const uint8_t coding_subsym_size,
                              const uint8_t coding_order,

@@ -18,6 +18,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 template <typename Lambda>
 bool MgbFile::base_sorter(
     const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>& u1,

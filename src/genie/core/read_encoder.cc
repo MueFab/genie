@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,20 +16,24 @@
 namespace genie::core {
 
 // -----------------------------------------------------------------------------
+
 void ReadEncoder::SetQvCoder(util::SideSelector<QvEncoder, QvEncoder::qv_coded,
                                                 const record::Chunk&>* coder) {
   qvcoder_ = coder;
 }
 
 // -----------------------------------------------------------------------------
+
 void ReadEncoder::SetNameCoder(name_selector* coder) { namecoder_ = coder; }
 
 // -----------------------------------------------------------------------------
+
 void ReadEncoder::SetEntropyCoder(entropy_selector* coder) {
   entropycoder_ = coder;
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit ReadEncoder::EntropyCodeAu(entropy_selector* entropycoder,
                                       AccessUnit&& a, bool write_raw) {
   AccessUnit au = std::move(a);
@@ -62,6 +66,7 @@ AccessUnit ReadEncoder::EntropyCodeAu(entropy_selector* entropycoder,
 }
 
 // -----------------------------------------------------------------------------
+
 AccessUnit ReadEncoder::EntropyCodeAu(AccessUnit&& a) const {
   return EntropyCodeAu(entropycoder_, std::move(a), write_out_streams_);
 }

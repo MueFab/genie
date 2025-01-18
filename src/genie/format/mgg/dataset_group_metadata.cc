@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroupMetadata::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -28,12 +29,14 @@ bool DatasetGroupMetadata::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroupMetadata::GetKey() const {
   static const std::string key = "dgmd";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupMetadata::DatasetGroupMetadata(
     util::BitReader& bitreader, const core::MpegMinorVersion version)
     : version_(version) {
@@ -52,6 +55,7 @@ DatasetGroupMetadata::DatasetGroupMetadata(
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupMetadata::DatasetGroupMetadata(
     const uint8_t dataset_group_id, std::string dg_metatdata_value,
     const core::MpegMinorVersion version)
@@ -60,6 +64,7 @@ DatasetGroupMetadata::DatasetGroupMetadata(
       dg_metadata_value_(std::move(dg_metatdata_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupMetadata::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -69,21 +74,25 @@ void DatasetGroupMetadata::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetGroupMetadata::GetDatasetGroupId() const {
   return dataset_group_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroupMetadata::GetMetadata() const {
   return dg_metadata_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 std::string DatasetGroupMetadata::decapsulate() {
   return std::move(dg_metadata_value_);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroupMetadata::PatchId(const uint8_t group_id) {
   dataset_group_id_ = group_id;
 }

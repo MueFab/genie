@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -22,6 +22,7 @@
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
+
 void code(const std::string& input_file_path,
           const std::string& output_file_path, const std::string& config_path,
           size_t blocksize, uint8_t desc_id, uint8_t subseq_id, bool decode,

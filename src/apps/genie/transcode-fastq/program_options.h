@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -15,6 +15,8 @@
 // -----------------------------------------------------------------------------
 
 namespace genie_app::transcode_fastq {
+
+std::string file_extension(const std::string& path);
 
 /**
  * @brief

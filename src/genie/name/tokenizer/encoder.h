@@ -24,7 +24,6 @@
 
 // -----------------------------------------------------------------------------
 
-#include <string>
 #include <tuple>
 
 #include "genie/core/name_encoder.h"

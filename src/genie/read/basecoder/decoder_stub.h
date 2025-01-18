@@ -50,17 +50,29 @@ class DecoderStub : public core::ReadDecoder {
    * decoding, including quality values, record positions, and CIGAR strings.
    */
   struct DecodingState {
-    core::AccessUnit::Descriptor
-        qv_stream;  //!< @brief Quality value descriptor.
-    core::AccessUnit::Descriptor
-        name_stream;                    //!< @brief Name stream descriptor.
-    size_t num_records;                 //!< @brief Number of records to Decode.
-    size_t num_segments;                //!< @brief Number of template segments.
-    size_t ref;                         //!< @brief Reference identifier.
-    std::vector<std::string> e_cigars;  //!< @brief Vector of CIGAR strings.
-    std::vector<uint64_t> positions;  //!< @brief Vector of reference positions.
-    std::unique_ptr<core::parameter::QualityValues>
-        qv_param;  //!< @brief Quality value parameters.
+    /// Quality value descriptor.
+    core::AccessUnit::Descriptor qv_stream;
+
+    /// Name stream descriptor.
+    core::AccessUnit::Descriptor name_stream;
+
+    /// Number of records to Decode.
+    size_t num_records;
+
+    /// Number of template segments.
+    size_t num_segments;
+
+    /// Reference identifier.
+    size_t ref;
+
+    /// Vector of CIGAR strings.
+    std::vector<std::string> e_cigars;
+
+    /// Vector of reference positions.
+    std::vector<uint64_t> positions;
+
+    /// Quality value parameters.
+    std::unique_ptr<core::parameter::QualityValues> qv_param;
 
     /**
      * @brief Constructs a `DecodingState` from an access unit.
@@ -145,6 +157,8 @@ class DecoderStub : public core::ReadDecoder {
 // -----------------------------------------------------------------------------
 
 }  // namespace genie::read::basecoder
+
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_READ_BASECODER_DECODER_STUB_H_
 

@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
@@ -17,12 +17,16 @@
 
 #include "cli11/CLI11.hpp"
 #include "genie/util/runtime_exception.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/TranscodeSam";
 
 namespace genie_app::transcode_sam {
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(const int argc, char* argv[])
     : verbosity_level_(0),
       force_overwrite_(false),
@@ -34,23 +38,23 @@ ProgramOptions::ProgramOptions(const int argc, char* argv[])
 }
 
 // -----------------------------------------------------------------------------
+
 ProgramOptions::~ProgramOptions() = default;
 
 // -----------------------------------------------------------------------------
+
 genie::format::sam::Config ProgramOptions::ToConfig() const {
   genie::format::sam::Config config;
   config.tmp_dir_path_ = tmp_dir_path_;
   config.fasta_file_path_ = fasta_file_path_;
   config.input_file_ = input_file_;
-  config.output_file_ = output_file_;
-  config.force_overwrite_ = force_overwrite_;
-  config.no_ref_ = no_ref_;
   config.clean_ = clean_;
   config.num_threads_ = num_threads_;
   return config;
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
   CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
@@ -86,7 +90,7 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::CallForHelp&) {
-    std::cerr << app.help() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, app.help());
     help_ = true;
     return;
   } catch (const CLI::ParseError& e) {
@@ -97,6 +101,7 @@ void ProgramOptions::ProcessCommandLine(const int argc, char* argv[]) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateInputFile(const std::string& file) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -111,6 +116,7 @@ void ValidateInputFile(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateReference(const std::string& file) {
   UTILS_DIE_IF(!std::filesystem::exists(file),
                "Reference file does not exist: " + file);
@@ -122,6 +128,7 @@ void ValidateReference(const std::string& file) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateOutputFile(const std::string& file, const bool forced) {
   if (file.substr(0, 2) == "-.") {
     return;
@@ -146,6 +153,7 @@ void ValidateOutputFile(const std::string& file, const bool forced) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string size_string(const std::uintmax_t f_size) {
   size_t exponent = 0;
   auto size = static_cast<double>(f_size);
@@ -166,6 +174,7 @@ std::string size_string(const std::uintmax_t f_size) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string parent_dir(const std::string& path) {
   std::string ret;
 
@@ -182,6 +191,7 @@ std::string parent_dir(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string random_string(const size_t length) {
   // Define the character set
   constexpr char charset[] =
@@ -206,6 +216,7 @@ std::string random_string(const size_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ValidateWorkingDir(const std::string& dir) {
   UTILS_DIE_IF(!std::filesystem::exists(dir),
                "Directory does not exist: " + dir);
@@ -231,38 +242,41 @@ void ValidateWorkingDir(const std::string& dir) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ProgramOptions::validate() {
   ValidateInputFile(input_file_);
   if (input_file_.substr(0, 2) != "-.") {
     input_file_ = std::filesystem::canonical(input_file_).string();
     std::replace(input_file_.begin(), input_file_.end(), '\\', '/');
-    std::cerr << "Input file: " << input_file_ << " with Size "
-              << size_string(std::filesystem::file_size(input_file_))
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Input file: " + input_file_ + " with size " +
+                  size_string(std::filesystem::file_size(input_file_)));
   } else {
-    std::cerr << "Input file: stdin" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Input file: stdin");
   }
-
-  std::cerr << std::endl;
 
   ValidateOutputFile(output_file_, force_overwrite_);
   if (output_file_.substr(0, 2) != "-.") {
     output_file_ = std::filesystem::weakly_canonical(output_file_).string();
     std::replace(output_file_.begin(), output_file_.end(), '\\', '/');
-    std::cerr << "Output file: " << output_file_ << " with "
-              << size_string(
-                     std::filesystem::space(parent_dir(output_file_)).available)
-              << " available" << std::endl;
+
+    UTILS_LOG(
+        genie::util::Logger::Severity::INFO,
+        "Output file: " + output_file_ + " with " +
+            size_string(
+                std::filesystem::space(parent_dir(output_file_)).available) +
+            " available");
   } else {
-    std::cerr << "Output file: stdout" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO, "Output file: stdout");
   }
 
   ValidateWorkingDir(tmp_dir_path_);
   tmp_dir_path_ = std::filesystem::canonical(tmp_dir_path_).string();
   std::replace(tmp_dir_path_.begin(), tmp_dir_path_.end(), '\\', '/');
-  std::cerr << "Working directory: " << tmp_dir_path_ << " with "
-            << size_string(std::filesystem::space(tmp_dir_path_).available)
-            << " available" << std::endl;
+  UTILS_LOG(genie::util::Logger::Severity::INFO,
+            "Working directory: " + tmp_dir_path_ + " with " +
+                size_string(std::filesystem::space(tmp_dir_path_).available) +
+                " available");
 
   if (std::thread::hardware_concurrency()) {
     UTILS_DIE_IF(
@@ -270,16 +284,17 @@ void ProgramOptions::validate() {
         "Invalid number of threads: " + std::to_string(num_threads_) +
             ". Your system supports between 1 and " +
             std::to_string(std::thread::hardware_concurrency()) + " threads.");
-    std::cerr << "Threads: " << num_threads_ << " with "
-              << std::thread::hardware_concurrency() << " supported"
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Threads: " + std::to_string(num_threads_) + " with " +
+                  std::to_string(std::thread::hardware_concurrency()) +
+                  " supported");
   } else {
     UTILS_DIE_IF(!num_threads_,
                  "Could not detect hardware concurrency level. Please provide "
                  "a number of threads manually.");
-    std::cerr << "Threads: " << num_threads_
-              << " (could not detected supported number automatically)"
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Threads: " + std::to_string(num_threads_) +
+                  " (could not detected supported number automatically)");
   }
 
   UTILS_DIE_IF(fasta_file_path_.empty() && !no_ref_ && input_file_.size() > 4 &&
@@ -294,8 +309,6 @@ void ProgramOptions::validate() {
     ValidateReference(fasta_file_path_);
     fasta_file_path_ = std::filesystem::canonical(fasta_file_path_).string();
   }
-
-  std::cerr << std::endl;
 }
 
 // -----------------------------------------------------------------------------

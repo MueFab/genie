@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implementation of the Spring Decoder module for processing sequencing
+ * data.
+ *
+ * This file contains the implementation of the decoder for the Spring
+ * framework, including functions for reading, decoding, and managing paired and
+ * unpaired sequencing records. The module handles complex pairing logic,
+ * mismatch resolution, and temporary file management for efficient processing.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -14,6 +23,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -23,14 +33,17 @@
 
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
+#include "genie/util/log.h"
 #include "genie/util/stop_watch.h"
 #include "kwaymergesort/kwaymergesort.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Spring";
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                    std::array<std::vector<Record>, 2>& matched_records,
                    std::array<std::vector<Record>, 2>& unmatched_records,
@@ -264,6 +277,7 @@ void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 }
 
 // -----------------------------------------------------------------------------
+
 Decoder::Decoder(const std::string& working_dir, const bool comb_p,
                  const bool paired_end)
     : combine_pairs_(comb_p), unmatched_record_index_{} {
@@ -279,7 +293,7 @@ Decoder::Decoder(const std::string& working_dir, const bool comb_p,
   }
   UTILS_DIE_IF(!std::filesystem::create_directory(basedir_),
                "Cannot create temporary directory.");
-  std::cerr << "Temporary directory: " << basedir_ << "\n";
+  UTILS_LOG(util::Logger::Severity::INFO, "Temporary directory: " + basedir_);
   cp_.unaligned_reads_flag = false;
   cp_.paired_end = paired_end;
   // temporary files for combine pairs case
@@ -299,6 +313,7 @@ Decoder::Decoder(const std::string& working_dir, const bool comb_p,
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
   core::record::Chunk chunk;
   core::AccessUnit au = EntropyCodeAu(std::move(t), true);
@@ -427,6 +442,7 @@ void Decoder::FlowIn(core::AccessUnit&& t, const util::Section& id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::ReadRec(std::ifstream& i, Record& r) {
   UTILS_DIE_IF(!std::getline(i, r.name), "Error reading tmp file");
   UTILS_DIE_IF(!std::getline(i, r.seq), "Error reading tmp file");
@@ -434,6 +450,7 @@ void Decoder::ReadRec(std::ifstream& i, Record& r) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::Add(core::record::Chunk& chunk, core::record::Record&& r,
                   uint64_t& pos) {
   chunk.GetData().push_back(std::move(r));
@@ -446,6 +463,7 @@ void Decoder::Add(core::record::Chunk& chunk, core::record::Record&& r,
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FlushIn(uint64_t& pos) {
   core::record::Chunk chunk;
 
@@ -464,8 +482,10 @@ void Decoder::FlushIn(uint64_t& pos) {
   // Higher BIN_SIZE_COMBINE_PAIRS can lead to speed up due to fewer disk
   // accesses.
 
+  double time_name_sorting = 0;
+  double time_record_sorting = 0;
   if (!cp_.unaligned_reads_flag && cp_.paired_end && combine_pairs_) {
-    std::cerr << "Order unmatched decoded reads..." << std::endl;
+    UTILS_LOG(util::Logger::Severity::INFO, "Order unmatched decoded reads...");
     file_out_unmatched1_.close();
     file_out_unmatched2_.close();
     file_out_unmatched_read_names_1_.close();
@@ -475,7 +495,8 @@ void Decoder::FlushIn(uint64_t& pos) {
     if (unmatched_record_index_[0] != unmatched_record_index_[1])
       UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
     uint32_t size_unmatched = unmatched_record_index_[0];
-    std::cerr << "Pairs to match: " << size_unmatched << "\n";
+    UTILS_LOG(util::Logger::Severity::INFO,
+              "Pairs to match: " + std::to_string(size_unmatched));
 
     std::string file_unmatched_read_names_1_sorted =
         file_unmatched_read_names_1_ + ".sorted";
@@ -483,34 +504,32 @@ void Decoder::FlushIn(uint64_t& pos) {
         file_unmatched_read_names_2_ + ".sorted";
 
     if (size_unmatched > 0) {
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Processing " + std::to_string(size_unmatched) +
+                    " unmatched reads...");
+      UTILS_LOG(util::Logger::Severity::INFO, "---- Sorting read names");
+      util::Watch sort_watch;
       // first sort f_out_unmatched_read_n_ames_* using disk-based merge
       // sort from fork of https://github.com/arq5x/kway-mergesort
-      auto sort_read_names_start = std::chrono::steady_clock::now();
       size_t max_buffer_size = 2000000000;  // roughly 2 GB
       std::ofstream f_out_unmatched_read_names_1_sorted(
           file_unmatched_read_names_1_sorted);
       std::ofstream f_out_unmatched_read_names_2_sorted(
           file_unmatched_read_names_2_sorted);
-      auto* sorter = new kwaymergesort::KwayMergeSort(
+      std::make_unique<kwaymergesort::KwayMergeSort>(
           file_unmatched_read_names_1_, &f_out_unmatched_read_names_1_sorted,
-          static_cast<int>(max_buffer_size), false, basedir_);
-      sorter->Sort();
-      delete sorter;
+          static_cast<int>(max_buffer_size), false, basedir_)
+          ->Sort();
       f_out_unmatched_read_names_1_sorted.close();
-      sorter = new kwaymergesort::KwayMergeSort(
+      std::make_unique<kwaymergesort::KwayMergeSort>(
           file_unmatched_read_names_2_, &f_out_unmatched_read_names_2_sorted,
-          static_cast<int>(max_buffer_size), false, basedir_);
-      sorter->Sort();
-      delete sorter;
+          static_cast<int>(max_buffer_size), false, basedir_)
+          ->Sort();
       f_out_unmatched_read_names_2_sorted.close();
-      auto sort_read_names_end = std::chrono::steady_clock::now();
 
-      std::cerr << "Time for sorting read names: "
-                << std::chrono::duration_cast<std::chrono::seconds>(
-                       sort_read_names_end - sort_read_names_start)
-                       .count()
-                << " s\n";
+      time_name_sorting = sort_watch.Check();
 
+      util::Watch reorder_unmatched_start;
       // now build an index that tells for read `i` in file_2, where it's
       // pair in file_1 lies.
       std::vector<uint32_t> index_file_1(size_unmatched);
@@ -561,15 +580,14 @@ void Decoder::FlushIn(uint64_t& pos) {
 
       index_file_1.clear();
 
-      auto reorder_unmatched_start = std::chrono::steady_clock::now();
       // we will write the reads in file 1 in the same order as in
       // file_unmatched_fastq1
       std::ifstream fin_unmatched1(file_unmatched_fastq1_);
       UTILS_DIE_IF(!fin_unmatched1,
-                     "Cannot open file to read: " + file_unmatched_fastq1_);
+                   "Cannot open file to read: " + file_unmatched_fastq1_);
       // now reorder the unmatched records in file 2, by picking them in
       // chunks
-      uint32_t bin_size = std::min(kBin_Size_Combine_Pairs, size_unmatched);
+      uint32_t bin_size = std::min(kBinSizeCombinePairs, size_unmatched);
       std::vector<Record> records_bin(bin_size);
       Record tmp_fastq_record;
       for (uint32_t i = 0; i <= size_unmatched / bin_size; i++) {
@@ -614,12 +632,7 @@ void Decoder::FlushIn(uint64_t& pos) {
       }
       std::filesystem::remove(file_unmatched_read_names_1_sorted);
       std::filesystem::remove(file_unmatched_read_names_2_sorted);
-      auto reorder_unmatched_end = std::chrono::steady_clock::now();
-      std::cerr << "Time for reordering unmatched reads: "
-                << std::chrono::duration_cast<std::chrono::seconds>(
-                       reorder_unmatched_end - reorder_unmatched_start)
-                       .count()
-                << " s\n";
+      time_record_sorting = reorder_unmatched_start.Check();
     }
     std::filesystem::remove(file_unmatched_fastq1_);
     std::filesystem::remove(file_unmatched_fastq2_);
@@ -628,6 +641,10 @@ void Decoder::FlushIn(uint64_t& pos) {
   }
 
   if (size_t size = chunk.GetData().size() * 2) {
+    chunk.GetStats().AddDouble("time-spring-unmatched-name-sort",
+                               time_name_sorting);
+    chunk.GetStats().AddDouble("time-spring-unmatched-record-sort",
+                               time_record_sorting);
     FlowOut(std::move(chunk), {pos, size, true});
     pos += size;
   }
@@ -638,6 +655,7 @@ void Decoder::FlushIn(uint64_t& pos) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::SkipIn(const util::Section& id) {
   {
     util::OrderedSection sec(&lock_, id);  // NOLINT

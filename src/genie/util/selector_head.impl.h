@@ -34,6 +34,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::Route(Tin&& t, const size_t mod_id, Section global_id) {
   for (size_t i = 0; i < mods_.size(); ++i) {
@@ -46,42 +47,49 @@ void SelectorHead<Tin>::Route(Tin&& t, const size_t mod_id, Section global_id) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 size_t SelectorHead<Tin>::DefaultSelect(const Tin&) {
   return 0;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 SelectorHead<Tin>::SelectorHead() : select_(&DefaultSelect) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::Add(Drain<Tin>* mod) {
   mods_.push_back(mod);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::Set(Drain<Tin>* mod, size_t index) {
   mods_[index] = mod;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::SetOperation(std::function<size_t(const Tin& t)> s) {
   select_ = s;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::FlowIn(Tin&& t, const Section& id) {
   Tin in = std::move(t);
-  const size_t kDest = select_(in);
-  Route(std::move(in), kDest, id);
+  const size_t dest = select_(in);
+  Route(std::move(in), dest, id);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::FlushIn(uint64_t& pos) {
   for (const auto& m : mods_) {
@@ -90,6 +98,7 @@ void SelectorHead<Tin>::FlushIn(uint64_t& pos) {
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tin>
 void SelectorHead<Tin>::SkipIn(const Section& id) {
   bool first = true;

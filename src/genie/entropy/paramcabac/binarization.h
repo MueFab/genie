@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file binarization.h
  * @brief Defines the `Binarization` class, which represents CABAC binarization
  * configurations in Genie
  * @details The `Binarization` class encapsulates the various configurations

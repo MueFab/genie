@@ -25,12 +25,14 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 OrderedSection::OrderedSection(OrderedLock* lock, const Section& id)
     : lock_(lock), length_(id.length) {
   lock_->Wait(id.start);
 }
 
 // -----------------------------------------------------------------------------
+
 OrderedSection::~OrderedSection() { lock_->Finished(length_); }
 
 // -----------------------------------------------------------------------------

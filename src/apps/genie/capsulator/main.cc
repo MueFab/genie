@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,13 +23,17 @@
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mgg/mgg_file.h"
 #include "genie/util/runtime_exception.h"
+#include "util/log.h"
 #include "util/string_helpers.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "App/Capsulator";
+
 namespace genie_app::capsulator {
 
 // -----------------------------------------------------------------------------
+
 void encapsulate(ProgramOptions& options) {
   auto version = genie::core::MpegMinorVersion::kV2000;
 
@@ -41,12 +45,16 @@ void encapsulate(ProgramOptions& options) {
   std::ofstream output_stream(options.output_file_);
   genie::util::BitWriter writer(output_stream);
 
-  mgg_file.print_debug(std::cerr, 100);
+  std::stringstream stream;
+  mgg_file.print_debug(stream, 100);
+
+  UTILS_LOG(genie::util::Logger::Severity::INFO, stream.str());
 
   mgg_file.Write(writer);
 }
 
 // -----------------------------------------------------------------------------
+
 void decapsulate(ProgramOptions& options) {
   genie::format::mgg::encapsulator::DecapsulatedFile ret(options.input_file_);
   std::string global_output_prefix =
@@ -70,6 +78,7 @@ void decapsulate(ProgramOptions& options) {
 }
 
 // -----------------------------------------------------------------------------
+
 int main(const int argc, char* argv[]) {
   ProgramOptions p_opts(argc, argv);
 
@@ -84,13 +93,13 @@ int main(const int argc, char* argv[]) {
       decapsulate(p_opts);
     }
   } catch (genie::util::RuntimeException& e) {
-    std::cerr << e.Msg() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.Msg());
     return -1;
   } catch (std::runtime_error& e) {
-    std::cerr << e.what() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return -1;
   } catch (...) {
-    std::cerr << "Unknown error" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return -1;
   }
   return 0;

@@ -11,13 +11,17 @@
 #include <iostream>
 #include <string>
 
+#include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Fasta";
+
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 FastaSource::FastaSource(std::ostream* outfile, core::ReferenceManager* ref_mgr)
     : outfile_(outfile), ref_mgr_(ref_mgr), line_length_(0) {
   auto seqs = ref_mgr_->GetSequences();
@@ -31,6 +35,7 @@ FastaSource::FastaSource(std::ostream* outfile, core::ReferenceManager* ref_mgr)
 }
 
 // -----------------------------------------------------------------------------
+
 bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
   util::Section loc_id = {0, 1, false};
   {
@@ -61,10 +66,13 @@ bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
           ? ref_mgr_->GetLength(seq) % core::ReferenceManager::GetChunkSize()
           : string->length();
 
-  std::cerr << "Decompressing " << seq << " ["
-            << pos * core::ReferenceManager::GetChunkSize() << ", "
-            << pos * core::ReferenceManager::GetChunkSize() + actual_length
-            << "]" << std::endl;
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "Decompressing " + seq + " [" +
+                std::to_string(pos * core::ReferenceManager::GetChunkSize()) +
+                ", " +
+                std::to_string(pos * core::ReferenceManager::GetChunkSize() +
+                               actual_length) +
+                "]");
 
   [[maybe_unused]] util::OrderedSection out_sec(&output_lock_, loc_id);
   if (pos == 0) {
@@ -93,6 +101,7 @@ bool FastaSource::Pump(uint64_t& id, std::mutex& lock) {
 }
 
 // -----------------------------------------------------------------------------
+
 void FastaSource::FlushIn(uint64_t&) {}
 
 // -----------------------------------------------------------------------------

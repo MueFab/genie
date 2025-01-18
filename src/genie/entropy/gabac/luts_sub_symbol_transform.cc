@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,11 +19,13 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 bool LutEntry::operator>(const LutEntry& entry) const {
   return freq > entry.freq;
 }
 
 // -----------------------------------------------------------------------------
+
 LutOrder1 LuTsSubSymbolTransform::GetInitLutsOrder1(
     const uint64_t num_alpha_subsym) {
   return std::vector<LutRow>(
@@ -33,6 +35,7 @@ LutOrder1 LuTsSubSymbolTransform::GetInitLutsOrder1(
 }
 
 // -----------------------------------------------------------------------------
+
 LuTsSubSymbolTransform::LuTsSubSymbolTransform(
     const paramcabac::SupportValues& support_vals,
     const paramcabac::StateVars& state_vars, const uint8_t num_luts,
@@ -44,10 +47,12 @@ LuTsSubSymbolTransform::LuTsSubSymbolTransform(
       encoding_mode_flag_(mode_flag) {}
 
 // -----------------------------------------------------------------------------
+
 LuTsSubSymbolTransform::LuTsSubSymbolTransform(
     const LuTsSubSymbolTransform& src) = default;
 
 // -----------------------------------------------------------------------------
+
 void LuTsSubSymbolTransform::SetupLutsOrder1(const uint8_t num_subsyms,
                                              const uint64_t num_alpha_subsym) {
   if (num_alpha_subsym > paramcabac::kMaxLutSize) return;
@@ -57,6 +62,7 @@ void LuTsSubSymbolTransform::SetupLutsOrder1(const uint8_t num_subsyms,
 }
 
 // -----------------------------------------------------------------------------
+
 void LuTsSubSymbolTransform::SetupLutsOrder2(const uint8_t num_subsyms,
                                              const uint64_t num_alpha_subsym) {
   if (num_alpha_subsym > paramcabac::kMaxLutSize) return;

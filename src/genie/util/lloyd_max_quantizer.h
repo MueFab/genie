@@ -23,21 +23,22 @@
  * given distribution.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
+#define SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
 #include <vector>
 
-#include "genie/quality/calq/probability_distribution.h"
-#include "genie/quality/calq/quantizer.h"
+#include "genie/util/probability_distribution.h"
+#include "genie/util/quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Implements the Lloyd-Max quantizer for quality value compression.
  *
@@ -49,11 +50,14 @@ namespace genie::quality::calq {
  * of probability characteristics compared to uniform quantizers.
  */
 class LloydMaxQuantizer final : public Quantizer {
-  std::vector<double> borders_;  //!< @brief Decision thresholds for each
-                                 //!< quantization interval.
-  std::vector<double> values_;   //!< @brief Representative values (centroids)
-                                 //!< for each interval.
-  size_t steps_;                 //!< @brief Number of quantization steps.
+  /// Decision thresholds for each quantization interval.
+  std::vector<double> borders_;
+
+  /// Representative values (centroids) for each interval.
+  std::vector<double> values_;
+
+  /// Number of quantization steps.
+  size_t steps_;
 
   /**
    * @brief Fills the lookup table (LUT) based on the provided probability
@@ -120,11 +124,11 @@ class LloydMaxQuantizer final : public Quantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_LLOYD_MAX_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_LLOYD_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

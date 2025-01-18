@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file subsequences.h
  * @brief Defines the `Subsequence` class, which handles transformation
  * configurations for subsequences in CABAC entropy coding.
  * @details The `Subsequence` class manages the configurations and parameters

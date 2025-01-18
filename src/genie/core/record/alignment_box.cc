@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -21,6 +21,7 @@
 namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
+
 void AlignmentBox::Write(util::BitWriter& writer) const {
   writer.WriteAlignedInt<uint64_t, 5>(mapping_pos_);
   alignment_.Write(writer);
@@ -30,6 +31,7 @@ void AlignmentBox::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox::AlignmentBox(const ClassType type, const uint8_t as_depth,
                            const uint8_t number_of_template_segments,
                            util::BitReader& reader)
@@ -53,6 +55,7 @@ AlignmentBox::AlignmentBox(const ClassType type, const uint8_t as_depth,
 AlignmentBox::AlignmentBox() : split_alignment_info_(0) {}
 
 // -----------------------------------------------------------------------------
+
 void AlignmentBox::AddAlignmentSplit(
     std::unique_ptr<AlignmentSplit> alignment) {
   if (alignment->GetType() == AlignmentSplit::Type::kSameRec) {
@@ -66,35 +69,43 @@ void AlignmentBox::AddAlignmentSplit(
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t AlignmentBox::GetNumberOfTemplateSegments() const {
   return static_cast<uint8_t>(split_alignment_info_.size() + 1);
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t AlignmentBox::GetPosition() const { return mapping_pos_; }
 
 // -----------------------------------------------------------------------------
+
 const Alignment& AlignmentBox::GetAlignment() const { return alignment_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::unique_ptr<AlignmentSplit>>&
 AlignmentBox::GetAlignmentSplits() const {
   return split_alignment_info_;
 }
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox::AlignmentBox(const uint64_t mapping_pos, Alignment&& alignment)
     : mapping_pos_(mapping_pos), alignment_(std::move(alignment)) {}
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox::AlignmentBox(const AlignmentBox& container) { *this = container; }
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox::AlignmentBox(AlignmentBox&& container) noexcept {
   *this = container;
 }
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox& AlignmentBox::operator=(const AlignmentBox& container) {
   if (this == &container) {
     return *this;
@@ -109,6 +120,7 @@ AlignmentBox& AlignmentBox::operator=(const AlignmentBox& container) {
 }
 
 // -----------------------------------------------------------------------------
+
 AlignmentBox& AlignmentBox::operator=(AlignmentBox&& container) noexcept {
   this->mapping_pos_ = container.mapping_pos_;
   this->alignment_ = container.alignment_;

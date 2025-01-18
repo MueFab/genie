@@ -18,6 +18,7 @@
 namespace genie::format::mgg::encapsulator {
 
 // -----------------------------------------------------------------------------
+
 void EncapsulatedDatasetGroup::PatchId(const uint8_t id) {
   if (group_meta != std::nullopt) {
     group_meta->PatchId(id);
@@ -42,6 +43,7 @@ void EncapsulatedDatasetGroup::PatchId(const uint8_t id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void EncapsulatedDatasetGroup::MergeMetadata(
     const core::MpegMinorVersion version) {
   std::string meta;
@@ -80,6 +82,7 @@ void EncapsulatedDatasetGroup::MergeMetadata(
 }
 
 // -----------------------------------------------------------------------------
+
 void EncapsulatedDatasetGroup::MergeReferences(
     const core::MpegMinorVersion version) {
   for (const auto& d : datasets) {
@@ -150,6 +153,7 @@ void EncapsulatedDatasetGroup::MergeReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 void EncapsulatedDatasetGroup::MergeLabels() {
   std::map<std::string, std::vector<LabelDataset>> labels;
   for (const auto& d : datasets) {
@@ -173,6 +177,7 @@ void EncapsulatedDatasetGroup::MergeLabels() {
 }
 
 // -----------------------------------------------------------------------------
+
 EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(
     const std::vector<std::string>& input_files,
     core::MpegMinorVersion version) {
@@ -195,6 +200,7 @@ EncapsulatedDatasetGroup::EncapsulatedDatasetGroup(
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroup EncapsulatedDatasetGroup::Assemble(
     const core::MpegMinorVersion version) {
   DatasetGroup ret(0, 0, version);

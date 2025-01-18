@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file spring_encoding.cc
+ *
+ * @brief Spring encoding implementation for the Genie project.
+ *
+ * This file contains the implementation of the Spring encoder used in the Genie
+ * project. It includes functions for building contigs, writing contigs,
+ * retrieving data parameters, correcting read orders, and other encoding
+ * operations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,9 +27,12 @@
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Spring";
+
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 std::string BuildContig(std::list<ContigReads>& current_contig,
                         const uint32_t& list_size) {
   static constexpr char long_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
@@ -68,6 +79,7 @@ std::string BuildContig(std::list<ContigReads>& current_contig,
 }
 
 // -----------------------------------------------------------------------------
+
 void WriteContig(const std::string& ref, std::list<ContigReads>& current_contig,
                  std::ofstream& f_seq, std::ofstream& f_pos,
                  std::ofstream& f_noise, std::ofstream& f_noise_pos,
@@ -102,6 +114,7 @@ void WriteContig(const std::string& ref, std::list<ContigReads>& current_contig,
 }
 
 // -----------------------------------------------------------------------------
+
 void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
   const uint32_t num_reads_clean =
       cp.num_reads_clean[0] + cp.num_reads_clean[1];
@@ -109,9 +122,8 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
 
   std::ifstream my_file_s_count(eg.infile + ".singleton" + ".count",
                                 std::ifstream::in | std::ios::binary);
-  UTILS_DIE_IF(
-      !my_file_s_count,
-      "Cannot open file to read: " + eg.infile + ".singleton" + ".count");
+  UTILS_DIE_IF(!my_file_s_count, "Cannot open file to read: " + eg.infile +
+                                     ".singleton" + ".count");
   my_file_s_count.read(reinterpret_cast<char*>(&eg.num_reads_s),
                        sizeof(uint32_t));
   my_file_s_count.close();
@@ -121,22 +133,29 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp) {
   eg.num_reads = num_reads_clean - eg.num_reads_s;
   eg.num_reads_n = num_reads_total - num_reads_clean;
 
-  std::cerr << "Maximum Read length: " << eg.max_read_len << std::endl;
-  std::cerr << "Number of non-singleton reads: " << eg.num_reads << std::endl;
-  std::cerr << "Number of singleton reads: " << eg.num_reads_s << std::endl;
-  std::cerr << "Number of reads with N: " << eg.num_reads_n << std::endl;
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "---- Maximum Read length: " + std::to_string(cp.max_read_len));
+  UTILS_LOG(
+      util::Logger::Severity::INFO,
+      "---- Number of non-singleton reads: " + std::to_string(eg.num_reads));
+  UTILS_LOG(util::Logger::Severity::INFO, "---- Number of singleton reads: " +
+                                              std::to_string(eg.num_reads_s));
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "---- Number of reads with N: " + std::to_string(eg.num_reads_n));
 }
 
 // -----------------------------------------------------------------------------
-void CorrectOrder(uint32_t* order_s, const EncoderGlobal& eg) {
+
+void CorrectOrder(std::vector<uint32_t>& order_s, const EncoderGlobal& eg) {
   uint32_t num_reads_total = eg.num_reads + eg.num_reads_s + eg.num_reads_n;
-  auto read_flag_n = new bool[num_reads_total]();
+  auto read_flag_n = std::vector<uint8_t>(num_reads_total);
   // bool array indicating N reads
   for (uint32_t i = 0; i < eg.num_reads_n; i++) {
     read_flag_n[order_s[eg.num_reads_s + i]] = true;
   }
 
-  auto* cumulative_n_reads = new uint32_t[eg.num_reads + eg.num_reads_s];
+  auto cumulative_n_reads =
+      std::vector<uint32_t>(eg.num_reads + eg.num_reads_s);
   // number of reads occurring before pos in clean reads
   uint32_t pos_in_clean = 0, num_n_reads_till_now = 0;
   for (uint32_t i = 0; i < num_reads_total; i++) {
@@ -154,9 +173,8 @@ void CorrectOrder(uint32_t* order_s, const EncoderGlobal& eg) {
   for (int tid = 0; tid < eg.num_thr; tid++) {
     std::ifstream fin_order(eg.infile_order + '.' + std::to_string(tid),
                             std::ios::binary);
-    UTILS_DIE_IF(!fin_order,
-                 "Cannot open file to read: " + eg.infile_order + '.' +
-                     std::to_string(tid));
+    UTILS_DIE_IF(!fin_order, "Cannot open file to read: " + eg.infile_order +
+                                 '.' + std::to_string(tid));
     std::ofstream f_out_order(
         eg.infile_order + '.' + std::to_string(tid) + ".tmp", std::ios::binary);
     uint32_t pos;
@@ -173,8 +191,6 @@ void CorrectOrder(uint32_t* order_s, const EncoderGlobal& eg) {
            (eg.infile_order + '.' + std::to_string(tid)).c_str());
   }
   remove(eg.infile_order_n.c_str());
-  delete[] read_flag_n;
-  delete[] cumulative_n_reads;
 }
 
 // -----------------------------------------------------------------------------

@@ -13,23 +13,35 @@
 #include <string>
 #include <utility>
 
+#include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Mgrec";
+
 namespace genie::format::mgrec {
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(const size_t block_size, std::istream& file_1,
                    std::ostream& unsupported, const bool check_support)
     : block_size_(block_size),
       reader_(file_1),
       writer_(unsupported),
       buffered_record_(std::nullopt),
-      check_support_(check_support) {}
+      check_support_(check_support),
+      file_size_(0),
+      last_progress_(0) {
+  const auto pos = file_1.tellg();
+  file_1.seekg(0, std::ios::end);
+  file_size_ = file_1.tellg();
+  file_1.seekg(pos);
+}
 
 // -----------------------------------------------------------------------------
+
 bool IsECigarSupported(const std::string& e_cigar) {
   // Splices not supported
   if (e_cigar.find_first_of('*') != std::string::npos ||
@@ -41,6 +53,7 @@ bool IsECigarSupported(const std::string& e_cigar) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::IsRecordSupported(const core::record::Record& rec) {
   if (!check_support_) {
     return true;
@@ -82,6 +95,7 @@ bool Importer::IsRecordSupported(const core::record::Record& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
   const util::Watch watch;
   core::record::Chunk chunk;
@@ -119,6 +133,19 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
     }
   }
 
+  if (reader_.IsStreamGood()) {
+    const auto progress = static_cast<float>(reader_.GetStreamPosition()) /
+                          static_cast<float>(file_size_);
+    while (progress - last_progress_ > 0.05) {  // NOLINT
+      UTILS_LOG(
+          util::Logger::Severity::INFO,
+          "Progress in file: " +
+              std::to_string(static_cast<int>(std::round(progress * 100))) +
+              "%");
+      last_progress_ += 0.05;
+    }
+  }
+
   chunk.GetStats().AddDouble("time-mgrec-import", watch.Check());
   for (const auto& c : chunk.GetData()) {
     missing_additional_alignments_ +=
@@ -129,25 +156,39 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Importer::PrintStats() const {
-  std::cerr << std::endl
-            << "The following number of reads were dropped:" << std::endl;
-  std::cerr << discarded_splices_ << " containing splices" << std::endl;
-  std::cerr << discarded_hm_ << " class HM reads" << std::endl;
-  std::cerr << discarded_long_distance_
-            << " aligned, paired reads with mapping distance too big"
-            << std::endl;
-  std::cerr << discarded_missing_pair_u_ << " unaligned reads with missing pair"
-            << std::endl;
-  std::cerr << discarded_splices_ + discarded_hm_ + discarded_long_distance_ +
-                   discarded_missing_pair_u_
-            << " in total" << std::endl;
-  std::cerr << std::endl
-            << missing_additional_alignments_
-            << " additional alignments were dropped" << std::endl;
+  if (discarded_splices_ + discarded_hm_ + discarded_long_distance_ +
+          discarded_missing_pair_u_ ==
+      0) {
+    UTILS_LOG(util::Logger::Severity::INFO, "No reads were dropped");
+    return;
+  }
+
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            "The following number of reads were dropped:");
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            std::to_string(discarded_splices_) + " containing splices");
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            std::to_string(discarded_hm_) + " class HM reads");
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            std::to_string(discarded_long_distance_) +
+                " aligned, paired reads with mapping distance too big");
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            std::to_string(discarded_missing_pair_u_) +
+                " unaligned reads with missing pair");
+  UTILS_LOG(
+      util::Logger::Severity::WARNING,
+      std::to_string(discarded_splices_ + discarded_hm_ +
+                     discarded_long_distance_ + discarded_missing_pair_u_) +
+          " in total");
+  UTILS_LOG(util::Logger::Severity::WARNING,
+            std::to_string(missing_additional_alignments_) +
+                " additional alignments were dropped");
 }
 
 // -----------------------------------------------------------------------------
+
 void Importer::FlushIn(uint64_t& pos) {
   FormatImporter::FlushIn(pos);
   PrintStats();

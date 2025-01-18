@@ -22,9 +22,12 @@
 #include <iostream>
 #include <utility>
 
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "ThreadManager";
 
 namespace genie::util {
 
@@ -37,10 +40,10 @@ void ThreadManager::Action(size_t) {
       }
     }
   } catch (Exception& e) {
-    std::cerr << e.Msg() << std::endl;
+    UTILS_LOG(util::Logger::Severity::ERROR, e.Msg());
     throw;
   } catch (std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    UTILS_LOG(util::Logger::Severity::ERROR, e.what());
     throw;
   }
 }

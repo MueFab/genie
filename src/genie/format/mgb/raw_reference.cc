@@ -20,10 +20,12 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 RawReference::RawReference(const bool header_less)
     : DataUnit(DataUnitType::kRawReference), headerless_(header_less) {}
 
 // -----------------------------------------------------------------------------
+
 RawReference::RawReference(util::BitReader& reader, bool header_only,
                            const bool header_less)
     : DataUnit(DataUnitType::kRawReference), headerless_(header_less) {
@@ -37,6 +39,7 @@ RawReference::RawReference(util::BitReader& reader, bool header_only,
 }
 
 // -----------------------------------------------------------------------------
+
 void RawReference::AddSequence(RawReferenceSequence&& ref) {
   for (const auto& a : seqs_) {
     if (!a.IsIdUnique(ref)) {
@@ -47,6 +50,7 @@ void RawReference::AddSequence(RawReferenceSequence&& ref) {
 }
 
 // -----------------------------------------------------------------------------
+
 void RawReference::Write(util::BitWriter& writer) const {
   if (!headerless_) {
     DataUnit::Write(writer);
@@ -65,24 +69,29 @@ void RawReference::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool RawReference::IsEmpty() const { return seqs_.empty(); }
 
 // -----------------------------------------------------------------------------
+
 RawReferenceSequence& RawReference::GetSequence(const size_t index) {
   return seqs_[index];
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<RawReferenceSequence>::iterator RawReference::begin() {
   return seqs_.begin();
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<RawReferenceSequence>::iterator RawReference::end() {
   return seqs_.end();
 }
 
 // -----------------------------------------------------------------------------
+
 void RawReference::SetHeaderLess(const bool state) { headerless_ = state; }
 
 // -----------------------------------------------------------------------------

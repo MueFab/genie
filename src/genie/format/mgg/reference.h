@@ -13,11 +13,6 @@
  * locations for a given reference sequence. Additionally, it supports
  * serialization and deserialization of the reference information from a
  * bitstream.
- *
- * MPEG-G (ISO/IEC 23092) is a comprehensive standard designed to efficiently
- * store, transmit, and process large-scale genomic data. The `Reference` class
- * helps facilitate this by providing a structured way to manage and access
- * reference sequence details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_REFERENCE_H_
@@ -66,23 +61,29 @@ class Reference final : public GenInfo {
     MPEGG_REF = 0,
     RAW_REF = 1,
     FASTA_REF = 2
-  };  //!< @brief Type of reference
+  };
 
  private:
-  uint8_t dataset_group_id_;    //!< @brief ID of the associated dataset group.
-  uint8_t reference_id_;        //!< @brief ID of the reference sequence.
-  std::string reference_name_;  //!< @brief Name of the reference sequence.
-  reference::Version
-      ref_version_;  //!< @brief Version of the reference sequence.
+  /// ID of the associated dataset group.
+  uint8_t dataset_group_id_;
 
-  std::vector<reference::Sequence>
-      sequences_;  //!< @brief Container holding reference sequences.
+  /// ID of the reference sequence.
+  uint8_t reference_id_;
 
-  std::unique_ptr<reference::Location>
-      reference_location_;  //!< @brief Storage location details for the
-                            //!< reference.
+  /// Name of the reference sequence
+  std::string reference_name_;
 
-  core::MpegMinorVersion version_;  //!< @brief MPEG-G minor version used.
+  /// Version of the reference sequence.
+  reference::Version ref_version_;
+
+  /// Container holding reference sequences.
+  std::vector<reference::Sequence> sequences_;
+
+  /// Storage location details for the reference.
+  std::unique_ptr<reference::Location> reference_location_;
+
+  /// MPEG-G minor version used.
+  core::MpegMinorVersion version_;
 
  public:
   /**

@@ -15,12 +15,14 @@
 namespace genie::format::mgg::reference {
 
 // -----------------------------------------------------------------------------
+
 bool Sequence::operator==(const Sequence& other) const {
   return name_ == other.name_ && sequence_length_ == other.sequence_length_ &&
          sequence_id_ == other.sequence_id_ && version_ == other.version_;
 }
 
 // -----------------------------------------------------------------------------
+
 Sequence::Sequence(std::string name, const uint32_t length, const uint16_t id,
                    const core::MpegMinorVersion version)
     : name_(std::move(name)),
@@ -29,15 +31,19 @@ Sequence::Sequence(std::string name, const uint32_t length, const uint16_t id,
       version_(version) {}
 
 // -----------------------------------------------------------------------------
+
 const std::string& Sequence::GetName() const { return name_; }
 
 // -----------------------------------------------------------------------------
+
 uint32_t Sequence::GetLength() const { return sequence_length_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Sequence::GetId() const { return sequence_id_; }
 
 // -----------------------------------------------------------------------------
+
 Sequence::Sequence(util::BitReader& reader,
                    const core::MpegMinorVersion version)
     : version_(version) {
@@ -49,6 +55,7 @@ Sequence::Sequence(util::BitReader& reader,
 }
 
 // -----------------------------------------------------------------------------
+
 void Sequence::Write(util::BitWriter& writer) const {
   writer.WriteAlignedBytes(name_.data(), name_.length());
   writer.WriteAlignedInt<uint8_t>('\0');
@@ -59,6 +66,7 @@ void Sequence::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 Sequence::Sequence(core::meta::Sequence s,
                    const core::MpegMinorVersion version)
     : name_(std::move(s.GetName())),

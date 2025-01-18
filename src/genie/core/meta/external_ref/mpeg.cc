@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,6 +16,7 @@
 namespace genie::core::meta::external_ref {
 
 // -----------------------------------------------------------------------------
+
 Mpeg::Mpeg(std::string ref_uri, const ChecksumAlgorithm check,
            const uint16_t group_id, const uint16_t id, std::string checksum)
     : ExternalRef(std::move(ref_uri), check, ReferenceType::kMpeggRef),
@@ -24,6 +25,7 @@ Mpeg::Mpeg(std::string ref_uri, const ChecksumAlgorithm check,
       ref_checksum_(std::move(checksum)) {}
 
 // -----------------------------------------------------------------------------
+
 Mpeg::Mpeg(const nlohmann::json& json) : ExternalRef(json) {
   external_dataset_group_id_ =
       json["ref_type_mpegg_ref"]["external_dataset_group_id"];
@@ -32,6 +34,7 @@ Mpeg::Mpeg(const nlohmann::json& json) : ExternalRef(json) {
 }
 
 // -----------------------------------------------------------------------------
+
 nlohmann::json Mpeg::ToJson() const {
   auto ret = ExternalRef::ToJson();
   ret["ref_type_mpegg_ref"]["external_dataset_group_id"] =
@@ -42,18 +45,23 @@ nlohmann::json Mpeg::ToJson() const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Mpeg::GetGroupId() const { return external_dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Mpeg::GetId() const { return external_dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Mpeg::GetChecksum() const { return ref_checksum_; }
 
 // -----------------------------------------------------------------------------
+
 std::string& Mpeg::GetChecksum() { return ref_checksum_; }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<RefBase> Mpeg::Clone() const {
   auto ret = std::make_unique<Mpeg>(GetUri(), GetChecksumAlgo(),
                                     external_dataset_group_id_,

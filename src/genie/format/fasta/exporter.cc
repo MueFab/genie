@@ -17,11 +17,13 @@
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 Exporter::Exporter(core::ReferenceManager* ref_mgr, std::ostream* out,
                    const size_t num_threads)
     : ref_mgr_(ref_mgr), outfile_(out), num_threads_(num_threads) {}
 
 // -----------------------------------------------------------------------------
+
 void Exporter::FlushIn(uint64_t&) {
   util::ThreadManager mgr(num_threads_);
   FastaSource source(outfile_, ref_mgr_);
@@ -32,6 +34,7 @@ void Exporter::FlushIn(uint64_t&) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Exporter::FlowIn(core::record::Chunk&&, const util::Section&) {}
 
 // -----------------------------------------------------------------------------

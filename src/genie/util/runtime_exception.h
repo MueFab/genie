@@ -25,6 +25,7 @@
 #define SRC_GENIE_UTIL_RUNTIME_EXCEPTION_H_
 
 // -----------------------------------------------------------------------------
+
 #define UTILS_DIE(msg) UTILS_THROW_RUNTIME_EXCEPTION(msg)
 #define UTILS_DIE_IF(cond, msg)           \
   do {                                    \

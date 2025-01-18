@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file decoder.h
  * @brief Header file for the ZSTD entropy decoder module.
  * @details This file declares the `Decoder` class, which provides functionality
  * for decompressing a block payload back into a raw access unit using the ZSTD

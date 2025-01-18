@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file decoder.h
  * @brief Defines classes for CABAC (Context-based Adaptive Binary Arithmetic
  * Coding) decoders: `DecoderTokenType` and `DecoderRegular`. These decoders
  * handle specific CABAC configurations for different descriptor types in Genie

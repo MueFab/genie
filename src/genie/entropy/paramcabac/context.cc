@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file context.cc
+ * @brief Implementation of CABAC context handling for Genie.
+ *
+ * Manages adaptive mode, context initialization values, and serialization,
+ * with support for JSON conversion and shared sub-symbol context flags.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,9 +21,11 @@
 namespace genie::entropy::paramcabac {
 
 // -----------------------------------------------------------------------------
+
 Context::Context() : Context(true, 8, 8, false) {}
 
 // -----------------------------------------------------------------------------
+
 Context::Context(const bool adaptive_mode_flag,
                  const uint8_t output_symbol_size,
                  const uint8_t coding_subsym_size, bool share_subsym_ctx_flag)
@@ -31,6 +38,7 @@ Context::Context(const bool adaptive_mode_flag,
 }
 
 // -----------------------------------------------------------------------------
+
 Context::Context(const uint8_t output_symbol_size,
                  const uint8_t coding_subsym_size, util::BitReader& reader) {
   adaptive_mode_flag_ = reader.Read<bool>(1);
@@ -44,6 +52,7 @@ Context::Context(const uint8_t output_symbol_size,
 }
 
 // -----------------------------------------------------------------------------
+
 void Context::AddContextInitializationValue(
     const uint8_t context_initialization_value) {
   ++num_contexts_;
@@ -51,6 +60,7 @@ void Context::AddContextInitializationValue(
 }
 
 // -----------------------------------------------------------------------------
+
 void Context::write(util::BitWriter& writer) const {
   writer.WriteBits(adaptive_mode_flag_, 1);
   writer.WriteBits(num_contexts_, 16);
@@ -63,12 +73,15 @@ void Context::write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool Context::GetAdaptiveModeFlag() const { return adaptive_mode_flag_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Context::GetNumContexts() const { return num_contexts_; }
 
 // -----------------------------------------------------------------------------
+
 bool Context::GetShareSubsymCtxFlag() const {
   if (share_subsym_ctx_flag_) return *share_subsym_ctx_flag_;
   return false;
@@ -76,11 +89,13 @@ bool Context::GetShareSubsymCtxFlag() const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<uint8_t>& Context::GetContextInitializationValue() const {
   return context_initialization_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool Context::operator==(const Context& ctx) const {
   return adaptive_mode_flag_ == ctx.adaptive_mode_flag_ &&
          num_contexts_ == ctx.num_contexts_ &&
@@ -89,6 +104,7 @@ bool Context::operator==(const Context& ctx) const {
 }
 
 // -----------------------------------------------------------------------------
+
 Context::Context(nlohmann::json j) : num_contexts_(0) {
   adaptive_mode_flag_ = static_cast<bool>(j["adaptive_mode_flag"]);
   if (j.contains("context_initialization_value")) {
@@ -102,6 +118,7 @@ Context::Context(nlohmann::json j) : num_contexts_(0) {
 }
 
 // -----------------------------------------------------------------------------
+
 nlohmann::json Context::ToJson() const {
   nlohmann::json ret;
   ret["adaptive_mode_flag"] = adaptive_mode_flag_;

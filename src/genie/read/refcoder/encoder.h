@@ -57,9 +57,8 @@ class Encoder final : public basecoder::EncoderStub {
      */
     explicit RefEncodingState(const core::record::Chunk& data);
 
-    core::ReferenceManager::ReferenceExcerpt
-        excerpt;  //!< @brief Reference information for managing sequence
-                  //!< encoding.
+    /// Reference information for managing sequence encoding.
+    core::ReferenceManager::ReferenceExcerpt excerpt;
   };
 
   /**

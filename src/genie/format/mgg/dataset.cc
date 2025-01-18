@@ -19,6 +19,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 Dataset::Dataset(util::BitReader& reader, const core::MpegMinorVersion version)
     : version_(version) {
   const auto start_pos = reader.GetStreamPosition() - 4;
@@ -36,9 +37,11 @@ Dataset::Dataset(util::BitReader& reader, const core::MpegMinorVersion version)
 }
 
 // -----------------------------------------------------------------------------
+
 const DatasetHeader& Dataset::GetHeader() const { return header_; }
 
 // -----------------------------------------------------------------------------
+
 void Dataset::BoxWrite(util::BitWriter& bit_writer) const {
   header_.Write(bit_writer);
   if (metadata_) {
@@ -62,37 +65,46 @@ void Dataset::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Dataset::GetKey() const {
   static const std::string key = "dtcn";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 bool Dataset::HasMetadata() const { return metadata_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 bool Dataset::HasProtection() const { return metadata_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 DatasetMetadata& Dataset::GetMetadata() { return *metadata_; }
 
 // -----------------------------------------------------------------------------
+
 DatasetProtection& Dataset::GetProtection() { return *protection_; }
 
 // -----------------------------------------------------------------------------
+
 std::vector<AccessUnit>& Dataset::GetAccessUnits() { return access_units_; }
 
 // -----------------------------------------------------------------------------
+
 std::vector<DescriptorStream>& Dataset::GetDescriptorStreams() {
   return descriptor_streams_;
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<DatasetParameterSet>& Dataset::GetParameterSets() {
   return parameter_sets_;
 }
 
 // -----------------------------------------------------------------------------
+
 Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta,
                  const core::MpegMinorVersion version,
                  const std::vector<uint8_t>& param_ids)
@@ -189,6 +201,7 @@ Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta,
 }
 
 // -----------------------------------------------------------------------------
+
 void Dataset::PatchId(const uint8_t group_id, const uint16_t set_id) {
   header_.PatchId(group_id, set_id);
   if (metadata_ != std::nullopt) {
@@ -203,14 +216,17 @@ void Dataset::PatchId(const uint8_t group_id, const uint16_t set_id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Dataset::PatchRefId(const uint8_t old, const uint8_t _new) {
   header_.PatchRefId(old, _new);
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetHeader& Dataset::GetHeader() { return header_; }
 
 // -----------------------------------------------------------------------------
+
 void Dataset::ReadBox(util::BitReader& reader,  // NOLINT
                       const bool in_offset) {
   std::string tmp_str(4, '\0');
@@ -291,6 +307,7 @@ void Dataset::ReadBox(util::BitReader& reader,  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 void Dataset::PrintDebug(std::ostream& output, uint8_t depth,
                           uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Dataset");

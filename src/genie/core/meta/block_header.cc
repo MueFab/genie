@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -12,9 +12,11 @@
 namespace genie::core::meta {
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::BlockHeader(const HeaderType type) : type_(type) {}
 
 // -----------------------------------------------------------------------------
+
 BlockHeader::HeaderType BlockHeader::GetType() const { return type_; }
 
 // -----------------------------------------------------------------------------

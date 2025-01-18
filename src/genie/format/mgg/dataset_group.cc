@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroup::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -29,6 +30,7 @@ bool DatasetGroup::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroup::DatasetGroup(util::BitReader& reader,
                            const core::MpegMinorVersion version)
     : version_(version) {
@@ -43,17 +45,17 @@ DatasetGroup::DatasetGroup(util::BitReader& reader,
     read_box(reader, false);
   }
 
-  std::cout << std::to_string(end_pos - reader.GetStreamPosition())
-            << std::endl;
   UTILS_DIE_IF(header_ == std::nullopt, "Dataset group without header");
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroup::DatasetGroup(const uint8_t id, const uint8_t version,
                            const core::MpegMinorVersion mpeg_version)
     : header_(DatasetGroupHeader(id, version)), version_(mpeg_version) {}
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::AddDataset(Dataset ds) {
   dataset_.emplace_back(std::move(ds));
   header_->AddDatasetId(
@@ -61,63 +63,77 @@ void DatasetGroup::AddDataset(Dataset ds) {
 }
 
 // -----------------------------------------------------------------------------
+
 const DatasetGroupHeader& DatasetGroup::GetHeader() const { return *header_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Reference>& DatasetGroup::GetReferences() const {
   return references_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<ReferenceMetadata>& DatasetGroup::GetReferenceMetadata()
     const {
   return reference_metadatas_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroup::HasLabelList() const { return labels_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const LabelList& DatasetGroup::GetLabelList() const { return *labels_; }
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroup::HasMetadata() const { return metadata_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const DatasetGroupMetadata& DatasetGroup::GetMetadata() const {
   return *metadata_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DatasetGroup::HasProtection() const { return protection_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 const DatasetGroupProtection& DatasetGroup::GetProtection() const {
   return *protection_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::AddMetadata(DatasetGroupMetadata md) {
   metadata_ = std::move(md);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::AddProtection(DatasetGroupProtection pr) {
   protection_ = std::move(pr);
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Dataset>& DatasetGroup::GetDatasets() const {
   return dataset_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetGroup::GetKey() const {
   static const std::string key = "dgcn";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::BoxWrite(util::BitWriter& wr) const {
   header_->Write(wr);
   for (const auto& r : references_) {
@@ -141,29 +157,35 @@ void DatasetGroup::BoxWrite(util::BitWriter& wr) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::SetMetadata(DatasetGroupMetadata meta) {
   metadata_ = std::move(meta);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::SetProtection(DatasetGroupProtection protection) {
   protection_ = std::move(protection);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::AddReference(Reference r) {
   references_.emplace_back(std::move(r));
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::AddReferenceMeta(ReferenceMetadata r) {
   reference_metadatas_.emplace_back(std::move(r));
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::SetLabels(LabelList l) { labels_ = std::move(l); }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::PatchId(const uint8_t group_id) {
   if (header_ != std::nullopt) {
     header_->PatchId(group_id);
@@ -189,6 +211,7 @@ void DatasetGroup::PatchId(const uint8_t group_id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::PatchRefId(const uint8_t old_id,  // NOLINT
                               const uint8_t new_id) {
   for (auto& r : references_) {
@@ -203,26 +226,33 @@ void DatasetGroup::PatchRefId(const uint8_t old_id,  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<Reference>& DatasetGroup::GetReferences() { return references_; }
 
 // -----------------------------------------------------------------------------
+
 std::vector<ReferenceMetadata>& DatasetGroup::GetReferenceMetadata() {
   return reference_metadatas_;
 }
 
 // -----------------------------------------------------------------------------
+
 LabelList& DatasetGroup::GetLabelList() { return *labels_; }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupMetadata& DatasetGroup::GetMetadata() { return *metadata_; }
 
 // -----------------------------------------------------------------------------
+
 DatasetGroupProtection& DatasetGroup::GetProtection() { return *protection_; }
 
 // -----------------------------------------------------------------------------
+
 std::vector<Dataset>& DatasetGroup::GetDatasets() { return dataset_; }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::PrintDebug(std::ostream& output, const uint8_t depth,
                                const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Dataset Group");
@@ -248,6 +278,7 @@ void DatasetGroup::PrintDebug(std::ostream& output, const uint8_t depth,
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetGroup::read_box(util::BitReader& reader,  // NOLINT
                             const bool in_offset) {
   std::string tmp_str(4, '\0');

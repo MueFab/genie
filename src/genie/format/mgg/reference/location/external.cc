@@ -23,6 +23,7 @@ namespace genie::format::mgg::reference::location {
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Location> External::factory(util::BitReader& reader,
                                             uint8_t reserved, size_t seq_count,
                                             core::MpegMinorVersion version) {
@@ -45,6 +46,7 @@ std::unique_ptr<Location> External::factory(util::BitReader& reader,
 }
 
 // -----------------------------------------------------------------------------
+
 External::External(const uint8_t reserved, std::string uri,
                    const ChecksumAlgorithm algo, const RefType type)
     : Location(reserved, true),
@@ -53,6 +55,7 @@ External::External(const uint8_t reserved, std::string uri,
       reference_type_(type) {}
 
 // -----------------------------------------------------------------------------
+
 External::External(util::BitReader& reader) : Location(reader) {
   uri_ = reader.ReadAlignedStringTerminated();
   checksum_algo_ = reader.ReadAlignedInt<ChecksumAlgorithm>();
@@ -60,6 +63,7 @@ External::External(util::BitReader& reader) : Location(reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 External::External(util::BitReader& reader, const uint8_t reserved)
     : Location(reserved, true) {
   uri_ = reader.ReadAlignedStringTerminated();
@@ -68,17 +72,21 @@ External::External(util::BitReader& reader, const uint8_t reserved)
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& External::GetUri() const { return uri_; }
 
 // -----------------------------------------------------------------------------
+
 External::ChecksumAlgorithm External::GetChecksumAlgorithm() const {
   return checksum_algo_;
 }
 
 // -----------------------------------------------------------------------------
+
 External::RefType External::GetReferenceType() const { return reference_type_; }
 
 // -----------------------------------------------------------------------------
+
 void External::Write(util::BitWriter& writer) {
   Location::Write(writer);
   writer.WriteAlignedBytes(uri_.data(), uri_.length());
@@ -88,6 +96,7 @@ void External::Write(util::BitWriter& writer) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string& External::GetUri() { return uri_; }
 
 // -----------------------------------------------------------------------------

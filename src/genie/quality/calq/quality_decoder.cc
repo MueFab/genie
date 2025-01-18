@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file quality_decoder.cc
+ *
+ * @brief Implements the QualityDecoder class for decoding quality values of
+ * genomic data.
+ *
+ * This file is part of the Genie project, designed for efficient genomic data
+ * compression and reconstruction. The `QualityDecoder` class decodes quality
+ * information from compressed genomic blocks, reconstructing the original
+ * quality values using advanced quantization and decoding techniques.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -13,8 +22,8 @@
 #include <vector>
 
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/error_exception_reporter.h"
 #include "genie/quality/calq/quality_encoder.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -109,7 +118,7 @@ void QualityDecoder::DecodeMappedRecordFromBlock(
       case '[':
         break;  // ignore first clip char
       default:
-        THROW_ERROR_EXCEPTION("Bad CIGAR string");
+        UTILS_DIE("Bad CIGAR string");
     }
     op_len = 0;
   }

@@ -39,19 +39,20 @@ namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
-template <typename T, size_t NUM_BYTES, typename>
+template <typename T, size_t NumBytes, typename>
 void BitWriter::WriteAlignedInt(T val) {
-  static_assert(NUM_BYTES > 0, "NUM_BYTES should be greater than 0.");
+  static_assert(NumBytes > 0, "NUM_BYTES should be greater than 0.");
   static_assert(
-      NUM_BYTES <= sizeof(T),
+      NumBytes <= sizeof(T),
       "NUM_BYTES should be less than or equal to the Size of type T.");
 
   // Swap Endianness if necessary
-  if (NUM_BYTES > 1) {
-    SwapEndianness<T, NUM_BYTES>(val);
+  if (NumBytes > 1) {
+    SwapEndianness<T, NumBytes>(val);
   }
 
-  stream_.write(reinterpret_cast<char*>(&val), NUM_BYTES);
+  stream_.write(reinterpret_cast<char*>(&val), NumBytes);
+  total_bits_written_ += NumBytes * 8;
 }
 
 // -----------------------------------------------------------------------------

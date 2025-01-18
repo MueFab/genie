@@ -15,11 +15,13 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 LabelRegion::LabelRegion(const uint16_t seq_id, const uint64_t start_pos,
                          const uint64_t end_pos)
     : seq_id_(seq_id), start_pos_(start_pos), end_pos_(end_pos) {}
 
 // -----------------------------------------------------------------------------
+
 LabelRegion::LabelRegion(util::BitReader& reader) {
   // seq_ID u(16)
   seq_id_ = reader.Read<uint16_t>();
@@ -40,25 +42,31 @@ LabelRegion::LabelRegion(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelRegion::AddClassId(const core::record::ClassType class_id) {
   class_i_ds_.push_back(class_id);
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t LabelRegion::GetSeqId() const { return seq_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<core::record::ClassType>& LabelRegion::GetClassIDs() const {
   return class_i_ds_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t LabelRegion::GetStartPos() const { return start_pos_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t LabelRegion::GetEndPos() const { return end_pos_; }
 
 // -----------------------------------------------------------------------------
+
 void LabelRegion::Write(util::BitWriter& bit_writer) const {
   // seq_ID u(16)
   bit_writer.WriteBits(seq_id_, 16);
@@ -79,17 +87,20 @@ void LabelRegion::Write(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool LabelRegion::operator==(const LabelRegion& other) const {
   return seq_id_ == other.seq_id_ && class_i_ds_ == other.class_i_ds_ &&
          start_pos_ == other.start_pos_ && end_pos_ == other.end_pos_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t LabelRegion::SizeInBits() const {
   return sizeof(uint16_t) * 8 + 4 + 4 * class_i_ds_.size() + 40 + 40;
 }
 
 // -----------------------------------------------------------------------------
+
 core::meta::Region LabelRegion::Decapsulate() {
   core::meta::Region ret(seq_id_, start_pos_, end_pos_, std::move(class_i_ds_));
   return ret;

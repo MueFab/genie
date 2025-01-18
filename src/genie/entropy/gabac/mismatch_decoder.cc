@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,6 +20,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 MismatchDecoder::MismatchDecoder(util::DataBlock&& d,
                                  const EncodingConfiguration& c)
     : num_subseq_symbols_total_(0),
@@ -92,6 +93,7 @@ MismatchDecoder::MismatchDecoder(util::DataBlock&& d,
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t MismatchDecoder::DecodeMismatch(const uint64_t ref) {
   std::vector<uint64_t> decoded_trnsf_symbols(num_trnsf_subseqs_, 0);
 
@@ -108,16 +110,19 @@ uint64_t MismatchDecoder::DecodeMismatch(const uint64_t ref) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool MismatchDecoder::DataLeft() const {
   return num_subseq_symbols_decoded_ < num_subseq_symbols_total_;
 }
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] uint64_t MismatchDecoder::GetSubseqSymbolsTotal() const {
   return num_subseq_symbols_total_;
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::MismatchDecoder> MismatchDecoder::Copy() const {
   return std::make_unique<MismatchDecoder>(*this);
 }

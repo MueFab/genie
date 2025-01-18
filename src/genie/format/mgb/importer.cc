@@ -11,21 +11,33 @@
 #include <utility>
 
 #include "genie/format/mgb/access_unit.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Mgb";
 
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 Importer::Importer(std::istream& file, core::ReferenceManager* manager,
                    core::RefDecoder* ref_decoder, const bool ref_only)
     : ReferenceSource(manager),
       reader_(file),
       factory_(manager, this, ref_only),
       ref_manager_(manager),
-      decoder_(ref_decoder) {}
+      decoder_(ref_decoder),
+      file_size_(0),
+      last_progress_(0) {
+  const auto pos = file.tellg();
+  file.seekg(0, std::ios::end);
+  file_size_ = file.tellg();
+  file.seekg(pos);
+}
 
 // -----------------------------------------------------------------------------
+
 bool Importer::Pump(uint64_t& id, std::mutex&) {
   // util::Watch watch; TODO(fabian): Statistics
   std::optional<AccessUnit> unit;
@@ -39,12 +51,24 @@ bool Importer::Pump(uint64_t& id, std::mutex&) {
     sec.start = id;
     sec.length = unit->GetHeader().GetReadCount();
     id += unit->GetHeader().GetReadCount();
+
+    const float progress = static_cast<float>(reader_.GetStreamPosition()) /
+                           static_cast<float>(file_size_);
+    while (progress - last_progress_ > 0.05) {  // NOLINT
+      last_progress_ += 0.05;
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Progress: " +
+                    std::to_string(
+                        static_cast<int>(std::round(last_progress_ * 100))) +
+                    "% of file read");
+    }
   }
   FlowOut(ConvertAu(std::move(unit.value())), sec);
   return true;
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Importer::GetRef(const bool raw, const size_t f_pos,
                              const size_t start, const size_t end) {
   AccessUnit au(0, 0, core::record::ClassType::kNone, 0,
@@ -75,6 +99,7 @@ std::string Importer::GetRef(const bool raw, const size_t f_pos,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit Importer::ConvertAu(AccessUnit&& au) const {
   auto unit = std::move(au);
   auto paramset = factory_.GetParams(unit.GetHeader().GetParameterId());

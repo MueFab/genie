@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,13 +19,17 @@
 #include "genie/entropy/gabac/encode_desc_sub_seq.h"
 #include "genie/entropy/gabac/encode_transformed_sub_seq.h"
 #include "genie/entropy/gabac/stream_handler.h"
+#include "genie/util/log.h"
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "App/Gabac";
+
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 paramcabac::Binarization ConfigSearchBinarization::GetBinarization(
     const bool bypass, const uint8_t output_bits,
     const uint8_t sub_symbol_size) const {
@@ -39,6 +43,7 @@ paramcabac::Binarization ConfigSearchBinarization::GetBinarization(
 }
 
 // -----------------------------------------------------------------------------
+
 ConfigSearchBinarization::ConfigSearchBinarization(
     const std::pair<int64_t, int64_t>& range, uint8_t split_size)
     : binarization_search_idx_(0), binarization_parameter_search_idx_(0) {
@@ -92,6 +97,7 @@ ConfigSearchBinarization::ConfigSearchBinarization(
 }
 
 // -----------------------------------------------------------------------------
+
 bool ConfigSearchBinarization::Increment() {
   binarization_parameter_search_idx_++;
   if (binarization_parameter_search_idx_ ==
@@ -107,6 +113,7 @@ bool ConfigSearchBinarization::Increment() {
 }
 
 // -----------------------------------------------------------------------------
+
 void ConfigSearchBinarization::Mutate(std::mt19937& rd,
                                       std::normal_distribution<>& d) {
   binarization_search_idx_ =
@@ -117,6 +124,7 @@ void ConfigSearchBinarization::Mutate(std::mt19937& rd,
 }
 
 // -----------------------------------------------------------------------------
+
 bool ConfigSearchTransformedSeq::LutValid() const {
   return output_bits_ / GetSplitRatio() <= 8 &&
          coding_order_.GetIndex(coding_order_search_idx_) > 0;
@@ -444,8 +452,9 @@ ResultFull BenchmarkFull(const std::string& input_file,
   bool new_file = !std::filesystem::exists("benchmark_total.csv");
   std::ofstream results_file("benchmark_total.csv", std::ios_base::app);
   do {
-    std::cerr << "Optimizing transformation "
-              << static_cast<int>(config.GetTransform()) << "..." << std::endl;
+    UTILS_LOG(
+        util::Logger::Severity::INFO,
+        "Optimizing transformation " + std::to_string(config.GetTransform()));
     // Execute transformation
     std::vector<util::DataBlock> transformed_sub_seqs;
     transformed_sub_seqs.resize(1);
@@ -460,7 +469,8 @@ ResultFull BenchmarkFull(const std::string& input_file,
 
     // Optimize transformed sequences independently
     for (size_t i = 0; i < transformed_sub_seqs.size(); ++i) {
-      std::cerr << "Optimizing subsequence " << i << "..." << std::endl;
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Optimizing subsequence " + std::to_string(i) + "...");
       trans_results.emplace_back(OptimizeTransformedSequence(
           config.GetTransformedSeqs()[i], desc, transformed_sub_seqs[i],
           time_weight, i == transformed_sub_seqs.size() - 1,

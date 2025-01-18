@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implements the Decoder class for reconstructing quality values from
+ * compressed genomic data.
+ *
+ * This file is part of the Genie project, which specializes in efficient
+ * genomic data compression and decompression workflows. The `Decoder` class is
+ * responsible for reversing the compression process by reconstructing quality
+ * values from encoded representations, supporting both aligned and unaligned
+ * genomic data.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,14 +27,17 @@
 #include "genie/util/stop_watch.h"
 
 // -----------------------------------------------------------------------------
+
 namespace genie::quality::calq {
 
 // -----------------------------------------------------------------------------
+
 bool Decoder::IsAligned(const core::AccessUnit::Descriptor& desc) {
   return desc.GetSize() != 3;
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::DecodeAligned(
     const paramqv1::QualityValues1& param,
     const std::vector<std::string>& e_cigar_vec,
@@ -50,6 +63,7 @@ std::vector<std::string> Decoder::DecodeAligned(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::string> Decoder::DecodeUnaligned(
     const paramqv1::QualityValues1& param_casted,
     const std::vector<std::string>& e_cigar_vec,
@@ -76,6 +90,7 @@ std::vector<std::string> Decoder::DecodeUnaligned(
 }
 
 // -----------------------------------------------------------------------------
+
 void Decoder::FillInput(DecodingBlock& input,
                         core::AccessUnit::Descriptor& desc,
                         const paramqv1::QualityValues1& param) {
@@ -99,6 +114,7 @@ void Decoder::FillInput(DecodingBlock& input,
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     const core::parameter::QualityValues& param,
     const std::vector<std::string>& e_cigar_vec,
@@ -126,4 +142,8 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::calq
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

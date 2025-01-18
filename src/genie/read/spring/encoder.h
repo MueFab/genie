@@ -35,8 +35,9 @@ namespace genie::read::spring {
  * final encoded access units that can be stored or further processed.
  */
 class Encoder final : public core::ReadEncoder {
-  Preprocessor preprocessor_;  //!< @brief Handles preprocessing of input
-                               //!< records and file management.
+  /// Handles preprocessing of input records and file management.
+  Preprocessor preprocessor_;
+  size_t preprocess_progress_printed_;
 
  public:
   /**

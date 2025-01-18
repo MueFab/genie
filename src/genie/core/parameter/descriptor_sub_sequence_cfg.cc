@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,6 +18,7 @@
 namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg::DescriptorSubSequenceCfg()
     : class_specific_dec_cfg_flag_(false), descriptor_configurations_(0) {
   descriptor_configurations_.push_back(
@@ -25,6 +26,7 @@ DescriptorSubSequenceCfg::DescriptorSubSequenceCfg()
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(
     const DescriptorSubSequenceCfg& cfg)
     : class_specific_dec_cfg_flag_(false) {
@@ -32,6 +34,7 @@ DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(
     DescriptorSubSequenceCfg&& cfg) noexcept
     : class_specific_dec_cfg_flag_(false) {
@@ -39,6 +42,7 @@ DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg& DescriptorSubSequenceCfg::operator=(
     const DescriptorSubSequenceCfg& cfg) {
   if (this == &cfg) {
@@ -53,6 +57,7 @@ DescriptorSubSequenceCfg& DescriptorSubSequenceCfg::operator=(
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg& DescriptorSubSequenceCfg::operator=(
     DescriptorSubSequenceCfg&& cfg) noexcept {
   class_specific_dec_cfg_flag_ = cfg.class_specific_dec_cfg_flag_;
@@ -61,6 +66,7 @@ DescriptorSubSequenceCfg& DescriptorSubSequenceCfg::operator=(
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(const size_t num_classes,
                                                    const GenDesc desc,
                                                    util::BitReader& reader) {
@@ -76,6 +82,7 @@ DescriptorSubSequenceCfg::DescriptorSubSequenceCfg(const size_t num_classes,
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorSubSequenceCfg::SetClassSpecific(
     const uint8_t index, std::unique_ptr<Descriptor> conf) {
   if (index > descriptor_configurations_.size()) {
@@ -85,6 +92,7 @@ void DescriptorSubSequenceCfg::SetClassSpecific(
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorSubSequenceCfg::Set(std::unique_ptr<Descriptor> conf) {
   if (class_specific_dec_cfg_flag_) {
     UTILS_THROW_RUNTIME_EXCEPTION(
@@ -94,17 +102,20 @@ void DescriptorSubSequenceCfg::Set(std::unique_ptr<Descriptor> conf) {
 }
 
 // -----------------------------------------------------------------------------
+
 const Descriptor& DescriptorSubSequenceCfg::Get() const {
   return *descriptor_configurations_.front();
 }
 
 // -----------------------------------------------------------------------------
+
 const Descriptor& DescriptorSubSequenceCfg::GetClassSpecific(
     const uint8_t index) const {
   return *descriptor_configurations_[index];
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorSubSequenceCfg::EnableClassSpecific(const uint8_t num_classes) {
   if (class_specific_dec_cfg_flag_) {
     return;
@@ -117,11 +128,13 @@ void DescriptorSubSequenceCfg::EnableClassSpecific(const uint8_t num_classes) {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorSubSequenceCfg::IsClassSpecific() const {
   return class_specific_dec_cfg_flag_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorSubSequenceCfg::Write(util::BitWriter& writer) const {
   writer.WriteBits(class_specific_dec_cfg_flag_, 1);
   for (auto& i : descriptor_configurations_) {
@@ -130,6 +143,7 @@ void DescriptorSubSequenceCfg::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorSubSequenceCfg::operator==(
     const DescriptorSubSequenceCfg& cfg) const {
   return class_specific_dec_cfg_flag_ == cfg.class_specific_dec_cfg_flag_ &&
@@ -137,6 +151,7 @@ bool DescriptorSubSequenceCfg::operator==(
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorSubSequenceCfg::DescComp(
     const DescriptorSubSequenceCfg& cfg) const {
   if (cfg.descriptor_configurations_.size() !=

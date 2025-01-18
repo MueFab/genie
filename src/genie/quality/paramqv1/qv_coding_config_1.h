@@ -59,11 +59,14 @@ class QualityValues1 final : public core::parameter::QualityValues {
    * and offset of quality values based on the format used.
    */
   enum class QualityParametersPresetId {
-    ASCII = 0,  //!< @brief ASCII quality values.
-    OFFSET33_RANGE41 =
-        1,  //!< @brief Quality values with offset 33 and range 41.
-    OFFSET64_RANGE40 =
-        2  //!< @brief Quality values with offset 64 and range 40.
+    /// ASCII quality values.
+    ASCII = 0,
+
+    /// Quality values with offset 33 and range 41.
+    OFFSET33_RANGE41 = 1,
+
+    /// Quality values with offset 64 and range 40.
+    OFFSET64_RANGE40 = 2
   };
 
   /**
@@ -211,16 +214,17 @@ class QualityValues1 final : public core::parameter::QualityValues {
   bool Equals(const QualityValues* qv) const override;
 
  private:
-  std::optional<ParameterSet>
-      parameter_set_quality_;  //!< @brief Optional custom parameter set for
-                               //!< quality values.
-  std::optional<QualityParametersPresetId>
-      quality_parameter_preset_id_;  //!< @brief Optional preset ID for
-                                     //!< predefined configurations.
+  /// Optional custom parameter set for quality values.
+  std::optional<ParameterSet> parameter_set_quality_;
+
+  /// Optional preset ID for predefined configurations.
+  std::optional<QualityParametersPresetId> quality_parameter_preset_id_;
 };
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::paramqv1
 
 // -----------------------------------------------------------------------------
+
 #endif  // SRC_GENIE_QUALITY_PARAMQV1_QV_CODING_CONFIG_1_H_

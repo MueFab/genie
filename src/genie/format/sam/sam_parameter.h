@@ -1,6 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file sam_parameter.h
+ *
+ * @brief Defines configuration parameters and options for handling SAM format
+ * processing in Genie.
+ *
+ * This file is part of the Genie project and provides the `Config` class, which
+ * encapsulates parameters and settings required for processing SAM (Sequence
+ * Alignment/Map) files. The configuration includes paths, flags, and system
+ * settings necessary for SAM file operations.
+ *
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
@@ -9,8 +18,6 @@
 #define SRC_GENIE_FORMAT_SAM_SAM_PARAMETER_H_
 
 // -----------------------------------------------------------------------------
-
-#include <genie/core/record/record.h>
 
 #include <cstdint>
 #include <string>
@@ -21,40 +28,32 @@
 namespace genie::format::sam {
 
 /**
- * @brief
+ * @brief Configuration parameters for handling SAM format processing.
  */
 class Config {
  public:
   /**
-   * @brief
-   */
-  enum Format : std::uint8_t {
-    kSam = 0,
-  };
-
-  /**
-   * @brief
+   * @brief Represents the configuration settings for the application.
    */
   Config()
       : tmp_dir_path_("/tmp"),
-        force_overwrite_(false),
-        no_ref_(false),
         clean_(false),
         num_threads_(std::thread::hardware_concurrency()) {}
 
-  /**
-   * @brief
-   */
-  ~Config();
+  /// Path to the temporary directory.
+  std::string tmp_dir_path_;
 
-  std::string tmp_dir_path_;     //!< @brief
-  std::string fasta_file_path_;  //!< @brief
-  std::string input_file_;       //!< @brief
-  std::string output_file_;      //!< @brief
-  bool force_overwrite_;         //!< @brief
-  bool no_ref_;                  //!< @brief
-  bool clean_;                   //!< @brief
-  uint32_t num_threads_;         //!< @brief
+  /// Path to the reference FASTA file.
+  std::string fasta_file_path_;
+
+  /// Path to the input SAM file.
+  std::string input_file_;
+
+  /// Whether to clean unsupported records
+  bool clean_;
+
+  /// How many threads to use for phase 1 transcoding
+  uint32_t num_threads_;
 };
 
 // -----------------------------------------------------------------------------

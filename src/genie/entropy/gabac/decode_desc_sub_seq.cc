@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,6 +23,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 void DoInverseSubsequenceTransform(
     const paramcabac::Subsequence& sub_sequence_cfg,
     std::vector<util::DataBlock>* const transformed_sub_sequence) {
@@ -48,6 +49,7 @@ void DoInverseSubsequenceTransform(
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t DecodeDescSubsequence(const IoConfiguration& io_conf,
                                const EncodingConfiguration& en_conf) {
   const paramcabac::Subsequence& sub_sequence_cfg = en_conf.GetSubSeqConfig();

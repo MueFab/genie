@@ -6,8 +6,7 @@
  * @brief Header file for the UniformMinMaxQuantizer class.
  *
  * This file defines the `UniformMinMaxQuantizer` class, which is a specialized
- * version of the `UniformQuantizer` used in the CALQ (Compression Algorithms
- * for Lossless Quality values) quality encoding scheme. The
+ * version of the `UniformQuantizer`. The
  * `UniformMinMaxQuantizer` class provides a uniform quantization strategy
  * within a specified minimum and maximum value range, offering flexibility and
  * control over quantization intervals.
@@ -19,16 +18,16 @@
  * compression, ensuring that all scores fall within the given bounds.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
+#define SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
-#include "genie/quality/calq/uniform_quantizer.h"
+#include "genie/util/uniform_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief A specialized uniform quantizer with configurable value range.
@@ -45,7 +44,7 @@ namespace genie::quality::calq {
  * ### Example Usage
  * @code
  * // Create a uniform quantizer with range [0, 40] and 10 quantization steps
- * genie::quality::calq::UniformMinMaxQuantizer quantizer(0, 40, 10);
+ * genie::util::UniformMinMaxQuantizer quantizer(0, 40, 10);
  *
  * // Perform quantization on a quality value
  * int quantized_value = quantizer.valueToIndex(35);
@@ -80,11 +79,11 @@ class UniformMinMaxQuantizer final : public UniformQuantizer {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_UNIFORM_MIN_MAX_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_UNIFORM_MIN_MAX_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

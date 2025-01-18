@@ -18,10 +18,12 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 LabelList::LabelList(const uint8_t ds_group_id)
     : dataset_group_id_(ds_group_id) {}
 
 // -----------------------------------------------------------------------------
+
 LabelList::LabelList(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -38,12 +40,15 @@ LabelList::LabelList(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t LabelList::GetDatasetGroupId() const { return dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<Label>& LabelList::GetLabels() const { return labels_; }
 
 // -----------------------------------------------------------------------------
+
 void LabelList::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedInt<uint8_t>(dataset_group_id_);
   bit_writer.WriteAlignedInt<uint16_t>(static_cast<uint16_t>(labels_.size()));
@@ -54,12 +59,14 @@ void LabelList::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& LabelList::GetKey() const {
   static const std::string key = "labl";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 bool LabelList::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -70,14 +77,17 @@ bool LabelList::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelList::AddLabel(Label l) { labels_.emplace_back(std::move(l)); }
 
 // -----------------------------------------------------------------------------
+
 void LabelList::PatchId(const uint8_t group_id) {
   dataset_group_id_ = group_id;
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<core::meta::Label> LabelList::Decapsulate(const uint16_t dataset) {
   std::vector<core::meta::Label> ret;
   ret.reserve(labels_.size());
@@ -89,6 +99,7 @@ std::vector<core::meta::Label> LabelList::Decapsulate(const uint16_t dataset) {
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelList::PrintDebug(std::ostream& output, const uint8_t depth,
                             const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Label list");
@@ -98,6 +109,7 @@ void LabelList::PrintDebug(std::ostream& output, const uint8_t depth,
 }
 
 // -----------------------------------------------------------------------------
+
 void LabelList::ReadBox(util::BitReader& reader,  // NOLINT
                         const bool in_offset) {
   std::string tmp_str(4, '\0');
