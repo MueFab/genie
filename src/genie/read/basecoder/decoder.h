@@ -30,7 +30,6 @@
 #include <vector>
 
 #include "genie/core/access_unit.h"
-#include "genie/core/qv_decoder.h"
 #include "genie/core/record/record.h"
 
 // -----------------------------------------------------------------------------
@@ -46,17 +45,20 @@ namespace genie::read::basecoder {
  * template segments.
  */
 class Decoder {
- private:
-  core::AccessUnit
-      container_;      //!< @brief Access unit container for encoded data.
-  uint64_t position_;  //!< @brief Current position within the access unit.
-  uint64_t length_;    //!< @brief Total length of the access unit.
+  /// Access unit container for encoded data.
+  core::AccessUnit container_;
 
-  uint64_t record_counter_;  //!< @brief Counter to track the number of
-                             //!< records processed.
+  /// Current position within the access unit.
+  uint64_t position_;
 
-  size_t number_template_segments_;  //!< @brief Number of template segments
-                                     //!< to Decode.
+  /// Total length of the access unit.
+  uint64_t length_;
+
+  /// Counter to track the number of records processed.
+  uint64_t record_counter_;
+
+  /// Number of template segments to Decode.
+  size_t number_template_segments_;
 
  public:
   /**
@@ -71,12 +73,20 @@ class Decoder {
    * @brief Holds metadata for segments.
    */
   struct SegmentMeta {
-    std::array<uint64_t, 2>
-        position;  //!< @brief Start positions for both segments.
-    std::array<uint64_t, 2> length;  //!< @brief Lengths for both segments.
-    bool first1;  //!< @brief Flag indicating if the first segment is read 1.
-    uint8_t decoding_case;  //!< @brief Case identifier for decoding.
-    uint8_t num_segments;   //!< @brief Number of segments.
+    /// Start positions for both segments.
+    std::array<uint64_t, 2> position;
+
+    /// Lengths for both segments.
+    std::array<uint64_t, 2> length;
+
+    /// Flag indicating if the first segment is read 1.
+    bool first1;
+
+    /// Case identifier for decoding.
+    uint8_t decoding_case;
+
+    /// Number of segments.
+    uint8_t num_segments;
   };
 
   /**
@@ -93,7 +103,7 @@ class Decoder {
    * @brief Reads metadata for a segment.
    * @return The segment metadata.
    */
-  Decoder::SegmentMeta ReadSegmentMeta();
+  SegmentMeta ReadSegmentMeta();
 
   /**
    * @brief Decodes an alignment from the sequence and cigar string.

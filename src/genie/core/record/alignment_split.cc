@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -21,15 +21,18 @@
 namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
+
 AlignmentSplit::AlignmentSplit(const Type split_alignment)
     : split_alignment_(split_alignment) {}
 
 // -----------------------------------------------------------------------------
+
 void AlignmentSplit::Write(util::BitWriter& writer) const {
   writer.WriteAlignedInt(split_alignment_);
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
     uint8_t as_depth, util::BitReader& reader) {
   switch (reader.ReadAlignedInt<Type>()) {
@@ -45,6 +48,7 @@ std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
 }
 
 // -----------------------------------------------------------------------------
+
 AlignmentSplit::Type AlignmentSplit::GetType() const {
   return split_alignment_;
 }

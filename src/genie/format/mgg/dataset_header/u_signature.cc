@@ -12,17 +12,21 @@
 namespace genie::format::mgg::dataset_header {
 
 // -----------------------------------------------------------------------------
+
 bool USignature::operator==(const USignature& other) const {
   return const_length_ == other.const_length_;
 }
 
 // -----------------------------------------------------------------------------
+
 USignature::USignature() : const_length_(std::nullopt) {}
 
 // -----------------------------------------------------------------------------
+
 USignature::USignature(uint8_t const_length) : const_length_(const_length) {}
 
 // -----------------------------------------------------------------------------
+
 USignature::USignature(util::BitReader& reader) {
   if (reader.Read<bool>(1)) {
     const_length_ = reader.Read<uint8_t>(8);
@@ -30,6 +34,7 @@ USignature::USignature(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void USignature::Write(util::BitWriter& writer) const {
   writer.WriteBits(IsConstLength(), 1);
   if (IsConstLength()) {
@@ -38,9 +43,11 @@ void USignature::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool USignature::IsConstLength() const { return const_length_ != std::nullopt; }
 
 // -----------------------------------------------------------------------------
+
 uint8_t USignature::GetConstLength() const { return *const_length_; }
 
 // -----------------------------------------------------------------------------

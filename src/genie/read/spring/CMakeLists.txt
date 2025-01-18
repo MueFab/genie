@@ -11,6 +11,8 @@ set(source_files
         encoder.cc
         encoder_source.cc
         util.cc
+        ../../util/barrier.h
+        ../../util/barrier.cc
 )
 
 add_library(genie-spring ${source_files})
@@ -21,8 +23,4 @@ target_link_libraries(genie-spring PUBLIC genie-lzma)
 target_link_libraries(genie-spring PUBLIC genie-bsc)
 
 target_link_libraries(genie-spring PUBLIC genie-core)
-
-if (${GENIE_USE_OPENMP})
-    target_compile_definitions(genie-spring PRIVATE GENIE_USE_OPENMP)
-    target_link_libraries(genie-spring PRIVATE ${OpenMP_CXX_LIBRARIES})
-endif ()
+target_link_libraries(genie-spring PRIVATE ${OpenMP_CXX_LIBRARIES})

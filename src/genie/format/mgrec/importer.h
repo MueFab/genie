@@ -53,6 +53,9 @@ class Importer final : public core::FormatImporter {
       buffered_record_;  //!< Buffer to hold the current record being processed
   bool check_support_;   //!< Flag to enable/disable record support checking
 
+  uint64_t file_size_;   //!< Size of the input file
+  float last_progress_;  //!< Last progress indicator
+
   /**
    * @brief Check if a given record is supported by the importer.
    * @param rec Record to be validated.

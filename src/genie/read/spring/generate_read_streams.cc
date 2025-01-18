@@ -1,18 +1,23 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file generate_read_streams.cc
+ * @brief Implementation of functions for generating read streams in the Spring
+ * module of Genie.
+ *
+ * This file contains the implementation of functions that generate encoded read
+ * streams from temporary directory files. It utilizes the `CompressionParams`
+ * structure and various encoders provided by the GENIE core. The resulting read
+ * streams are written in a format that can be used for efficient encoding and
+ * compression within the Spring module.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
+ *
  */
 
-#ifdef GENIE_USE_OPENMP
-#include <omp.h>
-#endif
-
-// -----------------------------------------------------------------------------
+#include "genie/read/spring/generate_read_streams.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -26,14 +31,18 @@
 #include "genie/core/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/read_encoder.h"
-#include "genie/read/spring/generate_read_streams.h"
+#include "genie/util/dynamic_scheduler.h"
 #include "genie/read/spring/util.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Spring";
 
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 struct SeData {
   CompressionParams cp{};
   std::vector<bool> flag_arr;
@@ -50,6 +59,7 @@ struct SeData {
 };
 
 // -----------------------------------------------------------------------------
+
 void GenerateSubSeqs(const SeData& data, const uint64_t block_num,
                      core::AccessUnit& raw_au) {
   int64_t rc_to_int[128];
@@ -147,6 +157,70 @@ void GenerateSubSeqs(const SeData& data, const uint64_t block_num,
 }
 
 // -----------------------------------------------------------------------------
+
+// Task to process a single block
+void process_block_task(size_t block_num,
+                        std::vector<core::parameter::EncodingSet>& params,
+                        const SeData& data,
+                        std::vector<uint32_t>& num_reads_per_block,
+                        bool write_raw,
+                        core::ReadEncoder::entropy_selector* entropy_encoder,
+                        std::vector<core::stats::PerfStats>& stat_vec,
+                        const std::string& temp_dir) {
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "-------- Processing block " + std::to_string(block_num) + "/" +
+                std::to_string(num_reads_per_block.size()));
+  params[block_num] = core::parameter::EncodingSet(
+      core::parameter::ParameterSet::DatasetType::kNonAligned,
+      core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
+  params[block_num].SetComputedRef(core::parameter::ComputedRef(
+      core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
+  core::AccessUnit au(std::move(params[block_num]), 0);
+
+  GenerateSubSeqs(data, block_num, au);
+  num_reads_per_block[block_num] = static_cast<uint32_t>(
+      au.Get(core::gen_sub::kReverseComplement).GetNumSymbols());
+
+  au = core::ReadEncoder::EntropyCodeAu(entropy_encoder, std::move(au),
+                                        write_raw);
+  stat_vec[block_num].Add(au.GetStats());
+
+  params[block_num] = std::move(au.MoveParameters());
+
+  std::string file_to_save_streams =
+      temp_dir + "/read_streams." + std::to_string(block_num);
+  for (const auto& d : au) {
+    if (d.IsEmpty()) {
+      continue;
+    }
+    std::ofstream out(file_to_save_streams + "." +
+                          std::to_string(static_cast<uint8_t>(d.GetId())),
+                      std::ios::binary);
+    util::BitWriter bw(out);
+    d.Write(bw);
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+void parallel_process_blocks_dynamic(
+    const size_t blocks, std::vector<core::parameter::EncodingSet>& params,
+    const SeData& data, std::vector<uint32_t>& num_reads_per_block,
+    const bool write_raw, core::ReadEncoder::entropy_selector* entropy_encoder,
+    std::vector<core::stats::PerfStats>& stat_vec, const std::string& temp_dir,
+    const int num_threads) {
+  // Create an instance of the DynamicScheduler
+  util::DynamicScheduler scheduler(num_threads);
+
+  // Run the dynamic scheduler with tasks
+  scheduler.run(blocks, [&](const util::DynamicScheduler::SchedulerInfo& info) {
+    process_block_task(info.task_id, params, data, num_reads_per_block,
+                       write_raw, entropy_encoder, stat_vec, temp_dir);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
 void GenerateAndCompressSe(const std::string& temp_dir, const SeData& data,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
                            std::vector<core::parameter::EncodingSet>& params,
@@ -161,45 +235,9 @@ void GenerateAndCompressSe(const std::string& temp_dir, const SeData& data,
 
   std::vector<uint32_t> num_reads_per_block(blocks);
   std::vector<core::stats::PerfStats> stat_vec(blocks);
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(data.cp.num_thr)            \
-    schedule(dynamic) default(none)                              \
-    shared(blocks, params, data, num_reads_per_block, write_raw, \
-               entropy_encoder, stat_vec, temp_dir,              \
-               core::gen_sub::kReverseComplement)
-#endif
-  for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks);
-       block_num++) {
-    params[block_num] = core::parameter::EncodingSet(
-        core::parameter::ParameterSet::DatasetType::kNonAligned,
-        core::AlphabetId::kAcgtn, 0, false, false, 1, 0, false, false);
-    params[block_num].SetComputedRef(core::parameter::ComputedRef(
-        core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
-    core::AccessUnit au(std::move(params[block_num]), 0);
-
-    GenerateSubSeqs(data, block_num, au);
-    num_reads_per_block[block_num] = static_cast<uint32_t>(
-        au.Get(core::gen_sub::kReverseComplement).GetNumSymbols());
-
-    au = core::ReadEncoder::EntropyCodeAu(entropy_encoder, std::move(au),
-                                          write_raw);
-    stat_vec[block_num].Add(au.GetStats());
-
-    params[block_num] = std::move(au.MoveParameters());
-
-    std::string file_to_save_streams =
-        temp_dir + "/read_streams." + std::to_string(block_num);
-    for (const auto& d : au) {
-      if (d.IsEmpty()) {
-        continue;
-      }
-      std::ofstream out(file_to_save_streams + "." +
-                            std::to_string(static_cast<uint8_t>(d.GetId())),
-                        std::ios::binary);
-      util::BitWriter bw(out);
-      d.Write(bw);
-    }
-  }  // end omp parallel for
+  parallel_process_blocks_dynamic(blocks, params, data, num_reads_per_block,
+                                  write_raw, entropy_encoder, stat_vec,
+                                  temp_dir, data.cp.num_thr);
 
   for (const auto& s : stat_vec) {
     stats.Add(s);
@@ -216,6 +254,7 @@ void GenerateAndCompressSe(const std::string& temp_dir, const SeData& data,
 }
 
 // -----------------------------------------------------------------------------
+
 void LoadSeData(const CompressionParams& cp, const std::string& temp_dir,
                 SeData* data) {
   const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -344,6 +383,7 @@ void LoadSeData(const CompressionParams& cp, const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreamsSe(const std::string& temp_dir,
                            const CompressionParams& cp,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
@@ -358,6 +398,7 @@ void GenerateReadStreamsSe(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void LoadPeData(const CompressionParams& cp, const std::string& temp_dir,
                 SeData* data) {
   const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -455,7 +496,7 @@ void LoadPeData(const CompressionParams& cp, const std::string& temp_dir,
   std::ifstream f_unaligned_count(file_unaligned_count,
                                   std::ios::in | std::ios::binary);
   UTILS_DIE_IF(!f_unaligned_count,
-                   "Cannot open file to read: " + file_unaligned_count);
+               "Cannot open file to read: " + file_unaligned_count);
   uint64_t unaligned_array_size;
   f_unaligned_count.read(reinterpret_cast<char*>(&unaligned_array_size),
                          sizeof(uint64_t));
@@ -497,6 +538,7 @@ void LoadPeData(const CompressionParams& cp, const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 struct PeBlockData {
   std::vector<uint32_t> block_start;
   std::vector<uint32_t> block_end;  // block start and end positions wrt
@@ -508,6 +550,7 @@ struct PeBlockData {
 };
 
 // -----------------------------------------------------------------------------
+
 void GenerateBlocksPe(const SeData& data, PeBlockData* block_data) {
   block_data->block_num = std::vector<uint32_t>(data.cp.num_reads);
 
@@ -618,6 +661,7 @@ void GenerateBlocksPe(const SeData& data, PeBlockData* block_data) {
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateQualityIdPaired(const std::string& temp_dir,
                              const PeBlockData& block_data,
                              uint32_t num_reads) {
@@ -691,6 +735,7 @@ void GenerateQualityIdPaired(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 struct PeStatistics {
   std::vector<uint32_t> count_same_rec;
   std::vector<uint32_t> count_split_same_au;
@@ -698,15 +743,10 @@ struct PeStatistics {
 };
 
 // -----------------------------------------------------------------------------
-void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
-                       const uint64_t cur_block_num, PeStatistics* pest,
-                       core::AccessUnit& raw_au) {
-#ifdef GENIE_USE_OPENMP
-  const unsigned cur_thread_num = omp_get_thread_num();
-#else
-  const unsigned cur_thread_num = 0;
-#endif
 
+void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
+                       const uint64_t cur_block_num, PeStatistics& pest,
+                       const size_t cur_thread_num, core::AccessUnit& raw_au) {
   int64_t rc_to_int[128];
   rc_to_int[static_cast<uint8_t>('d')] = 0;
   rc_to_int[static_cast<uint8_t>('r')] = 1;
@@ -831,7 +871,7 @@ void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
             .Push(0);  // pair decoding case same_rec
         raw_au.Get(core::gen_sub::kPairSameRec)
             .Push(!read_1_first + 2 * delta);  // pair
-        pest->count_same_rec[cur_thread_num]++;
+        pest.count_same_rec[cur_thread_num]++;
       }
     } else {
       // only one read in genomic record
@@ -893,9 +933,9 @@ void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
       const bool same_block =
           block_data.block_num[current] == block_data.block_num[pair];
       if (same_block)
-        pest->count_split_same_au[cur_thread_num]++;
+        pest.count_split_same_au[cur_thread_num]++;
       else
-        pest->count_split_diff_au[cur_thread_num]++;
+        pest.count_split_diff_au[cur_thread_num]++;
 
       if (const bool read_1_first = current < pair;
           same_block && !read_1_first) {
@@ -925,7 +965,76 @@ void GenerateStreamsPe(const SeData& data, const PeBlockData& block_data,
   }
 }
 
+void process_block_task(size_t cur_block_num, const PeBlockData& block_data,
+                        std::vector<core::parameter::EncodingSet>& params,
+                        PeStatistics& pest, const SeData& data,
+                        std::vector<uint32_t>& num_reads_per_block,
+                        std::vector<uint32_t>& num_records_per_block,
+                        bool write_raw,
+                        core::ReadEncoder::entropy_selector* entropy_encoder,
+                        std::vector<core::stats::PerfStats>& stat_vec,
+                        const std::string& temp_dir, size_t cur_thread_num) {
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "-------- Processing block " + std::to_string(cur_block_num) + "/" +
+                std::to_string(block_data.block_start.size()));
+  params[cur_block_num] = core::parameter::EncodingSet(
+      core::parameter::ParameterSet::DatasetType::kNonAligned,
+      core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
+  params[cur_block_num].SetComputedRef(core::parameter::ComputedRef(
+      core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
+  core::AccessUnit au(std::move(params[cur_block_num]), 0);
+
+  GenerateStreamsPe(data, block_data, cur_block_num, pest, cur_thread_num, au);
+  num_reads_per_block[cur_block_num] = static_cast<uint32_t>(
+      au.Get(core::gen_sub::kReverseComplement).GetNumSymbols());
+  num_records_per_block[cur_block_num] =
+      block_data.block_end[cur_block_num] -
+      block_data.block_start[cur_block_num];  // used later for ids
+  au = core::ReadEncoder::EntropyCodeAu(entropy_encoder, std::move(au),
+                                        write_raw);
+
+  stat_vec[cur_block_num].Add(au.GetStats());
+
+  params[cur_block_num] = std::move(au.MoveParameters());
+
+  std::string file_to_save_streams =
+      temp_dir + "/read_streams." + std::to_string(cur_block_num);
+  for (const auto& d : au) {
+    if (d.IsEmpty()) {
+      continue;
+    }
+    std::ofstream out(file_to_save_streams + "." +
+                          std::to_string(static_cast<uint8_t>(d.GetId())),
+                      std::ios::binary);
+    util::BitWriter bw(out);
+    d.Write(bw);
+  }
+}
+
+// Function replacing OpenMP loop
+void parallel_process_blocks_dynamic(
+    const PeBlockData& block_data,
+    std::vector<core::parameter::EncodingSet>& params, PeStatistics& pest,
+    const SeData& data, std::vector<uint32_t>& num_reads_per_block,
+    std::vector<uint32_t>& num_records_per_block, const bool write_raw,
+    core::ReadEncoder::entropy_selector* entropy_encoder,
+    std::vector<core::stats::PerfStats>& stat_vec, const std::string& temp_dir,
+    const int num_threads) {
+  // Create an instance of the DynamicScheduler
+  util::DynamicScheduler scheduler(num_threads);
+
+  // Run the dynamic scheduler with tasks
+  scheduler.run(block_data.block_start.size(),
+                [&](const util::DynamicScheduler::SchedulerInfo& info) {
+                  process_block_task(
+                      info.task_id, block_data, params, pest, data,
+                      num_reads_per_block, num_records_per_block, write_raw,
+                      entropy_encoder, stat_vec, temp_dir, info.thread_id);
+                });
+}
+
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreamsPe(const std::string& temp_dir,
                            const CompressionParams& cp,
                            core::ReadEncoder::entropy_selector* entropy_encoder,
@@ -963,67 +1072,31 @@ void GenerateReadStreamsPe(const std::string& temp_dir,
   std::vector<core::stats::PerfStats> stat_vec(block_data.block_start.size());
 
   // PE step 4: Now generate read streams and Compress blocks in parallel
-// this is actually number of read pairs per block for PE
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(cp.num_thr)                            \
-    schedule(dynamic) default(none)                                         \
-    shared(block_data, params, pest, data, num_reads_per_block,             \
-               num_records_per_block, write_raw, entropy_encoder, stat_vec, \
-               temp_dir, core::gen_sub::kReverseComplement)
-#endif
-  for (int64_t cur_block_num = 0;
-       cur_block_num < static_cast<int64_t>(block_data.block_start.size());
-       cur_block_num++) {
-    params[cur_block_num] = core::parameter::EncodingSet(
-        core::parameter::ParameterSet::DatasetType::kNonAligned,
-        core::AlphabetId::kAcgtn, 0, true, false, 1, 0, false, false);
-    params[cur_block_num].SetComputedRef(core::parameter::ComputedRef(
-        core::parameter::ComputedRef::Algorithm::kGlobalAssembly));
-    core::AccessUnit au(std::move(params[cur_block_num]), 0);
-
-    GenerateStreamsPe(data, block_data, cur_block_num, &pest, au);
-    num_reads_per_block[cur_block_num] = static_cast<uint32_t>(
-        au.Get(core::gen_sub::kReverseComplement).GetNumSymbols());
-    num_records_per_block[cur_block_num] =
-        block_data.block_end[cur_block_num] -
-        block_data.block_start[cur_block_num];  // used later for ids
-    au = core::ReadEncoder::EntropyCodeAu(entropy_encoder, std::move(au),
-                                          write_raw);
-
-    stat_vec[cur_block_num].Add(au.GetStats());
-
-    params[cur_block_num] = std::move(au.MoveParameters());
-
-    std::string file_to_save_streams =
-        temp_dir + "/read_streams." + std::to_string(cur_block_num);
-    for (const auto& d : au) {
-      if (d.IsEmpty()) {
-        continue;
-      }
-      std::ofstream out(file_to_save_streams + "." +
-                            std::to_string(static_cast<uint8_t>(d.GetId())),
-                        std::ios::binary);
-      util::BitWriter bw(out);
-      d.Write(bw);
-    }
-  }  // end omp parallel
+  // this is actually number of read pairs per block for PE
+  parallel_process_blocks_dynamic(block_data, params, pest, data,
+                                  num_reads_per_block, num_records_per_block,
+                                  write_raw, entropy_encoder, stat_vec,
+                                  temp_dir, cp.num_thr);
 
   for (const auto& s : stat_vec) {
     stats.Add(s);
   }
 
-  std::cerr << "count_same_rec: "
-            << std::accumulate(pest.count_same_rec.begin(),
-                               pest.count_same_rec.end(), 0u)
-            << "\n";
-  std::cerr << "count_split_same_AU: "
-            << std::accumulate(pest.count_split_same_au.begin(),
-                               pest.count_split_same_au.end(), 0u)
-            << "\n";
-  std::cerr << "count_split_diff_AU: "
-            << std::accumulate(pest.count_split_diff_au.begin(),
-                               pest.count_split_diff_au.end(), 0u)
-            << "\n";
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "---- Joint records: " +
+                std::to_string(std::accumulate(pest.count_same_rec.begin(),
+                                               pest.count_same_rec.end(), 0u)));
+
+  UTILS_LOG(util::Logger::Severity::INFO,
+            "---- Split records, same AU: " +
+                std::to_string(std::accumulate(pest.count_same_rec.begin(),
+                                               pest.count_same_rec.end(), 0u)));
+
+  UTILS_LOG(
+      util::Logger::Severity::INFO,
+      "---- Split records, diff AU: " +
+          std::to_string(std::accumulate(pest.count_split_diff_au.begin(),
+                                         pest.count_split_diff_au.end(), 0u)));
 
   // write num blocks, reads per block and records per block to a file
   const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -1039,6 +1112,7 @@ void GenerateReadStreamsPe(const std::string& temp_dir,
 }
 
 // -----------------------------------------------------------------------------
+
 void GenerateReadStreams(const std::string& temp_dir,
                          const CompressionParams& cp,
                          core::ReadEncoder::entropy_selector* entropy_encoder,

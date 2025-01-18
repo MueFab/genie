@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ * @brief Implementation of Zstd-based entropy encoding for Genie.
+ *
+ * Provides functionality for compressing subsequences,
+ * managing descriptor parameters,
+ * and tracking performance metrics using the Zstd library.
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -25,6 +30,7 @@
 namespace genie::entropy::zstd {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void FillDecoder(const core::GenomicDescriptorProperties& desc,
                  T& decoder_config) {
@@ -38,6 +44,7 @@ void FillDecoder(const core::GenomicDescriptorProperties& desc,
 }
 
 // -----------------------------------------------------------------------------
+
 void StoreParameters(core::GenDesc desc,
                      core::parameter::DescriptorSubSequenceCfg& parameter_set) {
   auto descriptor_configuration =
@@ -52,6 +59,7 @@ void StoreParameters(core::GenDesc desc,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence&& in) {
   const size_t num_symbols = in.GetNumSymbols();
   util::DataBlock input_buffer = in.Move();
@@ -72,6 +80,7 @@ core::AccessUnit::Subsequence compress(core::AccessUnit::Subsequence&& in) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::EntropyEncoder::entropy_coded Encoder::Process(
     core::AccessUnit::Descriptor& desc) {
   entropy_coded ret;
@@ -83,7 +92,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
       const auto [fst, snd] = sub_sequence.GetId();
 
       std::get<2>(ret).AddInteger(
-          "Size-zstd-total-raw",
+          "size-zstd-total-raw",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
       auto sub_seq_name = std::string();
       if (GetDescriptor(std::get<1>(ret).GetId()).token_type) {
@@ -94,17 +103,17 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
             GetDescriptor(std::get<1>(ret).GetId()).sub_seqs[snd].name;
       }
       std::get<2>(ret).AddInteger(
-          "Size-zstd-" + sub_seq_name + "-raw",
+          "size-zstd-" + sub_seq_name + "-raw",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
 
       std::get<1>(ret).Set(snd, compress(std::move(sub_sequence)));
 
       if (!std::get<1>(ret).Get(snd).IsEmpty()) {
         std::get<2>(ret).AddInteger(
-            "Size-zstd-total-comp",
+            "size-zstd-total-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(snd).GetRawSize()));
         std::get<2>(ret).AddInteger(
-            "Size-zstd-" + sub_seq_name + "-comp",
+            "size-zstd-" + sub_seq_name + "-comp",
             static_cast<int64_t>(std::get<1>(ret).Get(snd).GetRawSize()));
       }
     } else {
@@ -120,6 +129,7 @@ core::EntropyEncoder::entropy_coded Encoder::Process(
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const bool write_out_streams)
     : write_out_streams_(write_out_streams) {}
 

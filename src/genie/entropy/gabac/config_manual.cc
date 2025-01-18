@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,6 +19,7 @@ namespace genie::entropy::gabac {
 #define MAX_NUM_TRANSPORT_SEQS 4  // put max 4 for now.
 
 // -----------------------------------------------------------------------------
+
 uint8_t GetCmaxTu(const uint64_t num_alpha_special,
                   const uint8_t coding_subsym_size) {
   if (num_alpha_special > 0) { /* special case */
@@ -29,6 +30,7 @@ uint8_t GetCmaxTu(const uint64_t num_alpha_special,
 }
 
 // -----------------------------------------------------------------------------
+
 paramcabac::Subsequence GetEncoderConfigManual(const core::GenSubIndex& sub) {
   const auto genie_desc_id = static_cast<core::GenDesc>(sub.first);
   const core::GenSubIndex genie_subseq_id = sub;

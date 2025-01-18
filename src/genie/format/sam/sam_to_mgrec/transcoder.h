@@ -29,6 +29,7 @@
 namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
+
 #define PHASE1_EXT ".phase1.mgrec"
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"
@@ -61,16 +62,6 @@ std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(
  * @return
  */
 std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
-
-/**
- * @brief
- * @param options
- * @param num_chunks
- * @param refs
- */
-void sam_to_mgrec_phase2(
-    Config& options, int num_chunks,
-    const std::vector<std::pair<std::string, size_t>>& refs);
 
 /**
  * @brief

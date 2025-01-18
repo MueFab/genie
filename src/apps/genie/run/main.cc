@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -33,12 +33,16 @@
 #include "genie/quality/qvwriteout/encoder_none.h"
 #include "genie/read/lowlatency/encoder.h"
 #include "genie/util/stop_watch.h"
+#include "util/log.h"
+
+constexpr auto kLogModuleName = "App/Run";
 
 // -----------------------------------------------------------------------------
 
 namespace genie_app::run {
 
 // -----------------------------------------------------------------------------
+
 std::string file_extension(const std::string& path) {
   const auto pos = path.find_last_of('.');
   std::string ext = path.substr(pos + 1);
@@ -49,12 +53,15 @@ std::string file_extension(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 enum class OperationCase { UNKNOWN = 0, ENCODE = 1, DECODE = 2, CAPSULATE = 4 };
 
 // -----------------------------------------------------------------------------
+
 enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 
 // -----------------------------------------------------------------------------
+
 FileType GetType(const std::string& ext) {
   if (ext == "mgrec" || ext == "fasta" || ext == "fastq" || ext == "sam") {
     return FileType::THIRD_PARTY;
@@ -66,6 +73,7 @@ FileType GetType(const std::string& ext) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const FileType in, const FileType out) {
   if (in == FileType::THIRD_PARTY && out == FileType::MPEG) {
     return OperationCase::ENCODE;
@@ -80,6 +88,7 @@ OperationCase GetOperation(const FileType in, const FileType out) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const std::string& filename_in,
                            const std::string& filename_out) {
   return GetOperation(GetType(file_extension(filename_in)),
@@ -87,6 +96,7 @@ OperationCase GetOperation(const std::string& filename_in,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ofstream>>& output_files) {
@@ -122,6 +132,7 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 void AddFasta(const std::string& fasta_file_path,
               genie::core::FlowGraphEncode* flow,
               std::vector<std::unique_ptr<std::ifstream>>& input_files) {
@@ -133,13 +144,14 @@ void AddFasta(const std::string& fasta_file_path,
   auto fasta_file = std::make_unique<std::ifstream>(fasta_file_path);
   UTILS_DIE_IF(!fasta_file, "Cannot open file to read: " + fasta_file_path);
   if (!std::filesystem::exists(fai)) {
-    std::cerr << "Indexing " << fasta_file_path << " ..." << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Indexing " + fasta_file_path);
     std::ofstream fai_file(fai);
     genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
   }
   if (!std::filesystem::exists(sha)) {
-    std::cerr << "Calculating hashes " << fasta_file_path << " ..."
-              << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::INFO,
+              "Calculating hashes " + fasta_file_path);
     std::ofstream sha_file(sha);
     std::ifstream fai_file(fai);
     UTILS_DIE_IF(!fai_file, "Cannot open file to read: " + fai);
@@ -159,6 +171,7 @@ void AddFasta(const std::string& fasta_file_path,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporterMgrec(
     T& flow, const ProgramOptions& p_opts,
@@ -168,7 +181,7 @@ void AttachImporterMgrec(
   if (p_opts.inputFile.substr(0, 2) != "-.") {
     input_files.emplace_back(std::make_unique<std::ifstream>(p_opts.inputFile));
     UTILS_DIE_IF(!input_files.back(),
-                   "Cannot open file to read: " + p_opts.inputFile);
+                 "Cannot open file to read: " + p_opts.inputFile);
     in_ptr = input_files.back().get();
   }
 
@@ -184,6 +197,7 @@ void AttachImporterMgrec(
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporterFastq(
     T& flow, const ProgramOptions& p_opts,
@@ -193,7 +207,7 @@ void AttachImporterFastq(
   if (p_opts.inputFile.substr(0, 2) != "-.") {
     input_files.emplace_back(std::make_unique<std::ifstream>(p_opts.inputFile));
     UTILS_DIE_IF(!input_files.back(),
-                   "Cannot open file to read: " + p_opts.inputFile);
+                 "Cannot open file to read: " + p_opts.inputFile);
     file1 = input_files.back().get();
   }
   if (file_extension(p_opts.inputSupFile) == "fastq") {
@@ -228,6 +242,7 @@ void AttachImporterSam(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -293,6 +308,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildEncoder(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -314,13 +330,16 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
       UTILS_DIE_IF(uri.substr(0, scheme.length()) != scheme,
                    "Unknown URI scheme: " + uri);
       std::string path = uri.substr(scheme.length());
-      std::cerr << "Extracted reference URI: " << uri << std::endl;
+      UTILS_LOG(genie::util::Logger::Severity::INFO,
+                "Extracted reference URI " + uri);
       if (std::filesystem::exists(path)) {
-        std::cerr << "Reference URI valid." << std::endl;
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
+                  "Reference URI valid" + uri);
         json_uri_path = path;
       } else {
-        std::cerr << "Reference URI invalid. Falling back to CLI reference."
-                  << std::endl;
+        UTILS_LOG(
+            genie::util::Logger::Severity::WARNING,
+            "Reference URI invalid. Falling back to CLI reference." + uri);
       }
     }
   }
@@ -334,13 +353,14 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
           "sha256";
       auto fasta_file = std::make_unique<std::ifstream>(json_uri_path);
       if (!std::filesystem::exists(fai)) {
-        std::cerr << "Indexing " << json_uri_path << " ..." << std::endl;
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
+                  "Indexing " + json_uri_path);
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
       }
       if (!std::filesystem::exists(sha)) {
-        std::cerr << "Calculating hashes " << json_uri_path << " ..."
-                  << std::endl;
+        UTILS_LOG(genie::util::Logger::Severity::INFO,
+                  "Calculating hashes " + json_uri_path);
         std::ofstream sha_file(sha);
         std::ifstream fai_file(fai);
         UTILS_DIE_IF(!fai_file, "Cannot open file to read: " + fai);
@@ -377,6 +397,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildDecoder(
 }
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     ProgramOptions p_opts(argc, argv);
@@ -413,15 +434,15 @@ int main(int argc, char* argv[]) {
     }
 
     auto stats = flow_graph->GetStats();
-    stats.AddDouble("time-total", watch.Check());
-    std::cerr << stats << std::endl;
+    stats.AddDouble("time-wallclock", watch.Check());
+    stats.print();
 
     return 0;
   } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error: Unknown" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }

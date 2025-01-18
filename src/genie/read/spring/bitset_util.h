@@ -22,7 +22,9 @@
 #include <bbhash/BooPHF.h>
 
 #include <bitset>
+#include <memory>
 #include <string>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -43,16 +45,28 @@ using BooHashFunType = boomphf::mphf<uint64_t, HashObj>;
  */
 class BbHashDict {
  public:
-  BooHashFunType* boo_hash_fun_;  //!< BooPHF hash function
-  int start_;                     //!< Starting position for the dictionary
-  int end_;                       //!< Ending position for the dictionary
-  uint32_t num_keys_;             //!< Number of keys in the dictionary
-  uint32_t dict_num_reads_;       //!< Number of reads in this dictionary (for
-                                  //!< variable length)
-  uint32_t* start_pos_;           //!< Start positions for reads
-  uint32_t* read_id_;             //!< Read IDs for tracking
-  bool* empty_bin_ =
-      nullptr;  //!< Flags indicating empty bins in the dictionary
+  /// BooPHF hash function
+  std::unique_ptr<BooHashFunType> boo_hash_fun_;
+
+  /// Starting position for the dictionary
+  int start_;
+
+  /// Ending position for the dictionary
+  int end_;
+  /// Number of keys in the dictionary
+  uint32_t num_keys_;
+
+  /// Number of reads in this dictionary (for variable length)
+  uint32_t dict_num_reads_;
+
+  /// Start positions for reads
+  std::vector<uint32_t> start_pos_;
+
+  /// Read IDs for tracking
+  std::vector<uint32_t> read_id_;
+
+  /// Flags indicating empty bins in the dictionary
+  std::vector<uint8_t> empty_bin_;
 
   /**
    * @brief Find the position of a given key.
@@ -68,29 +82,11 @@ class BbHashDict {
    * @param current Current position to remove.
    */
   void Remove(const int64_t* dict_idx, const uint64_t& start_pos_idx,
-              int64_t current) const;
-
-  /**
-   * @brief Default constructor initializing pointers to nullptr.
-   */
-  BbHashDict() : start_(), end_(), num_keys_(), dict_num_reads_() {
-    boo_hash_fun_ = nullptr;
-    start_pos_ = nullptr;
-    read_id_ = nullptr;
-  }
-
-  /**
-   * @brief Destructor to free allocated memory.
-   */
-  ~BbHashDict() {
-    delete[] start_pos_;
-    delete[] read_id_;
-    delete[] empty_bin_;
-    delete boo_hash_fun_;
-  }
+              int64_t current);
 };
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Convert a string into a bitset based on character values.
  * @tparam BitsetSize Size of the bitset.
@@ -100,9 +96,9 @@ class BbHashDict {
  * @param base_mask Base masks to assist in conversion.
  */
 template <size_t BitsetSize>
-void StringToBitset(const std::string& s, uint16_t read_length,
-                    std::bitset<BitsetSize>& b,
-                    std::bitset<BitsetSize>** base_mask);
+void StringToBitset(
+    const std::string& s, uint16_t read_length, std::bitset<BitsetSize>& b,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask);
 
 /**
  * @brief Generate index masks for dictionary lookup.
@@ -113,14 +109,21 @@ void StringToBitset(const std::string& s, uint16_t read_length,
  * @param bpb Bits per base (typically 2 for DNA sequences).
  */
 template <size_t BitsetSize>
-void GenerateIndexMasks(std::bitset<BitsetSize>* mask1, BbHashDict* dict,
-                        int num_dict, int bpb);
+void GenerateIndexMasks(std::vector<std::bitset<BitsetSize>>& mask1,
+                        BbHashDict* dict, int num_dict, int bpb);
+
+struct SizeRange {
+  uint32_t start;
+  uint32_t end;
+};
+
+using DictSizes = std::array<SizeRange, 2>;
 
 /**
  * @brief Construct a dictionary using the given reads and parameters.
  * @tparam BitsetSize Size of the bitset.
  * @param read Array of reads in bitset format.
- * @param dict Pointer to the dictionary object.
+ * @param dict_sizes Dictionary sizes for the first two dictionaries.
  * @param read_lengths Array storing the lengths of each read.
  * @param num_dict Number of dictionaries.
  * @param num_reads Total number of reads.
@@ -129,10 +132,11 @@ void GenerateIndexMasks(std::bitset<BitsetSize>* mask1, BbHashDict* dict,
  * @param num_threads Number of threads to use for parallel processing.
  */
 template <size_t BitsetSize>
-void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
-                         const uint16_t* read_lengths, int num_dict,
-                         const uint32_t& num_reads, int bpb,
-                         const std::string& basedir, const int& num_threads);
+std::vector<BbHashDict> ConstructDictionary(
+    const std::vector<std::bitset<BitsetSize>>& read,
+    const std::vector<uint16_t>& read_lengths, int num_dict,
+    const uint32_t& num_reads, int bpb, const std::string& basedir,
+    const int& num_threads, const DictSizes& dict_sizes);
 
 /**
  * @brief Generate masks for each base in the reads.
@@ -142,7 +146,8 @@ void ConstructDictionary(std::bitset<BitsetSize>* read, BbHashDict* dict,
  * @param bpb Bits per base (typically 2 for DNA sequences).
  */
 template <size_t BitsetSize>
-void GenerateMasks(std::bitset<BitsetSize>** mask, int max_read_len, int bpb);
+std::vector<std::vector<std::bitset<BitsetSize>>> GenerateMasks(
+    uint32_t max_read_len, uint8_t bpb);
 
 /**
  * @brief Convert a character array into a bitset based on base values.
@@ -153,8 +158,9 @@ void GenerateMasks(std::bitset<BitsetSize>** mask, int max_read_len, int bpb);
  * @param base_mask Base masks to assist in conversion.
  */
 template <size_t BitsetSize>
-void CharToBitset(const char* s, int read_len, std::bitset<BitsetSize>& b,
-                  std::bitset<BitsetSize>** base_mask);
+std::bitset<BitsetSize> CharToBitset(
+    const std::string& s, size_t read_len,
+    const std::vector<std::vector<std::bitset<BitsetSize>>>& base_mask);
 
 // -----------------------------------------------------------------------------
 

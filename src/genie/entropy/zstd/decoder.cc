@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ * @brief Implementation of Zstd-based entropy decoding for Genie.
+ *
+ * Provides functionality to decompress subsequences and process descriptors
+ * using the Zstd library, ensuring efficient entropy decoding with performance
+ * tracking.
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,6 +28,7 @@
 namespace genie::entropy::zstd {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
   const auto id = data.GetId();
 
@@ -52,6 +58,7 @@ core::AccessUnit::Subsequence decompress(core::AccessUnit::Subsequence&& data) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {
@@ -76,10 +83,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
     }
     if (!sub_sequence.IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-zstd-total-comp",
+          "size-zstd-total-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-zstd-" + sub_seq_name + "-comp",
+          "size-zstd-" + sub_seq_name + "-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
     }
 
@@ -87,10 +94,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (!std::get<0>(desc).Get(snd).IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-zstd-total-raw",
+          "size-zstd-total-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-zstd-" + sub_seq_name + "-raw",
+          "size-zstd-" + sub_seq_name + "-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(snd).GetRawSize()));
     }
   }

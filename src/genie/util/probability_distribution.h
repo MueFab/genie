@@ -21,8 +21,8 @@
  * within a specific interval and for constructing probability models.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
-#define SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
+#ifndef SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
+#define SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief A class for tracking and manipulating a discrete probability
@@ -44,10 +44,11 @@ namespace genie::quality::calq {
  * genomic data.
  */
 class ProbabilityDistribution {
-  std::vector<size_t> pdf_;  //!< @brief The probability distribution function
-                             //!< (PDF) represented as a vector of counts.
-  size_t range_min_;         //!< @brief The minimum value in the range of the
-                             //!< distribution.
+  /// The probability distribution (PDF) represented as vector of counts.
+  std::vector<size_t> pdf_;
+
+  /// The minimum value in the range of the distribution.
+  size_t range_min_;
 
  public:
   /**
@@ -131,11 +132,11 @@ class ProbabilityDistribution {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_PROBABILITY_DISTRIBUTION_H_
+#endif  // SRC_GENIE_UTIL_PROBABILITY_DISTRIBUTION_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

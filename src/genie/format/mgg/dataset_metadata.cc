@@ -17,12 +17,14 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetMetadata::GetKey() const {
   static const std::string key = "dtmd";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetMetadata::DatasetMetadata(util::BitReader& bitreader,
                                  const core::MpegMinorVersion version)
     : version_(version) {
@@ -44,6 +46,7 @@ DatasetMetadata::DatasetMetadata(util::BitReader& bitreader,
 }
 
 // -----------------------------------------------------------------------------
+
 DatasetMetadata::DatasetMetadata(const uint8_t dataset_group_id,
                                  const uint16_t dataset_id,
                                  std::string dg_metatdata_value,
@@ -54,6 +57,7 @@ DatasetMetadata::DatasetMetadata(const uint8_t dataset_group_id,
       dg_metatdata_value_(std::move(dg_metatdata_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void DatasetMetadata::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -64,17 +68,21 @@ void DatasetMetadata::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t DatasetMetadata::GetDatasetGroupId() const { return dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t DatasetMetadata::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DatasetMetadata::GetMetadata() const {
   return dg_metatdata_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DatasetMetadata::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -87,11 +95,13 @@ bool DatasetMetadata::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string DatasetMetadata::decapsulate() {
   return std::move(dg_metatdata_value_);
 }
 
 // -----------------------------------------------------------------------------
+
 void DatasetMetadata::PatchId(const uint8_t group_id, const uint16_t set_id) {
   dataset_group_id_ = group_id;
   dataset_id_ = set_id;

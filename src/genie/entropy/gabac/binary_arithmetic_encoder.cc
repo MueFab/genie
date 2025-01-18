@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,6 +16,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 BinaryArithmeticEncoder::BinaryArithmeticEncoder(
     const util::BitWriter& bit_output_stream)
     : bit_output_stream_(bit_output_stream),
@@ -26,9 +27,11 @@ BinaryArithmeticEncoder::BinaryArithmeticEncoder(
       range_(0) {}
 
 // -----------------------------------------------------------------------------
+
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
 
 // -----------------------------------------------------------------------------
+
 inline void BinaryArithmeticEncoder::EncodeBin(unsigned int bin,
                                                ContextModel* context_model) {
   assert((bin == 0) || (bin == 1));
@@ -58,6 +61,7 @@ inline void BinaryArithmeticEncoder::EncodeBin(unsigned int bin,
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::EncodeBinEp(unsigned int bin) {
   assert((bin == 0) || (bin == 1));
 
@@ -72,6 +76,7 @@ void BinaryArithmeticEncoder::EncodeBinEp(unsigned int bin) {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::EncodeBinsEp(unsigned int bins,
                                            unsigned int num_bins) {
   while (num_bins > 8) {
@@ -94,6 +99,7 @@ void BinaryArithmeticEncoder::EncodeBinsEp(unsigned int bins,
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::EncodeBinTrm(unsigned int bin) {
   // Encode the least-significant bit of bin as a terminating bin
   range_ -= 2;
@@ -115,6 +121,7 @@ void BinaryArithmeticEncoder::EncodeBinTrm(unsigned int bin) {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::Flush() {
   EncodeBinTrm(1);
   Finish();
@@ -124,6 +131,7 @@ void BinaryArithmeticEncoder::Flush() {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::Start() {
   buffered_byte_ = 0xff;
   low_ = 0;
@@ -133,6 +141,7 @@ void BinaryArithmeticEncoder::Start() {
 }
 
 // -----------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::Finish() {
   if ((low_ >> (32u - num_bits_left_)) > 0) {
     bit_output_stream_.WriteBits((buffered_byte_ + 1), 8);

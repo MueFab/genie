@@ -37,15 +37,17 @@ namespace genie::read::localassembly {
  */
 class LocalReference {
  public:
-  uint32_t cr_buf_max_size_;  //!< @brief Maximum buffer Size for the local
-                              //!< reference sequences.
+  /// Maximum buffer Size for the local reference sequences.
+  uint32_t cr_buf_max_size_;
 
-  std::vector<std::string>
-      sequences_;  //!< @brief Buffer storing sequence strings.
-  std::vector<uint64_t>
-      sequence_positions_;  //!< @brief Positions corresponding to the sequences
-                            //!< in the buffer.
-  uint32_t cr_buf_size_;    //!< @brief Current Size of the buffer.
+  /// Buffer storing sequence strings.
+  std::vector<std::string> sequences_;
+
+  /// Positions corresponding to the sequences in the buffer.
+  std::vector<uint64_t> sequence_positions_;
+
+  /// Current Size of the buffer.
+  uint32_t cr_buf_size_;
 
   /**
    * @brief Generate a reference sequence of specified length starting at a

@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -13,7 +13,7 @@
 #include <string>
 
 #include "genie/quality/calq/calq_coder.h"
-#include "genie/quality/calq/error_exception_reporter.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace genie::quality::calq {
 // -----------------------------------------------------------------------------
 
 QualityEncoder::QualityEncoder(const EncodingOptions& options,
-                               const std::map<int, Quantizer>& quant,
+                               const std::map<int, util::Quantizer>& quant,
                                DecodingBlock* output)
     : nr_mapped_records_(0),
       min_pos_unencoded_(0),
@@ -42,10 +42,6 @@ QualityEncoder::QualityEncoder(const EncodingOptions& options,
       out_(output),
 
       quantizers_(quant) {}
-
-// -----------------------------------------------------------------------------
-
-QualityEncoder::~QualityEncoder() = default;
 
 // -----------------------------------------------------------------------------
 
@@ -134,6 +130,7 @@ void QualityEncoder::FinishBlock() {
 size_t QualityEncoder::NrMappedRecords() const { return nr_mapped_records_; }
 
 // -----------------------------------------------------------------------------
+
 void QualityEncoder::EncodeMappedQuality(const std::string& quality_values,
                                          const std::string& cigar,
                                          const uint64_t pos) const {
@@ -190,7 +187,7 @@ void QualityEncoder::EncodeMappedQuality(const std::string& quality_values,
       case '[':
         break;  // ignore first clip char
       default:
-        THROW_ERROR_EXCEPTION("Bad CIGAR string");
+        UTILS_DIE("Bad CIGAR string");
     }
     op_len = 0;
   }

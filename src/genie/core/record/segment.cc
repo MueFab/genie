@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,12 +20,15 @@
 namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
+
 Segment::Segment() = default;
 
 // -----------------------------------------------------------------------------
+
 Segment::Segment(std::string&& sequence) : sequence_(std::move(sequence)) {}
 
 // -----------------------------------------------------------------------------
+
 Segment::Segment(const uint32_t length, const uint8_t qv_depth,
                  util::BitReader& reader)
     : sequence_(length, 0), quality_values_(qv_depth, std::string(length, 0)) {
@@ -36,14 +39,17 @@ Segment::Segment(const uint32_t length, const uint8_t qv_depth,
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Segment::GetSequence() const { return sequence_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::string>& Segment::GetQualities() const {
   return quality_values_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Segment::AddQualities(std::string&& qv) {
   // Source:
   //  From Section 10.2.16
@@ -57,6 +63,7 @@ void Segment::AddQualities(std::string&& qv) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Segment::Write(util::BitWriter& writer) const {
   writer.WriteAlignedBytes(this->sequence_.data(), this->sequence_.length());
   for (const auto& a : this->quality_values_) {

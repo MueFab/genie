@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the Quality Value Writeout encoder for the Genie
+ * framework.
+ *
+ * This file contains the implementation of the `Encoder` class within the
+ * `qvwriteout` namespace. The encoder processes sequencing quality values (QV)
+ * and writes them into Access Units (AUs) with customizable quality value
+ * configurations.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,6 +29,7 @@
 namespace genie::quality::qvwriteout {
 
 // -----------------------------------------------------------------------------
+
 void Encoder::SetUpParameters(const core::record::Chunk& rec,
                               paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
@@ -45,6 +55,7 @@ void Encoder::SetUpParameters(const core::record::Chunk& rec,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeAlignedSegment(const core::record::Segment& s,
                                    const std::string& e_cigar,
                                    core::AccessUnit::Descriptor& desc) {
@@ -70,6 +81,7 @@ void Encoder::EncodeAlignedSegment(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::EncodeUnalignedSegment(const core::record::Segment& s,
                                      core::AccessUnit::Descriptor& desc) {
   for (const auto& q : s.GetQualities()) {
@@ -81,6 +93,7 @@ void Encoder::EncodeUnalignedSegment(const core::record::Segment& s,
 }
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& rec) {
   const util::Watch watch;
   auto param = std::make_unique<paramqv1::QualityValues1>(
@@ -125,6 +138,7 @@ core::QvEncoder::qv_coded Encoder::Process(const core::record::Chunk& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 }  // namespace genie::quality::qvwriteout
 
 // -----------------------------------------------------------------------------

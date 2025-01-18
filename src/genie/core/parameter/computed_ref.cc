@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,11 +16,13 @@
 namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
+
 bool ComputedRef::operator==(const ComputedRef& cr) const {
   return cr_alg_id_ == cr.cr_alg_id_ && extension_ == cr.extension_;
 }
 
 // -----------------------------------------------------------------------------
+
 ComputedRef::ComputedRef(const Algorithm cr_alg_id) : cr_alg_id_(cr_alg_id) {
   if (cr_alg_id_ == Algorithm::kPushIn ||
       cr_alg_id_ == Algorithm::kLocalAssembly) {
@@ -29,6 +31,7 @@ ComputedRef::ComputedRef(const Algorithm cr_alg_id) : cr_alg_id_(cr_alg_id) {
 }
 
 // -----------------------------------------------------------------------------
+
 ComputedRef::ComputedRef(util::BitReader& reader) {
   cr_alg_id_ = static_cast<Algorithm>(reader.Read<uint8_t>());
   if (cr_alg_id_ == Algorithm::kPushIn ||
@@ -40,6 +43,7 @@ ComputedRef::ComputedRef(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ComputedRef::SetExtension(ComputedRefExtended&& computed_reference) {
   UTILS_DIE_IF(!extension_,
                "Invalid computed reference mode in computed reference "
@@ -48,11 +52,13 @@ void ComputedRef::SetExtension(ComputedRefExtended&& computed_reference) {
 }
 
 // -----------------------------------------------------------------------------
+
 const ComputedRefExtended& ComputedRef::GetExtension() const {
   return *extension_;
 }
 
 // -----------------------------------------------------------------------------
+
 ComputedRef::Algorithm ComputedRef::GetAlgorithm() const { return cr_alg_id_; }
 
 // -----------------------------------------------------------------------------

@@ -1,7 +1,12 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file state_vars.cc
+ * @brief Implementation of state variables for CABAC parameter handling in
+ * Genie.
+ *
+ * Provides the `StateVars` class to calculate and manage coding contexts,
+ * alphabets, subsymbols, and transformation parameters for entropy encoding.
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 #include "genie/entropy/paramcabac/state_vars.h"
@@ -10,13 +15,17 @@
 #include <iostream>
 
 #include "genie/entropy/paramcabac/binarization_parameters.h"
+#include "genie/util/log.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "Gabac";
+
 namespace genie::entropy::paramcabac {
 
 // -----------------------------------------------------------------------------
+
 bool StateVars::operator==(const StateVars& bin) const {
   return num_alpha_subsym_ == bin.num_alpha_subsym_ &&
          num_subsyms_ == bin.num_subsyms_ &&
@@ -31,6 +40,7 @@ bool StateVars::operator==(const StateVars& bin) const {
 }
 
 // -----------------------------------------------------------------------------
+
 StateVars::StateVars()
     : num_alpha_subsym_(0),
       num_subsyms_(0),
@@ -42,6 +52,7 @@ StateVars::StateVars()
       num_ctx_total_(0) {}
 
 // -----------------------------------------------------------------------------
+
 uint64_t StateVars::GetNumAlphaSpecial(const core::GenSubIndex& subsequence_id,
                                        const core::AlphabetId alphabet_id) {
   uint64_t num_alpha_special = 0;
@@ -70,6 +81,7 @@ uint64_t StateVars::GetNumAlphaSpecial(const core::GenSubIndex& subsequence_id,
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t StateVars::GetNumLuts(
     const uint8_t coding_order, const bool share_subsym_lut_flag,
     const SupportValues::TransformIdSubsym trnsf_subsym_id) const {
@@ -80,11 +92,13 @@ uint8_t StateVars::GetNumLuts(
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t StateVars::GetNumPrvs(const bool share_subsym_prv_flag) const {
   return share_subsym_prv_flag ? 1 : static_cast<uint8_t>(num_subsyms_);
 }
 
 // -----------------------------------------------------------------------------
+
 void StateVars::populate(
     const SupportValues::TransformIdSubsym transform_id_subsym,
     const SupportValues& support_values, const Binarization& cabac_binarization,
@@ -111,9 +125,9 @@ void StateVars::populate(
   } else {
     static bool print = false;
     if (!print) {
-      std::cerr << "coding_subsym_size = " +
-                       std::to_string(coding_subsym_size) + " not supported"
-                << std::endl;
+      UTILS_LOG(util::Logger::Severity::WARNING,
+                "coding_subsym_size = " + std::to_string(coding_subsym_size) +
+                    " not supported");
       print = true;
     }
   }
@@ -244,12 +258,15 @@ void StateVars::populate(
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t StateVars::GetNumSubsymbols() const { return num_subsyms_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t StateVars::GetNumAlphaSubsymbol() const { return num_alpha_subsym_; }
 
 // -----------------------------------------------------------------------------
+
 uint32_t StateVars::GetNumCtxPerSubsymbol() const { return num_ctx_subsym_; }
 
 // -----------------------------------------------------------------------------

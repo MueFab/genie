@@ -16,6 +16,7 @@
 namespace genie::format::mgg::encapsulator {
 
 // -----------------------------------------------------------------------------
+
 EncapsulatedDataset::EncapsulatedDataset(const std::string& input_file,
                                          core::MpegMinorVersion version)
     : reader(input_file), mgb_file(&reader) {

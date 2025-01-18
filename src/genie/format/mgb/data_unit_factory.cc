@@ -16,23 +16,29 @@
 #include "genie/format/mgb/access_unit.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mgb/reference.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "Mgb";
 
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr,
                                  Importer* importer, const bool ref)
     : refmgr_(mgr), importer_(importer), reference_only_(ref) {}
 
 // -----------------------------------------------------------------------------
+
 const core::parameter::EncodingSet& DataUnitFactory::GetParams(
     const size_t id) const {
   return parameters_.at(id);
 }
 
 // -----------------------------------------------------------------------------
+
 std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
   int i = 0;
   do {
@@ -49,9 +55,10 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
         auto r = RawReference(bit_reader, true);
         for (auto& ref : r) {
           pos += 12;
-          std::cerr << "Found ref(raw) " << ref.GetSeqId() << ":["
-                    << ref.GetStart() << ", " << ref.GetEnd() << "] ..."
-                    << std::endl;
+          UTILS_LOG(util::Logger::Severity::INFO,
+                    "Found ref(raw) " + std::to_string(ref.GetSeqId()) + ":[" +
+                        std::to_string(ref.GetStart()) + ", " +
+                        std::to_string(ref.GetEnd()) + "] ...");
           refmgr_->ValidateRefId(ref.GetSeqId());
           refmgr_->AddRef(
               i++, std::make_unique<Reference>(refmgr_->Id2Ref(ref.GetSeqId()),
@@ -63,8 +70,8 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
       }
       case core::parameter::DataUnit::DataUnitType::kParameterSet: {
         auto p = core::parameter::ParameterSet(bit_reader);
-        std::cerr << "Found PS " << static_cast<uint32_t>(p.GetId()) << "..."
-                  << std::endl;
+        UTILS_LOG(util::Logger::Severity::INFO,
+                  "Found PS " + std::to_string(p.GetId()) + "...");
         parameters_.insert(
             std::make_pair(p.GetId(), std::move(p.GetEncodingSet())));
         break;
@@ -75,9 +82,10 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
             AccessUnit::DatasetType::kReference) {
           const auto& ref = ret.GetHeader().GetRefCfg();
           refmgr_->ValidateRefId(ref.GetSeqId());
-          std::cerr << "Found ref(compressed) " << ref.GetSeqId() << ":["
-                    << ref.GetStart() << ", " << ref.GetEnd() << "] ..."
-                    << std::endl;
+          UTILS_LOG(util::Logger::Severity::INFO,
+                    "Found ref(compressed) " + std::to_string(ref.GetSeqId()) +
+                        ":[" + std::to_string(ref.GetStart()) + ", " +
+                        std::to_string(ref.GetEnd()) + "] ...");
           refmgr_->AddRef(
               i++, std::make_unique<Reference>(refmgr_->Id2Ref(ref.GetSeqId()),
                                                ref.GetStart(), ref.GetEnd() + 1,
@@ -93,7 +101,9 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
             UTILS_DIE_IF(ret.GetHeader().GetClass() ==
                              genie::core::record::ClassType::kClassHm,
                          "Class HM not supported");
-            ret.DebugPrint(parameters_.at(ret.GetHeader().GetParameterId()));
+            UTILS_LOG(util::Logger::Severity::INFO,
+                      ret.DebugPrint(
+                          parameters_.at(ret.GetHeader().GetParameterId())));
             return ret;
           }
           bit_reader.SkipAlignedBytes(ret.GetPayloadSize());
@@ -108,6 +118,7 @@ std::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bit_reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::map<size_t, core::parameter::EncodingSet>&
 DataUnitFactory::GetParams() const {
   return parameters_;

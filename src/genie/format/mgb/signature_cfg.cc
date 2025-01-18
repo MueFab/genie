@@ -12,6 +12,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 bool SignatureCfg::operator==(const SignatureCfg& other) const {
   return u_cluster_signature_ == other.u_cluster_signature_ &&
          u_cluster_signature_length_ == other.u_cluster_signature_length_ &&
@@ -19,6 +20,7 @@ bool SignatureCfg::operator==(const SignatureCfg& other) const {
 }
 
 // -----------------------------------------------------------------------------
+
 SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t u_signature_size,
                            const uint8_t base_bits)
     : u_signature_size_(u_signature_size
@@ -40,6 +42,7 @@ SignatureCfg::SignatureCfg(util::BitReader& reader, uint8_t u_signature_size,
 }
 
 // -----------------------------------------------------------------------------
+
 void SignatureCfg::AddSignature(uint64_t u_cluster_signature, uint8_t length) {
   if (u_cluster_signature_.empty()) {
     u_signature_size_ = length;
@@ -53,6 +56,7 @@ void SignatureCfg::AddSignature(uint64_t u_cluster_signature, uint8_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 void SignatureCfg::Write(util::BitWriter& writer) const {
   writer.WriteBits(u_cluster_signature_.size(), 16);
   for (size_t i = 0; i < u_cluster_signature_.size(); ++i) {

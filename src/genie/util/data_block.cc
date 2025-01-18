@@ -27,6 +27,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 BlockStepper DataBlock::GetReader() const {
   return BlockStepper(const_cast<uint8_t*>(data_.data()),
                       const_cast<uint8_t*>(data_.data() + data_.size()),
@@ -35,11 +36,13 @@ BlockStepper DataBlock::GetReader() const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DataBlock::operator==(const DataBlock& d) const {
   return lg_word_size_ == d.lg_word_size_ && data_ == d.data_;
 }
 
 // -----------------------------------------------------------------------------
+
 DataBlock& DataBlock::operator=(const std::initializer_list<uint64_t>& il) {
   Resize(il.size());
   size_t ctr = 0;
@@ -51,23 +54,29 @@ DataBlock& DataBlock::operator=(const std::initializer_list<uint64_t>& il) {
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DataBlock::Size() const { return DivByWordSize(data_.size()); }
 
 // -----------------------------------------------------------------------------
+
 [[maybe_unused]] void DataBlock::Reserve(const size_t size) {
   data_.reserve(MulByWordSize(size));
 }
 
 // -----------------------------------------------------------------------------
+
 void DataBlock::Clear() { data_.clear(); }
 
 // -----------------------------------------------------------------------------
+
 void DataBlock::Resize(const size_t size) { data_.resize(MulByWordSize(size)); }
 
 // -----------------------------------------------------------------------------
+
 bool DataBlock::Empty() const { return data_.empty(); }
 
 // -----------------------------------------------------------------------------
+
 void DataBlock::Swap(DataBlock* const d) {
   const size_t tmp = lg_word_size_;
   lg_word_size_ = d->lg_word_size_;
@@ -76,6 +85,7 @@ void DataBlock::Swap(DataBlock* const d) {
 }
 
 // -----------------------------------------------------------------------------
+
 DataBlock::DataBlock(const size_t size, const uint8_t word_size)
     : lg_word_size_(0) {
   SetWordSize(word_size);
@@ -83,11 +93,13 @@ DataBlock::DataBlock(const size_t size, const uint8_t word_size)
 }
 
 // -----------------------------------------------------------------------------
+
 DataBlock::DataBlock(std::vector<uint8_t>* vec) : lg_word_size_(0) {
   this->data_.swap(*vec);
 }
 
 // -----------------------------------------------------------------------------
+
 DataBlock::DataBlock(std::string* vec) : lg_word_size_(0) {
   const size_t size = vec->size() * sizeof(char);
   this->data_.resize(size);
@@ -97,6 +109,7 @@ DataBlock::DataBlock(std::string* vec) : lg_word_size_(0) {
 }
 
 // -----------------------------------------------------------------------------
+
 DataBlock::DataBlock(const uint8_t* d, const size_t size,
                      const uint8_t word_size)
     : lg_word_size_(0) {

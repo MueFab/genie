@@ -28,44 +28,46 @@
 
 #include <utility>
 
-#include "genie/util/selector_tail.h"
-
 // -----------------------------------------------------------------------------
 
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 SelectorTail<Tout>::SelectorTail() : dry_ctr_(0), mod_num_(0) {}
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::AddMod() {
   mod_num_++;
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::FlowIn(Tout&& t, const Section& id) {
-  genie::util::Source<Tout>::FlowOut(std::move(t), id);
+  Source<Tout>::FlowOut(std::move(t), id);
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::FlushIn(uint64_t& pos) {
-  size_t num = ++dry_ctr_;
-  if (num == mod_num_) {
+  if (const size_t num = ++dry_ctr_; num == mod_num_) {
     // Output signal once every module contained finished
     dry_ctr_ = 0;
-    genie::util::Source<Tout>::FlushOut(pos);
+    Source<Tout>::FlushOut(pos);
   }
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename Tout>
 void SelectorTail<Tout>::SkipIn(const Section& id) {
   if (id.strong_skip) {
-    genie::util::Source<Tout>::SkipOut(id);
+    Source<Tout>::SkipOut(id);
   }
 }
 

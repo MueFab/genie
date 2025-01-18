@@ -239,9 +239,16 @@ class BitReader {
   [[nodiscard]] bool IsStreamGood() const;
 
  private:
+  /// Reference to the input stream from which bits are read.
   std::istream& input_stream_;
+
+  /// Holds the bits that have been read but not yet processed.
   uint8_t held_bits_;
+
+  /// Number of bits currently held in `held_bits_`.
   uint8_t num_held_bits_;
+
+  /// Total number of bits read from the input stream so far.
   uint64_t total_bits_read_;
 
   /**

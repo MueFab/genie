@@ -17,23 +17,29 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 uint16_t RawReferenceSequence::GetSeqId() const { return sequence_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t RawReferenceSequence::GetStart() const { return seq_start_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t RawReferenceSequence::GetEnd() const { return seq_end_; }
 
 // -----------------------------------------------------------------------------
+
 std::string& RawReferenceSequence::GetSequence() { return ref_sequence_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& RawReferenceSequence::GetSequence() const {
   return ref_sequence_;
 }
 
 // -----------------------------------------------------------------------------
+
 RawReferenceSequence::RawReferenceSequence(util::BitReader& reader,
                                            const bool header_only) {
   sequence_id_ = reader.Read<uint16_t>();
@@ -49,6 +55,7 @@ RawReferenceSequence::RawReferenceSequence(util::BitReader& reader,
 }
 
 // -----------------------------------------------------------------------------
+
 RawReferenceSequence::RawReferenceSequence(const uint16_t sequence_id,
                                            const uint64_t seq_start,
                                            std::string&& ref_sequence)
@@ -58,6 +65,7 @@ RawReferenceSequence::RawReferenceSequence(const uint16_t sequence_id,
       ref_sequence_(std::move(ref_sequence)) {}
 
 // -----------------------------------------------------------------------------
+
 void RawReferenceSequence::Write(util::BitWriter& writer) const {
   writer.WriteBits(sequence_id_, 16);
   writer.WriteBits(seq_start_, 40);
@@ -66,11 +74,13 @@ void RawReferenceSequence::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool RawReferenceSequence::IsIdUnique(const RawReferenceSequence& s) const {
   return sequence_id_ != s.sequence_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t RawReferenceSequence::GetTotalSize() const {
   constexpr uint64_t header_size =
       (16 + 40 + 40) / 8;  // sequence_ID, seq_start, seq_end

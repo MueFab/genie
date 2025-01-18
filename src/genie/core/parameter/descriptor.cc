@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,11 +17,13 @@
 namespace genie::core::parameter {
 
 // -----------------------------------------------------------------------------
+
 bool Descriptor::Equals(const Descriptor* desc) const {
   return dec_cfg_preset_ == desc->dec_cfg_preset_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Descriptor::Write(util::BitWriter& writer) const {
   writer.WriteBits(dec_cfg_preset_, 8);
 }
@@ -33,9 +35,11 @@ std::unique_ptr<Descriptor> Descriptor::Factory(GenDesc desc,
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t Descriptor::GetPreset() const { return dec_cfg_preset_; }
 
 // -----------------------------------------------------------------------------
+
 Descriptor::Descriptor(const uint8_t dec_cfg_preset)
     : dec_cfg_preset_(dec_cfg_preset) {}
 

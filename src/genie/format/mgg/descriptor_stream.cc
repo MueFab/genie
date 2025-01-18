@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStream::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -27,10 +28,12 @@ bool DescriptorStream::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorStream::DescriptorStream(DescriptorStreamHeader header)
     : header_(std::move(header)) {}
 
 // -----------------------------------------------------------------------------
+
 DescriptorStream::DescriptorStream(
     util::BitReader& reader, const MasterIndexTable& table,
     const std::vector<dataset_header::MitClassConfig>& configs) {
@@ -86,37 +89,44 @@ DescriptorStream::DescriptorStream(
 }
 
 // -----------------------------------------------------------------------------
+
 const DescriptorStreamHeader& DescriptorStream::GetHeader() const {
   return header_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStream::AddPayload(core::Payload p) {
   payload_.emplace_back(std::move(p));
   header_.AddBlock();
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<core::Payload>& DescriptorStream::GetPayloads() const {
   return payload_;
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStream::SetProtection(DescriptorStreamProtection protection) {
   ds_protection_ = std::move(protection);
 }
 
 // -----------------------------------------------------------------------------
+
 const DescriptorStreamProtection& DescriptorStream::GetProtection() const {
   return *ds_protection_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStream::HasProtection() const {
   return ds_protection_ != std::nullopt;
 }
 
 // -----------------------------------------------------------------------------
+
 void DescriptorStream::BoxWrite(util::BitWriter& writer) const {
   header_.Write(writer);
   if (ds_protection_ != std::nullopt) {
@@ -128,12 +138,14 @@ void DescriptorStream::BoxWrite(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& DescriptorStream::GetKey() const {
   static const std::string key = "dscn";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorStream::DescriptorStream(const core::GenDesc descriptor,
                                    const core::record::ClassType class_id,
                                    std::vector<mgb::Block>&& blocks)
@@ -145,6 +157,7 @@ DescriptorStream::DescriptorStream(const core::GenDesc descriptor,
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<mgb::Block> DescriptorStream::Decapsulate() {
   std::vector<mgb::Block> ret;
   ret.reserve(payload_.size());
@@ -155,6 +168,7 @@ std::vector<mgb::Block> DescriptorStream::Decapsulate() {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DescriptorStream::IsEmpty() const {
   if (payload_.empty()) {
     return true;
@@ -165,6 +179,7 @@ bool DescriptorStream::IsEmpty() const {
 }
 
 // -----------------------------------------------------------------------------
+
 DescriptorStreamProtection& DescriptorStream::GetProtection() {
   return *ds_protection_;
 }

@@ -47,6 +47,8 @@ class Importer final : public core::FormatImporter {
       file_list_;           //!< @brief Input streams, supports paired files.
   util::OrderedLock lock_;  //!< @brief Lock to ensure ordered processing in
                             //!< multithreaded contexts.
+  float last_progress_ = 0.0f;  //!< @brief Last progress value for logging.
+  uint64_t last_pos_ = 0;       //!< @brief Last file position for progress.
 
   /**
    * @brief Enumerations for the different lines in a FASTQ record.

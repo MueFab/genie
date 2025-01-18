@@ -24,6 +24,7 @@
 #include <bitset>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "genie/read/spring/bitset_util.h"
 #include "genie/read/spring/params.h"
@@ -39,71 +40,109 @@ namespace genie::read::spring {
  */
 template <size_t BitsetSize>
 struct EncoderGlobalB {
-  std::bitset<BitsetSize>** base_mask;  //!< @brief Base mask used for bitset
-                                        //!< conversion of A, C, G, T, N bases.
-  int max_read_len;  //!< @brief Maximum read length for the sequences.
-  std::bitset<BitsetSize> mask63;  //!< @brief Bitset with 63 bits set to 1
+  /// Base mask used for bitset conversion of A, C, G, T, N bases.
+  std::vector<std::vector<std::bitset<BitsetSize>>> base_mask;
+
+  /// Maximum read length for the sequences.
+  int max_read_len;
+
+  /// Bitset with 63 bits set to 1
+  std::bitset<BitsetSize> mask63;
 
   /**
    * @brief Constructor to initialize the base mask and other structures.
    * @param max_read_len_param Maximum read length.
    */
   explicit EncoderGlobalB(int max_read_len_param);
-
-  /**
-   * @brief Destructor to clean up dynamically allocated base masks.
-   */
-  ~EncoderGlobalB();
 };
 
 /**
  * @brief Global configuration and file paths for the Spring encoder.
  */
 struct EncoderGlobal {
-  uint32_t num_reads{};    //!< @brief Total number of reads.
-  uint32_t num_reads_s{};  //!< @brief Number of singleton reads.
-  uint32_t num_reads_n{};  //!< @brief Number of reads containing 'N' bases.
-  int num_dict_s = kNum_Dict_Encoder;  //!< @brief Number of hash dictionaries
-                                       //!< used for encoding.
+  /// Total number of reads.
+  uint32_t num_reads{};
 
-  int max_read_len{},
-      num_thr{};  //!< @brief Maximum read length and number of threads.
+  /// Number of singleton reads.
+  uint32_t num_reads_s{};
+
+  /// Number of reads containing 'N' bases.
+  uint32_t num_reads_n{};
+
+  /// Number of hash dictionaries used for encoding.
+  int num_dict_s = kNumDictEncoder;
+
+  /// Maximum read length and number of threads.
+  int max_read_len{}, num_thr{};
 
   // File paths for various inputs and outputs
-  std::string basedir;      //!< @brief Base directory for input/output files.
-  std::string infile;       //!< @brief Input file for sequences.
-  std::string infile_flag;  //!< @brief Input file for flags.
-  std::string infile_pos;   //!< @brief Input file for positions.
-  std::string infile_seq;   //!< @brief Input file for sequences.
-  std::string infile_rc;    //!< @brief Input file for reverse complement flags.
-  std::string infile_read_length;  //!< @brief Input file for read lengths.
-  std::string infile_n;            //!< @brief Input file for reads with 'N'.
-  std::string outfile_unaligned;   //!< @brief Output file for unaligned reads.
-  std::string outfile_seq;         //!< @brief Output file for sequences.
-  std::string outfile_pos;         //!< @brief Output file for positions.
-  std::string outfile_noise;       //!< @brief Output file for noisy reads.
-  std::string outfile_noise_pos;   //!< @brief Output file for noisy positions.
-  std::string infile_order;  //!< @brief Input file for order of sequences.
-  std::string
-      infile_order_n;  //!< @brief Input file for order of 'N' sequences.
+  /// Base directory for input/output files.
+  std::string basedir;
 
-  char enc_noise[128][128]{};  //!< @brief Encoded noise data.
+  /// Input file for sequences.
+  std::string infile;
 
-  /**
-   * @brief Default constructor to initialize all fields.
-   */
-  EncoderGlobal() = default;
+  /// Input file for flags.
+  std::string infile_flag;
+
+  /// Input file for positions.
+  std::string infile_pos;
+
+  /// Input file for sequences.
+  std::string infile_seq;
+
+  /// Input file for reverse complement flags.
+  std::string infile_rc;
+
+  /// Input file for read lengths.
+  std::string infile_read_length;
+
+  /// Input file for reads with 'N'.
+  std::string infile_n;
+
+  /// Output file for unaligned reads.
+  std::string outfile_unaligned;
+
+  /// Output file for sequences.
+  std::string outfile_seq;
+
+  /// Output file for positions.
+  std::string outfile_pos;
+
+  /// Output file for noisy reads.
+  std::string outfile_noise;
+
+  /// Output file for noisy positions.
+  std::string outfile_noise_pos;
+
+  /// Input file for order of sequences.
+  std::string infile_order;
+
+  /// Input file for order of 'N' sequences.
+  std::string infile_order_n;
+
+  /// Encoded noise data.
+  char enc_noise[128][128]{};
 };
 
 /**
  * @brief Structure representing a contig read.
  */
 struct ContigReads {
-  std::string read;      //!< @brief Read sequence.
-  int64_t pos;           //!< @brief Position of the read.
-  char rc;               //!< @brief Reverse complement flag.
-  uint32_t order;        //!< @brief Order of the read in the original data.
-  uint16_t read_length;  //!< @brief Length of the read.
+  /// Read sequence.
+  std::string read;
+
+  /// Position of the read.
+  int64_t pos;
+
+  /// Reverse complement flag.
+  char rc;
+
+  /// Order of the read in the original data.
+  uint32_t order;
+
+  /// Length of the read.
+  uint16_t read_length;
 };
 
 /**
@@ -150,7 +189,7 @@ void GetDataParams(EncoderGlobal& eg, const CompressionParams& cp);
  * @param order_s Array of read orders.
  * @param eg Reference to the global encoder configuration.
  */
-void CorrectOrder(uint32_t* order_s, const EncoderGlobal& eg);
+void CorrectOrder(std::vector<uint32_t>& order_s, const EncoderGlobal& eg);
 
 /**
  * @brief Convert a bitset to a string representation.

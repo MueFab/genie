@@ -20,6 +20,7 @@
 namespace genie::format::fasta {
 
 // -----------------------------------------------------------------------------
+
 Manager::Manager(std::istream& fasta, std::istream& fai, std::istream& sha,
                  core::ReferenceManager* mgr, std::string path)
     : ReferenceSource(mgr), reader_(fasta, fai, sha, std::move(path)) {
@@ -31,16 +32,19 @@ Manager::Manager(std::istream& fasta, std::istream& fai, std::istream& sha,
 }
 
 // -----------------------------------------------------------------------------
+
 std::map<size_t, std::string> Manager::GetSequences() const {
   return reader_.GetSequences();
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Manager::GetLength(const std::string& seq) const {
   return reader_.GetLength(seq);
 }
 
 // -----------------------------------------------------------------------------
+
 std::string Manager::GetRef(const std::string& sequence, const uint64_t start,
                             const uint64_t end) {
   std::lock_guard guard(reader_mutex_);
@@ -48,6 +52,7 @@ std::string Manager::GetRef(const std::string& sequence, const uint64_t start,
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::unique_ptr<core::Reference>> Manager::GenerateRefHandles() {
   const auto seqs = GetSequences();
   std::vector<std::unique_ptr<core::Reference>> ret;
@@ -59,6 +64,7 @@ std::vector<std::unique_ptr<core::Reference>> Manager::GenerateRefHandles() {
 }
 
 // -----------------------------------------------------------------------------
+
 core::meta::Reference Manager::GetMeta() const { return reader_.GetMeta(); }
 
 // -----------------------------------------------------------------------------

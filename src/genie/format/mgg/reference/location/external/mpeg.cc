@@ -19,6 +19,7 @@
 namespace genie::format::mgg::reference::location::external {
 
 // -----------------------------------------------------------------------------
+
 Mpeg::Mpeg(const uint8_t reserved, std::string uri, ChecksumAlgorithm algo,
            const uint8_t group_id, const uint16_t dataset_id,
            std::string ref_checksum, const core::MpegMinorVersion version)
@@ -34,6 +35,7 @@ Mpeg::Mpeg(const uint8_t reserved, std::string uri, ChecksumAlgorithm algo,
 }
 
 // -----------------------------------------------------------------------------
+
 Mpeg::Mpeg(util::BitReader& reader, const size_t seq_count,
            const core::MpegMinorVersion version)
     : External(reader),
@@ -56,6 +58,7 @@ Mpeg::Mpeg(util::BitReader& reader, const size_t seq_count,
 }
 
 // -----------------------------------------------------------------------------
+
 Mpeg::Mpeg(util::BitReader& reader, const uint8_t reserved, std::string uri,
            const ChecksumAlgorithm algo, const size_t seq_count,
            const core::MpegMinorVersion version)
@@ -79,22 +82,27 @@ Mpeg::Mpeg(util::BitReader& reader, const uint8_t reserved, std::string uri,
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t Mpeg::GetExternalDatasetGroupId() const {
   return external_dataset_group_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Mpeg::GetExternalDatasetId() const { return external_dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Mpeg::GetRefChecksum() const { return ref_checksum_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::string>& Mpeg::GetSeqChecksums() const {
   return seq_checksums_;
 }
 
 // -----------------------------------------------------------------------------
+
 void Mpeg::AddSeqChecksum(std::string checksum) {
   UTILS_DIE_IF(
       checksum.size() !=
@@ -104,6 +112,7 @@ void Mpeg::AddSeqChecksum(std::string checksum) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Mpeg::Write(util::BitWriter& writer) {
   External::Write(writer);
   writer.WriteAlignedInt(external_dataset_group_id_);
@@ -118,6 +127,7 @@ void Mpeg::Write(util::BitWriter& writer) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Mpeg::AddChecksum(std::string checksum) {
   UTILS_DIE_IF(
       checksum.size() !=
@@ -129,6 +139,7 @@ void Mpeg::AddChecksum(std::string checksum) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::meta::RefBase> Mpeg::decapsulate() {
   auto ret = std::make_unique<core::meta::external_ref::Mpeg>(
       std::move(GetUri()),

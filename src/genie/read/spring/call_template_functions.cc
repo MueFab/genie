@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file call_template_functions.cc
+ *
+ * @brief Template function invocations for Spring's reordering and encoding
+ * workflows.
+ *
+ * This file contains implementations for invoking specialized template
+ * functions for the reordering and encoding steps in the Spring framework,
+ * based on the maximum read length provided in the compression parameters. The
+ * functions leverage template specialization to optimize performance for
+ * specific bitset sizes.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -19,6 +29,7 @@
 namespace genie::read::spring {
 
 // -----------------------------------------------------------------------------
+
 void CallReorder(const std::string& temp_dir, const CompressionParams& cp) {
   switch ((2 * cp.max_read_len - 1) / 64 * 64 + 64) {
     case 64:
@@ -75,6 +86,7 @@ void CallReorder(const std::string& temp_dir, const CompressionParams& cp) {
 }
 
 // -----------------------------------------------------------------------------
+
 void CallEncoder(const std::string& temp_dir, const CompressionParams& cp) {
   switch ((3 * cp.max_read_len - 1) / 64 * 64 + 64) {
     case 64:

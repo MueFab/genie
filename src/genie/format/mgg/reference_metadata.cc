@@ -17,6 +17,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool ReferenceMetadata::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -28,12 +29,14 @@ bool ReferenceMetadata::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& ReferenceMetadata::GetKey() const {
   static const std::string key = "rfmd";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 ReferenceMetadata::ReferenceMetadata(const uint8_t dataset_group_id,
                                      const uint8_t reference_id,
                                      std::string reference_metadata_value)
@@ -42,6 +45,7 @@ ReferenceMetadata::ReferenceMetadata(const uint8_t dataset_group_id,
       reference_metadata_value_(std::move(reference_metadata_value)) {}
 
 // -----------------------------------------------------------------------------
+
 ReferenceMetadata::ReferenceMetadata(util::BitReader& bitreader) {
   const auto start_pos = bitreader.GetStreamPosition() - 4;
   const auto length = bitreader.ReadAlignedInt<uint64_t>();
@@ -56,6 +60,7 @@ ReferenceMetadata::ReferenceMetadata(util::BitReader& bitreader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceMetadata::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedInt<uint8_t>(dataset_group_id_);
   bit_writer.WriteAlignedInt<uint8_t>(reference_id_);
@@ -64,24 +69,29 @@ void ReferenceMetadata::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t ReferenceMetadata::GetDatasetGroupId() const {
   return dataset_group_id_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t ReferenceMetadata::GetReferenceId() const { return reference_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& ReferenceMetadata::GetReferenceMetadataValue() const {
   return reference_metadata_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceMetadata::PatchId(const uint8_t group_id) {
   dataset_group_id_ = group_id;
 }
 
 // -----------------------------------------------------------------------------
+
 void ReferenceMetadata::PatchRefId(const uint8_t old, const uint8_t _new) {
   if (reference_id_ == old) {
     reference_id_ = _new;
@@ -89,6 +99,7 @@ void ReferenceMetadata::PatchRefId(const uint8_t old, const uint8_t _new) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string ReferenceMetadata::decapsulate() {
   return std::move(reference_metadata_value_);
 }

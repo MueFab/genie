@@ -2,20 +2,18 @@ project("calq")
 
 set(source_files
         calq_coder.cc
-        circular_buffer.h
-        exceptions.cc
-        filter_buffer.cc
+        ../../util/circular_buffer.h
+        ../../util/filter_buffer.cc
         genotyper.cc
         haplotyper.cc
-        lloyd_max_quantizer.cc
-        log.cc
-        probability_distribution.cc
+        ../../util/lloyd_max_quantizer.cc
+        ../../util/probability_distribution.cc
         quality_decoder.cc
         quality_encoder.cc
-        quantizer.cc
+        ../../util/quantizer.cc
         soft_clip_spreader.cc
-        uniform_min_max_quantizer.cc
-        uniform_quantizer.cc
+        ../../util/uniform_min_max_quantizer.cc
+        ../../util/uniform_quantizer.cc
         decoder.cc
         encoder.cc
         record_pileup.cc

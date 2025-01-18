@@ -21,6 +21,7 @@
 namespace genie::format::mgg::encapsulator {
 
 // -----------------------------------------------------------------------------
+
 std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::GroupInputFiles(
     const std::vector<std::string>& input_files) {
   std::vector<std::string> unknown_id;
@@ -62,6 +63,7 @@ std::map<uint8_t, std::vector<std::string>> EncapsulatedFile::GroupInputFiles(
 }
 
 // -----------------------------------------------------------------------------
+
 EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files,
                                    const core::MpegMinorVersion version) {
   const std::map<uint8_t, std::vector<std::string>> file_groups =
@@ -75,6 +77,7 @@ EncapsulatedFile::EncapsulatedFile(const std::vector<std::string>& input_files,
 }
 
 // -----------------------------------------------------------------------------
+
 MggFile EncapsulatedFile::assemble(core::MpegMinorVersion version) {  // NOLINT
   MggFile ret;
   ret.AddBox(std::make_unique<FileHeader>(version));

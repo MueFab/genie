@@ -18,12 +18,15 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 Label::Label() = default;
 
 // -----------------------------------------------------------------------------
+
 Label::Label(std::string label_id) : label_id_(std::move(label_id)) {}
 
 // -----------------------------------------------------------------------------
+
 Label::Label(util::BitReader& reader) {
   const auto start_pos = reader.GetStreamPosition() - 4;
   const auto length = reader.ReadAlignedInt<uint64_t>();
@@ -43,14 +46,17 @@ Label::Label(util::BitReader& reader) {
 }
 
 // -----------------------------------------------------------------------------
+
 void Label::AddDataset(LabelDataset ds_info) {
   dataset_infos_.push_back(std::move(ds_info));
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Label::GetLabelId() const { return label_id_; }
 
 // -----------------------------------------------------------------------------
+
 void Label::BoxWrite(util::BitWriter& bit_writer) const {
   bit_writer.WriteAlignedBytes(label_id_.data(), label_id_.length());
   bit_writer.WriteAlignedInt('\0');
@@ -69,12 +75,14 @@ void Label::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& Label::GetKey() const {
   static const std::string key = "lbll";  // NOLINT
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 bool Label::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -84,11 +92,13 @@ bool Label::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<LabelDataset>& Label::GetDatasets() const {
   return dataset_infos_;
 }
 
 // -----------------------------------------------------------------------------
+
 core::meta::Label Label::Decapsulate(const uint16_t dataset) {  // NOLINT
   core::meta::Label ret(label_id_);
   for (auto& d : dataset_infos_) {
@@ -101,6 +111,7 @@ core::meta::Label Label::Decapsulate(const uint16_t dataset) {  // NOLINT
 }
 
 // -----------------------------------------------------------------------------
+
 void Label::PrintDebug(std::ostream& output, const uint8_t depth,
                        const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Label");

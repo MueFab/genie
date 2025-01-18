@@ -13,6 +13,10 @@ set(source_files
         thread_manager.cc
         stop_watch.cc
         literal.h
+        log.h
+        log.cc
+        circular_buffer.impl.h
+        dynamic_scheduler.cc
 )
 
 add_library(genie-util ${source_files})

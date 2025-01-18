@@ -53,6 +53,7 @@ namespace genie::entropy::gabac {
 using BinFunc = uint64_t (Reader::*)(const std::vector<unsigned int>&);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Decodes the sign flag for a given symbol value using the specified
  * binarization method.
@@ -72,6 +73,7 @@ void DecodeSignFlag(Reader& reader,
                     uint64_t& symbol_value);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Retrieves the appropriate binarization function for the given
  * configuration parameters.
@@ -99,6 +101,7 @@ BinFunc GetBinarizationReader(
     std::vector<unsigned int>& bin_params);
 
 // -----------------------------------------------------------------------------
+
 /**
  * @brief Decodes a transformed subsequence from the bitstream using the
  * specified configuration.

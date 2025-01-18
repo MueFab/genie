@@ -1,7 +1,14 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder.cc
+ *
+ * @brief Implementation of the LocalAssembly encoder for the Genie framework.
+ *
+ * This file contains the implementation of the `Encoder` class within the
+ * `localassembly` namespace. The encoder handles sequencing reads and generates
+ * Access Units (AUs) using local assembly for reference generation.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -14,12 +21,16 @@
 #include <utility>
 
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "LocalAssembly";
 
 namespace genie::read::localassembly {
 
 // -----------------------------------------------------------------------------
+
 Encoder::LaEncodingState::LaEncodingState(const core::record::Chunk& data,
                                           const uint32_t cr_buf_max_size)
     : EncodingState(data), ref_coder(cr_buf_max_size) {
@@ -28,33 +39,37 @@ Encoder::LaEncodingState::LaEncodingState(const core::record::Chunk& data,
 }
 
 // -----------------------------------------------------------------------------
+
 void Encoder::PrintDebug(const LaEncodingState& state, const std::string& ref1,
                          const std::string& ref2,
                          const core::record::Record& r) const {
   if (!debug_) {
     return;
   }
+  std::stringstream ss;
   state.ref_coder.PrintWindow();
-  std::cerr << "pair!" << std::endl;
-  std::cerr << "ref1: " << std::endl;
+  ss << "pair!" << std::endl;
+  ss << "ref1: " << std::endl;
   for (size_t i = 0; i < r.GetAlignments().front().GetPosition() -
                              state.ref_coder.GetWindowBorder();
        ++i) {
-    std::cerr << " ";
+    ss << " ";
   }
-  std::cerr << ref1 << std::endl;
+  ss << ref1 << std::endl;
 
-  std::cerr << "ref2: " << std::endl;
+  ss << "ref2: " << std::endl;
   for (size_t i = 0; i < r.GetAlignments().front().GetPosition() -
                              state.ref_coder.GetWindowBorder();
        ++i) {
-    std::cerr << " ";
+    ss << " ";
   }
-  std::cerr << ref2 << std::endl;
-  std::cerr << std::endl;
+  ss << ref2 << std::endl;
+  ss << std::endl;
+  UTILS_LOG(util::Logger::Severity::INFO, ss.str());
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
                                core::AccessUnit::Descriptor read_name,
                                EncodingState& state) {
@@ -70,6 +85,7 @@ core::AccessUnit Encoder::Pack(const size_t id, core::QvEncoder::qv_coded qv,
 }
 
 // -----------------------------------------------------------------------------
+
 std::pair<std::string, std::string> Encoder::GetReferences(
     const core::record::Record& r, EncodingState& state) {
   std::pair<std::string, std::string> ret;
@@ -107,6 +123,7 @@ std::pair<std::string, std::string> Encoder::GetReferences(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
     const core::record::Chunk& data) const {
   constexpr uint32_t reads_per_assembly = 10;
@@ -126,10 +143,12 @@ std::unique_ptr<Encoder::EncodingState> Encoder::CreateState(
 }
 
 // -----------------------------------------------------------------------------
+
 Encoder::Encoder(const bool debug, const bool write_raw)
     : EncoderStub(write_raw), debug_(debug) {}
 
 // -----------------------------------------------------------------------------
+
 void Encoder::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   core::record::Chunk d = std::move(t);
 

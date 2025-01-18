@@ -18,8 +18,8 @@
  * during the quantization process.
  */
 
-#ifndef SRC_GENIE_QUALITY_CALQ_QUANTIZER_H_
-#define SRC_GENIE_QUALITY_CALQ_QUANTIZER_H_
+#ifndef SRC_GENIE_UTIL_QUANTIZER_H_
+#define SRC_GENIE_UTIL_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 /**
  * @brief Class for quantizing genomic quality values.
@@ -128,20 +128,20 @@ class Quantizer {
   void print() const;
 
  protected:
-  std::map<int, std::pair<int, int>>
-      lut_;  //!< @brief Maps quality values to (index, reconstruction value)
-             //!< pairs.
-  std::map<std::size_t, int>
-      inverse_lut_;  //!< @brief Maps indices to reconstruction values.
+  /// Maps quality values to (index, reconstruction value) pairs.
+  std::map<int, std::pair<int, int>> lut_;
+
+  /// Maps indices to reconstruction values.
+  std::map<std::size_t, int> inverse_lut_;
 };
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_QUALITY_CALQ_QUANTIZER_H_
+#endif  // SRC_GENIE_UTIL_QUANTIZER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

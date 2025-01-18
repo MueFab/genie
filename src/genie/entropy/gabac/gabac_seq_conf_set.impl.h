@@ -32,6 +32,7 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 void GabacSeqConfSet::FillDecoder(const core::GenomicDescriptorProperties& desc,
                                   T& decoder_config) const {
@@ -43,6 +44,7 @@ void GabacSeqConfSet::FillDecoder(const core::GenomicDescriptorProperties& desc,
 }
 
 // -----------------------------------------------------------------------------
+
 template <typename T>
 const T& GabacSeqConfSet::LoadDescriptorDecoderCfg(
     const ParameterSet& parameter_set, const core::GenDesc descriptor_id) {

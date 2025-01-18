@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,28 +23,25 @@
 #include "genie/format/mgrec/importer.h"
 #include "genie/module/default_setup.h"
 #include "genie/util/stop_watch.h"
+#include "util/log.h"
+
+constexpr auto kLogModuleName = "App/TranscodeFastq";
 
 // -----------------------------------------------------------------------------
 
 namespace genie_app::transcode_fastq {
 
-// -----------------------------------------------------------------------------
-std::string file_extension(const std::string& path) {
-  const auto pos = path.find_last_of('.');
-  std::string ext = path.substr(pos + 1);
-  for (auto& c : ext) {
-    c = static_cast<char>(std::tolower(c));
-  }
-  return ext;
-}
 
 // -----------------------------------------------------------------------------
+
 enum class OperationCase { UNKNOWN = 0, CONVERT = 3 };
 
 // -----------------------------------------------------------------------------
+
 enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 
 // -----------------------------------------------------------------------------
+
 FileType GetType(const std::string& ext) {
   if (ext == "fastq" || ext == "mgrec") {
     return FileType::THIRD_PARTY;
@@ -56,6 +53,7 @@ FileType GetType(const std::string& ext) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const FileType in, const FileType out) {
   if (in == FileType::THIRD_PARTY && out == FileType::THIRD_PARTY) {
     return OperationCase::CONVERT;
@@ -64,6 +62,7 @@ OperationCase GetOperation(const FileType in, const FileType out) {
 }
 
 // -----------------------------------------------------------------------------
+
 OperationCase GetOperation(const std::string& filename_in,
                            const std::string& filename_out) {
   return GetOperation(GetType(file_extension(filename_in)),
@@ -71,6 +70,7 @@ OperationCase GetOperation(const std::string& filename_in,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachExporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ofstream>>& output_files) {
@@ -103,6 +103,7 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 template <class T>
 void AttachImporter(T& flow, const ProgramOptions& p_opts,
                     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -141,6 +142,7 @@ void AttachImporter(T& flow, const ProgramOptions& p_opts,
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<genie::core::FlowGraph> BuildConverter(
     const ProgramOptions& p_opts,
     std::vector<std::unique_ptr<std::ifstream>>& input_files,
@@ -152,6 +154,7 @@ std::unique_ptr<genie::core::FlowGraph> BuildConverter(
 }
 
 // -----------------------------------------------------------------------------
+
 int main(const int argc, char* argv[]) {
   try {
     const ProgramOptions p_opts(argc, argv);
@@ -176,15 +179,15 @@ int main(const int argc, char* argv[]) {
     flow_graph->Run();
 
     auto stats = flow_graph->GetStats();
-    stats.AddDouble("time-total", watch.Check());
-    std::cerr << stats << std::endl;
+    stats.AddDouble("time-wallclock", watch.Check());
+    stats.print();
 
     return 0;
   } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error - Unknown" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Error - Unknown");
     return 1;
   }
 }

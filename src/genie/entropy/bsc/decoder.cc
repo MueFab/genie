@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -21,6 +21,7 @@
 namespace genie::entropy::bsc {
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Decompress(core::AccessUnit::Subsequence&& data) {
   const auto id = data.GetId();
 
@@ -51,6 +52,7 @@ core::AccessUnit::Subsequence Decompress(core::AccessUnit::Subsequence&& data) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats>
 Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
                  core::AccessUnit::Descriptor& d, const bool mm_coder_enabled) {
@@ -75,10 +77,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
     }
     if (!sub_sequence.IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-bsc-total-comp",
+          "size-bsc-total-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-bsc-" + sub_sequence_name + "-comp",
+          "size-bsc-" + sub_sequence_name + "-comp",
           static_cast<int64_t>(sub_sequence.GetRawSize()));
     }
 
@@ -86,10 +88,10 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
 
     if (!std::get<0>(desc).Get(kSnd).IsEmpty()) {
       std::get<1>(desc).AddInteger(
-          "Size-bsc-total-raw",
+          "size-bsc-total-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(kSnd).GetRawSize()));
       std::get<1>(desc).AddInteger(
-          "Size-bsc-" + sub_sequence_name + "-raw",
+          "size-bsc-" + sub_sequence_name + "-raw",
           static_cast<int64_t>(std::get<0>(desc).Get(kSnd).GetRawSize()));
     }
   }

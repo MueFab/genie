@@ -1,7 +1,13 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file param_decoder.cc
+ * @brief Implementation of Zstd-based parameter decoding for Genie.
+ *
+ * Defines the `DecoderRegular` class for handling descriptor subsequence
+ * configurations, enabling cloning, serialization, and comparison
+ * functionalities.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -11,10 +17,12 @@
 
 namespace genie::entropy::zstd {
 // -----------------------------------------------------------------------------
+
 DecoderRegular::DecoderRegular()
     : core::parameter::desc_pres::DecoderRegular(kModeZstd) {}
 
 // -----------------------------------------------------------------------------
+
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(kModeZstd) {
   for (size_t i = 0;
@@ -26,6 +34,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 }
 
 // -----------------------------------------------------------------------------
+
 DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader& reader)
     : core::parameter::desc_pres::DecoderRegular(kModeZstd) {
   const uint8_t num_descriptor_subsequence_configs = reader.Read<uint8_t>() + 1;
@@ -35,34 +44,40 @@ DecoderRegular::DecoderRegular(core::GenDesc, util::BitReader& reader)
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderRegular::SetSubsequenceCfg(const uint8_t index, Subsequence&& cfg) {
   descriptor_subsequence_configs_[index] = cfg;
 }
 
 // -----------------------------------------------------------------------------
+
 const Subsequence& DecoderRegular::GetSubsequenceCfg(
     const uint8_t index) const {
   return descriptor_subsequence_configs_[index];
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::Clone()
     const {
   return std::make_unique<DecoderRegular>(*this);
 }
 
 // -----------------------------------------------------------------------------
+
 Subsequence& DecoderRegular::GetSubsequenceCfg(const uint8_t index) {
   return descriptor_subsequence_configs_[index];
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<core::parameter::desc_pres::DecoderRegular>
 DecoderRegular::create(core::GenDesc desc, util::BitReader& reader) {
   return std::make_unique<DecoderRegular>(desc, reader);
 }
 
 // -----------------------------------------------------------------------------
+
 void DecoderRegular::Write(util::BitWriter& writer) const {
   Decoder::Write(writer);
   writer.WriteBits(descriptor_subsequence_configs_.size() - 1, 8);
@@ -72,6 +87,7 @@ void DecoderRegular::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 bool DecoderRegular::Equals(const Decoder* dec) const {
   return Decoder::Equals(dec) && dynamic_cast<const DecoderRegular*>(dec)
                                          ->descriptor_subsequence_configs_ ==

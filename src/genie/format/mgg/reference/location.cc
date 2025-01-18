@@ -22,6 +22,7 @@
 namespace genie::format::mgg::reference {
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Location> Location::factory(
     util::BitReader& reader, const size_t seq_count,
     const core::MpegMinorVersion version) {
@@ -33,6 +34,7 @@ std::unique_ptr<Location> Location::factory(
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<Location> Location::ReferenceLocationFactory(
     const std::unique_ptr<core::meta::RefBase>& base,
     core::MpegMinorVersion version) {
@@ -78,19 +80,23 @@ std::unique_ptr<Location> Location::ReferenceLocationFactory(
 }
 
 // -----------------------------------------------------------------------------
+
 Location::Location(const uint8_t reserved, const bool external_ref_flag)
     : reserved_(reserved), external_ref_flag_(external_ref_flag) {}
 
 // -----------------------------------------------------------------------------
+
 Location::Location(util::BitReader& reader) {
   reserved_ = reader.Read<uint8_t>(7);
   external_ref_flag_ = reader.Read<bool>(1);
 }
 
 // -----------------------------------------------------------------------------
+
 bool Location::IsExternal() const { return external_ref_flag_; }
 
 // -----------------------------------------------------------------------------
+
 void Location::Write(util::BitWriter& writer) {
   writer.WriteBits(reserved_, 7);
   writer.WriteBits(external_ref_flag_, 1);

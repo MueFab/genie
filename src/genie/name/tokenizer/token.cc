@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file token.cc
+ *
+ * @brief Implements the SingleToken class and related utilities for handling
+ * tokenized genomic data.
+ *
+ * This file is part of the Genie project, offering tools for efficient genome
+ * data compression and processing. The `token.cpp` file defines and manipulates
+ * tokens used to represent segmented parts of genomic data names, offering
+ * support for comparisons, patching, and token metadata.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -16,20 +25,24 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 SingleToken::SingleToken(const Tokens t, const uint32_t p, std::string ps)
     : token(t), param(p), param_string(std::move(ps)) {}
 
 // -----------------------------------------------------------------------------
+
 bool SingleToken::operator==(const SingleToken& t) const {
   return token == t.token && param == t.param && param_string == t.param_string;
 }
 
 // -----------------------------------------------------------------------------
+
 bool SingleToken::operator!=(const SingleToken& t) const {
   return !(*this == t);
 }
 
 // -----------------------------------------------------------------------------
+
 const TokenInfo& GetTokenInfo(Tokens t) {
   static auto info = []() -> std::vector<TokenInfo> {
     std::vector<TokenInfo> ret = {{"DUP", sizeof(uint32_t)},
@@ -50,6 +63,7 @@ const TokenInfo& GetTokenInfo(Tokens t) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<SingleToken> patch(const std::vector<SingleToken>& old_string,
                                const std::vector<SingleToken>& new_string) {
   std::vector ret(new_string.size(), SingleToken(Tokens::DUP, 0, ""));

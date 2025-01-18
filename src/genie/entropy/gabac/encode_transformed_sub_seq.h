@@ -23,6 +23,7 @@
 #define SRC_GENIE_ENTROPY_GABAC_ENCODE_TRANSFORMED_SUB_SEQ_H_
 
 // -----------------------------------------------------------------------------
+
 #define NOMINMAX
 #include <cstddef>
 #include <cstdint>

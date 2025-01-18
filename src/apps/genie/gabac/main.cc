@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,12 +20,15 @@
 #include "apps/genie/gabac/program_options.h"
 #include "genie/entropy/gabac/benchmark.h"
 #include "genie/entropy/gabac/gabac.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
 
+constexpr auto kLogModuleName = "App/Gabac";
 namespace genie_app::gabac {
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     if (ProgramOptions program_options(argc, argv);
@@ -72,10 +75,10 @@ int main(int argc, char* argv[]) {
       UTILS_DIE("Invalid task: " + std::string(program_options.task_));
     }
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return EXIT_FAILURE;
   } catch (...) {
-    std::cerr << "Unkown error occurred" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error occurred");
     return EXIT_FAILURE;
   }
 

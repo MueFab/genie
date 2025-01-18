@@ -40,12 +40,17 @@ class Encoder final : public core::ReadEncoder {
    * process.
    */
   struct LlState {
-    size_t read_length{};  //!< @brief Length of the read being processed.
-    bool paired_end{};  //!< @brief Indicates whether the reads are paired-end.
-    core::AccessUnit
-        streams;      //!< @brief Encoded data streams for the current read.
-    bool ref_only{};  //!< @brief Flag indicating if only reference data is
-                      //!< being processed.
+    /// Length of the read being processed.
+    size_t read_length{};
+
+    /// Indicates whether the reads are paired-end.
+    bool paired_end{};
+
+    /// Encoded data streams for the current read.
+    core::AccessUnit streams;
+
+    /// Flag indicating if only reference data is being processed.
+    bool ref_only{};
   };
 
  public:

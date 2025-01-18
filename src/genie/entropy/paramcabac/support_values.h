@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file support_values.h
  * @brief Defines the `SupportValues` class, which handles support values for
  * transformations in CABAC entropy coding.
  * @details This class manages configuration values used in various

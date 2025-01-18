@@ -23,11 +23,14 @@
 #include <string>
 #include <utility>
 
+#include "genie/util/stop_watch.h"
+
 // -----------------------------------------------------------------------------
 
 namespace genie::read::basecoder {
 
 // -----------------------------------------------------------------------------
+
 EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
     : read_coder(data.GetData().front().GetAlignments().front().GetPosition()),
       paired_end(data.GetData().front().GetNumberOfTemplateSegments() > 1),
@@ -41,6 +44,7 @@ EncoderStub::EncodingState::EncodingState(const core::record::Chunk& data)
       last_read_position(0) {}
 
 // -----------------------------------------------------------------------------
+
 void EncoderStub::EncodeSeq(core::record::Chunk& data, EncodingState& state) {
   const util::Watch watch;
   for (auto& r : data.GetData()) {
@@ -70,6 +74,7 @@ void EncoderStub::EncodeSeq(core::record::Chunk& data, EncodingState& state) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit EncoderStub::Pack(const size_t id,
                                    core::QvEncoder::qv_coded qv,
                                    core::AccessUnit::Descriptor read_name,
@@ -99,6 +104,7 @@ core::AccessUnit EncoderStub::Pack(const size_t id,
 }
 
 // -----------------------------------------------------------------------------
+
 void EncoderStub::RemoveRedundantDescriptors(core::AccessUnit& raw_au) {
   if (raw_au.GetClassType() < core::record::ClassType::kClassI) {
     raw_au.Get(core::gen_sub::kClipsHardClip) =
@@ -127,6 +133,7 @@ void EncoderStub::RemoveRedundantDescriptors(core::AccessUnit& raw_au) {
 }
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded EncoderStub::EncodeQVs(qv_selector* qv_coder,
                                                  core::record::Chunk& data) {
   const util::Watch watch;
@@ -136,6 +143,7 @@ core::QvEncoder::qv_coded EncoderStub::EncodeQVs(qv_selector* qv_coder,
 }
 
 // -----------------------------------------------------------------------------
+
 core::AccessUnit::Descriptor EncoderStub::EncodeNames(
     name_selector* name_coder, core::record::Chunk& data) {
   const util::Watch watch;
@@ -145,6 +153,7 @@ core::AccessUnit::Descriptor EncoderStub::EncodeNames(
 }
 
 // -----------------------------------------------------------------------------
+
 void EncoderStub::FlowIn(core::record::Chunk&& t, const util::Section& id) {
   core::record::Chunk data = std::move(t);
 

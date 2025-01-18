@@ -1,7 +1,17 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file soft_clip_spreader.cc
+ *
+ * @brief Implementation of the SoftClipSpreader class for quality score
+ * propagation.
+ *
+ * This source file implements the `SoftClipSpreader` class, part of the GENIE
+ * quality value coding module. The class is designed to propagate quality
+ * scores influenced by soft-clipped bases, ensuring accurate representation
+ * of local quality in genomic data. It applies score adjustments based on
+ * configurable thresholds and handles buffering for efficient computation.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 

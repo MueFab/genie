@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file encoder.h
  * @brief Header file for the ZSTD entropy encoder module.
  * @details This file declares the `Encoder` class, which provides functionality
  * for compressing raw access units into block payloads using the ZSTD

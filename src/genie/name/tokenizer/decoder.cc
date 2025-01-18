@@ -1,7 +1,15 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file decoder.cc
+ *
+ * @brief Implements the Decoder class for decoding tokenized genomic record
+ * names.
+ *
+ * This file is part of the Genie project, designed to handle efficient genomic
+ * data compression and decompression. The `decoder.cpp` file focuses on
+ * reconstructing original record names from tokenized and encoded sequences.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,6 +26,7 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
   std::string ret;
   for (const auto& st : rec) {
@@ -54,6 +63,7 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
 }
 
 // -----------------------------------------------------------------------------
+
 uint32_t Pull32BigEndian(core::AccessUnit::Subsequence& seq) {
   uint32_t ret = 0;
   ret |= seq.Pull() << 24;
@@ -64,6 +74,7 @@ uint32_t Pull32BigEndian(core::AccessUnit::Subsequence& seq) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::Process(
     core::AccessUnit::Descriptor& desc) {
   std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;

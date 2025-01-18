@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -23,11 +23,14 @@ namespace genie::core::meta {
  * @brief Region on the genome, spanning many loci
  */
 class Region {
-  uint16_t seq_id_;  //!< @brief Sequence ID name
-  std::vector<record::ClassType>
-      classes_;         //!< @brief Record classes the region applies to
-  uint64_t start_pos_;  //!< @brief Start position of region
-  uint64_t end_pos_;    //!< @brief End position of region
+  /// Sequence ID name
+  uint16_t seq_id_;
+  /// Record classes the region applies to
+  std::vector<record::ClassType> classes_;
+  /// Start position of region
+  uint64_t start_pos_;
+  /// End position of region
+  uint64_t end_pos_;
 
  public:
   /**

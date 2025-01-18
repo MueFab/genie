@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -44,6 +44,7 @@ void DecodeSignFlag(
 }
 
 // -----------------------------------------------------------------------------
+
 BinFunc GetBinarizationReader(
     const uint8_t output_symbol_size, const bool bypass_flag,
     const paramcabac::BinarizationParameters::BinarizationId bin_id,
@@ -127,6 +128,7 @@ BinFunc GetBinarizationReader(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DecodeTransformSubSeqOrder0(
     const paramcabac::TransformedSubSeq& transformed_sub_seq_conf,
     const unsigned int num_encoded_symbols, util::DataBlock* bitstream,
@@ -212,6 +214,7 @@ size_t DecodeTransformSubSeqOrder0(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DecodeTransformSubSeqOrder1(
     const paramcabac::TransformedSubSeq& trans_sub_seq_conf,
     const unsigned int num_encoded_symbols, util::DataBlock* bitstream,
@@ -350,6 +353,7 @@ size_t DecodeTransformSubSeqOrder1(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DecodeTransformSubSeqOrder2(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     const unsigned int num_encoded_symbols, util::DataBlock* bitstream,
@@ -468,6 +472,7 @@ size_t DecodeTransformSubSeqOrder2(
 }
 
 // -----------------------------------------------------------------------------
+
 size_t DecodeTransformSubSeq(
     const paramcabac::TransformedSubSeq& transform_sub_seq_conf,
     const unsigned int num_encoded_symbols, util::DataBlock* bitstream,

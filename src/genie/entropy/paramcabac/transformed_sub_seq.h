@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file transformed_sub_seq.h
  * @brief Defines the `TransformedSubSeq` class for managing CABAC-transformed
  * subsequences in entropy coding.
  * @details This class handles the properties and configurations for transformed

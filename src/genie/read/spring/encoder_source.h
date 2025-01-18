@@ -42,22 +42,32 @@ namespace genie::read::spring {
  */
 class SpringSource final : public util::OriginalSource,
                            public util::Source<core::AccessUnit> {
-  uint32_t num_a_us_;  //!< @brief Number of access units to be generated.
-  std::string
-      read_desc_prefix_;  //!< @brief Prefix for the read description files.
-  std::string id_desc_prefix_;  //!< @brief Prefix for the ID description files.
-  std::string quality_desc_prefix_;  //!< @brief Prefix for the quality
-                                     //!< description files.
-  std::vector<uint32_t>
-      num_records_per_au_;  //!< @brief Number of records per access unit.
-  std::vector<uint32_t>
-      num_reads_per_au_;  //!< @brief Number of reads per access unit.
-  uint32_t au_id_;        //!< @brief ID of the current access unit.
-  std::vector<core::parameter::EncodingSet>&
-      params_;  //!< @brief Encoding parameters for the access units.
+  /// Number of access units to be generated.
+  uint32_t num_a_us_;
 
-  core::stats::PerfStats stats_;  //!< @brief Performance statistics for
-                                  //!< tracking encoding efficiency.
+  /// Prefix for the read description files.
+  std::string read_desc_prefix_;
+
+  /// Prefix for the ID description files.
+  std::string id_desc_prefix_;
+
+  /// Prefix for the quality description files.
+  std::string quality_desc_prefix_;
+
+  /// Number of records per access unit.
+  std::vector<uint32_t> num_records_per_au_;
+
+  /// Number of reads per access unit.
+  std::vector<uint32_t> num_reads_per_au_;
+
+  /// ID of the current access unit.
+  uint32_t au_id_;
+
+  /// Encoding parameters for the access units.
+  std::vector<core::parameter::EncodingSet> params_;
+
+  /// Performance statistics for tracking encoding efficiency.
+  core::stats::PerfStats stats_;
 
  public:
   /**

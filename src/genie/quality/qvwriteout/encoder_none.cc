@@ -1,7 +1,16 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file encoder_none.cc
+ *
+ * @brief Implementation of the NoneEncoder for the Genie framework.
+ *
+ * This file contains the implementation of the `NoneEncoder` class within the
+ * `qvwriteout` namespace. The `NoneEncoder` is a no-operation encoder for
+ * sequencing quality values (QV), returning empty parameters and descriptors
+ * while maintaining compatibility with the Genie framework's interface.
+ *
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -17,6 +26,7 @@
 namespace genie::quality::qvwriteout {
 
 // -----------------------------------------------------------------------------
+
 core::QvEncoder::qv_coded NoneEncoder::Process(const core::record::Chunk&) {
   auto param = std::make_unique<paramqv1::QualityValues1>(
       paramqv1::QualityValues1::QualityParametersPresetId::ASCII, false);

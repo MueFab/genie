@@ -18,6 +18,7 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 bool MasterIndexTable::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -28,18 +29,21 @@ bool MasterIndexTable::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<std::vector<std::vector<master_index_table::AlignedAuIndex>>>&
 MasterIndexTable::GetAlignedAUs() const {
   return aligned_aus_;
 }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<master_index_table::UnalignedAuIndex>&
 MasterIndexTable::GetUnalignedAUs() const {
   return unaligned_aus_;
 }
 
 // -----------------------------------------------------------------------------
+
 MasterIndexTable::MasterIndexTable(const uint16_t seq_count,
                                    const uint8_t num_classes) {
   aligned_aus_.resize(
@@ -49,6 +53,7 @@ MasterIndexTable::MasterIndexTable(const uint16_t seq_count,
 }
 
 // -----------------------------------------------------------------------------
+
 MasterIndexTable::MasterIndexTable(util::BitReader& reader,
                                    const DatasetHeader& hdr) {
   const auto start_pos = reader.GetStreamPosition() - 4;
@@ -92,6 +97,7 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader,
 }
 
 // -----------------------------------------------------------------------------
+
 void MasterIndexTable::BoxWrite(util::BitWriter& bit_writer) const {
   for (const auto& a : aligned_aus_) {
     for (const auto& b : a) {
@@ -106,12 +112,14 @@ void MasterIndexTable::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 const std::string& MasterIndexTable::GetKey() const {
   static const std::string key = "mitb";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<uint64_t> MasterIndexTable::GetDescriptorStreamOffsets(
     const uint8_t class_index, const uint8_t desc_index,
     const bool is_unaligned, const uint64_t total_size) const {
@@ -140,6 +148,7 @@ std::vector<uint64_t> MasterIndexTable::GetDescriptorStreamOffsets(
 }
 
 // -----------------------------------------------------------------------------
+
 void MasterIndexTable::PrintDebug(std::ostream& output, const uint8_t depth,
                                    const uint8_t max_depth) const {
   print_offset(output, depth, max_depth, "* Master index table");

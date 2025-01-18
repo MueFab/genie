@@ -21,14 +21,10 @@
 
 // -----------------------------------------------------------------------------
 
-#include <genie/core/read_encoder.h>
-#include <genie/util/stop_watch.h>
-
 #include <array>
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "genie/core/access_unit.h"
 #include "genie/core/record/alignment_split/same_rec.h"
@@ -47,11 +43,14 @@ namespace genie::read::basecoder {
  * compressed format.
  */
 class Encoder {
-  core::AccessUnit
-      container_;  //!< @brief Container to store the encoded access unit.
-  uint64_t pos_;   //!< @brief Position for the next record.
-  uint32_t
-      read_counter_;  //!< @brief Counter for the number of processed reads.
+  /// Container to store the encoded access unit.
+  core::AccessUnit container_;
+
+  /// Position for the next record.
+  uint64_t pos_;
+
+  /// Counter for the number of processed reads.
+  uint32_t read_counter_;
 
   /**
    * @brief Encodes the first segment of a record.
@@ -73,9 +72,11 @@ class Encoder {
    * @brief Structure to hold clipping information.
    */
   struct ClipInformation {
-    std::array<std::string, 2> soft_clips;  //!< @brief Soft clipping sequences.
-    std::array<size_t, 2> hard_clips = {
-        {0, 0}};  //!< @brief Number of bases hard clipped.
+    /// Soft clipping sequences.
+    std::array<std::string, 2> soft_clips;
+
+    /// Number of bases hard clipped.
+    std::array<size_t, 2> hard_clips = {{0, 0}};
   };
 
   /**
@@ -110,18 +111,32 @@ class Encoder {
   struct CodingState {
     CodingState(const std::string& read_seq, const std::string& ref_name,
                 core::record::ClassType c_type);
-    size_t count;          //!< @brief Current count of operations.
-    size_t read_pos;       //!< @brief Position in the read.
-    size_t ref_offset;     //!< @brief Offset in the reference sequence.
-    size_t last_mismatch;  //!< @brief Last mismatch position.
-    bool is_right_clip;    //!< @brief Indicates if currently processing a
-                           //!< right clip.
+    /// Current count of operations.
+    size_t count;
 
-    const std::string& read;             //!< @brief The read sequence.
-    const std::string& ref;              //!< @brief The reference sequence.
-    const core::record::ClassType type;  //!< @brief Type of the record.
-    ClipInformation
-        clips;  //!< @brief Clipping information for the current read.
+    /// Position in the read.
+    size_t read_pos;
+
+    /// Offset in the reference sequence.
+    size_t ref_offset;
+
+    /// Last mismatch position.
+    size_t last_mismatch;
+
+    /// Indicates if currently processing a right clip.
+    bool is_right_clip;
+
+    /// The read sequence.
+    const std::string& read;
+
+    /// The reference sequence.
+    const std::string& ref;
+
+    /// Type of the record.
+    const core::record::ClassType type;
+
+    /// Clipping information for the current read.
+    ClipInformation clips;
   };
 
   /**

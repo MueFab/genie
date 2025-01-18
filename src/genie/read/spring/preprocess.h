@@ -22,6 +22,7 @@
 // -----------------------------------------------------------------------------
 
 #include <filesystem>  // NOLINT
+#include <optional>
 #include <string>
 
 #include "genie/core/record/chunk.h"
@@ -43,82 +44,46 @@ namespace genie::read::spring {
  * maintaining order and synchronization across multiple threads.
  */
 struct Preprocessor {
-  CompressionParams
-      cp;  //!< @brief Compression parameters for the pre-processing step.
+ private:
+  void preprocess_segment(const core::record::Segment& seg,
+                                        size_t seg_index, size_t rec_index);
 
-  std::string outfile_clean[2];  //!< @brief File paths for cleaned reads (one
-                                 //!< for each paired-end read).
-  std::string
-      outfile_n[2];  //!< @brief File paths for reads containing `N` bases.
-  std::string outfile_order_n[2];  //!< @brief File paths for order of reads
-                                   //!< containing `N` bases.
-  std::string outfile_id;          //!< @brief File path for storing read IDs.
-  std::string
-      outfile_quality[2];  //!< @brief File paths for storing quality values.
-  std::string outfile_read_length[2];  //!< @brief File paths for storing read
-                                       //!< lengths.
+  // ---------------------------------------------------------------------------
 
-  std::ofstream
-      f_out_clean[2];  //!< @brief Output file streams for cleaned reads.
-  std::ofstream
-      f_out_n[2];  //!< @brief Output file streams for reads with `N` bases.
-  std::ofstream f_out_order_n[2];  //!< @brief Output file streams for order
-                                   //!< of `N` reads.
-  std::ofstream f_out_id;          //!< @brief Output file stream for read IDs.
-  std::ofstream
-      f_out_quality[2];  //!< @brief Output file streams for quality values.
+  void preprocess_record(const core::record::Record& rec,
+  size_t record_index);
 
-  std::string temp_dir;  //!< @brief Temporary directory for storing
-                         //!< intermediate files.
-  std::string
-      working_dir;  //!< @brief Working directory for the pre-processing step.
+ public:
+  CompressionParams cp;
 
-  util::OrderedLock
-      lock;  //!< @brief Synchronization lock for multithreaded processing.
+  std::array<std::string, 2> outfile_clean;
+  std::array<std::string, 2> outfile_n;
+  std::array<std::string, 2> outfile_order_n;
+  std::string outfile_id;
+  std::array<std::string, 2> outfile_quality;
 
-  core::stats::PerfStats
-      stats;  //!< @brief Performance statistics for the pre-processing step.
+  std::array<std::ofstream, 2> f_out_clean;
+  std::array<std::ofstream, 2> f_out_n;
+  std::array<std::ofstream, 2> f_out_order_n;
+  std::ofstream f_out_id;
+  std::array<std::ofstream, 2> f_out_quality;
 
-  /**
-   * @brief Get the performance statistics.
-   * @return Reference to the performance statistics object.
-   */
-  core::stats::PerfStats& GetStats();
+  std::string temp_dir;
+  std::string working_dir;
 
-  bool used =
-      false;  //!< @brief Flag to indicate if the preprocessor has been used.
+  util::OrderedLock lock;
+  core::stats::PerfStats stats;
 
-  /**
-   * @brief Set up the preprocessor with the specified parameters.
-   * @param working_dir_p Directory for storing temporary files.
-   * @param num_thr Number of threads to use for processing.
-   * @param paired_end Flag indicating if the reads are paired-end.
-   */
+  size_t preprocess_progress_printed;
+
+  bool used = false;
+
+  core::stats::PerfStats& GetStats() const;
   void Setup(const std::string& working_dir_p, size_t num_thr, bool paired_end);
-
-  /**
-   * @brief Destructor to clean up resources.
-   */
-  ~Preprocessor();
-
-  /**
-   * @brief Preprocess a chunk of genomic reads.
-   * @param t Chunk of reads to preprocess.
-   * @param id Unique section ID for synchronization.
-   */
   void Preprocess(core::record::Chunk&& t, const util::Section& id);
-
-  /**
-   * @brief Skip the processing for a specific section.
-   * @param id Section ID to skip.
-   */
   void Skip(const util::Section& id);
-
-  /**
-   * @brief Finalize the preprocessor, closing files and cleaning up.
-   * @param id Position to finalize at.
-   */
   void Finish(size_t id);
+  ~Preprocessor();
 };
 
 // -----------------------------------------------------------------------------

@@ -43,8 +43,8 @@ namespace genie::quality::paramqv1 {
  * comparison to facilitate comparison of different parameter sets.
  */
 class ParameterSet final {
-  std::vector<Codebook>
-      qv_codebooks_;  //!< @brief The collection of quality value codebooks.
+  /// The collection of quality value codebooks.
+  std::vector<Codebook> qv_codebooks_;
 
  public:
   /**

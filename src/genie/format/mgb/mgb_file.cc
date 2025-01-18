@@ -18,6 +18,7 @@
 namespace genie::format::mgb {
 
 // -----------------------------------------------------------------------------
+
 uint8_t MgbFile::data_unit_order(const core::parameter::DataUnit& u) {
   switch (u.GetDataUnitType()) {
     case core::parameter::DataUnit::DataUnitType::kParameterSet:
@@ -31,6 +32,7 @@ uint8_t MgbFile::data_unit_order(const core::parameter::DataUnit& u) {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::Write(util::BitWriter& writer) const {
   for (const auto& [fst, snd] : units_) {
     snd->Write(writer);
@@ -38,14 +40,17 @@ void MgbFile::Write(util::BitWriter& writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::AddUnit(std::unique_ptr<core::parameter::DataUnit> unit) {
   units_.emplace_back(0, std::move(unit));
 }
 
 // -----------------------------------------------------------------------------
+
 MgbFile::MgbFile() : file_(nullptr) {}
 
 // -----------------------------------------------------------------------------
+
 MgbFile::MgbFile(std::istream* file)
     : file_(file), reader_(std::make_unique<util::BitReader>(*file_)) {
   while (true) {
@@ -78,6 +83,7 @@ MgbFile::MgbFile(std::istream* file)
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
   for (const auto& [fst, snd] : units_) {
     snd->PrintDebug(output, 0, max_depth);
@@ -85,6 +91,7 @@ void MgbFile::print_debug(std::ostream& output, const uint8_t max_depth) const {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::sort_by_class() {
   auto sorter =
       [](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>&
@@ -122,6 +129,7 @@ void MgbFile::sort_by_class() {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::sort_by_position() {
   auto sorter =
       [](const std::pair<uint64_t, std::unique_ptr<core::parameter::DataUnit>>&
@@ -163,6 +171,7 @@ void MgbFile::sort_by_position() {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::remove_class(core::record::ClassType type) {
   auto remover =
       [type](
@@ -180,6 +189,7 @@ void MgbFile::remove_class(core::record::ClassType type) {
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::select_mapping_range(uint16_t ref_id, uint64_t start_pos,
                                    uint64_t end_pos) {
   auto remover =
@@ -214,6 +224,7 @@ void MgbFile::select_mapping_range(uint16_t ref_id, uint64_t start_pos,
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::remove_unused_parametersets() {
   std::set<uint8_t> ids;
   for (const auto& [fst, snd] : units_) {
@@ -245,6 +256,7 @@ void MgbFile::remove_unused_parametersets() {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<Block> MgbFile::ExtractDescriptor(
     const core::record::ClassType type, core::GenDesc descriptor,
     const std::vector<uint8_t>& param_sets) {
@@ -278,6 +290,7 @@ std::vector<Block> MgbFile::ExtractDescriptor(
 }
 
 // -----------------------------------------------------------------------------
+
 void MgbFile::ClearAuBlocks(const std::vector<uint8_t>& param_sets) {
   for (auto& [fst, snd] : units_) {
     if (snd->GetDataUnitType() ==
@@ -292,6 +305,7 @@ void MgbFile::ClearAuBlocks(const std::vector<uint8_t>& param_sets) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::unique_ptr<core::parameter::ParameterSet>>
 MgbFile::ExtractParameters(const std::vector<uint8_t>& param_sets) {
   std::vector<std::unique_ptr<core::parameter::ParameterSet>> ret;
@@ -316,6 +330,7 @@ MgbFile::ExtractParameters(const std::vector<uint8_t>& param_sets) {
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<std::unique_ptr<AccessUnit>> MgbFile::ExtractAUs(
     const std::vector<uint8_t>& param_sets) {
   std::vector<std::unique_ptr<AccessUnit>> ret;
@@ -339,6 +354,7 @@ std::vector<std::unique_ptr<AccessUnit>> MgbFile::ExtractAUs(
 }
 
 // -----------------------------------------------------------------------------
+
 std::vector<uint8_t> MgbFile::collect_param_ids(
     const bool multiple_alignments, const bool pos40,
     const core::parameter::DataUnit::DatasetType dataset_type,

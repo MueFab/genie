@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -20,15 +20,18 @@
 namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
+
 AlignmentExternal::AlignmentExternal(const Type more_alignment_info_type)
     : more_alignment_info_type_(more_alignment_info_type) {}
 
 // -----------------------------------------------------------------------------
+
 void AlignmentExternal::Write(util::BitWriter& writer) const {
   writer.WriteAlignedInt(more_alignment_info_type_);
 }
 
 // -----------------------------------------------------------------------------
+
 std::unique_ptr<AlignmentExternal> AlignmentExternal::Factory(
     util::BitReader& reader) {
   switch (reader.ReadAlignedInt<Type>()) {

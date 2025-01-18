@@ -1,15 +1,19 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file uniform_min_max_quantizer.cc
+ * @brief Implementation of UniformMinMaxQuantizer for Genie.
+ *
+ * Defines a quantizer that ensures the smallest and largest reconstruction
+ * values align with specified minimum and maximum values
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/quality/calq/uniform_min_max_quantizer.h"
+#include "genie/util/uniform_min_max_quantizer.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::quality::calq {
+namespace genie::util {
 
 // -----------------------------------------------------------------------------
 
@@ -49,7 +53,7 @@ UniformMinMaxQuantizer::~UniformMinMaxQuantizer() = default;
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::quality::calq
+}  // namespace genie::util
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

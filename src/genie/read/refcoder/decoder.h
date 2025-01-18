@@ -70,9 +70,8 @@ class Decoder final : public basecoder::DecoderStub {
    * @brief Internal state for managing reference-based decoding.
    */
   struct RefDecodingState final : DecodingState {
-    core::ReferenceManager::ReferenceExcerpt
-        ref_excerpt;  //!< @brief Reference excerpt for managing sequence
-                     //!< reconstruction.
+    /// Reference excerpt for managing sequence reconstruction.
+    core::ReferenceManager::ReferenceExcerpt ref_excerpt;
 
     /**
      * @brief Constructs the state from the provided access unit.

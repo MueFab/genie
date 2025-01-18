@@ -1,7 +1,13 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @file binarization.cc
+ *
+ * @brief Implementation of CABAC binarization for Genie.
+ *
+ * Provides the `Binarization` class for managing CABAC binarization parameters,
+ * context handling, serialization, and JSON conversion.
+ *
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -14,11 +20,13 @@
 namespace genie::entropy::paramcabac {
 
 // -----------------------------------------------------------------------------
+
 Binarization::Binarization()
     : Binarization(BinarizationParameters::BinarizationId::BI, false,
                    BinarizationParameters(), Context()) {}
 
 // -----------------------------------------------------------------------------
+
 Binarization::Binarization(
     const BinarizationParameters::BinarizationId binarization_id,
     const bool bypass_flag,
@@ -33,6 +41,7 @@ Binarization::Binarization(
 }
 
 // -----------------------------------------------------------------------------
+
 Binarization::Binarization(const uint8_t output_symbol_size,
                            const uint8_t coding_subsym_size,
                            util::BitReader& reader) {

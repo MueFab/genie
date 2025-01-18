@@ -37,8 +37,9 @@
 namespace genie::name::tokenizer {
 
 // -----------------------------------------------------------------------------
+
 constexpr uint8_t kTypeSeq =
-    0;  //!< @brief Constant representing a sequence type for encoding.
+    0;  /// Constant representing a sequence type for encoding.
 
 /**
  * @brief Enumeration of token types used for name encoding and decoding.
@@ -49,21 +50,41 @@ constexpr uint8_t kTypeSeq =
  * delta-encoded differences.
  */
 enum class Tokens : uint8_t {
-  DUP = 0,      //!< @brief Duplicate token indicating repetition of a previous
-                //!< pattern.
-  DIFF = 1,     //!< @brief Difference token indicating changes relative to a
-                //!< previous token.
-  STRING = 2,   //!< @brief A literal string token.
-  CHAR = 3,     //!< @brief A single character token.
-  DIGITS = 4,   //!< @brief Numeric digits token.
-  DELTA = 5,    //!< @brief Delta-encoded numeric value.
-  DIGITS0 = 6,  //!< @brief Numeric digits token with leading zeros.
-  DELTA0 = 7,   //!< @brief Delta-encoded numeric value with leading zeros.
-  MATCH =
-      8,  //!< @brief Match token indicating alignment with a previous sequence.
-  DZLEN = 9,  //!< @brief Delta-encoded zero-length value.
-  END = 10,   //!< @brief End-of-sequence token.
-  NONE = 11   //!< @brief No-operation token.
+  /// Duplicate token indicating repetition of a previous pattern.
+  DUP = 0,
+
+  /// Difference token indicating changes relative to a previous token.
+  DIFF = 1,
+
+  /// A literal string token.
+  STRING = 2,
+
+  /// A single character token.
+  CHAR = 3,
+
+  /// Numeric digits token.
+  DIGITS = 4,
+
+  /// Delta-encoded numeric value.
+  DELTA = 5,
+
+  /// Numeric digits token with leading zeros.
+  DIGITS0 = 6,
+
+  /// Delta-encoded numeric value with leading zeros.
+  DELTA0 = 7,
+
+  /// Match token indicating alignment with a previous sequence.
+  MATCH = 8,
+
+  /// Delta-encoded zero-length value.
+  DZLEN = 9,
+
+  /// End-of-sequence token.
+  END = 10,
+
+  /// No-operation token.
+  NONE = 11
 };
 
 /**
@@ -74,9 +95,11 @@ enum class Tokens : uint8_t {
  * descriptive purposes.
  */
 struct TokenInfo {
-  std::string name;  //!< @brief The name of the token type.
-  int8_t param_seq;   //!< @brief Indicates the presence of a sequence parameter
-                     //!< (if applicable).
+  /// The name of the token type.
+  std::string name;
+
+  /// Indicates the presence of a sequence parameter (if applicable).
+  int8_t param_seq;
 };
 
 /**
@@ -88,11 +111,14 @@ struct TokenInfo {
  * suitable for use in differential encoding.
  */
 struct SingleToken {
-  Tokens token;  //!< @brief The type of the token.
-  uint32_t
-      param;  //!< @brief Optional numeric parameter associated with the token.
-  std::string param_string;  //!< @brief Optional string parameter associated
-                            //!< with the token.
+  /// The type of the token.
+  Tokens token;
+
+  /// Optional numeric parameter associated with the token.
+  uint32_t param;
+
+  /// Optional string parameter associated with the token.
+  std::string param_string;
 
   /**
    * @brief Constructs a `SingleToken` object with the specified type,

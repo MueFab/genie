@@ -1,6 +1,6 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
- * @file
+ * @file binarization_parameters.h
  * @brief Defines the `BinarizationParameters` class for handling CABAC
  * binarization parameters in Genie
  * @details The `BinarizationParameters` class encapsulates the parameters

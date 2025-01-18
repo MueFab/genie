@@ -26,6 +26,7 @@
 namespace genie::util {
 
 // -----------------------------------------------------------------------------
+
 void OrderedLock::Wait(const size_t id) {
   std::unique_lock lock(m_);
   if (id == counter_) {
@@ -35,6 +36,7 @@ void OrderedLock::Wait(const size_t id) {
 }
 
 // -----------------------------------------------------------------------------
+
 void OrderedLock::Finished(const size_t length) {
   {
     std::unique_lock lock(m_);
@@ -44,9 +46,11 @@ void OrderedLock::Finished(const size_t length) {
 }
 
 // -----------------------------------------------------------------------------
+
 OrderedLock::OrderedLock() : counter_(0) {}
 
 // -----------------------------------------------------------------------------
+
 void OrderedLock::Reset() { counter_ = 0; }
 
 // -----------------------------------------------------------------------------

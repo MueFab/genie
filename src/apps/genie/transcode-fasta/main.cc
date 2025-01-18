@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -18,12 +18,16 @@
 #include "apps/genie/transcode-fasta/program_options.h"
 #include "genie/format/fasta/manager.h"
 #include "genie/format/mgb/raw_reference.h"
+#include "util/log.h"
 
 // -----------------------------------------------------------------------------
+
+constexpr auto kLogModuleName = "App/TranscodeFasta";
 
 namespace genie_app::transcode_fasta {
 
 // -----------------------------------------------------------------------------
+
 std::string file_extension(const std::string& path) {
   const auto pos = path.find_last_of('.');
   std::string ext = path.substr(pos + 1);
@@ -34,6 +38,7 @@ std::string file_extension(const std::string& path) {
 }
 
 // -----------------------------------------------------------------------------
+
 int main(int argc, char* argv[]) {
   try {
     ProgramOptions p_opts(argc, argv);
@@ -98,10 +103,10 @@ int main(int argc, char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, e.what());
     return 1;
   } catch (...) {
-    std::cerr << "Error - unknown exception" << std::endl;
+    UTILS_LOG(genie::util::Logger::Severity::ERROR, "Unknown error");
     return 1;
   }
 }

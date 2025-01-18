@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -14,13 +14,16 @@
 namespace genie::entropy::gabac {
 
 // -----------------------------------------------------------------------------
+
 ContextSelector::ContextSelector(const paramcabac::StateVars& state_vars)
     : state_vars_(state_vars) {}
 
 // -----------------------------------------------------------------------------
+
 ContextSelector::ContextSelector(const ContextSelector& src) = default;
 
 // -----------------------------------------------------------------------------
+
 unsigned int ContextSelector::GetContextIdxOrder0(
     const uint8_t subsym_idx) const {
   return static_cast<unsigned int>(subsym_idx *
@@ -28,6 +31,7 @@ unsigned int ContextSelector::GetContextIdxOrder0(
 }
 
 // -----------------------------------------------------------------------------
+
 unsigned int ContextSelector::GetContextIdxOrderGt0(
     const uint8_t subsym_idx, const uint8_t prv_idx,
     const std::vector<Subsymbol>& subsymbols,

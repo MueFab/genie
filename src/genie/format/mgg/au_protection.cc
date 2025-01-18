@@ -17,12 +17,14 @@
 namespace genie::format::mgg {
 
 // -----------------------------------------------------------------------------
+
 const std::string& AuProtection::GetKey() const {
   static const std::string key = "aupr";
   return key;
 }
 
 // -----------------------------------------------------------------------------
+
 AuProtection::AuProtection(util::BitReader& bitreader,
                            const core::MpegMinorVersion version)
     : version_(version) {
@@ -43,6 +45,7 @@ AuProtection::AuProtection(util::BitReader& bitreader,
 }
 
 // -----------------------------------------------------------------------------
+
 AuProtection::AuProtection(const uint8_t dataset_group_id,
                            const uint16_t dataset_id,
                            std::string au_protection_value,
@@ -53,6 +56,7 @@ AuProtection::AuProtection(const uint8_t dataset_group_id,
       au_protection_value_(std::move(au_protection_value)) {}
 
 // -----------------------------------------------------------------------------
+
 void AuProtection::BoxWrite(util::BitWriter& bit_writer) const {
   if (version_ != core::MpegMinorVersion::kV1900) {
     bit_writer.WriteAlignedInt(dataset_group_id_);
@@ -63,17 +67,21 @@ void AuProtection::BoxWrite(util::BitWriter& bit_writer) const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint8_t AuProtection::GetDatasetGroupId() const { return dataset_group_id_; }
 
 // -----------------------------------------------------------------------------
+
 uint16_t AuProtection::GetDatasetId() const { return dataset_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::string& AuProtection::GetInformation() const {
   return au_protection_value_;
 }
 
 // -----------------------------------------------------------------------------
+
 bool AuProtection::operator==(const GenInfo& info) const {
   if (!GenInfo::operator==(info)) {
     return false;
@@ -87,6 +95,7 @@ bool AuProtection::operator==(const GenInfo& info) const {
 }
 
 // -----------------------------------------------------------------------------
+
 std::string AuProtection::decapsulate() {
   return std::move(au_protection_value_);
 }

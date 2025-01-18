@@ -47,18 +47,20 @@ namespace genie::name::tokenizer {
  * generate the appropriate tokens.
  */
 class TokenState {
-  uint32_t token_pos_;  //!< @brief Current position in the list of old tokens.
-  const std::vector<SingleToken>&
-      old_rec_;  //!< @brief Reference to the old record's tokens for
-               //!< reference-based compression.
-  std::vector<SingleToken>
-      cur_rec_;  //!< @brief List of tokens generated for the current record.
+  /// Current position in the list of old tokens.
+  uint32_t token_pos_;
 
-  std::string::const_iterator
-      cur_it_;  //!< @brief Iterator pointing to the current position in the
-               //!< input string.
-  std::string::const_iterator
-      end_it_;  //!< @brief Iterator pointing to the end of the input string.
+  /// Reference to the old record's tokens for reference-based compression.
+  const std::vector<SingleToken>& old_rec_;
+
+  /// List of tokens generated for the current record.
+  std::vector<SingleToken> cur_rec_;
+
+  /// Iterator pointing to the current position in the input string.
+  std::string::const_iterator cur_it_;
+
+  /// Iterator pointing to the end of the input string.
+  std::string::const_iterator end_it_;
 
  protected:
   /**

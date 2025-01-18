@@ -37,9 +37,14 @@ namespace genie::read::spring {
  * process.
  */
 struct Record {
-  std::string name;  //!< @brief Name of the record.
-  std::string seq;   //!< @brief Sequence data of the record.
-  std::string qv;    //!< @brief Quality values of the record.
+  /// Name of the record.
+  std::string name;
+
+  /// Sequence data of the record.
+  std::string seq;
+
+  /// Quality values of the record.
+  std::string qv;
 };
 
 /**
@@ -72,29 +77,33 @@ void DecodeStreams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
  * records using the `util::OrderedLock` mechanism.
  */
 class Decoder final : public core::ReadDecoder {
-  CompressionParams cp_{};  //!< @brief Compression parameters.
-  bool combine_pairs_;      //!< @brief Flag for combined pairs decoding.
-  util::OrderedLock lock_;  //!< @brief Lock for multithreaded decoding.
-  std::ofstream file_out_unmatched1_;  //!< @brief Output stream for unmatched
-                                       //!< reads (1st file).
-  std::ofstream file_out_unmatched2_;  //!< @brief Output stream for unmatched
-                                       //!< reads (2nd file).
-  std::ofstream file_out_unmatched_read_names_1_;  //!< @brief Output stream for
-  //!< unmatched read names (1st file).
-  std::ofstream file_out_unmatched_read_names_2_;  //!< @brief Output stream for
-  //!< unmatched read names (2nd file).
+  /// Compression parameters.
+  CompressionParams cp_{};
+  /// Flag for combined pairs decoding.
+  bool combine_pairs_;
+  /// Lock for multithreaded decoding.
+  util::OrderedLock lock_;
+  /// Output stream for unmatched
+  std::ofstream file_out_unmatched1_;
+  /// Output stream for unmatched reads (2nd file).
+  std::ofstream file_out_unmatched2_;
+  /// Output stream for unmatched read names (1st file).
+  std::ofstream file_out_unmatched_read_names_1_;
+  /// Output stream for unmatched read names (2nd file).
+  std::ofstream file_out_unmatched_read_names_2_;
 
-  std::string
-      file_unmatched_fastq1_;  //!< @brief Path to unmatched FASTQ (1st file).
-  std::string
-      file_unmatched_fastq2_;  //!< @brief Path to unmatched FASTQ (2nd file).
-  std::string file_unmatched_read_names_1_;  //!< @brief Path to unmatched
-                                             //!< read names (1st file).
-  std::string file_unmatched_read_names_2_;  //!< @brief Path to unmatched
-                                             //!< read names (2nd file).
-  uint32_t unmatched_record_index_[2];       //!< @brief Index counters for
-                                             //!< unmatched records.
-  std::string basedir_;  //!< @brief Base directory for output files.
+  /// Path to unmatched FASTQ (1st file).
+  std::string file_unmatched_fastq1_;
+  /// Path to unmatched FASTQ (2nd file).
+  std::string file_unmatched_fastq2_;
+  /// Path to unmatched read names (1st file).
+  std::string file_unmatched_read_names_1_;
+  /// Path to unmatched read names (2nd file).
+  std::string file_unmatched_read_names_2_;
+  /// Index counters for unmatched records.
+  uint32_t unmatched_record_index_[2];
+  /// Base directory for output files.
+  std::string basedir_;
 
  public:
   /**

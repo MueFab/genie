@@ -1,7 +1,7 @@
 /**
  * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of Genie See LICENSE and/or
+ * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
  */
 
@@ -15,6 +15,7 @@
 namespace genie::core::meta {
 
 // -----------------------------------------------------------------------------
+
 Region::Region(const uint16_t seq_id, const uint64_t start, const uint64_t end,
                std::vector<record::ClassType> classes)
     : seq_id_(seq_id),
@@ -23,6 +24,7 @@ Region::Region(const uint16_t seq_id, const uint64_t start, const uint64_t end,
       end_pos_(end) {}
 
 // -----------------------------------------------------------------------------
+
 Region::Region(const nlohmann::json& json)
     : seq_id_(json["seq_ID"]),
       start_pos_(json["start_pos"]),
@@ -34,6 +36,7 @@ Region::Region(const nlohmann::json& json)
 }
 
 // -----------------------------------------------------------------------------
+
 nlohmann::json Region::ToJson() const {
   nlohmann::json ret;
   ret["seq_ID"] = seq_id_;
@@ -48,17 +51,21 @@ nlohmann::json Region::ToJson() const {
 }
 
 // -----------------------------------------------------------------------------
+
 uint16_t Region::GetSeqId() const { return seq_id_; }
 
 // -----------------------------------------------------------------------------
+
 const std::vector<record::ClassType>& Region::GetClasses() const {
   return classes_;
 }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Region::GetStartPos() const { return start_pos_; }
 
 // -----------------------------------------------------------------------------
+
 uint64_t Region::GetEndPos() const { return end_pos_; }
 
 // -----------------------------------------------------------------------------
