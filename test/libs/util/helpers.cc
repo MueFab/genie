@@ -1,5 +1,4 @@
 #include "helpers.h"
-#include <genie/util/string-helpers.h>
 
 namespace util_tests {
 
@@ -27,4 +26,3 @@ namespace util_tests {
 }*/
 
 }  // namespace util_tests
-

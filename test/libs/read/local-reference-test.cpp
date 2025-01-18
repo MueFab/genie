@@ -1,123 +1,126 @@
-#include <genie/read/localassembly/local-reference.h>
-#include <genie/util/exception.h>
+#include "genie/read/localassembly/local_reference.h"
+#include "genie/util/runtime_exception.h"
 #include <gtest/gtest.h>
-#include <iostream>
+
 #include <string>
 
-typedef genie::read::localassembly::LocalReference LocalReference;
+using LocalReference = genie::read::localassembly::LocalReference;
 
 TEST(LocalReferenceTest, shiftedReads) {
-    LocalReference localRef(1024);
-    std::string reference = "ACCGTTCGAAATGCGTTACGCGCCATGCTA";
-    std::string cigar = "5=";
+  LocalReference local_ref(1024);
+  const std::string reference = "ACCGTTCGAAATGCGTTACGCGCCATGCTA";
+  const std::string cigar = "5=";
 
-    // add reads in overlapping pieces
-    for (uint64_t pos = 0; pos <= reference.size() - 5; ++pos) {
-        localRef.addSingleRead(reference.substr(pos, 5), cigar, pos);
-    }
+  // add reads in overlapping pieces
+  for (uint64_t pos = 0; pos <= reference.size() - 5; ++pos) {
+    local_ref.AddSingleRead(reference.substr(pos, 5), cigar, pos);
+  }
 
-    EXPECT_EQ(reference, localRef.getReference(0, static_cast<uint32_t>(reference.size())));
+  EXPECT_EQ(reference,
+            local_ref.GetReference(0, static_cast<uint32_t>(reference.size())));
 }
 
 TEST(LocalReferenceTest, majorityVoteNull) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    // null should always loose majority-vote
-    localRef.addSingleRead("0000000", "7=", 0);
-    localRef.addSingleRead("0ACGTN0", "7=", 0);
-    localRef.addSingleRead("0000000", "7=", 0);
+  // null should always loose majority-vote
+  local_ref.AddSingleRead("0000000", "7=", 0);
+  local_ref.AddSingleRead("0ACGTN0", "7=", 0);
+  local_ref.AddSingleRead("0000000", "7=", 0);
 
-    // to get string with null-byte
-    std::string expected("\0ACGTN\0", 7);
-    EXPECT_EQ(localRef.getReference(0, 7), expected);
+  // to get string with null-byte
+  const std::string expected("\0ACGTN\0", 7);
+  EXPECT_EQ(local_ref.GetReference(0, 7), expected);
 }
 
 TEST(LocalReferenceTest, majorityVoteDraw) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    // A should win vs C, C vs G and so on
-    localRef.addSingleRead("AGGNN", "5=", 0);
-    localRef.addSingleRead("CCTT0", "5=", 0);
-    EXPECT_EQ(localRef.getReference(0, 5), "ACGTN");
+  // A should win vs C, C vs G and so on
+  local_ref.AddSingleRead("AGGNN", "5=", 0);
+  local_ref.AddSingleRead("CCTT0", "5=", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 5), "ACGTN");
 }
 
 TEST(LocalReferenceTest, insertion) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    // simple insertion
-    localRef.addSingleRead("ACACCACCCA", "1=1+1=2+1=3+1=", 0);
+  // simple insertion
+  local_ref.AddSingleRead("ACACCACCCA", "1=1+1=2+1=3+1=", 0);
 
-    // to get string with null-byte
-    std::string expected("AAAA\0", 5);
-    EXPECT_EQ(localRef.getReference(0, 5), expected);
+  // to get string with null-byte
+  const std::string expected("AAAA\0", 5);
+  EXPECT_EQ(local_ref.GetReference(0, 5), expected);
 }
 
 TEST(LocalReferenceTest, deletion) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    // 1. AA  AA  A
-    // 2.   C   T
-    // 3.    G   G
-    // 4. NNNNNNNNN
-    localRef.addSingleRead("AAAAA", "2=2-2=2-1=", 0);
-    localRef.addSingleRead("CT", "1=3-1=", 2);
-    localRef.addSingleRead("GG", "1=3-1=", 3);
-    localRef.addSingleRead("NNNNNNNNN", "9=", 0);
+  // 1. AA  AA  A
+  // 2.   C   T
+  // 3.    G   G
+  // 4. NNNNNNNNN
+  local_ref.AddSingleRead("AAAAA", "2=2-2=2-1=", 0);
+  local_ref.AddSingleRead("CT", "1=3-1=", 2);
+  local_ref.AddSingleRead("GG", "1=3-1=", 3);
+  local_ref.AddSingleRead("NNNNNNNNN", "9=", 0);
 
-    EXPECT_EQ(localRef.getReference(0, 9), "AACGAATGA");
+  EXPECT_EQ(local_ref.GetReference(0, 9), "AACGAATGA");
 }
 
 TEST(LocalReferenceTest, softClip) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    localRef.addSingleRead("AGAGA", "(1)3=(1)", 0);
-    EXPECT_EQ(localRef.getReference(0, 3), "GAG");
+  local_ref.AddSingleRead("AGAGA", "(1)3=(1)", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 3), "GAG");
 
-    // should not change ref
-    localRef.addSingleRead("AAA", "(3)", 0);
-    EXPECT_EQ(localRef.getReference(0, 3), "GAG");
+  // should not change ref
+  local_ref.AddSingleRead("AAA", "(3)", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 3), "GAG");
 
-    // should change ref
-    localRef.addSingleRead("AAA", "(1)1=(1)", 0);
-    EXPECT_EQ(localRef.getReference(0, 3), "AAG");
+  // should change ref
+  local_ref.AddSingleRead("AAA", "(1)1=(1)", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 3), "AAG");
 }
 
 TEST(LocalReferenceTest, mixedCigar) {
-    LocalReference localRef(1024);
+  LocalReference local_ref(1024);
 
-    // mix of deletion and insertions
-    localRef.addSingleRead("AAAA", "4-4+", 0);
-    localRef.addSingleRead("AAAA", "2+4-2+", 0);
-    localRef.addSingleRead("AAAA", "4+4-", 0);
-    EXPECT_EQ(localRef.getReference(0, 4), std::string("\0\0\0\0", 4));
+  // mix of deletion and insertions
+  local_ref.AddSingleRead("AAAA", "4-4+", 0);
+  local_ref.AddSingleRead("AAAA", "2+4-2+", 0);
+  local_ref.AddSingleRead("AAAA", "4+4-", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 4), std::string("\0\0\0\0", 4));
 
-    // mixed all
-    localRef = LocalReference(1024);
+  // mixed all
+  local_ref = LocalReference(1024);
 
-    localRef.addSingleRead("AGTCGT", "[4](2)2=2-2+[2]", 0);
-    EXPECT_EQ(localRef.getReference(0, 4), std::string("TC\0\0", 4));
+  local_ref.AddSingleRead("AGTCGT", "[4](2)2=2-2+[2]", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 4), std::string("TC\0\0", 4));
 
-    localRef.addSingleRead("AGTCGT", "(2)2=(2)", 3);
-    EXPECT_EQ(localRef.getReference(0, 5), std::string("TC\0TC", 5));
-    localRef.addSingleRead("AAAAA", "2+1=(2)", 2);
-    EXPECT_EQ(localRef.getReference(0, 5), std::string("TCATC", 5));
+  local_ref.AddSingleRead("AGTCGT", "(2)2=(2)", 3);
+  EXPECT_EQ(local_ref.GetReference(0, 5), std::string("TC\0TC", 5));
+  local_ref.AddSingleRead("AAAAA", "2+1=(2)", 2);
+  EXPECT_EQ(local_ref.GetReference(0, 5), std::string("TCATC", 5));
 }
 
 TEST(LocalReferenceTest, bufferOverflow) {
-    LocalReference localRef(8);
+  LocalReference local_ref(8);
 
-    localRef.addSingleRead("AAAA", "4=", 0);
-    localRef.addSingleRead("GGGG", "4=", 0);
-    localRef.addSingleRead("TTTT", "4=", 0);
-    EXPECT_EQ(localRef.getReference(0, 4), "GGGG");
+  local_ref.AddSingleRead("AAAA", "4=", 0);
+  local_ref.AddSingleRead("GGGG", "4=", 0);
+  local_ref.AddSingleRead("TTTT", "4=", 0);
+  EXPECT_EQ(local_ref.GetReference(0, 4), "GGGG");
 }
 
 TEST(LocalReferenceTest, wrongUsage) {
-    // too long read
-    LocalReference localRef(2);
-    EXPECT_THROW(localRef.addSingleRead("AAA", "3=", 0), genie::util::RuntimeException);
+  // too long read
+  LocalReference local_ref(2);
+  EXPECT_THROW(local_ref.AddSingleRead("AAA", "3=", 0),
+               genie::util::RuntimeException);
 
-    // wrong cigar-length
-    localRef = LocalReference(32);
-    EXPECT_THROW(localRef.addSingleRead("AAA", "1+1=", 0), genie::util::RuntimeException);
+  // wrong cigar-length
+  local_ref = LocalReference(32);
+  EXPECT_THROW(local_ref.AddSingleRead("AAA", "1+1=", 0),
+               genie::util::RuntimeException);
 }

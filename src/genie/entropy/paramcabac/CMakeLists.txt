@@ -8,7 +8,7 @@ set(source_files
         subsequence.cc
         support_values.cc
         state_vars.cc
-        transformed-subseq.cc
+        transformed_sub_seq.cc
         transformed_parameters.cc
 )
 

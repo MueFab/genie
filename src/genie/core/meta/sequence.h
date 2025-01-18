@@ -1,18 +1,20 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_META_SEQUENCE_H_
 #define SRC_GENIE_CORE_META_SEQUENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <string>
+
 #include "nlohmann/json.hpp"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::core::meta {
 
@@ -20,64 +22,68 @@ namespace genie::core::meta {
  * @brief Reference sequence information
  */
 class Sequence {
- private:
-    std::string name;  //!< @brief Sequence name
-    uint64_t length;   //!< @brief Sequence length
-    uint16_t id;       //!< @brief Sequence ID
+  /// Sequence name
+  std::string name_;
+
+  /// Sequence length
+  uint64_t length_;
+
+  /// Sequence ID
+  uint16_t id_;
 
  public:
-    /**
-     * @brief
-     * @return
-     */
-    std::string& getName();
+  /**
+   * @brief
+   * @return
+   */
+  std::string& GetName();
 
-    /**
-     * @brief Construct from raw values
-     * @param _name Sequence name
-     * @param _length  Sequence length
-     * @param _id Sequence id
-     */
-    explicit Sequence(std::string _name, uint64_t _length, uint16_t _id);
+  /**
+   * @brief Construct from raw values
+   * @param name Sequence name
+   * @param length  Sequence length
+   * @param id Sequence id
+   */
+  explicit Sequence(std::string name, uint64_t length, uint16_t id);
 
-    /**
-     * @brief Construct from json
-     * @param json Json representation
-     */
-    explicit Sequence(const nlohmann::json& json);
+  /**
+   * @brief Construct from json
+   * @param json Json representation
+   */
+  explicit Sequence(const nlohmann::json& json);
 
-    /**
-     * @brief Convert to json
-     * @return Json representation
-     */
-    [[nodiscard]] nlohmann::json toJson() const;
+  /**
+   * @brief Convert to json
+   * @return Json representation
+   */
+  [[nodiscard]] nlohmann::json ToJson() const;
 
-    /**
-     * @brief Get Name of Sequence
-     * @return Name
-     */
-    [[nodiscard]] const std::string& getName() const;
+  /**
+   * @brief Get Name of Sequence
+   * @return Name
+   */
+  [[nodiscard]] const std::string& GetName() const;
 
-    /**
-     * @brief Get length of sequence
-     * @return Length
-     */
-    [[nodiscard]] uint64_t getLength() const;
+  /**
+   * @brief Get length of sequence
+   * @return Length
+   */
+  [[nodiscard]] uint64_t GetLength() const;
 
-    /**
-     * @brief Get Sequence ID
-     * @return ID
-     */
-    [[nodiscard]] uint16_t getID() const;
+  /**
+   * @brief Get Sequence ID
+   * @return ID
+   */
+  [[nodiscard]] uint16_t GetId() const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::meta
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_META_SEQUENCE_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

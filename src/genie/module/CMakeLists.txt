@@ -1,7 +1,7 @@
 project("genie-module")
 
 set(source_files
-        default-setup.cc
+        default_setup.cc
         manager.cc
 )
 

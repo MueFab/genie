@@ -1,295 +1,352 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset.h"
+
+#include <genie/core/meta/block_header/enabled.h>
+
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Dataset::Dataset(util::BitReader& reader, core::MPEGMinorVersion _version) : version(_version) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    auto end_pos = start_pos + static_cast<int64_t>(length);
-    std::string tmp(4, '\0');
-    reader.readAlignedBytes(tmp.data(), tmp.length());
-    UTILS_DIE_IF(tmp != "dthd", "Dataset without header");
-    header = DatasetHeader(reader);
-    while (reader.getStreamPosition() != end_pos) {
-        UTILS_DIE_IF(reader.getStreamPosition() > end_pos, "Read too far");
-        UTILS_DIE_IF(!reader.isStreamGood(), "Reader died");
-        read_box(reader, false);
-    }
+Dataset::Dataset(util::BitReader& reader, const core::MpegMinorVersion version)
+    : version_(version) {
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  const auto end_pos = start_pos + static_cast<int64_t>(length);
+  std::string tmp(4, '\0');
+  reader.ReadAlignedBytes(tmp.data(), tmp.length());
+  UTILS_DIE_IF(tmp != "dthd", "Dataset without header");  // NOLINT
+  header_ = DatasetHeader(reader);
+  while (reader.GetStreamPosition() != end_pos) {
+    UTILS_DIE_IF(reader.GetStreamPosition() > end_pos, "Read too far");
+    UTILS_DIE_IF(!reader.IsStreamGood(), "Reader died");
+    ReadBox(reader, false);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const DatasetHeader& Dataset::getHeader() const { return header; }
+const DatasetHeader& Dataset::GetHeader() const { return header_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Dataset::box_write(genie::util::BitWriter& bitWriter) const {
-    header.write(bitWriter);
-    if (metadata) {
-        metadata->write(bitWriter);
-    }
-    if (protection) {
-        protection->write(bitWriter);
-    }
-    for (const auto& p : parameterSets) {
-        p.write(bitWriter);
-    }
-    if (master_index_table) {
-        master_index_table->write(bitWriter);
-    }
-    for (const auto& p : access_units) {
-        p.write(bitWriter);
-    }
-    for (const auto& p : descriptor_streams) {
-        p.write(bitWriter);
-    }
+void Dataset::BoxWrite(util::BitWriter& bit_writer) const {
+  header_.Write(bit_writer);
+  if (metadata_) {
+    metadata_->Write(bit_writer);
+  }
+  if (protection_) {
+    protection_->Write(bit_writer);
+  }
+  for (const auto& p : parameter_sets_) {
+    p.Write(bit_writer);
+  }
+  if (master_index_table_) {
+    master_index_table_->Write(bit_writer);
+  }
+  for (const auto& p : access_units_) {
+    p.Write(bit_writer);
+  }
+  for (const auto& p : descriptor_streams_) {
+    p.Write(bit_writer);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string& Dataset::getKey() const {
-    static const std::string key = "dtcn";
-    return key;
+const std::string& Dataset::GetKey() const {
+  static const std::string key = "dtcn";  // NOLINT
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Dataset::hasMetadata() const { return metadata != std::nullopt; }
+bool Dataset::HasMetadata() const { return metadata_ != std::nullopt; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Dataset::hasProtection() const { return metadata != std::nullopt; }
+bool Dataset::HasProtection() const { return metadata_ != std::nullopt; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-DatasetMetadata& Dataset::getMetadata() { return *metadata; }
+DatasetMetadata& Dataset::GetMetadata() { return *metadata_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-DatasetProtection& Dataset::getProtection() { return *protection; }
+DatasetProtection& Dataset::GetProtection() { return *protection_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<AccessUnit>& Dataset::getAccessUnits() { return access_units; }
+std::vector<AccessUnit>& Dataset::GetAccessUnits() { return access_units_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<DescriptorStream>& Dataset::getDescriptorStreams() { return descriptor_streams; }
+std::vector<DescriptorStream>& Dataset::GetDescriptorStreams() {
+  return descriptor_streams_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameterSets; }
+std::vector<DatasetParameterSet>& Dataset::GetParameterSets() {
+  return parameter_sets_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Dataset::Dataset(format::mgb::MgbFile& file, core::meta::Dataset& meta, core::MPEGMinorVersion _version,
+Dataset::Dataset(mgb::MgbFile& file, core::meta::Dataset& meta,
+                 const core::MpegMinorVersion version,
                  const std::vector<uint8_t>& param_ids)
-    : version(_version) {
-    bool mitFlag = false;
-    bool cc_mode = false;
-    bool ordered_blocks = false;
-    bool headerON = meta.getHeader().getType() == core::meta::BlockHeader::HeaderType::ENABLED;
-    if (headerON) {
-        cc_mode = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getCCFlag();
-        mitFlag = dynamic_cast<const core::meta::blockheader::Enabled&>(meta.getHeader()).getMITFlag();
-    } else {
-        ordered_blocks = dynamic_cast<const core::meta::blockheader::Disabled&>(meta.getHeader()).getOrderedFlag();
-    }
+    : version_(version) {
+  bool mit_flag = false;
+  bool cc_mode = false;
+  bool ordered_blocks = false;
+  const bool header_on = meta.GetHeader().GetType() ==
+                         core::meta::BlockHeader::HeaderType::kEnabled;
+  if (header_on) {
+    cc_mode =
+        dynamic_cast<const core::meta::block_header::Enabled&>(meta.GetHeader())
+            .GetCcFlag();
+    mit_flag =
+        dynamic_cast<const core::meta::block_header::Enabled&>(meta.GetHeader())
+            .GetMitFlag();
+  } else {
+    ordered_blocks = dynamic_cast<const core::meta::block_header::Disabled&>(
+                         meta.GetHeader())
+                         .GetOrderedFlag();
+  }
 
-    if (!headerON) {
-        if (ordered_blocks) {
-            file.sort_by_position();
-        }
-        for (size_t c = 0; c < size_t(core::record::ClassType::COUNT); ++c) {
-            for (size_t d = 0; d < size_t(core::GenDesc::COUNT); ++d) {
-                auto blocks = file.extractDescriptor(core::record::ClassType(c), core::GenDesc(d), param_ids);
-                auto desc = DescriptorStream(core::GenDesc(d), core::record::ClassType(c), blocks);
-                if (!desc.isEmpty()) {
-                    descriptor_streams.emplace_back(std::move(desc));
-                    for (auto& b : meta.getDSs()) {
-                        if (core::GenDesc(b.getID()) == descriptor_streams.back().getHeader().getDescriptorID()) {
-                            descriptor_streams.back().setProtection(
-                                DescriptorStreamProtection(std::move(b.getProtection())));
-                        }
-                    }
-                }
+  if (!header_on) {
+    if (ordered_blocks) {
+      file.sort_by_position();
+    }
+    for (size_t c = 0; c < static_cast<size_t>(core::record::ClassType::kCount);
+         ++c) {
+      for (size_t d = 0; d < static_cast<size_t>(core::GenDesc::kCount); ++d) {
+        auto blocks =
+            file.ExtractDescriptor(static_cast<core::record::ClassType>(c),
+                                   static_cast<core::GenDesc>(d), param_ids);
+        auto desc = DescriptorStream(static_cast<core::GenDesc>(d),
+                                     static_cast<core::record::ClassType>(c),
+                                     std::move(blocks));
+        if (!desc.IsEmpty()) {
+          descriptor_streams_.emplace_back(std::move(desc));
+          for (auto& b : meta.GetDSs()) {
+            if (static_cast<core::GenDesc>(b.GetId()) ==
+                descriptor_streams_.back().GetHeader().GetDescriptorId()) {
+              descriptor_streams_.back().SetProtection(
+                  DescriptorStreamProtection(std::move(b.GetProtection())));
             }
+          }
         }
-        file.clearAUBlocks(param_ids);
+      }
+    }
+    file.ClearAuBlocks(param_ids);
+  } else {
+    if (cc_mode) {
+      file.sort_by_class();
     } else {
-        if (cc_mode) {
-            file.sort_by_class();
-        } else {
-            file.sort_by_position();
-        }
+      file.sort_by_position();
     }
+  }
 
-    auto params_p2 = file.extractParameters(param_ids);
-    for (auto& p : params_p2) {
-        parameterSets.emplace_back(static_cast<uint8_t>(0), static_cast<uint16_t>(0), p->getID(), p->getParentID(),
-                                   std::move(p->getEncodingSet()), version);
+  auto params_p2 = file.ExtractParameters(param_ids);
+  for (const auto& p : params_p2) {
+    parameter_sets_.emplace_back(
+        static_cast<uint8_t>(0), static_cast<uint16_t>(0), p->GetId(),
+        p->GetParentId(), std::move(p->GetEncodingSet()), version_);
+  }
+
+  auto access_units_p2 = file.ExtractAUs(param_ids);
+
+  for (auto& a : access_units_p2) {
+    access_units_.emplace_back(std::move(*a), mit_flag, version_);
+    for (auto& b : meta.GetAUs()) {
+      if (b.GetId() == access_units_.back().GetHeader().GetHeader().GetId()) {
+        access_units_.back().SetInformation(
+            AuInformation(0, 0, std::move(b.GetInformation()), version));
+        access_units_.back().SetProtection(
+            AuProtection(0, 0, std::move(b.GetProtection()), version));
+      }
     }
+  }
 
-    auto access_units_p2 = file.extractAUs(param_ids);
+  header_ = DatasetHeader(
+      0, 0, version_,
+      parameter_sets_.front().GetEncodingSet().HasMultipleAlignments(), true,
+      false, parameter_sets_.front().GetEncodingSet().GetPosSize() == 40,
+      parameter_sets_.front().GetEncodingSet().GetDatasetType(), false,
+      parameter_sets_.front().GetEncodingSet().GetAlphabetId());
 
-    for (auto& a : access_units_p2) {
-        access_units.emplace_back(std::move(*a), mitFlag, version);
-        for (auto& b : meta.getAUs()) {
-            if (b.getID() == access_units.back().getHeader().getHeader().getID()) {
-                access_units.back().setInformation(AUInformation(0, 0, std::move(b.getInformation()), _version));
-                access_units.back().setProtection(AUProtection(0, 0, std::move(b.getProtection()), _version));
-            }
-        }
-    }
+  if (!meta.GetInformation().empty()) {
+    metadata_ =
+        DatasetMetadata(0, 0, std::move(meta.GetInformation()), version);
+  }
 
-    header = DatasetHeader(0, 0, version, parameterSets.front().getEncodingSet().hasMultipleAlignments(), true, false,
-                           parameterSets.front().getEncodingSet().getPosSize() == 40,
-                           parameterSets.front().getEncodingSet().getDatasetType(), false,
-                           parameterSets.front().getEncodingSet().getAlphabetID());
-
-    if (!meta.getInformation().empty()) {
-        metadata = DatasetMetadata(0, 0, std::move(meta.getInformation()), _version);
-    }
-
-    if (!meta.getProtection().empty()) {
-        protection = DatasetProtection(0, 0, std::move(meta.getProtection()), _version);
-    }
+  if (!meta.GetProtection().empty()) {
+    protection_ =
+        DatasetProtection(0, 0, std::move(meta.GetProtection()), version);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Dataset::patchID(uint8_t groupID, uint16_t setID) {
-    header.patchID(groupID, setID);
-    if (metadata != std::nullopt) {
-        metadata->patchID(groupID, setID);
-    }
-    if (protection != std::nullopt) {
-        protection->patchID(groupID, setID);
-    }
-    for (auto& ps : parameterSets) {
-        ps.patchID(groupID, setID);
-    }
+void Dataset::PatchId(const uint8_t group_id, const uint16_t set_id) {
+  header_.PatchId(group_id, set_id);
+  if (metadata_ != std::nullopt) {
+    metadata_->PatchId(group_id, set_id);
+  }
+  if (protection_ != std::nullopt) {
+    protection_->PatchId(group_id, set_id);
+  }
+  for (auto& ps : parameter_sets_) {
+    ps.PatchId(group_id, set_id);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Dataset::patchRefID(uint8_t _old, uint8_t _new) { header.patchRefID(_old, _new); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetHeader& Dataset::getHeader() { return header; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Dataset::read_box(util::BitReader& reader, bool in_offset) {
-    std::string tmp_str(4, '\0');
-    reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
-    if (tmp_str == "dtmd") {
-        UTILS_DIE_IF(metadata != std::nullopt, "Metadata already present");
-        UTILS_DIE_IF(protection != std::nullopt, "Metadata must be before protection");
-        UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
-        UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-        UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-        metadata = DatasetMetadata(reader, version);
-    } else if (tmp_str == "dtpr") {
-        UTILS_DIE_IF(protection != std::nullopt, "Protection already present");
-        UTILS_DIE_IF(!parameterSets.empty(), "Metadata must be before parametersets");
-        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
-        UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-        UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-        protection = DatasetProtection(reader, version);
-    } else if (tmp_str == "pars") {
-        UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table != std::nullopt, "Metadata must be before MIT");
-        UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-        UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-        parameterSets.emplace_back(reader, version, header.getParameterUpdateFlag());
-        encoding_sets.emplace(size_t(parameterSets.back().getParameterSetID()), parameterSets.back().getEncodingSet());
-    } else if (tmp_str == "mitb") {
-        UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table != std::nullopt, "MIT already present");
-        UTILS_DIE_IF(!access_units.empty(), "Metadata must be before Access Units");
-        UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-        master_index_table = MasterIndexTable(reader, header);
-    } else if (tmp_str == "aucn") {
-        UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(!descriptor_streams.empty(), "Metadata must be before Descriptor streams");
-        access_units.emplace_back(reader, encoding_sets, header.isMITEnabled(), header.isBlockHeaderEnabled(), version);
-    } else if (tmp_str == "dscn") {
-        UTILS_DIE_IF(in_offset, "Offset not permitted");
-        UTILS_DIE_IF(master_index_table == std::nullopt, "descriptor streams without MIT not allowed");
-        UTILS_DIE_IF(header.isBlockHeaderEnabled(), "descriptor streams only allowed without block headers");
-        descriptor_streams.emplace_back(reader, *master_index_table, header.getMITConfigs());
-    } else if (tmp_str == "offs") {
-        UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
-        reader.readAlignedBytes(tmp_str.data(), tmp_str.length());
-        auto offset = reader.readAlignedInt<uint64_t>();
-        if (offset == ~static_cast<uint64_t>(0)) {
-            return;
-        }
-        auto pos_save = reader.getStreamPosition();
-        reader.setStreamPosition(offset);
-        read_box(reader, true);
-        reader.setStreamPosition(pos_save);
-    } else {
-        UTILS_DIE("Unknown box");
-    }
+void Dataset::PatchRefId(const uint8_t old, const uint8_t _new) {
+  header_.PatchRefId(old, _new);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Dataset::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
-    print_offset(output, depth, max_depth, "* Dataset");
-    header.print_debug(output, depth + 1, max_depth);
-    if (metadata) {
-        metadata->print_debug(output, depth + 1, max_depth);
+DatasetHeader& Dataset::GetHeader() { return header_; }
+
+// -----------------------------------------------------------------------------
+
+void Dataset::ReadBox(util::BitReader& reader,  // NOLINT
+                      const bool in_offset) {
+  std::string tmp_str(4, '\0');
+  reader.ReadAlignedBytes(tmp_str.data(), tmp_str.length());
+  if (tmp_str == "dtmd") {  // NOLINT
+    UTILS_DIE_IF(metadata_ != std::nullopt, "Metadata already present");
+    UTILS_DIE_IF(protection_ != std::nullopt,
+                 "Metadata must be before protection");
+    UTILS_DIE_IF(!parameter_sets_.empty(),
+                 "Metadata must be before parameter sets");
+    UTILS_DIE_IF(master_index_table_ != std::nullopt,
+                 "Metadata must be before MIT");
+    UTILS_DIE_IF(!access_units_.empty(),
+                 "Metadata must be before Access Units");
+    UTILS_DIE_IF(!descriptor_streams_.empty(),
+                 "Metadata must be before Descriptor streams");
+    metadata_ = DatasetMetadata(reader, version_);
+  } else if (tmp_str == "dtpr") {  // NOLINT
+    UTILS_DIE_IF(protection_ != std::nullopt, "Protection already present");
+    UTILS_DIE_IF(!parameter_sets_.empty(),
+                 "Metadata must be before parameter sets");
+    UTILS_DIE_IF(master_index_table_ != std::nullopt,
+                 "Metadata must be before MIT");
+    UTILS_DIE_IF(!access_units_.empty(),
+                 "Metadata must be before Access Units");
+    UTILS_DIE_IF(!descriptor_streams_.empty(),
+                 "Metadata must be before Descriptor streams");
+    protection_ = DatasetProtection(reader, version_);
+  } else if (tmp_str == "pars") {
+    UTILS_DIE_IF(in_offset, "Offset not permitted");
+    UTILS_DIE_IF(master_index_table_ != std::nullopt,
+                 "Metadata must be before MIT");
+    UTILS_DIE_IF(!access_units_.empty(),
+                 "Metadata must be before Access Units");
+    UTILS_DIE_IF(!descriptor_streams_.empty(),
+                 "Metadata must be before Descriptor streams");
+    parameter_sets_.emplace_back(reader, version_,
+                                 header_.GetParameterUpdateFlag());
+    encoding_sets_.emplace(
+        static_cast<size_t>(parameter_sets_.back().GetParameterSetId()),
+        parameter_sets_.back().GetEncodingSet());
+  } else if (tmp_str == "mitb") {  // NOLINT
+    UTILS_DIE_IF(in_offset, "Offset not permitted");
+    UTILS_DIE_IF(master_index_table_ != std::nullopt, "MIT already present");
+    UTILS_DIE_IF(!access_units_.empty(),
+                 "Metadata must be before Access Units");
+    UTILS_DIE_IF(!descriptor_streams_.empty(),
+                 "Metadata must be before Descriptor streams");
+    master_index_table_ = MasterIndexTable(reader, header_);
+  } else if (tmp_str == "aucn") {  // NOLINT
+    UTILS_DIE_IF(in_offset, "Offset not permitted");
+    UTILS_DIE_IF(!descriptor_streams_.empty(),
+                 "Metadata must be before Descriptor streams");
+    access_units_.emplace_back(reader, encoding_sets_, header_.IsMitEnabled(),
+                               header_.IsBlockHeaderEnabled(), version_);
+  } else if (tmp_str == "dscn") {  // NOLINT
+    UTILS_DIE_IF(in_offset, "Offset not permitted");
+    UTILS_DIE_IF(master_index_table_ == std::nullopt,
+                 "descriptor streams without MIT not allowed");
+    UTILS_DIE_IF(header_.IsBlockHeaderEnabled(),
+                 "descriptor streams only allowed without block headers");
+    descriptor_streams_.emplace_back(reader, *master_index_table_,
+                                     header_.GetMitConfigs());
+  } else if (tmp_str == "offs") {
+    UTILS_DIE_IF(in_offset, "Recursive offset not permitted");
+    reader.ReadAlignedBytes(tmp_str.data(), tmp_str.length());
+    const auto offset = reader.ReadAlignedInt<uint64_t>();
+    if (offset == ~static_cast<uint64_t>(0)) {
+      return;
     }
-    if (protection) {
-        metadata->print_debug(output, depth + 1, max_depth);
-    }
-    for (const auto& r : parameterSets) {
-        r.print_debug(output, depth + 1, max_depth);
-    }
-    if (master_index_table) {
-        master_index_table->print_debug(output, depth + 1, max_depth);
-    }
-#ifdef GENIE_DEBUG_PRINT_NODETAIL
-    if (!access_units.empty()) {
-        print_offset(output, depth + 1, max_depth, "* " + std::to_string(access_units.size()) + " access units");
-    }
-    if (!descriptor_streams.empty()) {
-        print_offset(output, depth + 1, max_depth,
-                     "* " + std::to_string(descriptor_streams.size()) + " descriptor streams");
-    }
+    const auto pos_save = reader.GetStreamPosition();
+    reader.SetStreamPosition(static_cast<int64_t>(offset));
+    ReadBox(reader, true);
+    reader.SetStreamPosition(pos_save);
+  } else {
+    UTILS_DIE("Unknown box");
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+void Dataset::PrintDebug(std::ostream& output, uint8_t depth,
+                          uint8_t max_depth) const {
+  print_offset(output, depth, max_depth, "* Dataset");
+  header_.PrintDebug(output, depth + 1, max_depth);
+  if (metadata_) {
+    metadata_->PrintDebug(output, depth + 1, max_depth);
+  }
+  if (protection_) {
+    metadata_->PrintDebug(output, depth + 1, max_depth);
+  }
+  for (const auto& r : parameter_sets_) {
+    r.PrintDebug(output, depth + 1, max_depth);
+  }
+  if (master_index_table_) {
+    master_index_table_->PrintDebug(output, depth + 1, max_depth);
+  }
+#ifdef Genie_DEBUG_PRINT_NODETAIL
+  if (!access_units_.empty()) {
+    print_offset(output, depth + 1, max_depth,
+                 "* " + std::to_string(access_units_.size()) + " access units");
+  }
+  if (!descriptor_streams_.empty()) {
+    print_offset(output, depth + 1, max_depth,
+                 "* " + std::to_string(descriptor_streams_.size()) +
+                     " descriptor streams");
+  }
 #else
-    for (const auto& r : access_units) {
-        r.print_debug(output, depth + 1, max_depth);
-    }
-    for (const auto& r : descriptor_streams) {
-        r.print_debug(output, depth + 1, max_depth);
-    }
+  for (const auto& r : access_units) {
+    r.print_debug(output, depth + 1, max_depth);
+  }
+  for (const auto& r : descriptor_streams) {
+    r.print_debug(output, depth + 1, max_depth);
+  }
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

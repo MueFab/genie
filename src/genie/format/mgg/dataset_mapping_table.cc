@@ -1,77 +1,85 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/dataset_mapping_table.h"
-#include <string>
-#include <utility>
-#include <vector>
-#include "genie/util/runtime-exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <string>
+#include <vector>
+
+#include "genie/util/runtime_exception.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::string& DataSetMappingTable::getKey() const {
-    static const std::string key = "dmtb";
-    return key;
+const std::string& DataSetMappingTable::GetKey() const {
+  static const std::string key = "dmtb";
+  return key;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void DataSetMappingTable::box_write(genie::util::BitWriter& bitWriter) const {
-    bitWriter.writeAlignedInt(dataset_id);
-    for (const auto& s : streams) {
-        s.write(bitWriter);
-    }
+void DataSetMappingTable::BoxWrite(util::BitWriter& bit_writer) const {
+  bit_writer.WriteAlignedInt(dataset_id_);
+  for (const auto& s : streams_) {
+    s.Write(bit_writer);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint16_t DataSetMappingTable::getDatasetID() const { return dataset_id; }
+uint16_t DataSetMappingTable::GetDatasetId() const { return dataset_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<DataStream>& DataSetMappingTable::getDataStreams() const { return streams; }
+const std::vector<DataStream>& DataSetMappingTable::GetDataStreams() const {
+  return streams_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void DataSetMappingTable::addDataStream(DataStream d) { streams.emplace_back(d); }
+void DataSetMappingTable::AddDataStream(DataStream d) {
+  streams_.emplace_back(d);
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-DataSetMappingTable::DataSetMappingTable(uint16_t _dataset_id) : dataset_id(_dataset_id) {}
+DataSetMappingTable::DataSetMappingTable(const uint16_t dataset_id)
+    : dataset_id_(dataset_id) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 DataSetMappingTable::DataSetMappingTable(util::BitReader& reader) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    dataset_id = reader.readAlignedInt<uint16_t>();
-    size_t num_data_streams = (length - 14) / 3;
-    for (size_t i = 0; i < num_data_streams; ++i) {
-        streams.emplace_back(reader);
-    }
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  dataset_id_ = reader.ReadAlignedInt<uint16_t>();
+  const size_t num_data_streams = (length - 14) / 3;
+  for (size_t i = 0; i < num_data_streams; ++i) {
+    streams_.emplace_back(reader);
+  }
+  UTILS_DIE_IF(start_pos + length != reader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool DataSetMappingTable::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const DataSetMappingTable&>(info);
-    return dataset_id == other.dataset_id && streams == other.streams;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const DataSetMappingTable&>(info);
+  return dataset_id_ == other.dataset_id_ && streams_ == other.streams_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

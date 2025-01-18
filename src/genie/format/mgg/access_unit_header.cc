@@ -1,92 +1,111 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgg/access_unit_header.h"
+
 #include <map>
-#include <sstream>
 #include <string>
 #include <utility>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void AccessUnitHeader::print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const {
-    static const std::string class_lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
-    print_offset(output, depth, max_depth, "* Access Unit Header");
-    print_offset(output, depth + 1, max_depth, "Access unit ID: " + std::to_string(header.getID()));
-    print_offset(output, depth + 1, max_depth, "Access unit class: " + class_lut[static_cast<int>(header.getClass())]);
-    print_offset(output, depth + 1, max_depth, "Access unit blocks: " + std::to_string(header.getNumBlocks()));
-    print_offset(output, depth + 1, max_depth, "Access unit records: " + std::to_string(header.getReadCount()));
+void AccessUnitHeader::PrintDebug(std::ostream& output, const uint8_t depth,
+                                   const uint8_t max_depth) const {
+  static const std::string class_lut[] = {"NONE", "P",  "N", "M",
+                                          "I",    "HM", "U"};
+  print_offset(output, depth, max_depth, "* Access Unit Header");
+  print_offset(output, depth + 1, max_depth,
+               "Access unit ID: " + std::to_string(header_.GetId()));
+  print_offset(
+      output, depth + 1, max_depth,
+      "Access unit class: " + class_lut[static_cast<int>(header_.GetClass())]);
+  print_offset(output, depth + 1, max_depth,
+               "Access unit blocks: " + std::to_string(header_.GetNumBlocks()));
+  print_offset(
+      output, depth + 1, max_depth,
+      "Access unit records: " + std::to_string(header_.GetReadCount()));
+  print_offset(output, depth + 1, max_depth,
+               "Access unit parameter set ID: " +
+                   std::to_string(header_.GetParameterId()));
+  if (header_.GetClass() != core::record::ClassType::kClassU) {
     print_offset(output, depth + 1, max_depth,
-                 "Access unit parameter set ID: " + std::to_string(static_cast<int>(header.getParameterID())));
-    if (header.getClass() != core::record::ClassType::CLASS_U) {
-        print_offset(output, depth + 1, max_depth,
-                     "Access unit reference ID: " + std::to_string(header.getAlignmentInfo().getRefID()));
-        print_offset(output, depth + 1, max_depth,
-                     "Access unit start pos:  " + std::to_string(header.getAlignmentInfo().getStartPos()));
-        print_offset(output, depth + 1, max_depth,
-                     "Access unit end pos:  " + std::to_string(header.getAlignmentInfo().getEndPos()));
-    }
+                 "Access unit reference ID: " +
+                     std::to_string(header_.GetAlignmentInfo().GetRefId()));
+    print_offset(output, depth + 1, max_depth,
+                 "Access unit start pos:  " +
+                     std::to_string(header_.GetAlignmentInfo().GetStartPos()));
+    print_offset(output, depth + 1, max_depth,
+                 "Access unit end pos:  " +
+                     std::to_string(header_.GetAlignmentInfo().GetEndPos()));
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool AccessUnitHeader::operator==(const GenInfo& info) const {
-    if (!GenInfo::operator==(info)) {
-        return false;
-    }
-    const auto& other = dynamic_cast<const AccessUnitHeader&>(info);
-    return header == other.header && mit_flag == other.mit_flag;
+  if (!GenInfo::operator==(info)) {
+    return false;
+  }
+  const auto& other = dynamic_cast<const AccessUnitHeader&>(info);
+  return header_ == other.header_ && mit_flag_ == other.mit_flag_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() const { return header; }
+const mgb::AuHeader& AccessUnitHeader::GetHeader() const { return header_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie::format::mgb::AUHeader& AccessUnitHeader::getHeader() { return header; }
+mgb::AuHeader& AccessUnitHeader::GetHeader() { return header_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader() : AccessUnitHeader(genie::format::mgb::AUHeader(), false) {}
+AccessUnitHeader::AccessUnitHeader()
+    : AccessUnitHeader(mgb::AuHeader(), false) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader(util::BitReader& reader,
-                                   const std::map<size_t, core::parameter::EncodingSet>& parameterSets, bool mit)
-    : mit_flag(mit) {
-    auto start_pos = reader.getStreamPosition() - 4;
-    auto length = reader.readAlignedInt<uint64_t>();
-    header = genie::format::mgb::AUHeader(reader, parameterSets, !mit_flag);
-    UTILS_DIE_IF(start_pos + length != uint64_t(reader.getStreamPosition()), "Invalid length");
+AccessUnitHeader::AccessUnitHeader(
+    util::BitReader& reader,
+    const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
+    const bool mit)
+    : mit_flag_(mit) {
+  const auto start_pos = reader.GetStreamPosition() - 4;
+  const auto length = reader.ReadAlignedInt<uint64_t>();
+  header_ = mgb::AuHeader(reader, parameter_sets, !mit_flag_);
+  UTILS_DIE_IF(start_pos + length != reader.GetStreamPosition(),
+               "Invalid length");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-AccessUnitHeader::AccessUnitHeader(genie::format::mgb::AUHeader _header, bool _mit_flag)
-    : header(std::move(_header)), mit_flag(_mit_flag) {}
+AccessUnitHeader::AccessUnitHeader(mgb::AuHeader header, const bool mit_flag)
+    : header_(std::move(header)), mit_flag_(mit_flag) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void AccessUnitHeader::box_write(genie::util::BitWriter& bitWriter) const { header.write(bitWriter, !mit_flag); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string& AccessUnitHeader::getKey() const {
-    static const std::string key = "auhd";
-    return key;
+void AccessUnitHeader::BoxWrite(util::BitWriter& bit_writer) const {
+  header_.Write(bit_writer, !mit_flag_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+const std::string& AccessUnitHeader::GetKey() const {
+  static const std::string key = "auhd";
+  return key;
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

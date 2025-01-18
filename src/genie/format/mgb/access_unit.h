@@ -1,128 +1,133 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
 #define SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <map>
 #include <vector>
+#include <string>
 #include "genie/format/mgb/access_unit_header.h"
 #include "genie/format/mgb/block.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgb {
 
 /**
  * @brief
  */
-class AccessUnit : public core::parameter::DataUnit {
+class AccessUnit final : public core::parameter::DataUnit {
  public:
-    /**
-     * @brief
-     */
-    void debugPrint(const core::parameter::EncodingSet &ps) const;
+  /**
+   * @brief
+   */
+  [[nodiscard]] std::string DebugPrint(
+      const core::parameter::EncodingSet& ps) const;
 
-    /**
-     * @brief
-     * @param parameterSets
-     * @param bitReader
-     * @param lazyPayload
-     */
-    explicit AccessUnit(const std::map<size_t, core::parameter::EncodingSet> &parameterSets, util::BitReader &bitReader,
-                        bool lazyPayload = false);
+  /**
+   * @brief
+   * @param parameter_sets
+   * @param bit_reader
+   * @param lazy_payload
+   */
+  explicit AccessUnit(
+      const std::map<size_t, core::parameter::EncodingSet>& parameter_sets,
+      util::BitReader& bit_reader, bool lazy_payload = false);
 
-    /**
-     * @brief
-     * @param bitReader
-     */
-    void loadPayload(util::BitReader &bitReader);
+  /**
+   * @brief
+   * @param bit_reader
+   */
+  void LoadPayload(util::BitReader& bit_reader);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] size_t getPayloadSize() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] size_t GetPayloadSize() const;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter &writer) const override;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const override;
 
-    /**
-     * @brief
-     * @param _access_unit_ID
-     * @param _parameter_set_ID
-     * @param _au_type
-     * @param _reads_count
-     * @param dataset_type
-     * @param posSize
-     * @param signatureFlag
-     * @param alphabet
-     */
-    AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, bool signatureFlag,
-               core::AlphabetID alphabet);
+  /**
+   * @brief
+   * @param access_unit_id
+   * @param parameter_set_id
+   * @param au_type
+   * @param reads_count
+   * @param dataset_type
+   * @param pos_size
+   * @param signature_flag
+   * @param alphabet
+   */
+  AccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id,
+             core::record::ClassType au_type, uint32_t reads_count,
+             DatasetType dataset_type, uint8_t pos_size, bool signature_flag,
+             core::AlphabetId alphabet);
 
-    /**
-     * @brief
-     * @param block
-     */
-    void addBlock(Block block);
+  /**
+   * @brief
+   * @param block
+   */
+  void AddBlock(Block block);
 
-    /**
-     * @brief
-     * @return
-     */
-    std::vector<Block> &getBlocks();
+  /**
+   * @brief
+   * @return
+   */
+  std::vector<Block>& GetBlocks();
 
-    /**
-     * @brief
-     * @return
-     */
-    AUHeader &getHeader();
+  /**
+   * @brief
+   * @return
+   */
+  AuHeader& GetHeader();
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const AUHeader &getHeader() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const AuHeader& GetHeader() const;
 
-    /**
-     * @brief
-     * @param output
-     */
-    void print_debug(std::ostream &output, uint8_t, uint8_t) const override;
+  /**
+   * @brief
+   * @param output
+   */
+  void PrintDebug(std::ostream& output, uint8_t, uint8_t) const override;
 
-    /**
-     * @brief
-     * @param h
-     * @param b
-     */
-    AccessUnit(AUHeader h, std::vector<Block> b);
+  /**
+   * @brief
+   * @param h
+   * @param b
+   */
+  AccessUnit(AuHeader h, std::vector<Block> b);
 
  private:
-    AUHeader header;  //!< @brief
+  AuHeader header;  //!< @brief
 
-    std::vector<Block> blocks;  //!< @brief
+  std::vector<Block> blocks;  //!< @brief
 
-    size_t payloadbytes;  //!< @brief
-    size_t qv_payloads;   //!< @brief
+  size_t payloadbytes;  //!< @brief
+  size_t qv_payloads;   //!< @brief
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
