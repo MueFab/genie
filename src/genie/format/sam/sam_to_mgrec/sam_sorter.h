@@ -22,43 +22,46 @@ namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
 
+using SamRecordPair = std::vector<SamRecord>;
+
 struct CmpOpen {
-  bool operator()(const std::vector<SamRecord>& a,
-                  const std::vector<SamRecord>& b) const;
+  bool operator()(const SamRecord& a,
+                  const SamRecord& b) const;
 };
 
-struct CmpCompete {
-  bool operator()(const std::vector<SamRecord>& a,
-                  const std::vector<SamRecord>& b) const;
+struct CmpComplete {
+  bool operator()(const SamRecordPair& a, const SamRecordPair& b) const;
 };
 
 /**
  * @brief
  */
 class SamSorter {
-  /// Queries that can be returned at any moment
-  std::vector<std::vector<SamRecord>> queries_;
-  /// Automatically sorted by p_next because priority queue
-  std::priority_queue<std::vector<SamRecord>,
-                      std::vector<std::vector<SamRecord>>, CmpOpen>
-      open_queries_;
-  /// Automatically sorted by position of primary alignment as priority queue
-  std::priority_queue<std::vector<SamRecord>,
-                      std::vector<std::vector<SamRecord>>, CmpCompete>
-      completed_queries_;
+  /// Reads waiting for their mate
+  std::priority_queue<SamRecord, std::vector<SamRecord>, CmpOpen>
+      unmatched_pairs_;
+  /// Reads that are already matched but have to wait as there is still
+  /// an incomplete pair before them
+  std::priority_queue<SamRecordPair, std::vector<SamRecordPair>, CmpComplete>
+      matched_pairs_;
+  /// Output buffer for already sorted pairs
+  std::vector<SamRecordPair> sorted_pairs_;
+
   /// Mapping position of the next ready query
   uint64_t cur_alignment_position_ = 0;
-  /// All positions of primary alignments
-  std::list<int> primary_alignment_positions_;
-  /// Maximal allowed distance of two mates
+  /// Maximal allowed distance of two mates. If exceeded, the pair is split
   uint32_t max_distance_;
+
+  void FinishOrphanedReads(uint64_t current_pos);
+
+  void AddUnmappedPair(const SamRecord& rec);
 
   /**
    * @brief This functions checks what the position of the record that needs
    * to be next is. If there is no record we are waiting on this number is
    * set to maximum uint64 value.
    */
-  void set_new_alignment_pos();
+  void SetNewAlignmentPos();
 
   /**
    * @brief This function checks if the record is ready to be added to the
@@ -72,7 +75,7 @@ class SamSorter {
    * it to queries. If we are still waiting for a record with smaller position,
    * then cur_query is appended to completed_queries.
    */
-  void try_appending_to_queries(const std::vector<SamRecord>& cur_query);
+  void FinishQuery(const std::vector<SamRecord>& cur_query);
 
  public:
   /**

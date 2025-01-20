@@ -10,45 +10,44 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <mutex>
-#include <thread>
+#include <optional>
 #include <vector>
 
 #include "genie/util/runtime_exception.h"
 
+// -----------------------------------------------------------------------------
+
 namespace genie::format::sam::sam_to_mgrec {
 
-/** compare function for open reads **/
-bool CmpOpen::operator()(const std::vector<SamRecord>& a,
-                         const std::vector<SamRecord>& b) const {
-  UTILS_DIE_IF(a.empty() || b.empty(), "emtpy sam read in open list");
-  return a.at(a.size() - 1).mate_pos_ > b.at(b.size() - 1).mate_pos_;
+// -----------------------------------------------------------------------------
+
+bool CmpOpen::operator()(const SamRecord& a,
+                         const SamRecord& b) const {
+  return a.mate_pos_ > b.mate_pos_;
 }
 
 // -----------------------------------------------------------------------------
 
-/** compare function for complete reads **/
-bool CmpCompete::operator()(const std::vector<SamRecord>& a,
-                            const std::vector<SamRecord>& b) const {
+bool CmpComplete::operator()(const SamRecordPair& a,
+                             const SamRecordPair& b) const {
   UTILS_DIE_IF(a.empty() || b.empty(), "emtpy sam read in closed list");
-  return a.at(0).mate_pos_ > b.at(0).mate_pos_;
+  return a.front().mate_pos_ > b.front().mate_pos_;
 }
 
 // -----------------------------------------------------------------------------
 
 SamSorter::SamSorter(const uint32_t max_waiting_distance)
-    : open_queries_(CmpOpen()),
-      completed_queries_(CmpCompete()),
+    : unmatched_pairs_(CmpOpen()),
+      matched_pairs_(CmpComplete()),
       max_distance_(max_waiting_distance) {}
 
 // -----------------------------------------------------------------------------
 
-/** gets the smallest primary alignment position of the open list or maximum **/
-void SamSorter::set_new_alignment_pos() {
-  if (!open_queries_.empty()) {
-    UTILS_DIE_IF(primary_alignment_positions_.size() > open_queries_.size(),
+void SamSorter::SetNewAlignmentPos() {
+  if (!unmatched_pairs_.empty()) {
+    UTILS_DIE_IF(primary_alignment_positions_.size() > unmatched_pairs_.size(),
                  "too many positions");
-    UTILS_DIE_IF(primary_alignment_positions_.size() > open_queries_.size(),
+    UTILS_DIE_IF(primary_alignment_positions_.size() > unmatched_pairs_.size(),
                  "not enough positions");
     cur_alignment_position_ =
         *std::min_element(primary_alignment_positions_.begin(),
@@ -60,128 +59,142 @@ void SamSorter::set_new_alignment_pos() {
 
 // -----------------------------------------------------------------------------
 
-/** checks if cur query is allowed on queries or needs to be put on completed
- * **/
-void SamSorter::try_appending_to_queries(
-    const std::vector<SamRecord>& cur_query) {
-  /** cur_query is complete, try appending to queries **/
-  if (cur_alignment_position_ >= cur_query.at(0).mate_pos_) {
+void SamSorter::FinishQuery(const std::vector<SamRecord>& cur_query) {
+  // cur_query is complete, try appending to queries
+  if (cur_alignment_position_ >= cur_query.front().mate_pos_) {
     /** allowed to append to queries **/
-    queries_.emplace_back();
-    queries_.back() = cur_query;
+    sorted_pairs_.emplace_back();
+    sorted_pairs_.back() = cur_query;
   } else {
     /** not allowed to append to queries, append to complete_reads **/
-    completed_queries_.push(cur_query);
+    matched_pairs_.push(cur_query);
   }
 }
 
 // -----------------------------------------------------------------------------
 
 bool SamSorter::IsReadComplete(const std::vector<SamRecord>& read) {
-  return read.at(read.size() - 1).mate_pos_ == read.at(0).mate_pos_;
+  return read.back().mate_pos_ == read.front().mate_pos_;
+}
+
+void SamSorter::FinishOrphanedReads(const uint64_t current_pos) {
+  // We have already passed the position where the mate was expected...
+  // This means that the mate is not present in the file.
+  while (!unmatched_pairs_.empty() &&
+         current_pos > unmatched_pairs_.top().mate_pos_) {
+    FinishQuery({unmatched_pairs_.top()});
+    unmatched_pairs_.pop();
+  }
 }
 
 // -----------------------------------------------------------------------------
 
+uint64_t unsigned_distance(uint64_t a, uint64_t b) {
+  return (a > b) ? (a - b) : (b - a);
+}
+
+void SamSorter::AddUnmappedPair(const SamRecord& rec) {
+  // TODO
+}
+
+std::optional<SamRecord> SamSorter::MatchPair(const SamRecord& record) {
+  /** here the record is not complete yet **/
+  /** get all candidates that could be a match for new record **/
+  std::vector<SamRecord> candidate_reads;
+  std::optional<SamRecord> mate = std::nullopt;
+  while (!unmatched_pairs_.empty() &&
+         unmatched_pairs_.top().mate_pos_ == record.pos_) {
+    if (unmatched_pairs_.top().qname_ == record.qname_) {
+      mate = unmatched_pairs_.top();
+      unmatched_pairs_.pop();
+      break;
+    }
+    candidate_reads.emplace_back(unmatched_pairs_.top());
+    unmatched_pairs_.pop();
+  }
+
+  // Put back any non-matching candidates
+  for (auto& c : candidate_reads) {
+    unmatched_pairs_.emplace(std::move(c));
+  }
+
+  return mate;
+}
+
 void SamSorter::AddSamRead(const SamRecord& record) {
-  /** this part checks if the top element on open_queries can be removed,
-   * because it's mate was not found **/
-  while (!open_queries_.empty() &&
-         record.mate_pos_ >
-             open_queries_.top().at(open_queries_.top().size() - 1).mate_pos_) {
-    try_appending_to_queries(open_queries_.top());
-    primary_alignment_positions_.remove(
-        static_cast<int>(open_queries_.top().at(0).mate_pos_));
-    open_queries_.pop();
+  // Fully unmapped pair
+  if ((!record.IsPaired() && record.IsUnmapped()) ||
+      (record.IsPaired() && record.IsUnmapped() && record.IsMateUnmapped())) {
+    AddUnmappedPair(record);
+    return;
   }
 
-  /** this part checks where to put the new record **/
-  if (static_cast<uint64_t>(record.mate_pos_) >
-      static_cast<uint64_t>(record.mate_pos_) +
-          static_cast<uint64_t>(max_distance_)) {
-    /** mate is to far away, record gets treated as complete **/
-    try_appending_to_queries({record});
-  } else {
-    /** here the record is not complete yet **/
-    /** get all candidates that could be a match for new record **/
-    std::vector<std::vector<SamRecord>> candidate_reads;
-    auto candidate_pos =
-        open_queries_.empty()
-            ? 0
-            : open_queries_.top().at(open_queries_.top().size() - 1).mate_pos_;
-    while (!open_queries_.empty() &&
-           open_queries_.top().at(open_queries_.top().size() - 1).mate_pos_ ==
-               candidate_pos) {
-      candidate_reads.emplace_back();
-      candidate_reads.back() = open_queries_.top();
-      open_queries_.pop();
-    }
+  FinishOrphanedReads(record.pos_);
 
-    /** check if new record belongs to any query in candidates **/
-    for (auto& candidate : candidate_reads) {
-      if (record.qname_ == candidate.at(0).qname_) {
-        std::vector<SamRecord> cur_query = candidate;
-        cur_query.push_back(record);
-        if (IsReadComplete(cur_query)) {
-          try_appending_to_queries(cur_query);
-          primary_alignment_positions_.remove(
-              static_cast<int>(cur_query.at(0).mate_pos_));
-          candidate_pos = 1;
-        } else {
-          /** query is still not complete **/
-          open_queries_.push(cur_query);
-        }
-      } else {
-        open_queries_.push(candidate);
-      }
-    }
-
-    /** new record didn't match any candidate **/
-    if (candidate_pos != 1) {
-      if (record.mate_pos_ <= record.mate_pos_) {  // TODO(sophie): incorrect
-        open_queries_.push({record});
-        primary_alignment_positions_.push_back(
-            static_cast<int>(record.mate_pos_));
-      } else {
-        try_appending_to_queries({record});
-      }
-    }
+  // No mate to wait for
+  if (!record.IsPaired() || !record.IsPrimary()) {
+    FinishQuery({record});
+    return;
   }
-  set_new_alignment_pos();
+
+  // There is a mate, but it is too far away to wait for it.
+  if (record.mate_rid_ != record.rid_ ||
+      unsigned_distance(record.pos_, record.mate_pos_) > max_distance_) {
+    FinishQuery({record});
+    return;
+  }
+
+  if (record.mate_pos_ > record.pos_) {
+    // Impossible that we have already seen the mate, it is at higher position
+    unmatched_pairs_.emplace(record);
+    return;
+  }
+  auto mate = MatchPair(record);
+  if (!mate) {
+    if (record.mate_pos_ < record.pos_) {
+      // No mate but we should have seen it... Orphan.
+      FinishQuery({record});
+      return;
+    }
+    // Mate maps to same position. There is still hope.
+    unmatched_pairs_.emplace(record);
+    return;
+  }
+
+  // Mate found
+  FinishQuery({*mate, record});
+  return;
+  
+  SetNewAlignmentPos();
 
   /** check if any completed queries can be put to queries **/
-  while (!completed_queries_.empty() &&
-         cur_alignment_position_ >= completed_queries_.top().at(0).mate_pos_) {
-    queries_.emplace_back();
-    queries_.back() = completed_queries_.top();
-    completed_queries_.pop();
+  while (!matched_pairs_.empty() &&
+         cur_alignment_position_ >= matched_pairs_.top().front().mate_pos_) {
+    sorted_pairs_.emplace_back();
+    sorted_pairs_.back() = matched_pairs_.top();
+    matched_pairs_.pop();
   }
 }
 
 // -----------------------------------------------------------------------------
 
 std::vector<std::vector<SamRecord>> SamSorter::GetQueries() {
-  std::vector<std::vector<SamRecord>> ret = queries_;
-  queries_.clear();
-  return ret;
+  return std::move(sorted_pairs_);
 }
 
 // -----------------------------------------------------------------------------
 
 void SamSorter::EndFile() {
   /** mark all records on open list as complete **/
-  while (!open_queries_.empty()) {
-    try_appending_to_queries(open_queries_.top());
-    primary_alignment_positions_.remove(
-        static_cast<int>(open_queries_.top().at(0).mate_pos_));
-    open_queries_.pop();
+  while (!unmatched_pairs_.empty()) {
+    FinishQuery(unmatched_pairs_.top());
+    unmatched_pairs_.pop();
   }
 
   /** append everything from complete_queries to queries **/
-  while (!completed_queries_.empty()) {
-    queries_.emplace_back();
-    queries_.back() = completed_queries_.top();
-    completed_queries_.pop();
+  while (!matched_pairs_.empty()) {
+    sorted_pairs_.emplace_back(matched_pairs_.top());
+    matched_pairs_.pop();
   }
 }
 
