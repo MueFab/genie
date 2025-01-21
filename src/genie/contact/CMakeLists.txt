@@ -23,6 +23,10 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
+
+add_library(xtensor_no_warnings INTERFACE)
+target_link_libraries(xtensor_no_warnings INTERFACE xtensor)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     target_compile_options(${PROJECT_NAME} PRIVATE "-pedantic")
     target_compile_options(${PROJECT_NAME} PRIVATE "-fno-common")
@@ -33,11 +37,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
-endif()
-
 # Create an interface library for xtensor with suppressed warnings
-add_library(xtensor_no_warnings INTERFACE)
-target_link_libraries(xtensor_no_warnings INTERFACE xtensor)
 target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-undef
         -Wno-shadow
@@ -49,6 +49,10 @@ target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-unused-but-set-variable
         -Wno-implicit-fallthrough
 )
+else ()
+target_compile_options(xtensor_no_warnings INTERFACE "/w")
+endif()
+
 
 target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
