@@ -199,11 +199,11 @@ size_t ContactMatrixTilePayload::getPayloadSize() const { return payload.size();
 
 size_t ContactMatrixTilePayload::getSize() const {
     if (codec_ID != core::AlgoID::JBIG){
-        // Adds the codec_ID, tile_nrows, tile_ncols, and payload_size
-        return 1 + 4 + 4 + 4+ getPayloadSize();
+        // Adds tile_nrows, tile_ncols, and payload_size
+        return 1 + 4 + 4 + getPayloadSize();// removed + 4
     } else {
-        // Adds the codec_ID and payload size
-        return 1 + 4 + getPayloadSize();
+        // Adds the  payload size
+        return 1 + getPayloadSize(); // removed + 4
     }
 }
 
@@ -217,7 +217,7 @@ void ContactMatrixTilePayload::write(util::BitWriter &writer) const {
         writer.writeBypassBE(tile_ncols);
     }
 
-    writer.writeBypassBE(static_cast<uint32_t>(getPayloadSize()));
+    //writer.writeBypassBE(static_cast<uint32_t>(getPayloadSize()));
     for (auto v: payload)
         writer.writeBypassBE<uint8_t>(v);
 }

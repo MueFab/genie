@@ -40,11 +40,8 @@ void Block::read(util::BitReader& reader, uint8_t num_Chrs) {
 }
 
 void Block::write(core::Writer& writer) const {
-    std::cerr << "block " << AnnotDescToString(block_header.getDescriptorID()) << std::endl;
     block_header.write(writer);
-    std::cerr << "payload...";
     block_payload.write(writer);
-    std::cerr << "end" << std::endl;
 }
 
 void Block::set(BlockVectorData blockData) {

@@ -75,13 +75,13 @@ uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) con
         case 3:
             writer.write_reserved(10);
             writesize = (annotationParameterSet.getSize() + 40) / 8;
-            writer.write((annotationParameterSet.getSize() + 40) / 8, 22);
+            writer.write(writesize, 22);
             annotationParameterSet.write(writer);
             break;
         case 4:
             writer.write_reserved(3);
             writesize = (annotationAccessUnit.getSize() + 40) / 8;
-            writer.write((annotationAccessUnit.getSize() + 40) / 8, 29);
+            writer.write(writesize, 29);
             annotationAccessUnit.write(writer);
             break;
         default:
