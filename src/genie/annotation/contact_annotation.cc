@@ -22,7 +22,7 @@ namespace genie {
 namespace annotation {
 
 CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
-    uint8_t AG_class = 2;
+    uint8_t AG_class = 0;
     uint8_t AT_ID = 2;
     std::vector<genie::core::record::ContactRecord> RECS;
     genie::util::BitReader reader(inputfile);
