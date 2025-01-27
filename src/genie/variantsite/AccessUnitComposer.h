@@ -35,28 +35,32 @@ namespace variant_site {
 class AccessUnitComposer {
  public:
     void setCompressors(genie::annotation::Compressor _compressors) { compressors = _compressors; }
-//    void setParameterSet(const core::record::annotation_parameter_set::Record& _annotationParameterSet) {
- //       annotationParameterSet = _annotationParameterSet;
-        //AG_class = annotationParameterSet;
- //   }
+    //    void setParameterSet(const core::record::annotation_parameter_set::Record& _annotationParameterSet) {
+    //       annotationParameterSet = _annotationParameterSet;
+    // AG_class = annotationParameterSet;
+    //   }
+    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype, uint8_t ATsubtype) {
+        AT_type = ATtype;
+        AT_subtype = ATsubtype;
+    };
+
     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
                        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
                        uint8_t AT_ID, uint64_t _rowIndex);
- 
-       void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
+
+    void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
                        const core::record::annotation_parameter_set::Record& annotationParameterSet,
                        core::record::annotation_access_unit::Record& annotationAccessUnit, uint8_t AG_class,
                        uint8_t AT_ID, uint64_t _rowIndex, uint64_t _colIndex);
 
-    
  private:
     genie::annotation::Compressor compressors;
-  //  core::record::annotation_parameter_set::Record& annotationParameterSet;
+    //  core::record::annotation_parameter_set::Record& annotationParameterSet;
     // default values
     bool attributeContiguity = false;
     bool twoDimensional = false;
@@ -74,8 +78,7 @@ class AccessUnitComposer {
     core::AnnotDesc descriptor_ID = core::AnnotDesc::STARTPOS;
     uint8_t AT_ID = 1;
     uint8_t AG_class = 0;
-    core::record::annotation_access_unit::AnnotationType AT_type =
-        core::record::annotation_access_unit::AnnotationType::VARIANTS;
+    core::record::annotation_access_unit::AnnotationType AT_type {core::record::annotation_access_unit::AnnotationType::VARIANTS};
     uint8_t numChrs = 0;
 
     void compress(const std::vector<genie::core::record::annotation_parameter_set::DescriptorConfiguration>&
