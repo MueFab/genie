@@ -65,6 +65,8 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
       genie::variant_site::ParameterSetComposer encodeParameters;
  
       genie::variant_site::AccessUnitComposer accessUnit;
+      accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS);
+
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;
