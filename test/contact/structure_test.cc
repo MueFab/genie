@@ -55,12 +55,14 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
         auto bitwriter = genie::util::BitWriter(&writer);
         orig_obj.write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        auto tile_payload_size = obj_payload.str().size();
+        ASSERT_EQ(tile_payload_size, orig_obj.getSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::ContactMatrixTilePayload(
-            bitreader
+            bitreader,
+            tile_payload_size
         );
 
         ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
@@ -103,12 +105,14 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
         auto bitwriter = genie::util::BitWriter(&writer);
         orig_obj.write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        auto tile_payload_size = obj_payload.str().size();
+        ASSERT_EQ(tile_payload_size, orig_obj.getSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::ContactMatrixTilePayload(
-            bitreader
+            bitreader,
+            tile_payload_size
         );
 
         ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
