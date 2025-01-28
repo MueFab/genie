@@ -30,10 +30,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wdouble-promotion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=conversion")
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=sign-conversion")
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Werror=maybe-uninitialized")
 endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
-target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
+#target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
+target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 #target_link_libraries(${PROJECT_NAME} PRIVATE genie-gvc)
