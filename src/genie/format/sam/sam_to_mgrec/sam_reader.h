@@ -32,7 +32,9 @@ class SamReader {
   bam1_t* sam_alignment_;  //!< @brief
   kstring_t header_info;   //!< @brief
 
-  std::optional<SamRecord> buffered_rec_;
+  std::optional<SamRecord> buffer_;  //!< @brief
+
+  void InternalRead();
 
  public:
   /**
@@ -69,7 +71,10 @@ class SamReader {
    * @param sr
    * @return
    */
-  int ReadSamQuery(std::vector<SamRecord>& sr);
+  void Read();
+
+  const std::optional<SamRecord>& Peek() const;
+  std::optional<SamRecord> Move();
 };
 
 // -----------------------------------------------------------------------------

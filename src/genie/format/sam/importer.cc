@@ -36,6 +36,8 @@
 #include "genie/util/log.h"
 #include "genie/util/ordered_section.h"
 #include "genie/util/stop_watch.h"
+#include "sam_to_mgrec/pair_matcher.h"
+#include "sam_to_mgrec/sam_sorter.h"
 
 // -----------------------------------------------------------------------------
 
@@ -91,6 +93,28 @@ core::ReferenceManager* RefInfo::GetMgr() const { return ref_mgr_.get(); }
 
 // -----------------------------------------------------------------------------
 
+std::pair<std::vector<SamRecord>, std::optional<int>> Importer::ReadSamChunk() {
+  sam_to_mgrec::SamReader sam_reader(this->input_sam_file_);
+  RefIDWatcher watcher;
+  std::vector<SamRecord> sam_records;
+  std::lock_guard guard(lock_);
+  if (eof_) {
+    return {sam_records, watcher.get()};
+  }
+  for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
+    if (sam_reader.Peek() == std::nullopt) {
+      eof_ = true;
+      return {sam_records, watcher.get()};
+    }
+    if (watcher.watch(sam_reader.Peek()->rid_)) {
+      return {sam_records, watcher.get()};
+    }
+    sam_records.emplace_back(*sam_reader.Move());
+    sam_reader.Read();
+  }
+  return {sam_records, watcher.get()};
+}
+
 Importer::Importer(const size_t block_size, std::string input, std::string ref)
     : block_size_(block_size),
       input_sam_file_(std::move(input)),
@@ -98,7 +122,8 @@ Importer::Importer(const size_t block_size, std::string input, std::string ref)
       nref_(0),
       phase1_complete_(false),
       reader_prio_(CmpReaders()),
-      refinf_(input_ref_file_) {}
+      refinf_(input_ref_file_),
+      eof_(false){}
 
 // -----------------------------------------------------------------------------
 
@@ -673,8 +698,96 @@ void Importer::setup_merge(const int num_chunks) {
   }
 }
 
+std::vector<SamRecordPair> MatchPairs(std::vector<SamRecord>&& records) {
+  sam_to_mgrec::SamSorter sorter(100000);
+  for (auto& r : records) {
+    sorter.AddSamRead(r);
+  }
+  records.clear();
+  sorter.Finish();
+  return sorter.GetPairs();
+}
+
+core::record::Segment CreateSegment(SamRecord& sam_record) {
+  core::record::Segment segment(std::move(sam_record.seq_));
+  segment.AddQualities(std::move(sam_record.qual_));
+  return segment;
+}
+
+core::record::Alignment CreateAlignment(const SamRecord& sam_record,
+                                        const std::string& seq) {
+  std::string e_cigar =
+      SamRecord::ConvertCigar2ECigar(sam_record.cigar_, seq);
+  core::record::Alignment alignment(std::move(e_cigar), sam_record.IsReverse());
+  return alignment;
+}
+
 bool Importer::PumpRetrieve(core::Classifier* classifier) {
-  if (!phase1_complete_) {
+  auto [sam_records, ref_id] = ReadSamChunk();
+  auto sam_pairs = MatchPairs(std::move(sam_records));
+
+
+  // Convert data
+  for (auto& q : queries) {
+    sam_to_mgrec::SamRecordGroup buffer;
+    for (auto& s : q) {
+      buffer.AddRecord(std::move(s));
+    }
+    std::list<core::record::Record> records;
+    buffer.convert(records);
+    for (auto& m : records) {
+      std::vector<core::record::Record> buf;
+      if (clean) {
+        auto [fst, snd] = CleanRecord(std::move(m));
+        buf = std::move(fst);
+        local_stats.splice_recs += snd.splice_recs;
+        local_stats.distance += snd.distance;
+        local_stats.additional_alignments += snd.additional_alignments;
+        local_stats.hm_recs += snd.hm_recs;
+      } else {
+        buf.emplace_back(std::move(m));
+      }
+      for (auto& b : buf) {
+        output_buffer.push_back(std::move(b));
+      }
+    }
+    q.clear();
+  }
+  queries.clear();
+
+  // Sort data
+
+  std::sort(output_buffer.begin(), output_buffer.end(), sam_to_mgrec::compare);
+
+  // Write data
+  {
+    std::string fpath =
+        tmp_path + "/" + std::to_string(this_chunk) + PHASE1_EXT;
+    std::ofstream output_file(fpath, std::ios::trunc | std::ios::binary);
+    util::BitWriter bwriter(output_file);
+
+    for (auto& r : output_buffer) {
+      r.Write(bwriter);
+    }
+
+    bwriter.FlushBits();
+  }
+
+  {
+    std::lock_guard guard(lock);
+    stats.splice_recs += local_stats.splice_recs;
+    stats.hm_recs += local_stats.hm_recs;
+    stats.additional_alignments += local_stats.additional_alignments;
+    stats.distance += local_stats.distance;
+  }
+
+  if (ret == EOF) {
+    return;
+  }
+
+
+
+/*  if (!phase1_complete_) {
     Config options;
     options.input_file_ = input_sam_file_;
     options.fasta_file_path_ = input_ref_file_;
@@ -752,7 +865,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
       "size-sam-total", static_cast<int64_t>(size_name + size_qual + size_seq));
   chunk.GetStats().AddDouble("time-sam-import", watch.Check());
   classifier->Add(std::move(chunk));
-  return !eof;
+  return !eof;*/
 }
 
 // -----------------------------------------------------------------------------

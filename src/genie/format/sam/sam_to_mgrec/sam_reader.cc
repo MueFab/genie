@@ -22,6 +22,14 @@ namespace genie::format::sam::sam_to_mgrec {
 
 // -----------------------------------------------------------------------------
 
+void SamReader::InternalRead() {
+  if (sam_read1(sam_file_, sam_header, sam_alignment_) >= 0) {
+    buffer_ = SamRecord(sam_alignment_);
+  } else {
+    buffer_.reset();
+  }
+}
+
 SamReader::SamReader(const std::string& fpath)
     : sam_file_(nullptr),           // open bam file
       sam_header(nullptr),          // read header
@@ -32,6 +40,7 @@ SamReader::SamReader(const std::string& fpath)
   } else {
     sam_file_ = hts_open(fpath.c_str(), "r");
   }
+  InternalRead();
 }
 
 // -----------------------------------------------------------------------------
@@ -85,33 +94,21 @@ bool SamReader::IsValid() {
 
 // -----------------------------------------------------------------------------
 
-int SamReader::ReadSamQuery(std::vector<SamRecord>& sr) {
-  sr.clear();
-  if (buffered_rec_) {
-    sr.push_back(std::move(buffered_rec_.value()));
-    buffered_rec_.reset();
-  } else {
-    if (const auto res = sam_read1(sam_file_, sam_header, sam_alignment_);
-        res >= 0) {
-      sr.emplace_back(sam_alignment_);
-    } else {
-      return res;
-    }
+void SamReader::Read() {
+  if (buffer_) {
+    InternalRead();
   }
+}
 
-  while (true) {
-    if (const auto res = sam_read1(sam_file_, sam_header, sam_alignment_);
-        res >= 0) {
-      buffered_rec_ = SamRecord(sam_alignment_);
-    } else {
-      return res;
-    }
-    if (buffered_rec_->qname_ != sr.front().qname_) {
-      return 0;
-    }
-    sr.push_back(std::move(buffered_rec_.value()));
-    buffered_rec_.reset();
-  }
+
+// -----------------------------------------------------------------------------
+
+const std::optional<SamRecord>& SamReader::Peek() const {
+  return buffer_;
+}
+
+std::optional<SamRecord> SamReader::Move() {
+  return std::move(buffer_);
 }
 
 // -----------------------------------------------------------------------------
