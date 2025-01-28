@@ -96,7 +96,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
             if (!isIntraSCM() || i<=j){
 
                 auto tile_payload_size = reader.readBypassBE<uint32_t>();
-                auto tile_payload = ContactMatrixTilePayload(reader);
+                auto tile_payload = ContactMatrixTilePayload(reader, tile_payload_size);
                 UTILS_DIE_IF(
                     tile_payload_size != tile_payload.getSize(),
                     "Invalid tile_payload size!"
