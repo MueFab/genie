@@ -28,11 +28,12 @@ namespace genieapp::sam_sort_test {
 
 void get_samfile_thread(
     std::mutex& lock_read, std::mutex& lock_sort,
-    std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>>&
+    std::vector<std::vector<genie::format::sam::SamRecord>>&
         queries,
     genie::format::sam::sam_to_mgrec::SamReader& sam_reader,
     genie::format::sam::sam_to_mgrec::SamSorter sam_sorter) {
-  std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>> data;
+  std::vector<std::vector<genie::format::sam::SamRecord>> data;
+  std::vector<genie::format::sam::sam_to_mgrec::SamRecordPair> pairs;
   // reading data from sam file
   {
     int ret = 0;
@@ -60,7 +61,7 @@ void get_samfile_thread(
       }
     }
     std::cerr << "getting queries" << std::endl;
-    data = sam_sorter.GetQueries();
+    pairs = sam_sorter.GetPairs();
     queries.insert(queries.end(), data.begin(), data.end());
     std::cerr << "done" << std::endl;
   }
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
   std::mutex lock_read;
   std::mutex lock_sort;
   std::vector<std::thread> threads;
-  std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>> queries;
+  std::vector<std::vector<genie::format::sam::SamRecord>> queries;
   auto sam_sorter = genie::format::sam::sam_to_mgrec::SamSorter(100000);
   threads.reserve(1);
   for (int i = 0; i < 1; ++i) {

@@ -5,24 +5,32 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_RECORD_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_RECORD_H_
 
 // -----------------------------------------------------------------------------
 
 #include <htslib/sam.h>
 
 #include <string>
+#include <vector>
+#include <optional>
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 /**
  * @brief
  */
 class SamRecord {
  public:
+
+  struct Tag {
+    std::string tag;  //!< @brief Tag name
+    std::string value;  //!< @brief Tag value
+  };
+
   std::string qname_;  //!< @brief Query template name
   uint16_t flag_;      //!< @brief Flag
   int32_t rid_;        //!< @brief Reference sequence ID
@@ -33,6 +41,7 @@ class SamRecord {
   uint32_t mate_pos_;  //!< @brief Mate position
   std::string seq_;    //!< @brief Read sequence
   std::string qual_;   //!< @brief
+  std::vector<Tag> optional_fields_;
 
   /**
    * @brief
@@ -312,15 +321,23 @@ class SamRecord {
    * @return
    */
   [[nodiscard]] bool IsPairOf(const SamRecord& r) const;
+
+  void write(std::ostream& os) const;
+
+  explicit SamRecord(std::ifstream& is);
+
+  void ParseOptionalField(const std::string& field);
 };
 
-// -----------------------------------------------------------------------------
-
-}  // namespace genie::format::sam::sam_to_mgrec
+using SamRecordPair = std::pair<SamRecord, std::optional<SamRecord>>;
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+}  // namespace genie::format::sam
+
+// -----------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_RECORD_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

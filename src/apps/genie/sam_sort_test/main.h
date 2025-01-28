@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam_record.h"
 
 // -----------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace genieapp::sam_sort_test {
 
 // -----------------------------------------------------------------------------
 
-std::vector<std::vector<genie::format::sam::sam_to_mgrec::SamRecord>>
+std::vector<std::vector<genie::format::sam::SamRecord>>
 get_sam_file(const std::string& file_path);
 
 /**

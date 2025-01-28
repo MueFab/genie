@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam_record.h"
 
 // -----------------------------------------------------------------------------
 
