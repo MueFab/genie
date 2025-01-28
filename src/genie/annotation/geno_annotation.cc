@@ -29,86 +29,6 @@
 namespace genie {
 namespace annotation {
 
-/*
-std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile) {
-    std::vector<GenoUnits> dataunits;
-    likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
-
-    uint8_t AT_ID = 1;
-    constexpr uint8_t AG_class = 0;
-
-    std::vector<ParsBlocks> blocksWPars;
-
-    //size_t rowsRead = 
-        readBlocks(inputfile, defaultTileSizeHeight, blocksWPars);
-
-    for (auto& parWBlocks : blocksWPars) {
-        genie::genotype::ParameterSetComposer parameterSetComposer;
-        parameterSetComposer.setGenotypeParameters(parWBlocks.genotypePars);
-        parameterSetComposer.setGenotypeParameters(parWBlocks.genotypePars);
-        parameterSetComposer.setLikelihoodParameters(parWBlocks.likelihoodPars);
-        parameterSetComposer.setCompressors(compressors);
-
-        GenoUnits dataunit;
-
-        dataunit.annotationParameterSet =
-            parameterSetComposer.Build(AT_ID, parWBlocks.blocks.at(0).genotypeDatablock.attributeInfo,
-                                       {defaultTileSizeHeight, defaultTileSizeWidth});
-        dataunit.annotationAccessUnit.resize(parWBlocks.blocks.size());
-
-       // size_t linkIdRowCnt = 0;
-        for (auto i = 0u; i < parWBlocks.blocks.size(); ++i) {
-            std::map<std::string, genie::core::record::annotation_access_unit::TypedData> attributeTDStream;
-
-            for (auto& formatdata : parWBlocks.blocks.at(i).genotypeDatablock.attributeData) {
-                auto& info = parWBlocks.blocks.at(i).genotypeDatablock.attributeInfo[formatdata.first];
-                std::vector<uint32_t> arrayDims;
-                arrayDims.push_back(static_cast<uint32_t>(formatdata.second.size()));
-                arrayDims.push_back(parWBlocks.blocks.at(i).numSamples);
-                arrayDims.push_back(info.getArrayLength());
-
-                attributeTDStream[formatdata.first].set(info.getAttributeType(), static_cast<uint8_t>(arrayDims.size()),
-                                                        arrayDims);
-                attributeTDStream[formatdata.first].convertToTypedData(formatdata.second);
-            }
-
-            std::map<genie::core::AnnotDesc, std::stringstream> descriptorStream;
-            descriptorStream[genie::core::AnnotDesc::GENOTYPE];
-            {
-                genie::genotype::GenotypePayload genotypePayload(parWBlocks.blocks.at(i).genotypeDatablock,
-                                                                 parWBlocks.genotypePars);
-                genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-                genotypePayload.write(writer);
-            }
-            variant_site::AccessUnitComposer accessUnitcomposer;
-            accessUnitcomposer.setCompressors(compressors);
-
-            if (parWBlocks.blocks.at(i).likelihoodDatablock.nrows > 0 &&
-                parWBlocks.blocks.at(i).likelihoodDatablock.ncols > 0) {
-                descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];
-                genie::likelihood::LikelihoodPayload likelihoodPayload(parWBlocks.likelihoodPars,
-                                                                       parWBlocks.blocks.at(i).likelihoodDatablock);
-                genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::LIKELIHOOD]);
-                likelihoodPayload.write(writer);
-            }
-            // add LINK_ID default values
-            // for (auto j = 0u; j < defaultTileSizeHeight && linkIdRowCnt < rowsRead; ++j, ++linkIdRowCnt) {
-            //    const char val = '\xFF';
-            //    descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
-            //}
-
-            accessUnitcomposer.setAccessUnit(
-                descriptorStream, attributeTDStream, parWBlocks.blocks.at(i).genotypeDatablock.attributeInfo,
-                dataunit.annotationParameterSet, dataunit.annotationAccessUnit.at(i), AG_class, AT_ID,
-                parWBlocks.blocks.at(i).rowStart, parWBlocks.blocks.at(i).colStart);
-        }
-        dataunits.push_back(dataunit);
-        AT_ID++;
-    }
-
-    return dataunits;
-}
-*/
 
 std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
                                                      std::vector<std::pair<uint64_t, uint8_t>>& numBitPlanes) {
@@ -143,18 +63,6 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
         encodingPars.setLikelihoodParameters(combined.likelihoodPars);
         encodingPars.setAttributes(combined.blocks.at(0).genotypeDatablock.attributeInfo);
         auto annotationEncodingParameters = encodingPars.Compose();
-
-        /*
-        genie::genotype::ParameterSetComposer parameterSetComposer;
-        parameterSetComposer.setGenotypeParameters(combined.genotypePars);
-        parameterSetComposer.setGenotypeParameters(combined.genotypePars);
-        parameterSetComposer.setLikelihoodParameters(combined.likelihoodPars);
-        parameterSetComposer.setCompressors(compressors);
-
-        dataunit.annotationParameterSet = 
-            parameterSetComposer.Build(AT_ID, combined.blocks.at(0).genotypeDatablock.attributeInfo,
-                                       {defaultTileSizeHeight, defaultTileSizeWidth});
-        */
 
         ParameterSetComposer parameterset;
 
@@ -195,6 +103,8 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
                 genotypePayload.write(writer);
             }
             variant_site::AccessUnitComposer accessUnitcomposer;
+            accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS);
+ 
             accessUnitcomposer.setCompressors(compressors);
 
             if (combined.blocks.at(blockIndex).likelihoodDatablock.nrows > 0 &&

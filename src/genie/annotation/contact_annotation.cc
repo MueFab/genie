@@ -22,7 +22,7 @@ namespace genie {
 namespace annotation {
 
 CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
-    uint8_t AG_class = 2;
+    uint8_t AG_class = 0;
     uint8_t AT_ID = 2;
     std::vector<genie::core::record::ContactRecord> RECS;
     genie::util::BitReader reader(inputfile);
@@ -86,6 +86,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
         const char val = '\xFF';
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
+    accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::CONTACT_MATRICES);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,
                                      dataunits.annotationParameterSet,
                                      annotationAccessUnit, AG_class, AT_ID, 0);
