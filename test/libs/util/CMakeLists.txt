@@ -8,6 +8,9 @@ set(source_files
         string-helpers.cc
         thread-manager.cc
         sam_sorter_test.cc
+        merge_sort.cc
+        pair_queue_test.cc
+        pair_matcher_test.cc
 )
 
 add_executable(util-tests ${source_files})

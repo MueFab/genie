@@ -7,19 +7,21 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+#include "sam_record.h"
 
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
-#include "genie/core/record/alignment_external/other_rec.h"
-#include "genie/core/record/alignment_split/other_rec.h"
-#include "genie/util/runtime_exception.h"
+#include "../../core/record/alignment_split/other_rec.h"
+#include "../../util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
@@ -349,6 +351,67 @@ bool SamRecord::IsPairOf(const SamRecord& r) const {
   }
 
   return false;
+}
+
+// -----------------------------------------------------------------------------
+
+void SamRecord::write(std::ostream& os) const {
+  os << qname_ << '\t' << flag_ << '\t' << rid_ << '\t' << pos_ << '\t'
+     << static_cast<int>(mapq_) << '\t' << cigar_ << '\t' << mate_rid_ << '\t'
+     << mate_pos_ << '\t' << seq_ << '\t' << qual_;
+
+  for (const auto& [tag, value] : optional_fields_) {
+    os << '\t' << tag << ':' << value;
+  }
+
+  os << '\n';
+}
+
+// -----------------------------------------------------------------------------
+
+// Parse a single optional field and store it as a Tag
+void SamRecord::ParseOptionalField(const std::string& field) {
+  if (field.size() > 5 && field[2] == ':') {
+    const std::string key_with_type =
+        field.substr(0, 4);  // Extract the key with type (e.g., "NM:i")
+    const std::string value = field.substr(5);  // Extract the value
+
+    optional_fields_.emplace_back(Tag{key_with_type, value});
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+SamRecord::SamRecord(std::ifstream& is)
+    : flag_(0), rid_(0), pos_(0), mapq_(0), mate_rid_(0), mate_pos_(0) {
+  std::string line;
+  UTILS_DIE_IF(!std::getline(is, line), "No line to parse SAM record from.");
+  std::istringstream iss(line);
+  std::vector<std::string> fields;
+  fields.reserve(11);
+  std::string field;
+
+  // Tokenize by tab delimiter
+  while (std::getline(iss, field, '\t')) {
+    fields.push_back(field);
+  }
+
+  UTILS_DIE_IF(fields.size() < 11, "Invalid SAM line: fewer than 11 fields.");
+  qname_ = fields[0];
+  flag_ = static_cast<uint16_t>(std::stoi(fields[1]));
+  rid_ = std::stoi(fields[2]);
+  pos_ = static_cast<uint32_t>(std::stoul(fields[3]));
+  mapq_ = static_cast<uint8_t>(std::stoi(fields[4]));
+  cigar_ = fields[5];
+  mate_rid_ = std::stoi(fields[6]);
+  mate_pos_ = static_cast<uint32_t>(std::stoul(fields[7]));
+  seq_ = fields[9];
+  qual_ = fields[10];
+
+  // Parse optional fields
+  for (size_t i = 11; i < fields.size(); ++i) {
+    ParseOptionalField(fields[i]);
+  }
 }
 
 // -----------------------------------------------------------------------------

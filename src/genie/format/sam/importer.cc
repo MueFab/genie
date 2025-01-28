@@ -492,7 +492,7 @@ void phase1_thread(sam_to_mgrec::SamReader& sam_reader, int& chunk_id,
                    CleanStatistics& stats) {
   while (true) {
     std::vector<core::record::Record> output_buffer;
-    std::vector<std::vector<sam_to_mgrec::SamRecord>> queries;
+    std::vector<std::vector<SamRecord>> queries;
     int ret = 0;
     int this_chunk = 0;
 

@@ -21,7 +21,6 @@
 #include "genie/core/record/record.h"
 #include "genie/format/fasta/manager.h"
 #include "genie/format/sam/sam_parameter.h"
-#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 #include "genie/util/bit_writer.h"
 
 // -----------------------------------------------------------------------------
