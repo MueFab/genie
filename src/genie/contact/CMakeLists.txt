@@ -48,6 +48,7 @@ target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-unused-parameter
         -Wno-unused-but-set-variable
         -Wno-implicit-fallthrough
+        -Werror=maybe-uninitialized
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
