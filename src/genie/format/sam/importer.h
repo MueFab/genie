@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "genie/core/format_importer.h"
+#include "sam_record.h"
 #include "sam_to_mgrec/sorter.h"
 
 // -----------------------------------------------------------------------------
@@ -92,6 +93,28 @@ struct CmpReaders {
                   const sam_to_mgrec::SubfileReader* b) const;
 };
 
+
+class RefIDWatcher {
+private:
+  std::optional<int> ref_id_;
+public:
+  bool watch(int id) {
+    if (ref_id_ == std::nullopt) {
+      ref_id_ = id;
+      return false;
+    }
+    if (ref_id_ != id) {
+      ref_id_ = id;
+      return true;
+    }
+    return false;
+  }
+
+  std::optional<int> get() const {
+    return ref_id_;
+  }
+};
+
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
  */
@@ -130,6 +153,12 @@ class Importer final : public core::FormatImporter {
 
   /// Reference information
   RefInfo refinf_;
+
+  std::pair<std::vector<SamRecord>, std::optional<int>> ReadSamChunk();
+
+  std::mutex lock_;
+
+  bool eof_;
 
  public:
   /**
