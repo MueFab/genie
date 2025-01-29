@@ -104,7 +104,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(std::ifstream& inputfile,
             }
             variant_site::AccessUnitComposer accessUnitcomposer;
             accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
- 
+
             accessUnitcomposer.setCompressors(compressors);
 
             if (combined.blocks.at(blockIndex).likelihoodDatablock.nrows > 0 &&

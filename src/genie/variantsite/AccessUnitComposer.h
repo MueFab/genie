@@ -44,6 +44,7 @@ class AccessUnitComposer {
         AT_subtype = ATsubtype;
     };
 
+
     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,
                        std::map<std::string, core::record::annotation_parameter_set::AttributeData> AttributeInfo,
