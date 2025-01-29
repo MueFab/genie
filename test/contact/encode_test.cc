@@ -807,6 +807,8 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto CODEC_ID = genie::core::AlgoID::JBIG;
         auto TILE_SIZE = 1000u;
         auto MULT = 1u;
+        auto NUM_TILES_IN_ROW = 1u;
+        auto NUM_TILES_IN_COL = 1u;
 
         auto cm_param = genie::contact::ContactMatrixParameters();
         auto scm_param = genie::contact::SubcontactMatrixParameters();
@@ -875,8 +877,11 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         }
 
         ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
+        ASSERT_EQ(scm_payload.getNTilesInRow(), NUM_TILES_IN_ROW);
+        ASSERT_EQ(scm_param.getNTilesInRow(), NUM_TILES_IN_ROW);
+        ASSERT_EQ(scm_payload.getNTilesInCol(), NUM_TILES_IN_COL);
+        ASSERT_EQ(scm_param.getNTilesInCol(), NUM_TILES_IN_COL);
+
         ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
