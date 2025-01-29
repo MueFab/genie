@@ -9,10 +9,15 @@
 
 #include <cmath>
 #include <tuple>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <xtensor/xindex_view.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
+#pragma GCC diagnostic pop
+
 #include "genie/core/record/variant_genotype/record.h"
 #include "likelihood_parameters.h"
 
