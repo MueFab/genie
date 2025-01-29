@@ -39,7 +39,11 @@ class AccessUnitComposer {
     //       annotationParameterSet = _annotationParameterSet;
     // AG_class = annotationParameterSet;
     //   }
-    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype) { AT_type = ATtype; };
+    void setATtype(core::record::annotation_access_unit::AnnotationType ATtype, uint8_t ATsubtype) {
+        AT_type = ATtype;
+        AT_subtype = ATsubtype;
+    };
+
 
     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
                        std::map<std::string, core::record::annotation_access_unit::TypedData>& attributeTileStream,

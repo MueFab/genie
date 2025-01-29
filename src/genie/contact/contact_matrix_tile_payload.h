@@ -86,7 +86,7 @@ class ContactMatrixTilePayload {
      *
      *  @param reader The BitReader to read from.
      */
-    explicit ContactMatrixTilePayload(util::BitReader &reader);
+    explicit ContactMatrixTilePayload(util::BitReader &reader, size_t payload_size);
 
     /**
      * @brief Overloaded equality operator.

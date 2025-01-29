@@ -86,7 +86,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
         const char val = '\xFF';
         descriptorStream[genie::core::AnnotDesc::LINKID].write(&val, 1);
     }
-    accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::CONTACT_MATRICES);
+    accessUnitcomposer.setATtype(core::record::annotation_access_unit::AnnotationType::CONTACT_MATRICES, 10);
     accessUnitcomposer.setAccessUnit(descriptorStream, attributeTDStream, attributeInfo,
                                      dataunits.annotationParameterSet,
                                      annotationAccessUnit, AG_class, AT_ID, 0);
