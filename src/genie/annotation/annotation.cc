@@ -58,8 +58,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
     }
     if (inputfile.is_open()) inputfile.close();
 
-    std::cout << "writing to file..." << std::endl;
-
     writeToFile(outputFileName);
 }
 
@@ -76,11 +74,9 @@ void Annotation::writeToFile(std::string& outputFileName) {
     for (auto& pars : annotationParameterSet) {
         genie::core::record::data_unit::Record APS_dataUnit(pars);
         sizeSofar = APS_dataUnit.write(testwriter);
-        std::cerr << "writing APS" << std::endl;
         APS_dataUnit.write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
-        std::cerr << "writing AAU" << std::endl;
         genie::core::record::data_unit::Record AAU_dataUnit(aau);
         sizeSofar = AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter, sizeSofar);
