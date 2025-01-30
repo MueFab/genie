@@ -7,7 +7,7 @@
 
 // -----------------------------------------------------------------------------
 
-#include "sam_record.h"
+#include "genie/format/sam/sam_record.h"
 
 #include <algorithm>
 #include <fstream>
@@ -16,8 +16,8 @@
 #include <utility>
 #include <vector>
 
-#include "../../core/record/alignment_split/other_rec.h"
-#include "../../util/runtime_exception.h"
+#include "genie/core/record/alignment_split/other_rec.h"
+#include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
@@ -331,6 +331,10 @@ bool SamRecord::IsReverse() const { return CheckFlag(BAM_FREVERSE); }
 
 // -----------------------------------------------------------------------------
 
+bool SamRecord::IsQualityFail() const { return CheckFlag(BAM_FQCFAIL); }
+
+// -----------------------------------------------------------------------------
+
 bool SamRecord::IsPairOf(const SamRecord& r) const {
   /// Both must be paired-ended
   if (IsPaired() != r.IsPaired() || !IsPaired()) {
@@ -416,7 +420,7 @@ SamRecord::SamRecord(std::ifstream& is)
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

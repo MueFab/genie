@@ -8,7 +8,7 @@ set(source_files
         reader.cc
         reference.cc
         sha256File.cc
-        ../sam/sam_to_mgrec/sam_sorter.h)
+        ../sam/sam_sorter.h)
 
 add_library(genie-fasta ${source_files})
 

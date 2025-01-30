@@ -12,9 +12,10 @@
 
 #include <htslib/sam.h>
 
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
+#include <utility>
 
 // -----------------------------------------------------------------------------
 
@@ -25,9 +26,8 @@ namespace genie::format::sam {
  */
 class SamRecord {
  public:
-
   struct Tag {
-    std::string tag;  //!< @brief Tag name
+    std::string tag;    //!< @brief Tag name
     std::string value;  //!< @brief Tag value
   };
 
@@ -314,6 +314,12 @@ class SamRecord {
    * @return
    */
   [[nodiscard]] bool IsReverse() const;
+
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsQualityFail() const;
 
   /**
    * @brief

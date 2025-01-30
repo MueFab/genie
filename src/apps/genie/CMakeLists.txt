@@ -13,7 +13,6 @@ set(source_files
         gabac/program_options.cc
         capsulator/program_options.cc
         capsulator/main.cc
-        sam_sort_test/main.cc
 )
 
 if (${GENIE_SAM_SUPPORT})

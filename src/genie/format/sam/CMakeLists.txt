@@ -3,15 +3,12 @@ project("genie-sam")
 set(source_files
         exporter.cc
         importer.cc
-        sam_to_mgrec/sam_group.cc
-        sam_to_mgrec/sam_reader.cc
+        sam_reader.cc
         sam_record.cc
-        sam_to_mgrec/sorter.cc
-        sam_to_mgrec/transcoder.cc
-        sam_to_mgrec/sam_sorter.cc
-        sam_to_mgrec/pair_matcher.h
-        sam_to_mgrec/pair_matcher.cc
-        sam_to_mgrec/unmapped_record_matcher.h
+        sam_sorter.cc
+        pair_matcher.h
+        pair_matcher.cc
+        unmapped_record_matcher.h
         unmapped_record_matcher.cc
         record_queue.impl.h
 )

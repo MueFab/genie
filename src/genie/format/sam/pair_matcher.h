@@ -5,8 +5,8 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_PAIR_MATCHER_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_PAIR_MATCHER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_PAIR_MATCHER_H_
+#define SRC_GENIE_FORMAT_SAM_PAIR_MATCHER_H_
 
 // -----------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
@@ -76,11 +76,11 @@ class PairMatcher {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_PAIR_MATCHER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_PAIR_MATCHER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
