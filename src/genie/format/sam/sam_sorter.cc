@@ -5,26 +5,28 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/format/sam/sam_to_mgrec/sam_sorter.h"
+#include "genie/format/sam/sam_sorter.h"
 
 #include <algorithm>
 #include <iostream>
 #include <limits>
 #include <optional>
+#include <utility>
 #include <vector>
 
-#include "genie/util/runtime_exception.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
-bool CmpPairMatePos::operator()(const SamRecordPair& a,
-                             const SamRecordPair& b) const {
-  return a.first.mate_pos_ > b.first.mate_pos_;
+bool CmpPairPos::operator()(const SamRecordPair& a,
+                                const SamRecordPair& b) const {
+  return a.first.pos_ > b.first.pos_;
 }
+
 
 // -----------------------------------------------------------------------------
 
@@ -36,7 +38,7 @@ SamSorter::SamSorter(const uint32_t max_waiting_distance)
 void SamSorter::FinishPair(const SamRecordPair& cur_query) {
   this->pair_queue_.Add(cur_query);
   for (auto& c : pair_queue_.CompleteUntil(
-           CmpPairMatePosLess(pair_matcher_.GetLowestUnmatchedPosition()))) {
+           CmpPairPosLess(pair_matcher_.GetLowestUnmatchedPosition()))) {
     pair_buffer_.emplace_back(std::move(c));
   }
 }
@@ -48,7 +50,10 @@ uint64_t unsigned_distance(uint64_t a, uint64_t b) {
 }
 
 void SamSorter::AddUnmappedPair(const SamRecord& rec) {
-  // TODO
+  auto result = this->unmapped_matcher_.AddSamRead(rec);
+  if (result) {
+    pair_buffer_.emplace_back(std::move(*result));
+  }
 }
 
 void SamSorter::AddSamRead(const SamRecord& record) {
@@ -113,14 +118,18 @@ void SamSorter::Finish() {
     this->pair_queue_.Add({p, std::nullopt});
   }
   for (auto& c : pair_queue_.CompleteUntil(
-           CmpPairMatePosLess(std::numeric_limits<uint64_t>::max()))) {
+           CmpPairPosLess(std::numeric_limits<uint64_t>::max()))) {
     this->pair_buffer_.emplace_back(std::move(c));
+  }
+  this->unmapped_matcher_.finish();
+  if (auto result = this->unmapped_matcher_.GetAfterFinish()) {
+    pair_buffer_.emplace_back(std::move(*result));
   }
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

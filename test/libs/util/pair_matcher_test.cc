@@ -1,6 +1,7 @@
-#include "gtest/gtest.h"
-#include "genie/format/sam/sam_to_mgrec/pair_matcher.h"
+#include "../../../src/genie/format/sam/pair_matcher.h"
+
 #include "genie/format/sam/sam_record.h"
+#include "gtest/gtest.h"
 
 namespace genie::format::sam::sam_to_mgrec {
 

@@ -5,38 +5,40 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_SORTER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_SORTER_H_
 
 // -----------------------------------------------------------------------------
 
 #include <vector>
 
-#include "genie/format/sam/sam_to_mgrec/pair_matcher.h"
-#include "genie/format/sam/sam_record.h"
+#include "genie/format/sam/pair_matcher.h"
 #include "genie/format/sam/record_queue.h"
+#include "genie/format/sam/sam_record.h"
+#include "genie/format/sam/unmapped_record_matcher.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
-struct CmpPairMatePos {
+struct CmpPairPos {
   bool operator()(const SamRecordPair& a, const SamRecordPair& b) const;
 };
 
-class CmpPairMatePosLess {
+class CmpPairPosLess {
   uint64_t pos_;
-public:
-  explicit CmpPairMatePosLess(const uint64_t pos) : pos_(pos) {}
+
+ public:
+  explicit CmpPairPosLess(const uint64_t pos) : pos_(pos) {}
   bool operator()(const SamRecordPair& a) const {
-    return a.first.mate_pos_ < pos_;
+    return a.first.pos_ < pos_;
   }
 };
 
-using PairQueue = RecordQueue<SamRecordPair, CmpPairMatePos,
-                                      CmpPairMatePosLess>;
+using PairQueue =
+    RecordQueue<SamRecordPair, CmpPairPos, CmpPairPosLess>;
 
 /**
  * @brief Class to match pairs of reads
@@ -53,6 +55,9 @@ class SamSorter {
 
   /// Maximal allowed distance of two mates. If exceeded, the pair is split
   uint32_t max_distance_;
+
+  /// Matcher for unmapped pairs
+  UnmappedRecordMatcher unmapped_matcher_;
 
   /**
    * @brief Process a record that is part of a completely unmapped pair
@@ -95,11 +100,11 @@ class SamSorter {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_SORTER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

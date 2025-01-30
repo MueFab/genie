@@ -12,13 +12,13 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam_reader.h"
 #include "genie/format/sam/sam_record.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
@@ -40,6 +40,9 @@ SamReader::SamReader(const std::string& fpath)
   } else {
     sam_file_ = hts_open(fpath.c_str(), "r");
   }
+  UTILS_DIE_IF(!sam_file_, "Could not open file: " + fpath);
+  sam_header = sam_hdr_read(sam_file_);
+  UTILS_DIE_IF(!sam_header, "Could not read header from file: " + fpath);
   InternalRead();
 }
 
@@ -100,20 +103,15 @@ void SamReader::Read() {
   }
 }
 
+// -----------------------------------------------------------------------------
+
+const std::optional<SamRecord>& SamReader::Peek() const { return buffer_; }
+
+std::optional<SamRecord> SamReader::Move() { return std::move(buffer_); }
 
 // -----------------------------------------------------------------------------
 
-const std::optional<SamRecord>& SamReader::Peek() const {
-  return buffer_;
-}
-
-std::optional<SamRecord> SamReader::Move() {
-  return std::move(buffer_);
-}
-
-// -----------------------------------------------------------------------------
-
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

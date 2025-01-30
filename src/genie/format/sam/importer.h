@@ -27,14 +27,14 @@
 #include <genie/format/sam/sam_parameter.h>
 
 #include <memory>
-#include <queue>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "genie/core/format_importer.h"
-#include "sam_record.h"
-#include "sam_to_mgrec/sorter.h"
+#include "genie/format/sam/sam_record.h"
+#include "genie/format/sam/sam_reader.h"
+#include "genie/format/sam/sam_sorter.h"
 
 // -----------------------------------------------------------------------------
 
@@ -79,25 +79,10 @@ class RefInfo {
   [[nodiscard]] core::ReferenceManager* GetMgr() const;
 };
 
-/**
- * @brief Compare function to get the reader with the next read available
- */
-struct CmpReaders {
-  /**
-   * @brief Return reader with the next read available
-   * @param a Reader a
-   * @param b Reader b
-   * @return True if a has the next read available
-   */
-  bool operator()(const sam_to_mgrec::SubfileReader* a,
-                  const sam_to_mgrec::SubfileReader* b) const;
-};
-
-
-class RefIDWatcher {
-private:
+class RefIdWatcher {
   std::optional<int> ref_id_;
-public:
+
+ public:
   bool watch(int id) {
     if (ref_id_ == std::nullopt) {
       ref_id_ = id;
@@ -110,9 +95,7 @@ public:
     return false;
   }
 
-  std::optional<int> get() const {
-    return ref_id_;
-  }
+  [[nodiscard]] std::optional<int> get() const { return ref_id_; }
 };
 
 /**
@@ -137,14 +120,6 @@ class Importer final : public core::FormatImporter {
   /// Map between reference names and ids
   std::vector<std::pair<std::string, size_t>> refs_;
 
-  /// Priority queue to find the next record to read
-  std::priority_queue<sam_to_mgrec::SubfileReader*,
-                      std::vector<sam_to_mgrec::SubfileReader*>, CmpReaders>
-      reader_prio_;
-
-  /// List of subfile readers (ownership of readers here)
-  std::vector<std::unique_ptr<sam_to_mgrec::SubfileReader>> readers_;
-
   /// Map between SAM header and FASTA reference ids
   std::vector<size_t> sam_hdr_to_fasta_lut_;
 
@@ -156,9 +131,24 @@ class Importer final : public core::FormatImporter {
 
   std::pair<std::vector<SamRecord>, std::optional<int>> ReadSamChunk();
 
+  /// Protects the sam reader and sam sorter
   std::mutex lock_;
 
+  /// Set to true when no more reads in the input file
   bool eof_;
+
+  /// Reader for sam records
+  SamReader sam_reader_;
+
+  /// Sorter for sam records
+  SamSorter sorter_;
+
+  /**
+   * Matches all possible sam records into pairs using the sam sorter
+   * @param records Unmatched records
+   * @return Matched records
+   */
+  std::vector<SamRecordPair> MatchPairs(std::vector<SamRecord>&& records);
 
  public:
   /**

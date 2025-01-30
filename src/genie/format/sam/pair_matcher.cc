@@ -5,15 +5,17 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#include "genie/format/sam/sam_to_mgrec/pair_matcher.h"
+#include "genie/format/sam/pair_matcher.h"
 
 #include <limits>
+#include <utility>
+#include <vector>
 
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
 
@@ -91,7 +93,7 @@ void PairMatcher::AddUnmatchedRead(const SamRecord& rec) {
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

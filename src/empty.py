@@ -1,5 +1,6 @@
 import os
 
+
 # Function to search for files containing the exact line '* @file'
 def find_files_with_exact_at_file(directory):
     matching_files = []
@@ -18,6 +19,7 @@ def find_files_with_exact_at_file(directory):
 
     return matching_files
 
+
 if __name__ == "__main__":
     # Change this to your target directory
     DIRECTORY_TO_SEARCH = "."
@@ -29,4 +31,3 @@ if __name__ == "__main__":
             print(file)
     else:
         print("No files containing the exact line '* @file' were found.")
-

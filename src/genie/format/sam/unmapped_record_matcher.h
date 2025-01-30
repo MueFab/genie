@@ -5,25 +5,27 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_UNMAPPED_RECORD_MATCHER_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_UNMAPPED_RECORD_MATCHER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_UNMAPPED_RECORD_MATCHER_H_
+#define SRC_GENIE_FORMAT_SAM_UNMAPPED_RECORD_MATCHER_H_
 
 #include <algorithm>
 #include <fstream>
+#include <utility>
 
 #include "genie/format/sam/sam_record.h"
-
-#include "genie/util/merge_sort/chunk_file.h"
+#include "genie/util/log.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 class UnmappedRecordMatcher {
   std::optional<SamRecord> last_record_;
 
  public:
-  std::optional<SamRecordPair> AddSamRead(const SamRecord& record) {
+  [[nodiscard]] std::optional<SamRecordPair> AddSamRead(
+      const SamRecord& record) {
+    constexpr auto kLogModuleName = "SamImporter";
     if (!last_record_) {
       last_record_ = record;
       return std::nullopt;
@@ -33,13 +35,14 @@ class UnmappedRecordMatcher {
       last_record_.reset();
       return ret;
     }
-    // TODO: process last_record_
+    UTILS_LOG(util::Logger::Severity::WARNING,
+              "Unmapped, unsorted record dropped");
     last_record_ = record;
     return std::nullopt;
   }
 
   void finish() {
-    // TODO
+    // TODO(fabian): Implement
   }
 
   std::optional<SamRecordPair> GetAfterFinish() {
@@ -48,19 +51,17 @@ class UnmappedRecordMatcher {
       last_record_.reset();
       return ret;
     }
-    // TODO
+    // TODO(fabian): Implement
     return std::nullopt;
   }
 };
 
-
-
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_UNMAPPED_RECORD_MATCHER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_UNMAPPED_RECORD_MATCHER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
