@@ -32,7 +32,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=maybe-uninitialized")
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
+#target_link_libraries(${PROJECT_NAME} PUBLIC xtensor xtensor::optimize)
+target_link_libraries(${PROJECT_NAME} PUBLIC xtensor_no_warnings)
 target_link_libraries(${PROJECT_NAME} PRIVATE mpeggCodecs-static)
 #target_link_libraries(${PROJECT_NAME} PUBLIC mpeggCodecs-shared)
 target_link_libraries(${PROJECT_NAME} PUBLIC genie-jbig)

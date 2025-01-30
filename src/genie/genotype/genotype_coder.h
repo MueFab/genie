@@ -13,10 +13,15 @@
 #include <optional>
 #include <sstream>
 #include <tuple>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 // #include <xtensor/xmath.hpp>
 // #include <xtensor/xoperation.hpp>
+#pragma GCC diagnostic pop
+
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/variant_genotype/record.h"
