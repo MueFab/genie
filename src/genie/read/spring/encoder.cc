@@ -14,8 +14,8 @@
 #include "genie/read/spring/encoder-source.h"
 #include "genie/read/spring/generate-read-streams.h"
 #include "genie/read/spring/reorder-compress-quality-id.h"
+#include "genie/util/stop_watch.h"
 #include "genie/util/thread_manager.h"
-#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flushIn(uint64_t& pos) {
+void Encoder::FlushIn(uint64_t& pos) {
     if (!preprocessor.used) {
         flushOut(pos);
         return;
@@ -99,7 +99,7 @@ Encoder::Encoder(const std::string& working_dir, size_t num_thr, bool paired_end
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::skipIn(const util::Section& id) {
+void Encoder::SkipIn(const util::Section& id) {
     preprocessor.skip(id);
     skipOut(id);
 }

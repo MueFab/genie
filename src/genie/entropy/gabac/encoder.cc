@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 #include "genie/util/make_unique.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     core::AccessUnit::Subsequence data = std::move(in);
     size_t num_symbols = data.getNumSymbols();
     util::DataBlock buffer = data.move();
-    uint8_t inputwordsize = buffer.getWordSize();
+    uint8_t inputwordsize = buffer.GetWordSize();
     gabac::IBufferStream bufferInputStream(&buffer);
 
     gabac::IBufferStream *bufferDependencyStream = nullptr;
@@ -107,7 +107,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor &desc) {
+core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor &desc) {
     EntropyCoded ret;
     util::Watch watch;
     std::get<1>(ret) = std::move(desc);
@@ -159,7 +159,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                                         std::get<1>(ret).begin()->getRawSize());
         }
     }
-    std::get<2>(ret).addDouble("time-gabac", watch.check());
+    std::get<2>(ret).addDouble("time-gabac", watch.Check());
     return ret;
 }
 

@@ -27,7 +27,7 @@
 //#include "genie/quality/calq/encoder.h"
 //#include "genie/quality/qvwriteout/encoder-none.h"
 //#include "genie/read/lowlatency/encoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
 #include "filesystem/filesystem.hpp"

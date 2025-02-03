@@ -48,13 +48,13 @@ class Encoder : public genie::core::ReadEncoder {
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 
     /**
      * @brief
      * @param id
      */
-    void skipIn(const util::Section& id) override;
+    void SkipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

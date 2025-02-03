@@ -24,7 +24,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
                           std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
-    uint8_t wordsize = transformedSubseqs->front().getWordSize();
+    uint8_t wordsize = transformedSubseqs->front().GetWordSize();
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
     symbols.swap(&(*transformedSubseqs)[0]);
@@ -34,9 +34,9 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
     util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
-    pointers->setWordSize(core::range2bytes({0, matchBufferSize}));
-    lengths->setWordSize(core::range2bytes({0, matchBufferSize}));
-    rawValues->setWordSize(wordsize);
+    pointers->SetWordSize(core::range2bytes({0, matchBufferSize}));
+    lengths->SetWordSize(core::range2bytes({0, matchBufferSize}));
+    rawValues->SetWordSize(wordsize);
 
     const uint64_t symbolsSize = symbols.size();
 
@@ -56,7 +56,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
             while ((offset < symbolsSize) &&
-                   (symbols.get(offset) == (symbols.get(w + offset - i)) && (offset - i) < (matchBufferSize - 1u))) {
+                   (symbols.Get(offset) == (symbols.Get(w + offset - i)) && (offset - i) < (matchBufferSize - 1u))) {
                 offset++;
             }
             offset -= i;
@@ -66,11 +66,11 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
             }
         }
         if (length < 2) {
-            lengths->push_back(0);
-            rawValues->push_back(symbols.get(i));
+            lengths->PushBack(0);
+            rawValues->PushBack(symbols.Get(i));
         } else {
-            pointers->push_back(i - pointer);
-            lengths->push_back(length);
+            pointers->PushBack(i - pointer);
+            lengths->PushBack(length);
             i += (length - 1);
         }
     }
@@ -92,7 +92,7 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
 
-    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
 
     // Re-compute the symbols from the pointer, lengths and raw values
@@ -100,18 +100,18 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::BlockStepper t0 = pointers->getReader();
     util::BlockStepper t1 = lengths->getReader();
     util::BlockStepper t2 = rawValues->getReader();
-    while (t1.isValid()) {
-        uint64_t length = t1.get();
-        t1.inc();
+    while (t1.IsValid()) {
+        uint64_t length = t1.Get();
+        t1.Inc();
         if (length == 0) {
-            symbols.push_back(t2.get());
-            t2.inc();
+            symbols.PushBack(t2.Get());
+            t2.Inc();
             n++;
         } else {
-            uint64_t pointer = t0.get();
-            t0.inc();
+            uint64_t pointer = t0.Get();
+            t0.Inc();
             for (uint64_t l = 0; l < length; l++) {
-                symbols.push_back(symbols.get(n - pointer));
+                symbols.PushBack(symbols.Get(n - pointer));
                 n++;
             }
         }

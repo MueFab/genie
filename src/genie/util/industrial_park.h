@@ -37,7 +37,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    Factory<T>* findAndCreate();
+    Factory<T>* FindAndCreate();
 
     /**
      * @brief
@@ -45,7 +45,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    Factory<T>* findAndFail() const;
+    Factory<T>* FindAndFail() const;
 
  public:
     /**
@@ -55,7 +55,7 @@ class IndustrialPark {
      * @param constructor
      */
     template <typename T>
-    void registerConstructor(
+    void RegisterConstructor(
         uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
@@ -65,7 +65,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    uint8_t registerConstructor(
+    uint8_t RegisterConstructor(
         const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
@@ -74,7 +74,7 @@ class IndustrialPark {
      * @param id
      */
     template <typename T>
-    void unregisterConstructor(uint8_t id);
+    void UnregisterConstructor(uint8_t id);
 
     /**
      * @brief
@@ -85,7 +85,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    std::unique_ptr<T> construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const;
+    std::unique_ptr<T> Construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

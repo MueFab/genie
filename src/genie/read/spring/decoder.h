@@ -17,8 +17,8 @@
 #include "genie/core/read-decoder.h"
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
-#include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/ordered_section.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -105,13 +105,13 @@ class Decoder : public genie::core::ReadDecoder {
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 
     /**
      * @brief
      * @param id
      */
-    void skipIn(const util::Section& id) override;
+    void SkipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

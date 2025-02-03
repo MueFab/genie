@@ -13,7 +13,7 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatImporterCompressed::flushIn(uint64_t& pos) { flushOut(pos); }
+void FormatImporterCompressed::FlushIn(uint64_t& pos) { FlushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

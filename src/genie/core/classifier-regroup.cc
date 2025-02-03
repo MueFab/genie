@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/constants.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -303,7 +303,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ClassifierRegroup::flush() {
+void ClassifierRegroup::Flush() {
     for (auto& refblock : currentChunks) {
         for (auto& pairblock : refblock) {
             for (auto& classblock : pairblock) {

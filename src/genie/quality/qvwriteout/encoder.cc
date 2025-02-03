@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 #include "genie/core/record/alignment_split/same-rec.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

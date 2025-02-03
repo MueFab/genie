@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/ordered-section.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,12 +14,12 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 OrderedSection::OrderedSection(OrderedLock* _lock, const Section& id) : lock(_lock), length(id.length) {
-    lock->wait(id.start);
+    lock->Wait(id.start);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OrderedSection::~OrderedSection() { lock->finished(length); }
+OrderedSection::~OrderedSection() { lock->Finished(length); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

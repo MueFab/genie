@@ -32,7 +32,7 @@ std::string exec(const std::string &cmd) {
 #else
     pclose(pipe);
 #endif
-    genie::util::rtrim(result);
+    genie::util::Rtrim(result);
 
     return result;
 }

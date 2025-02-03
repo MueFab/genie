@@ -31,7 +31,7 @@ class FormatImporterCompressed : public util::Source<AccessUnit>, public util::O
     /**
      * @brief
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

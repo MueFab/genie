@@ -39,7 +39,7 @@ class Exporter : public core::FormatExporter {
      * @brief
      * @param id
      */
-    void flushIn(uint64_t& id) override;
+    void FlushIn(uint64_t& id) override;
 
     /**
      * @brief

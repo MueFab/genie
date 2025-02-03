@@ -91,12 +91,12 @@ bool Date::leapYear() const {
 Date Date::fromString(const std::string& string) {
     UTILS_DIE_IF(!std::regex_match(string, std::regex(getRegex())), "Invalid date");
 
-    auto date_time = tokenize(string, 'T');
-    auto date = tokenize(date_time.front(), '-');
+    auto date_time = Tokenize(string, 'T');
+    auto date = Tokenize(date_time.front(), '-');
     if (date_time.size() == 1) {
         return {uint16_t(std::stoi(date[0])), uint8_t(std::stoi(date[1])), uint8_t(std::stoi(date[2]))};
     } else if (date_time.size() == 2) {
-        auto time = tokenize(date_time.back(), ':');
+        auto time = Tokenize(date_time.back(), ':');
         return {uint16_t(std::stoi(date[0])), uint8_t(std::stoi(date[1])), uint8_t(std::stoi(date[2])),
                 uint8_t(std::stoi(time[0])),  uint8_t(std::stoi(time[1])), uint8_t(std::stoi(time[2]))};
     } else {

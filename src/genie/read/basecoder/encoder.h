@@ -10,15 +10,15 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/read-encoder.h>
-#include <genie/util/watch.h>
+#include <genie/util/stop_watch.h>
 #include <array>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 #include "genie/core/access-unit.h"
-#include "genie/core/record/alignment/record.h"
 #include "genie/core/record/alignment/alignment_split/same-rec.h"
+#include "genie/core/record/alignment/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

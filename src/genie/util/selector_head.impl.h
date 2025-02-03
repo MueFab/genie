@@ -22,9 +22,9 @@ template <typename Tin>
 void SelectorHead<Tin>::route(Tin&& t, size_t mod_id, Section global_id) {
     for (size_t i = 0; i < mods.size(); ++i) {
         if (i == mod_id) {
-            mods[i]->flowIn(std::move(t), global_id);
+            mods[i]->FlowIn(std::move(t), global_id);
         } else {
-            mods[i]->skipIn(Section{global_id.start, global_id.length, false});
+            mods[i]->SkipIn(Section{global_id.start, global_id.length, false});
         }
     }
 }
@@ -65,7 +65,7 @@ void SelectorHead<Tin>::setOperation(std::function<size_t(const Tin& t)> s) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin>
-void SelectorHead<Tin>::flowIn(Tin&& t, const Section& id) {
+void SelectorHead<Tin>::FlowIn(Tin&& t, const Section& id) {
     Tin in = std::move(t);
     size_t dest = select(in);
     route(std::move(in), dest, id);
@@ -74,25 +74,25 @@ void SelectorHead<Tin>::flowIn(Tin&& t, const Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin>
-void SelectorHead<Tin>::flushIn(uint64_t& pos) {
+void SelectorHead<Tin>::FlushIn(uint64_t& pos) {
     for (const auto& m : mods) {
-        m->flushIn(pos);
+        m->FlushIn(pos);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin>
-void SelectorHead<Tin>::skipIn(const Section& id) {
+void SelectorHead<Tin>::SkipIn(const Section& id) {
     bool first = true;
     for (const auto& m : mods) {
         if (first) {
-            m->skipIn(id);
+            m->SkipIn(id);
             first = false;
         } else {
             Section locID = id;
             locID.strongSkip = false;
-            m->skipIn(locID);
+            m->SkipIn(locID);
         }
     }
 }

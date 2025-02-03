@@ -30,7 +30,7 @@ Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
     mapping_score.resize(as_depth);
     reader.ReadAlignedBytes(&mapping_score[0], as_depth * sizeof(int32_t));
     for (auto &s : mapping_score) {
-        util::swap_endianness(s);
+        util::SwapEndianness(s);
     }
 }
 

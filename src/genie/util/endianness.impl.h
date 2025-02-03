@@ -19,7 +19,7 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T, size_t SIZE>
-inline void swap_endianness(T& u) {
+inline void SwapEndianness(T& u) {
     static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
 
     for (size_t k = 0; k < SIZE / 2; k++) {

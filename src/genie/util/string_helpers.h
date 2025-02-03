@@ -28,7 +28,7 @@ static const char *ws = " \t\n\r\f\v";  //!< @brief All known whitespace charact
  * @param t List of characters to remove.
  * @return Trimmed string.
  */
-std::string &rtrim(std::string &s, const char *t = ws);
+std::string &Rtrim(std::string &s, const char *t = ws);
 
 /**
  * @brief Removes specified characters from the left side of a string.
@@ -36,7 +36,8 @@ std::string &rtrim(std::string &s, const char *t = ws);
  * @param t List of characters to remove.
  * @return Trimmed string.
  */
-std::string &ltrim(std::string &s, const char *t = ws);
+std::string &Ltrim
+    (std::string &s, const char *t = ws);
 
 /**
  * @brief Removes specified characters from both sides of a string.
@@ -44,29 +45,29 @@ std::string &ltrim(std::string &s, const char *t = ws);
  * @param t List of characters to remove.
  * @return Trimmed string.
  */
-std::string &trim(std::string &s, const char *t = ws);
+std::string &Trim(std::string &s, const char *t = ws);
 
 /**
  * @brief Splits a string at a delimiting character.
- * @param str String to tokenize.
+ * @param str String to Tokenize.
  * @param delim Delimiting character, e.g. ' '.
  * @return Vector of tokens. The delimiting character will not be included.
  */
-std::vector<std::string> tokenize(const std::string &str, char delim);
+std::vector<std::string> Tokenize(const std::string &str, char delim);
 
 /**
  * @brief
  * @param bin
  * @return
  */
-std::string toHex(const std::string &bin);
+std::string ToHex(const std::string &bin);
 
 /**
  * @brief
  * @param hex
  * @return
  */
-std::string fromHex(const std::string &hex);
+std::string FromHex(const std::string &hex);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,11 +17,11 @@ stats::PerfStats& FormatExporterCompressed::getStats() { return stats; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatExporterCompressed::skipIn(const util::Section&) {}
+void FormatExporterCompressed::SkipIn(const util::Section&) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatExporterCompressed::flushIn(uint64_t&) {}
+void FormatExporterCompressed::FlushIn(uint64_t& pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

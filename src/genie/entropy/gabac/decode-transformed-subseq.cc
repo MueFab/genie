@@ -157,7 +157,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
@@ -177,8 +177,8 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
         decodeSignFlag(reader, binID, symbolValue);
 
-        r.set(symbolValue);
-        r.inc();
+        r.Set(symbolValue);
+        r.Inc();
     }
 
     payloadSizeUsed = reader.close();
@@ -245,14 +245,14 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
-        if (rDep.isValid()) {
-            depSymbolValue = rDep.get();
-            rDep.inc();
+        if (rDep.IsValid()) {
+            depSymbolValue = rDep.Get();
+            rDep.Inc();
         }
 
         uint32_t oss = outputSymbolSize;
@@ -287,8 +287,8 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
         decodeSignFlag(reader, binID, symbolValue);
 
-        r.set(symbolValue);
-        r.inc();
+        r.Set(symbolValue);
+        r.Inc();
     }
 
     payloadSizeUsed = reader.close();
@@ -348,7 +348,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
@@ -379,8 +379,8 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
         decodeSignFlag(reader, binID, symbolValue);
 
-        r.set(symbolValue);
-        r.inc();
+        r.Set(symbolValue);
+        r.Inc();
     }
 
     payloadSizeUsed = reader.close();

@@ -47,13 +47,13 @@ class FastaSource : public util::OriginalSource, public util::Source<std::string
      * @param lock
      * @return
      */
-    bool pump(uint64_t& id, std::mutex& lock) override;
+    bool Pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      * @brief
      * @param id
      */
-    void flushIn(uint64_t& id) override;
+    void FlushIn(uint64_t& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

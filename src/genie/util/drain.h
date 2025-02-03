@@ -23,7 +23,7 @@ namespace util {
 struct Section {
     size_t start;     //!< @brief ID of first record
     size_t length;    //!< @brief Number of records
-    bool strongSkip;  //!< @brief If hte pipeline branches and branches are merged again, only skipIn() with strongSkip
+    bool strongSkip;  //!< @brief If hte pipeline branches and branches are merged again, only SkipIn() with strongSkip
                       //!< == true will pass through the merging point.
 };
 
@@ -39,12 +39,12 @@ class Drain {
      * @param t Input data chunk
      * @param id Current block identifier (for multithreading)
      */
-    virtual void flowIn(TYPE&& t, const Section& id) = 0;
+    virtual void FlowIn(TYPE&& t, const Section& id) = 0;
 
     /**
-     * @brief Signals that no further data (and calls to flowIn) will be available.
+     * @brief Signals that no further data (and calls to FlowIn) will be available.
      */
-    virtual void flushIn(uint64_t& pos) = 0;
+    virtual void FlushIn(uint64_t& pos) = 0;
 
     /**
      * @brief For inheritance.
@@ -52,10 +52,10 @@ class Drain {
     virtual ~Drain() = default;
 
     /**
-     * @brief Signals that a chunk of data won't be delivered using flowIn()
+     * @brief Signals that a chunk of data won't be delivered using FlowIn()
      * @param id Block position of skipped data.
      */
-    virtual void skipIn(const Section& id) = 0;
+    virtual void SkipIn(const Section& id) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

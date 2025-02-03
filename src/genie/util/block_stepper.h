@@ -36,24 +36,24 @@ struct BlockStepper {
      * @brief
      * @return True, if the current position is not yet the end position.
      */
-    bool isValid() const;
+    bool IsValid() const;
 
     /**
      * @brief Increment by one element.
      */
-    void inc();
+    void Inc();
 
     /**
      * @brief
      * @return The current element.
      */
-    uint64_t get() const;
+    uint64_t Get() const;
 
     /**
      * @brief Set the current element to a new value.
      * @param val New value.
      */
-    void set(uint64_t val) const;
+    void Set(uint64_t val) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

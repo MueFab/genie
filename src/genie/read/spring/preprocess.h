@@ -14,8 +14,8 @@
 #include "genie/core/record/alignment/chunk.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/drain.h"
-#include "genie/util/ordered-section.h"
 #include "genie/util/ordered_lock.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

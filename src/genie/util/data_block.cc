@@ -18,7 +18,7 @@ namespace util {
 
 BlockStepper util::DataBlock::getReader() const {
     return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.data() + data.size()),
-                        static_cast<uint8_t>(getWordSize()));
+                        static_cast<uint8_t>(GetWordSize()));
     // TODO(Fabian): Add BlockStepper for const
 }
 
@@ -34,7 +34,7 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
     resize(il.size());
     size_t ctr = 0;
     for (const auto &v : il) {
-        set(ctr, v);
+        Set(ctr, v);
         ++ctr;
     }
     return *this;
@@ -42,11 +42,11 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return static_cast<size_t>(divByWordSize(data.size())); }
+size_t util::DataBlock::size() const { return static_cast<size_t>(DivByWordSize(data.size())); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve(static_cast<size_t>(mulByWordSize(size))); }
+void util::DataBlock::reserve(size_t size) { data.reserve(static_cast<size_t>(MulByWordSize(size))); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize(static_cast<size_t>(mulByWordSize(size))); }
+void util::DataBlock::resize(size_t size) { data.resize(static_cast<size_t>(MulByWordSize(size))); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ void util::DataBlock::swap(util::DataBlock *const d) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataBlock::DataBlock(size_t size, uint8_t wsize) : lgWordSize(0) {
-    setWordSize(wsize);
+    SetWordSize(wsize);
     data.resize(size * wsize);
 }
 
@@ -97,7 +97,7 @@ DataBlock::DataBlock(std::string *vec) : lgWordSize(0) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) : lgWordSize(0) {
-    setWordSize(word_size);
+    SetWordSize(word_size);
     size_t s = size * word_size;
     this->data.resize(s);
     this->data.shrink_to_fit();
@@ -110,7 +110,7 @@ uint8_t util::DataBlock::getMaxWordSize() const {
     uint8_t w = 1;
     while (w != 8) {
         w *= 2;
-        if (getRawSize() % w) {
+        if (GetRawSize() % w) {
             w /= 2;
             break;
         }

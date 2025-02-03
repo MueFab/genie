@@ -70,19 +70,19 @@ class SelectorHead : public genie::util::Drain<Tin> {
     /**
      * @brief
      */
-    void flowIn(Tin&& t, const Section& id) override;
+    void FlowIn(Tin&& t, const Section& id) override;
 
     /**
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 
     /**
      * @brief
      * @param id
      */
-    void skipIn(const Section& id) override;
+    void SkipIn(const Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

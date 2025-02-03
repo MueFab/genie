@@ -127,7 +127,7 @@ void validateOutputFile(const std::string &file, bool forced) {
 void ProgramOptions::validate() const {
     std::cerr << "validate\n";
 
-    auto files = genie::util::tokenize(inputFile, ';');
+    auto files = genie::util::Tokenize(inputFile, ';');
     if (task != "encode" && task != "decode") {
         UTILS_DIE("Task '" + task + "' is invalid");
     }

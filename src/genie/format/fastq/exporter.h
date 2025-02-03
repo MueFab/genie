@@ -15,8 +15,8 @@
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/drain.h"
 #include "genie/util/make_unique.h"
-#include "genie/util/ordered-section.h"
 #include "genie/util/ordered_lock.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ class Exporter : public core::FormatExporter {
      * @brief
      * @param id
      */
-    void skipIn(const util::Section &id) override;
+    void SkipIn(const Section &id) override;
 
     /**
      * @brief Process one chunk of MPEGG records

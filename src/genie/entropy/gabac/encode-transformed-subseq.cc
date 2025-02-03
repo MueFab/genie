@@ -160,13 +160,13 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         if (maxSize <= bitstream.size()) {
             break;
         }
 
         // Split symbol into subsymbols and then encode subsymbols
-        const uint64_t origSymbol = r.get();
+        const uint64_t origSymbol = r.Get();
         // const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
         const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
         uint64_t subsymValToCode = 0;
@@ -189,7 +189,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
         // encodeSignflag(writer, binID, signedSymbolValue);
 
-        r.inc();
+        r.Inc();
     }
 
     writer.close();
@@ -250,13 +250,13 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         if (maxSize <= bitstream.size()) {
             break;
         }
 
         // Split symbol into subsymbols and then encode subsymbols
-        const uint64_t origSymbol = r.get();
+        const uint64_t origSymbol = r.Get();
         //    const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol,
         //    symbols->getWordSize());
         const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
@@ -265,9 +265,9 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
         uint64_t subsymValToCode = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
-        if (rDep.isValid()) {
-            depSymbolValue = rDep.get();
-            rDep.inc();
+        if (rDep.IsValid()) {
+            depSymbolValue = rDep.Get();
+            rDep.Inc();
         }
 
         uint32_t oss = outputSymbolSize;
@@ -302,7 +302,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
         // encodeSignflag(writer, binID, signedSymbolValue);
 
-        r.inc();
+        r.Inc();
     }
 
     writer.close();
@@ -358,13 +358,13 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         if (maxSize <= bitstream.size()) {
             break;
         }
 
         // Split symbol into subsymbols and then encode subsymbols
-        const uint64_t origSymbol = r.get();
+        const uint64_t origSymbol = r.Get();
         // const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
         const uint64_t symbolValue = origSymbol;  // abs(signedSymbolValue);
         UTILS_DIE_IF(origSymbol != symbolValue, "Loss of information");
@@ -398,7 +398,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
         // encodeSignflag(writer, binID, signedSymbolValue);
 
-        r.inc();
+        r.Inc();
     }
 
     writer.close();

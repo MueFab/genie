@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 #include "genie/format/mgb/raw_reference.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::skipIn(const genie::util::Section& id) { util::OrderedSection sec(&lock, id); }
+void Exporter::SkipIn(const Section& id) { util::OrderedSection sec(&lock, id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

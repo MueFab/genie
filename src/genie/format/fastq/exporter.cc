@@ -7,8 +7,8 @@
 #include "genie/format/fastq/exporter.h"
 #include <string>
 #include <utility>
-#include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/ordered_section.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2) : file{&_file_1
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::skipIn(const util::Section &id) { util::OrderedSection sec(&lock, id); }
+void Exporter::SkipIn(const Section &id) { util::OrderedSection sec(&lock, id); }
 
 void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);

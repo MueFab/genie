@@ -14,7 +14,7 @@
 #include "genie/entropy/gabac/encode-desc-subseq.h"
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -247,12 +247,12 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
             if (j == 0) {
                 codingsize = 0;
             }
-            binarizations.back().back().emplace_back(range, codingsize);  // No-Transform
-            binarizations.back().back().emplace_back(
+            binarizations.back().back().EmplaceBack(range, codingsize);  // No-Transform
+            binarizations.back().back().EmplaceBack(
                 std::make_pair(-(range.second - range.first), range.second - range.first),
                 codingsize);  // DIFF
-            binarizations.back().back().emplace_back(std::make_pair(0, range.second - range.first),
-                                                     codingsize);  // LUT
+            binarizations.back().back().EmplaceBack(std::make_pair(0, range.second - range.first),
+                                                    codingsize);  // LUT
         }
     }
 }
@@ -373,10 +373,10 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         auto subsequence = sequence;
         transformedSubseqs[0].swap(&subsequence);
         util::Watch timer;
-        timer.reset();
+        timer.Reset();
         auto cfg = config.createConfig(desc, core::getDescriptor(desc.first).tokentype);
         gabac::doSubsequenceTransform(cfg, &transformedSubseqs);
-        size_t total_time = static_cast<size_t>(timer.check() * 1000);
+        size_t total_time = static_cast<size_t>(timer.Check() * 1000);
         std::vector<ResultTransformed> trans_results;
 
         // Optimze transformed sequences independently
@@ -579,10 +579,10 @@ ResultTransformed optimizeTransformedSequence(ConfigSearchTranformedSeq& seq, co
         auto input = data;
 
         util::Watch watch;
-        watch.reset();
+        watch.Reset();
         gabac::encodeTransformSubseq(cfg, &input);
-        auto time = size_t(watch.check() * 1000);  // Milliseconds
-        auto size = input.getRawSize();
+        auto time = size_t(watch.Check() * 1000);  // Milliseconds
+        auto size = input.GetRawSize();
 
         float newscore = static_cast<float>(timeweight * time + (1.0 - timeweight) * size);
         if (newscore < score) {

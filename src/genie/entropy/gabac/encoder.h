@@ -14,7 +14,7 @@
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/util/make_unique.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ class Encoder : public core::EntropyEncoder {
      * @param desc
      * @return
      */
-    EntropyCoded process(core::AccessUnit::Descriptor& desc) override;
+    EntropyCoded Process(core::AccessUnit::Descriptor& desc) override;
 
     /**
      * @brief

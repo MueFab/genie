@@ -43,14 +43,14 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     for (uint64_t ts = 0; ts < subseqCount; ts++) {
         const uint8_t codingSubsymSize = trnsfCfgs[ts].getSupportValues().getCodingSubsymSize();
         trnsSubseqMasks[ts] = (1u << codingSubsymSize) - 1;
-        (*transformedSubseqs)[ts].setWordSize(4);
+        (*transformedSubseqs)[ts].SetWordSize(4);
         (*transformedSubseqs)[ts].resize(symbolsCount);
     }
 
     // split
     for (uint64_t i = 0; i < symbolsCount; i++) {
-        uint64_t symbolValue = symbols.get(i);
-        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, (uint8_t)symbols.getWordSize());
+        uint64_t symbolValue = symbols.Get(i);
+        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, (uint8_t)symbols.GetWordSize());
 
         bool isNegative = false;
         if (signedSymbolValue < 0) {
@@ -66,7 +66,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
                 isNegative = false;
             }
 
-            (*transformedSubseqs)[ts].set(i, trnsfSymbol);
+            (*transformedSubseqs)[ts].Set(i, trnsfSymbol);
         }
     }
 
@@ -93,7 +93,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         uint64_t symbolValue = 0;
         bool isNegative = false;
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
-            uint64_t decodedTrnsfSymbol = (*transformedSubseqs)[ts].get(i);
+            uint64_t decodedTrnsfSymbol = (*transformedSubseqs)[ts].Get(i);
             if (static_cast<int64_t>(decodedTrnsfSymbol) < 0) {
                 decodedTrnsfSymbol = -(static_cast<int64_t>(decodedTrnsfSymbol));
                 isNegative = true;
@@ -107,7 +107,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
             symbolValue = static_cast<uint64_t>(symbolValueSigned);
         }
 
-        symbols.set(i, symbolValue);
+        symbols.Set(i, symbolValue);
     }
 
     (*transformedSubseqs).resize(1);

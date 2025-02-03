@@ -19,7 +19,7 @@ genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) c
     reader.SetStreamPosition(payloadPosition);
     genie::util::DataBlock tmp;
     tmp.resize(payloadSize);
-    reader.ReadAlignedBytes(tmp.getData(), payloadSize);
+    reader.ReadAlignedBytes(tmp.GetData(), payloadSize);
     reader.SetStreamPosition(pos);
     return tmp;
 }
@@ -28,7 +28,7 @@ genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) c
 
 uint64_t Payload::getPayloadSize() const {
     if (isPayloadLoaded()) {
-        return block_payload.getRawSize();
+        return block_payload.GetRawSize();
     } else {
         return payloadSize;
     }
@@ -69,7 +69,7 @@ Payload::Payload(genie::util::DataBlock payload)
     : block_payload(std::move(payload)),
       payloadLoaded(true),
       payloadPosition(-1),
-      payloadSize(payload.getRawSize()),
+      payloadSize(payload.GetRawSize()),
       internal_reader(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -88,9 +88,9 @@ Payload::Payload(util::BitReader& reader, uint64_t size)
 void Payload::write(genie::util::BitWriter& writer) const {
     if (!isPayloadLoaded() && internal_reader) {
         auto tmp = _internal_loadPayload(*internal_reader);
-        writer.writeBypass(tmp.getData(), tmp.getRawSize());
+        writer.writeBypass(tmp.GetData(), tmp.GetRawSize());
     } else {
-        writer.writeBypass(block_payload.getData(), block_payload.getRawSize());
+        writer.writeBypass(block_payload.GetData(), block_payload.GetRawSize());
     }
 }
 

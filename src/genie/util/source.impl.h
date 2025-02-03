@@ -19,28 +19,28 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-void Source<TYPE>::flowOut(TYPE&& t, const Section& id) {
-    drain->flowIn(std::move(t), id);
+void Source<TYPE>::FlowOut(TYPE&& t, const Section& id) {
+    drain->FlowIn(std::move(t), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-void Source<TYPE>::flushOut(uint64_t& pos) {
-    drain->flushIn(pos);
+void Source<TYPE>::FlushOut(uint64_t& pos) {
+    drain->FlushIn(pos);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-void Source<TYPE>::skipOut(const Section& id) {
-    drain->skipIn(id);
+void Source<TYPE>::SkipOut(const Section& id) {
+    drain->SkipIn(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-void Source<TYPE>::setDrain(Drain<TYPE>* d) {
+void Source<TYPE>::SetDrain(Drain<TYPE>* d) {
     drain = d;
 }
 

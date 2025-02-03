@@ -104,7 +104,7 @@ class ClassifierRegroup : public Classifier {
     /**
      * @brief
      */
-    void flush() override;
+    void Flush() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -31,10 +31,10 @@ DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : De
     auto mode = reader.Read<uint8_t>();
     if (desc == GenDesc::MSAR || desc == GenDesc::RNAME) {
         decoder_configuration =
-            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, desc, reader);
+            GlobalCfg::getSingleton().getIndustrialPark().Construct<DecoderTokentype>(mode, desc, reader);
     } else {
         decoder_configuration =
-            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderRegular>(mode, desc, reader);
+            GlobalCfg::getSingleton().getIndustrialPark().Construct<DecoderRegular>(mode, desc, reader);
     }
 }
 

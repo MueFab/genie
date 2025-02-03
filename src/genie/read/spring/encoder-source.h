@@ -57,13 +57,13 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
      * @param lock
      * @return
      */
-    bool pump(uint64_t& id, std::mutex& lock) override;
+    bool Pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

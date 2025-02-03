@@ -44,7 +44,7 @@ void FlowGraphConvert::setClassifier(std::unique_ptr<genie::core::Classifier> _c
 void FlowGraphConvert::setImporter(std::unique_ptr<genie::core::FormatImporter> dat, size_t index) {
     importers[index] = std::move(dat);
     importers[index]->setClassifier(classifier.get());
-    importers[index]->setDrain(&exporterSelector);
+    importers[index]->SetDrain(&exporterSelector);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -74,13 +74,13 @@ void FlowGraphConvert::run() {
     for (auto& i : importers) {
         imps.emplace_back(i.get());
     }
-    mgr.setSource(std::move(imps));
-    mgr.run();
+    mgr.SetSource(std::move(imps));
+    mgr.Run();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphConvert::stop(bool abort) { mgr.stop(abort); }
+void FlowGraphConvert::stop(bool abort) { mgr.Stop(abort); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

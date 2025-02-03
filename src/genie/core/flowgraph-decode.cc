@@ -36,7 +36,7 @@ genie::core::RefDecoder* FlowGraphDecode::getRefDecoder() { return refDecoder; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) {
-    readSelector.setDrain(&exporterSelector);
+    readSelector.SetDrain(&exporterSelector);
     refMgr = genie::util::make_unique<ReferenceManager>(16);
 }
 
@@ -51,14 +51,14 @@ void FlowGraphDecode::addImporter(std::unique_ptr<genie::core::FormatImporterCom
 
 void FlowGraphDecode::setImporter(std::unique_ptr<genie::core::FormatImporterCompressed> dat, size_t index) {
     importers[index] = std::move(dat);
-    importers[index]->setDrain(&readSelector);
+    importers[index]->SetDrain(&readSelector);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::addReadCoder(std::unique_ptr<genie::core::ReadDecoder> dat) {
     readCoders.emplace_back(std::move(dat));
-    readSelector.addBranch(readCoders.back().get(), readCoders.back().get());
+    readSelector.AddBranch(readCoders.back().get(), readCoders.back().get());
     readCoders.back()->setQVCoder(&qvSelector);
     readCoders.back()->setNameCoder(&nameSelector);
     readCoders.back()->setEntropyCoder(&entropySelector);
@@ -68,7 +68,7 @@ void FlowGraphDecode::addReadCoder(std::unique_ptr<genie::core::ReadDecoder> dat
 
 void FlowGraphDecode::setReadCoder(std::unique_ptr<genie::core::ReadDecoder> dat, size_t index) {
     readCoders[index] = std::move(dat);
-    readSelector.setBranch(readCoders[index].get(), readCoders[index].get(), index);
+    readSelector.SetBranch(readCoders[index].get(), readCoders[index].get(), index);
     readCoders[index]->setQVCoder(&qvSelector);
     readCoders[index]->setNameCoder(&nameSelector);
     readCoders.back()->setEntropyCoder(&entropySelector);
@@ -78,14 +78,14 @@ void FlowGraphDecode::setReadCoder(std::unique_ptr<genie::core::ReadDecoder> dat
 
 void FlowGraphDecode::addEntropyCoder(std::unique_ptr<genie::core::EntropyDecoder> dat) {
     entropyCoders.emplace_back(std::move(dat));
-    entropySelector.addMod(entropyCoders.back().get());
+    entropySelector.AddMod(entropyCoders.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setEntropyCoder(std::unique_ptr<genie::core::EntropyDecoder> dat, size_t index) {
     entropyCoders[index] = std::move(dat);
-    entropySelector.setMod(entropyCoders[index].get(), index);
+    entropySelector.SetMod(entropyCoders[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void FlowGraphDecode::setExporter(std::unique_ptr<genie::core::FormatExporter> d
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setReadCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
-    readSelector.setOperation(fun);
+    readSelector.SetOperation(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void FlowGraphDecode::setQVSelector(
     std::function<size_t(const genie::core::parameter::QualityValues& param, const std::vector<std::string>& ecigar,
                          const std::vector<uint64_t>& positions, genie::core::AccessUnit::Descriptor& desc)>
         fun) {
-    qvSelector.setSelection(std::move(fun));
+    qvSelector.SetSelection(std::move(fun));
 
     for (auto& r : readCoders) {
         r->setQVCoder(&qvSelector);
@@ -124,7 +124,7 @@ void FlowGraphDecode::setQVSelector(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUnit::Descriptor& desc)> fun) {
-    nameSelector.setSelection(std::move(fun));
+    nameSelector.SetSelection(std::move(fun));
 
     for (auto& r : readCoders) {
         r->setNameCoder(&nameSelector);
@@ -136,7 +136,7 @@ void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUn
 void FlowGraphDecode::setEntropyCoderSelector(
     const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>&
         fun) {
-    entropySelector.setSelection(fun);
+    entropySelector.SetSelection(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -149,28 +149,28 @@ void FlowGraphDecode::setExporterSelector(const std::function<size_t(const genie
 
 void FlowGraphDecode::addNameCoder(std::unique_ptr<genie::core::NameDecoder> dat) {
     nameCoders.emplace_back(std::move(dat));
-    nameSelector.addMod(nameCoders.back().get());
+    nameSelector.AddMod(nameCoders.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setNameCoder(std::unique_ptr<genie::core::NameDecoder> dat, size_t index) {
     nameCoders[index] = std::move(dat);
-    nameSelector.setMod(nameCoders[index].get(), index);
+    nameSelector.SetMod(nameCoders[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::addQVCoder(std::unique_ptr<genie::core::QVDecoder> dat) {
     qvCoders.emplace_back(std::move(dat));
-    qvSelector.addMod(qvCoders.back().get());
+    qvSelector.AddMod(qvCoders.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setQVCoder(std::unique_ptr<genie::core::QVDecoder> dat, size_t index) {
     qvCoders[index] = std::move(dat);
-    qvSelector.setMod(qvCoders[index].get(), index);
+    qvSelector.SetMod(qvCoders[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -180,8 +180,8 @@ void FlowGraphDecode::run() {
     for (auto& i : importers) {
         imps.emplace_back(i.get());
     }
-    mgr.setSource(std::move(imps));
-    mgr.run();
+    mgr.SetSource(std::move(imps));
+    mgr.Run();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

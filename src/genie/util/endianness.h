@@ -19,7 +19,7 @@ namespace util {
  * @param u Value
  */
 template <typename T, size_t SIZE = sizeof(T)>
-inline void swap_endianness(T& u);
+inline void SwapEndianness(T& u);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ class ExceptionPartiallyAuthorized : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -45,7 +45,7 @@ class ExceptionNotAuthorized : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -57,7 +57,7 @@ class ExceptionVerificationFailed : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -69,7 +69,7 @@ class ExceptionDecryptionFailed : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -81,7 +81,7 @@ class ExceptionDatasetGroupNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -93,7 +93,7 @@ class ExceptionDatasetNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -105,7 +105,7 @@ class ExceptionAccessUnitNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -117,7 +117,7 @@ class ExceptionReferenceNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -129,7 +129,7 @@ class ExceptionSequenceNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -141,7 +141,7 @@ class ExceptionMetadataFieldNotFound : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -153,7 +153,7 @@ class ExceptionMetadataInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -165,7 +165,7 @@ class ExceptionReferenceInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -177,7 +177,7 @@ class ExceptionParameterInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**
@@ -189,7 +189,7 @@ class ExceptionBitstreamInvalid : public genie::util::RuntimeException {
      * @brief
      * @return
      */
-    std::string msg() const override;
+    std::string Msg() const override;
 };
 
 /**

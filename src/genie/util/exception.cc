@@ -18,11 +18,11 @@ Exception::Exception(std::string msg) noexcept : msg_(std::move(msg)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exception::Exception(const Exception& e) noexcept : msg_(e.msg()) {}
+Exception::Exception(const Exception& e) noexcept : msg_(e.Msg()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Exception::msg() const { return msg_; }
+std::string Exception::Msg() const { return msg_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

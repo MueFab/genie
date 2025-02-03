@@ -14,7 +14,7 @@
 #include "genie/entropy/gabac/mismatch-decoder.h"
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,12 +34,12 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         return ret;
     }
     size_t offset = 6;
-    UTILS_DIE_IF(offset >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
+    UTILS_DIE_IF(offset >= remainingData.GetRawSize(), "Tokentype stream smaller than expected");
     uint16_t num_tokentype_descriptors = 0;
     {
         const size_t READAHEAD = 6;
-        util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD,
-                                              (uint8_t)remainingData.getWordSize());
+        util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.GetData()), READAHEAD,
+                                              (uint8_t)remainingData.GetWordSize());
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
@@ -53,10 +53,10 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         uint64_t numSymbols = 0;
         size_t mappedTypeId = 0;
         {
-            const size_t READAHEAD = std::min<size_t>(11, remainingData.getRawSize() - offset - 1);
-            UTILS_DIE_IF(offset + READAHEAD >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
-            util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, READAHEAD,
-                                                  remainingData.getWordSize());
+            const size_t READAHEAD = std::min<size_t>(11, remainingData.GetRawSize() - offset - 1);
+            UTILS_DIE_IF(offset + READAHEAD >= remainingData.GetRawSize(), "Tokentype stream smaller than expected");
+            util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.GetData()) + offset, READAHEAD,
+                                                  remainingData.GetWordSize());
             gabac::IBufferStream stream(&tmp);
             util::BitReader reader(stream);
 
@@ -74,20 +74,20 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         for (size_t j = 0; j < conf0.getSubseqConfig().getNumTransformSubseqCfgs(); ++j) {
             size_t payload_size = 0;
             if (j < (conf0.getSubseqConfig().getNumTransformSubseqCfgs() - 1)) {
-                util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
-                                                      remainingData.getWordSize());
+                util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.GetData()) + offset, 4,
+                                                      remainingData.GetWordSize());
                 gabac::IBufferStream stream(&tmp);
                 util::BitReader reader(stream);
                 payload_size = reader.Read<uint32_t>();
                 offset += 4;
             } else {
-                payload_size = remainingData.getRawSize() - offset;
+                payload_size = remainingData.GetRawSize() - offset;
             }
             auto numTransformedSymbols = static_cast<uint32_t>(numSymbols);
             if (payload_size > 0) {
                 if (conf0.getSubseqConfig().getNumTransformSubseqCfgs() > 1) {
-                    util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, 4,
-                                                          remainingData.getWordSize());
+                    util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.GetData()) + offset, 4,
+                                                          remainingData.GetWordSize());
                     gabac::IBufferStream stream(&tmp);
                     util::BitReader reader(stream);
                     numTransformedSymbols = reader.Read<uint32_t>();
@@ -95,8 +95,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
                     payload_size -= 4;
                 }
             }
-            auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset, payload_size,
-                                       remainingData.getWordSize());
+            auto tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.GetData()) + offset, payload_size,
+                                       remainingData.GetWordSize());
             offset +=
                 gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(static_cast<uint8_t>(j)),
                                              static_cast<unsigned int>(numTransformedSymbols), &tmp, uint8_t(4));
@@ -157,7 +157,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
+std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::Process(
     const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
@@ -217,7 +217,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             }
         }
     }
-    std::get<1>(desc).addDouble("time-gabac", watch.check());
+    std::get<1>(desc).addDouble("time-gabac", watch.Check());
     return desc;
 }
 

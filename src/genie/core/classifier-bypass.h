@@ -40,7 +40,7 @@ class ClassifierBypass : public Classifier {
     /**
      * @brief
      */
-    void flush() override;
+    void Flush() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -14,15 +14,15 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline bool BlockStepper::isValid() const { return curr != end; }
+inline bool BlockStepper::IsValid() const { return curr != end; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void BlockStepper::inc() { curr += wordSize; }
+inline void BlockStepper::Inc() { curr += wordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t BlockStepper::get() const {
+inline uint64_t BlockStepper::Get() const {
     switch (wordSize) {
         case 1:
             return *curr;
@@ -40,7 +40,7 @@ inline uint64_t BlockStepper::get() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void BlockStepper::set(uint64_t val) const {
+inline void BlockStepper::Set(uint64_t val) const {
     switch (wordSize) {
         case 1:
             *curr = static_cast<uint8_t>(val);

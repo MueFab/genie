@@ -22,36 +22,36 @@ size_t SideSelector<Coder, Ret, Args...>::defaultSelect(Args...) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Coder, typename Ret, typename... Args>
-SideSelector<Coder, Ret, Args...>::SideSelector() : select(&defaultSelect) {}
+SideSelector<Coder, Ret, Args...>::SideSelector() : select_(&defaultSelect) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Coder, typename Ret, typename... Args>
-void SideSelector<Coder, Ret, Args...>::setMod(Coder* mod, size_t index) {
+void SideSelector<Coder, Ret, Args...>::SetMod(Coder* mod, size_t index) {
     mods[index] = mod;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Coder, typename Ret, typename... Args>
-void SideSelector<Coder, Ret, Args...>::addMod(Coder* mod) {
+void SideSelector<Coder, Ret, Args...>::AddMod(Coder* mod) {
     mods.emplace_back(mod);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Coder, typename Ret, typename... Args>
-void SideSelector<Coder, Ret, Args...>::setSelection(std::function<size_t(Args...)> _select) {
-    select = _select;
+void SideSelector<Coder, Ret, Args...>::SetSelection(std::function<size_t(Args...)> _select) {
+    select_ = _select;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Coder, typename Ret, typename... Args>
-Ret SideSelector<Coder, Ret, Args...>::process(Args... param) {
-    size_t index = select(param...);
+Ret SideSelector<Coder, Ret, Args...>::Process(Args... param) {
+    size_t index = select_(param...);
     UTILS_DIE_IF(index >= mods.size(), "Invalid index in SideSelector");
-    return mods[index]->process(param...);
+    return mods[index]->Process(param...);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

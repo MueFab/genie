@@ -45,7 +45,7 @@ class DataBlock {
      * @brief Sets the size of one symbol, changing the number of elments
      * @param size New size in bytes
      */
-    void setWordSize(uint8_t size);
+    void SetWordSize(uint8_t size);
 
     /**
      * @brief Get size of one symbol in bytes.
@@ -59,25 +59,25 @@ class DataBlock {
      * before promoting it back to int.  Ergo, just leave the return type
      * of the word size as int.
      */
-    uint8_t getWordSize() const;
+    uint8_t GetWordSize() const;
 
     /**
      * @brief multiply by size of one symbol in bytes
      * @return multiply arg by size of one symbol
      */
-    uint64_t mulByWordSize(uint64_t val) const;
+    uint64_t MulByWordSize(uint64_t val) const;
 
     /**
      * @brief divide by size of one symbol in bytes
      * @return divide arg by size of one symbol
      */
-    uint64_t divByWordSize(uint64_t val) const;
+    uint64_t DivByWordSize(uint64_t val) const;
 
     /**
      * @brief modulo divide by size of one symbol in bytes
      * @return modulo divide arg by size of one symbol
      */
-    uint64_t modByWordSize(uint64_t val) const;
+    uint64_t ModByWordSize(uint64_t val) const;
 
     /**
      * @brief Creates a blockStepper for this DataBlock.
@@ -109,7 +109,7 @@ class DataBlock {
      * @param index Position of symbol in block
      * @return Symbol widened to 64 bits
      */
-    uint64_t get(size_t index) const;
+    uint64_t Get(size_t index) const;
 
     /**
      * @brief Calculates the biggest possible word size for this block
@@ -122,7 +122,7 @@ class DataBlock {
      * @param index Position in stream
      * @param val Value (will be narrowed to word size)
      */
-    void set(size_t index, uint64_t val);
+    void Set(size_t index, uint64_t val);
 
     /**
      * @brief A proxy object abstracting the get/set access using regular
@@ -231,7 +231,7 @@ class DataBlock {
          * @brief Return index
          * @return Saved index
          */
-        size_t getOffset() const;
+        size_t GetOffset() const;
 
         /**
          * @brief Dereference to Proxy object
@@ -328,32 +328,32 @@ class DataBlock {
      * @brief Append a new symbol
      * @param val Value of symbol
      */
-    void push_back(uint64_t val);
+    void PushBack(uint64_t val);
 
     /**
      * @brief Append a new symbol
      * @param val Value of symbol
      */
-    void emplace_back(uint64_t val);
+    void EmplaceBack(uint64_t val);
 
     /**
      * @brief Get raw const pointer to memory block
      * @return Pointer
      */
-    const void *getData() const;
+    const void *GetData() const;
 
     /**
      * @brief Get raw pointer to memory block
      * @return Pointer
      */
-    void *getData();
+    void *GetData();
 
     /**
      * @brief Gets the size of the underlying data in bytes.
      * wordsize * numberOfElements
      * @return Data size in bytes
      */
-    size_t getRawSize() const;
+    size_t GetRawSize() const;
 
     /**
      * @brief Swap the contents of two data blocks without copying of data.
@@ -370,7 +370,7 @@ class DataBlock {
      * @param end Where the source buffer ends
      */
     template <typename IT1, typename IT2>
-    void insert(const IT1 &pos, const IT2 &start, const IT2 &end);
+    void Insert(const IT1 &pos, const IT2 &start, const IT2 &end);
 
     /**
      * @brief Create Data block

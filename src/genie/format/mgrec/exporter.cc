@@ -6,7 +6,7 @@
 
 #include "genie/format/mgrec/exporter.h"
 #include <utility>
-#include "genie/util/ordered-section.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

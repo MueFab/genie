@@ -36,7 +36,7 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
     /**
      * @brief
      */
-    void addMod();
+    void AddMod();
 
     /**
      * @brief
@@ -49,19 +49,19 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
      * @param t
      * @param id
      */
-    void flowIn(Tout&& t, const Section& id) override;
+    void FlowIn(Tout&& t, const Section& id) override;
 
     /**
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 
     /**
      * @brief
      * @param id
      */
-    void skipIn(const Section& id) override;
+    void SkipIn(const Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
