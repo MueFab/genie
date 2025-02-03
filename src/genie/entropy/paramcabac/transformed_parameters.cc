@@ -121,18 +121,18 @@ void TransformedParameters::setMergeCodingShiftSizes(std::vector<uint8_t> mergeC
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TransformedParameters::write(util::BitWriter &writer) const {
-    writer.write(uint8_t(transform_ID_subseq), 8);
+    writer.WriteBits(uint8_t(transform_ID_subseq), 8);
     if (match_coding_buffer_size) {
-        writer.write(*match_coding_buffer_size, 16);
+        writer.WriteBits(*match_coding_buffer_size, 16);
     }
     if (rle_coding_guard) {
-        writer.write(*rle_coding_guard, 8);
+        writer.WriteBits(*rle_coding_guard, 8);
     }
     if (merge_coding_subseq_count) {
-        writer.write(*merge_coding_subseq_count, 4);
+        writer.WriteBits(*merge_coding_subseq_count, 4);
     }
     for (auto &i : merge_coding_shift_size) {
-        writer.write(i, 5);
+        writer.WriteBits(i, 5);
     }
 }
 

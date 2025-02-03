@@ -57,9 +57,9 @@ void Segment::addQualities(std::string&& qv) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Segment::write(util::BitWriter& writer) const {
-    writer.writeBypass(this->sequence.data(), this->sequence.length());
+    writer.WriteAlignedBytes(this->sequence.data(), this->sequence.length());
     for (const auto& a : this->quality_values) {
-        writer.writeBypass(a.data(), a.length());
+        writer.WriteAlignedBytes(a.data(), a.length());
     }
 }
 

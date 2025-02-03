@@ -54,13 +54,13 @@ void Context::addContextInitializationValue(uint8_t _context_initialization_valu
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Context::write(util::BitWriter& writer) const {
-    writer.write(adaptive_mode_flag, 1);
-    writer.write(num_contexts, 16);
+    writer.WriteBits(adaptive_mode_flag, 1);
+    writer.WriteBits(num_contexts, 16);
     for (auto& i : context_initialization_value) {
-        writer.write(i, 7);
+        writer.WriteBits(i, 7);
     }
     if (share_subsym_ctx_flag) {
-        writer.write(*share_subsym_ctx_flag, 1);
+        writer.WriteBits(*share_subsym_ctx_flag, 1);
     }
 }
 

@@ -293,7 +293,7 @@ void SubcontactMatrixParameters::write(util::BitWriter& writer) const {
     flags |= static_cast<uint8_t>(row_mask_exists_flag);
     writer.writeBypassBE(flags);
 
-    writer.flush();
+    writer.FlushBits();
 }
 
 void SubcontactMatrixParameters::write(core::Writer& writer) const {

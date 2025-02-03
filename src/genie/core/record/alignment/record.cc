@@ -207,8 +207,8 @@ void Record::write(util::BitWriter &writer) const {
     }
     writer.writeBypassBE(qv_depth);
     writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
-    writer.writeBypass(read_name.data(), read_name.length());
-    writer.writeBypass(read_group.data(), read_group.length());
+    writer.WriteAlignedBytes(read_name.data(), read_name.length());
+    writer.WriteAlignedBytes(read_group.data(), read_group.length());
     for (const auto &r : reads) {
         r.write(writer);
     }

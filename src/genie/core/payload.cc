@@ -88,9 +88,9 @@ Payload::Payload(util::BitReader& reader, uint64_t size)
 void Payload::write(genie::util::BitWriter& writer) const {
     if (!isPayloadLoaded() && internal_reader) {
         auto tmp = _internal_loadPayload(*internal_reader);
-        writer.writeBypass(tmp.GetData(), tmp.GetRawSize());
+        writer.WriteAlignedBytes(tmp.GetData(), tmp.GetRawSize());
     } else {
-        writer.writeBypass(block_payload.GetData(), block_payload.GetRawSize());
+        writer.WriteAlignedBytes(block_payload.GetData(), block_payload.GetRawSize());
     }
 }
 

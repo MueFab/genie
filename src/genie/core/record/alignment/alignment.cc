@@ -58,7 +58,7 @@ uint8_t Alignment::getRComp() const { return this->reverse_comp; }
 
 void Alignment::write(util::BitWriter &writer) const {
     writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(ecigar_string.length()));
-    writer.writeBypass(ecigar_string.data(), ecigar_string.length());
+    writer.WriteAlignedBytes(ecigar_string.data(), ecigar_string.length());
     writer.writeBypassBE(reverse_comp);
     for (auto s : mapping_score) {
         writer.writeBypassBE(s);

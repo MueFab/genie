@@ -74,18 +74,18 @@ BinarizationParameters::BinarizationParameters(const BinarizationId &_binarizati
 void BinarizationParameters::write(BinarizationId binID, util::BitWriter &writer) const {
     switch (binID) {
         case BinarizationId::TU:
-            writer.write(cmax, 8);
+            writer.WriteBits(cmax, 8);
             break;
         case BinarizationId::TEG:
         case BinarizationId::STEG:
-            writer.write(cmax_teg, 8);
+            writer.WriteBits(cmax_teg, 8);
             break;
         case BinarizationId::DTU:
         case BinarizationId::SDTU:
-            writer.write(cmax_dtu, 8);  // Fall-through
+            writer.WriteBits(cmax_dtu, 8);  // Fall-through
         case BinarizationId::SUTU:
         case BinarizationId::SSUTU:
-            writer.write(split_unit_size, 4);
+            writer.WriteBits(split_unit_size, 4);
             break;
         default:
             break;
