@@ -40,9 +40,8 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
       format(),
       alleles(),
       phasings() {
-    if (!bitreader.IsStreamGood()) {
-        std::cerr << "return from VariantGenotype1..." << std::endl;
 
+    if (!bitreader.IsStreamGood()) {
         return;
     }
 
@@ -92,7 +91,7 @@ VariantGenotype::VariantGenotype(util::BitReader& bitreader)
             }
         }
     }
-    std::cout << std::endl;
+
     auto linked_record = bitreader.Read<bool>(8);
     if (linked_record) {
         link_record = LinkRecord(bitreader);
