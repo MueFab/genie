@@ -121,7 +121,10 @@ ContactRecord::ContactRecord(util::BitReader &reader){
     for (size_t j = 0; j < num_norm_counts; j++){
         norm_counts[j].resize(num_entries);
         for (size_t i = 0; i< num_entries; i++){
-            norm_counts[j][i] = reader.ReadAlignedInt<double_t>();
+            auto tmp_val = reader.ReadAlignedInt<uint64_t>();
+            double norm_count;
+            std::memcpy(&norm_count, &tmp_val, sizeof(norm_count));
+            norm_counts[j][i] = norm_count;
         }
     }
 
