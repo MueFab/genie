@@ -350,13 +350,13 @@ inline std::string &trim(std::string &str) { return ltrim(rtrim(str)); }
 /// Trim anything from string
 inline std::string &trim(std::string &str, const std::string filter) { return ltrim(rtrim(str, filter), filter); }
 
-/// Make a copy of the string and then trim it
+/// Make a copy of the string and then Trim it
 inline std::string trim_copy(const std::string &str) {
     std::string s = str;
     return trim(s);
 }
 
-/// Make a copy of the string and then trim it, any filter string can be used (any char in string is filtered)
+/// Make a copy of the string and then Trim it, any filter string can be used (any char in string is filtered)
 inline std::string trim_copy(const std::string &str, const std::string &filter) {
     std::string s = str;
     return trim(s, filter);
@@ -4200,7 +4200,7 @@ class App {
             bool retval = true;
             values.reserve(res.size());
             for(const auto &elem : res) {
-                values.emplace_back();
+                values.EmplaceBack();
                 retval &= detail::lexical_cast(elem, values.back());
             }
             if(retval) {

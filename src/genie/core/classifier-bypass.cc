@@ -31,7 +31,7 @@ void ClassifierBypass::add(record::Chunk&& c) { vec.emplace_back(std::move(c)); 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ClassifierBypass::flush() { flushing = true; }
+void ClassifierBypass::Flush() { flushing = true; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

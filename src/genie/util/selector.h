@@ -42,42 +42,42 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
     /**
      * @brief
      */
-    void addBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out);
+    void AddBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out);
 
     /**
      * @brief
      */
-    void setBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out, size_t index);
+    void SetBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out, size_t index);
 
     /**
      * @brief
      * @param s
      */
-    void setOperation(std::function<size_t(const Tin& t)> s);
+    void SetOperation(std::function<size_t(const Tin& t)> s);
 
     /**
      * @brief
      * @param t
      * @param id
      */
-    void flowIn(Tin&& t, const util::Section& id) override;
+    void FlowIn(Tin&& t, const Section& id) override;
 
     /**
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 
     /**
      * @brief
      * @param id
      */
-    void skipIn(const Section& id) override;
+    void SkipIn(const Section& id) override;
 
     /**
      * @brief
      */
-    void setDrain(genie::util::Drain<Tout>* d) override;
+    void SetDrain(Drain<Tout>* d) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

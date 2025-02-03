@@ -393,7 +393,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flushIn(uint64_t& pos) {
+void Decoder::FlushIn(uint64_t& pos) {
     core::record::Chunk chunk;
 
     // now reorder the remaining unmatched reads so that they are paired and then
@@ -556,7 +556,7 @@ void Decoder::flushIn(uint64_t& pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::skipIn(const util::Section& id) {
+void Decoder::SkipIn(const util::Section& id) {
     { util::OrderedSection sec(&lock, id); }
     skipOut(id);
 }

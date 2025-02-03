@@ -34,23 +34,23 @@ class Watch {
     /**
      *  @brief Reset the watch to the default state, measurements are stopped and time set to zero.
      */
-    void reset();
+    void Reset();
 
     /**
      * @brief
      * @return Elapsed time in all periods where the watch was active.
      */
-    double check() const;
+    double Check() const;
 
     /**
-     * @brief Pause the current measurement, time elapsed until resume() is called won't be counted.
+     * @brief Pause the current measurement, time elapsed until Resume() is called won't be counted.
      */
-    void pause();
+    void Pause();
 
     /**
-     * @brief Active watch again after a previous call to pause().
+     * @brief Active watch again after a previous call to Pause().
      */
-    void resume();
+    void Resume();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

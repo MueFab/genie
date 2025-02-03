@@ -25,7 +25,7 @@ Fasta::Fasta(std::string _ref_uri, ChecksumAlgorithm check)
 
 Fasta::Fasta(const nlohmann::json& json) : ExternalRef(json) {
     for (const auto& s : json["ref_type_other_checksums"]) {
-        ref_type_other_checksums.push_back(util::fromHex(s));
+        ref_type_other_checksums.push_back(util::FromHex(s));
     }
     UTILS_DIE_IF(ref_type_other_checksums.empty(), "No checksums supplied.");
 }
@@ -44,7 +44,7 @@ nlohmann::json Fasta::toJson() const {
     auto ret = ExternalRef::toJson();
     std::vector<std::string> hexed = ref_type_other_checksums;
     for (auto& s : hexed) {
-        s = util::toHex(s);
+        s = util::ToHex(s);
     }
     ret["ref_type_other_checksums"] = hexed;
     return ret;

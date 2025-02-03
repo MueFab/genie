@@ -21,16 +21,16 @@ thread_local size_t ThreadManager::threadNum;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::action(size_t id) {
+void ThreadManager::Action(size_t id) {
     ThreadManager::threadID = id;
     ThreadManager::threadNum = threads.size();
     try {
         for (const auto& s : source) {
-            while (!stopFlag && s->pump(counter, lock)) {
+            while (!stopFlag && s->Pump(counter, lock)) {
             }
         }
     } catch (genie::util::Exception& e) {
-        std::cerr << e.msg() << std::endl;
+        std::cerr << e.Msg() << std::endl;
         throw(e);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
@@ -45,34 +45,34 @@ ThreadManager::ThreadManager(size_t thread_num, size_t ctr)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::setSource(std::vector<OriginalSource*> src) { source = std::move(src); }
+void ThreadManager::SetSource(std::vector<OriginalSource*> src) { source = std::move(src); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t ThreadManager::run() {
+uint64_t ThreadManager::Run() {
     size_t ctr = 0;
     for (auto& t : threads) {
-        t = std::thread(&ThreadManager::action, this, ctr++);
+        t = std::thread(&ThreadManager::Action, this, ctr++);
     }
     for (auto& t : threads) {
         t.join();
     }
     if (!abortFlag) {
-        source.front()->flushIn(counter);
+        source.front()->FlushIn(counter);
     }
     return counter;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::stop(bool abort) {
+void ThreadManager::Stop(bool abort) {
     abortFlag = abort;
     stopFlag = true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::~ThreadManager() { stop(true); }
+ThreadManager::~ThreadManager() { Stop(true); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

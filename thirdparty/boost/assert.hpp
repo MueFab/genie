@@ -1,8 +1,8 @@
 //
 //  boost/assert.hpp - BOOST_ASSERT(expr)
-//                     BOOST_ASSERT_MSG(expr, msg)
+//                     BOOST_ASSERT_MSG(expr, Msg)
 //                     BOOST_VERIFY(expr)
-//                     BOOST_VERIFY_MSG(expr, msg)
+//                     BOOST_VERIFY_MSG(expr, Msg)
 //                     BOOST_ASSERT_IS_VOID
 //
 //  Copyright (c) 2001, 2002 Peter Dimov and Multi Media Ltd.
@@ -36,7 +36,7 @@
 #if defined(BOOST_DISABLE_ASSERTS) || ( defined(BOOST_ENABLE_ASSERT_DEBUG_HANDLER) && defined(NDEBUG) )
 
 # define BOOST_ASSERT(expr) ((void)0)
-# define BOOST_ASSERT_MSG(expr, msg) ((void)0)
+# define BOOST_ASSERT_MSG(expr, Msg) ((void)0)
 # define BOOST_ASSERT_IS_VOID
 
 #elif defined(BOOST_ENABLE_ASSERT_HANDLER) || ( defined(BOOST_ENABLE_ASSERT_DEBUG_HANDLER) && !defined(NDEBUG) )
@@ -51,7 +51,7 @@ namespace boost
 } // namespace boost
 
 #define BOOST_ASSERT(expr) (BOOST_LIKELY(!!(expr))? ((void)0): ::boost::assertion_failed(#expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
-#define BOOST_ASSERT_MSG(expr, msg) (BOOST_LIKELY(!!(expr))? ((void)0): ::boost::assertion_failed_msg(#expr, msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
+#define BOOST_ASSERT_MSG(expr, msg) (BOOST_LIKELY(!!(expr))? ((void)0): ::boost::assertion_failed_msg(#expr, Msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #else
 
@@ -75,7 +75,7 @@ namespace boost
 #if defined(BOOST_DISABLE_ASSERTS) || ( !defined(BOOST_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) )
 
 # define BOOST_VERIFY(expr) ((void)(expr))
-# define BOOST_VERIFY_MSG(expr, msg) ((void)(expr))
+# define BOOST_VERIFY_MSG(expr, Msg) ((void)(expr))
 
 #else
 

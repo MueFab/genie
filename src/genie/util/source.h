@@ -31,25 +31,25 @@ class Source {
      * @param t Current chunk of data.
      * @param id Block identifier (for multithreading).
      */
-    void flowOut(TYPE&& t, const Section& id);
+    void FlowOut(TYPE&& t, const Section& id);
 
     /**
      * @brief Propagates end-of-data signal to drain set before.
      */
-    void flushOut(uint64_t& pos);
+    void FlushOut(uint64_t& pos);
 
     /**
      * @brief Propagates SkipAlignedBytes signal to drain set before.
      * @param id Section to SkipAlignedBytes.
      */
-    void skipOut(const Section& id);
+    void SkipOut(const Section& id);
 
  public:
     /**
      * @brief Current data output will be propagated to a new destination.
      * @param d New destination for output data.
      */
-    virtual void setDrain(Drain<TYPE>* d);
+    virtual void SetDrain(Drain<TYPE>* d);
 
     /**
      * @brief For inheritance.

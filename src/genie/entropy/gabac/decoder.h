@@ -44,7 +44,7 @@ class Decoder : public core::EntropyDecoder {
      * @param mmCoderEnabled
      * @return
      */
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Process(
         const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d,
         bool mmCoderEnabled) override;
 };

@@ -8,8 +8,8 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/ordered_section.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ void Importer::printStats() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::flushIn(uint64_t& pos) {
+void Importer::FlushIn(uint64_t& pos) {
     FormatImporter::flushIn(pos);
     printStats();
 }

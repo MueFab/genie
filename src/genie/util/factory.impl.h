@@ -22,7 +22,7 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-void Factory<T>::registerType(
+void Factory<T>::RegisterType(
     uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
     factories.insert(std::make_pair(id, factory));
 }
@@ -30,7 +30,7 @@ void Factory<T>::registerType(
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-uint8_t Factory<T>::registerType(
+uint8_t Factory<T>::RegisterType(
     const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
     uint8_t id = 0;
     auto it = factories.find(id);
@@ -45,14 +45,14 @@ uint8_t Factory<T>::registerType(
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-void Factory<T>::unregisterType(uint8_t id) {
+void Factory<T>::UnregisterType(uint8_t id) {
     factories.erase(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-std::unique_ptr<T> Factory<T>::create(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) {
+std::unique_ptr<T> Factory<T>::Create(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) {
     auto it = factories.find(id);
     UTILS_DIE_IF(it == factories.end(), "Unknown implementation in factory");
     return it->second(desc, reader);

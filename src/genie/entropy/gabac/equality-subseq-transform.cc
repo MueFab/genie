@@ -34,20 +34,20 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
 
     util::BlockStepper r = values->getReader();
     // Treat value as equalityFlags and vice versa
-    while (r.isValid()) {
-        uint64_t symbol = r.get();
+    while (r.IsValid()) {
+        uint64_t symbol = r.Get();
         if (symbol == previousSymbol) {
-            r.set(1);
+            r.Set(1);
         } else {
-            r.set(0);
+            r.Set(0);
             if (symbol > previousSymbol) {
-                equalityFlags->push_back(symbol - 1);
+                equalityFlags->PushBack(symbol - 1);
             } else {
-                equalityFlags->push_back(symbol);
+                equalityFlags->PushBack(symbol);
             }
             previousSymbol = symbol;
         }
-        r.inc();
+        r.Inc();
     }
 
     // Swap back before returning
@@ -63,21 +63,21 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
     util::BlockStepper r = values->getReader();
     util::BlockStepper w = values->getReader();
     // Treat value as equalityFlags and vice versa
-    while (r.isValid()) {
-        uint64_t symbol = r.get();
+    while (r.IsValid()) {
+        uint64_t symbol = r.Get();
         if (symbol == previousSymbol) {
-            equalityFlags->push_back(1);
+            equalityFlags->PushBack(1);
         } else {
-            equalityFlags->push_back(0);
+            equalityFlags->PushBack(0);
             if (symbol > previousSymbol) {
-                w.set(symbol - 1);
+                w.Set(symbol - 1);
             } else {
-                w.set(symbol);
+                w.Set(symbol);
             }
-            w.inc();
+            w.Inc();
             previousSymbol = symbol;
         }
-        r.inc();
+        r.Inc();
     }
 
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
@@ -87,17 +87,17 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
 
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     // Prepare internal and the output data structures
-    uint8_t wordsize = transformedSubseqs->front().getWordSize();
+    uint8_t wordsize = transformedSubseqs->front().GetWordSize();
     transformedSubseqs->resize(2);
     (*transformedSubseqs)[0].swap(
         &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
 
-    flags->setWordSize(1);
-    rawValues->setWordSize(wordsize);
+    flags->SetWordSize(1);
+    rawValues->SetWordSize(wordsize);
 
-    if (rawValues->getWordSize() == 1) {
+    if (rawValues->GetWordSize() == 1) {
         transformEqualityCoding0(rawValues, flags);  // FIXME this might not be needed TBC
     } else {
         transformEqualityCoding1(rawValues, flags);
@@ -116,17 +116,17 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     // Prepare internal and the output data structures
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
 
     util::BlockStepper rflag = flags->getReader();
     util::BlockStepper rval = rawValues->getReader();
 
     // Re-compute the symbols from the equality flags and values
     uint64_t previousSymbol = 0;
-    while (rflag.isValid()) {
-        if (rflag.get() == 0) {
-            uint64_t val = rval.get();
-            rval.inc();
+    while (rflag.IsValid()) {
+        if (rflag.Get() == 0) {
+            uint64_t val = rval.Get();
+            rval.Inc();
             if (val >= previousSymbol) {
                 previousSymbol = val + 1;
             } else {
@@ -134,8 +134,8 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
             }
         }
 
-        symbols.push_back(previousSymbol);
-        rflag.inc();
+        symbols.PushBack(previousSymbol);
+        rflag.Inc();
     }
 
     (*transformedSubseqs).resize(1);

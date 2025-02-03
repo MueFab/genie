@@ -22,7 +22,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(transformedSubseqs != nullptr);
     const auto guard = (uint8_t)subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
-    auto wordsize = transformedSubseqs->front().getWordSize();
+    auto wordsize = transformedSubseqs->front().GetWordSize();
 
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
@@ -32,25 +32,25 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
 
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    lengths->setWordSize(1);
-    rawValues->setWordSize(wordsize);
+    lengths->SetWordSize(1);
+    rawValues->SetWordSize(wordsize);
 
     util::BlockStepper r = symbols.getReader();
     uint64_t lastSym = 0;
     uint64_t runValue = 0;
-    while (r.isValid()) {
-        uint64_t curSym = r.get();
-        r.inc();
+    while (r.IsValid()) {
+        uint64_t curSym = r.Get();
+        r.Inc();
         if (lastSym != curSym && runValue > 0) {
-            rawValues->push_back(lastSym);
+            rawValues->PushBack(lastSym);
 
             while (runValue > guard) {
-                lengths->push_back(guard);
+                lengths->PushBack(guard);
                 runValue -= guard;
             }
 
             if (runValue > 0) {
-                lengths->push_back(runValue - 1);
+                lengths->PushBack(runValue - 1);
             }
 
             runValue = 0;
@@ -61,15 +61,15 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     }
 
     if (runValue > 0) {
-        rawValues->push_back(lastSym);
+        rawValues->PushBack(lastSym);
 
         while (runValue >= guard) {
-            lengths->push_back(guard);
+            lengths->PushBack(guard);
             runValue -= guard;
         }
 
         if (runValue > 0) {
-            lengths->push_back(runValue - 1);  // non-guard run-value is coded as lengthValue-1
+            lengths->PushBack(runValue - 1);  // non-guard run-value is coded as lengthValue-1
         }
 
         runValue = 0;
@@ -94,20 +94,20 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     // Prepare internal and the output data structures
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
 
     util::BlockStepper rVal = rawValues->getReader();
     util::BlockStepper rLen = lengths->getReader();
 
     // Re-compute the symbols from the lengths and raw values
-    while (rVal.isValid()) {
+    while (rVal.IsValid()) {
         uint64_t totalLengthValue = 0;
-        uint64_t rawValue = rVal.get();
-        rVal.inc();
+        uint64_t rawValue = rVal.Get();
+        rVal.Inc();
 
-        while (rLen.isValid()) {
-            uint64_t runValue = rLen.get();
-            rLen.inc();
+        while (rLen.IsValid()) {
+            uint64_t runValue = rLen.Get();
+            rLen.Inc();
 
             if (runValue == guard) {
                 totalLengthValue += runValue;
@@ -119,7 +119,7 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
 
         while (totalLengthValue > 0) {
             totalLengthValue--;
-            symbols.push_back(rawValue);
+            symbols.PushBack(rawValue);
         }
     }
 

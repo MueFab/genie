@@ -64,7 +64,7 @@ EncodingSet::EncodingSet(util::BitReader &bitReader) {
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.Read<uint8_t>(4);
         if (mode == 1) {
-            qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
+            qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().Construct<QualityValues>(
                 mode, genie::core::GenDesc::QV, bitReader));
         } else {
             bitReader.Read<uint8_t>(1);

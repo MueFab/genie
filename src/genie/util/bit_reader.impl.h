@@ -48,7 +48,7 @@ T BitReader::ReadAlignedInt() {
 
     // Swap Endianness if necessary
     if (NumBytes > 1) {
-        swap_endianness<T, NumBytes>(ret);
+        SwapEndianness<T, NumBytes>(ret);
     }
 
     // Extend sign bit if necessary

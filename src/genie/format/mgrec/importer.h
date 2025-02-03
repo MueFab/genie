@@ -70,7 +70,7 @@ class Importer : public core::FormatImporter {
      * @brief
      * @param pos
      */
-    void flushIn(uint64_t& pos) override;
+    void FlushIn(uint64_t& pos) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ class Factory : public GenericFactory {
      * @param id
      * @param factory
      */
-    void registerType(uint8_t id,
+    void RegisterType(uint8_t id,
                       const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
@@ -43,13 +43,13 @@ class Factory : public GenericFactory {
      * @param factory
      * @return
      */
-    uint8_t registerType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
+    uint8_t RegisterType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
      * @brief
      * @param id
      */
-    void unregisterType(uint8_t id);
+    void UnregisterType(uint8_t id);
 
     /**
      * @brief
@@ -58,7 +58,7 @@ class Factory : public GenericFactory {
      * @param reader
      * @return
      */
-    std::unique_ptr<T> create(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader);
+    std::unique_ptr<T> Create(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

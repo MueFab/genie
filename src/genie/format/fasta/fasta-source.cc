@@ -7,7 +7,7 @@
 #include "genie/format/fasta/fasta-source.h"
 #include <algorithm>
 #include <iostream>
-#include "genie/util/ordered-section.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

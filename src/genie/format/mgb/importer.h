@@ -18,7 +18,7 @@
 #include "genie/core/stats/perf-stats.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/util/bit_reader.h"
-#include "genie/util/ordered-section.h"
+#include "genie/util/ordered_section.h"
 #include "genie/util/original_source.h"
 #include "genie/util/source.h"
 
@@ -62,7 +62,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
      * @param lock
      * @return
      */
-    bool pump(uint64_t& id, std::mutex& lock) override;
+    bool Pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      * @brief

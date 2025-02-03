@@ -18,13 +18,13 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 inline static unsigned char readIn(util::BlockStepper *reader) {
-    if (!reader->isValid()) {
+    if (!reader->IsValid()) {
         UTILS_DIE("Index out of bounds");
     }
     // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple
     // bytes. Fix that.
-    auto byte = static_cast<unsigned char>(reader->get());
-    reader->inc();
+    auto byte = static_cast<unsigned char>(reader->Get());
+    reader->Inc();
     return byte;
 }
 
@@ -47,7 +47,7 @@ unsigned int BitInputStream::getNumBitsUntilByteAligned() const { return m_numHe
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t BitInputStream::getNumBytesRead() const {
-    return m_reader.curr - static_cast<uint8_t *>(m_bitstream->getData());
+    return m_reader.curr - static_cast<uint8_t *>(m_bitstream->GetData());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

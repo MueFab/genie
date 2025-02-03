@@ -99,16 +99,16 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
     else
         setupLutsOrder1(numSubsymbols, numAlphaSubsym);
 
-    while (r.isValid()) {
+    while (r.IsValid()) {
         // Split symbol into subsymbols and then build subsymbols
-        uint64_t symbolValue = r.get();
+        uint64_t symbolValue = r.Get();
         uint64_t subsymValue = 0;
         uint32_t oss = outputSymbolSize;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
-        if (d.isValid()) {
-            depSymbolValue = d.get();
-            d.inc();
+        if (d.IsValid()) {
+            depSymbolValue = d.Get();
+            d.Inc();
         }
 
         uint64_t symValue = abs((int64_t)symbolValue);
@@ -141,7 +141,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
             }
         }
 
-        r.inc();
+        r.Inc();
     }
 
     return;

@@ -8,12 +8,12 @@ set(source_files
         date.cc
         exception.cc
         ordered_lock.cc
-        ordered-section.cc
+        ordered_section.cc
         runtime_exception.cc
         string_helpers.cc
         stringview.cc
         thread_manager.cc
-        watch.cc
+        stop_watch.cc
         )
 
 add_library(genie-util ${source_files})

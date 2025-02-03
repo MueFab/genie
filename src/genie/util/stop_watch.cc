@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,11 +13,11 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Watch::Watch() : paused(false) { reset(); }
+Watch::Watch() : paused(false) { Reset(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Watch::reset() {
+void Watch::Reset() {
     start = std::chrono::steady_clock::now();
     offset = 0;
     paused = false;
@@ -25,7 +25,7 @@ void Watch::reset() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-double Watch::check() const {
+double Watch::Check() const {
     if (paused) {
         return offset;
     } else {
@@ -37,7 +37,7 @@ double Watch::check() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Watch::pause() {
+void Watch::Pause() {
     if (paused) {
         return;
     }
@@ -48,7 +48,7 @@ void Watch::pause() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Watch::resume() {
+void Watch::Resume() {
     if (!paused) {
         return;
     }

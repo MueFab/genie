@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 #include "genie/read/basecoder/decoder.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

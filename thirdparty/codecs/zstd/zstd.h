@@ -2453,7 +2453,7 @@ size_t ZSTD_compressBegin_usingCDict_advanced(ZSTD_CCtx* const cctx, const ZSTD_
   In a round buffer methodology, ZSTD_decompressContinue() decompresses each block next to previous one,
   up to the moment there is not enough room left in the buffer to guarantee decoding another full block,
   which maximum size is provided in `ZSTD_frameHeader` structure, field `blockSizeMax`.
-  At which point, decoding can resume from the beginning of the buffer.
+  At which point, decoding can Resume from the beginning of the buffer.
   Note that already decoded data stored in the buffer should be flushed before being overwritten.
 
   There are alternatives possible, for example using two or more buffers of size `windowSize` each, though they consume more memory.

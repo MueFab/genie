@@ -19,11 +19,11 @@ namespace module {
 
 void detect() {
     auto& indPark = core::GlobalCfg::getSingleton().getIndustrialPark();
-    indPark.registerConstructor<core::parameter::desc_pres::DecoderRegular>(
+    indPark.RegisterConstructor<core::parameter::desc_pres::DecoderRegular>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
-    indPark.registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
+    indPark.RegisterConstructor<core::parameter::desc_pres::DecoderTokentype>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
-//    indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
+//    indPark.RegisterConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
 //                                                                &quality::paramqv1::QualityValues1::create);
 }
 

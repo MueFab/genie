@@ -43,12 +43,12 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
                 std::ofstream out_file_stream("rawstream_" + std::to_string(this_id) + "_" +
                                               std::to_string(static_cast<uint8_t>(d.id)) + "_" +
                                               std::to_string(static_cast<uint8_t>(s.getID().second)));
-                out_file_stream.write(static_cast<char*>(s.getData().getData()), s.getData().getRawSize());
+                out_file_stream.write(static_cast<char*>(s.getData().GetData()), s.getData().GetRawSize());
             }
         }
     }
     for (auto& d : au) {
-        auto encoded = _entropycoder->process(d);
+        auto encoded = _entropycoder->Process(d);
         au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
         au.set(d.getID(), std::move(std::get<1>(encoded)));
         au.getStats().add(std::get<2>(encoded));

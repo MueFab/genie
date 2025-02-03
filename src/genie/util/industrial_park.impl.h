@@ -21,7 +21,7 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-Factory<T>* IndustrialPark::findAndCreate() {
+Factory<T>* IndustrialPark::FindAndCreate() {
     auto type = std::type_index(typeid(T));
     auto it = factories.find(type);
     if (it == factories.end()) {
@@ -34,7 +34,7 @@ Factory<T>* IndustrialPark::findAndCreate() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-Factory<T>* IndustrialPark::findAndFail() const {
+Factory<T>* IndustrialPark::FindAndFail() const {
     auto type = std::type_index(typeid(T));
     auto it = factories.find(type);
     UTILS_DIE_IF(it == factories.end(), "Unknown factory type");
@@ -44,31 +44,31 @@ Factory<T>* IndustrialPark::findAndFail() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-void IndustrialPark::registerConstructor(
+void IndustrialPark::RegisterConstructor(
     uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
-    findAndCreate<T>()->registerType(id, constructor);
+    FindAndCreate<T>()->RegisterType(id, constructor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-uint8_t IndustrialPark::registerConstructor(
+uint8_t IndustrialPark::RegisterConstructor(
     const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
-    return findAndCreate<T>()->registerType(constructor);
+    return FindAndCreate<T>()->RegisterType(constructor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-void IndustrialPark::unregisterConstructor(uint8_t id) {
-    findAndFail<T>()->unregisterType(id);
+void IndustrialPark::UnregisterConstructor(uint8_t id) {
+    FindAndFail<T>()->UnregisterType(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-std::unique_ptr<T> IndustrialPark::construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const {
-    return findAndFail<T>()->create(id, desc, reader);
+std::unique_ptr<T> IndustrialPark::Construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const {
+    return FindAndFail<T>()->Create(id, desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

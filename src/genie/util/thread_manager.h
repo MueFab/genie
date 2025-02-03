@@ -35,7 +35,7 @@ class ThreadManager {
     /**
      * @brief Threading code.
      */
-    void action(size_t id);
+    void Action(size_t id);
 
  public:
     static thread_local size_t threadID;   //!< @brief Each thread will see its own ID here
@@ -52,20 +52,20 @@ class ThreadManager {
      * @brief Set the entry points to the pipeline.
      * @param src Vector of entry points.
      */
-    void setSource(std::vector<OriginalSource*> src);
+    void SetSource(std::vector<OriginalSource*> src);
 
     /**
      * @brief Executes the complete genie pipeline until no input data left
      * @return The total number of blocks processed until the end
      */
-    uint64_t run();
+    uint64_t Run();
 
     /**
      * @brief The genie pipeline will stop after the blocks currently in the pipeline are processed.
      * @param abort If true, genie will not try to finish the output data to be valid, but will exit as fast as
      * possible.
      */
-    void stop(bool abort);
+    void Stop(bool abort);
 
     /**
      * @brief Stop pipeline if running and clean up

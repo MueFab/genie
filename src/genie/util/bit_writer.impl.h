@@ -33,7 +33,7 @@ void BitWriter::writeBypassBE(T val) {
 
     // Swap Endianness if necessary
     if (SIZE > 1) {
-        swap_endianness<T, SIZE>(val);
+        SwapEndianness<T, SIZE>(val);
     }
 
     stream->write(reinterpret_cast<char*>(&val), SIZE);

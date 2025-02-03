@@ -74,15 +74,15 @@ AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, (uint8_t)d.getWordSize()) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, (uint8_t)d.GetWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::push(uint64_t val) { data.push_back(val); }
+void AccessUnit::Subsequence::push(uint64_t val) { data.PushBack(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::pushDependency(uint64_t val) { dependency.push_back(val); }
+void AccessUnit::Subsequence::pushDependency(uint64_t val) { dependency.PushBack(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ void AccessUnit::Subsequence::inc() { position++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data.get(position + lookahead); }
+uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data.Get(position + lookahead); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ uint64_t AccessUnit::Subsequence::pull() {
     if (end()) {
         UTILS_DIE("Tried to read descriptor that has already ended");
     }
-    return data.get(position++);
+    return data.Get(position++);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -229,12 +229,12 @@ bool AccessUnit::Subsequence::isEmpty() const { return !getNumSymbols(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::Subsequence::getRawSize() const { return data.getRawSize(); }
+size_t AccessUnit::Subsequence::getRawSize() const { return data.GetRawSize(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
-    writer.writeBypass(data.getData(), data.getRawSize());
+    writer.writeBypass(data.GetData(), data.GetRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -243,7 +243,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.ReadAlignedBytes(reinterpret_cast<char *>(data.getData()), size);
+    reader.ReadAlignedBytes(reinterpret_cast<char *>(data.GetData()), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), num
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data.getWordSize()) {}
+    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data.GetWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

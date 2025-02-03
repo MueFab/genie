@@ -22,19 +22,19 @@ inline uint8_t DataBlock::getLgWordSize() const { return lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint8_t DataBlock::getWordSize() const { return static_cast<uint8_t>(1 << lgWordSize); }
+inline uint8_t DataBlock::GetWordSize() const { return static_cast<uint8_t>(1 << lgWordSize); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t DataBlock::mulByWordSize(uint64_t val) const { return val << lgWordSize; }
+inline uint64_t DataBlock::MulByWordSize(uint64_t val) const { return val << lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t DataBlock::divByWordSize(uint64_t val) const { return val >> lgWordSize; }
+inline uint64_t DataBlock::DivByWordSize(uint64_t val) const { return val >> lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t DataBlock::modByWordSize(uint64_t val) const {
+inline uint64_t DataBlock::ModByWordSize(uint64_t val) const {
     return val & ((1 << static_cast<uint64_t> (lgWordSize)) - 1);
 }
 
@@ -47,11 +47,11 @@ inline size_t DataBlock::IteratorCore<T>::operator-(const IteratorCore &offset) 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline size_t DataBlock::getRawSize() const { return getWordSize() * size(); }
+inline size_t DataBlock::GetRawSize() const { return GetWordSize() * size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline uint64_t DataBlock::get(size_t index) const {
+inline uint64_t DataBlock::Get(size_t index) const {
     switch (lgWordSize) {
         case 0:
             return *(data.data() + index);
@@ -68,7 +68,7 @@ inline uint64_t DataBlock::get(size_t index) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void DataBlock::set(size_t index, uint64_t val) {
+inline void DataBlock::Set(size_t index, uint64_t val) {
     switch (lgWordSize) {
         case 0:
             *(data.data() + index) = static_cast<uint8_t>(val);
@@ -97,16 +97,16 @@ inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::ConstIterator DataBlock::end() const { return {this, size_t(divByWordSize(data.size()))}; }
+inline DataBlock::ConstIterator DataBlock::end() const { return {this, size_t(DivByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::Iterator DataBlock::end() { return {this, size_t(divByWordSize(data.size()))}; }
+inline DataBlock::Iterator DataBlock::end() { return {this, size_t(DivByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void DataBlock::push_back(uint64_t val) {
-    data.resize(data.size() + getWordSize());
+inline void DataBlock::PushBack(uint64_t val) {
+    data.resize(data.size() + GetWordSize());
     switch (lgWordSize) {
         case 0:
             *(data.end() - 1) = static_cast<uint8_t>(val);
@@ -127,19 +127,19 @@ inline void DataBlock::push_back(uint64_t val) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void DataBlock::emplace_back(uint64_t val) { push_back(val); }
+inline void DataBlock::EmplaceBack(uint64_t val) { PushBack(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline const void *DataBlock::getData() const { return data.data(); }
+inline const void *DataBlock::GetData() const { return data.data(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void *DataBlock::getData() { return data.data(); }
+inline void *DataBlock::GetData() { return data.data(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline void DataBlock::setWordSize(uint8_t size) {
+inline void DataBlock::SetWordSize(uint8_t size) {
     switch (size) {
         case 1:
             lgWordSize = 0;
@@ -156,7 +156,7 @@ inline void DataBlock::setWordSize(uint8_t size) {
         default:
             UTILS_DIE("Bad DataBlock word size");
     }
-    if (modByWordSize(data.size())) {
+    if (ModByWordSize(data.size())) {
         UTILS_DIE("Bad DataBlock word size");
     }
 }
@@ -170,14 +170,14 @@ inline DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos) : stream(str), posi
 
 template <typename T>
 inline DataBlock::ProxyCore<T>::operator uint64_t() const {
-    return stream->get(position);
+    return stream->Get(position);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
 inline DataBlock::ProxyCore<T> &DataBlock::ProxyCore<T>::operator=(uint64_t val) {
-    stream->set(position, val);
+    stream->Set(position, val);
     return *this;
 }
 
@@ -237,7 +237,7 @@ inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(i
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-inline size_t DataBlock::IteratorCore<T>::getOffset() const {
+inline size_t DataBlock::IteratorCore<T>::GetOffset() const {
     return position;
 }
 
@@ -265,19 +265,19 @@ inline bool DataBlock::IteratorCore<T>::operator!=(const IteratorCore &c) const 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename IT1, typename IT2>
-void DataBlock::insert(const IT1 &pos, const IT2 &start, const IT2 &end) {
+void DataBlock::Insert(const IT1 &pos, const IT2 &start, const IT2 &end) {
     if (pos.getStream() != this || start.getStream() != end.getStream()) {
         return;
     }
-    data.insert(data.begin() + pos.getOffset(), start.getStream()->data.begin() + start.getOffset(),
-                end.getStream()->data.begin() + end.getOffset());
+    data.insert(data.begin() + pos.GetOffset(), start.getStream()->data.begin() + start.GetOffset(),
+                end.getStream()->data.begin() + end.GetOffset());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
 DataBlock::DataBlock(std::vector<T> *vec) {
-    setWordSize(sizeof(T));
+    SetWordSize(sizeof(T));
     size_t size = vec->size() * sizeof(T);
     this->data.resize(size);
     this->data.shrink_to_fit();

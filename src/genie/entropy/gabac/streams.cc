@@ -45,36 +45,36 @@ DataBlockBuffer::DataBlockBuffer(util::DataBlock *d, size_t pos_i) : block(0, 1)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t DataBlockBuffer::size() const { return block.getRawSize(); }
+size_t DataBlockBuffer::size() const { return block.GetRawSize(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 int DataBlockBuffer::overflow(int c) {
-    block.push_back(static_cast<uint64_t>(c));
+    block.PushBack(static_cast<uint64_t>(c));
     return c;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::streamsize DataBlockBuffer::xsputn(const char *s, std::streamsize n) {
-    if (block.modByWordSize(n)) {
+    if (block.ModByWordSize(n)) {
         UTILS_DIE("Invalid Data length");
     }
     size_t oldSize = block.size();
-    block.resize(block.size() + block.divByWordSize(n));
-    memcpy(static_cast<uint8_t *>(block.getData()) + block.mulByWordSize(oldSize), s, static_cast<size_t>(n));
+    block.resize(block.size() + block.DivByWordSize(n));
+    memcpy(static_cast<uint8_t *>(block.GetData()) + block.MulByWordSize(oldSize), s, static_cast<size_t>(n));
     return n;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::streamsize DataBlockBuffer::xsgetn(char *s, std::streamsize n) {
-    if (block.modByWordSize(n)) {
+    if (block.ModByWordSize(n)) {
         UTILS_DIE("Invalid Data length");
     }
-    size_t bytesRead = std::min<size_t>(block.getRawSize() - block.mulByWordSize(pos), size_t(n));
-    memcpy(s, static_cast<uint8_t *>(block.getData()) + block.mulByWordSize(pos), bytesRead);
-    pos += block.divByWordSize(bytesRead);
+    size_t bytesRead = std::min<size_t>(block.GetRawSize() - block.MulByWordSize(pos), size_t(n));
+    memcpy(s, static_cast<uint8_t *>(block.GetData()) + block.MulByWordSize(pos), bytesRead);
+    pos += block.DivByWordSize(bytesRead);
     return bytesRead;
 }
 
@@ -84,7 +84,7 @@ int DataBlockBuffer::underflow() {
     if (pos == block.size()) {
         return EOF;
     }
-    return static_cast<int>(block.get(pos));
+    return static_cast<int>(block.Get(pos));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ int DataBlockBuffer::uflow() {
     if (pos == block.size()) {
         return EOF;
     }
-    return static_cast<int>(block.get(pos++));
+    return static_cast<int>(block.Get(pos++));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

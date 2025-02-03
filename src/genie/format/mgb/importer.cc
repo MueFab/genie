@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 #include "genie/format/mgb/access_unit.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::R
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pump(uint64_t& id, std::mutex&) {
+bool Importer::Pump(uint64_t& id, std::mutex&) {
     util::Watch watch;
     boost::optional<mgb::AccessUnit> unit;
     util::Section sec{};

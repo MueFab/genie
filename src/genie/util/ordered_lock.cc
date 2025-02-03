@@ -13,7 +13,7 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OrderedLock::wait(size_t id) {
+void OrderedLock::Wait(size_t id) {
     std::unique_lock<std::mutex> lock(m);
     if (id == counter) {
         return;
@@ -23,7 +23,7 @@ void OrderedLock::wait(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OrderedLock::finished(size_t length) {
+void OrderedLock::Finished(size_t length) {
     {
         std::unique_lock<std::mutex> lock(m);
         counter += length;
@@ -37,7 +37,7 @@ OrderedLock::OrderedLock() : counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OrderedLock::reset() { counter = 0; }
+void OrderedLock::Reset() { counter = 0; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

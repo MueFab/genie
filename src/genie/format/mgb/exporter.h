@@ -17,8 +17,8 @@
 #include "genie/core/stats/perf-stats.h"
 #include "genie/format/mgb/access_unit.h"
 #include "genie/util/drain.h"
-#include "genie/util/ordered-section.h"
 #include "genie/util/ordered_lock.h"
+#include "genie/util/ordered_section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ class Exporter : public core::FormatExporterCompressed {
      * @brief
      * @param id
      */
-    void skipIn(const genie::util::Section& id) override;
+    void SkipIn(const Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

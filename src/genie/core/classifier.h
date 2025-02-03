@@ -38,7 +38,7 @@ class Classifier {
     /**
      * @brief
      */
-    virtual void flush() = 0;
+    virtual void Flush() = 0;
 
     /**
      * @brief

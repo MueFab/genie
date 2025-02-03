@@ -24,7 +24,7 @@ SelectorTail<Tout>::SelectorTail() : modNum(0), position(0) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tout>
-void SelectorTail<Tout>::addMod() {
+void SelectorTail<Tout>::AddMod() {
     modNum++;
 }
 
@@ -38,28 +38,28 @@ void SelectorTail<Tout>::setNum(size_t num) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tout>
-void SelectorTail<Tout>::flowIn(Tout&& t, const Section& id) {
-    genie::util::Source<Tout>::flowOut(std::move(t), id);
+void SelectorTail<Tout>::FlowIn(Tout&& t, const Section& id) {
+    genie::util::Source<Tout>::FlowOut(std::move(t), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tout>
-void SelectorTail<Tout>::flushIn(uint64_t& pos) {
+void SelectorTail<Tout>::FlushIn(uint64_t& pos) {
     size_t num = ++dryCtr;
     if (num == modNum) {
         // Output signal once every module contained finished
         dryCtr = 0;
-        genie::util::Source<Tout>::flushOut(pos);
+        genie::util::Source<Tout>::FlushOut(pos);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tout>
-void SelectorTail<Tout>::skipIn(const Section& id) {
+void SelectorTail<Tout>::SkipIn(const Section& id) {
     if (id.strongSkip) {
-        genie::util::Source<Tout>::skipOut(id);
+        genie::util::Source<Tout>::SkipOut(id);
     }
 }
 

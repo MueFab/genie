@@ -36,17 +36,17 @@ class OrderedLock {
      * @brief Waits until the current thread / data block is allowed to execute
      * @param id Block / thread identifier of this thread
      */
-    void wait(size_t id);
+    void Wait(size_t id);
 
     /**
      * @brief Marks current block / thread as finished and triggers waiting threads to continue if allowed to.
      */
-    void finished(size_t length);
+    void Finished(size_t length);
 
     /**
      * @brief Reset the internal counter
      */
-    void reset();
+    void Reset();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

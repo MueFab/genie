@@ -42,7 +42,7 @@ class Exception : public std::exception {
      * @brief
      * @return The internal message.
      */
-    virtual std::string msg() const;
+    virtual std::string Msg() const;
 
     /**
      * @brief

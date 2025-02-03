@@ -84,7 +84,7 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
                 uint8_t wordsize = i == numTrnsfSubseqsCfgs - 1 ? ioConf.outputWordsize : 1;
-                transformedSubseqs[i].setWordSize(wordsize);
+                transformedSubseqs[i].SetWordSize(wordsize);
             }
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
                 util::DataBlock decodedTransformedSubseq;

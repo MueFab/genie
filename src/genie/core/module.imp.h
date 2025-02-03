@@ -15,15 +15,15 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin, typename Tout>
-void Module<Tin, Tout>::skipIn(const util::Section& id) {
-    util::Source<Tout>::skipOut(id);
+void Module<Tin, Tout>::SkipIn(const util::Section& id) {
+    util::Source<Tout>::SkipOut(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin, typename Tout>
-void Module<Tin, Tout>::flushIn(uint64_t& pos) {
-    util::Source<Tout>::flushOut(pos);
+void Module<Tin, Tout>::FlushIn(uint64_t& pos) {
+    util::Source<Tout>::FlushOut(pos);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

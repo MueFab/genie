@@ -7,8 +7,8 @@
 #include "genie/format/fastq/importer.h"
 #include <utility>
 #include "genie/core/record/alignment/class-type.h"
-#include "genie/util/ordered-section.h"
-#include "genie/util/watch.h"
+#include "genie/util/ordered_section.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

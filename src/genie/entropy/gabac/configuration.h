@@ -22,7 +22,7 @@
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/util/data_block.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

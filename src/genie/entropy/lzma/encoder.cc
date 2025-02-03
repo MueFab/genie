@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 #include "genie/util/make_unique.h"
-#include "genie/util/watch.h"
+#include "genie/util/stop_watch.h"
 
 //#include "codecs/api/mpegg_utils.h"
 #include "codecs/include/mpegg-codecs.h"

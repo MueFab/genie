@@ -28,7 +28,7 @@ template <typename Coder, typename Ret, typename... Args>
 class SideSelector {
  private:
     std::vector<Coder*> mods;               //!< @brief List of possible modules to select.
-    std::function<size_t(Args...)> select;  //!< @brief select function. It returns the index of the selected module.
+    std::function<size_t(Args...)> select_;  //!< @brief select function. It returns the index of the selected module.
 
     /**
      * @brief A default selection function.
@@ -47,28 +47,28 @@ class SideSelector {
      * @brief Set the module at a specified index.
      * @param mod The new module.
      * @param index Index where to insert the module.
-     * @attention The index has to be added by addMod() before.
+     * @attention The index has to be added by AddMod() before.
      */
-    void setMod(Coder* mod, size_t index);
+    void SetMod(Coder* mod, size_t index);
 
     /**
      * @brief Add a new module to the end of the module list.
      * @param mod The new module.
      */
-    void addMod(Coder* mod);
+    void AddMod(Coder* mod);
 
     /**
      * @brief Set the selection function which will determine to which module data is passed.
      * @param _select A selection function returning an index.
      */
-    void setSelection(std::function<size_t(Args...)> _select);
+    void SetSelection(std::function<size_t(Args...)> _select);
 
     /**
      * @brief
      * @param param
      * @return
      */
-    Ret process(Args... param);
+    Ret Process(Args... param);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

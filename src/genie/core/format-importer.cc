@@ -18,7 +18,7 @@ void FormatImporter::setClassifier(Classifier* _classifier) { classifier = _clas
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
+bool FormatImporter::Pump(uint64_t& id, std::mutex& lock) {
     record::Chunk chunk;
     util::Section sec{};
     {
@@ -37,7 +37,7 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         } else {
             bool dataLeft = pumpRetrieve(classifier);
             if (!dataLeft && !flushing) {
-                classifier->flush();
+                classifier->Flush();
                 flushing = true;
                 return true;
             }
@@ -48,14 +48,14 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         }
     }
     if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
-        Source<record::Chunk>::flowOut(std::move(chunk), sec);
+        Source<record::Chunk>::FlowOut(std::move(chunk), sec);
     }
     return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatImporter::flushIn(uint64_t& pos) { flushOut(pos); }
+void FormatImporter::FlushIn(uint64_t& pos) { FlushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

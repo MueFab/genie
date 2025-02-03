@@ -28,12 +28,12 @@ class OriginalSource {
      * @param lock
      * @return
      */
-    virtual bool pump(uint64_t& id, std::mutex& lock) = 0;
+    virtual bool Pump(uint64_t& id, std::mutex& lock) = 0;
 
     /**
      * @brief Signal end of data.
      */
-    virtual void flushIn(uint64_t& pos) = 0;
+    virtual void FlushIn(uint64_t& pos) = 0;
 
     /**
      * @brief For inheritance
