@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include "genie/core/record/variant_genotype/record.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ TEST(VariantGenotypeRecord, Genotype_gt_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -94,7 +94,7 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_only) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -126,7 +126,7 @@ TEST(VariantGenotypeRecord, Genotype_FORMAT_CASE2) {  // NOLINT(cert-err58-cpp)
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 

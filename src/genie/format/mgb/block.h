@@ -16,7 +16,7 @@
 #include "boost/variant/variant.hpp"
 #include "genie/core/access-unit.h"
 #include "genie/core/payload.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

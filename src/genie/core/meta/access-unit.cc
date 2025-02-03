@@ -7,7 +7,7 @@
 #include "genie/core/meta/access-unit.h"
 #include <string>
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

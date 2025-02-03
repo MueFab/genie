@@ -11,7 +11,7 @@
 #include "genie/entropy/gabac/context-selector.h"
 #include "genie/entropy/gabac/luts-subsymbol-transform.h"
 #include "genie/entropy/paramcabac/subsequence.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

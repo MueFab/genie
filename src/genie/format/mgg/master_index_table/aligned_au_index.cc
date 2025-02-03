@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/master_index_table/aligned_au_index.h"
-#include "genie/util/runtime-exception.h"
+#include <utility>
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -8,10 +8,10 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -114,27 +114,27 @@ size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
 void AnnotationAccessUnitHeader::read(util::BitReader& reader) {
     uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size); 
     if (attribute_contiguity) {
-        is_attribute = static_cast<bool>(reader.read_b(1));
+        is_attribute = static_cast<bool>(reader.ReadBits(1));
         if (is_attribute) {
-            attribute_ID = static_cast<uint16_t>(reader.read_b(16));
+            attribute_ID = static_cast<uint16_t>(reader.ReadBits(16));
         } else {
-            descriptor_ID = static_cast<AnnotDesc>(reader.read_b(7));
+            descriptor_ID = static_cast<AnnotDesc>(reader.ReadBits(7));
         }
         if (two_dimensional && !variable_size_tiles) {
             if (column_major_tile_order) {
-                n_tiles_per_col = static_cast<uint64_t>(reader.read_b(ATCoordBits));
+                n_tiles_per_col = static_cast<uint64_t>(reader.ReadBits(ATCoordBits));
             } else {
-                n_tiles_per_row = static_cast<uint64_t>(reader.read_b(ATCoordBits));
+                n_tiles_per_row = static_cast<uint64_t>(reader.ReadBits(ATCoordBits));
             }
-            n_blocks = static_cast<uint64_t>(reader.read_b(ATCoordBits));
+            n_blocks = static_cast<uint64_t>(reader.ReadBits(ATCoordBits));
         }
     } else {
-        tile_index_1 = static_cast<uint64_t>(reader.read_b(ATCoordBits));
-        tile_index_2_exists = static_cast<bool>(reader.read_b(1));
-        if (tile_index_2_exists) tile_index_2 = static_cast<uint64_t>(reader.read_b(ATCoordBits));
-        n_blocks = static_cast<uint64_t>(reader.read_b(16));
+        tile_index_1 = static_cast<uint64_t>(reader.ReadBits(ATCoordBits));
+        tile_index_2_exists = static_cast<bool>(reader.ReadBits(1));
+        if (tile_index_2_exists) tile_index_2 = static_cast<uint64_t>(reader.ReadBits(ATCoordBits));
+        n_blocks = static_cast<uint64_t>(reader.ReadBits(16));
     }
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 }  // namespace annotation_access_unit

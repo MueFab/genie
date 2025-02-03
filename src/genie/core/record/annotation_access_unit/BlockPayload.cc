@@ -10,10 +10,10 @@
 #include <string>
 #include <utility>
 
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -56,9 +56,9 @@ void BlockPayload::read(util::BitReader& reader) {
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
     } else {
-        generic_payload.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        generic_payload.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
     }
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs) {

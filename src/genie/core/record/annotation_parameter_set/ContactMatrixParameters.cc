@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "ContactMatrixParameters.h"
 
@@ -71,59 +71,59 @@ ContactMatrixParameters::ContactMatrixParameters(
       norm_matrix_name(norm_matrix_name) {}
 
 void ContactMatrixParameters::read(util::BitReader& reader) {
-    num_samples = static_cast<uint8_t>(reader.read_b(8));
+    num_samples = static_cast<uint8_t>(reader.ReadBits(8));
 
     for (auto i = 0; i < num_samples; ++i) {
-        sample_ID.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        sample_ID.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
         std::string name;
         char readchar = 0;
         do {
-            readchar = static_cast<char>(reader.read_b(8));
+            readchar = static_cast<char>(reader.ReadBits(8));
             if (readchar != 0) name += readchar;
         } while (readchar != 0);
         sample_name.push_back(name);
     }
 
-    num_chrs = static_cast<uint8_t>(reader.read_b(8));
+    num_chrs = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < num_chrs; ++i) {
-        chr_ID.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        chr_ID.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
         std::string name;
         char readchar = 0;
         do {
-            readchar = static_cast<char>(reader.read_b(8));
+            readchar = static_cast<char>(reader.ReadBits(8));
             if (readchar != 0) name += readchar;
         } while (readchar != 0);
         chr_name.push_back(name);
-        chr_length.push_back(reader.read_b(64));
+        chr_length.push_back(reader.ReadBits(64));
     }
 
-    interval = static_cast<uint32_t>(reader.read_b(32));
-    tile_size = static_cast<uint32_t>(reader.read_b(32));
+    interval = static_cast<uint32_t>(reader.ReadBits(32));
+    tile_size = static_cast<uint32_t>(reader.ReadBits(32));
 
-    num_interval_multipliers = static_cast<uint8_t>(reader.read_b(8));
+    num_interval_multipliers = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < num_interval_multipliers; ++i)
-        interval_multiplier.push_back(static_cast<uint32_t>(reader.read_b(32)));
+        interval_multiplier.push_back(static_cast<uint32_t>(reader.ReadBits(32)));
 
-    num_norm_methods = static_cast<uint8_t>(reader.read_b(8));
+    num_norm_methods = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < num_norm_methods; ++i) {
-        norm_method_ID.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        norm_method_ID.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
         std::string name;
         char readchar = 0;
         do {
-            readchar = static_cast<char>(reader.read_b(8));
+            readchar = static_cast<char>(reader.ReadBits(8));
             if (readchar != 0) name += readchar;
         } while (readchar != 0);
         norm_method_name.push_back(name);
-        norm_method_mult_flag.push_back(static_cast<bool>(reader.read_b(1)));
+        norm_method_mult_flag.push_back(static_cast<bool>(reader.ReadBits(1)));
     }
 
-    num_norm_matrices = static_cast<uint8_t>(reader.read_b(8));
+    num_norm_matrices = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < num_norm_matrices; ++i) {
-        norm_matrix_ID.push_back(static_cast<uint8_t>(reader.read_b(8)));
+        norm_matrix_ID.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
         std::string name;
         char readchar = 0;
         do {
-            readchar = static_cast<char>(reader.read_b(8));
+            readchar = static_cast<char>(reader.ReadBits(8));
             if (readchar != 0) name += readchar;
         } while (readchar != 0);
         norm_matrix_name.push_back(name);

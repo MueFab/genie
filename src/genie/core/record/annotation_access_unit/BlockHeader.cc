@@ -8,10 +8,10 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,12 +37,12 @@ BlockHeader::BlockHeader(bool attribute_contiguity,
       block_payload_size(block_payload_size) {}
 
 void BlockHeader::read(genie::util::BitReader& reader) {
-    descriptor_ID = static_cast<AnnotDesc>(reader.read_b(8));
+    descriptor_ID = static_cast<AnnotDesc>(reader.ReadBits(8));
     if (descriptor_ID == AnnotDesc::ATTRIBUTE)
-        attribute_ID = static_cast<uint16_t>(reader.read_b(16));
-    reader.read_b(2);
-    indexed = static_cast<bool>(reader.read_b(1));
-    block_payload_size = static_cast<uint32_t>(reader.read_b(29));
+        attribute_ID = static_cast<uint16_t>(reader.ReadBits(16));
+    reader.ReadBits(2);
+    indexed = static_cast<bool>(reader.ReadBits(1));
+    block_payload_size = static_cast<uint32_t>(reader.ReadBits(29));
 }
 
 void BlockHeader::write(core::Writer& writer) const {

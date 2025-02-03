@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <utility>
 #include "genie/format/mgg/reference/location/external.h"
+#include <utility>
 #include "genie/format/mgg/reference/location/external/fasta.h"
 #include "genie/format/mgg/reference/location/external/mpeg.h"
 #include "genie/format/mgg/reference/location/external/raw.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

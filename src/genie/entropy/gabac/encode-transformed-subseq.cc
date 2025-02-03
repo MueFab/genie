@@ -10,8 +10,8 @@
 #include "genie/entropy/gabac/context-selector.h"
 #include "genie/entropy/gabac/luts-subsymbol-transform.h"
 #include "genie/entropy/gabac/writer.h"
-#include "genie/util/block-stepper.h"
-#include "genie/util/data-block.h"
+#include "genie/util/block_stepper.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

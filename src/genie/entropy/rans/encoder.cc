@@ -1,5 +1,5 @@
 #include "encoder.h"
-#include <genie/util/runtime-exception.h>
+#include <genie/util/runtime_exception.h>
 #include <cstdint>
 
 namespace genie::entropy::rans {

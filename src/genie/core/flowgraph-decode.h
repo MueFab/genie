@@ -20,8 +20,8 @@
 #include "genie/core/ref-decoder.h"
 #include "genie/core/reference-source.h"
 #include "genie/util/selector.h"
-#include "genie/util/side-selector.h"
-#include "genie/util/thread-manager.h"
+#include "genie/util/side_selector.h"
+#include "genie/util/thread_manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

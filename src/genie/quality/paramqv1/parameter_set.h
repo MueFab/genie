@@ -13,8 +13,8 @@
 #include <memory>
 #include <vector>
 #include "genie/quality/paramqv1/codebook.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

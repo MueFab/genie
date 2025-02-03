@@ -17,8 +17,8 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "genie/util/block-stepper.h"
-#include "genie/util/data-block.h"
+#include "genie/util/block_stepper.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

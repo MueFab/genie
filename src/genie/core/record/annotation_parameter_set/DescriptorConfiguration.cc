@@ -16,8 +16,8 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/contact/subcontact_matrix_parameters.h"
@@ -58,7 +58,7 @@ DescriptorConfiguration::DescriptorConfiguration(
 }
 
 void DescriptorConfiguration::read(util::BitReader& reader) {
-    descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.read_b(8)));
+    descriptor_ID = static_cast<AnnotDesc>(static_cast<uint8_t>(reader.ReadBits(8)));
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
         genotype_parameters.read(reader);
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
@@ -66,7 +66,7 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
         // not implemented
     } else {
-        encoding_mode_ID = static_cast<AlgoID>(reader.read_b(8));
+        encoding_mode_ID = static_cast<AlgoID>(reader.ReadBits(8));
         algorithm_parameters.read(reader);
     }
 }

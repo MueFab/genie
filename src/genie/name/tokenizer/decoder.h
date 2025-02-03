@@ -14,7 +14,7 @@
 #include <vector>
 #include "genie/core/name-decoder.h"
 #include "genie/name/tokenizer/token.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

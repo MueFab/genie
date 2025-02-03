@@ -6,9 +6,9 @@
 
 #include "other-rec.h"
 #include <memory>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,8 +26,8 @@ OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
 
 OtherRec::OtherRec(util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
-      split_pos(reader.readBypassBE<uint64_t, 5>()),
-      split_seq_ID(reader.readBypassBE<uint16_t>()) {}
+      split_pos(reader.ReadAlignedInt<uint64_t, 5>()),
+      split_seq_ID(reader.ReadAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

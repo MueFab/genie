@@ -7,7 +7,7 @@
 #include "genie/format/fasta/exporter.h"
 #include <vector>
 #include "genie/format/fasta/fasta-source.h"
-#include "genie/util/thread-manager.h"
+#include "genie/util/thread_manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

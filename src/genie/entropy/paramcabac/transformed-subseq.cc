@@ -6,8 +6,8 @@
 
 #include "genie/entropy/paramcabac/transformed-subseq.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ TransformedSubSeq::TransformedSubSeq(SupportValues::TransformIdSubsym _transform
 TransformedSubSeq::TransformedSubSeq(util::BitReader& reader, const core::GenSubIndex _subsequence_ID,
                                      const core::AlphabetID _alphabet_ID)
     : subsequence_ID(_subsequence_ID), alphabet_ID(_alphabet_ID) {
-    transform_ID_subsym = reader.read<SupportValues::TransformIdSubsym>(3);
+    transform_ID_subsym = reader.Read<SupportValues::TransformIdSubsym>(3);
     support_values = SupportValues(transform_ID_subsym, reader);
     cabac_binarization =
         Binarization(support_values.getOutputSymbolSize(), support_values.getCodingSubsymSize(), reader);

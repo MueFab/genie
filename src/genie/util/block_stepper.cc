@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/block-stepper.h"
+#include "genie/util/block_stepper.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

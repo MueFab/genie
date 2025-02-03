@@ -5,7 +5,7 @@
 */
 
 #include "contact_matrix_tile_payload.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,24 +72,24 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader, size_t payload_size){
-    UTILS_DIE_IF(!reader.isAligned(), "Must be byte-aligned");
+    UTILS_DIE_IF(!reader.IsByteAligned(), "Must be byte-aligned");
 
-    codec_ID = reader.readBypassBE<core::AlgoID>();
+    codec_ID = reader.ReadAlignedInt<core::AlgoID>();
     payload_size -= sizeof(uint8_t);
 
     if (codec_ID == core::AlgoID::JBIG){
         tile_nrows = 0;
         tile_ncols = 0;
     } else {
-        tile_nrows = reader.readBypassBE<uint32_t>();
-        tile_ncols = reader.readBypassBE<uint32_t>();
+        tile_nrows = reader.ReadAlignedInt<uint32_t>();
+        tile_ncols = reader.ReadAlignedInt<uint32_t>();
         payload_size -= sizeof(uint32_t);
         payload_size -= sizeof(uint32_t);
     }
 
     payload.resize(payload_size);
     for (auto &v: payload){
-        v = reader.readBypassBE<uint8_t>();
+        v = reader.ReadAlignedInt<uint8_t>();
     }
 }
 

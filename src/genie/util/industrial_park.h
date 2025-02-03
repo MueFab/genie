@@ -13,11 +13,11 @@
 #include <map>
 #include <memory>
 #include <typeindex>
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include "genie/util/factory.h"
-#include "genie/util/generic-factory.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/generic_factory.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ class IndustrialPark {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/industrial-park.impl.h"
+#include "genie/util/industrial_park.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

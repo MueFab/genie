@@ -7,10 +7,10 @@
 #include "alignment-external.h"
 #include "genie/core/record/alignment/alignment_external/none.h"
 #include "genie/core/record/alignment/alignment_external/other-rec.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ void AlignmentExternal::write(util::BitWriter &writer) const { writer.writeBypas
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &reader) {
-    Type type = reader.readBypassBE<Type>();
+    Type type = reader.ReadAlignedInt<Type>();
     switch (type) {
         case Type::NONE:
             return util::make_unique<alignment_external::None>();

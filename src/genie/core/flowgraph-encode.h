@@ -17,7 +17,7 @@
 #include "genie/core/format-importer.h"
 #include "genie/core/read-encoder.h"
 #include "genie/core/reference-source.h"
-#include "genie/util/thread-manager.h"
+#include "genie/util/thread_manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

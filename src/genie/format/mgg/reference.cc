@@ -9,7 +9,7 @@
 #include <utility>
 #include "genie/format/mgg/reference/location/external.h"
 #include "genie/format/mgg/reference/location/internal.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@
 
 #include "genie/format/mgg/dataset_group_metadata.h"
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

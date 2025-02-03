@@ -6,9 +6,9 @@
 #include <iostream>
 
 #include "genie/core/arrayType.h"
-#include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/variant_genotype/format_field.h"
-#include "genie/util/bitreader.h"
+#include "genie/core/record/variant_genotype/record.h"
+#include "genie/util/bit_reader.h"
 
 class RandomGenotype {
  public:

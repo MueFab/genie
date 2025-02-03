@@ -3720,7 +3720,7 @@ XXH_FORCE_INLINE void XXH_writeLE64(void* dst, xxh_u64 v64)
  * essentially independent.
  *
  * This doesn't matter on 64-bit hashes since they all get merged together in
- * the end, so we skip the extra step.
+ * the end, so we SkipAlignedBytes the extra step.
  *
  * Both XXH3_64bits and XXH3_128bits use this subroutine.
  */

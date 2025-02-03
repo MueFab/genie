@@ -420,7 +420,7 @@ Local register size is 64-bits on 64-bits systems, 32-bits on 32-bits systems (s
 Writing data to memory is a manual operation, performed by the flushBits function.
     BIT_flushBits(&bitStream);
 
-Your last FSE encoding operation shall be to flush your last state value(s).
+Your last FSE encoding operation shall be to FlushHeldBits your last state value(s).
     FSE_flushState(&bitStream, &state);
 
 Finally, you must close the bitStream.

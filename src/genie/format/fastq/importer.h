@@ -15,10 +15,10 @@
 #include "genie/core/format-importer.h"
 #include "genie/core/record/alignment/record.h"
 #include "genie/core/stats/perf-stats.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/ordered-lock.h"
-#include "genie/util/original-source.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/ordered_lock.h"
+#include "genie/util/original_source.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

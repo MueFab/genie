@@ -11,7 +11,7 @@
 
 #include "genie/entropy/paramcabac/binarization_parameters.h"
 #include "genie/entropy/paramcabac/context.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

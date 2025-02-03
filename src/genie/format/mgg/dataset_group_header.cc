@@ -5,7 +5,7 @@
  */
 
 #include "genie/format/mgg/dataset_group_header.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

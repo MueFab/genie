@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -14,31 +14,31 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::getBitsRead() const { return bitsRead; }
+uint64_t BitReader::GetTotalBitsRead() const { return bitsRead; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool BitReader::isAligned() const { return !m_numHeldBits; }
+bool BitReader::IsByteAligned() const { return !m_numHeldBits; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t BitReader::getPos() const { return istream.tellg(); }
+int64_t BitReader::GetStreamPosition() const { return istream.tellg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::setPos(int64_t pos) const { istream.seekg(pos, std::ios_base::beg); }
+void BitReader::SetStreamPosition(int64_t pos) const { istream.seekg(pos, std::ios_base::beg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::clear() { istream.clear(); }
+void BitReader::ClearStreamState() { istream.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::skip(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
+void BitReader::SkipAlignedBytes(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::readBypass(void *in, size_t size) {
+void BitReader::ReadAlignedBytes(void *in, size_t size) {
     bitsRead += size * 8;
     istream.read(reinterpret_cast<char *>(in), size);
 }
@@ -49,7 +49,7 @@ BitReader::BitReader(std::istream &_istream) : istream(_istream), m_heldBits(0),
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::getByte() {
+uint64_t BitReader::ReadAlignedByte() {
     char c = 0;
     istream.read(&c, 1);
     return uint8_t(c);
@@ -57,7 +57,7 @@ uint64_t BitReader::getByte() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::flush() {
+uint64_t BitReader::FlushHeldBits() {
     auto ret = m_heldBits;
     m_heldBits = 0;
     bitsRead += m_numHeldBits;
@@ -67,7 +67,7 @@ uint64_t BitReader::flush() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::read_b(uint8_t numBits) {
+uint64_t BitReader::ReadBits(uint8_t numBits) {
     bitsRead += numBits;
     uint64_t bits;
     if (numBits <= m_numHeldBits) {
@@ -78,7 +78,7 @@ uint64_t BitReader::read_b(uint8_t numBits) {
         return bits;
     }
 
-    // More bits requested than currently held, flush all heldBits to bits
+    // More bits requested than currently held, FlushHeldBits all heldBits to bits
     numBits -= m_numHeldBits;
     bits = m_heldBits & ~(0xffu << m_numHeldBits);
     // bits = static_cast<uint64_t>(m_heldBits & ~(0xffu << m_numHeldBits));
@@ -106,21 +106,21 @@ uint64_t BitReader::read_b(uint8_t numBits) {
         goto L0;
     }
 
-    alignedWord |= (getByte() << 56u);
+    alignedWord |= (ReadAlignedByte() << 56u);
 L7:
-    alignedWord |= (getByte() << 48u);
+    alignedWord |= (ReadAlignedByte() << 48u);
 L6:
-    alignedWord |= (getByte() << 40u);
+    alignedWord |= (ReadAlignedByte() << 40u);
 L5:
-    alignedWord |= (getByte() << 32u);
+    alignedWord |= (ReadAlignedByte() << 32u);
 L4:
-    alignedWord |= (getByte() << 24u);
+    alignedWord |= (ReadAlignedByte() << 24u);
 L3:
-    alignedWord |= (getByte() << 16u);
+    alignedWord |= (ReadAlignedByte() << 16u);
 L2:
-    alignedWord |= (getByte() << 8u);
+    alignedWord |= (ReadAlignedByte() << 8u);
 L1:
-    alignedWord |= (getByte());
+    alignedWord |= (ReadAlignedByte());
 L0:
 
     // Resolve remainder bits
@@ -149,16 +149,16 @@ void BitReader::readBypass(std::string &str) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool BitReader::isGood() const { return static_cast<bool>(istream); }
+bool BitReader::IsStreamGood() const { return static_cast<bool>(istream); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::readBypass_null_terminated(std::string &str) {
+void BitReader::ReadAlignedStringTerminated(std::string &str) {
     str.clear();
-    auto c = readBypassBE<char>();
+    auto c = ReadAlignedInt<char>();
     while (c != 0) {
         str.push_back(c);
-        c = readBypassBE<char>();
+        c = ReadAlignedInt<char>();
     }
 }
 

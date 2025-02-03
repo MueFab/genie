@@ -18,8 +18,8 @@
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/linked_record/linked_record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

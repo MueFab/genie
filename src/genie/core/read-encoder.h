@@ -17,7 +17,7 @@
 #include "genie/core/qv-encoder.h"
 #include "genie/util/drain.h"
 #include "genie/util/selector.h"
-#include "genie/util/side-selector.h"
+#include "genie/util/side_selector.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

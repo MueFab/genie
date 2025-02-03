@@ -5,8 +5,8 @@
  */
 
 #include "genie/entropy/paramcabac/context.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,13 +34,13 @@ Context::Context(bool _adaptive_mode_flag, uint8_t _output_symbol_size, uint8_t 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Context::Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
-    adaptive_mode_flag = reader.read<bool>(1);
-    num_contexts = reader.read<uint16_t>();
+    adaptive_mode_flag = reader.Read<bool>(1);
+    num_contexts = reader.Read<uint16_t>();
     for (size_t i = 0; i < num_contexts; ++i) {
-        context_initialization_value.emplace_back(reader.read<uint8_t>(7));
+        context_initialization_value.emplace_back(reader.Read<uint8_t>(7));
     }
     if (coding_subsym_size < output_symbol_size) {
-        share_subsym_ctx_flag = reader.read<bool>(1);
+        share_subsym_ctx_flag = reader.Read<bool>(1);
     }
 }
 

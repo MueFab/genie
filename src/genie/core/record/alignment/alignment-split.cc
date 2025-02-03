@@ -8,10 +8,10 @@
 #include "genie/core/record/alignment/alignment_split/other-rec.h"
 #include "genie/core/record/alignment/alignment_split/same-rec.h"
 #include "genie/core/record/alignment/alignment_split/unpaired.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeBypassBE
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
-    Type type = reader.readBypassBE<Type>();
+    Type type = reader.ReadAlignedInt<Type>();
     switch (type) {
         case Type::SAME_REC:
             return util::make_unique<alignment_split::SameRec>(as_depth, reader);

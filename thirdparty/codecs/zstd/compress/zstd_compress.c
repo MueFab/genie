@@ -60,7 +60,7 @@
 /* ZSTD_compressBound()
  * Note that the result from this function is only compatible with the "normal"
  * full-block strategy.
- * When there are a lot of small blocks due to frequent flush in streaming mode
+ * When there are a lot of small blocks due to frequent FlushHeldBits in streaming mode
  * the overhead of headers can make the compressed data to be larger than the
  * return value of ZSTD_compressBound().
  */
@@ -4316,7 +4316,7 @@ size_t ZSTD_loadCEntropy(ZSTD_compressedBlockState_t* bs, void* workspace,
 {
     short offcodeNCount[MaxOff+1];
     unsigned offcodeMaxValue = MaxOff;
-    const BYTE* dictPtr = (const BYTE*)dict;    /* skip magic num and dict ID */
+    const BYTE* dictPtr = (const BYTE*)dict;    /* SkipAlignedBytes magic num and dict ID */
     const BYTE* const dictEnd = dictPtr + dictSize;
     dictPtr += 8;
     bs->entropy.huf.repeatMode = HUF_repeat_check;
@@ -4428,7 +4428,7 @@ static size_t ZSTD_loadZstdDictionary(ZSTD_compressedBlockState_t* bs,
     assert(dictSize >= 8);
     assert(MEM_readLE32(dictPtr) == ZSTD_MAGIC_DICTIONARY);
 
-    dictID = params->fParams.noDictIDFlag ? 0 :  MEM_readLE32(dictPtr + 4 /* skip magic number */ );
+    dictID = params->fParams.noDictIDFlag ? 0 :  MEM_readLE32(dictPtr + 4 /* SkipAlignedBytes magic number */ );
     eSize = ZSTD_loadCEntropy(bs, workspace, dict, dictSize);
     FORWARD_IF_ERROR(eSize, "ZSTD_loadCEntropy failed");
     dictPtr += eSize;
@@ -5339,7 +5339,7 @@ static size_t ZSTD_compressStream_generic(ZSTD_CStream* zcs,
     U32 someMoreWork = 1;
 
     /* check expectations */
-    DEBUGLOG(5, "ZSTD_compressStream_generic, flush=%u", (unsigned)flushMode);
+    DEBUGLOG(5, "ZSTD_compressStream_generic, FlushHeldBits=%u", (unsigned)flushMode);
     if (zcs->appliedParams.inBufferMode == ZSTD_bm_buffered) {
         assert(zcs->inBuff != NULL);
         assert(zcs->inBuffSize > 0);
@@ -5404,7 +5404,7 @@ static size_t ZSTD_compressStream_generic(ZSTD_CStream* zcs,
                     ? zcs->inBuffPos - zcs->inToCompress
                     : MIN((size_t)(iend - ip), zcs->blockSize);
                 if (oSize >= ZSTD_compressBound(iSize) || zcs->appliedParams.outBufferMode == ZSTD_bm_stable)
-                    cDst = op;   /* compress into output buffer, to skip flush stage */
+                    cDst = op;   /* compress into output buffer, to SkipAlignedBytes FlushHeldBits stage */
                 else
                     cDst = zcs->outBuff, oSize = zcs->outBuffSize;
                 if (inputBuffered) {
@@ -5439,7 +5439,7 @@ static size_t ZSTD_compressStream_generic(ZSTD_CStream* zcs,
                     if (lastBlock)
                         assert(ip == iend);
                 }
-                if (cDst == op) {  /* no need to flush */
+                if (cDst == op) {  /* no need to FlushHeldBits */
                     op += cSize;
                     if (zcs->frameEnded) {
                         DEBUGLOG(5, "Frame completed directly in outBuffer");
@@ -5450,11 +5450,11 @@ static size_t ZSTD_compressStream_generic(ZSTD_CStream* zcs,
                 }
                 zcs->outBuffContentSize = cSize;
                 zcs->outBuffFlushedSize = 0;
-                zcs->streamStage = zcss_flush; /* pass-through to flush stage */
+                zcs->streamStage = zcss_flush; /* pass-through to FlushHeldBits stage */
             }
 	    ZSTD_FALLTHROUGH;
         case zcss_flush:
-            DEBUGLOG(5, "flush stage");
+            DEBUGLOG(5, "FlushHeldBits stage");
             assert(zcs->appliedParams.outBufferMode == ZSTD_bm_buffered);
             {   size_t const toFlush = zcs->outBuffContentSize - zcs->outBuffFlushedSize;
                 size_t const flushed = ZSTD_limitCopy(op, (size_t)(oend-op),
@@ -5465,14 +5465,14 @@ static size_t ZSTD_compressStream_generic(ZSTD_CStream* zcs,
                     op += flushed;
                 zcs->outBuffFlushedSize += flushed;
                 if (toFlush!=flushed) {
-                    /* flush not fully completed, presumably because dst is too small */
+                    /* FlushHeldBits not fully completed, presumably because dst is too small */
                     assert(op==oend);
                     someMoreWork = 0;
                     break;
                 }
                 zcs->outBuffContentSize = zcs->outBuffFlushedSize = 0;
                 if (zcs->frameEnded) {
-                    DEBUGLOG(5, "Frame completed on flush");
+                    DEBUGLOG(5, "Frame completed on FlushHeldBits");
                     someMoreWork = 0;
                     ZSTD_CCtx_reset(zcs, ZSTD_reset_session_only);
                     break;
@@ -5617,7 +5617,7 @@ static size_t ZSTD_CCtx_init_compressStream2(ZSTD_CCtx* cctx,
         cctx->inToCompress = 0;
         cctx->inBuffPos = 0;
         if (cctx->appliedParams.inBufferMode == ZSTD_bm_buffered) {
-            /* for small input: avoid automatic flush on reaching end of block, since
+            /* for small input: avoid automatic FlushHeldBits on reaching end of block, since
             * it would require to add a 3-bytes null block to end frame
             */
             cctx->inBuffTarget = cctx->blockSize + (cctx->blockSize == pledgedSrcSize);
@@ -5691,7 +5691,7 @@ size_t ZSTD_compressStream2( ZSTD_CCtx* cctx,
         }
         DEBUGLOG(5, "completed ZSTD_compressStream2 delegating to ZSTDMT_compressStream_generic");
         /* Either we don't require maximum forward progress, we've finished the
-         * flush, or we are out of output space.
+         * FlushHeldBits, or we are out of output space.
          */
         assert(endOp == ZSTD_e_continue || flushMin == 0 || output->pos == output->size);
         ZSTD_setBufferExpectations(cctx, output, input);
@@ -5701,7 +5701,7 @@ size_t ZSTD_compressStream2( ZSTD_CCtx* cctx,
     FORWARD_IF_ERROR( ZSTD_compressStream_generic(cctx, output, input, endOp) , "");
     DEBUGLOG(5, "completed ZSTD_compressStream2");
     ZSTD_setBufferExpectations(cctx, output, input);
-    return cctx->outBuffContentSize - cctx->outBuffFlushedSize; /* remaining to flush */
+    return cctx->outBuffContentSize - cctx->outBuffFlushedSize; /* remaining to FlushHeldBits */
 }
 
 size_t ZSTD_compressStream2_simpleArgs (
@@ -6156,7 +6156,7 @@ size_t ZSTD_compressSequences(ZSTD_CCtx* const cctx, void* dst, size_t dstCapaci
 /*======   Finalize   ======*/
 
 /*! ZSTD_flushStream() :
- * @return : amount of data remaining to flush */
+ * @return : amount of data remaining to FlushHeldBits */
 size_t ZSTD_flushStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output)
 {
     ZSTD_inBuffer input = { NULL, 0, 0 };
@@ -6170,11 +6170,11 @@ size_t ZSTD_endStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output)
     size_t const remainingToFlush = ZSTD_compressStream2(zcs, output, &input, ZSTD_e_end);
     FORWARD_IF_ERROR( remainingToFlush , "ZSTD_compressStream2 failed");
     if (zcs->appliedParams.nbWorkers > 0) return remainingToFlush;   /* minimal estimation */
-    /* single thread mode : attempt to calculate remaining to flush more precisely */
+    /* single thread mode : attempt to calculate remaining to FlushHeldBits more precisely */
     {   size_t const lastBlockSize = zcs->frameEnded ? 0 : ZSTD_BLOCKHEADERSIZE;
         size_t const checksumSize = (size_t)(zcs->frameEnded ? 0 : zcs->appliedParams.fParams.checksumFlag * 4);
         size_t const toFlush = remainingToFlush + lastBlockSize + checksumSize;
-        DEBUGLOG(4, "ZSTD_endStream : remaining to flush : %u", (unsigned)toFlush);
+        DEBUGLOG(4, "ZSTD_endStream : remaining to FlushHeldBits : %u", (unsigned)toFlush);
         return toFlush;
     }
 }

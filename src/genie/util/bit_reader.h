@@ -33,31 +33,31 @@ class BitReader {
      * @brief
      * @return Total number of bits read since the BitReader has been created.
      */
-    uint64_t getBitsRead() const;
+    uint64_t GetTotalBitsRead() const;
 
     /**
      * @brief
      * @return True if the position of the bitstream is aligned to a full byte.
      */
-    bool isAligned() const;
+    bool IsByteAligned() const;
 
     /**
      * @brief
      * @return Returns the position in the input stream.
      */
-    int64_t getPos() const;
+    int64_t GetStreamPosition() const;
 
     /**
      * @brief Sets the input stream position.
      * @param pos New position.
      * @attention This bypasses the bit wise reading mechanism.
      */
-    void setPos(int64_t pos) const;
+    void SetStreamPosition(int64_t pos) const;
 
     /**
      * @brief Clears the error state of the underlying input stream.
      */
-    void clear();
+    void ClearStreamState();
 
     /**
      * @brief Create from existing input stream.
@@ -70,20 +70,20 @@ class BitReader {
      * @attention This bypasses the bit wise reading. Only safe to use if position is aligned to a full byte.
      * @return One byte of data.
      */
-    uint64_t getByte();
+    uint64_t ReadAlignedByte();
 
     /**
      * @brief Aligns the current position of the input stream to the next full byte.
      * @return 1 byte of data containing the remaining bits of the current byte.
      */
-    uint64_t flush();
+    uint64_t FlushHeldBits();
 
     /**
      * @brief Read a custom number of bits.
      * @param numBits Number of bits to read.
      * @return Integer containing the bits.
      */
-    uint64_t read_b(uint8_t numBits);
+    uint64_t ReadBits(uint8_t numBits);
 
     /**
      * @brief Reads a full integer with the required number of bits.
@@ -91,7 +91,7 @@ class BitReader {
      * @return Integer read.
      */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-    T read();
+    T Read();
 
     /**
      * @brief Shortcut to the general read() function, but the return value is casted to a custom integer type.
@@ -100,7 +100,7 @@ class BitReader {
      * @return Custom integer.
      */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-    T read(uint8_t s);
+    T Read(uint8_t s);
 
     /**
      * @brief Read a string from the input.
@@ -114,20 +114,20 @@ class BitReader {
      * @attention This bypasses the bit wise reading mechanism.
      * @param str The string to fill with data.
      */
-    void readBypass_null_terminated(std::string &str);
+    void ReadAlignedStringTerminated(std::string &str);
 
     /**
      * @brief
      * @return True if there are no problems so far reading data.
      */
-    bool isGood() const;
+    bool IsStreamGood() const;
 
     /**
      * @brief Skips a number of bytes
      * @attention This bypasses the bit wise reading mechanism.
      * @param bytes
      */
-    void skip(size_t bytes);
+    void SkipAlignedBytes(size_t bytes);
 
     /**
      * @brief read
@@ -135,7 +135,7 @@ class BitReader {
      * @param size
      * @attention This bypasses the bit wise reading mechanism.
      */
-    void readBypass(void *in, size_t size);
+    void ReadAlignedBytes(void *in, size_t size);
 
     /**
      * @brief Read a single value as big endian
@@ -144,7 +144,7 @@ class BitReader {
      * @return Value
      */
     template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
-    T readBypassBE();
+    T ReadAlignedInt();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ class BitReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/bitreader.impl.h"
+#include "genie/util/bit_reader.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

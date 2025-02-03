@@ -7,9 +7,9 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include "genie/core/record/variant_site/record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 #include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

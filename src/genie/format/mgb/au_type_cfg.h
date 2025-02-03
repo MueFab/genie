@@ -12,8 +12,8 @@
 #include <memory>
 #include "boost/optional/optional.hpp"
 #include "genie/format/mgb/extended_au.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

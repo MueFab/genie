@@ -20,8 +20,8 @@
 #include "genie/entropy/gabac/encode-transformed-subseq.h"
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/paramcabac/subsequence.h"
-#include "genie/util/data-block.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/data_block.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

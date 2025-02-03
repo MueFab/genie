@@ -8,7 +8,7 @@
 #include <codecs/include/mpegg-codecs.h>
 #include "annotation.h"
 #include "genie/core/arrayType.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

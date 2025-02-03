@@ -8,7 +8,7 @@
 #include <cassert>
 #include <fstream>
 #include "cli11/CLI11.hpp"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

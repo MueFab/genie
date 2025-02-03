@@ -678,7 +678,7 @@ U32 ZSTD_insertBtAndGetAllMatches (
                 mnum = 1;
                 if ( (mlen > sufficient_len) |
                      (ip+mlen == iLimit) ) {  /* best possible length */
-                    ms->nextToUpdate = curr+1;  /* skip insertion */
+                    ms->nextToUpdate = curr+1;  /* SkipAlignedBytes insertion */
                     return 1;
         }   }   }
         /* no dictMatchState lookup: dicts don't have a populated HC3 table */
@@ -717,7 +717,7 @@ U32 ZSTD_insertBtAndGetAllMatches (
             mnum++;
             if ( (matchLength > ZSTD_OPT_NUM)
                | (ip+matchLength == iLimit) /* equal : no way to know if inf or sup */) {
-                if (dictMode == ZSTD_dictMatchState) nbCompares = 0; /* break should also skip searching dms */
+                if (dictMode == ZSTD_dictMatchState) nbCompares = 0; /* break should also SkipAlignedBytes searching dms */
                 break; /* drop, to preserve bt consistency (miss a little bit of compression) */
         }   }
 
@@ -778,7 +778,7 @@ U32 ZSTD_insertBtAndGetAllMatches (
     }   }   }  /* if (dictMode == ZSTD_dictMatchState) */
 
     assert(matchEndIdx > curr+8);
-    ms->nextToUpdate = matchEndIdx - 8;  /* skip repetitive patterns */
+    ms->nextToUpdate = matchEndIdx - 8;  /* SkipAlignedBytes repetitive patterns */
     return mnum;
 }
 
@@ -1189,7 +1189,7 @@ ZSTD_compressBlock_opt_generic(ZSTD_matchState_t* ms,
             if ( (optLevel==0) /*static_test*/
               && (opt[cur+1].price <= opt[cur].price + (BITCOST_MULTIPLIER/2)) ) {
                 DEBUGLOG(7, "move to next rPos:%u : price is <=", cur+1);
-                continue;  /* skip unpromising positions; about ~+6% speed, -0.01 ratio */
+                continue;  /* SkipAlignedBytes unpromising positions; about ~+6% speed, -0.01 ratio */
             }
 
             assert(opt[cur].price >= 0);

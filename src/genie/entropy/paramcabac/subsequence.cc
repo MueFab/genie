@@ -6,9 +6,9 @@
 
 #include "genie/entropy/paramcabac/subsequence.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, u
 Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader) {
     core::GenSubIndex subSeq;
     if (!tokentype) {
-        descriptor_subsequence_ID = reader.read<uint16_t>(10);
+        descriptor_subsequence_ID = reader.Read<uint16_t>(10);
         subSeq = std::pair<core::GenDesc, uint16_t>(desc, *descriptor_subsequence_ID);
     } else {
         subSeq = std::pair<core::GenDesc, uint16_t>(desc, (uint16_t)0);  // FIXME use zero always?

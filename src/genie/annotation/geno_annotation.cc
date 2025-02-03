@@ -6,7 +6,7 @@
 
 #include <codecs/include/mpegg-codecs.h>
 #include "genie/core/arrayType.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 #include "genie/core/constants.h"
 
@@ -143,7 +143,7 @@ size_t GenoAnnotation::readBlocks(std::ifstream& inputfile, const uint32_t& rowT
 
     // std::vector<ParsBlocks> blocksWPars;
 
-    while (bitreader.isGood()) {
+    while (bitreader.IsStreamGood()) {
         genie::genotype::GenotypeParameters genotypeParameters;
         genie::likelihood::LikelihoodParameters likelihoodParameters;
         RecData oneTileData;
@@ -192,9 +192,9 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(genie::util::BitReader& r
                                                        RecData& recData) {
     // read rowTileSize of rows
     std::vector<genie::core::record::VariantGenotype> varGenoType;
-    while (reader.isGood() && varGenoType.size() < rowTileSize) {
+    while (reader.IsStreamGood() && varGenoType.size() < rowTileSize) {
         varGenoType.emplace_back(reader);
-        if (!reader.isGood()) varGenoType.pop_back();
+        if (!reader.IsStreamGood()) varGenoType.pop_back();
     }
     if (varGenoType.empty()) return 0;
     // extract format fields

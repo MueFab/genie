@@ -9,10 +9,10 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 
@@ -144,39 +144,39 @@ void TileConfiguration::read(util::BitReader& reader, uint8_t ATCoordSize) {
 }
 
 void TileConfiguration::read(util::BitReader& reader) {
-    AG_class = static_cast<uint8_t>(reader.read_b(3));
-    attribute_contiguity = static_cast<bool>(reader.read_b(1));
-    two_dimensional = static_cast<bool>(reader.read_b(1));
+    AG_class = static_cast<uint8_t>(reader.ReadBits(3));
+    attribute_contiguity = static_cast<bool>(reader.ReadBits(1));
+    two_dimensional = static_cast<bool>(reader.ReadBits(1));
     if (two_dimensional) {
-        reader.read_b(6);
-        column_major_tile_order = static_cast<bool>(reader.read_b(1));
-        symmetry_mode = static_cast<uint8_t>(reader.read_b(3));
-        symmetry_minor_diagonal = static_cast<bool>(reader.read_b(1));
+        reader.ReadBits(6);
+        column_major_tile_order = static_cast<bool>(reader.ReadBits(1));
+        symmetry_mode = static_cast<uint8_t>(reader.ReadBits(3));
+        symmetry_minor_diagonal = static_cast<bool>(reader.ReadBits(1));
     } else {
-        reader.read_b(3);
+        reader.ReadBits(3);
         symmetry_minor_diagonal = false;
         symmetry_mode = 0;
         column_major_tile_order = false;
     }
-    attribute_dependent_tiles = static_cast<bool>(reader.read_b(1));
+    attribute_dependent_tiles = static_cast<bool>(reader.ReadBits(1));
     default_tile_structure.read(reader, AT_coord_size, two_dimensional);
     if (attribute_dependent_tiles) {
-        n_add_tile_structures = static_cast<uint16_t>(reader.read_b(16));
+        n_add_tile_structures = static_cast<uint16_t>(reader.ReadBits(16));
         n_attributes.resize(n_add_tile_structures);
         attribute_ID.resize(n_add_tile_structures);
         n_descriptors.resize(n_add_tile_structures);
         descriptor_ID.resize(n_add_tile_structures);
         additional_tile_structure.resize(n_add_tile_structures);
         for (auto i = 0; i < n_add_tile_structures; ++i) {
-            n_attributes[i] = static_cast<uint16_t>(reader.read_b(16));
+            n_attributes[i] = static_cast<uint16_t>(reader.ReadBits(16));
             attribute_ID[i].resize(n_attributes[i]);
             for (auto j = 0; j < n_attributes[i]; ++j) {
-                attribute_ID[i][j] = static_cast<uint16_t>(reader.read_b(16));
+                attribute_ID[i][j] = static_cast<uint16_t>(reader.ReadBits(16));
             }
-            n_descriptors[i] = static_cast<uint8_t>(reader.read_b(7));
+            n_descriptors[i] = static_cast<uint8_t>(reader.ReadBits(7));
             descriptor_ID[i].resize(n_descriptors[i]);
             for (auto j = 0; j < n_descriptors[i]; ++j) {
-                descriptor_ID[i][j] = static_cast<uint8_t>(reader.read_b(7));
+                descriptor_ID[i][j] = static_cast<uint8_t>(reader.ReadBits(7));
             }
             additional_tile_structure[i].read(reader, AT_coord_size, two_dimensional);
         }

@@ -1339,7 +1339,7 @@ ZSTD_loadDEntropy(ZSTD_entropyDTables_t* entropy,
 
     RETURN_ERROR_IF(dictSize <= 8, dictionary_corrupted, "dict is too small");
     assert(MEM_readLE32(dict) == ZSTD_MAGIC_DICTIONARY);   /* dict must be valid */
-    dictPtr += 8;   /* skip header = magic + dictID */
+    dictPtr += 8;   /* SkipAlignedBytes header = magic + dictID */
 
     ZSTD_STATIC_ASSERT(offsetof(ZSTD_entropyDTables_t, OFTable) == offsetof(ZSTD_entropyDTables_t, LLTable) + sizeof(entropy->LLTable));
     ZSTD_STATIC_ASSERT(offsetof(ZSTD_entropyDTables_t, MLTable) == offsetof(ZSTD_entropyDTables_t, OFTable) + sizeof(entropy->OFTable));
@@ -2152,7 +2152,7 @@ size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inB
                 size_t const flushedSize = ZSTD_limitCopy(op, (size_t)(oend-op), zds->outBuff + zds->outStart, toFlushSize);
                 op += flushedSize;
                 zds->outStart += flushedSize;
-                if (flushedSize == toFlushSize) {  /* flush completed */
+                if (flushedSize == toFlushSize) {  /* FlushHeldBits completed */
                     zds->streamStage = zdss_read;
                     if ( (zds->outBuffSize < zds->fParams.frameContentSize)
                       && (zds->outStart + zds->fParams.blockSizeMax > zds->outBuffSize) ) {
@@ -2163,7 +2163,7 @@ size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inB
                     }
                     break;
             }   }
-            /* cannot complete flush */
+            /* cannot complete FlushHeldBits */
             someMoreWork = 0;
             break;
 

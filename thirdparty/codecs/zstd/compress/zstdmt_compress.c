@@ -569,7 +569,7 @@ static void ZSTDMT_serialState_update(serialState_t* serialState,
         DEBUGLOG(5, "wait for serialState->cond");
         ZSTD_pthread_cond_wait(&serialState->cond, &serialState->mutex);
     }
-    /* A future job may error and skip our job */
+    /* A future job may error and SkipAlignedBytes our job */
     if (serialState->nextJobID == jobID) {
         /* It is now our turn, do any processing necessary */
         if (serialState->params.ldmParams.enableLdm == ZSTD_ps_enable) {
@@ -718,10 +718,10 @@ static void ZSTDMT_compressionJob(void* jobDescription)
     /* Perform serial step as early as possible, but after CCtx initialization */
     ZSTDMT_serialState_update(job->serial, cctx, rawSeqStore, job->src, job->jobID);
 
-    if (!job->firstJob) {  /* flush and overwrite frame header when it's not first job */
+    if (!job->firstJob) {  /* FlushHeldBits and overwrite frame header when it's not first job */
         size_t const hSize = ZSTD_compressContinue(cctx, dstBuff.start, dstBuff.capacity, job->src.start, 0);
         if (ZSTD_isError(hSize)) JOB_ERROR(hSize);
-        DEBUGLOG(5, "ZSTDMT_compressionJob: flush and overwrite %u bytes of frame header (not first job)", (U32)hSize);
+        DEBUGLOG(5, "ZSTDMT_compressionJob: FlushHeldBits and overwrite %u bytes of frame header (not first job)", (U32)hSize);
         ZSTD_invalidateRepCodes(cctx);
     }
 
@@ -1001,7 +1001,7 @@ static void ZSTDMT_waitForAllJobsCompleted(ZSTDMT_CCtx* mtctx)
         unsigned const jobID = mtctx->doneJobID & mtctx->jobIDMask;
         ZSTD_PTHREAD_MUTEX_LOCK(&mtctx->jobs[jobID].job_mutex);
         while (mtctx->jobs[jobID].consumed < mtctx->jobs[jobID].src.size) {
-            DEBUGLOG(4, "waiting for jobCompleted signal from job %u", mtctx->doneJobID);   /* we want to block when waiting for data to flush */
+            DEBUGLOG(4, "waiting for jobCompleted signal from job %u", mtctx->doneJobID);   /* we want to block when waiting for data to FlushHeldBits */
             ZSTD_pthread_cond_wait(&mtctx->jobs[jobID].job_cond, &mtctx->jobs[jobID].job_mutex);
         }
         ZSTD_pthread_mutex_unlock(&mtctx->jobs[jobID].job_mutex);
@@ -1117,7 +1117,7 @@ size_t ZSTDMT_toFlushNow(ZSTDMT_CCtx* mtctx)
     size_t toFlush;
     unsigned const jobID = mtctx->doneJobID;
     assert(jobID <= mtctx->nextJobID);
-    if (jobID == mtctx->nextJobID) return 0;   /* no active job => nothing to flush */
+    if (jobID == mtctx->nextJobID) return 0;   /* no active job => nothing to FlushHeldBits */
 
     /* look into oldest non-fully-flushed job */
     {   unsigned const wJobID = jobID & mtctx->jobIDMask;
@@ -1129,7 +1129,7 @@ size_t ZSTDMT_toFlushNow(ZSTDMT_CCtx* mtctx)
             assert(flushed <= produced);
             assert(jobPtr->consumed <= jobPtr->src.size);
             toFlush = produced - flushed;
-            /* if toFlush==0, nothing is available to flush.
+            /* if toFlush==0, nothing is available to FlushHeldBits.
              * However, jobID is expected to still be active:
              * if jobID was already completed and fully flushed,
              * ZSTDMT_flushProduced() should have already moved onto next job.
@@ -1286,7 +1286,7 @@ size_t ZSTDMT_initCStream_internal(
         size_t const windowSize = mtctx->params.ldmParams.enableLdm == ZSTD_ps_enable ? (1U << mtctx->params.cParams.windowLog) : 0;
         /* Two buffers of slack, plus extra space for the overlap
          * This is the minimum slack that LDM works with. One extra because
-         * flush might waste up to targetSectionSize-1 bytes. Another extra
+         * FlushHeldBits might waste up to targetSectionSize-1 bytes. Another extra
          * for the overlap (if > 0), then one to fill which doesn't overlap
          * with the LDM window.
          */
@@ -1428,10 +1428,10 @@ static size_t ZSTDMT_createCompressionJob(ZSTDMT_CCtx* mtctx, size_t srcSize, ZS
 
 
 /*! ZSTDMT_flushProduced() :
- *  flush whatever data has been produced but not yet flushed in current job.
+ *  FlushHeldBits whatever data has been produced but not yet flushed in current job.
  *  move to next job if current one is fully flushed.
  * `output` : `pos` will be updated with amount of data flushed .
- * `blockToFlush` : if >0, the function will block and wait if there is no data available to flush .
+ * `blockToFlush` : if >0, the function will block and wait if there is no data available to FlushHeldBits .
  * @return : amount of data remaining within internal buffer, 0 if no more, 1 if unknown but > 0, or an error code */
 static size_t ZSTDMT_flushProduced(ZSTDMT_CCtx* mtctx, ZSTD_outBuffer* output, unsigned blockToFlush, ZSTD_EndDirective end)
 {
@@ -1444,18 +1444,18 @@ static size_t ZSTDMT_flushProduced(ZSTDMT_CCtx* mtctx, ZSTD_outBuffer* output, u
     if (  blockToFlush
       && (mtctx->doneJobID < mtctx->nextJobID) ) {
         assert(mtctx->jobs[wJobID].dstFlushed <= mtctx->jobs[wJobID].cSize);
-        while (mtctx->jobs[wJobID].dstFlushed == mtctx->jobs[wJobID].cSize) {  /* nothing to flush */
+        while (mtctx->jobs[wJobID].dstFlushed == mtctx->jobs[wJobID].cSize) {  /* nothing to FlushHeldBits */
             if (mtctx->jobs[wJobID].consumed == mtctx->jobs[wJobID].src.size) {
                 DEBUGLOG(5, "job %u is completely consumed (%u == %u) => don't wait for cond, there will be none",
                             mtctx->doneJobID, (U32)mtctx->jobs[wJobID].consumed, (U32)mtctx->jobs[wJobID].src.size);
                 break;
             }
-            DEBUGLOG(5, "waiting for something to flush from job %u (currently flushed: %u bytes)",
+            DEBUGLOG(5, "waiting for something to FlushHeldBits from job %u (currently flushed: %u bytes)",
                         mtctx->doneJobID, (U32)mtctx->jobs[wJobID].dstFlushed);
-            ZSTD_pthread_cond_wait(&mtctx->jobs[wJobID].job_cond, &mtctx->jobs[wJobID].job_mutex);  /* block when nothing to flush but some to come */
+            ZSTD_pthread_cond_wait(&mtctx->jobs[wJobID].job_cond, &mtctx->jobs[wJobID].job_mutex);  /* block when nothing to FlushHeldBits but some to come */
     }   }
 
-    /* try to flush something */
+    /* try to FlushHeldBits something */
     {   size_t cSize = mtctx->jobs[wJobID].cSize;                  /* shared */
         size_t const srcConsumed = mtctx->jobs[wJobID].consumed;   /* shared */
         size_t const srcSize = mtctx->jobs[wJobID].src.size;       /* read-only, could be done after mutex lock, but no-declaration-after-statement */
@@ -1676,12 +1676,12 @@ static int ZSTDMT_tryGetInputRange(ZSTDMT_CCtx* mtctx)
 
 typedef struct {
   size_t toLoad;  /* The number of bytes to load from the input. */
-  int flush;      /* Boolean declaring if we must flush because we found a synchronization point. */
+  int flush;      /* Boolean declaring if we must FlushHeldBits because we found a synchronization point. */
 } syncPoint_t;
 
 /**
  * Searches through the input for a synchronization point. If one is found, we
- * will instruct the caller to flush, and return the number of bytes to load.
+ * will instruct the caller to FlushHeldBits, and return the number of bytes to load.
  * Otherwise, we will load as many bytes as possible and instruct the caller
  * to continue as normal.
  */
@@ -1744,7 +1744,7 @@ findSynchronizationPoint(ZSTDMT_CCtx const* mtctx, ZSTD_inBuffer const input)
         hash = ZSTD_rollingHash_compute(prev, RSYNC_LENGTH);
         if ((hash & hitMask) == hitMask) {
             /* We're already at a sync point so don't load any more until
-             * we're able to flush this sync point.
+             * we're able to FlushHeldBits this sync point.
              * This likely happened because the job table was full so we
              * couldn't add our job.
              */
@@ -1755,7 +1755,7 @@ findSynchronizationPoint(ZSTDMT_CCtx const* mtctx, ZSTD_inBuffer const input)
     }
     /* Starting with the hash of the previous RSYNC_LENGTH bytes, roll
      * through the input. If we hit a synchronization point, then cut the
-     * job off, and tell the compressor to flush the job. Otherwise, load
+     * job off, and tell the compressor to FlushHeldBits the job. Otherwise, load
      * all the bytes and continue as normal.
      * If we go too long without a synchronization point (targetSectionSize)
      * then a block will be emitted anyways, but this is okay, since if we
@@ -1785,7 +1785,7 @@ size_t ZSTDMT_nextInputSizeHint(const ZSTDMT_CCtx* mtctx)
 /** ZSTDMT_compressStream_generic() :
  *  internal use only - exposed to be invoked from zstd_compress.c
  *  assumption : output and input are valid (pos <= size)
- * @return : minimum amount of data remaining to flush, 0 if none */
+ * @return : minimum amount of data remaining to FlushHeldBits, 0 if none */
 size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
                                      ZSTD_outBuffer* output,
                                      ZSTD_inBuffer* input,
@@ -1798,7 +1798,7 @@ size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
     assert(input->pos  <= input->size);
 
     if ((mtctx->frameEnded) && (endOp==ZSTD_e_continue)) {
-        /* current frame being ended. Only flush/end are allowed */
+        /* current frame being ended. Only FlushHeldBits/end are allowed */
         return ERROR(stage_wrong);
     }
 
@@ -1834,7 +1834,7 @@ size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
         /* Can't end yet because the input is not fully consumed.
             * We are in one of these cases:
             * - mtctx->inBuff is NULL & empty: we couldn't get an input buffer so don't create a new job.
-            * - We filled the input buffer: flush this job but don't end the frame.
+            * - We filled the input buffer: FlushHeldBits this job but don't end the frame.
             * - We hit a synchronization point: flush this job but don't end the frame.
             */
         assert(mtctx->inBuff.filled == 0 || mtctx->inBuff.filled == mtctx->targetSectionSize || mtctx->params.rsyncable);
@@ -1843,7 +1843,7 @@ size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
 
     if ( (mtctx->jobReady)
       || (mtctx->inBuff.filled >= mtctx->targetSectionSize)  /* filled enough : let's compress */
-      || ((endOp != ZSTD_e_continue) && (mtctx->inBuff.filled > 0))  /* something to flush : let's go */
+      || ((endOp != ZSTD_e_continue) && (mtctx->inBuff.filled > 0))  /* something to FlushHeldBits : let's go */
       || ((endOp == ZSTD_e_end) && (!mtctx->frameEnded)) ) {   /* must finish the frame with a zero-size block */
         size_t const jobSize = mtctx->inBuff.filled;
         assert(mtctx->inBuff.filled <= mtctx->targetSectionSize);
@@ -1852,7 +1852,7 @@ size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
 
     /* check for potential compressed data ready to be flushed */
     {   size_t const remainingToFlush = ZSTDMT_flushProduced(mtctx, output, !forwardInputProgress, endOp); /* block if there was no forward input progress */
-        if (input->pos < input->size) return MAX(remainingToFlush, 1);  /* input not consumed : do not end flush yet */
+        if (input->pos < input->size) return MAX(remainingToFlush, 1);  /* input not consumed : do not end FlushHeldBits yet */
         DEBUGLOG(5, "end of ZSTDMT_compressStream_generic: remainingToFlush = %u", (U32)remainingToFlush);
         return remainingToFlush;
     }

@@ -11,8 +11,8 @@
 #include <vector>
 #include "blockheader/disabled.h"
 #include "blockheader/enabled.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

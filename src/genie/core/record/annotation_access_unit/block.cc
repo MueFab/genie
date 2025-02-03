@@ -6,12 +6,12 @@
 
 #include "genie/core/record/annotation_access_unit/block.h"
 #include <algorithm>
-#include <string>
 #include <iostream>
+#include <string>
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

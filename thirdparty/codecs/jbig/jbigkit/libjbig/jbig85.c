@@ -896,7 +896,7 @@ int jbg85_dec_in(struct jbg85_dec_state *s, unsigned char *data, size_t len,
 
     /* process floating marker segments */
 
-    /* skip COMMENT contents */
+    /* SkipAlignedBytes COMMENT contents */
     if (s->comment_skip) {
       if (s->comment_skip <= len - *cnt) {
 	*cnt += s->comment_skip;

@@ -267,7 +267,7 @@ static dictItem ZDICT_analyzePos(
     if ( (MEM_read16(b+pos+0) == MEM_read16(b+pos+2))
        ||(MEM_read16(b+pos+1) == MEM_read16(b+pos+3))
        ||(MEM_read16(b+pos+2) == MEM_read16(b+pos+4)) ) {
-        /* skip and mark segment */
+        /* SkipAlignedBytes and mark segment */
         U16 const pattern16 = MEM_read16(b+pos+4);
         U32 u, patternEnd = 6;
         while (MEM_read16(b+pos+patternEnd) == pattern16) patternEnd+=2 ;
@@ -381,7 +381,7 @@ static dictItem ZDICT_analyzePos(
             while (b[pos+l-2]==c) l--;
             maxLength = l;
         }
-        if (maxLength < MINMATCHLENGTH) return solution;   /* skip : no long-enough solution */
+        if (maxLength < MINMATCHLENGTH) return solution;   /* SkipAlignedBytes : no long-enough solution */
 
         /* calculate savings */
         savings[5] = 0;

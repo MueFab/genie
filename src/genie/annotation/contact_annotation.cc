@@ -7,7 +7,7 @@
 #include <codecs/include/mpegg-codecs.h>
 #include "annotation.h"
 #include "genie/core/arrayType.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 #include "contact_annotation.h"
 #include "genie/contact/contact_coder.h"
@@ -29,7 +29,7 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
 
     genie::util::BitReader bitreader(reader);
 
-    while (bitreader.isGood()) {
+    while (bitreader.IsStreamGood()) {
         RECS.emplace_back(bitreader);
     }
 

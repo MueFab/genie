@@ -379,7 +379,7 @@ typedef enum {
      */
     ZSTD_c_nbWorkers=400,    /* Select how many threads will be spawned to compress in parallel.
                               * When nbWorkers >= 1, triggers asynchronous mode when invoking ZSTD_compressStream*() :
-                              * ZSTD_compressStream*() consumes input and flush output if possible, but immediately gives back control to caller,
+                              * ZSTD_compressStream*() consumes input and FlushHeldBits output if possible, but immediately gives back control to caller,
                               * while compression is performed in parallel, within worker thread(s).
                               * (note : a strong exception to this rule is when first invocation of ZSTD_compressStream2() sets ZSTD_e_end :
                               *  in which case, ZSTD_compressStream2() delegates to ZSTD_compress2(), which is always a blocking call).
@@ -465,7 +465,7 @@ ZSTDLIB_API ZSTD_bounds ZSTD_cParam_getBounds(ZSTD_cParameter cParam);
  *  Exception : when using multi-threading mode (nbWorkers >= 1),
  *              the following parameters can be updated _during_ compression (within same frame):
  *              => compressionLevel, hashLog, chainLog, searchLog, minMatch, targetLength and strategy.
- *              new parameters will be active for next job only (after a flush()).
+ *              new parameters will be active for next job only (after a FlushHeldBits()).
  * @return : an error code (which can be tested using ZSTD_isError()).
  */
 ZSTDLIB_API size_t ZSTD_CCtx_setParameter(ZSTD_CCtx* cctx, ZSTD_cParameter param, int value);
@@ -661,7 +661,7 @@ typedef struct ZSTD_outBuffer_s {
 *  You must continue calling ZSTD_compressStream2() with ZSTD_e_end until it returns 0, at which point you are free to
 *  start a new frame.
 *  note: ZSTD_e_end will flush as much output as possible, meaning when compressing with multiple threads, it will
-*        block until the flush is complete or the output buffer is full.
+*        block until the FlushHeldBits is complete or the output buffer is full.
 *  @return : 0 if frame fully completed and fully flushed,
 *            >0 if some data still present within internal buffer (the value is minimal estimation of remaining size),
 *            or an error code, which can be tested using ZSTD_isError().
@@ -677,11 +677,11 @@ ZSTDLIB_API size_t ZSTD_freeCStream(ZSTD_CStream* zcs);  /* accept NULL pointer 
 /*===== Streaming compression functions =====*/
 typedef enum {
     ZSTD_e_continue=0, /* collect more data, encoder decides when to output compressed result, for optimal compression ratio */
-    ZSTD_e_flush=1,    /* flush any data provided so far,
+    ZSTD_e_flush=1,    /* FlushHeldBits any data provided so far,
                         * it creates (at least) one new block, that can be decoded immediately on reception;
                         * frame will continue: any future data can still reference previously compressed data, improving compression.
                         * note : multithreaded compression will block to flush as much output as possible. */
-    ZSTD_e_end=2       /* flush any remaining data _and_ close current frame.
+    ZSTD_e_end=2       /* FlushHeldBits any remaining data _and_ close current frame.
                         * note that frame is only closed after compressed data is fully flushed (return value == 0).
                         * After that point, any additional data starts a new frame.
                         * note : each frame is independent (does not reference any content from previous frame).
@@ -696,19 +696,19 @@ typedef enum {
  *  - output->pos and input->pos will be updated. They are guaranteed to remain below their respective limit.
  *  - endOp must be a valid directive
  *  - When nbWorkers==0 (default), function is blocking : it completes its job before returning to caller.
- *  - When nbWorkers>=1, function is non-blocking : it copies a portion of input, distributes jobs to internal worker threads, flush to output whatever is available,
+ *  - When nbWorkers>=1, function is non-blocking : it copies a portion of input, distributes jobs to internal worker threads, FlushHeldBits to output whatever is available,
  *                                                  and then immediately returns, just indicating that there is some data remaining to be flushed.
  *                                                  The function nonetheless guarantees forward progress : it will return only after it reads or write at least 1+ byte.
  *  - Exception : if the first call requests a ZSTD_e_end directive and provides enough dstCapacity, the function delegates to ZSTD_compress2() which is always blocking.
  *  - @return provides a minimum amount of data remaining to be flushed from internal buffers
  *            or an error code, which can be tested using ZSTD_isError().
- *            if @return != 0, flush is not fully completed, there is still some data left within internal buffers.
+ *            if @return != 0, FlushHeldBits is not fully completed, there is still some data left within internal buffers.
  *            This is useful for ZSTD_e_flush, since in this case more flushes are necessary to empty all buffers.
  *            For ZSTD_e_end, @return == 0 when internal buffers are fully flushed and frame is completed.
  *  - after a ZSTD_e_end directive, if internal buffer is not fully flushed (@return != 0),
  *            only ZSTD_e_end or ZSTD_e_flush operations are allowed.
  *            Before starting a new compression job, or changing compression parameters,
- *            it is required to fully flush internal buffers.
+ *            it is required to fully FlushHeldBits internal buffers.
  */
 ZSTDLIB_API size_t ZSTD_compressStream2( ZSTD_CCtx* cctx,
                                          ZSTD_outBuffer* output,
@@ -730,7 +730,7 @@ ZSTDLIB_API size_t ZSTD_compressStream2( ZSTD_CCtx* cctx,
  * for both input and output, to reduce the nb of roundtrips.
  */
 ZSTDLIB_API size_t ZSTD_CStreamInSize(void);    /**< recommended size for input buffer */
-ZSTDLIB_API size_t ZSTD_CStreamOutSize(void);   /**< recommended size for output buffer. Guarantee to successfully flush at least one complete compressed block. */
+ZSTDLIB_API size_t ZSTD_CStreamOutSize(void);   /**< recommended size for output buffer. Guarantee to successfully FlushHeldBits at least one complete compressed block. */
 
 
 /* *****************************************************************************
@@ -753,7 +753,7 @@ ZSTDLIB_API size_t ZSTD_initCStream(ZSTD_CStream* zcs, int compressionLevel);
  * Alternative for ZSTD_compressStream2(zcs, output, input, ZSTD_e_continue).
  * NOTE: The return value is different. ZSTD_compressStream() returns a hint for
  * the next read size (if non-zero and not an error). ZSTD_compressStream2()
- * returns the minimum nb of bytes left to flush (if non-zero and not an error).
+ * returns the minimum nb of bytes left to FlushHeldBits (if non-zero and not an error).
  */
 ZSTDLIB_API size_t ZSTD_compressStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output, ZSTD_inBuffer* input);
 /*! Equivalent to ZSTD_compressStream2(zcs, output, &emptyInput, ZSTD_e_flush). */
@@ -780,7 +780,7 @@ ZSTDLIB_API size_t ZSTD_endStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output);
 *  The function tries to flush all data decoded immediately, respecting output buffer size.
 *  If `output.pos < output.size`, decoder has flushed everything it could.
 *  But if `output.pos == output.size`, there might be some data left within internal buffers.,
-*  In which case, call ZSTD_decompressStream() again to flush whatever remains in the buffer.
+*  In which case, call ZSTD_decompressStream() again to FlushHeldBits whatever remains in the buffer.
 *  Note : with no additional input provided, amount of data flushed is necessarily <= ZSTD_BLOCKSIZE_MAX.
 * @return : 0 when a frame is completely decoded and fully flushed,
 *        or an error code, which can be tested using ZSTD_isError(),
@@ -807,7 +807,7 @@ ZSTDLIB_API size_t ZSTD_initDStream(ZSTD_DStream* zds);
 ZSTDLIB_API size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inBuffer* input);
 
 ZSTDLIB_API size_t ZSTD_DStreamInSize(void);    /*!< recommended size for input buffer */
-ZSTDLIB_API size_t ZSTD_DStreamOutSize(void);   /*!< recommended size for output buffer. Guarantee to successfully flush at least one complete block in all circumstances. */
+ZSTDLIB_API size_t ZSTD_DStreamOutSize(void);   /*!< recommended size for output buffer. Guarantee to successfully FlushHeldBits at least one complete block in all circumstances. */
 
 
 /**************************
@@ -2285,7 +2285,7 @@ size_t ZSTD_initCStream_usingCDict_advanced(ZSTD_CStream* zcs,
  *       explicitly specified.
  *
  *  start a new frame, using same parameters from previous frame.
- *  This is typically useful to skip dictionary loading stage, since it will re-use it in-place.
+ *  This is typically useful to SkipAlignedBytes dictionary loading stage, since it will re-use it in-place.
  *  Note that zcs must be init at least once before using ZSTD_resetCStream().
  *  If pledgedSrcSize is not known at reset time, use macro ZSTD_CONTENTSIZE_UNKNOWN.
  *  If pledgedSrcSize > 0, its value must be correct, as it will be written in header, and controlled at the end.
@@ -2325,7 +2325,7 @@ ZSTDLIB_STATIC_API ZSTD_frameProgression ZSTD_getFrameProgression(const ZSTD_CCt
  *  + there is no active job (could be checked with ZSTD_frameProgression()), or
  *  + oldest job is still actively compressing data,
  *    but everything it has produced has also been flushed so far,
- *    therefore flush speed is limited by production speed of oldest job
+ *    therefore FlushHeldBits speed is limited by production speed of oldest job
  *    irrespective of the speed of concurrent (and newer) jobs.
  */
 ZSTDLIB_STATIC_API size_t ZSTD_toFlushNow(ZSTD_CCtx* cctx);

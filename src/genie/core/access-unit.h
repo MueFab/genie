@@ -18,7 +18,7 @@
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/reference-manager.h"
 #include "genie/core/stats/perf-stats.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

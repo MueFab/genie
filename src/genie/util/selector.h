@@ -13,8 +13,8 @@
 #include <functional>
 #include <vector>
 #include "genie/util/drain.h"
-#include "genie/util/selector-head.h"
-#include "genie/util/selector-tail.h"
+#include "genie/util/selector_head.h"
+#include "genie/util/selector_tail.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

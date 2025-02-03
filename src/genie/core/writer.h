@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 namespace genie {
 namespace core {

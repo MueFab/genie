@@ -7,9 +7,9 @@
 #include <xtensor/xsort.hpp>
 #include <codecs/include/mpegg-codecs.h>
 
-#include "genie/util/runtime-exception.h"
-#include "likelihood_coder.h"
 #include "genie/entropy/lzma/encoder.h"
+#include "genie/util/runtime_exception.h"
+#include "likelihood_coder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

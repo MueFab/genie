@@ -5,17 +5,17 @@
 */
 
 #include <gtest/gtest.h>
-#include <sstream>
-#include <iostream>
-#include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xrandom.hpp>
-#include "genie/core/constants.h"
 #include "genie/contact/contact_coder.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/core/constants.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 #include "helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

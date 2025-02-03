@@ -11,8 +11,8 @@
 
 #include <cstdint>
 #include <vector>
-#include "genie/util/data-block.h"
 #include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

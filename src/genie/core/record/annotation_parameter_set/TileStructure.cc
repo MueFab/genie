@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "TileStructure.h"
 
@@ -95,9 +95,9 @@ void TileStructure::read(util::BitReader& reader, uint8_t AT_coordsize, bool two
 }
 
 void TileStructure::read(util::BitReader& reader) {
-    reader.read_b(7);
-    variable_size_tiles = static_cast<bool>(reader.read_b(1));
-    n_tiles = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
+    reader.ReadBits(7);
+    variable_size_tiles = static_cast<bool>(reader.ReadBits(1));
+    n_tiles = static_cast<uint64_t>(reader.ReadBits(coordSizeInBits(ATCoordSize)));
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
         tile_size.clear();
@@ -105,8 +105,8 @@ void TileStructure::read(util::BitReader& reader) {
         end_index.resize(n_tiles, std::vector<uint64_t>(dimensions));
         for (uint64_t i = 0; i < n_tiles; ++i) {
             for (auto j = 0; j < dimensions; ++j) {
-                start_index[i][j] = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
-                end_index[i][j] = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
+                start_index[i][j] = static_cast<uint64_t>(reader.ReadBits(coordSizeInBits(ATCoordSize)));
+                end_index[i][j] = static_cast<uint64_t>(reader.ReadBits(coordSizeInBits(ATCoordSize)));
             }
         }
     } else {
@@ -114,7 +114,7 @@ void TileStructure::read(util::BitReader& reader) {
         start_index.clear();
         tile_size.resize(dimensions);
         for (auto& dimension : tile_size)
-            dimension = static_cast<uint64_t>(reader.read_b(coordSizeInBits(ATCoordSize)));
+            dimension = static_cast<uint64_t>(reader.ReadBits(coordSizeInBits(ATCoordSize)));
     }
 }
 

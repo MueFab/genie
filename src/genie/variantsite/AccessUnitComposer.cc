@@ -10,10 +10,10 @@
 
 #include "genie/core/record/annotation_access_unit/AnnotationAccessUnitHeader.h"
 #include "genie/core/record/annotation_access_unit/block.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/variantsite/AccessUnitComposer.h"
 
 #include "genie/core/record/variant_genotype/record.h"

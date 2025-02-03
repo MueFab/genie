@@ -6,7 +6,7 @@
 
 #include "genie/quality/paramqv1/parameter_set.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -14,7 +14,7 @@
 #include "genie/core/access-unit.h"
 #include "genie/core/entropy-decoder.h"
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

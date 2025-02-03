@@ -17,7 +17,7 @@
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

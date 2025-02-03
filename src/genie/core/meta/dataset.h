@@ -20,7 +20,7 @@
 #include "genie/core/meta/descriptor-stream.h"
 #include "genie/core/meta/label.h"
 #include "genie/core/meta/reference.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/make_unique.h"
 #include "nlohmann/json.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------

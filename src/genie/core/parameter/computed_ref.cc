@@ -6,7 +6,7 @@
 
 #include "genie/core/parameter/computed_ref.h"
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,10 +31,10 @@ ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ComputedRef::ComputedRef(util::BitReader &reader) {
-    cr_alg_ID = Algorithm(reader.read<uint8_t>());
+    cr_alg_ID = Algorithm(reader.Read<uint8_t>());
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
-        auto pad = reader.read<uint8_t>();
-        auto buffer = reader.read<uint32_t>(24);
+        auto pad = reader.Read<uint8_t>();
+        auto buffer = reader.Read<uint32_t>(24);
         extension = ComputedRefExtended(pad, buffer);
     }
 }

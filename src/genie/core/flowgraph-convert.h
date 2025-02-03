@@ -15,7 +15,7 @@
 #include "genie/core/format-exporter.h"
 #include "genie/core/format-importer.h"
 #include "genie/util/selector.h"
-#include "genie/util/thread-manager.h"
+#include "genie/util/thread_manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

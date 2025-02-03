@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "AttributeParameterSet.h"
 #include "genie/core/arrayType.h"
@@ -111,33 +111,33 @@ AttributeParameterSet& AttributeParameterSet::operator=(const AttributeParameter
 AttributeParameterSet::AttributeParameterSet(util::BitReader& reader) { read(reader); }
 
 void AttributeParameterSet::read(util::BitReader& reader) {
-    attribute_ID = static_cast<uint16_t>(reader.read_b(16));
-    attribute_name_len = static_cast<uint8_t>(reader.read_b(8));
+    attribute_ID = static_cast<uint16_t>(reader.ReadBits(16));
+    attribute_name_len = static_cast<uint8_t>(reader.ReadBits(8));
     attribute_name.resize(attribute_name_len);
-    for (auto& attribute_nameChar : attribute_name) attribute_nameChar = static_cast<char>(reader.read_b(8));
+    for (auto& attribute_nameChar : attribute_name) attribute_nameChar = static_cast<char>(reader.ReadBits(8));
 
-    attribute_type = static_cast<DataType>(reader.read_b(8));
-    attribute_num_array_dims = static_cast<uint8_t>(reader.read_b(2));
+    attribute_type = static_cast<DataType>(reader.ReadBits(8));
+    attribute_num_array_dims = static_cast<uint8_t>(reader.ReadBits(2));
     attribute_array_dims.resize(attribute_num_array_dims);
     for (auto i = 0; i < attribute_num_array_dims; ++i)
-        attribute_array_dims[i] = static_cast<uint8_t>(reader.read_b(8));
+        attribute_array_dims[i] = static_cast<uint8_t>(reader.ReadBits(8));
 
     ArrayType curType;
     attribute_default_val = curType.toArray(attribute_type, reader);
-    attribute_miss_val_flag = static_cast<bool>(reader.read_b(1));
+    attribute_miss_val_flag = static_cast<bool>(reader.ReadBits(1));
     if (attribute_miss_val_flag) {
-        attribute_miss_default_flag = static_cast<bool>(reader.read_b(1));
+        attribute_miss_default_flag = static_cast<bool>(reader.ReadBits(1));
         if (!attribute_miss_default_flag) attribute_miss_val = curType.toArray(attribute_type, reader);
 
         char readChar = 0;
         do {
-            readChar = static_cast<char>(reader.read_b(8));
+            readChar = static_cast<char>(reader.ReadBits(8));
             if (readChar != 0) attribute_miss_str += readChar;
         } while (readChar != 0);
     }
-    compressor_ID = static_cast<uint8_t>(reader.read_b(8));
+    compressor_ID = static_cast<uint8_t>(reader.ReadBits(8));
 
-    n_steps_with_dependencies = static_cast<uint8_t>(reader.read_b(4));
+    n_steps_with_dependencies = static_cast<uint8_t>(reader.ReadBits(4));
 
     n_dependencies.resize(n_steps_with_dependencies);
     dependency_step_ID.resize(n_steps_with_dependencies);
@@ -146,23 +146,23 @@ void AttributeParameterSet::read(util::BitReader& reader) {
     dependency_ID.resize(n_steps_with_dependencies);
 
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
-        dependency_step_ID[i] = static_cast<uint8_t>(reader.read_b(4));
-        n_dependencies[i] = static_cast<uint8_t>(reader.read_b(4));
+        dependency_step_ID[i] = static_cast<uint8_t>(reader.ReadBits(4));
+        n_dependencies[i] = static_cast<uint8_t>(reader.ReadBits(4));
 
         dependency_var_ID[i].resize(n_dependencies[i]);
         dependency_is_attribute[i].resize(n_dependencies[i]);
         dependency_ID[i].resize(n_dependencies[i]);
 
         for (auto j = 0; j < n_dependencies[i]; ++j) {
-            dependency_var_ID[i][j] = static_cast<uint8_t>(reader.read_b(4));
-            dependency_is_attribute[i][j] = static_cast<bool>(reader.read_b(1));
+            dependency_var_ID[i][j] = static_cast<uint8_t>(reader.ReadBits(4));
+            dependency_is_attribute[i][j] = static_cast<bool>(reader.ReadBits(1));
             if (dependency_is_attribute[i][j])
-                dependency_ID[i][j] = static_cast<uint16_t>(reader.read_b(16));
+                dependency_ID[i][j] = static_cast<uint16_t>(reader.ReadBits(16));
             else
-                dependency_ID[i][j] = static_cast<uint16_t>(reader.read_b(7));
+                dependency_ID[i][j] = static_cast<uint16_t>(reader.ReadBits(7));
         }
     }
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 void AttributeParameterSet::write(core::Writer& writer) const {

@@ -12,8 +12,8 @@
 #include <cstdint>
 #include "boost/optional/optional.hpp"
 #include "genie/core/parameter/computed_ref_extended.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

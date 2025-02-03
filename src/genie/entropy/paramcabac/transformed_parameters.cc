@@ -5,9 +5,9 @@
  */
 
 #include "genie/entropy/paramcabac/transformed_parameters.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,23 +22,23 @@ TransformedParameters::TransformedParameters() : TransformedParameters(Transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedParameters::TransformedParameters(util::BitReader &reader) {
-    transform_ID_subseq = reader.read<TransformIdSubseq>(8);
+    transform_ID_subseq = reader.Read<TransformIdSubseq>(8);
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
             break;
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = reader.read<uint16_t>();
+            match_coding_buffer_size = reader.Read<uint16_t>();
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = reader.read<uint8_t>();
+            rle_coding_guard = reader.Read<uint8_t>();
             break;
         case TransformIdSubseq::MERGE_CODING:
-            merge_coding_subseq_count = reader.read<uint8_t>(4);
+            merge_coding_subseq_count = reader.Read<uint8_t>(4);
             merge_coding_shift_size.resize(*merge_coding_subseq_count);
             for (int i = 0; i < *merge_coding_subseq_count; i++) {
-                merge_coding_shift_size[i] = reader.read<uint8_t>(5);
+                merge_coding_shift_size[i] = reader.Read<uint8_t>(5);
             }
             break;
         default:

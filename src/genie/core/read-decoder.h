@@ -19,7 +19,7 @@
 #include "genie/core/qv-decoder.h"
 #include "genie/core/record/alignment/chunk.h"
 #include "genie/util/selector.h"
-#include "genie/util/side-selector.h"
+#include "genie/util/side_selector.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -225,7 +225,7 @@ size_t FSE_NCountWriteBound(unsigned maxSymbolValue, unsigned tableLog)
                                    + 4 /* bitCount initialized at 4 */
                                    + 2 /* first two symbols may use one additional bit each */) / 8)
                                     + 1 /* round up to whole nb bytes */
-                                    + 2 /* additional two bytes for bitstream flush */;
+                                    + 2 /* additional two bytes for bitstream FlushHeldBits */;
     return maxSymbolValue ? maxHeaderSize : FSE_NCOUNTBOUND;  /* maxSymbolValue==0 ? use default */
 }
 
@@ -314,7 +314,7 @@ FSE_writeNCount_generic (void* header, size_t headerBufferSize,
         return ERROR(GENERIC);  /* incorrect normalized distribution */
     assert(symbol <= alphabetSize);
 
-    /* flush remaining bitStream */
+    /* FlushHeldBits remaining bitStream */
     if ((!writeIsSafe) && (out > oend - 2))
         return ERROR(dstSize_tooSmall);   /* Buffer overflow */
     out[0] = (BYTE)bitStream;

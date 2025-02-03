@@ -7,7 +7,7 @@
 #include "arrayType.h"
 #include <cstring>
 #include <iostream>
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 namespace genie {
 namespace core {
@@ -133,47 +133,47 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
     std::vector<uint8_t> byteArray;
     switch (type) {
         case DataType::BOOL:
-            byteArray.push_back(static_cast<uint8_t>(reader.read_b(1)));
+            byteArray.push_back(static_cast<uint8_t>(reader.ReadBits(1)));
             break;
         case DataType::CHAR:
         case DataType::UINT8:
-            byteArray.push_back(static_cast<uint8_t>(reader.read_b(8)));
+            byteArray.push_back(static_cast<uint8_t>(reader.ReadBits(8)));
             break;
         case DataType::INT8: {
-            uint8_t readValue = static_cast<uint8_t>(reader.read_b(8));
+            uint8_t readValue = static_cast<uint8_t>(reader.ReadBits(8));
              byteArray.resize(1);
             memcpy(&byteArray[0], &readValue, 1);
             break;
         }
         case DataType::INT16: {
-            uint16_t readValue = static_cast<uint16_t>(reader.read_b(16));
+            uint16_t readValue = static_cast<uint16_t>(reader.ReadBits(16));
             byteArray.resize(2);
             memcpy(&byteArray[0], &readValue, 2);
             break;
         }
         case DataType::UINT16: {
             uint16_t temp;
-            temp = static_cast<uint16_t>(reader.read_b(16));
+            temp = static_cast<uint16_t>(reader.ReadBits(16));
             byteArray.resize(2);
             memcpy(&byteArray[0], &temp, 2);
             break;
         }
         case DataType::INT32: {
-            uint32_t readValue = static_cast<uint32_t>(reader.read_b(32));
+            uint32_t readValue = static_cast<uint32_t>(reader.ReadBits(32));
             byteArray.resize(4);
             memcpy(&byteArray[0], &readValue, 4);
             break;
         }
         case DataType::UINT32: {
             uint32_t temp;
-            temp = static_cast<uint32_t>(reader.read_b(32));
+            temp = static_cast<uint32_t>(reader.ReadBits(32));
             byteArray.resize(4);
             memcpy(&byteArray[0], &temp, 4);
             break;
         }
         case DataType::INT64: {
             int64_t temp;
-            temp = static_cast<int64_t>(reader.read_b(64));
+            temp = static_cast<int64_t>(reader.ReadBits(64));
             byteArray.resize(8);
             memcpy(&byteArray[0], &temp, 8);
             break;
@@ -181,24 +181,24 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
         case DataType::DOUBLE:
         case DataType::UINT64: {
             uint64_t temp;
-            temp = static_cast<uint64_t>(reader.read_b(64));
+            temp = static_cast<uint64_t>(reader.ReadBits(64));
             byteArray.resize(8);
             memcpy(&byteArray[0], &temp, 8);
             break;
         }
         case DataType::FLOAT: {  // decided to treat a float the same as u32
             uint32_t temp;
-            temp = static_cast<uint32_t>(reader.read_b(32));
+            temp = static_cast<uint32_t>(reader.ReadBits(32));
             byteArray.resize(4);
             memcpy(&byteArray[0], &temp, 4);
             break;
         }
         default:  // case STRING
-            uint8_t read = static_cast<uint8_t>(reader.read_b(8));
+            uint8_t read = static_cast<uint8_t>(reader.ReadBits(8));
 
             while (read != 0) {
                 byteArray.push_back(read);
-                read = static_cast<uint8_t>(reader.read_b(8));
+                read = static_cast<uint8_t>(reader.ReadBits(8));
             }
             break;
     }
@@ -234,7 +234,7 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Write
     if (type == core::DataType::STRING) {
         for (uint64_t i = 0; i < number; ++i) {
             std::string temp;
-            reader.readBypass_null_terminated(temp);
+            reader.ReadAlignedStringTerminated(temp);
             writer.write(temp);
             writer.write(0, 8, true);
         }
@@ -243,7 +243,7 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Write
             //        uint64_t writeValue = 0;
             uint8_t byteSize = getDefaultBitsize(type);
             if (byteSize == 0) byteSize = 1;
-            for (uint64_t n = 0; n < number; ++n) writer.write(reader.read_b(byteSize), byteSize);
+            for (uint64_t n = 0; n < number; ++n) writer.write(reader.ReadBits(byteSize), byteSize);
         }
     }
 }

@@ -6,7 +6,7 @@
 
 #include "unpaired.h"
 #include <memory>
-#include "genie/util/make-unique.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

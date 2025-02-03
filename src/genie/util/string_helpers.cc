@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/string-helpers.h"
+#include "genie/util/string_helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

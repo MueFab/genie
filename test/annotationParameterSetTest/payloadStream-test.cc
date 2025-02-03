@@ -3,8 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include "genie/core/record/annotation_access_unit/BlockPayloadStream.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 class payloadStreamTests : public ::testing::Test {
  protected:

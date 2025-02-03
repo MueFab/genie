@@ -151,7 +151,7 @@ _start: /* Requires: ip0 */
     step = stepSize;
     nextStep = ip0 + kStepIncr;
 
-    /* calculate positions, ip0 - anchor == 0, so we skip step calc */
+    /* calculate positions, ip0 - anchor == 0, so we SkipAlignedBytes step calc */
     ip1 = ip0 + 1;
     ip2 = ip0 + step;
     ip3 = ip2 + 1;

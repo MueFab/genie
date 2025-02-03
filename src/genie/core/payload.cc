@@ -15,12 +15,12 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
-    auto pos = reader.getPos();
-    reader.setPos(payloadPosition);
+    auto pos = reader.GetStreamPosition();
+    reader.SetStreamPosition(payloadPosition);
     genie::util::DataBlock tmp;
     tmp.resize(payloadSize);
-    reader.readBypass(tmp.getData(), payloadSize);
-    reader.setPos(pos);
+    reader.ReadAlignedBytes(tmp.getData(), payloadSize);
+    reader.SetStreamPosition(pos);
     return tmp;
 }
 
@@ -77,10 +77,10 @@ Payload::Payload(genie::util::DataBlock payload)
 Payload::Payload(util::BitReader& reader, uint64_t size)
     : block_payload(),
       payloadLoaded(false),
-      payloadPosition(reader.getPos()),
+      payloadPosition(reader.GetStreamPosition()),
       payloadSize(size),
       internal_reader(&reader) {
-    reader.skip(size);
+    reader.SkipAlignedBytes(size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

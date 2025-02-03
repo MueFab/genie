@@ -14,7 +14,7 @@
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
 #include "genie/entropy/paramcabac/subsequence.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

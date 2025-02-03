@@ -22,8 +22,8 @@
 #include "genie/format/mgb/mm_cfg.h"
 #include "genie/format/mgb/ref_cfg.h"
 #include "genie/format/mgb/signature_cfg.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,8 +5,8 @@
  */
 
 #include "alignment-shared-data.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ void AlignmentSharedData::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AlignmentSharedData::AlignmentSharedData(util::BitReader &reader)
-    : seq_ID(reader.readBypassBE<uint16_t>()), as_depth(reader.readBypassBE<uint8_t>()) {}
+    : seq_ID(reader.ReadAlignedInt<uint16_t>()), as_depth(reader.ReadAlignedInt<uint8_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

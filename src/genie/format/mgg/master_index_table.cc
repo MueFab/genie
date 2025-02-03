@@ -7,7 +7,7 @@
 #include "genie/format/mgg/master_index_table.h"
 #include <sstream>
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@
 #include "genie/entropy/gabac/rle-subseq-transform.h"
 #include <cassert>
 #include <vector>
-#include "genie/util/block-stepper.h"
+#include "genie/util/block_stepper.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

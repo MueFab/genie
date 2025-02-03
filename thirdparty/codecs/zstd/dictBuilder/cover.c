@@ -380,7 +380,7 @@ static void COVER_group(COVER_ctx_t *ctx, const void *group,
     }
     freq += 1;
     /* Binary search to find the end of the sample *grpPtr is in.
-     * In the common case that grpPtr + 1 == grpEnd we can skip the binary
+     * In the common case that grpPtr + 1 == grpEnd we can SkipAlignedBytes the binary
      * search because the loop is over.
      */
     if (grpPtr + 1 != grpEnd) {

@@ -18,9 +18,9 @@
 #include <vector>
 
 #include "genie/core/constants.h"
-#include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
+#include "genie/core/writer.h"
+#include "genie/util/bit_reader.h"
 
 #include "genie/core/record/variant_site/record.h"
 

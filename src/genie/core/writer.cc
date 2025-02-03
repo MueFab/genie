@@ -5,7 +5,7 @@
  */
 
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 namespace genie {
 namespace core {

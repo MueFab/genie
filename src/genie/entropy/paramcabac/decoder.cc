@@ -7,7 +7,7 @@
 #include "genie/entropy/paramcabac/decoder.h"
 #include <memory>
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 
 DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader)
     : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
-    uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
+    uint8_t num_descriptor_subsequence_cfgs = reader.Read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(false, desc, reader);
     }
@@ -91,7 +91,7 @@ DecoderTokenType::DecoderTokenType()
 DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
     : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = 2;
-    rle_guard_tokentype = reader.read<uint8_t>();
+    rle_guard_tokentype = reader.Read<uint8_t>();
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(true, desc, reader);
     }

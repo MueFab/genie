@@ -18,8 +18,8 @@
 #include <sstream>
 
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"

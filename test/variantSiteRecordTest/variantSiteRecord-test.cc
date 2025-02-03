@@ -10,7 +10,7 @@
 #include <iostream>
 #include "codecs/include/mpegg-codecs.h"
 #include "genie/core/arrayType.h"
-#include "genie/util/string-helpers.h"
+#include "genie/util/string_helpers.h"
 
 #include "genie/annotation/AnnotationEncoder.h"
 #include "genie/annotation/ParameterSetComposer.h"
@@ -28,7 +28,7 @@
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 class VariantSiteRecordTests : public ::testing::Test {
  protected:

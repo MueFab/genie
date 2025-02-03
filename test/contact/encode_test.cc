@@ -9,13 +9,13 @@
 #include <vector>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
-#include <xtensor/xio.hpp>
-#include "helpers.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
+#include "helpers.h"
 //#include "genie/util/bitwriter.h"
 //#include "genie/util/runtime-exception.h"
 //#include <unistd.h>
@@ -788,7 +788,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()) {
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
@@ -1045,7 +1045,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -1294,7 +1294,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -1544,7 +1544,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -1563,7 +1563,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             LR_RECS.emplace_back(bitreader);
         }
 
@@ -1815,7 +1815,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()) {
+        while (bitreader.IsStreamGood()) {
             RECS.emplace_back(bitreader);
         }
 
@@ -2053,7 +2053,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -2072,7 +2072,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             LR_RECS.emplace_back(bitreader);
         }
 
@@ -2403,7 +2403,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -2653,7 +2653,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
 
@@ -2672,7 +2672,7 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         genie::util::BitReader bitreader(reader);
 
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             LR_RECS.emplace_back(bitreader);
         }
 
@@ -3056,7 +3056,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             RECS.emplace_back(bitreader);
         }
         RECS.pop_back();

@@ -20,7 +20,7 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include "genie/variantsite/Tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -243,7 +243,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.readBypass(reinterpret_cast<char *>(data.getData()), size);
+    reader.ReadAlignedBytes(reinterpret_cast<char *>(data.getData()), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
         if (i < (count - 1)) {
-            s = reader.read<size_t>(32);
+            s = reader.Read<size_t>(32);
             remainingSize -= (s + 4);
         } else {
             s = remainingSize;

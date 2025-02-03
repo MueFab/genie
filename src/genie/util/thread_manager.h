@@ -13,7 +13,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-#include "genie/util/original-source.h"
+#include "genie/util/original_source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
