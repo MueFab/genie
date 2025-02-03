@@ -377,19 +377,19 @@ void ContactRecord::write(util::BitWriter &writer) const {
     // Sample
     writer.writeBypassBE(sample_ID);
     writer.writeBypassBE(static_cast<uint8_t>(sample_name.length()));
-    writer.writeBypass(sample_name.data(), sample_name.length());
+    writer.WriteAlignedBytes(sample_name.data(), sample_name.length());
     writer.writeBypassBE(bin_size);
 
     // chr1
     writer.writeBypassBE(chr1_ID);
     writer.writeBypassBE(static_cast<uint8_t>(chr1_name.length()));
-    writer.writeBypass(chr1_name.data(), chr1_name.length());
+    writer.WriteAlignedBytes(chr1_name.data(), chr1_name.length());
     writer.writeBypassBE(chr1_length);
 
     // chr2
     writer.writeBypassBE(chr2_ID);
     writer.writeBypassBE(static_cast<uint8_t>(chr2_name.length()));
-    writer.writeBypass(chr2_name.data(), chr2_name.length());
+    writer.WriteAlignedBytes(chr2_name.data(), chr2_name.length());
     writer.writeBypassBE(chr2_length);
 
     // num_entries and num_norm_counts
@@ -398,7 +398,7 @@ void ContactRecord::write(util::BitWriter &writer) const {
 
     for (auto i = 0; i < getNumNormCounts(); i++){
         writer.writeBypassBE(static_cast<uint8_t>(norm_count_names[i].length()));
-        writer.writeBypass(norm_count_names[i].data(), norm_count_names[i].length());
+        writer.WriteAlignedBytes(norm_count_names[i].data(), norm_count_names[i].length());
     }
 
     for (const auto& v: start_pos1){

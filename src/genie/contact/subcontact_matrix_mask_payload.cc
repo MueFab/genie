@@ -229,10 +229,7 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
     std::ostream& _writer = payload;
     auto onmem_writer = genie::util::BitWriter(&_writer);
 
-    onmem_writer.write(
-        static_cast<uint64_t>(transform_ID),
-        TRANSFORM_ID_BLEN
-    );
+    onmem_writer.WriteBits(static_cast<uint64_t>(transform_ID), TRANSFORM_ID_BLEN);
 
     if (transform_ID == TransformID::ID_0){
         UTILS_DIE_IF(!mask_array.has_value(), "mask_array is missing?");
@@ -241,21 +238,21 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
         for (auto i = 0u; i < num_bin_entries; i++){
             auto _mask_array = mask_array.value();
             uint64_t val = mask_array->at(i);
-            onmem_writer.write(val, 1);
+            onmem_writer.WriteBits(val, 1);
         }
     } else {
         UTILS_DIE_IF(!rl_entries.has_value(), "rl_entries is missing?");
-        onmem_writer.write(first_val, FIRST_VAL_BLEN);
+        onmem_writer.WriteBits(first_val, FIRST_VAL_BLEN);
         auto num_rl_entries = rl_entries->size();
-        onmem_writer.write(num_rl_entries, NUM_RL_ENTRIES_BLEN);
+        onmem_writer.WriteBits(num_rl_entries, NUM_RL_ENTRIES_BLEN);
         for (auto i = 0u; i < num_rl_entries; i++){
             auto nbits = static_cast<uint8_t>(4u << static_cast<uint8_t>(transform_ID));
             auto val = static_cast<uint64_t>(rl_entries->at(i));
-            onmem_writer.write(val, nbits);
+            onmem_writer.WriteBits(val, nbits);
         }
     }
     // Align to byte
-    onmem_writer.flush();
+    onmem_writer.FlushBits();
 
     auto payload_str = payload.str();
     for (auto& v: payload_str){

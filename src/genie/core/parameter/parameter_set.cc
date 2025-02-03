@@ -121,23 +121,23 @@ EncodingSet::EncodingSet()
 
 void ParameterSet::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
-    writer.write(0, 10);  // reserved
+    writer.WriteBits(0, 10);  // reserved
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    tmp_writer.write(parameter_set_ID, 8);
-    tmp_writer.write(parent_parameter_set_ID, 8);
+    tmp_writer.WriteBits(parameter_set_ID, 8);
+    tmp_writer.WriteBits(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
-    tmp_writer.flush();
-    uint64_t bits = tmp_writer.getBitsWritten();
+    tmp_writer.FlushBits();
+    uint64_t bits = tmp_writer.GetTotalBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
     uint64_t bytes = bits / 8 + ((bits % 8) ? 1 : 0);
 
     // Now size is known, write to final destination
-    writer.write(bytes, 22);
-    writer.writeBypass(&ss);
+    writer.WriteBits(bytes, 22);
+    writer.WriteAlignedStream(&ss);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,11 +145,11 @@ void ParameterSet::write(util::BitWriter &writer) const {
 uint64_t ParameterSet::getLength() const {
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    tmp_writer.write(parameter_set_ID, 8);
-    tmp_writer.write(parent_parameter_set_ID, 8);
+    tmp_writer.WriteBits(parameter_set_ID, 8);
+    tmp_writer.WriteBits(parent_parameter_set_ID, 8);
     set.write(tmp_writer);
 
-    uint64_t len = tmp_writer.getBitsWritten() / 8;
+    uint64_t len = tmp_writer.GetTotalBitsWritten() / 8;
 
     return len;
 }
@@ -182,47 +182,47 @@ void EncodingSet::setSignatureLength(uint8_t length) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void EncodingSet::write(util::BitWriter &writer) const {
-    writer.write(uint8_t(dataset_type), 4);
-    writer.write(uint8_t(alphabet_ID), 8);
-    writer.write(read_length, 24);
-    writer.write(number_of_template_segments_minus1, 2);
-    writer.write(0, 6);  // reserved_2
-    writer.write(max_au_data_unit_size, 29);
-    writer.write(static_cast<uint8_t>(pos_40_bits_flag), 1);
-    writer.write(qv_depth, 3);
-    writer.write(as_depth, 3);
-    writer.write(class_IDs.size(), 4);  // num_classes
+    writer.WriteBits(uint8_t(dataset_type), 4);
+    writer.WriteBits(uint8_t(alphabet_ID), 8);
+    writer.WriteBits(read_length, 24);
+    writer.WriteBits(number_of_template_segments_minus1, 2);
+    writer.WriteBits(0, 6);  // reserved_2
+    writer.WriteBits(max_au_data_unit_size, 29);
+    writer.WriteBits(static_cast<uint8_t>(pos_40_bits_flag), 1);
+    writer.WriteBits(qv_depth, 3);
+    writer.WriteBits(as_depth, 3);
+    writer.WriteBits(class_IDs.size(), 4);  // num_classes
     for (auto &i : class_IDs) {
-        writer.write(uint8_t(i), 4);
+        writer.WriteBits(uint8_t(i), 4);
     }
     for (auto &i : descriptors) {
         i.write(writer);
     }
-    writer.write(rgroup_IDs.size(), 16);  // num_groups
+    writer.WriteBits(rgroup_IDs.size(), 16);  // num_groups
     for (auto &i : rgroup_IDs) {
         for (auto &j : i) {
-            writer.write(static_cast<uint8_t>(j), 8);
+            writer.WriteBits(static_cast<uint8_t>(j), 8);
         }
-        writer.write('\0', 8);  // NULL termination
+        writer.WriteBits('\0', 8);  // NULL termination
     }
-    writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
-    writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
-    writer.write(reserved, 30);
-    writer.write(signature_cfg != boost::none, 1);
+    writer.WriteBits(static_cast<uint8_t>(multiple_alignments_flag), 1);
+    writer.WriteBits(static_cast<uint8_t>(spliced_reads_flag), 1);
+    writer.WriteBits(reserved, 30);
+    writer.WriteBits(signature_cfg != boost::none, 1);
     if (signature_cfg != boost::none) {
-        writer.write(signature_cfg->signature_length != boost::none, 1);
+        writer.WriteBits(signature_cfg->signature_length != boost::none, 1);
         if (signature_cfg->signature_length != boost::none) {
-            writer.write(*signature_cfg->signature_length, 8);
+            writer.WriteBits(*signature_cfg->signature_length, 8);
         }
     }
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
-    writer.write(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
+    writer.WriteBits(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
     if (parameter_set_crps) {
         parameter_set_crps->write(writer);
     }
-    writer.flush();
+    writer.FlushBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

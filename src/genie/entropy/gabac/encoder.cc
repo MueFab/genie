@@ -41,13 +41,13 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
         return ret_empty;
     }
 
-    writer.write(desc.begin()->getNumSymbols(), 32);
-    writer.write(num_streams, 16);
+    writer.WriteBits(desc.begin()->getNumSymbols(), 32);
+    writer.WriteBits(num_streams, 16);
 
     for (auto &subsequence : desc) {
         if (subsequence.getNumSymbols()) {
-            writer.write(subsequence.getID().second & 0xfu, 4);
-            writer.write(3, 4);
+            writer.WriteBits(subsequence.getID().second & 0xfu, 4);
+            writer.WriteBits(3, 4);
             compress(conf0, std::move(subsequence)).write(writer);
         }
     }

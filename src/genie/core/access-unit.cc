@@ -234,7 +234,7 @@ size_t AccessUnit::Subsequence::getRawSize() const { return data.GetRawSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
-    writer.writeBypass(data.GetData(), data.GetRawSize());
+    writer.WriteAlignedBytes(data.GetData(), data.GetRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -285,7 +285,7 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
     }
     for (size_t i = 0; i < subdesc.size(); ++i) {
         if (i < (subdesc.size() - 1)) {
-            writer.write(subdesc[i].getRawSize(), 32);
+            writer.WriteBits(subdesc[i].getRawSize(), 32);
         }
         subdesc[i].write(writer);
     }

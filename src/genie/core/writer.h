@@ -84,7 +84,7 @@ class Writer {
         } else if (writingLog) {
             *logwriter << std::to_string(value) << endVal;
         } else if (bits > 0) {
-            binwriter.write(value, bits);
+            binwriter.WriteBits(value, bits);
         }
     }
 
@@ -116,7 +116,7 @@ class Writer {
             in->seekg(0, in->beg);
         } else if (!writingLog) {
             while (in->read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
-                binwriter.write(byte, 8);
+                binwriter.WriteBits(byte, 8);
             }
         }
     }
@@ -129,7 +129,7 @@ class Writer {
         if (getWriteSize) {
             if (writeBitSize % 8 != 0) writeBitSize += (8 - writeBitSize % 8);
         } else if (!writingLog) {
-            binwriter.flush();
+            binwriter.FlushBits();
         }
     }
 
@@ -141,7 +141,7 @@ class Writer {
         if (getWriteSize) {
             return writeBitSize;
         } else if (!writingLog) {
-            return binwriter.getBitsWritten();
+            return binwriter.GetTotalBitsWritten();
         } else {
             return 0;
         }
