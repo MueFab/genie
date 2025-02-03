@@ -6,8 +6,8 @@
 
 #include "genie/core/parameter/descriptor.h"
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ bool Descriptor::equals(const Descriptor *desc) const { return dec_cfg_preset ==
 
 void Descriptor::write(util::BitWriter &writer) const { writer.write(uint8_t(dec_cfg_preset), 8); }
 std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &reader) {
-    auto preset = reader.read<uint8_t>();
+    auto preset = reader.Read<uint8_t>();
     switch (preset) {
         case 0:  // TODO(Fabian): move factory
             return util::make_unique<desc_pres::DescriptorPresent>(desc, reader);

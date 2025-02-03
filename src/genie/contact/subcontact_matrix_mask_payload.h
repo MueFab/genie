@@ -7,9 +7,9 @@
 #ifndef GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
 #define GENIE_CONTACT_SUBCONTACT_MATRIX_MASK_PAYLOAD_H
 
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 #include "consts.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

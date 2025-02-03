@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include "genie/entropy/paramcabac/binarization_parameters.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

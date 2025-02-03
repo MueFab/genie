@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <codecs/include/mpegg-codecs.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <fstream>
@@ -13,11 +14,10 @@
 #include <xtensor/xoperation.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
-#include <codecs/include/mpegg-codecs.h>
 #include "genie/core/constants.h"
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/genotype/genotype_coder.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include "helpers.h"
 
 #include "genie/genotype/genotype_parameters.h"
@@ -33,7 +33,7 @@ TEST(Genotype, Decompose) {
     std::ifstream reader(filepath, std::ios::binary | std::ios::in);
     ASSERT_EQ(reader.fail(), false);
     genie::util::BitReader bitreader(reader);
-    while (bitreader.isGood()) {
+    while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
     }
     reader.close();

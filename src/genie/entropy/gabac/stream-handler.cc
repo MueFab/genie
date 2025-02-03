@@ -5,7 +5,7 @@
  */
 
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

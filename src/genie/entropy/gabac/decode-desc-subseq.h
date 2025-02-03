@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 #include "genie/entropy/paramcabac/subsequence.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

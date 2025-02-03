@@ -10,9 +10,9 @@
 
 #include "AnnotationEncoder.h"
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
 // #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"

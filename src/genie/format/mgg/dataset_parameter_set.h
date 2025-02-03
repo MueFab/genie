@@ -15,7 +15,7 @@
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/format/mgg/dataset_parameterset/update_info.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

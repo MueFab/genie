@@ -17,9 +17,9 @@
 #include "genie/core/reference-source.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/format/mgb/data-unit-factory.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 #include "genie/util/ordered-section.h"
-#include "genie/util/original-source.h"
+#include "genie/util/original_source.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/core/constants.h"
 #include "genie/core/parameter/descriptor.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

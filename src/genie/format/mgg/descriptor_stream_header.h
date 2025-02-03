@@ -12,7 +12,7 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment/class-type.h"
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

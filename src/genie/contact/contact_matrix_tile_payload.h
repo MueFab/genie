@@ -10,14 +10,14 @@
 
 #include <cstdint>
 #include <list>
-#include <tuple>
 #include <optional>
+#include <tuple>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

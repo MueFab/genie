@@ -9,17 +9,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
-#include <boost/optional/optional.hpp>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 #include "genie/core/record/linked_record/linked_record.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,9 +6,9 @@
 
 #include "same-rec.h"
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ SameRec::SameRec(int64_t _delta, Alignment _alignment)
 
 SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
-      delta(reader.readBypassBE<int64_t, 6>()),
+      delta(reader.ReadAlignedInt<int64_t, 6>()),
       alignment(as_depth, reader) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

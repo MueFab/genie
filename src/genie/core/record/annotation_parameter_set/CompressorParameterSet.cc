@@ -12,11 +12,11 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "CompressorParameterSet.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,32 +60,32 @@ CompressorParameterSet::CompressorParameterSet(
 }
 
 void CompressorParameterSet::read(util::BitReader& reader) {
-    compressor_ID = static_cast<uint8_t>(reader.read_b(8));
-    uint8_t n_compressor_steps = static_cast<uint8_t>(reader.read_b(4));
+    compressor_ID = static_cast<uint8_t>(reader.ReadBits(8));
+    uint8_t n_compressor_steps = static_cast<uint8_t>(reader.ReadBits(4));
     compressorSteps.resize(n_compressor_steps);
     for (auto i = 0; i < n_compressor_steps; ++i) {
-        compressorSteps.at(i).stepID = static_cast<uint8_t>(reader.read_b(4));
-        compressorSteps.at(i).algorithmID = static_cast<genie::core::AlgoID>(reader.read_b(5));
-        compressorSteps.at(i).useDefaultAlgorithmParameters = static_cast<bool>(reader.read_b(1));
+        compressorSteps.at(i).stepID = static_cast<uint8_t>(reader.ReadBits(4));
+        compressorSteps.at(i).algorithmID = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+        compressorSteps.at(i).useDefaultAlgorithmParameters = static_cast<bool>(reader.ReadBits(1));
 
         if (!compressorSteps.at(i).useDefaultAlgorithmParameters)
             compressorSteps.at(i).algorithm_parameters.read(reader);
 
-        uint8_t nrOfInVars = static_cast<uint8_t>(reader.read_b(4));
+        uint8_t nrOfInVars = static_cast<uint8_t>(reader.ReadBits(4));
         compressorSteps.at(i).in_var_ID.resize(nrOfInVars);
         compressorSteps.at(i).prev_step_ID.resize(nrOfInVars);
         compressorSteps.at(i).prev_out_var_ID.resize(nrOfInVars);
         for (auto j = 0; j < nrOfInVars; ++j) {
-            compressorSteps.at(i).in_var_ID.at(j) = static_cast<uint8_t>(reader.read_b(4));
-            compressorSteps.at(i).prev_step_ID.at(j) = static_cast<uint8_t>(reader.read_b(4));
-            compressorSteps.at(i).prev_out_var_ID.at(j) = static_cast<uint8_t>(reader.read_b(4));
+            compressorSteps.at(i).in_var_ID.at(j) = static_cast<uint8_t>(reader.ReadBits(4));
+            compressorSteps.at(i).prev_step_ID.at(j) = static_cast<uint8_t>(reader.ReadBits(4));
+            compressorSteps.at(i).prev_out_var_ID.at(j) = static_cast<uint8_t>(reader.ReadBits(4));
         }
-        uint8_t nrOfoutVars = static_cast<uint8_t>(reader.read_b(4));
+        uint8_t nrOfoutVars = static_cast<uint8_t>(reader.ReadBits(4));
         compressorSteps.at(i).completed_out_var_ID.resize(nrOfoutVars);
         for (auto j = 0; j < nrOfoutVars; ++j)
-            compressorSteps.at(i).completed_out_var_ID.at(j) = static_cast<uint8_t>(reader.read_b(4));
+            compressorSteps.at(i).completed_out_var_ID.at(j) = static_cast<uint8_t>(reader.ReadBits(4));
     }
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 void CompressorParameterSet::write(core::Writer& writer) const {

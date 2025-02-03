@@ -19,7 +19,7 @@
 #include "genie/core/parameter/data_unit.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/format/mgb/raw_reference.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

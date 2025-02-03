@@ -25,56 +25,56 @@ bool EncodingSet::SignatureCfg::operator==(const SignatureCfg &cfg) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 EncodingSet::EncodingSet(util::BitReader &bitReader) {
-    dataset_type = bitReader.read<DataUnit::DatasetType>(4);
-    alphabet_ID = bitReader.read<AlphabetID>();
-    read_length = bitReader.read<uint32_t>(24);
-    number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
-    bitReader.read_b(6);
-    max_au_data_unit_size = bitReader.read<uint32_t>(29);
-    pos_40_bits_flag = bitReader.read<bool>(1);
-    qv_depth = bitReader.read<uint8_t>(3);
-    as_depth = bitReader.read<uint8_t>(3);
-    auto num_classes = bitReader.read<uint8_t>(4);
+    dataset_type = bitReader.Read<DataUnit::DatasetType>(4);
+    alphabet_ID = bitReader.Read<AlphabetID>();
+    read_length = bitReader.Read<uint32_t>(24);
+    number_of_template_segments_minus1 = bitReader.Read<uint8_t>(2);
+    bitReader.ReadBits(6);
+    max_au_data_unit_size = bitReader.Read<uint32_t>(29);
+    pos_40_bits_flag = bitReader.Read<bool>(1);
+    qv_depth = bitReader.Read<uint8_t>(3);
+    as_depth = bitReader.Read<uint8_t>(3);
+    auto num_classes = bitReader.Read<uint8_t>(4);
     for (size_t i = 0; i < num_classes; ++i) {
-        class_IDs.push_back(bitReader.read<record::ClassType>(4));
+        class_IDs.push_back(bitReader.Read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
         descriptors.emplace_back(DescriptorSubseqCfg(num_classes, GenDesc(i), bitReader));
     }
-    auto num_groups = bitReader.read<uint16_t>();
+    auto num_groups = bitReader.Read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
         rgroup_IDs.emplace_back();
         char c = 0;
         do {
-            c = bitReader.read<uint8_t>();
+            c = bitReader.Read<uint8_t>();
             rgroup_IDs.back().push_back(c);
         } while (c);
     }
-    multiple_alignments_flag = bitReader.read<bool>(1);
-    spliced_reads_flag = bitReader.read<bool>(1);
-    reserved = bitReader.read<uint32_t>(30);
-    bool sig_flag = bitReader.read<bool>(1);
+    multiple_alignments_flag = bitReader.Read<bool>(1);
+    spliced_reads_flag = bitReader.Read<bool>(1);
+    reserved = bitReader.Read<uint32_t>(30);
+    bool sig_flag = bitReader.Read<bool>(1);
     if (sig_flag) {
         signature_cfg = SignatureCfg();
-        bool const_flag = bitReader.read<bool>(1);
+        bool const_flag = bitReader.Read<bool>(1);
         if (const_flag) {
-            signature_cfg->signature_length = bitReader.read<uint8_t>(8);
+            signature_cfg->signature_length = bitReader.Read<uint8_t>(8);
         }
     }
     for (size_t i = 0; i < num_classes; ++i) {
-        auto mode = bitReader.read<uint8_t>(4);
+        auto mode = bitReader.Read<uint8_t>(4);
         if (mode == 1) {
             qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
                 mode, genie::core::GenDesc::QV, bitReader));
         } else {
-            bitReader.read<uint8_t>(1);
+            bitReader.Read<uint8_t>(1);
         }
     }
-    auto crps_flag = bitReader.read<bool>(1);
+    auto crps_flag = bitReader.Read<bool>(1);
     if (crps_flag) {
         parameter_set_crps = ComputedRef(bitReader);
     }
-    bitReader.flush();
+    bitReader.FlushHeldBits();
 }
 
 //------------------------------------------------------------------------------------------------------------------
@@ -442,10 +442,10 @@ bool EncodingSet::qual_cmp(const EncodingSet &ps) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
-    bitReader.read<uint16_t>(10);
-    bitReader.read<uint32_t>(22);
-    parameter_set_ID = bitReader.read<uint8_t>(8);
-    parent_parameter_set_ID = bitReader.read<uint8_t>(8);
+    bitReader.Read<uint16_t>(10);
+    bitReader.Read<uint32_t>(22);
+    parameter_set_ID = bitReader.Read<uint8_t>(8);
+    parent_parameter_set_ID = bitReader.Read<uint8_t>(8);
     set = EncodingSet(bitReader);
 }
 

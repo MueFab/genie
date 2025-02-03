@@ -13,8 +13,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/util/block-stepper.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/block_stepper.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -417,7 +417,7 @@ class DataBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/data-block.impl.h"
+#include "genie/util/data_block.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

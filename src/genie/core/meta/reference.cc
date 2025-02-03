@@ -13,8 +13,8 @@
 #include "genie/core/meta/external-ref/mpeg.h"
 #include "genie/core/meta/external-ref/raw.h"
 #include "genie/core/meta/internal-ref.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

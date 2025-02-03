@@ -6,14 +6,14 @@
 
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <utility>
-#include <iostream>
 #include "genie/core/arrayType.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -45,13 +45,13 @@ Record::Record(uint8_t parameter_set_ID, uint8_t AT_ID, core::AlphabetID AT_alph
       annotation_encoding_parameters(annotation_encoding_parameters) {}
 
 void Record::read(util::BitReader& reader) {
-    parameter_set_ID = static_cast<uint8_t>(reader.read_b(8));
-    AT_ID = static_cast<uint8_t>(reader.read_b(8));
-    AT_alphabet_ID = static_cast<core::AlphabetID>(reader.read_b(8));
-    reader.read_b(2);
-    AT_coord_size = static_cast<uint8_t>(reader.read_b(2));
-    AT_pos_40_bits_flag = static_cast<bool>(reader.read_b(1));
-    n_aux_attribute_groups = static_cast<uint8_t>(reader.read_b(3));
+    parameter_set_ID = static_cast<uint8_t>(reader.ReadBits(8));
+    AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
+    AT_alphabet_ID = static_cast<core::AlphabetID>(reader.ReadBits(8));
+    reader.ReadBits(2);
+    AT_coord_size = static_cast<uint8_t>(reader.ReadBits(2));
+    AT_pos_40_bits_flag = static_cast<bool>(reader.ReadBits(1));
+    n_aux_attribute_groups = static_cast<uint8_t>(reader.ReadBits(3));
     tile_configuration.resize(static_cast<size_t>(n_aux_attribute_groups) + 1);
     for (auto i = 0; i <= n_aux_attribute_groups; ++i) tile_configuration[i].read(reader, AT_coord_size);
     annotation_encoding_parameters.read(reader);

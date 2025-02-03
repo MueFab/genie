@@ -12,8 +12,8 @@
 #include <cstdint>
 #include <memory>
 #include "genie/core/record/alignment/alignment-external.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

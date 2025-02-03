@@ -10,7 +10,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "genie/util/make-unique.h"
+#include "genie/util/make_unique.h"
 #include "genie/util/watch.h"
 
 //#include "codecs/api/mpegg_utils.h"

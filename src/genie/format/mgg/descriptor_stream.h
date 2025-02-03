@@ -18,8 +18,8 @@
 #include "genie/format/mgg/descriptor_stream_protection.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/format/mgg/master_index_table.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/data-block.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

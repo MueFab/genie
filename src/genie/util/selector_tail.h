@@ -71,7 +71,7 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/util/selector-tail.impl.h"
+#include "genie/util/selector_tail.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

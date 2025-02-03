@@ -7,8 +7,8 @@
 #include "genie/core/parameter/descriptor_subseq_cfg.h"
 #include <utility>
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(DescriptorSubseqCfg&& cfg) n
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorSubseqCfg::DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util::BitReader& reader) {
-    class_specific_dec_cfg_flag = reader.read<bool>(1);
+    class_specific_dec_cfg_flag = reader.Read<bool>(1);
     if (class_specific_dec_cfg_flag == 0) {
         descriptor_configurations.emplace_back(Descriptor::factory(desc, reader));
     } else {

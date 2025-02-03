@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

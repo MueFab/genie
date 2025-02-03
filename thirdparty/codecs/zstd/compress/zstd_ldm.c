@@ -472,7 +472,7 @@ static size_t ZSTD_ldm_generateSequences_internal(
              * then we have a repeating, overlapping, pattern. E.g. all zeros.
              * If one repetition of the pattern matches our `stopMask` then all
              * repetitions will. We don't need to insert them all into out table,
-             * only the first one. So skip over overlapping matches.
+             * only the first one. So SkipAlignedBytes over overlapping matches.
              * This is a major speed boost (20x) for compressing a single byte
              * repeated, when that byte ends up in the table.
              */

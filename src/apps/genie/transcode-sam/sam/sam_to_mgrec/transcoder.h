@@ -20,7 +20,7 @@
 #include "genie/core/cigar-tokenizer.h"
 #include "genie/core/record/alignment/record.h"
 #include "genie/format/fasta/manager.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

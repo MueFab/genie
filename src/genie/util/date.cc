@@ -6,8 +6,8 @@
 
 #include "genie/util/date.h"
 #include <regex>
-#include "genie/util/runtime-exception.h"
-#include "genie/util/string-helpers.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/string_helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

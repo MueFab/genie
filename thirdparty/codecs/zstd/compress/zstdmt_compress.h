@@ -76,7 +76,7 @@ size_t ZSTDMT_initCStream_internal(ZSTDMT_CCtx* mtctx,
 
 /*! ZSTDMT_compressStream_generic() :
  *  Combines ZSTDMT_compressStream() with optional ZSTDMT_flushStream() or ZSTDMT_endStream()
- *  depending on flush directive.
+ *  depending on FlushHeldBits directive.
  * @return : minimum amount of data still to be flushed
  *           0 if fully flushed
  *           or an error code

@@ -21,13 +21,13 @@
 #include "genie/variantsite/Attributes.h"
 #include "genie/variantsite/Descriptors.h"
 
+#include "genie/annotation/JsonAttributeParser.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/AttributeParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
-#include "genie/annotation/JsonAttributeParser.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

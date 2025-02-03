@@ -1054,7 +1054,7 @@ static void encode_sde(struct jbg_enc_state *s,
 #endif
 	ltp_old = ltp;
 	if (ltp) {
-	  /* skip next line */
+	  /* SkipAlignedBytes next line */
 	  hp += hbpl;
 	  continue;
 	}
@@ -2731,7 +2731,7 @@ int jbg_dec_in(struct jbg_dec_state *s, unsigned char *data, size_t len,
 
     /* process floating marker segments */
 
-    /* skip COMMENT contents */
+    /* SkipAlignedBytes COMMENT contents */
     if (s->comment_skip) {
       if (s->comment_skip <= len - *cnt) {
 	*cnt += s->comment_skip;
@@ -3091,7 +3091,7 @@ void jbg_split_planes(unsigned long x, unsigned long y, int has_planes,
 	   * corresponding Gray code word, then g(i) = b(i) xor b(i+1).
 	   */
 	}
-	/* skip unused *src bytes */
+	/* SkipAlignedBytes unused *src bytes */
 	for (;p < has_planes; p++)
 	  if (((msb - p) & 7) == 0)
 	    src++;
@@ -3259,7 +3259,7 @@ int jbg_newlen(unsigned char *bie, size_t len)
     return JBG_EAGAIN;
   if ((bie[19] & (JBG_DPON | JBG_DPPRIV | JBG_DPLAST))
       == (JBG_DPON | JBG_DPPRIV))
-    p += 1728; /* skip DPTABLE */
+    p += 1728; /* SkipAlignedBytes DPTABLE */
   if (p >= bie + len)
     return JBG_EAGAIN;
 

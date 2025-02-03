@@ -20,7 +20,7 @@
 #include "format/mgg/encapsulator/encapsulated_file.h"
 #include "genie/format/mgb/raw_reference.h"
 #include "genie/format/mgg/mgg_file.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 #include "util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

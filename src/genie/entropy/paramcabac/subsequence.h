@@ -13,7 +13,7 @@
 #include <vector>
 #include "genie/entropy/paramcabac/transformed-subseq.h"
 #include "genie/entropy/paramcabac/transformed_parameters.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

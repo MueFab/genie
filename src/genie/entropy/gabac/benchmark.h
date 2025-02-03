@@ -18,7 +18,7 @@
 #include "genie/entropy/paramcabac/binarization.h"
 #include "genie/entropy/paramcabac/subsequence.h"
 #include "genie/entropy/paramcabac/transformed-subseq.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

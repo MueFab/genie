@@ -11,7 +11,7 @@
 #include "genie/variantsite/AccessUnitComposer.h"
 
 #include "genie/core/arrayType.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 #include "site_annotation.h"
 
 #include "AnnotationEncoder.h"

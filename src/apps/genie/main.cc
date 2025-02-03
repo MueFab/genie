@@ -9,10 +9,10 @@
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"
-#include "genie/gabac/main.h"
 #include "genie/annotation/main.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/gabac/main.h"
 #include "genie/module/manager.h"
+#include "genie/util/runtime_exception.h"
 //#include "genie/capsulator/main.h"
 //#include "genie/transcode-fasta/main.h"
 //#include "genie/transcode-fastq/main.h"

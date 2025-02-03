@@ -13,7 +13,7 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -20,7 +20,7 @@
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

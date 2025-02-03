@@ -8,7 +8,7 @@
 #include <istream>
 #include <ostream>
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

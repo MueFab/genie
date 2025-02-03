@@ -13,7 +13,7 @@
 #include "genie/entropy/gabac/decode-transformed-subseq.h"
 #include "genie/entropy/gabac/mismatch-decoder.h"
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,8 +43,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
-        reader.read<uint32_t>();
-        num_tokentype_descriptors = reader.read<uint16_t>();
+        reader.Read<uint32_t>();
+        num_tokentype_descriptors = reader.Read<uint16_t>();
     }
     int32_t typeNum = -1;
     for (size_t i = 0; i < num_tokentype_descriptors; ++i) {
@@ -60,8 +60,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
             gabac::IBufferStream stream(&tmp);
             util::BitReader reader(stream);
 
-            type_id = reader.read<uint16_t>(4);
-            method = reader.read<uint16_t>(4);
+            type_id = reader.Read<uint16_t>(4);
+            method = reader.Read<uint16_t>(4);
             if (type_id == 0) typeNum++;
             mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);
 
@@ -78,7 +78,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
                                                       remainingData.getWordSize());
                 gabac::IBufferStream stream(&tmp);
                 util::BitReader reader(stream);
-                payload_size = reader.read<uint32_t>();
+                payload_size = reader.Read<uint32_t>();
                 offset += 4;
             } else {
                 payload_size = remainingData.getRawSize() - offset;
@@ -90,7 +90,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
                                                           remainingData.getWordSize());
                     gabac::IBufferStream stream(&tmp);
                     util::BitReader reader(stream);
-                    numTransformedSymbols = reader.read<uint32_t>();
+                    numTransformedSymbols = reader.Read<uint32_t>();
                     offset += 4;
                     payload_size -= 4;
                 }

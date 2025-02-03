@@ -12,8 +12,8 @@
 #include <map>
 #include <string>
 #include "genie/core/reference-manager.h"
-#include "genie/util/ordered-lock.h"
-#include "genie/util/original-source.h"
+#include "genie/util/ordered_lock.h"
+#include "genie/util/original_source.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

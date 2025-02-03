@@ -6,9 +6,9 @@
 
 #include "segment.h"
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,9 +28,9 @@ Segment::Segment(std::string&& _sequence) : sequence(std::move(_sequence)), qual
 
 Segment::Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader)
     : sequence(length, 0), quality_values(qv_depth, std::string(length, 0)) {
-    reader.readBypass(&this->sequence[0], length);
+    reader.ReadAlignedBytes(&this->sequence[0], length);
     for (auto& q : quality_values) {
-        reader.readBypass(&q[0], q.length());
+        reader.ReadAlignedBytes(&q[0], q.length());
     }
 }
 

@@ -9,10 +9,10 @@
 #include <utility>
 
 #include "genie/core/record/annotation_access_unit/record.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,11 +64,11 @@ Record::Record(uint8_t AT_ID, AnnotationType AT_type, uint8_t AT_subtype, uint8_
 }
 
 void Record::read(util::BitReader& reader) {
-    AT_ID = static_cast<uint8_t>(reader.read_b(8));
-    AT_type = static_cast<AnnotationType>(reader.read_b(4));
-    AT_subtype = static_cast<uint8_t>(reader.read_b(4));
-    AG_class = static_cast<uint8_t>(reader.read_b(3));
-    reader.read_b(5);
+    AT_ID = static_cast<uint8_t>(reader.ReadBits(8));
+    AT_type = static_cast<AnnotationType>(reader.ReadBits(4));
+    AT_subtype = static_cast<uint8_t>(reader.ReadBits(4));
+    AG_class = static_cast<uint8_t>(reader.ReadBits(3));
+    reader.ReadBits(5);
     annotation_access_unit_header.read(reader, attribute_contiguity, two_dimensional, column_major_tile_order,
                                        variable_size_tiles, AT_coord_size);
     n_blocks = annotation_access_unit_header.getNumberOfBlocks();

@@ -21,8 +21,8 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment/alignment_split/same-rec.h"
 #include "genie/core/stats/perf-stats.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 #include "segment.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

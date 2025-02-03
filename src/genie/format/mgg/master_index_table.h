@@ -21,7 +21,7 @@
 #include "genie/format/mgg/gen_info.h"
 #include "genie/format/mgg/master_index_table/aligned_au_index.h"
 #include "genie/format/mgg/master_index_table/unaligned_au_index.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

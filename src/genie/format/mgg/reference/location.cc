@@ -11,9 +11,9 @@
 #include "genie/format/mgg/reference/location/external/mpeg.h"
 #include "genie/format/mgg/reference/location/external/raw.h"
 #include "genie/format/mgg/reference/location/internal.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-#include "genie/util/string-helpers.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/string_helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

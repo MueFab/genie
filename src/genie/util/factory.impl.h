@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 #include "genie/core/constants.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

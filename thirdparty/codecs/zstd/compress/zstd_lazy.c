@@ -333,7 +333,7 @@ ZSTD_DUBT_findBestMatch(ZSTD_matchState_t* ms,
                     if (dictMode == ZSTD_dictMatchState) {
                         nbCompares = 0; /* in addition to avoiding checking any
                                          * further in this loop, make sure we
-                                         * skip checking in the dictionary. */
+                                         * SkipAlignedBytes checking in the dictionary. */
                     }
                     break;   /* drop, to guarantee consistency (miss a little bit of compression) */
                 }
@@ -366,7 +366,7 @@ ZSTD_DUBT_findBestMatch(ZSTD_matchState_t* ms,
         }
 
         assert(matchEndIdx > curr+8); /* ensure nextToUpdate is increased */
-        ms->nextToUpdate = matchEndIdx - 8;   /* skip repetitive patterns */
+        ms->nextToUpdate = matchEndIdx - 8;   /* SkipAlignedBytes repetitive patterns */
         if (bestLength >= MINMATCH) {
             U32 const mIndex = curr - (U32)STORED_OFFSET(*offsetPtr); (void)mIndex;
             DEBUGLOG(8, "ZSTD_DUBT_findBestMatch(%u) : found match of length %u and offsetCode %u (pos %u)",
@@ -443,7 +443,7 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_matchState_t* ms, const B
             U32 countBeyondMinChain = 0;
             U32 i = tmpHashTable[hashIdx];
             for (count = 0; i >= tmpMinChain && count < cacheSize; count++) {
-                /* skip through the chain to the first position that won't be
+                /* SkipAlignedBytes through the chain to the first position that won't be
                  * in the hash cache bucket */
                 if (i < minChain) {
                     countBeyondMinChain++;
@@ -955,7 +955,7 @@ FORCE_INLINE_TEMPLATE void ZSTD_row_update_internal(ZSTD_matchState_t* ms, const
     if (useCache) {
         /* Only skip positions when using hash cache, i.e.
          * if we are loading a dict, don't skip anything.
-         * If we decide to skip, then we only update a set number
+         * If we decide to SkipAlignedBytes, then we only update a set number
          * of positions at the beginning and end of the match.
          */
         if (UNLIKELY(target - idx > kSkipThreshold)) {

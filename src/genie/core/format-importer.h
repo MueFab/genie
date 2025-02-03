@@ -13,7 +13,7 @@
 #include "genie/core/access-unit.h"
 #include "genie/core/classifier.h"
 #include "genie/core/record/alignment/record.h"
-#include "genie/util/original-source.h"
+#include "genie/util/original_source.h"
 #include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

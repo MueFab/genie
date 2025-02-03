@@ -14,8 +14,8 @@
 #include "apps/genie/annotation/code.h"
 #include "filesystem/filesystem.hpp"
 #include "genie/core/writer.h"
-#include "genie/util/runtime-exception.h"
-#include "genie/util/string-helpers.h"
+#include "genie/util/runtime_exception.h"
+#include "genie/util/string_helpers.h"
 
 #include "genie/core/record/data_unit/record.h"
 #include "genie/variantsite/AccessUnitComposer.h"
@@ -172,7 +172,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     genie::util::BitReader bitreader(reader);
     std::vector<genie::core::record::VariantGenotype> recs;
 
-    while (bitreader.isGood()) {
+    while (bitreader.IsStreamGood()) {
         recs.emplace_back(bitreader);
     }
 

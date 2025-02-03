@@ -6446,7 +6446,7 @@ class json_sax_dom_callback_parser
   private:
     /*!
     @param[in] v  value to add to the JSON value we build during parsing
-    @param[in] skip_callback  whether we should skip calling the callback
+    @param[in] skip_callback  whether we should SkipAlignedBytes calling the callback
                function; this is required after start_array() and
                start_object() SAX events, because otherwise we would call the
                callback function with an empty array or object, respectively.
@@ -6489,7 +6489,7 @@ class json_sax_dom_callback_parser
             return {true, &root};
         }
 
-        // skip this value if we already decided to skip the parent
+        // skip this value if we already decided to SkipAlignedBytes the parent
         // (https://github.com/nlohmann/json/issues/971#issuecomment-413678360)
         if (!ref_stack.back())
         {
@@ -7465,7 +7465,7 @@ class lexer : public lexer_base<BasicJsonType>
     {
         switch (get())
         {
-            // single-line comments skip input until a newline or EOF is read
+            // single-line comments SkipAlignedBytes input until a newline or EOF is read
             case '/':
             {
                 while (true)
@@ -7484,7 +7484,7 @@ class lexer : public lexer_base<BasicJsonType>
                 }
             }
 
-            // multi-line comments skip input until */ is read
+            // multi-line comments SkipAlignedBytes input until */ is read
             case '*':
             {
                 while (true)
@@ -8100,7 +8100,7 @@ scan_number_done:
     /////////////////////
 
     /*!
-    @brief skip the UTF-8 byte order mark
+    @brief SkipAlignedBytes the UTF-8 byte order mark
     @return true iff there is no BOM or the correct BOM has been skipped
     */
     bool skip_bom()
@@ -8128,7 +8128,7 @@ scan_number_done:
 
     token_type scan()
     {
-        // initially, skip the BOM
+        // initially, SkipAlignedBytes the BOM
         if (position.chars_read_total == 0 && !skip_bom())
         {
             error_message = "invalid BOM; must be 0xEF 0xBB 0xBF if given";
@@ -8146,7 +8146,7 @@ scan_number_done:
                 return token_type::parse_error;
             }
 
-            // skip following whitespace
+            // SkipAlignedBytes following whitespace
             skip_whitespace();
         }
 

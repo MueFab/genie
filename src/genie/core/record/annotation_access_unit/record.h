@@ -17,7 +17,7 @@
 
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 #include "AnnotationAccessUnitHeader.h"
 #include "genie/core/record/annotation_access_unit/block.h"

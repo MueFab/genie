@@ -1,18 +1,18 @@
 project("genie-util")
 
 set(source_files
-        block-stepper.cc
-        bitreader.cc
-        bitwriter.cc
-        data-block.cc
+        block_stepper.cc
+        bit_reader.cc
+        bit_writer.cc
+        data_block.cc
         date.cc
         exception.cc
-        ordered-lock.cc
+        ordered_lock.cc
         ordered-section.cc
-        runtime-exception.cc
-        string-helpers.cc
+        runtime_exception.cc
+        string_helpers.cc
         stringview.cc
-        thread-manager.cc
+        thread_manager.cc
         watch.cc
         )
 

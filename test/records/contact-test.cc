@@ -5,11 +5,11 @@
 */
 
 #include <gtest/gtest.h>
-#include <fstream>
 #include <cmath>
+#include <fstream>
 #include "genie/core/record/contact/record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 #include "helpers.h"
 
 void check_row_col_uniqueness(
@@ -64,7 +64,7 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -123,7 +123,7 @@ TEST(ContactRecord, IntraContactRecord_LR_All) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -185,7 +185,7 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -244,7 +244,7 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -303,7 +303,7 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 
@@ -362,7 +362,7 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
         ASSERT_EQ(reader.fail(), false);
         genie::util::BitReader bitreader(reader);
 
-        while (bitreader.isGood()){
+        while (bitreader.IsStreamGood()){
             recs.emplace_back(bitreader);
         }
 

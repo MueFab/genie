@@ -13,7 +13,7 @@
 #include "genie/format/mgb/block.h"
 #include "genie/format/mgg/block_header.h"
 #include "genie/format/mgg/box.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

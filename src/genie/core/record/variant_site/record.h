@@ -20,8 +20,8 @@
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/writer.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +39,14 @@ class InfoFields {
         std::vector<CustomType> values;
     };
     void read(genie::util::BitReader& reader) {
-        auto alt_count = static_cast<uint8_t>(reader.read_b(8));
+        auto alt_count = static_cast<uint8_t>(reader.ReadBits(8));
         fields.reserve(alt_count * 16);
         for (auto i = 0; i < alt_count; ++i) {
-            auto alt_len = static_cast<uint8_t>(reader.read_b(8));
+            auto alt_len = static_cast<uint8_t>(reader.ReadBits(8));
             std::string alttag(alt_len, 0);
-            for (auto& tag : alttag) tag = reader.readBypassBE<uint8_t>();
-            auto alt_type = static_cast<genie::core::DataType>(reader.readBypassBE<uint8_t>());
-            auto arrayLength = reader.readBypassBE<uint8_t>();
+            for (auto& tag : alttag) tag = reader.ReadAlignedInt<uint8_t>();
+            auto alt_type = static_cast<genie::core::DataType>(reader.ReadAlignedInt<uint8_t>());
+            auto arrayLength = reader.ReadAlignedInt<uint8_t>();
             ArrayType arrayType;
             std::vector<CustomType> values;
             for (auto j = 0; j < arrayLength; ++j) {

@@ -6,8 +6,8 @@
 
 #include "alignment.h"
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,12 +23,12 @@ Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
 // ---------------------------------------------------------------------------------------------------------------------
 
 Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
-    ecigar_string.resize(reader.readBypassBE<uint32_t, 3>());
-    reader.readBypass(&ecigar_string[0], ecigar_string.size());
+    ecigar_string.resize(reader.ReadAlignedInt<uint32_t, 3>());
+    reader.ReadAlignedBytes(&ecigar_string[0], ecigar_string.size());
 
-    reverse_comp = reader.readBypassBE<uint8_t>();
+    reverse_comp = reader.ReadAlignedInt<uint8_t>();
     mapping_score.resize(as_depth);
-    reader.readBypass(&mapping_score[0], as_depth * sizeof(int32_t));
+    reader.ReadAlignedBytes(&mapping_score[0], as_depth * sizeof(int32_t));
     for (auto &s : mapping_score) {
         util::swap_endianness(s);
     }

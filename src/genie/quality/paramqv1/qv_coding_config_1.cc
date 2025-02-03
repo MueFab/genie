@@ -7,9 +7,9 @@
 #include "genie/quality/paramqv1/qv_coding_config_1.h"
 #include <utility>
 #include <vector>
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

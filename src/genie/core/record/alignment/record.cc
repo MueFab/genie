@@ -11,12 +11,12 @@
 #include "alignment-box.h"
 #include "alignment-shared-data.h"
 #include "genie/core/record/alignment/alignment_external/none.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-#include "segment.h"
 #include "genie/core/record/data_unit/record.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
+#include "segment.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,21 +64,21 @@ Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record(util::BitReader &reader)
-    : number_of_template_segments(reader.readBypassBE<uint8_t>()),
-      reads(reader.readBypassBE<uint8_t>()),
-      alignmentInfo(reader.readBypassBE<uint16_t>()),
-      class_ID(reader.readBypassBE<ClassType>()),
-      read_group(reader.readBypassBE<uint8_t>(), 0),
-      read_1_first(reader.readBypassBE<uint8_t>()),
+    : number_of_template_segments(reader.ReadAlignedInt<uint8_t>()),
+      reads(reader.ReadAlignedInt<uint8_t>()),
+      alignmentInfo(reader.ReadAlignedInt<uint16_t>()),
+      class_ID(reader.ReadAlignedInt<ClassType>()),
+      read_group(reader.ReadAlignedInt<uint8_t>(), 0),
+      read_1_first(reader.ReadAlignedInt<uint8_t>()),
       sharedAlignmentInfo(!alignmentInfo.empty() ? AlignmentSharedData(reader) : AlignmentSharedData()) {
     std::vector<uint32_t> readSizes(reads.size());
     for (auto &s : readSizes) {
-        s = reader.readBypassBE<uint32_t, 3>();
+        s = reader.ReadAlignedInt<uint32_t, 3>();
     }
-    qv_depth = reader.readBypassBE<uint8_t>();
-    read_name.resize(reader.readBypassBE<uint8_t>());
-    reader.readBypass(&read_name[0], read_name.size());
-    reader.readBypass(&read_group[0], read_group.size());
+    qv_depth = reader.ReadAlignedInt<uint8_t>();
+    read_name.resize(reader.ReadAlignedInt<uint8_t>());
+    reader.ReadAlignedBytes(&read_name[0], read_name.size());
+    reader.ReadAlignedBytes(&read_group[0], read_group.size());
 
     size_t index = 0;
     for (auto &r : reads) {
@@ -88,7 +88,7 @@ Record::Record(util::BitReader &reader)
     for (auto &a : alignmentInfo) {
         a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
     }
-    flags = reader.readBypassBE<uint8_t>();
+    flags = reader.ReadAlignedInt<uint8_t>();
     moreAlignmentInfo = AlignmentExternal::factory(reader);
 }
 

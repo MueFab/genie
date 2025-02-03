@@ -13,10 +13,10 @@
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,57 +76,57 @@ void Record::write(core::Writer& writer) {
 
 bool Record::read(genie::util::BitReader& reader) {
     clearData();
-    variant_index = reader.read_b(64);
-    if (!reader.isGood()) return false;
-    seq_ID = static_cast<uint16_t>(reader.read_b(16));
-    pos = reader.read_b(40);
-    strand = static_cast<uint8_t>(reader.read_b(8));
-    ID_len = static_cast<uint8_t>(reader.read_b(8));
+    variant_index = reader.ReadBits(64);
+    if (!reader.IsStreamGood()) return false;
+    seq_ID = static_cast<uint16_t>(reader.ReadBits(16));
+    pos = reader.ReadBits(40);
+    strand = static_cast<uint8_t>(reader.ReadBits(8));
+    ID_len = static_cast<uint8_t>(reader.ReadBits(8));
     if (ID_len > 0) {
         ID.resize(ID_len);
-        reader.readBypass(&ID[0], ID_len);
+        reader.ReadAlignedBytes(&ID[0], ID_len);
     }
-    description_len = static_cast<uint8_t>(reader.read_b(8));
+    description_len = static_cast<uint8_t>(reader.ReadBits(8));
 
     if (description_len > 0) {
         description.resize(description_len);
-        reader.readBypass(&description[0], description_len);
+        reader.ReadAlignedBytes(&description[0], description_len);
     }
-    ref_len = static_cast<uint32_t>(reader.read_b(32));
+    ref_len = static_cast<uint32_t>(reader.ReadBits(32));
     if (ref_len > 0) {
         ref.resize(ref_len);
-        reader.readBypass(&ref[0], ref_len);
+        reader.ReadAlignedBytes(&ref[0], ref_len);
     }
-    alt_count = static_cast<uint8_t>(reader.read_b(8));
+    alt_count = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < alt_count; ++i) {
-        alt_len.push_back(static_cast<uint32_t>(reader.read_b(32)));
+        alt_len.push_back(static_cast<uint32_t>(reader.ReadBits(32)));
         std::string altlist(alt_len.back(), 0);
-        for (auto& item : altlist) item = static_cast<char>(reader.read_b(8));
+        for (auto& item : altlist) item = static_cast<char>(reader.ReadBits(8));
         altern.push_back(altlist);
     }
 
-    depth = static_cast<uint32_t>(reader.read_b(32));
+    depth = static_cast<uint32_t>(reader.ReadBits(32));
 
-    seq_qual = static_cast<uint32_t>(reader.read_b(32));
-    map_qual = static_cast<uint32_t>(reader.read_b(32));
-    map_num_qual_0 = static_cast<uint32_t>(reader.read_b(32));
+    seq_qual = static_cast<uint32_t>(reader.ReadBits(32));
+    map_qual = static_cast<uint32_t>(reader.ReadBits(32));
+    map_num_qual_0 = static_cast<uint32_t>(reader.ReadBits(32));
 
-    filters_len = static_cast<uint8_t>(reader.read_b(8));
+    filters_len = static_cast<uint8_t>(reader.ReadBits(8));
     if (filters_len > 0) {
         filters.resize(filters_len);
-        reader.readBypass(&filters[0], filters_len);
+        reader.ReadAlignedBytes(&filters[0], filters_len);
     }
 
     info.read(reader);
  
-    linked_record = static_cast<uint8_t>(reader.read_b(8));
+    linked_record = static_cast<uint8_t>(reader.ReadBits(8));
     if (linked_record) {
-        link_name_len = static_cast<uint8_t>(reader.read_b(8));
+        link_name_len = static_cast<uint8_t>(reader.ReadBits(8));
         if (link_name_len > 0) {
             link_name.resize(link_name_len);
-            reader.readBypass(&link_name[0], link_name_len);
+            reader.ReadAlignedBytes(&link_name[0], link_name_len);
         }
-        reference_box_ID = static_cast<uint8_t>(reader.read_b(8));
+        reference_box_ID = static_cast<uint8_t>(reader.ReadBits(8));
     }
     return true;
 }

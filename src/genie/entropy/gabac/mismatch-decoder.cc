@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

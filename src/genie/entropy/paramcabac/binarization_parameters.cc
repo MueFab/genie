@@ -5,8 +5,8 @@
  */
 
 #include "genie/entropy/paramcabac/binarization_parameters.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,18 +23,18 @@ BinarizationParameters::BinarizationParameters() : BinarizationParameters(Binari
 BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitReader &reader) {
     switch (binID) {
         case BinarizationId::TU:
-            cmax = reader.read<uint8_t>();
+            cmax = reader.Read<uint8_t>();
             break;
         case BinarizationId::TEG:
         case BinarizationId::STEG:
-            cmax_teg = reader.read<uint8_t>();
+            cmax_teg = reader.Read<uint8_t>();
             break;
         case BinarizationId::DTU:
         case BinarizationId::SDTU:
-            cmax_dtu = reader.read<uint8_t>();  // Fall-through
+            cmax_dtu = reader.Read<uint8_t>();  // Fall-through
         case BinarizationId::SUTU:
         case BinarizationId::SSUTU:
-            split_unit_size = reader.read<uint8_t>(4);
+            split_unit_size = reader.Read<uint8_t>(4);
             break;
         default:
             break;

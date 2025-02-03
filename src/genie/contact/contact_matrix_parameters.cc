@@ -5,7 +5,7 @@
  */
 
 #include "contact_matrix_parameters.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -61,13 +61,13 @@ ContactMatrixParameters::ContactMatrixParameters(
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
-    auto num_samples = reader.readBypassBE<uint16_t>();
+    auto num_samples = reader.ReadAlignedInt<uint16_t>();
     for (uint16_t i = 0; i<num_samples; i++){
-        auto ID = reader.readBypassBE<uint16_t>();
+        auto ID = reader.ReadAlignedInt<uint16_t>();
 
         std::string name;
-        name.resize(reader.readBypassBE<uint8_t>());
-        reader.readBypass(&name[0], name.size());
+        name.resize(reader.ReadAlignedInt<uint8_t>());
+        reader.ReadAlignedBytes(&name[0], name.size());
 
         SampleInformation sample_info = {
             ID,
@@ -77,13 +77,13 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
         sample_infos.emplace(ID, std::move(sample_info));
     }
 
-    auto num_chrs = reader.readBypassBE<uint8_t>();
+    auto num_chrs = reader.ReadAlignedInt<uint8_t>();
     for (uint8_t i = 0; i<num_chrs; i++){
-        auto ID = reader.readBypassBE<uint8_t>();
+        auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
-        name.resize(reader.readBypassBE<uint8_t>());
-        reader.readBypass(&name[0], name.size());
-        auto length = reader.readBypassBE<uint64_t>();
+        name.resize(reader.ReadAlignedInt<uint8_t>());
+        reader.ReadAlignedBytes(&name[0], name.size());
+        auto length = reader.ReadAlignedInt<uint64_t>();
 
         ChromosomeInformation chr_info = {
             ID,
@@ -94,20 +94,20 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
         chr_infos.emplace(ID, std::move(chr_info));
     }
 
-    bin_size = reader.readBypassBE<uint32_t>();
-    tile_size = reader.readBypassBE<uint32_t>();
-    auto num_interval_mults = reader.readBypassBE<uint8_t>();
+    bin_size = reader.ReadAlignedInt<uint32_t>();
+    tile_size = reader.ReadAlignedInt<uint32_t>();
+    auto num_interval_mults = reader.ReadAlignedInt<uint8_t>();
     for (uint8_t i = 0; i<num_interval_mults; i++){
-        bin_size_multipliers.push_back(reader.readBypassBE<uint32_t>());
+        bin_size_multipliers.push_back(reader.ReadAlignedInt<uint32_t>());
     }
 
-    auto num_norm_methods = reader.readBypassBE<uint8_t>();
+    auto num_norm_methods = reader.ReadAlignedInt<uint8_t>();
     for (uint8_t i = 0; i<num_norm_methods; i++){
-        auto ID = reader.readBypassBE<uint8_t>();
+        auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
-        name.resize(reader.readBypassBE<uint8_t>());
-        reader.readBypass(&name[0], name.size());
-        bool mult_flag = reader.readBypassBE<uint8_t>();
+        name.resize(reader.ReadAlignedInt<uint8_t>());
+        reader.ReadAlignedBytes(&name[0], name.size());
+        bool mult_flag = reader.ReadAlignedInt<uint8_t>();
 
         NormalizationMethodInformation norm_method_info = {
             ID,
@@ -118,12 +118,12 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
         norm_method_infos.emplace(ID, std::move(norm_method_info));
     }
 
-    auto num_norm_matrices = reader.readBypassBE<uint8_t>();
+    auto num_norm_matrices = reader.ReadAlignedInt<uint8_t>();
     for (uint8_t i = 0; i<num_norm_matrices; i++){
-        auto ID = reader.readBypassBE<uint8_t>();
+        auto ID = reader.ReadAlignedInt<uint8_t>();
         std::string name;
-        name.resize(reader.readBypassBE<uint8_t>());
-        reader.readBypass(&name[0], name.size());
+        name.resize(reader.ReadAlignedInt<uint8_t>());
+        reader.ReadAlignedBytes(&name[0], name.size());
 
         NormalizedMatrixInformations norm_mat_info = {
             ID,
@@ -133,10 +133,10 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
         norm_mat_infos.emplace(ID, std::move(norm_mat_info));
     }
 
-//    auto num_scm = reader.readBypassBE<uint16_t>();
+//    auto num_scm = reader.ReadAlignedInt<uint16_t>();
 //    for (uint16_t i = 0; i<num_scm; i++){
-//        auto chr1_ID = reader.readBypassBE<uint8_t>();
-//        auto chr2_ID = reader.readBypassBE<uint8_t>();
+//        auto chr1_ID = reader.ReadAlignedInt<uint8_t>();
+//        auto chr2_ID = reader.ReadAlignedInt<uint8_t>();
 
 //        auto scm_param =
 //            SubcontactMatrixParameters(

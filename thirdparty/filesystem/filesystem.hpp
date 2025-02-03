@@ -3298,7 +3298,7 @@ GHC_INLINE path::impl_string_type::const_iterator path::iterator::increment(cons
                     i = std::find(++i, _last, preferred_separator);
                 }
                 else {
-                    // skip redundant slashes
+                    // SkipAlignedBytes redundant slashes
                     while (i != _last && *i == preferred_separator) {
                         ++i;
                     }

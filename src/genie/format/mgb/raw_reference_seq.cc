@@ -6,8 +6,8 @@
 
 #include "genie/format/mgb/raw_reference_seq.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

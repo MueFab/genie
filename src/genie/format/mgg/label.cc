@@ -6,7 +6,7 @@
 
 #include "genie/format/mgg/label.h"
 #include <utility>
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,8 +5,8 @@
  */
 
 #include "genie/entropy/paramcabac/support_values.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,14 +32,14 @@ SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym
 
 SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader)
     : share_subsym_lut_flag(false), share_subsym_prv_flag(false) {
-    output_symbol_size = reader.read<uint8_t>(6);
-    coding_subsym_size = reader.read<uint8_t>(6);
-    coding_order = reader.read<uint8_t>(2);
+    output_symbol_size = reader.Read<uint8_t>(6);
+    coding_subsym_size = reader.Read<uint8_t>(6);
+    coding_order = reader.Read<uint8_t>(2);
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = reader.read<bool>(1);
+            share_subsym_lut_flag = reader.Read<bool>(1);
         }
-        share_subsym_prv_flag = reader.read<bool>(1);
+        share_subsym_prv_flag = reader.Read<bool>(1);
     }
 }
 

@@ -204,7 +204,7 @@ typedef enum {
  *  If it uses hufTable it does not modify hufTable or repeat.
  *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the table used.
  *  If preferRepeat then the old table will always be used if valid.
- *  If suspectUncompressible then some sampling checks will be run to potentially skip huffman coding */
+ *  If suspectUncompressible then some sampling checks will be run to potentially SkipAlignedBytes huffman coding */
 size_t HUF_compress4X_repeat(void* dst, size_t dstSize,
                        const void* src, size_t srcSize,
                        unsigned maxSymbolValue, unsigned tableLog,
@@ -310,7 +310,7 @@ size_t HUF_compress1X_usingCTable_bmi2(void* dst, size_t dstSize, const void* sr
  *  If it uses hufTable it does not modify hufTable or repeat.
  *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the table used.
  *  If preferRepeat then the old table will always be used if valid.
- *  If suspectUncompressible then some sampling checks will be run to potentially skip huffman coding */
+ *  If suspectUncompressible then some sampling checks will be run to potentially SkipAlignedBytes huffman coding */
 size_t HUF_compress1X_repeat(void* dst, size_t dstSize,
                        const void* src, size_t srcSize,
                        unsigned maxSymbolValue, unsigned tableLog,

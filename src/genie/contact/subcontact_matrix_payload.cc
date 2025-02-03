@@ -5,7 +5,7 @@
 */
 
 #include "subcontact_matrix_payload.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -63,12 +63,12 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
     auto MULT = 1u;
 
-    UTILS_DIE_IF(!reader.isAligned(),  "Not byte aligned!");
+    UTILS_DIE_IF(!reader.IsByteAligned(),  "Not byte aligned!");
 
-    parameter_set_ID = reader.readBypassBE<uint8_t>();
-    sample_ID = reader.readBypassBE<uint16_t>();
-    chr1_ID = reader.readBypassBE<uint8_t>();
-    chr2_ID = reader.readBypassBE<uint8_t>();
+    parameter_set_ID = reader.ReadAlignedInt<uint8_t>();
+    sample_ID = reader.ReadAlignedInt<uint16_t>();
+    chr1_ID = reader.ReadAlignedInt<uint8_t>();
+    chr2_ID = reader.ReadAlignedInt<uint8_t>();
 
     UTILS_DIE_IF(
         parameter_set_ID != scm_param.getParameterSetID(),
@@ -95,7 +95,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
         for (auto j = 0u; j<getNTilesInCol(); j++){
             if (!isIntraSCM() || i<=j){
 
-                auto tile_payload_size = reader.readBypassBE<uint32_t>();
+                auto tile_payload_size = reader.ReadAlignedInt<uint32_t>();
                 auto tile_payload = ContactMatrixTilePayload(reader, tile_payload_size);
                 UTILS_DIE_IF(
                     tile_payload_size != tile_payload.getSize(),
@@ -111,7 +111,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
 
     if (scm_param.getRowMaskExistsFlag()){
         auto num_entries = static_cast<uint32_t>(cm_param.getNumBinEntries(chr1_ID, MULT));
-        auto mask_payload_size = reader.readBypassBE<uint32_t>();
+        auto mask_payload_size = reader.ReadAlignedInt<uint32_t>();
         auto mask_payload = SubcontactMatrixMaskPayload(
             reader,
             num_entries
@@ -124,7 +124,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     }
     if (!isIntraSCM() && scm_param.getColMaskExistsFlag()){
         auto num_entries = cm_param.getNumBinEntries(chr2_ID, MULT);
-        auto mask_payload_size = reader.readBypassBE<uint32_t>();
+        auto mask_payload_size = reader.ReadAlignedInt<uint32_t>();
         auto mask_payload = SubcontactMatrixMaskPayload(
             reader,
             static_cast<uint32_t>(num_entries)

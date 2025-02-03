@@ -35,9 +35,9 @@ core::DataType LikelihoodParameters::getDtypeID() const { return dtype_id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 void LikelihoodParameters::read(util::BitReader& reader) {
-    num_gl_per_sample = static_cast<uint8_t>(reader.read_b(8));
-    transform_flag = static_cast<bool>(reader.read_b(1));
-    if (transform_flag) dtype_id = static_cast<genie::core::DataType>(reader.read_b(8));
+    num_gl_per_sample = static_cast<uint8_t>(reader.ReadBits(8));
+    transform_flag = static_cast<bool>(reader.ReadBits(1));
+    if (transform_flag) dtype_id = static_cast<genie::core::DataType>(reader.ReadBits(8));
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

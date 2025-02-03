@@ -15,9 +15,9 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 LinkRecord::LinkRecord(genie::util::BitReader& bitreader){
-    auto link_name_len = bitreader.readBypassBE<uint8_t>();
-    bitreader.readBypass(&link_name[0], link_name_len);
-    reference_box_ID = bitreader.readBypassBE<uint8_t>();
+    auto link_name_len = bitreader.ReadAlignedInt<uint8_t>();
+    bitreader.ReadAlignedBytes(&link_name[0], link_name_len);
+    reference_box_ID = bitreader.ReadAlignedInt<uint8_t>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

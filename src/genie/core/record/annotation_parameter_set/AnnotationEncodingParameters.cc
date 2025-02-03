@@ -13,8 +13,8 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "AnnotationEncodingParameters.h"
 
@@ -100,52 +100,52 @@ AnnotationEncodingParameters::AnnotationEncodingParameters(
       attribute_parameter_set(attribute_parameter_set) {}
 
 void AnnotationEncodingParameters::read(util::BitReader& reader) {
-    n_filter = static_cast<uint8_t>(reader.read_b(8));
+    n_filter = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_filter; ++i) {
-        filter_ID_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        filter_ID_len.push_back(static_cast<uint8_t>(reader.ReadBits(6)));
         std::string ID(filter_ID_len.back(), 0);
-        for (auto& byte : ID) byte = static_cast<uint8_t>(reader.read_b(8));
+        for (auto& byte : ID) byte = static_cast<uint8_t>(reader.ReadBits(8));
         filter_ID.push_back(ID);
-        desc_len.push_back(static_cast<uint16_t>(reader.read_b(10)));
+        desc_len.push_back(static_cast<uint16_t>(reader.ReadBits(10)));
         std::string desc(desc_len.back(), 0);
-        for (auto& byte : desc) byte = static_cast<uint8_t>(reader.read_b(8));
+        for (auto& byte : desc) byte = static_cast<uint8_t>(reader.ReadBits(8));
         description.push_back(desc);
     }
 
-    n_features_names = static_cast<uint8_t>(reader.read_b(8));
+    n_features_names = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_features_names; ++i) {
-        feature_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        feature_name_len.push_back(static_cast<uint8_t>(reader.ReadBits(6)));
         std::string name(feature_name_len.back(), 0);
-        for (auto& byte : name) byte = static_cast<uint8_t>(reader.read_b(8));
+        for (auto& byte : name) byte = static_cast<uint8_t>(reader.ReadBits(8));
         feature_name.push_back(name);
     }
 
-    n_ontology_terms = static_cast<uint8_t>(reader.read_b(8));
+    n_ontology_terms = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_ontology_terms; ++i) {
-        ontology_term_name_len.push_back(static_cast<uint8_t>(reader.read_b(6)));
+        ontology_term_name_len.push_back(static_cast<uint8_t>(reader.ReadBits(6)));
         std::string name(ontology_term_name_len.back(), 0);
-        for (auto& byte : name) byte = static_cast<uint8_t>(reader.read_b(8));
+        for (auto& byte : name) byte = static_cast<uint8_t>(reader.ReadBits(8));
         ontology_term_name.push_back(name);
     }
 
-    n_descriptors = static_cast<uint8_t>(reader.read_b(8));
+    n_descriptors = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_descriptors; ++i) {
         DescriptorConfiguration descrConf(reader);
         descriptor_configuration.push_back(descrConf);
     }
 
-    n_compressors = static_cast<uint8_t>(reader.read_b(8));
+    n_compressors = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_compressors; ++i) {
         CompressorParameterSet comprParSet(reader);
         compressor_parameter_set.push_back(comprParSet);
     }
 
-    n_attributes = static_cast<uint8_t>(reader.read_b(8));
+    n_attributes = static_cast<uint8_t>(reader.ReadBits(8));
     for (auto i = 0; i < n_attributes; ++i) {
         AttributeParameterSet attrParSet(reader);
         attribute_parameter_set.push_back(attrParSet);
     }
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 void AnnotationEncodingParameters::write(core::Writer& writer) const {

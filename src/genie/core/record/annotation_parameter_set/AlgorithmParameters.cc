@@ -13,8 +13,8 @@
 #include <utility>
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
 
 #include "genie/core/arrayType.h"
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
@@ -44,7 +44,7 @@ AlgorithmParameters::AlgorithmParameters(
 void AlgorithmParameters::read(util::BitReader& reader) {
     par_val.resize(0);
 
-    n_pars = static_cast<uint8_t>(reader.read_b(4));
+    n_pars = static_cast<uint8_t>(reader.ReadBits(4));
     par_array_dims.resize(n_pars);
     par_ID.resize(n_pars);
     par_type.resize(n_pars);
@@ -53,11 +53,11 @@ void AlgorithmParameters::read(util::BitReader& reader) {
     ArrayType types;
 
     for (auto i = 0; i < n_pars; ++i) {
-        par_ID[i] = (static_cast<uint8_t>(reader.read_b(4)));
-        par_type[i] = (static_cast<core::DataType>(reader.read_b(8)));
-        par_num_array_dims[i] = (static_cast<uint8_t>(reader.read_b(2)));
+        par_ID[i] = (static_cast<uint8_t>(reader.ReadBits(4)));
+        par_type[i] = (static_cast<core::DataType>(reader.ReadBits(8)));
+        par_num_array_dims[i] = (static_cast<uint8_t>(reader.ReadBits(2)));
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
-            par_array_dims[i].push_back(static_cast<uint8_t>(reader.read_b(8)));
+            par_array_dims[i].push_back(static_cast<uint8_t>(reader.ReadBits(8)));
         }
         par_val.emplace_back(resizeVector(par_num_array_dims[i], par_array_dims[i]));
         for (auto& d1 : par_val[i])

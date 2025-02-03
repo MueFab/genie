@@ -6,7 +6,7 @@
 
 #include "genie/entropy/paramcabac/binarization.h"
 #include <utility>
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +34,8 @@ Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
-    binarization_ID = reader.read<BinarizationParameters::BinarizationId>(5);
-    bypass_flag = reader.read<bool>(1);
+    binarization_ID = reader.Read<BinarizationParameters::BinarizationId>(5);
+    bypass_flag = reader.Read<bool>(1);
     cabac_binarization_parameters = BinarizationParameters(binarization_ID, reader);
     if (!bypass_flag) {
         cabac_context_parameters = Context(output_symbol_size, coding_subsym_size, reader);

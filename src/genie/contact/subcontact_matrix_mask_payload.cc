@@ -4,9 +4,9 @@
 * https://github.com/mitogen/genie for more details.
  */
 
-#include <ostream>
-#include "genie/util/runtime-exception.h"
 #include "subcontact_matrix_mask_payload.h"
+#include <ostream>
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,33 +19,33 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     util::BitReader& reader,
     uint32_t num_bin_entries
 ) {
-    transform_ID = reader.read<TransformID>(TRANSFORM_ID_BLEN);
+    transform_ID = reader.Read<TransformID>(TRANSFORM_ID_BLEN);
 
     if (transform_ID == TransformID::ID_0){
         BinVecDtype tmp_mask_array = xt::empty<bool>({num_bin_entries}); // Not part of the spec
         for (auto i = 0u; i<num_bin_entries; i++){
-            tmp_mask_array[i] = reader.read<bool>(MASK_ARR_BLEN);
+            tmp_mask_array[i] = reader.Read<bool>(MASK_ARR_BLEN);
         }
         setMaskArray(tmp_mask_array);
         first_val = mask_array->at(0);
 
     } else {
-        first_val = reader.read<bool>(FIRST_VAL_BLEN);
+        first_val = reader.Read<bool>(FIRST_VAL_BLEN);
 
-        auto num_rl_entries = reader.read<uint32_t>();
+        auto num_rl_entries = reader.Read<uint32_t>();
         UIntVecDtype tmp_rl_entries = xt::empty<uint32_t>({num_rl_entries}); // Not part of the spec
 
         if (transform_ID == TransformID::ID_1){
             for (auto i = 0u; i<num_rl_entries; i++){
-                tmp_rl_entries[i] = reader.read<uint8_t>();
+                tmp_rl_entries[i] = reader.Read<uint8_t>();
             }
         } else if (transform_ID == TransformID::ID_2){
             for (auto i = 0u; i<num_rl_entries; i++){
-                tmp_rl_entries[i] = reader.read<uint16_t>();
+                tmp_rl_entries[i] = reader.Read<uint16_t>();
             }
         } else if (transform_ID == TransformID::ID_3){
             for (auto i = 0u; i<num_rl_entries; i++){
-                tmp_rl_entries[i] = reader.read<uint32_t>();
+                tmp_rl_entries[i] = reader.Read<uint32_t>();
             }
         } else {
             UTILS_DIE("This should never be reached!");
@@ -58,7 +58,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
         );
     }
 
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

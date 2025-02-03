@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 #include <algorithm>
 #include <string>
 #include <utility>

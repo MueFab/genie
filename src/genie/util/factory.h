@@ -12,7 +12,7 @@
 #include <map>
 #include <memory>
 #include "genie/core/constants.h"
-#include "genie/util/generic-factory.h"
+#include "genie/util/generic_factory.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

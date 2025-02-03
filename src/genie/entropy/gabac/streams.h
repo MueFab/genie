@@ -11,7 +11,7 @@
 
 #include <istream>
 #include <ostream>
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

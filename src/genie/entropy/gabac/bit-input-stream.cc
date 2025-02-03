@@ -7,7 +7,7 @@
 #include "genie/entropy/gabac/bit-input-stream.h"
 #include <cassert>
 #include <limits>
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +86,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
         return bits;
     }
 
-    // More bits requested than currently held, flush all heldBits to bits
+    // More bits requested than currently held, FlushHeldBits all heldBits to bits
     numBits -= m_numHeldBits;
     bits = m_heldBits & ~(0xffu << m_numHeldBits);
     // bits = static_cast<uint64_t>(m_heldBits & ~(0xffu << m_numHeldBits));

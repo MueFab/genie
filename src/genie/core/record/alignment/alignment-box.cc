@@ -7,9 +7,9 @@
 #include "alignment-box.h"
 #include <utility>
 #include "genie/core/record/alignment/alignment_split/same-rec.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
                            util::BitReader& reader)
     : splitAlignmentInfo(type == ClassType::CLASS_HM ? 0 : number_of_template_segments - 1) {
-    mapping_pos = reader.readBypassBE<uint64_t, 5>();
+    mapping_pos = reader.ReadAlignedInt<uint64_t, 5>();
     alignment = Alignment(as_depth, reader);
 
     if (type == ClassType::CLASS_HM) {

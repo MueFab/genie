@@ -16,7 +16,7 @@
 #include "genie/entropy/gabac/reader.h"
 #include "genie/entropy/gabac/rle-subseq-transform.h"
 #include "genie/entropy/gabac/stream-handler.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,80 +4,75 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/thread-manager.h"
-#include <iostream>
-#include <utility>
-#include "genie/util/runtime-exception.h"
+#ifndef SRC_GENIE_UTIL_BIT_READER_IMPL_H_
+#define SRC_GENIE_UTIL_BIT_READER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+// Suppress MSVC warning about constants in template if-conditions
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#endif
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-thread_local size_t ThreadManager::threadID;
-thread_local size_t ThreadManager::threadNum;
+#include "genie/util/endianness.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::action(size_t id) {
-    ThreadManager::threadID = id;
-    ThreadManager::threadNum = threads.size();
-    try {
-        for (const auto& s : source) {
-            while (!stopFlag && s->pump(counter, lock)) {
-            }
+namespace genie::util {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <typename T, typename>
+T BitReader::Read() {
+    return static_cast<T>(ReadBits(sizeof(T) * 8));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <typename T, typename>
+T BitReader::Read(uint8_t s) {
+    return static_cast<T>(ReadBits(s));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <typename T, size_t NumBytes, typename>
+T BitReader::ReadAlignedInt() {
+    static_assert(NumBytes > 0, "NumBytes == 0");
+    static_assert(NumBytes <= sizeof(T), "NumBytes > sizeof(T)");
+    T ret = static_cast<T>(0);
+    istream.read(reinterpret_cast<char*>(&ret), NumBytes);
+
+    // Swap Endianness if necessary
+    if (NumBytes > 1) {
+        swap_endianness<T, NumBytes>(ret);
+    }
+
+    // Extend sign bit if necessary
+    if (std::is_signed<T>::value && NumBytes < sizeof(T) && reinterpret_cast<char*>(&ret)[NumBytes - 1] < 0) {
+        for (size_t i = NumBytes; i < sizeof(T); ++i) {
+            reinterpret_cast<unsigned char*>(&ret)[i] = static_cast<unsigned char>(0xff);
         }
-    } catch (genie::util::Exception& e) {
-        std::cerr << e.msg() << std::endl;
-        throw(e);
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        throw(e);
     }
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::ThreadManager(size_t thread_num, size_t ctr)
-    : counter(ctr), threads(thread_num), stopFlag(false), abortFlag(false) {}
+}  // namespace genie::util
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::setSource(std::vector<OriginalSource*> src) { source = std::move(src); }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t ThreadManager::run() {
-    size_t ctr = 0;
-    for (auto& t : threads) {
-        t = std::thread(&ThreadManager::action, this, ctr++);
-    }
-    for (auto& t : threads) {
-        t.join();
-    }
-    if (!abortFlag) {
-        source.front()->flushIn(counter);
-    }
-    return counter;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ThreadManager::stop(bool abort) {
-    abortFlag = abort;
-    stopFlag = true;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ThreadManager::~ThreadManager() { stop(true); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-}  // namespace util
-}  // namespace genie
+#endif  // SRC_GENIE_UTIL_BIT_READER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

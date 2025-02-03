@@ -16,7 +16,7 @@
 #include "genie/core/name-encoder.h"
 #include "genie/core/record/alignment/record.h"
 #include "genie/name/tokenizer/tokenizer.h"
-#include "genie/util/data-block.h"
+#include "genie/util/data_block.h"
 #include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

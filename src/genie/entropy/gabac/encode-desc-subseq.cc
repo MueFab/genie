@@ -17,8 +17,8 @@
 #include "genie/entropy/gabac/stream-handler.h"
 #include "genie/entropy/gabac/writer.h"
 #include "genie/entropy/paramcabac/transformed-subseq.h"
-#include "genie/util/block-stepper.h"
-#include "genie/util/data-block.h"
+#include "genie/util/block_stepper.h"
+#include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

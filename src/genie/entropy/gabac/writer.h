@@ -14,7 +14,7 @@
 #include <vector>
 #include "genie/entropy/gabac/binary-arithmetic-encoder.h"
 #include "genie/entropy/gabac/streams.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

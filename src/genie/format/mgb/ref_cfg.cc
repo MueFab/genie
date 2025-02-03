@@ -5,7 +5,7 @@
  */
 
 #include "genie/format/mgb/ref_cfg.h"
-#include "genie/util/bitwriter.h"
+#include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

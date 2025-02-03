@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #include "genie/format/mgg/gen_info.h"
-#include "genie/util/bitreader.h"
+#include "genie/util/bit_reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

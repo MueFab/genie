@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
-#include "record.h"
+#include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,67 +65,67 @@ ContactRecord::ContactRecord(
 
 ContactRecord::ContactRecord(util::BitReader &reader){
     // Sample
-    sample_ID = reader.readBypassBE<uint16_t>();
-    sample_name.resize(reader.readBypassBE<uint8_t>());
-    reader.readBypass(&sample_name[0], sample_name.size());
-    bin_size = reader.readBypassBE<uint32_t>();
+    sample_ID = reader.ReadAlignedInt<uint16_t>();
+    sample_name.resize(reader.ReadAlignedInt<uint8_t>());
+    reader.ReadAlignedBytes(&sample_name[0], sample_name.size());
+    bin_size = reader.ReadAlignedInt<uint32_t>();
 
     // chr1
-    chr1_ID = reader.readBypassBE<uint8_t>();
-    chr1_name.resize(reader.readBypassBE<uint8_t>());
-    reader.readBypass(&chr1_name[0], chr1_name.size());
-    chr1_length = reader.read<uint64_t>();
+    chr1_ID = reader.ReadAlignedInt<uint8_t>();
+    chr1_name.resize(reader.ReadAlignedInt<uint8_t>());
+    reader.ReadAlignedBytes(&chr1_name[0], chr1_name.size());
+    chr1_length = reader.Read<uint64_t>();
 
     // chr2
-    chr2_ID = reader.readBypassBE<uint8_t>();
-    chr2_name.resize(reader.readBypassBE<uint8_t>());
-    reader.readBypass(&chr2_name[0], chr2_name.size());
-    chr2_length = reader.read<uint64_t>();
+    chr2_ID = reader.ReadAlignedInt<uint8_t>();
+    chr2_name.resize(reader.ReadAlignedInt<uint8_t>());
+    reader.ReadAlignedBytes(&chr2_name[0], chr2_name.size());
+    chr2_length = reader.Read<uint64_t>();
 
     // num_entries and num_norm_counts
-    auto num_entries = reader.readBypassBE<uint64_t>();
-    auto num_norm_counts = reader.readBypassBE<uint8_t>();
+    auto num_entries = reader.ReadAlignedInt<uint64_t>();
+    auto num_norm_counts = reader.ReadAlignedInt<uint8_t>();
 
     norm_count_names.resize(num_norm_counts);
     for (auto i = 0; i < num_norm_counts; i++){
-        norm_count_names[i].resize(reader.readBypassBE<uint8_t>());
-        reader.readBypass(&norm_count_names[i][0], norm_count_names[i].size());
+        norm_count_names[i].resize(reader.ReadAlignedInt<uint8_t>());
+        reader.ReadAlignedBytes(&norm_count_names[i][0], norm_count_names[i].size());
     }
 
     start_pos1.resize(num_entries);
     for (size_t i = 0; i< num_entries; i++){
-        start_pos1[i] = reader.readBypassBE<uint64_t>();
+        start_pos1[i] = reader.ReadAlignedInt<uint64_t>();
     }
 
     end_pos1.resize(num_entries);
     for (size_t i = 0; i< num_entries; i++){
-        end_pos1[i] = reader.readBypassBE<uint64_t>();
+        end_pos1[i] = reader.ReadAlignedInt<uint64_t>();
     }
 
     start_pos2.resize(num_entries);
     for (size_t i = 0; i< num_entries; i++){
-        start_pos2[i] = reader.readBypassBE<uint64_t>();
+        start_pos2[i] = reader.ReadAlignedInt<uint64_t>();
     }
 
     end_pos2.resize(num_entries);
     for (size_t i = 0; i< num_entries; i++){
-        end_pos2[i] = reader.readBypassBE<uint64_t>();
+        end_pos2[i] = reader.ReadAlignedInt<uint64_t>();
     }
 
     counts.resize(num_entries);
     for (size_t i = 0; i< num_entries; i++){
-        counts[i] = reader.readBypassBE<uint32_t>();
+        counts[i] = reader.ReadAlignedInt<uint32_t>();
     }
 
     norm_counts.resize(num_norm_counts);
     for (size_t j = 0; j < num_norm_counts; j++){
         norm_counts[j].resize(num_entries);
         for (size_t i = 0; i< num_entries; i++){
-            norm_counts[j][i] = reader.readBypassBE<double_t>();
+            norm_counts[j][i] = reader.ReadAlignedInt<double_t>();
         }
     }
 
-    auto link_record_flag = reader.readBypassBE<uint8_t>();
+    auto link_record_flag = reader.ReadAlignedInt<uint8_t>();
     UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
 }
 
@@ -428,7 +428,7 @@ void ContactRecord::write(util::BitWriter &writer) const {
     }
 
     //TODO(yeremia): fix the flag
-    //    auto link_record_flag = reader.readBypassBE<uint8_t>();
+    //    auto link_record_flag = reader.ReadAlignedInt<uint8_t>();
     writer.writeBypassBE(static_cast<uint8_t>(0));
     //    UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
 }

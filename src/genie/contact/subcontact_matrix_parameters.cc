@@ -5,7 +5,7 @@
  */
 
 #include "subcontact_matrix_parameters.h"
-#include "genie/util/runtime-exception.h"
+#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -63,16 +63,16 @@ SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(const Subconta
 // ---------------------------------------------------------------------------------------------------------------------
 
 SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, ContactMatrixParameters& cm_params)
-    : parameter_set_ID(reader.readBypassBE<uint8_t>()),
-      chr1_ID(reader.readBypassBE<uint8_t>()),
-      chr2_ID(reader.readBypassBE<uint8_t>()) {
+    : parameter_set_ID(reader.ReadAlignedInt<uint8_t>()),
+      chr1_ID(reader.ReadAlignedInt<uint8_t>()),
+      chr2_ID(reader.ReadAlignedInt<uint8_t>()) {
     auto ntiles_in_row = cm_params.getNumTiles(chr1_ID, 1);
     tile_parameters.resize(ntiles_in_row);
 
     auto ntiles_in_col = cm_params.getNumTiles(chr2_ID, 1);
     for (auto& v : tile_parameters) v.resize(ntiles_in_col);
 
-    auto flags = reader.readBypassBE<uint8_t>();
+    auto flags = reader.ReadAlignedInt<uint8_t>();
     codec_ID = static_cast<core::AlgoID>(flags & 0x1F);
 
     for (size_t i = 0u; i < ntiles_in_row; ++i) {
@@ -83,17 +83,17 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, 
 
             auto& tile_parameter = tile_parameters[i][j];
 
-            flags = reader.readBypassBE<uint8_t>();
+            flags = reader.ReadAlignedInt<uint8_t>();
             tile_parameter.diag_tranform_mode = static_cast<DiagonalTransformMode>((flags >> 2) & 0x07);
             tile_parameter.binarization_mode = static_cast<BinarizationMode>(flags & 0x03);
         }
     }
 
-    flags = reader.readBypassBE<uint8_t>();
+    flags = reader.ReadAlignedInt<uint8_t>();
     row_mask_exists_flag = flags & 0x02;
     col_mask_exists_flag = flags & 0x01;
 
-    reader.flush();
+    reader.FlushHeldBits();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
