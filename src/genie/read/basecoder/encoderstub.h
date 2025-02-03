@@ -118,7 +118,7 @@ class EncoderStub : public core::ReadEncoder {
      * @param t Incoming chunk of data
      * @param id Multithreading sync ID
      */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
+    void FlowIn(core::record::Chunk&& t, const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

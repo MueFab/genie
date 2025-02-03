@@ -41,13 +41,13 @@ class Exporter : public core::FormatExporter {
      * @param t
      * @param id
      */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
+    void FlowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
      * @brief
      * @param id
      */
-    void SkipIn(const Section& id) override;
+    void SkipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

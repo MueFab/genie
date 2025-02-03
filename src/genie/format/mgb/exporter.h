@@ -48,13 +48,13 @@ class Exporter : public core::FormatExporterCompressed {
      * @param t
      * @param id
      */
-    void flowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
+    void FlowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
 
     /**
      * @brief
      * @param id
      */
-    void SkipIn(const Section& id) override;
+    void SkipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

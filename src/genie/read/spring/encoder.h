@@ -42,7 +42,7 @@ class Encoder : public genie::core::ReadEncoder {
      * @param t
      * @param id
      */
-    void flowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
+    void FlowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
 
     /**
      * @brief

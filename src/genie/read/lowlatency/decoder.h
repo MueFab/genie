@@ -45,7 +45,7 @@ class Decoder : public core::ReadDecoder, public core::RefDecoder {
      * @param t
      * @param id
      */
-    void flowIn(core::AccessUnit&& t, const util::Section& id) override;
+    void FlowIn(core::AccessUnit&& t, const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

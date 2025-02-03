@@ -39,7 +39,7 @@ class Encoder : public core::ReadEncoder {
      * @param t
      * @param id
      */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
+    void FlowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
      * @brief

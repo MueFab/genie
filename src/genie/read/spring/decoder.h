@@ -84,7 +84,7 @@ class Decoder : public genie::core::ReadDecoder {
      * @param t
      * @param id
      */
-    void flowIn(genie::core::AccessUnit&& t, const util::Section& id) override;
+    void FlowIn(genie::core::AccessUnit&& t, const util::Section& id) override;
 
     /**
      * @brief

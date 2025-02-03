@@ -92,7 +92,7 @@ class Encoder : public basecoder::EncoderStub {
      * @param t Data chunk
      * @param id Multithreading id
      */
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
+    void FlowIn(core::record::Chunk&& t, const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

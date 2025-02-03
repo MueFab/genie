@@ -247,11 +247,11 @@ ConfigSearchTranformedSeq::ConfigSearchTranformedSeq(const std::pair<int64_t, in
             if (j == 0) {
                 codingsize = 0;
             }
-            binarizations.back().back().EmplaceBack(range, codingsize);  // No-Transform
-            binarizations.back().back().EmplaceBack(
+            binarizations.back().back().emplace_back(range, codingsize);  // No-Transform
+            binarizations.back().back().emplace_back(
                 std::make_pair(-(range.second - range.first), range.second - range.first),
                 codingsize);  // DIFF
-            binarizations.back().back().EmplaceBack(std::make_pair(0, range.second - range.first),
+            binarizations.back().back().emplace_back(std::make_pair(0, range.second - range.first),
                                                     codingsize);  // LUT
         }
     }

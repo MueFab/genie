@@ -109,7 +109,7 @@ class DecoderStub : public core::ReadDecoder {
      * @param t
      * @param id
      */
-    void flowIn(core::AccessUnit&& t, const util::Section& id) override;
+    void FlowIn(core::AccessUnit&& t, const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
