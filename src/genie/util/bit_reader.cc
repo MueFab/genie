@@ -40,7 +40,7 @@ void BitReader::SkipAlignedBytes(size_t bytes) { istream.seekg(bytes, std::ios_b
 
 void BitReader::ReadAlignedBytes(void *in, size_t size) {
     bitsRead += size * 8;
-    istream.read(reinterpret_cast<char *>(in), size);
+    istream.read(reinterpret_cast<char *>(in), size);git 
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -48,6 +48,7 @@ target_compile_options(xtensor_no_warnings INTERFACE
         -Wno-unused-parameter
         -Wno-unused-but-set-variable
         -Wno-implicit-fallthrough
+        -Werror=maybe-uninitialized
 )
 else ()
 target_compile_options(xtensor_no_warnings INTERFACE "/w")
