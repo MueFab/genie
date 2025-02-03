@@ -233,8 +233,7 @@ void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core
 void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number = 1) const {
     if (type == core::DataType::STRING) {
         for (uint64_t i = 0; i < number; ++i) {
-            std::string temp;
-            reader.ReadAlignedStringTerminated(temp);
+            std::string temp = reader.ReadAlignedStringTerminated();
             writer.write(temp);
             writer.write(0, 8, true);
         }
