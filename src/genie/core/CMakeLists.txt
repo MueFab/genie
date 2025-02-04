@@ -105,6 +105,7 @@ set(source_files
         api.cc
         c_api.cc
         payload.cc
+        ndarray.cc
 )
 
 add_library(genie-core ${source_files})
