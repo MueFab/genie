@@ -9,7 +9,7 @@
 #include <limits>
 #include <map>
 #include <utility>
-#include "genie/core/record/alignment/class-type.h"
+#include "genie/core/record/class_type.h"
 #include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "alignment-box.h"
-#include "alignment-shared-data.h"
-#include "genie/core/record/alignment/alignment_external/none.h"
+#include "alignment_box.h"
+#include "alignment_shared_data.h"
+#include "genie/core/record/alignment_external/none.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -152,9 +152,9 @@ void Record::addSegment(Segment &&rec) {
 
 void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
     if (alignmentInfo.empty()) {
-        sharedAlignmentInfo = AlignmentSharedData(_seq_id, uint8_t(rec.getAlignment().getMappingScores().size()));
+        sharedAlignmentInfo = AlignmentSharedData(_seq_id, uint8_t(rec.getAlignment().GetMappingScores().size()));
     } else {
-        UTILS_DIE_IF(rec.getAlignment().getMappingScores().size() != sharedAlignmentInfo.getAsDepth(),
+        UTILS_DIE_IF(rec.getAlignment().GetMappingScores().size() != sharedAlignmentInfo.getAsDepth(),
                      "Incompatible AS depth");
         UTILS_DIE_IF(rec.getNumberOfTemplateSegments() != number_of_template_segments,
                      "Incompatible number_of_template_segments");
@@ -296,11 +296,11 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
 
 size_t Record::getMappedLength(size_t alignment, size_t split) const {
     if (split == 0) {
-        return static_cast<size_t>(getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar()));
+        return static_cast<size_t>(getLengthOfCigar(getAlignments()[alignment].getAlignment().GetECigar()));
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().getECigar()));
+    return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().GetECigar()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 #include <mutex>
 #include "genie/core/access_unit.h"
 #include "genie/core/classifier.h"
-#include "genie/core/record/alignment/record.h"
+#include "genie/core/record/record.h"
 #include "genie/util/original_source.h"
 #include "genie/util/source.h"
 

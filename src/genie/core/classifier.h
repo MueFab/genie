@@ -10,8 +10,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/record/alignment/chunk.h"
-#include "genie/core/record/alignment/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/chunk.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

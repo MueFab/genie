@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-split.h"
-#include "genie/core/record/alignment/alignment_split/other-rec.h"
-#include "genie/core/record/alignment/alignment_split/same-rec.h"
-#include "genie/core/record/alignment/alignment_split/unpaired.h"
+#include "alignment_split.h"
+#include "genie/core/record/alignment_split/other-rec.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/unpaired.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

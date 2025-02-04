@@ -11,8 +11,8 @@
 
 #include <cstdint>
 #include <memory>
-#include "genie/core/record/alignment/alignment-split.h"
-#include "genie/core/record/alignment/alignment.h"
+#include "genie/core/record/alignment.h"
+#include "genie/core/record/alignment_split.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 

@@ -12,7 +12,7 @@
 #include <tuple>
 #include <utility>
 #include "genie/core/access_unit.h"
-#include "genie/core/record/alignment/chunk.h"
+#include "genie/core/record/chunk.h"
 #include "genie/util/drain.h"
 #include "genie/util/source.h"
 

@@ -11,7 +11,7 @@
 
 #include "genie/core/classifier.h"
 #include "genie/core/format_importer.h"
-#include "genie/core/record/alignment/chunk.h"
+#include "genie/core/record/chunk.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/ordered_lock.h"

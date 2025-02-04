@@ -4,15 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
-#define SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <memory>
-#include <string>
-#include <vector>
+#include "genie/core/record/alignment_external.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
@@ -21,75 +19,41 @@
 namespace genie {
 namespace core {
 namespace record {
+namespace alignment_external {
 
 /**
  * @brief
  */
-class Alignment {
-    std::string ecigar_string;           //!< @brief
-    uint8_t reverse_comp;                //!< @brief
-    std::vector<int32_t> mapping_score;  //!< @brief
-
+class None : public AlignmentExternal {
  public:
     /**
      * @brief
-     * @param _ecigar_string
-     * @param _reverse_comp
      */
-    Alignment(std::string&& _ecigar_string, uint8_t _reverse_comp);
-
-    /**
-     * @brief
-     * @param as_depth
-     * @param reader
-     */
-    Alignment(uint8_t as_depth, util::BitReader& reader);
-
-    /**
-     * @brief
-     */
-    Alignment();
-
-    /**
-     * @brief
-     * @param score
-     */
-    void addMappingScore(int32_t score);
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<int32_t>& getMappingScores() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getECigar() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getRComp() const;
+    None();
 
     /**
      * @brief
      * @param writer
      */
-    virtual void write(util::BitWriter& writer) const;
+    void write(util::BitWriter &writer) const override;
+
+    /**
+     * @brief
+     * @return
+     */
+    std::unique_ptr<AlignmentExternal> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+}  // namespace alignment_external
 }  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_NONE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
