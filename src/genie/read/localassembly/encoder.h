@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include "genie/core/read-encoder.h"
+#include "genie/core/read_encoder.h"
 #include "genie/core/record/alignment/alignment_split/same-rec.h"
 #include "genie/read/basecoder/encoderstub.h"
 #include "genie/read/localassembly/local-reference.h"

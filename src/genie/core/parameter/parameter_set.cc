@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
-#include "genie/core/global-cfg.h"
+#include "genie/core/global_cfg.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

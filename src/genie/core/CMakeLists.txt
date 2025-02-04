@@ -64,28 +64,28 @@ set(source_files
 
         stats/perf-stats.cc
 
-        access-unit.cc
-        classifier-bypass.cc
-        classifier-regroup.cc
+        access_unit.cc
+        classifier_bypass.cc
+        classifier_regroup.cc
         constants.cc
         flowgraph.cc
-        flowgraph-convert.cc
-        flowgraph-decode.cc
-        flowgraph-encode.cc
-        format-importer.cc
-        format-importer-null.cc
-        format-exporter.cc
-        format-importer-compressed.cc
-        format-exporter-compressed.cc
-        global-cfg.cc
+        flowgraph_convert.cc
+        flowgraph_decode.cc
+        flowgraph_encode.cc
+        format_importer.cc
+        format_importer_null.cc
+        format_exporter.cc
+        format_importer_compressed.cc
+        format_exporter_compressed.cc
+        global_cfg.cc
         locus.cc
-        name-encoder-none.cc
-        read-encoder.cc
-        read-decoder.cc
+        name_encoder_none.cc
+        read_encoder.cc
+        read_decoder.cc
         reference.cc
-        reference-collection.cc
-        reference-manager.cc
-        reference-source.cc
+        reference_collection.cc
+        reference_manager.cc
+        reference_source.cc
         meta/sequence.cc
         meta/region.cc
         meta/reference.cc

@@ -12,7 +12,7 @@
 #include <array>
 #include <string>
 #include <vector>
-#include "genie/core/format-importer.h"
+#include "genie/core/format_importer.h"
 #include "genie/core/record/alignment/record.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/make_unique.h"

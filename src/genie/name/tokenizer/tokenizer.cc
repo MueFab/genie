@@ -6,7 +6,7 @@
 
 #include "genie/name/tokenizer/tokenizer.h"
 #include <utility>
-#include "genie/core/access-unit.h"
+#include "genie/core/access_unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include <memory>
 #include <utility>
-#include "genie/core/global-cfg.h"
+#include "genie/core/global_cfg.h"
 #include "genie/core/parameter/descriptor_present/decoder-regular.h"
 #include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
 #include "genie/util/make_unique.h"

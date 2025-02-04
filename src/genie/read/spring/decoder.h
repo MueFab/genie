@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 #include "filesystem/filesystem.hpp"
-#include "genie/core/read-decoder.h"
+#include "genie/core/read_decoder.h"
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 #include "genie/util/ordered_section.h"

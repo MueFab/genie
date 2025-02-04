@@ -11,7 +11,7 @@
 
 #include <map>
 #include <string>
-#include "genie/core/reference-manager.h"
+#include "genie/core/reference_manager.h"
 #include "genie/util/ordered_lock.h"
 #include "genie/util/original_source.h"
 #include "genie/util/source.h"

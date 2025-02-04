@@ -11,10 +11,10 @@
 
 #include <memory>
 #include <string>
-#include "genie/core/classifier-regroup.h"
-#include "genie/core/flowgraph-convert.h"
-#include "genie/core/flowgraph-decode.h"
-#include "genie/core/flowgraph-encode.h"
+#include "genie/core/classifier_regroup.h"
+#include "genie/core/flowgraph_convert.h"
+#include "genie/core/flowgraph_decode.h"
+#include "genie/core/flowgraph_encode.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

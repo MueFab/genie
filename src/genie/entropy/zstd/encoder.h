@@ -18,8 +18,8 @@
 
 #include <sstream>
 
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-encoder.h"
+#include "genie/core/access_unit.h"
+#include "genie/core/entropy_encoder.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/stop_watch.h"
 

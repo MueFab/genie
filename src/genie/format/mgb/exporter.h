@@ -11,9 +11,9 @@
 
 #include <memory>
 #include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/format-exporter-compressed.h"
-#include "genie/core/format-exporter.h"
+#include "genie/core/access_unit.h"
+#include "genie/core/format_exporter.h"
+#include "genie/core/format_exporter_compressed.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/format/mgb/access_unit.h"
 #include "genie/util/drain.h"

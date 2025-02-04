@@ -9,9 +9,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/classifier-bypass.h"
-#include "genie/core/classifier-regroup.h"
-#include "genie/core/flowgraph-convert.h"
+#include "genie/core/classifier_bypass.h"
+#include "genie/core/classifier_regroup.h"
+#include "genie/core/flowgraph_convert.h"
 #include "genie/entropy/gabac/decoder.h"
 #include "genie/entropy/gabac/encoder.h"
 #include "genie/name/tokenizer/decoder.h"

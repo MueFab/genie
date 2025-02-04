@@ -9,7 +9,7 @@
 #include <genie/core/record/alignment_split/unpaired.h>
 #include <tuple>
 #include <utility>
-#include "genie/core/qv-decoder.h"
+#include "genie/core/qv_decoder.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
