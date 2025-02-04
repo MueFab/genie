@@ -37,7 +37,7 @@ SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
 
 void SameRec::write(util::BitWriter &writer) const {
     AlignmentSplit::write(writer);
-    writer.writeBypassBE<int64_t, 6>(delta);
+    writer.WriteBypassBE<int64_t, 6>(delta);
     alignment.Write(writer);
 }
 

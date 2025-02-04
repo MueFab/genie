@@ -45,8 +45,8 @@ uint16_t OtherRec::getNextSeq() const { return split_seq_ID; }
 
 void OtherRec::write(util::BitWriter &writer) const {
     AlignmentSplit::write(writer);
-    writer.writeBypassBE<uint64_t, 5>(split_pos);
-    writer.writeBypassBE(split_seq_ID);
+    writer.WriteBypassBE<uint64_t, 5>(split_pos);
+    writer.WriteBypassBE(split_seq_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

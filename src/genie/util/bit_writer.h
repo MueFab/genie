@@ -117,7 +117,7 @@ class BitWriter {
      * @param val Value
      */
     template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
-    void writeBypassBE(T val);
+    void WriteBypassBE(T val);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

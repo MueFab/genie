@@ -27,7 +27,7 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T, size_t SIZE, typename>
-void BitWriter::writeBypassBE(T val) {
+void BitWriter::WriteBypassBE(T val) {
     static_assert(SIZE > 0, "SIZE == 0");
     static_assert(SIZE <= sizeof(T), "SIZE > sizeof(T)");
 

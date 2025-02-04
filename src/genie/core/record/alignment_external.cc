@@ -24,7 +24,7 @@ AlignmentExternal::AlignmentExternal(Type _moreAlignmentInfoType) : moreAlignmen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentExternal::write(util::BitWriter &writer) const { writer.writeBypassBE(moreAlignmentInfoType); }
+void AlignmentExternal::write(util::BitWriter &writer) const { writer.WriteBypassBE(moreAlignmentInfoType); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

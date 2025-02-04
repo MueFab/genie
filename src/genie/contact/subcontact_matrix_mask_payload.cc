@@ -256,7 +256,7 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
 
     auto payload_str = payload.str();
     for (auto& v: payload_str){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 }
 

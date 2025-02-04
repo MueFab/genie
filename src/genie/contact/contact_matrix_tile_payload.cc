@@ -221,16 +221,15 @@ size_t ContactMatrixTilePayload::getSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixTilePayload::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(codec_ID);
+    writer.WriteBypassBE(codec_ID);
 
     if (codec_ID != core::AlgoID::JBIG){
-        writer.writeBypassBE(tile_nrows);
-        writer.writeBypassBE(tile_ncols);
+        writer.WriteBypassBE(tile_nrows);
+        writer.WriteBypassBE(tile_ncols);
     }
 
-    //writer.writeBypassBE(static_cast<uint32_t>(getPayloadSize()));
-    for (auto v: payload)
-        writer.writeBypassBE<uint8_t>(v);
+    //writer.WriteBypassBE(static_cast<uint32_t>(getPayloadSize()));
+    for (auto v: payload) writer.WriteBypassBE<uint8_t>(v);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -193,20 +193,20 @@ const std::vector<AlignmentBox> &Record::getAlignments() const { return alignmen
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(number_of_template_segments);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(reads.size()));
-    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
-    writer.writeBypassBE(class_ID);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_group.length()));
-    writer.writeBypassBE(read_1_first);
+    writer.WriteBypassBE(number_of_template_segments);
+    writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(reads.size()));
+    writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
+    writer.WriteBypassBE(class_ID);
+    writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_group.length()));
+    writer.WriteBypassBE(read_1_first);
     if (!alignmentInfo.empty()) {
         sharedAlignmentInfo.write(writer);
     }
     for (const auto &a : reads) {
-        writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
+        writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
     }
-    writer.writeBypassBE(qv_depth);
-    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
+    writer.WriteBypassBE(qv_depth);
+    writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
     writer.WriteAlignedBytes(read_name.data(), read_name.length());
     writer.WriteAlignedBytes(read_group.data(), read_group.length());
     for (const auto &r : reads) {
@@ -215,7 +215,7 @@ void Record::write(util::BitWriter &writer) const {
     for (const auto &a : alignmentInfo) {
         a.write(writer);
     }
-    writer.writeBypassBE(flags);
+    writer.WriteBypassBE(flags);
     moreAlignmentInfo->write(writer);
 }
 

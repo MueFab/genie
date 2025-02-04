@@ -378,61 +378,61 @@ void ContactRecord::SetCMValues(
 // TODO (Yeremia): Implement this
 void ContactRecord::write(util::BitWriter &writer) const {
     // Sample
-    writer.writeBypassBE(sample_ID);
-    writer.writeBypassBE(static_cast<uint8_t>(sample_name.length()));
+    writer.WriteBypassBE(sample_ID);
+    writer.WriteBypassBE(static_cast<uint8_t>(sample_name.length()));
     writer.WriteAlignedBytes(sample_name.data(), sample_name.length());
-    writer.writeBypassBE(bin_size);
+    writer.WriteBypassBE(bin_size);
 
     // chr1
-    writer.writeBypassBE(chr1_ID);
-    writer.writeBypassBE(static_cast<uint8_t>(chr1_name.length()));
+    writer.WriteBypassBE(chr1_ID);
+    writer.WriteBypassBE(static_cast<uint8_t>(chr1_name.length()));
     writer.WriteAlignedBytes(chr1_name.data(), chr1_name.length());
-    writer.writeBypassBE(chr1_length);
+    writer.WriteBypassBE(chr1_length);
 
     // chr2
-    writer.writeBypassBE(chr2_ID);
-    writer.writeBypassBE(static_cast<uint8_t>(chr2_name.length()));
+    writer.WriteBypassBE(chr2_ID);
+    writer.WriteBypassBE(static_cast<uint8_t>(chr2_name.length()));
     writer.WriteAlignedBytes(chr2_name.data(), chr2_name.length());
-    writer.writeBypassBE(chr2_length);
+    writer.WriteBypassBE(chr2_length);
 
     // num_entries and num_norm_counts
-    writer.writeBypassBE(getNumEntries());
-    writer.writeBypassBE(getNumNormCounts());
+    writer.WriteBypassBE(getNumEntries());
+    writer.WriteBypassBE(getNumNormCounts());
 
     for (auto i = 0; i < getNumNormCounts(); i++){
-        writer.writeBypassBE(static_cast<uint8_t>(norm_count_names[i].length()));
+        writer.WriteBypassBE(static_cast<uint8_t>(norm_count_names[i].length()));
         writer.WriteAlignedBytes(norm_count_names[i].data(), norm_count_names[i].length());
     }
 
     for (const auto& v: start_pos1){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 
     for (const auto& v: end_pos1){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 
     for (const auto& v: start_pos2){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 
     for (const auto& v: end_pos2){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 
     for (const auto& v: counts){
-        writer.writeBypassBE(v);
+        writer.WriteBypassBE(v);
     }
 
     for (const auto& norm_count_vals: norm_counts){
         for (const auto& v: norm_count_vals){
-            writer.writeBypassBE(v);
+            writer.WriteBypassBE(v);
         }
     }
 
     //TODO(yeremia): fix the flag
     //    auto link_record_flag = reader.ReadAlignedInt<uint8_t>();
-    writer.writeBypassBE(static_cast<uint8_t>(0));
+    writer.WriteBypassBE(static_cast<uint8_t>(0));
     //    UTILS_DIE_IF(link_record_flag, "Not yet implemented for link_record!");
 }
 

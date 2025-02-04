@@ -176,19 +176,19 @@ void serialize_mat(
     if (dtype_id == core::DataType::UINT8){
         for (size_t i=0; i<nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(mat(i,j)));
+                writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(mat(i, j)));
             }
         }
     } else if (dtype_id == core::DataType::UINT16){
         for (size_t i=0; i<nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(mat(i,j)));
+                writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(mat(i, j)));
             }
         }
     } else if (dtype_id == core::DataType::UINT32){
         for (size_t i=0; i<nrows; i++) {
             for (size_t j = 0; j < ncols; j++) {
-                writer.writeBypassBE<uint32_t>(static_cast<uint32_t>(mat(i,j)));
+                writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(mat(i, j)));
             }
         }
     } else
@@ -205,7 +205,7 @@ void serialize_arr(
     util::BitWriter writer(&payload);
 
     for (size_t i=0; i<nelems; i++) {
-        writer.writeBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
+        writer.WriteBypassBE<uint32_t>(static_cast<uint32_t>(arr(i)));
     }
 }
 

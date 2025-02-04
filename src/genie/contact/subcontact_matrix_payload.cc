@@ -343,10 +343,10 @@ size_t SubcontactMatrixPayload::getSize() const{
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
-    writer.writeBypassBE(parameter_set_ID);
-    writer.writeBypassBE(sample_ID);
-    writer.writeBypassBE(chr1_ID);
-    writer.writeBypassBE(chr2_ID);
+    writer.WriteBypassBE(parameter_set_ID);
+    writer.WriteBypassBE(sample_ID);
+    writer.WriteBypassBE(chr1_ID);
+    writer.WriteBypassBE(chr2_ID);
 
     for (auto i = 0u; i<getNTilesInRow(); i++){
         for (auto j = 0u; j<getNTilesInCol(); j++){
@@ -354,9 +354,7 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
                 auto& tile_payload = tile_payloads[i][j];
                 auto tile_payload_size = tile_payload.getSize();
 
-                writer.writeBypassBE(
-                    static_cast<uint32_t>(tile_payload_size)
-                );
+                writer.WriteBypassBE(static_cast<uint32_t>(tile_payload_size));
 
                 tile_payload.write(writer);
             }
@@ -370,17 +368,13 @@ void SubcontactMatrixPayload::write(util::BitWriter &writer) const{
 
     if (row_mask_payload.has_value()){
         auto row_mask_payload_size = row_mask_payload->getSize();
-        writer.writeBypassBE(
-            static_cast<uint32_t>(row_mask_payload_size)
-        );
+        writer.WriteBypassBE(static_cast<uint32_t>(row_mask_payload_size));
         row_mask_payload->write(writer);
     }
 
     if (!isIntraSCM() && col_mask_payload.has_value()){
         auto col_mask_payload_size = col_mask_payload->getSize();
-        writer.writeBypassBE(
-            static_cast<uint32_t>(col_mask_payload_size)
-        );
+        writer.WriteBypassBE(static_cast<uint32_t>(col_mask_payload_size));
         col_mask_payload->write(writer);
     }
 }
