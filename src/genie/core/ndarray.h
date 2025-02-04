@@ -35,6 +35,9 @@ class NDArray {
      */
     NDArray();
 
+    // Constructor from dimensions
+    NDArray(const std::vector<size_t>& dims);
+
     /**
      * @brief Constructor from dimensions and buffer.
      *
