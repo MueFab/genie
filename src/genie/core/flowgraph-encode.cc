@@ -94,14 +94,14 @@ void FlowGraphEncode::setEntropyCoder(std::unique_ptr<genie::core::EntropyEncode
 
 void FlowGraphEncode::addExporter(std::unique_ptr<genie::core::FormatExporterCompressed> dat) {
     exporters.emplace_back(std::move(dat));
-    exporterSelector.add(exporters.back().get());
+    exporterSelector.Add(exporters.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphEncode::setExporter(std::unique_ptr<genie::core::FormatExporterCompressed> dat, size_t index) {
     exporters[index] = std::move(dat);
-    exporterSelector.set(exporters[index].get(), index);
+    exporterSelector.Set(exporters[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void FlowGraphEncode::setEntropyCoderSelector(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
-    exporterSelector.setOperation(fun);
+    exporterSelector.SetOperation(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -129,7 +129,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
                                    size_t maxSize) {
     assert(symbols != nullptr);
 
-    size_t numSymbols = symbols->size();
+    size_t numSymbols = symbols->Size();
     if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
@@ -151,7 +151,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
@@ -196,7 +196,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     bitstream.flush(symbols);
 
-    return symbols->size();  // size of bitstream
+    return symbols->Size();  // size of bitstream
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
                                    util::DataBlock *const depSymbols, size_t maxSize) {
     assert(symbols != nullptr);
 
-    size_t numSymbols = symbols->size();
+    size_t numSymbols = symbols->Size();
     if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
@@ -233,7 +233,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, true);
@@ -243,7 +243,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     util::BlockStepper rDep;
     if (depSymbols) {
-        rDep = depSymbols->getReader();
+        rDep = depSymbols->GetReader();
     }
 
     ContextSelector ctxSelector(stateVars);
@@ -309,7 +309,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     bitstream.flush(symbols);
 
-    return symbols->size();  // size of bitstream
+    return symbols->Size();  // size of bitstream
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -318,7 +318,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
                                    size_t maxSize) {
     assert(symbols != nullptr);
 
-    size_t numSymbols = symbols->size();
+    size_t numSymbols = symbols->Size();
     if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
@@ -346,7 +346,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
-    util::BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, true);
@@ -405,7 +405,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     bitstream.flush(symbols);
 
-    return symbols->size();  // size of bitstream
+    return symbols->Size();  // size of bitstream
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

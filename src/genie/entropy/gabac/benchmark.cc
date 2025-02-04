@@ -371,7 +371,7 @@ ResultFull benchmark_full(const std::string& input_file, const genie::core::GenS
         std::vector<util::DataBlock> transformedSubseqs;
         transformedSubseqs.resize(1);
         auto subsequence = sequence;
-        transformedSubseqs[0].swap(&subsequence);
+        transformedSubseqs[0].Swap(&subsequence);
         util::Watch timer;
         timer.Reset();
         auto cfg = config.createConfig(desc, core::getDescriptor(desc.first).tokentype);

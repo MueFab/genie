@@ -41,7 +41,7 @@ int FileBuffer::underflow() { return fgetc(fileptr); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlockBuffer::DataBlockBuffer(util::DataBlock *d, size_t pos_i) : block(0, 1), pos(pos_i) { block.swap(d); }
+DataBlockBuffer::DataBlockBuffer(util::DataBlock *d, size_t pos_i) : block(0, 1), pos(pos_i) { block.Swap(d); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,8 +60,8 @@ std::streamsize DataBlockBuffer::xsputn(const char *s, std::streamsize n) {
     if (block.ModByWordSize(n)) {
         UTILS_DIE("Invalid Data length");
     }
-    size_t oldSize = block.size();
-    block.resize(block.size() + block.DivByWordSize(n));
+    size_t oldSize = block.Size();
+    block.Resize(block.Size() + block.DivByWordSize(n));
     memcpy(static_cast<uint8_t *>(block.GetData()) + block.MulByWordSize(oldSize), s, static_cast<size_t>(n));
     return n;
 }
@@ -81,7 +81,7 @@ std::streamsize DataBlockBuffer::xsgetn(char *s, std::streamsize n) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 int DataBlockBuffer::underflow() {
-    if (pos == block.size()) {
+    if (pos == block.Size()) {
         return EOF;
     }
     return static_cast<int>(block.Get(pos));
@@ -90,7 +90,7 @@ int DataBlockBuffer::underflow() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 int DataBlockBuffer::uflow() {
-    if (pos == block.size()) {
+    if (pos == block.Size()) {
         return EOF;
     }
     return static_cast<int>(block.Get(pos++));
@@ -98,7 +98,7 @@ int DataBlockBuffer::uflow() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataBlockBuffer::flush_block(util::DataBlock *blk) { block.swap(blk); }
+void DataBlockBuffer::flush_block(util::DataBlock *blk) { block.Swap(blk); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,12 +110,12 @@ std::streambuf::pos_type DataBlockBuffer::seekoff(off_type off, std::ios_base::s
                                                   std::ios_base::openmode which) {
     (void)which;
     if (dir == std::ios_base::cur)
-        pos = (off < 0 && size_t(std::abs(off)) > pos) ? 0 : std::min<size_t>(pos + off, block.size());
+        pos = (off < 0 && size_t(std::abs(off)) > pos) ? 0 : std::min<size_t>(pos + off, block.Size());
     else if (dir == std::ios_base::end)
         pos =
-            (off < 0 && size_t(std::abs(off)) > block.size()) ? 0 : std::min<size_t>(block.size() + off, block.size());
+            (off < 0 && size_t(std::abs(off)) > block.Size()) ? 0 : std::min<size_t>(block.Size() + off, block.Size());
     else if (dir == std::ios_base::beg)
-        pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min<size_t>(size_t(0) + off, block.size());
+        pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min<size_t>(size_t(0) + off, block.Size());
     return pos;
 }
 

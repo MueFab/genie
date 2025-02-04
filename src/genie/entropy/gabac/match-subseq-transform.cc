@@ -27,8 +27,8 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     uint8_t wordsize = transformedSubseqs->front().GetWordSize();
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
-    symbols.swap(&(*transformedSubseqs)[0]);
-    (*transformedSubseqs)[0].clear();
+    symbols.Swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].Clear();
     transformedSubseqs->resize(3);
 
     util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
@@ -38,10 +38,10 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     lengths->SetWordSize(core::range2bytes({0, matchBufferSize}));
     rawValues->SetWordSize(wordsize);
 
-    const uint64_t symbolsSize = symbols.size();
+    const uint64_t symbolsSize = symbols.Size();
 
     if (matchBufferSize == 0) {
-        lengths->resize(symbolsSize);
+        lengths->Resize(symbolsSize);
         std::fill(lengths->begin(), lengths->end(), 0);
         return;
     }
@@ -75,7 +75,7 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
         }
     }
 
-    symbols.clear();
+    symbols.Clear();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -93,13 +93,13 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
 
     util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
-    assert(lengths->size() == pointers->size() + rawValues->size());
+    assert(lengths->Size() == pointers->Size() + rawValues->Size());
 
     // Re-compute the symbols from the pointer, lengths and raw values
     size_t n = 0;
-    util::BlockStepper t0 = pointers->getReader();
-    util::BlockStepper t1 = lengths->getReader();
-    util::BlockStepper t2 = rawValues->getReader();
+    util::BlockStepper t0 = pointers->GetReader();
+    util::BlockStepper t1 = lengths->GetReader();
+    util::BlockStepper t2 = rawValues->GetReader();
     while (t1.IsValid()) {
         uint64_t length = t1.Get();
         t1.Inc();
@@ -118,9 +118,9 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     }
 
     (*transformedSubseqs).resize(1);
-    (*transformedSubseqs)[0].clear();
+    (*transformedSubseqs)[0].Clear();
 
-    symbols.swap(&(*transformedSubseqs)[0]);
+    symbols.Swap(&(*transformedSubseqs)[0]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -81,7 +81,7 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
         // Insert subsequence into vector
         std::vector<util::DataBlock> transformedSubseqs;
         transformedSubseqs.resize(1);
-        transformedSubseqs[0].swap(&subsequence);
+        transformedSubseqs[0].Swap(&subsequence);
 
         // Put descriptor subsequence, get transformed subsequences out
         doSubsequenceTransform(subseqCfg, &transformedSubseqs);
@@ -89,13 +89,13 @@ uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfig
 
         // Loop through the transformed sequences
         for (size_t i = 0; i < numTrnsfSubseqs; i++) {
-            uint64_t numtrnsfSymbols = transformedSubseqs[i].size();
+            uint64_t numtrnsfSymbols = transformedSubseqs[i].Size();
             uint64_t trnsfSubseqPayloadSize = 0;
             if (numtrnsfSymbols > 0) {
                 // Encoding
                 trnsfSubseqPayloadSize =
                     gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i), &(transformedSubseqs[i]),
-                                                 (dependency.size()) ? &dependency : nullptr);
+                                                 (dependency.Size()) ? &dependency : nullptr);
             }
 
             if (i < (numTrnsfSubseqs - 1)) {

@@ -14,6 +14,7 @@ set(source_files
         stringview.cc
         thread_manager.cc
         stop_watch.cc
+        log.cc
         )
 
 add_library(genie-util ${source_files})

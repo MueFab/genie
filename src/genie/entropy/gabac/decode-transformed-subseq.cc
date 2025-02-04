@@ -148,7 +148,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
                                         0);
 
     util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
-    util::BlockStepper r = decodedSymbols.getReader();
+    util::BlockStepper r = decodedSymbols.GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
@@ -183,7 +183,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     payloadSizeUsed = reader.close();
 
-    decodedSymbols.swap(bitstream);
+    decodedSymbols.Swap(bitstream);
 
     return payloadSizeUsed;
 }
@@ -224,7 +224,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
                                         0);
 
     util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
-    util::BlockStepper r = decodedSymbols.getReader();
+    util::BlockStepper r = decodedSymbols.GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
@@ -238,7 +238,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     util::BlockStepper rDep;
     if (depSymbols) {
-        rDep = depSymbols->getReader();
+        rDep = depSymbols->GetReader();
     }
 
     ContextSelector ctxSelector(stateVars);
@@ -293,7 +293,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     payloadSizeUsed = reader.close();
 
-    decodedSymbols.swap(bitstream);
+    decodedSymbols.Swap(bitstream);
 
     return payloadSizeUsed;
 }
@@ -332,7 +332,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
                                         0);
 
     util::DataBlock decodedSymbols(numEncodedSymbols, wordsize);
-    util::BlockStepper r = decodedSymbols.getReader();
+    util::BlockStepper r = decodedSymbols.GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
@@ -385,7 +385,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     payloadSizeUsed = reader.close();
 
-    decodedSymbols.swap(bitstream);
+    decodedSymbols.Swap(bitstream);
 
     return payloadSizeUsed;
 }

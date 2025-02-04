@@ -51,20 +51,20 @@ void FlowGraphConvert::setImporter(std::unique_ptr<genie::core::FormatImporter> 
 
 void FlowGraphConvert::addExporter(std::unique_ptr<genie::core::FormatExporter> dat) {
     exporters.emplace_back(std::move(dat));
-    exporterSelector.add(exporters.back().get());
+    exporterSelector.Add(exporters.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphConvert::setExporter(std::unique_ptr<genie::core::FormatExporter> dat, size_t index) {
     exporters[index] = std::move(dat);
-    exporterSelector.set(exporters[index].get(), index);
+    exporterSelector.Set(exporters[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphConvert::setExporterSelector(const std::function<size_t(const genie::core::record::Chunk&)>& fun) {
-    exporterSelector.setOperation(fun);
+    exporterSelector.SetOperation(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
