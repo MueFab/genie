@@ -1,427 +1,599 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file data_block.h
+ *
+ * @copyright This file is part of Genie
+ * See LICENSE and/or visit https://github.com/MueFab/genie for more details.
+ *
+ * @brief Declaration of the DataBlock class for managing memory-efficient data
+ * blocks.
+ *
+ * This file contains the declaration of the `DataBlock` class, which provides a
+ * memory-efficient data structure for storing data in variable-sized symbols.
+ * It offers functionality similar to `std::vector`, but with a focus on
+ * handling data in non-standard element sizes using bit-packing and
+ * word-Size-aware operations.
+ *
+ * @details The `DataBlock` class is optimized for applications that require
+ * fine-grained control over memory usage and data alignment. It supports custom
+ * word sizes, symbol extraction, insertion, and iterator-based access. The
+ * class is designed to be used in scenarios where standard containers like
+ * `std::vector` are not sufficient due to non-standard element sizes.
  */
 
 #ifndef SRC_GENIE_UTIL_DATA_BLOCK_H_
 #define SRC_GENIE_UTIL_DATA_BLOCK_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include <cstring>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "genie/util/block_stepper.h"
-#include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-struct BlockStepper;
+// -----------------------------------------------------------------------------
 
 /**
- * @brief Word size aware data structure similar to a std::vector. Memory
- * efficient.
+ * @brief Memory-efficient data structure similar to `std::vector` with support
+ * for custom word sizes.
+ *
+ * The `DataBlock` class provides a container for storing data using a custom
+ * word Size. It allows for efficient memory management and provides operations
+ * for manipulating individual elements using word-Size-aware methods. It
+ * includes support for bit-packing, symbol extraction, insertion, and iterators
+ * for accessing the elements.
  */
 class DataBlock {
- private:
-    uint8_t lgWordSize;         //!< @brief log2 of the wordsize. Wordsize = 1 << lgWordsize
-    std::vector<uint8_t> data;  //!< @brief The actual raw data.
+  /// log2 of the word size. The word Size is defined as 1 << lgWordSize.
+  uint8_t lg_word_size_;
+
+  /// The raw data stored as a vector of bytes.
+  std::vector<uint8_t> data_;
 
  public:
-    /**
-     * @brief Get lg base 2 of the size of one symbol in bytes
-     * @return lg2 bytes of one symbol
-     */
-    uint8_t getLgWordSize() const;
+  /**
+   * @brief Sets the Size of one symbol, changing the number of elements.
+   *
+   * This function changes the word Size used for each symbol in the
+   * `DataBlock`. It modifies the internal state to adjust the number of
+   * elements based on the new word Size.
+   *
+   * @param size The new Size of each symbol in bytes.
+   */
+  void SetWordSize(uint8_t size);
 
-    /**
-     * @brief Sets the size of one symbol, changing the number of elments
-     * @param size New size in bytes
-     */
-    void SetWordSize(uint8_t size);
+  /**
+   * @brief Get the Size of one symbol in bytes.
+   *
+   * This function returns the Size of each symbol in bytes. The return type
+   * is `uint8_t`, but internally it uses an integer representation to avoid
+   * issues with C/C++ type promotion.
+   *
+   * @return The Size of one symbol in bytes.
+   */
+  [[nodiscard]] uint8_t GetWordSize() const;
 
+  /**
+   * @brief Multiplies a value by the Size of one symbol in bytes.
+   *
+   * This function multiplies the given value by the word Size in bytes.
+   *
+   * @param val The value to be multiplied.
+   * @return The result of the multiplication.
+   */
+  [[nodiscard]] uint64_t MulByWordSize(uint64_t val) const;
+
+  /**
+   * @brief Divides a value by the Size of one symbol in bytes.
+   *
+   * This function divides the given value by the word Size in bytes.
+   *
+   * @param val The value to be divided.
+   * @return The result of the division.
+   */
+  [[nodiscard]] uint64_t DivByWordSize(uint64_t val) const;
+
+  /**
+   * @brief Calculates the remainder when dividing by the Size of one symbol
+   * in bytes.
+   *
+   * This function returns the remainder when the given value is divided by
+   * the word Size in bytes.
+   *
+   * @param val The value to be used in the modulo operation.
+   * @return The remainder of the division.
+   */
+  [[nodiscard]] uint64_t ModByWordSize(uint64_t val) const;
+
+  /**
+   * @brief Creates a `BlockStepper` for this `DataBlock`.
+   *
+   * This function creates a `BlockStepper` object that can be used to iterate
+   * over the elements in the `DataBlock`. The `BlockStepper` provides an
+   * efficient way to access and manipulate data within the `DataBlock`.
+   *
+   * @warning The `BlockStepper` will become invalid if elements are added or
+   * removed from the `DataBlock`.
+   * @return A `BlockStepper` object for iterating over the `DataBlock`.
+   */
+  [[nodiscard]] BlockStepper GetReader() const;
+
+  /**
+   * @brief Compares the contents and word Size of two `DataBlock` objects.
+   *
+   * This function checks if the data and word Size of the current `DataBlock`
+   * are equal to those of another `DataBlock` object.
+   *
+   * @param d The other `DataBlock` to compare.
+   * @return True if the `DataBlock` objects are equal, false otherwise.
+   */
+  bool operator==(const DataBlock& d) const;
+
+  /**
+   * @brief Sets the contents of the `DataBlock` using an initializer list.
+   *
+   * This function replaces the contents of the `DataBlock` with the values
+   * from the given initializer list. It does not modify the word Size.
+   *
+   * @param il The initializer list containing the new values.
+   * @return A reference to the updated `DataBlock`.
+   */
+  DataBlock& operator=(const std::initializer_list<uint64_t>& il);
+
+  /**
+   * @brief Extracts one symbol from the `DataBlock`.
+   *
+   * This function retrieves the symbol at the specified index and returns it
+   * as a 64-bit value.
+   *
+   * @param index The position of the symbol in the `DataBlock`.
+   * @return The symbol at the specified position, widened to 64 bits.
+   */
+  [[nodiscard]] uint64_t Get(size_t index) const;
+
+  /**
+   * @brief Sets the value of a symbol at the specified index.
+   *
+   * This function updates the symbol at the given index with a new value.
+   * The value will be narrowed to fit the word Size.
+   *
+   * @param index The position of the symbol to update.
+   * @param val The new value to be set.
+   */
+  void Set(size_t index, uint64_t val);
+
+  // Inner classes Begin here
+
+  /**
+   * @brief Proxy class for abstracting access to individual elements using
+   * operators.
+   *
+   * The `ProxyCore` class provides a way to access and manipulate individual
+   * elements in the `DataBlock` using standard operators such as assignment
+   * and dereferencing. It allows for operations like range-based for loops
+   * and use with STL algorithms.
+   *
+   * @tparam T The type of the `DataBlock` being accessed.
+   */
+  template <typename T>
+  class ProxyCore {
+    /// The `DataBlock` being referred to.
+    T stream_;
+
+    /// The position inside the `DataBlock`.
+    size_t position_;
+
+   public:
     /**
-     * @brief Get size of one symbol in bytes.
-     * @return bytes of one symbol
+     * @brief Creates a `ProxyCore` object for accessing a specific element
+     * in the `DataBlock`.
      *
-     * Note: This is declared to be int and not uint8_t on purpose!!
-     * According to C/C++ semantics, operands smaller than one int are
-     * promoted to int before being used in and expression.  If the return
-     * type were uint8_t, then the result of the shift expression would be
-     * narrowed to 8 bits (a useless and with 0xff what we know does nothing)
-     * before promoting it back to int.  Ergo, just leave the return type
-     * of the word size as int.
+     * @param str The `DataBlock` being referred to.
+     * @param pos The index of the element inside the `DataBlock`.
      */
-    uint8_t GetWordSize() const;
+    ProxyCore(T str, size_t pos);
 
     /**
-     * @brief multiply by size of one symbol in bytes
-     * @return multiply arg by size of one symbol
+     * @brief Conversion to `uint64_t` by invoking `get()` on the
+     * `DataBlock`.
+     *
+     * This function allows the `ProxyCore` to be implicitly converted to a
+     * `uint64_t` by invoking the `get()` method of the associated
+     * `DataBlock`.
+     *
+     * @return The value of the element at the current position.
      */
-    uint64_t MulByWordSize(uint64_t val) const;
+    explicit operator uint64_t() const;
 
     /**
-     * @brief divide by size of one symbol in bytes
-     * @return divide arg by size of one symbol
+     * @brief Assigns a new value to the current element using `set()` of
+     * the `DataBlock`.
+     *
+     * This function updates the value of the element at the current
+     * position using the `set()` method of the associated `DataBlock`.
+     *
+     * @param val The new value to be assigned to the element.
+     * @return A reference to the updated `ProxyCore` object.
      */
-    uint64_t DivByWordSize(uint64_t val) const;
+    ProxyCore& operator=(uint64_t val);
+  };
+
+  /**
+   * @brief Iterator class for traversing elements in the `DataBlock`.
+   *
+   * The `IteratorCore` class provides an iterator interface for accessing the
+   * elements of the `DataBlock`. It supports standard iterator operations
+   * like Increment, decrement, and random access, making it compatible with
+   * STL algorithms.
+   *
+   * @tparam T The type of `DataBlock` being iterated over.
+   */
+  template <typename T>
+  class IteratorCore {
+    /// The `DataBlock` being iterated over.
+    T stream_;
+
+    /// The position of the current element inside the `DataBlock`.
+    size_t position_;
+
+   public:
+    /**
+     * @brief Constructs an iterator for the `DataBlock` starting at the
+     * specified position.
+     *
+     * @param str The `DataBlock` to iterate over.
+     * @param pos The initial position of the iterator.
+     */
+    IteratorCore(T str, size_t pos);
 
     /**
-     * @brief modulo divide by size of one symbol in bytes
-     * @return modulo divide arg by size of one symbol
+     * @brief Advances the iterator by a specified offset.
+     *
+     * @param offset The number of elements to advance.
+     * @return A new `IteratorCore` pointing to the updated position.
      */
-    uint64_t ModByWordSize(uint64_t val) const;
+    IteratorCore operator+(size_t offset) const;
 
     /**
-     * @brief Creates a blockStepper for this DataBlock.
-     * @warning It will become invalid once you add or remove elements from the
-     * data block.
-     * @todo This has to be refactored. There should be a BlockStepper_Const.
-     * Currently it is possible to alter a const DataBlock via blockstepper
-     * which should not be possible.
-     * @return BlockStepper
+     * @brief Rewinds the iterator by a specified offset.
+     *
+     * @param offset The number of elements to rewind.
+     * @return A new `IteratorCore` pointing to the updated position.
      */
-    BlockStepper getReader() const;
+    IteratorCore operator-(size_t offset) const;
 
     /**
-     * @brief Compare data and word size
-     * @param d Other block
-     * @return True if equal
+     * @brief Calculates the offset between two iterators.
+     *
+     * This function returns the difference between the current iterator and
+     * another iterator, indicating the number of elements between them.
+     *
+     * @param offset The other iterator to compare.
+     * @return The number of elements between the iterators.
      */
-    bool operator==(const DataBlock &d) const;
+    size_t operator-(const IteratorCore& offset) const;
 
     /**
-     * @brief Set contents to values from a list. Does not affect the word size.
-     * @param il List
-     * @return This data block.
+     * @brief Prefix Increment operator.
+     *
+     * Advances the iterator to the next element.
+     *
+     * @return A reference to the updated iterator.
      */
-    DataBlock &operator=(const std::initializer_list<uint64_t> &il);
+    IteratorCore& operator++();
 
     /**
-     * @brief Extract one symbol
-     * @param index Position of symbol in block
-     * @return Symbol widened to 64 bits
+     * @brief Prefix decrement operator.
+     *
+     * Moves the iterator to the previous element.
+     *
+     * @return A reference to the updated iterator.
      */
-    uint64_t Get(size_t index) const;
+    IteratorCore& operator--();
 
     /**
-     * @brief Calculates the biggest possible word size for this block
-     * @return Maximum
+     * @brief Postfix Increment operator.
+     *
+     * Advances the iterator to the next element.
+     *
+     * @return The iterator before the Increment.
      */
-    uint8_t getMaxWordSize() const;
+    IteratorCore operator++(int);
 
     /**
-     * @brief Pack symbol into stream.
-     * @param index Position in stream
-     * @param val Value (will be narrowed to word size)
+     * @brief Postfix decrement operator.
+     *
+     * Moves the iterator to the previous element.
+     *
+     * @return The iterator before the decrement.
      */
-    void Set(size_t index, uint64_t val);
+    IteratorCore operator--(int);
 
     /**
-     * @brief A proxy object abstracting the get/set access using regular
-     * operators. This way it is possible to use for example range based for
-     * loops or std algorithms with iterators.
-     * @note Even though this is convenient you should avoid it. It's slow.
-     * @warning Adding or removing elements from the data block this object is
-     * referring to leads to undefined behaviour. Don't do it as long as a proxy
-     * object is existent.
-     * @tparam T Type of data block
+     * @brief Returns the current index position of the iterator.
+     *
+     * @return The index position inside the `DataBlock`.
      */
-    template <typename T>
-    class ProxyCore {
-     private:
-        T stream;         //!< @brief The DataBlock we are referring to.
-        size_t position;  //!< @brief The position inside the datablock.
-
-     public:
-        /**
-         * @brief Create access proxy
-         * @param str Block we are referring to
-         * @param pos Element index inside the data block
-         */
-        ProxyCore(T str, size_t pos);
-
-        /**
-         * @brief Conversion to uint64_t - executes get() of data block
-         * @return str.get(pos);
-         */
-        explicit operator uint64_t() const;
-
-        /**
-         * @brief Assign uint64_t - executes set() of data block
-         * @param val New value
-         * @return *this, so that you can execute additional operations on this
-         * element.
-         */
-        ProxyCore &operator=(uint64_t val);
-    };
+    [[maybe_unused]] [[nodiscard]] size_t GetOffset() const;
 
     /**
-     * @brief Iterator for data blocks. Like for proxy object: only use if
-     * BlockStepper does not work.
-     * @tparam T Data block type
+     * @brief Dereferences the iterator to a `ProxyCore` object.
+     *
+     * This function returns a `ProxyCore` object that abstracts access to
+     * the current element in the `DataBlock`.
+     *
+     * @return A `ProxyCore` object for the current element.
      */
-    template <typename T>
-    class IteratorCore {
-     private:
-        T stream;         //!< @brief The DataBlock we are referring to.
-        size_t position;  //!< @brief The position inside the datablock.
-
-     public:
-        /**
-         * @brief Create iterator
-         * @param str Data block
-         * @param pos Index in data block.
-         */
-        IteratorCore(T str, size_t pos);
-
-        /**
-         * @brief Fast forward
-         * @param offset Index offset
-         * @return *this
-         */
-        IteratorCore operator+(size_t offset) const;
-
-        /**
-         * @brief Rewind
-         * @param offset Index offset
-         * @return *this
-         */
-        IteratorCore operator-(size_t offset) const;
-
-        /**
-         * @brief Calculate offset between iterators
-         * @param offset Other iterator
-         * @return Index offset
-         */
-        size_t operator-(const IteratorCore &offset) const;
-
-        /**
-         * @brief Increment prefix
-         * @return *this
-         */
-        IteratorCore &operator++();
-
-        /**
-         * @brief Decrement prefix
-         * @return *this
-         */
-        IteratorCore &operator--();
-
-        /**
-         * @brief Increment postfix
-         * @return *this
-         */
-        const IteratorCore operator++(int);
-
-        /**
-         * @brief Increment postfix
-         * @return *this
-         */
-        const IteratorCore operator--(int);
-
-        /**
-         * @brief Return index
-         * @return Saved index
-         */
-        size_t GetOffset() const;
-
-        /**
-         * @brief Dereference to Proxy object
-         * @return Newly created proxy
-         */
-        ProxyCore<T> operator*() const;
-
-        /**
-         * @brief Compare
-         * @param c other Iterator
-         * @return True if block and index equal
-         */
-        bool operator==(const IteratorCore &c) const;
-
-        /**
-         * @brief Compare
-         * @param c other Iterator
-         * @return False if block and index equal
-         */
-        bool operator!=(const IteratorCore &c) const;
-
-        using iterator_category = std::random_access_iterator_tag; /**< @brief Iterator category for  STL */
-        using reference = ProxyCore<T>;                            /**< @brief Reference type for STL */
-        using pointer = ProxyCore<T> *;                            /**< @brief Pointer type for STL */
-        using value_type = ProxyCore<T>;                           /**< @brief Value type for STL */
-        using difference_type = size_t;                            /**< @brief Difference type for STL */
-    };
-
-    using Iterator = IteratorCore<DataBlock *>;            /**< @brief Default iterator */
-    using ConstIterator = IteratorCore<const DataBlock *>; /**< @brief Default const iterator */
+    ProxyCore<T> operator*() const;
 
     /**
-     * @brief Get number of elements
-     * @return Size of data blocks in elements
+     * @brief Equality comparison operator.
+     *
+     * Compares two iterators for equality based on the `DataBlock` and
+     * position.
+     *
+     * @param c The other iterator to compare.
+     * @return True if both iterators refer to the same element, false
+     * otherwise.
      */
-    size_t size() const;
+    bool operator==(const IteratorCore& c) const;
 
     /**
-     * @brief Reserve more memory without expanding the actual data. Similar to
-     * vector.
-     * @param size New memory size in elements
+     * @brief Inequality comparison operator.
+     *
+     * Compares two iterators for inequality based on the `DataBlock` and
+     * position.
+     *
+     * @param c The other iterator to compare.
+     * @return True if the iterators do not refer to the same element, false
+     * otherwise.
      */
-    void reserve(size_t size);
+    bool operator!=(const IteratorCore& c) const;
 
-    /**
-     * @brief Free unused memory without shrinking the actual data. Similar to
-     * vector.
-     */
-    void shrink_to_fit();
+    using IteratorCategory [[maybe_unused]] = std::random_access_iterator_tag;
+    using Reference = ProxyCore<T>;
+    using Pointer = ProxyCore<T>*;
+    using ValueType = ProxyCore<T>;
+    using DifferenceType [[maybe_unused]] = size_t;
+  };
 
-    /**
-     * @brief Delete all elements. Sets the size to zero.
-     */
-    void clear();
+  using Iterator = IteratorCore<DataBlock*>;
+  using ConstIterator = IteratorCore<const DataBlock*>;
 
-    /**
-     * @brief Sets the size to a specified number of elements.
-     * If you are shrinking, the last elements are discarded.
-     * @param size New size in elements
-     */
-    void resize(size_t size);
+  /**
+   * @brief Get number of elements in the `DataBlock`.
+   *
+   * This function returns the number of elements currently stored in the
+   * `DataBlock`.
+   *
+   * @return The Size of the `DataBlock` in terms of elements.
+   */
+  [[nodiscard]] size_t Size() const;
 
-    /**
-     * @brief Check if there are elements in the block.
-     * @return True if no elements
-     */
-    bool empty() const;
+  /**
+   * @brief Reserves more memory without expanding the actual data.
+   *
+   * This function increases the capacity of the `DataBlock` to accommodate
+   * the specified number of elements without changing the current Size of the
+   * `DataBlock`.
+   *
+   * @param size The new memory capacity in terms of elements.
+   */
+  [[maybe_unused]] void Reserve(size_t size);
 
-    /**
-     * @brief Begin const iterator
-     * @return Const iterator to first element.
-     */
-    ConstIterator begin() const;
+  /**
+   * @brief Deletes all elements in the `DataBlock`.
+   *
+   * This function clears the contents of the `DataBlock` and sets its Size to
+   * zero.
+   */
+  void Clear();
 
-    /**
-     * @brief Begin iterator
-     * @return iterator to first element.
-     */
-    Iterator begin();
+  /**
+   * @brief Resizes the `DataBlock` to a specified number of elements.
+   *
+   * If the `DataBlock` is resized to a smaller Size, the excess elements are
+   * discarded. If resized to a larger Size, new elements are initialized with
+   * default values.
+   *
+   * @param size The new Size in terms of elements.
+   */
+  void Resize(size_t size);
 
-    /**
-     * @brief End const iterator
-     * @return Const iterator to behind the last element.
-     */
-    ConstIterator end() const;
+  /**
+   * @brief Checks if the `DataBlock` is empty.
+   *
+   * This function checks if there are any elements in the `DataBlock`.
+   *
+   * @return True if there are no elements, false otherwise.
+   */
+  [[nodiscard]] bool Empty() const;
 
-    /**
-     * @brief End iterator
-     * @return iterator to behind the last element.
-     */
-    Iterator end();
+  /**
+   * @brief Begin const iterator.
+   *
+   * Returns a const iterator to the first element in the `DataBlock`.
+   *
+   * @return A const iterator to the first element.
+   */
+  [[nodiscard]] ConstIterator begin() const;
 
-    /**
-     * @brief Append a new symbol
-     * @param val Value of symbol
-     */
-    void PushBack(uint64_t val);
+  /**
+   * @brief Begin mutable iterator.
+   *
+   * Returns an iterator to the first element in the `DataBlock`.
+   *
+   * @return An iterator to the first element.
+   */
+  Iterator begin();
 
-    /**
-     * @brief Append a new symbol
-     * @param val Value of symbol
-     */
-    void EmplaceBack(uint64_t val);
+  /**
+   * @brief End const iterator.
+   *
+   * Returns a const iterator to the position past the last element in the
+   * `DataBlock`.
+   *
+   * @return A const iterator to the position past the last element.
+   */
+  [[nodiscard]] ConstIterator end() const;
 
-    /**
-     * @brief Get raw const pointer to memory block
-     * @return Pointer
-     */
-    const void *GetData() const;
+  /**
+   * @brief End mutable iterator.
+   *
+   * Returns an iterator to the position past the last element in the
+   * `DataBlock`.
+   *
+   * @return An iterator to the position past the last element.
+   */
+  Iterator end();
 
-    /**
-     * @brief Get raw pointer to memory block
-     * @return Pointer
-     */
-    void *GetData();
+  /**
+   * @brief Appends a new symbol to the `DataBlock`.
+   *
+   * This function adds a new symbol to the end of the `DataBlock`.
+   *
+   * @param val The value of the new symbol to be added.
+   */
+  void PushBack(uint64_t val);
 
-    /**
-     * @brief Gets the size of the underlying data in bytes.
-     * wordsize * numberOfElements
-     * @return Data size in bytes
-     */
-    size_t GetRawSize() const;
+  /**
+   * @brief Emplaces a new symbol into the `DataBlock`.
+   *
+   * This function constructs a new symbol at the end of the `DataBlock`.
+   *
+   * @param val The value of the new symbol to be constructed.
+   */
+  [[maybe_unused]] void EmplaceBack(uint64_t val);
 
-    /**
-     * @brief Swap the contents of two data blocks without copying of data.
-     * @param d The other block.
-     */
-    void swap(DataBlock *d);
+  /**
+   * @brief Gets a raw const pointer to the memory block.
+   *
+   * This function returns a raw pointer to the underlying memory block,
+   * allowing for low-level access to the data.
+   *
+   * @return A const pointer to the memory block.
+   */
+  [[nodiscard]] const void* GetData() const;
 
-    /**
-     * @brief Insert elements into the data block
-     * @tparam IT1 Type of iterator 1
-     * @tparam IT2 Type of Iterator 2
-     * @param pos Where to insert
-     * @param start Where the source buffer starts
-     * @param end Where the source buffer ends
-     */
-    template <typename IT1, typename IT2>
-    void Insert(const IT1 &pos, const IT2 &start, const IT2 &end);
+  /**
+   * @brief Gets a raw pointer to the memory block.
+   *
+   * This function returns a raw pointer to the underlying memory block,
+   * allowing for low-level access to the data.
+   *
+   * @return A pointer to the memory block.
+   */
+  void* GetData();
 
-    /**
-     * @brief Create Data block
-     * @param size initial size in elements
-     * @param wsize size of one element in bytes
-     */
-    explicit DataBlock(size_t size = 0, uint8_t wsize = 1);
+  /**
+   * @brief Gets the Size of the underlying data in bytes.
+   *
+   * This function returns the total Size of the data stored in the
+   * `DataBlock` in bytes, which is computed as `wordsize * numberOfElements`.
+   *
+   * @return The total Size of the data in bytes.
+   */
+  [[nodiscard]] size_t GetRawSize() const;
 
-    /**
-     * @brief Create Data block from vector
-     * @tparam T Should be an integral type
-     * @param vec Vector to process
-     */
-    template <typename T>
-    explicit DataBlock(std::vector<T> *vec);
+  /**
+   * @brief Swaps the contents of two `DataBlock` objects.
+   *
+   * This function exchanges the contents of the current `DataBlock` with
+   * those of another `DataBlock` without performing a copy operation, making
+   * it efficient.
+   *
+   * @param d The other `DataBlock` to swap with.
+   */
+  void Swap(DataBlock* d);
 
-    /**
-     * @brief Create Data block from vector.
-     * This is an optimization, as you can move byte vectors
-     * into data blocks without any copy.
-     * @param vec Other vector
-     */
-    explicit DataBlock(std::vector<uint8_t> *vec);
+  /**
+   * @brief Inserts elements into the `DataBlock`.
+   *
+   * This function inserts a range of elements into the `DataBlock` at the
+   * specified position.
+   *
+   * @tparam It1 The type of the iterator for the insertion position.
+   * @tparam It2 The type of the iterator for the range of elements.
+   * @param pos The position at which to insert the elements.
+   * @param start The start of the range of elements to be inserted.
+   * @param end The end of the range of elements to be inserted.
+   */
+  template <typename It1, typename It2>
+  [[maybe_unused]] void Insert(const It1& pos, const It2& start,
+                               const It2& end);
 
-    /**
-     * @brief Create data block from string.
-     * @param vec String treated like a vector here.
-     */
-    explicit DataBlock(std::string *vec);
+  /**
+   * @brief Creates a `DataBlock` with a specified initial Size and word size.
+   *
+   * This constructor initializes a `DataBlock` with the given Size and word
+   * Size.
+   *
+   * @param size The initial Size in terms of elements.
+   * @param word_size The Size of each element in bytes.
+   */
+  explicit DataBlock(size_t size = 0, uint8_t word_size = 1);
 
-    /**
-     * @brief Create data block from a memory buffer. Will copy the data.
-     * @param d Start of buffer
-     * @param size Number of elements
-     * @param word_size Size of one element
-     */
-    explicit DataBlock(const uint8_t *d, size_t size, uint8_t word_size);
+  /**
+   * @brief Creates a `DataBlock` from a vector of values.
+   *
+   * This constructor initializes a `DataBlock` using the contents of a given
+   * vector. It requires that the vector elements are of an integral type.
+   *
+   * @tparam T The type of the vector elements.
+   * @param vec A pointer to the vector containing the values.
+   */
+  template <typename T>
+  explicit DataBlock(std::vector<T>* vec);
+
+  /**
+   * @brief Creates a `DataBlock` from a vector of bytes.
+   *
+   * This is an optimized constructor that allows a vector of bytes to be
+   * moved into the `DataBlock` without any copy operations.
+   *
+   * @param vec A pointer to the vector of bytes to be moved.
+   */
+  explicit DataBlock(std::vector<uint8_t>* vec);
+
+  /**
+   * @brief Creates a `DataBlock` from a string.
+   *
+   * This constructor treats the contents of the string as a vector of bytes
+   * and initializes the `DataBlock` using the given string.
+   *
+   * @param vec A pointer to the string to be used as the source.
+   */
+  explicit DataBlock(std::string* vec);
+
+  /**
+   * @brief Creates a `DataBlock` from a raw memory buffer.
+   *
+   * This constructor initializes a `DataBlock` by copying the contents of a
+   * given memory buffer.
+   *
+   * @param d A pointer to the start of the memory buffer.
+   * @param size The number of elements in the buffer.
+   * @param word_size The Size of each element.
+   */
+  explicit DataBlock(const uint8_t* d, size_t size, uint8_t word_size);
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include "genie/util/data_block.impl.h"
+#include "genie/util/data_block.impl.h"  // NOLINT
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_UTIL_DATA_BLOCK_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

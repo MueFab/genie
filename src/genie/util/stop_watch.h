@@ -1,66 +1,111 @@
 /**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * Copyright 2018-2024 The Genie Authors.
+ * @file stop_watch.h
+ * @copyright This file is part of Genie
+ * See LICENSE and/or https://github.com/MueFab/genie for more details.
+ *
+ * @brief Declaration of the Watch utility class for measuring elapsed time.
+ *
+ * This file contains the declaration of the Watch class, which provides methods
+ * to measure elapsed time with the ability to pause, resume, and Reset the
+ * timer.
+ *
+ * @details The Watch class uses std::chrono::steady_clock to measure time
+ * intervals and offers functionalities like checking elapsed time, pausing, and
+ * resuming the timer.
  */
 
-#ifndef SRC_GENIE_UTIL_WATCH_H_
-#define SRC_GENIE_UTIL_WATCH_H_
+#ifndef SRC_GENIE_UTIL_STOP_WATCH_H_
+#define SRC_GENIE_UTIL_STOP_WATCH_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#include <chrono>
+#include <chrono>  //NOLINT
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace util {
+namespace genie::util {
 
 /**
- * @brief Utility class to measure time.
+ * @brief A class that measures and tracks elapsed time.
+ *
+ * The Watch class provides functionality to measure and track elapsed time. It
+ * uses the steady clock from the chrono library for accurate time measurements.
+ *
+ * Example Usage:
+ * Watch watch;
+ * // Do something
+ * double elapsedTime = watch.check();
+ *
+ * @see std::chrono::steady_clock
  */
 class Watch {
- private:
-    std::chrono::steady_clock::time_point start;  //!< @brief When the current period of time started.
-    double offset{};                              //!< @brief Elapsed time from previous time periods.
-    bool paused;                                  //!< @brief If the time is currently measured.
+  /// When the current period of time started.
+  std::chrono::steady_clock::time_point start_;
+
+  /// Elapsed time from previous time periods.
+  double offset_{};
+
+  /// If the time is currently measured.
+  bool paused_;
 
  public:
-    /**
-     *  @brief Default initialize.
-     */
-    Watch();
+  /**
+   * @class Watch
+   * @brief A class that measures and tracks elapsed time.
+   *
+   * The Watch class provides functionality to measure and track elapsed time.
+   * It uses the steady clock from the chrono library for accurate time
+   * measurements.
+   *
+   * @see std::chrono::steady_clock
+   */
+  Watch();
 
-    /**
-     *  @brief Reset the watch to the default state, measurements are stopped and time set to zero.
-     */
-    void Reset();
+  /**
+   * @brief Resets the time measurement.
+   *
+   * This method resets the time measurement. It sets the start time to the
+   * current time and clears the offset time.
+   */
+  void Reset();
 
-    /**
-     * @brief
-     * @return Elapsed time in all periods where the watch was active.
-     */
-    double Check() const;
+  /**
+   * @brief Returns the elapsed time in seconds.
+   *
+   * This method returns the elapsed time in seconds. If the Watch is
+   * currently paused, it returns the accumulated offset time since the Watch
+   * was last Reset.
+   *
+   * @return The elapsed time in seconds.
+   */
+  [[nodiscard]] double Check() const;
 
-    /**
-     * @brief Pause the current measurement, time elapsed until Resume() is called won't be counted.
-     */
-    void Pause();
+  /**
+   * @brief Pauses the time measurement.
+   *
+   * This method pauses the measurement of time. The elapsed time up to the
+   * pause will be counted in the total elapsed time.
+   */
+  void Pause();
 
-    /**
-     * @brief Active watch again after a previous call to Pause().
-     */
-    void Resume();
+  /**
+   * @brief Resumes measuring time after a pause.
+   *
+   * This method resumes the measurement of time after it has been paused
+   * using the `pause()` method. The elapsed time between the pause and the
+   * resume will not be counted in the total elapsed time.
+   */
+  void Resume();
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace util
-}  // namespace genie
+}  // namespace genie::util
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_UTIL_WATCH_H_
+#endif  // SRC_GENIE_UTIL_STOP_WATCH_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

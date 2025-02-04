@@ -94,7 +94,7 @@ uint64_t AccessUnit::Subsequence::get(size_t lookahead) const { return data.Get(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::Subsequence::end() const { return data.size() <= position; }
+bool AccessUnit::Subsequence::end() const { return data.Size() <= position; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ GenSubIndex AccessUnit::Subsequence::getID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::Subsequence::getNumSymbols() const { return data.size(); }
+size_t AccessUnit::Subsequence::getNumSymbols() const { return data.Size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -241,7 +241,7 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
-    data.resize(size);
+    data.Resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
     reader.ReadAlignedBytes(reinterpret_cast<char *>(data.GetData()), size);
 }

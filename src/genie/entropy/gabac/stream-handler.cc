@@ -75,7 +75,7 @@ size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlo
         if (bytes % buffer->GetWordSize()) {
             UTILS_DIE("Input stream length not a multiple of word size");
         }
-        buffer->resize(bytes / buffer->GetWordSize());
+        buffer->Resize(bytes / buffer->GetWordSize());
         input.read(static_cast<char *>(buffer->GetData()), bytes);
     }
     return bytes;
@@ -88,10 +88,10 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     input.exceptions(std::ios::badbit);
 
     const size_t BUFFER_SIZE = size_t(1000000) / buffer->GetWordSize();
-    buffer->resize(0);
+    buffer->Resize(0);
     while (input.good()) {
-        size_t pos = buffer->size();
-        buffer->resize(pos + BUFFER_SIZE);
+        size_t pos = buffer->Size();
+        buffer->Resize(pos + BUFFER_SIZE);
         input.read(static_cast<char *>(buffer->GetData()) + pos * buffer->GetWordSize(),
                    BUFFER_SIZE * buffer->GetWordSize());
     }
@@ -101,9 +101,9 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     if (input.gcount() % buffer->GetWordSize()) {
         UTILS_DIE("Input stream length not a multiple of word size");
     }
-    buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->GetWordSize()));
+    buffer->Resize(buffer->Size() - (BUFFER_SIZE - input.gcount() / buffer->GetWordSize()));
     input.exceptions(safe);
-    return buffer->size();
+    return buffer->Size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -116,16 +116,16 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
         UTILS_DIE("Input stream length not a multiple of word size");
     }
     const size_t BUFFER_SIZE = bytes / buffer->GetWordSize();
-    buffer->resize(BUFFER_SIZE);
+    buffer->Resize(BUFFER_SIZE);
     input.read(static_cast<char *>(buffer->GetData()), BUFFER_SIZE * buffer->GetWordSize());
     if (!input.good()) {
         if (!input.eof()) {
             UTILS_DIE("Error while reading input stream");
         }
-        buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->GetWordSize()));
+        buffer->Resize(buffer->Size() - (BUFFER_SIZE - input.gcount() / buffer->GetWordSize()));
     }
     input.exceptions(safe);
-    return buffer->size();
+    return buffer->Size();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) 
     size_t ret = buffer->GetRawSize();
     if (ret > 0) {
         output.write(static_cast<char *>(buffer->GetData()), ret);
-        buffer->clear();
+        buffer->Clear();
     }
     return ret;
 }

@@ -116,8 +116,8 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
                     // Decoding
                     subseqPayloadSizeUsed += (uint64_t)gabac::decodeTransformSubseq(
                         subseqCfg.getTransformSubseqCfg((uint8_t)i), (unsigned int)numtrnsfSymbols,
-                        &decodedTransformedSubseq, wordsize, (dependency.size()) ? &dependency : nullptr);
-                    transformedSubseqs[i].swap(&(decodedTransformedSubseq));
+                        &decodedTransformedSubseq, wordsize, (dependency.Size()) ? &dependency : nullptr);
+                    transformedSubseqs[i].Swap(&(decodedTransformedSubseq));
                 }
             }
 

@@ -18,7 +18,7 @@ genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) c
     auto pos = reader.GetStreamPosition();
     reader.SetStreamPosition(payloadPosition);
     genie::util::DataBlock tmp;
-    tmp.resize(payloadSize);
+    tmp.Resize(payloadSize);
     reader.ReadAlignedBytes(tmp.GetData(), payloadSize);
     reader.SetStreamPosition(pos);
     return tmp;
@@ -45,7 +45,7 @@ void Payload::loadPayload() {
 
 void Payload::unloadPayload() {
     payloadLoaded = false;
-    block_payload.clear();
+    block_payload.Clear();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

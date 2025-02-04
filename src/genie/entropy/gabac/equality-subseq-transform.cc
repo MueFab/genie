@@ -32,7 +32,7 @@ namespace gabac {
 static void transformEqualityCoding0(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
 
-    util::BlockStepper r = values->getReader();
+    util::BlockStepper r = values->GetReader();
     // Treat value as equalityFlags and vice versa
     while (r.IsValid()) {
         uint64_t symbol = r.Get();
@@ -51,7 +51,7 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
     }
 
     // Swap back before returning
-    equalityFlags->swap(values);
+    equalityFlags->Swap(values);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -60,8 +60,8 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
 static void transformEqualityCoding1(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
 
-    util::BlockStepper r = values->getReader();
-    util::BlockStepper w = values->getReader();
+    util::BlockStepper r = values->GetReader();
+    util::BlockStepper w = values->GetReader();
     // Treat value as equalityFlags and vice versa
     while (r.IsValid()) {
         uint64_t symbol = r.Get();
@@ -80,7 +80,7 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
         r.Inc();
     }
 
-    values->resize(values->size() - (w.end - w.curr) / w.wordSize);
+    values->Resize(values->Size() - (w.end - w.curr) / w.word_size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubs
     // Prepare internal and the output data structures
     uint8_t wordsize = transformedSubseqs->front().GetWordSize();
     transformedSubseqs->resize(2);
-    (*transformedSubseqs)[0].swap(
+    (*transformedSubseqs)[0].Swap(
         &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
@@ -118,8 +118,8 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
 
-    util::BlockStepper rflag = flags->getReader();
-    util::BlockStepper rval = rawValues->getReader();
+    util::BlockStepper rflag = flags->GetReader();
+    util::BlockStepper rval = rawValues->GetReader();
 
     // Re-compute the symbols from the equality flags and values
     uint64_t previousSymbol = 0;
@@ -139,9 +139,9 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     }
 
     (*transformedSubseqs).resize(1);
-    (*transformedSubseqs)[0].clear();
+    (*transformedSubseqs)[0].Clear();
 
-    symbols.swap(&(*transformedSubseqs)[0]);
+    symbols.Swap(&(*transformedSubseqs)[0]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

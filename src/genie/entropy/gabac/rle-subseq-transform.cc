@@ -26,8 +26,8 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
 
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
-    symbols.swap(&(*transformedSubseqs)[0]);
-    (*transformedSubseqs)[0].clear();
+    symbols.Swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].Clear();
     transformedSubseqs->resize(2);
 
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
@@ -35,7 +35,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     lengths->SetWordSize(1);
     rawValues->SetWordSize(wordsize);
 
-    util::BlockStepper r = symbols.getReader();
+    util::BlockStepper r = symbols.GetReader();
     uint64_t lastSym = 0;
     uint64_t runValue = 0;
     while (r.IsValid()) {
@@ -75,7 +75,7 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
         runValue = 0;
     }
 
-    symbols.clear();
+    symbols.Clear();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     util::DataBlock symbols(0, (uint8_t)rawValues->GetWordSize());
 
-    util::BlockStepper rVal = rawValues->getReader();
-    util::BlockStepper rLen = lengths->getReader();
+    util::BlockStepper rVal = rawValues->GetReader();
+    util::BlockStepper rLen = lengths->GetReader();
 
     // Re-compute the symbols from the lengths and raw values
     while (rVal.IsValid()) {
@@ -124,9 +124,9 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     }
 
     (*transformedSubseqs).resize(1);
-    (*transformedSubseqs)[0].clear();
+    (*transformedSubseqs)[0].Clear();
 
-    symbols.swap(&(*transformedSubseqs)[0]);
+    symbols.Swap(&(*transformedSubseqs)[0]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

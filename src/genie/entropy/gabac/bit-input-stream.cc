@@ -32,7 +32,7 @@ inline static unsigned char readIn(util::BlockStepper *reader) {
 
 BitInputStream::BitInputStream(util::DataBlock *const bitstream)
     : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
-    m_reader = m_bitstream->getReader();  // TODO(Jan): This line is redundant.
+    m_reader = m_bitstream->GetReader();  // TODO(Jan): This line is redundant.
     reset();
 }
 
@@ -63,7 +63,7 @@ unsigned char BitInputStream::readByte() {
 void BitInputStream::reset() {
     m_heldBits = 0;
     m_numHeldBits = 0;
-    m_reader = m_bitstream->getReader();
+    m_reader = m_bitstream->GetReader();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -34,17 +34,17 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
 
     // Prepare internal and output data structures
     util::DataBlock symbols(0, 1);
-    symbols.swap(&(*transformedSubseqs)[0]);
-    (*transformedSubseqs)[0].clear();
+    symbols.Swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].Clear();
     transformedSubseqs->resize(subseqCount);
 
-    const uint64_t symbolsCount = symbols.size();
+    const uint64_t symbolsCount = symbols.Size();
     std::vector<uint64_t> trnsSubseqMasks(subseqCount, 0);
     for (uint64_t ts = 0; ts < subseqCount; ts++) {
         const uint8_t codingSubsymSize = trnsfCfgs[ts].getSupportValues().getCodingSubsymSize();
         trnsSubseqMasks[ts] = (1u << codingSubsymSize) - 1;
         (*transformedSubseqs)[ts].SetWordSize(4);
-        (*transformedSubseqs)[ts].resize(symbolsCount);
+        (*transformedSubseqs)[ts].Resize(symbolsCount);
     }
 
     // split
@@ -70,7 +70,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         }
     }
 
-    symbols.clear();
+    symbols.Clear();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     }
 
     // Prepare the output data structure
-    const uint64_t symbolsCount = (*transformedSubseqs)[0].size();
+    const uint64_t symbolsCount = (*transformedSubseqs)[0].Size();
     util::DataBlock symbols(symbolsCount, 4);
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
@@ -111,9 +111,9 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     }
 
     (*transformedSubseqs).resize(1);
-    (*transformedSubseqs)[0].clear();
+    (*transformedSubseqs)[0].Clear();
 
-    symbols.swap(&(*transformedSubseqs)[0]);
+    symbols.Swap(&(*transformedSubseqs)[0]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

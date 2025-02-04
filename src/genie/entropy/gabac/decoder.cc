@@ -30,7 +30,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     core::AccessUnit::Subsequence in = std::move(data);
     util::DataBlock remainingData = std::move(in.move());
     core::AccessUnit::Descriptor ret(in.getID().first);
-    if (remainingData.empty()) {
+    if (remainingData.Empty()) {
         return ret;
     }
     size_t offset = 6;

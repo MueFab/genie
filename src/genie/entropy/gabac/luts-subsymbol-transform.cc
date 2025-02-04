@@ -76,7 +76,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
 
     assert(symbols != nullptr);
 
-    size_t numSymbols = symbols->size();
+    size_t numSymbols = symbols->Size();
     if (numSymbols <= 0) return;
 
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
@@ -86,12 +86,12 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
 
-    util::BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->GetReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     util::BlockStepper d;
     if (depSymbols) {
-        d = depSymbols->getReader();
+        d = depSymbols->GetReader();
     }
 
     if (codingOrder == 2)
