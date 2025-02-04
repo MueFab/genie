@@ -4,13 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-external.h"
-#include "genie/core/record/alignment/alignment_external/none.h"
-#include "genie/core/record/alignment/alignment_external/other-rec.h"
+#include "alignment_shared_data.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
-#include "genie/util/runtime_exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,25 +16,31 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentExternal::AlignmentExternal(Type _moreAlignmentInfoType) : moreAlignmentInfoType(_moreAlignmentInfoType) {}
+AlignmentSharedData::AlignmentSharedData() : seq_ID(0), as_depth(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentExternal::write(util::BitWriter &writer) const { writer.writeBypassBE(moreAlignmentInfoType); }
+AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : seq_ID(_seq_ID), as_depth(_as_depth) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &reader) {
-    Type type = reader.ReadAlignedInt<Type>();
-    switch (type) {
-        case Type::NONE:
-            return util::make_unique<alignment_external::None>();
-        case Type::OTHER_REC:
-            return util::make_unique<alignment_external::OtherRec>(reader);
-        default:
-            UTILS_DIE("Unknown MoreAlignmentInfoType");
-    }
+void AlignmentSharedData::write(util::BitWriter &writer) const {
+    writer.writeBypassBE(seq_ID);
+    writer.writeBypassBE(as_depth);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AlignmentSharedData::AlignmentSharedData(util::BitReader &reader)
+    : seq_ID(reader.ReadAlignedInt<uint16_t>()), as_depth(reader.ReadAlignedInt<uint8_t>()) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t AlignmentSharedData::getSeqID() const { return seq_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t AlignmentSharedData::getAsDepth() const { return as_depth; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

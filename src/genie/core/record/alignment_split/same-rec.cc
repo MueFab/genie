@@ -4,69 +4,63 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment.h"
+#include "same-rec.h"
 #include <utility>
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
+#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace record {
+namespace alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
-    : ecigar_string(std::move(_ecigar_string)), reverse_comp(_reverse_comp), mapping_score() {}
+SameRec::SameRec() : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(0), alignment() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
-    ecigar_string.resize(reader.ReadAlignedInt<uint32_t, 3>());
-    reader.ReadAlignedBytes(&ecigar_string[0], ecigar_string.size());
+SameRec::SameRec(int64_t _delta, Alignment _alignment)
+    : AlignmentSplit(AlignmentSplit::Type::SAME_REC), delta(_delta), alignment(std::move(_alignment)) {}
 
-    reverse_comp = reader.ReadAlignedInt<uint8_t>();
-    mapping_score.resize(as_depth);
-    reader.ReadAlignedBytes(&mapping_score[0], as_depth * sizeof(int32_t));
-    for (auto &s : mapping_score) {
-        util::SwapEndianness(s);
-    }
+// ---------------------------------------------------------------------------------------------------------------------
+
+SameRec::SameRec(uint8_t as_depth, util::BitReader &reader)
+    : AlignmentSplit(AlignmentSplit::Type::SAME_REC),
+      delta(reader.ReadAlignedInt<int64_t, 6>()),
+      alignment(as_depth, reader) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void SameRec::write(util::BitWriter &writer) const {
+    AlignmentSplit::write(writer);
+    writer.writeBypassBE<int64_t, 6>(delta);
+    alignment.Write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Alignment::Alignment() : ecigar_string(), reverse_comp(0), mapping_score(0) {}
+const Alignment &SameRec::getAlignment() const { return alignment; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Alignment::addMappingScore(int32_t score) { mapping_score.push_back(score); }
+int64_t SameRec::getDelta() const { return delta; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<int32_t> &Alignment::getMappingScores() const { return mapping_score; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::string &Alignment::getECigar() const { return ecigar_string; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t Alignment::getRComp() const { return this->reverse_comp; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Alignment::write(util::BitWriter &writer) const {
-    writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(ecigar_string.length()));
-    writer.WriteAlignedBytes(ecigar_string.data(), ecigar_string.length());
-    writer.writeBypassBE(reverse_comp);
-    for (auto s : mapping_score) {
-        writer.writeBypassBE(s);
-    }
+std::unique_ptr<AlignmentSplit> SameRec::clone() const {
+    auto ret = util::make_unique<SameRec>();
+    ret->delta = this->delta;
+    ret->alignment = this->alignment;
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+}  // namespace alignment_split
 }  // namespace record
 }  // namespace core
 }  // namespace genie

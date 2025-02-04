@@ -14,19 +14,19 @@ set(source_files
         parameter/parameter_set.cc
         parameter/quality-values.cc
 
-        record/alignment/alignment_external/none.cc
-        record/alignment/alignment_external/other-rec.cc
-        record/alignment/alignment_split/other-rec.cc
-        record/alignment/alignment_split/same-rec.cc
-        record/alignment/alignment_split/unpaired.cc
-        record/alignment/segment.cc
-        record/alignment/record.cc
-        record/alignment/chunk.cc
-        record/alignment/alignment-split.cc
-        record/alignment/alignment-shared-data.cc
-        record/alignment/alignment-external.cc
-        record/alignment/alignment-box.cc
-        record/alignment/alignment.cc
+        record/alignment_external/none.cc
+        record/alignment_external/other-rec.cc
+        record/alignment_split/other-rec.cc
+        record/alignment_split/same-rec.cc
+        record/alignment_split/unpaired.cc
+        record/segment.cc
+        record/record.cc
+        record/chunk.cc
+        record/alignment_split.cc
+        record/alignment_shared_data.cc
+        record/alignment_external.cc
+        record/alignment_box.cc
+        record/alignment.cc
 
         record/variant_site/record.cc
 

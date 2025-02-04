@@ -19,8 +19,8 @@
 #include <vector>
 #include "genie/core/access_unit.h"
 #include "genie/core/read_encoder.h"
-#include "genie/core/record/alignment/chunk.h"
-#include "genie/core/record/alignment/segment.h"
+#include "genie/core/record/chunk.h"
+#include "genie/core/record/segment.h"
 #include "genie/read/spring/reorder-compress-quality-id.h"
 #include "genie/read/spring/util.h"
 

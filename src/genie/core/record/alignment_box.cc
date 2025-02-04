@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-box.h"
+#include "alignment_box.h"
 #include <utility>
-#include "genie/core/record/alignment/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -21,7 +21,7 @@ namespace record {
 
 void AlignmentBox::write(util::BitWriter& writer) const {
     writer.writeBypassBE<uint64_t, 5>(mapping_pos);
-    alignment.write(writer);
+    alignment.Write(writer);
     for (const auto& a : splitAlignmentInfo) {
         a->write(writer);
     }
@@ -51,8 +51,8 @@ AlignmentBox::AlignmentBox() : mapping_pos(0), alignment(), splitAlignmentInfo(0
 
 void AlignmentBox::addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment) {
     if (_alignment->getType() == AlignmentSplit::Type::SAME_REC) {
-        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).getAlignment().getMappingScores().size() !=
-                         alignment.getMappingScores().size(),
+        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).getAlignment().GetMappingScores().size() !=
+                         alignment.GetMappingScores().size(),
                      "AS depth incompatible");
     }
     splitAlignmentInfo.push_back(std::move(_alignment));

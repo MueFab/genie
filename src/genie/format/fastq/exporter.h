@@ -11,7 +11,7 @@
 
 #include <vector>
 #include "genie/core/format_exporter.h"
-#include "genie/core/record/alignment/chunk.h"
+#include "genie/core/record/chunk.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/drain.h"
 #include "genie/util/make_unique.h"

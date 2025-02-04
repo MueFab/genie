@@ -14,12 +14,12 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "alignment-box.h"
-#include "alignment-external.h"
-#include "alignment-shared-data.h"
-#include "class-type.h"
+#include "alignment_box.h"
+#include "alignment_external.h"
+#include "alignment_shared_data.h"
+#include "class_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

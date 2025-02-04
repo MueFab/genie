@@ -11,7 +11,7 @@
 
 #include <vector>
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment/class-type.h"
+#include "genie/core/record/class_type.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
