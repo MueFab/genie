@@ -14,7 +14,7 @@
 #include <vector>
 #include "boost/variant/get.hpp"
 #include "boost/variant/variant.hpp"
-#include "genie/core/access-unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/payload.h"
 #include "genie/util/bit_writer.h"
 

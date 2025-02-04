@@ -13,7 +13,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "genie/core/name-encoder.h"
+#include "genie/core/name_encoder.h"
 #include "genie/core/record/alignment/record.h"
 #include "genie/name/tokenizer/tokenizer.h"
 #include "genie/util/data_block.h"

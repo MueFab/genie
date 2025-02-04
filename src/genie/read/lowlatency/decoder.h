@@ -9,10 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
 #include <limits>
-#include "genie/core/read-decoder.h"
-#include "genie/core/ref-decoder.h"
+#include <string>
+#include "genie/core/read_decoder.h"
+#include "genie/core/ref_decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

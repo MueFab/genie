@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include "apps/genie/run/program-options.h"
-#include "genie/core/format-importer-null.h"
-#include "genie/core/name-encoder-none.h"
+#include "genie/core/format_importer_null.h"
+#include "genie/core/name_encoder_none.h"
 //#include "genie/format/fasta/exporter.h"
 //#include "genie/format/fasta/manager.h"
 //#include "genie/format/fastq/exporter.h"

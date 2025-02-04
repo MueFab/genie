@@ -11,7 +11,7 @@
 
 #include <memory>
 #include <vector>
-#include "genie/core/mismatch-decoder.h"
+#include "genie/core/mismatch_decoder.h"
 #include "genie/entropy/gabac/decode-transformed-symbols.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/util/data_block.h"

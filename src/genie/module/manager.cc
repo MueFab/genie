@@ -5,7 +5,7 @@
  */
 
 #include "genie/module/manager.h"
-#include "genie/core/global-cfg.h"
+#include "genie/core/global_cfg.h"
 #include "genie/core/parameter/quality-values.h"
 #include "genie/entropy/paramcabac/decoder.h"
 #include "genie/quality/paramqv1/qv_coding_config_1.h"

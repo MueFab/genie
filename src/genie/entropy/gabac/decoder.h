@@ -11,8 +11,8 @@
 
 #include <tuple>
 #include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-decoder.h"
+#include "genie/core/access_unit.h"
+#include "genie/core/entropy_decoder.h"
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
 #include "genie/util/make_unique.h"
 

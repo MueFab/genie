@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include "genie/core/read-encoder.h"
+#include "genie/core/read_encoder.h"
 #include "genie/read/basecoder/encoderstub.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

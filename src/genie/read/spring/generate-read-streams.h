@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "genie/core/read-encoder.h"
+#include "genie/core/read_encoder.h"
 #include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

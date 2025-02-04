@@ -11,10 +11,10 @@
 
 #include <string>
 #include <vector>
-#include "genie/core/entropy-encoder.h"
-#include "genie/core/name-encoder.h"
-#include "genie/core/qv-encoder.h"
-#include "genie/core/read-encoder.h"
+#include "genie/core/entropy_encoder.h"
+#include "genie/core/name_encoder.h"
+#include "genie/core/qv_encoder.h"
+#include "genie/core/read_encoder.h"
 #include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

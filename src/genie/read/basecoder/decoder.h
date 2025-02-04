@@ -14,8 +14,8 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/core/qv-decoder.h"
+#include "genie/core/access_unit.h"
+#include "genie/core/qv_decoder.h"
 #include "genie/core/record/alignment/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

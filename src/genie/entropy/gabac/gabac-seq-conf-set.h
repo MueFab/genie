@@ -11,7 +11,7 @@
 
 #include <utility>
 #include <vector>
-#include "genie/core/access-unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/parameter/descriptor_present/descriptor_present.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/entropy/paramcabac/decoder.h"

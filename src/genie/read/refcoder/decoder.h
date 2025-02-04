@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "genie/core/read-decoder.h"
+#include "genie/core/read_decoder.h"
 #include "genie/read/basecoder/decoderstub.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

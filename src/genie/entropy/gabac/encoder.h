@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/core/access-unit.h"
-#include "genie/core/entropy-encoder.h"
+#include "genie/core/access_unit.h"
+#include "genie/core/entropy_encoder.h"
 #include "genie/entropy/gabac/gabac-seq-conf-set.h"
 #include "genie/entropy/gabac/gabac.h"
 #include "genie/util/make_unique.h"

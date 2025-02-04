@@ -11,10 +11,10 @@
 
 #include <map>
 #include <string>
-#include "genie/core/format-importer-compressed.h"
-#include "genie/core/format-importer.h"
-#include "genie/core/ref-decoder.h"
-#include "genie/core/reference-source.h"
+#include "genie/core/format_importer.h"
+#include "genie/core/format_importer_compressed.h"
+#include "genie/core/ref_decoder.h"
+#include "genie/core/reference_source.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/util/bit_reader.h"

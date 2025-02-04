@@ -22,9 +22,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "genie/core/access-unit.h"
+#include "genie/core/access_unit.h"
 #include "genie/core/parameter/parameter_set.h"
-#include "genie/core/read-encoder.h"
+#include "genie/core/read_encoder.h"
 #include "genie/read/spring/generate-read-streams.h"
 #include "genie/read/spring/util.h"
 

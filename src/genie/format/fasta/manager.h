@@ -14,7 +14,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "genie/core/reference-source.h"
+#include "genie/core/reference_source.h"
 #include "genie/format/fasta/reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

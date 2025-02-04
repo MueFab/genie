@@ -11,7 +11,7 @@
 
 #include <utility>
 #include <vector>
-#include "genie/core/reference-manager.h"
+#include "genie/core/reference_manager.h"
 #include "record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
