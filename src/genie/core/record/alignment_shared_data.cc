@@ -25,8 +25,8 @@ AlignmentSharedData::AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth) : 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentSharedData::write(util::BitWriter &writer) const {
-    writer.writeBypassBE(seq_ID);
-    writer.writeBypassBE(as_depth);
+    writer.WriteBypassBE(seq_ID);
+    writer.WriteBypassBE(as_depth);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

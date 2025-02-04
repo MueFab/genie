@@ -45,8 +45,8 @@ uint16_t OtherRec::getNextSeq() const { return next_seq_ID; }
 
 void OtherRec::write(util::BitWriter &writer) const {
     AlignmentExternal::write(writer);
-    writer.writeBypassBE<uint64_t, 5>(next_pos);
-    writer.writeBypassBE(next_seq_ID);
+    writer.WriteBypassBE<uint64_t, 5>(next_pos);
+    writer.WriteBypassBE(next_seq_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

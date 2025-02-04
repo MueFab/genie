@@ -25,7 +25,7 @@ AlignmentSplit::AlignmentSplit(Type _split_alignment) : split_alignment(_split_a
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentSplit::write(util::BitWriter &writer) const { writer.writeBypassBE(split_alignment); }
+void AlignmentSplit::write(util::BitWriter &writer) const { writer.WriteBypassBE(split_alignment); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

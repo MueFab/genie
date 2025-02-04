@@ -20,7 +20,7 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentBox::write(util::BitWriter& writer) const {
-    writer.writeBypassBE<uint64_t, 5>(mapping_pos);
+    writer.WriteBypassBE<uint64_t, 5>(mapping_pos);
     alignment.Write(writer);
     for (const auto& a : splitAlignmentInfo) {
         a->write(writer);

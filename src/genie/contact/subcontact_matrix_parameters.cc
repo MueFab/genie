@@ -265,13 +265,13 @@ size_t SubcontactMatrixParameters::getSize() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::write(util::BitWriter& writer) const {
-    writer.writeBypassBE(parameter_set_ID);
-    writer.writeBypassBE(chr1_ID);
-    writer.writeBypassBE(chr2_ID);
+    writer.WriteBypassBE(parameter_set_ID);
+    writer.WriteBypassBE(chr1_ID);
+    writer.WriteBypassBE(chr2_ID);
 
     uint8_t flags = 0u;
     flags |= (static_cast<uint8_t>(codec_ID) & 0x1F);
-    writer.writeBypassBE(flags);
+    writer.WriteBypassBE(flags);
 
     // Write the tile_parameters
     for (size_t i = 0; i < getNTilesInRow(); ++i) {
@@ -284,14 +284,14 @@ void SubcontactMatrixParameters::write(util::BitWriter& writer) const {
             flags = 0u;
             flags |= static_cast<uint8_t>((static_cast<uint8_t>(tile_param.diag_tranform_mode) << 2));
             flags |= static_cast<uint8_t>(tile_param.binarization_mode);
-            writer.writeBypassBE(flags);
+            writer.WriteBypassBE(flags);
         }
     }
 
     flags = 0u;
     flags |= static_cast<uint8_t>((static_cast<uint8_t>(row_mask_exists_flag) << 1));
     flags |= static_cast<uint8_t>(row_mask_exists_flag);
-    writer.writeBypassBE(flags);
+    writer.WriteBypassBE(flags);
 
     writer.FlushBits();
 }
