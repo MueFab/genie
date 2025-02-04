@@ -1,4 +1,4 @@
-
+#add_subdirectory(core)
 add_subdirectory(annotationParameterSetTest)
 add_subdirectory(variantSiteRecordTest)
 add_subdirectory(example)

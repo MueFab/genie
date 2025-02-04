@@ -28,6 +28,18 @@ NDArray<T>::NDArray()
 
 // -----------------------------------------------------------------------------
 
+// Constructor from dimensions
+template<typename T>
+NDArray<T>::NDArray(const std::vector<size_t>& dims)
+    : dimensions(dims) {
+    size_t total = std::accumulate(
+        dimensions.begin(), dimensions.end(), 1, std::multiplies<size_t>());
+    data.resize(total);
+    computeStrides();
+}
+
+// -----------------------------------------------------------------------------
+
 // Constructor from dimensions and buffer
 template<typename T>
 NDArray<T>::NDArray(const std::vector<size_t>& dims, std::vector<T>&& buffer)
