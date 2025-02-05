@@ -208,13 +208,13 @@ std::vector<uint8_t> ArrayType::toArray(DataType type, util::BitReader& reader) 
 
 void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const {
     if (type == core::DataType::BOOL) {
-        writer.write(bytearray[0], 1);
+      writer.Write(bytearray[0], 1);
     } else if (type == core::DataType::STRING) {
         std::string stringOut;
         if (bytearray.size() > 0)
             for (auto byte : bytearray) stringOut += byte;
-        writer.write(stringOut);
-        writer.write(0, 8, true);
+        writer.Write(stringOut);
+        writer.Write(0, 8, true);
     } else {
         uint64_t writeValue = 0;
         if (bytearray.size() == 0) {
@@ -225,7 +225,7 @@ void ArrayType::toFile(core::DataType type, std::vector<uint8_t> bytearray, core
             if (byteSize == 0) byteSize = 1;
 
             for (auto i = 0; (i < byteSize); ++i) writeValue += static_cast<uint64_t>(bytearray[i]) << (i * 8);
-            writer.write(writeValue, static_cast<uint8_t>(byteSize) * 8);
+            writer.Write(writeValue, static_cast<uint8_t>(byteSize) * 8);
         }
     }
 }
@@ -234,15 +234,16 @@ void ArrayType::toFile(core::DataType type, util::BitReader& reader, core::Write
     if (type == core::DataType::STRING) {
         for (uint64_t i = 0; i < number; ++i) {
             std::string temp = reader.ReadAlignedStringTerminated();
-            writer.write(temp);
-            writer.write(0, 8, true);
+            writer.Write(temp);
+            writer.Write(0, 8, true);
         }
     } else {
         if (number > 0) {
             //        uint64_t writeValue = 0;
             uint8_t byteSize = getDefaultBitsize(type);
             if (byteSize == 0) byteSize = 1;
-            for (uint64_t n = 0; n < number; ++n) writer.write(reader.ReadBits(byteSize), byteSize);
+            for (uint64_t n = 0; n < number; ++n)
+              writer.Write(reader.ReadBits(byteSize), byteSize);
         }
     }
 }

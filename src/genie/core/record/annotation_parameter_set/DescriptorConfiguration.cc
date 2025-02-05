@@ -71,24 +71,25 @@ void DescriptorConfiguration::read(util::BitReader& reader) {
     }
 }
 void DescriptorConfiguration::write(core::Writer& writer) const {
-    writer.write(static_cast<uint8_t>(descriptor_ID), 8);
+  writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
     if (descriptor_ID == AnnotDesc::GENOTYPE) {
         genotype_parameters.write(writer);
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_parameters.write(writer);
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
         contact_matrix_parameters.write(writer);
-        writer.write(subcontract_matrix_parameters.size(), 16);
-        for (auto& scm_params : subcontract_matrix_parameters) scm_params.write(writer);
+        writer.Write(subcontract_matrix_parameters.size(), 16);
+        for (auto& scm_params : subcontract_matrix_parameters)
+          scm_params.Write(writer);
     } else {
-        writer.write(static_cast<uint8_t>(encoding_mode_ID), 8);
+      writer.Write(static_cast<uint8_t>(encoding_mode_ID), 8);
         algorithm_parameters.write(writer);
     }
 }
 
 size_t DescriptorConfiguration::getSize(core::Writer& write_size) const {
     write(write_size);
-    return write_size.getBitsWritten();
+    return write_size.GetBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

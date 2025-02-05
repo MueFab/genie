@@ -51,26 +51,26 @@ class TiledStream {
     void write(T value, uint8_t bits) {
         setTile();
         if (bits == 0) bits = sizeof(T);
-        tiles.tileWriter.back().write(value, bits);
+        tiles.tileWriter.back().Write(value, bits);
     }
 
     template <class T>
     void write(std::vector<T> values, uint8_t bits) {
         setTile();
         if (bits == 0) bits = sizeof(T);
-        for (auto value : values) tiles.tileWriter.back().write(value, bits);
+        for (auto value : values) tiles.tileWriter.back().Write(value, bits);
     }
 
     void write(std::string value);
 
     void emptyForRow() { setTile(); }
 
-    void wrapUp() { tiles.tileWriter.back().flush(); }
+    void wrapUp() { tiles.tileWriter.back().Flush(); }
     std::vector<std::stringstream>& getTiles() { return tiles.tileData; }
     size_t getNrOfTiles() { return tiles.tileData.size(); }
     std::stringstream& getTile(uint64_t tilenr) { return tiles.tileData.at(tilenr); }
 
-    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).getBitsWritten(); }
+    size_t getBitsWrittenInTile(size_t tilenr) { return tiles.tileWriter.at(tilenr).GetBitsWritten(); }
 
  private:
     uint64_t rowsPerTile;

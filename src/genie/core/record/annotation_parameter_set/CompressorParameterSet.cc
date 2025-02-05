@@ -89,21 +89,21 @@ void CompressorParameterSet::read(util::BitReader& reader) {
 }
 
 void CompressorParameterSet::write(core::Writer& writer) const {
-    writer.write(compressor_ID, 8);
-    writer.write(compressorSteps.size(), 4);
+  writer.Write(compressor_ID, 8);
+    writer.Write(compressorSteps.size(), 4);
     for (auto step : compressorSteps) {
-        writer.write(step.stepID, 4);
-        writer.write(static_cast<uint8_t>(step.algorithmID), 5);
-        writer.write(step.useDefaultAlgorithmParameters, 1);
+      writer.Write(step.stepID, 4);
+        writer.Write(static_cast<uint8_t>(step.algorithmID), 5);
+        writer.Write(step.useDefaultAlgorithmParameters, 1);
         if (!step.useDefaultAlgorithmParameters) step.algorithm_parameters.write(writer);
-        writer.write(step.in_var_ID.size(), 4);
+        writer.Write(step.in_var_ID.size(), 4);
         for (size_t i = 0; i < step.in_var_ID.size(); ++i) {
-            writer.write(step.in_var_ID.at(i), 4);
-            writer.write(step.prev_step_ID.at(i), 4);
-            writer.write(step.prev_out_var_ID.at(i), 4);
+          writer.Write(step.in_var_ID.at(i), 4);
+            writer.Write(step.prev_step_ID.at(i), 4);
+            writer.Write(step.prev_out_var_ID.at(i), 4);
         }
-        writer.write(step.completed_out_var_ID.size(), 4);
-        for (auto outvar : step.completed_out_var_ID) writer.write(outvar, 4);
+        writer.Write(step.completed_out_var_ID.size(), 4);
+        for (auto outvar : step.completed_out_var_ID) writer.Write(outvar, 4);
     }
     /*
     writer.write(n_compressor_steps, 4);
@@ -126,7 +126,7 @@ void CompressorParameterSet::write(core::Writer& writer) const {
         for (auto j = 0; j < n_completed_out_vars[i]; ++j) writer.write(completed_out_var_ID[i][j], 4);
     }
     */
-    writer.flush();
+    writer.Flush();
 }
 
 void CompressorParameterSet::addCompressorStep(compressorStep stepParameters) {
@@ -137,7 +137,7 @@ void CompressorParameterSet::addCompressorStep(compressorStep stepParameters) {
 
 size_t CompressorParameterSet::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

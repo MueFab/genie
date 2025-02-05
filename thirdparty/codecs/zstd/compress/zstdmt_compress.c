@@ -1835,7 +1835,7 @@ size_t ZSTDMT_compressStream_generic(ZSTDMT_CCtx* mtctx,
             * We are in one of these cases:
             * - mtctx->inBuff is NULL & empty: we couldn't get an input buffer so don't create a new job.
             * - We filled the input buffer: FlushHeldBits this job but don't end the frame.
-            * - We hit a synchronization point: flush this job but don't end the frame.
+            * - We hit a synchronization point: Flush this job but don't end the frame.
             */
         assert(mtctx->inBuff.filled == 0 || mtctx->inBuff.filled == mtctx->targetSectionSize || mtctx->params.rsyncable);
         endOp = ZSTD_e_flush;

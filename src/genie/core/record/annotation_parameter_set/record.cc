@@ -58,13 +58,13 @@ void Record::read(util::BitReader& reader) {
 }
 
 void Record::write(Writer& writer) const {
-    writer.write(parameter_set_ID, 8);
-    writer.write(AT_ID, 8);
-    writer.write(static_cast<uint8_t>(AT_alphabet_ID), 8);
-    writer.write_reserved(2);
-    writer.write(AT_coord_size, 2);
-    writer.write(AT_pos_40_bits_flag, 1);
-    writer.write(n_aux_attribute_groups, 3);
+  writer.Write(parameter_set_ID, 8);
+    writer.Write(AT_ID, 8);
+    writer.Write(static_cast<uint8_t>(AT_alphabet_ID), 8);
+    writer.WriteReserved(2);
+    writer.Write(AT_coord_size, 2);
+    writer.Write(AT_pos_40_bits_flag, 1);
+    writer.Write(n_aux_attribute_groups, 3);
     for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
     annotation_encoding_parameters.write(writer);
 }
@@ -76,7 +76,7 @@ size_t Record::getSize() const {
 
 size_t Record::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 

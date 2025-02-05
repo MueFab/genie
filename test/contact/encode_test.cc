@@ -855,19 +855,19 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
         {
             std::string out_path = gitRootDir + "/tmp/encoded/contact/IntraSCM_Raw_SingleTile/";
             {
                 std::ofstream tmp_writer(out_path + "case01-scm_payload.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_payload.write(tmp_bitwriter);
+                scm_payload.Write(tmp_bitwriter);
             }
             {
                 std::ofstream tmp_writer(out_path + "case01-scm_param.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_param.write(tmp_bitwriter);
+                scm_param.Write(tmp_bitwriter);
             }
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
@@ -876,13 +876,13 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             }
         }
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), NUM_TILES_IN_ROW);
-        ASSERT_EQ(scm_param.getNTilesInRow(), NUM_TILES_IN_ROW);
-        ASSERT_EQ(scm_payload.getNTilesInCol(), NUM_TILES_IN_COL);
-        ASSERT_EQ(scm_param.getNTilesInCol(), NUM_TILES_IN_COL);
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), NUM_TILES_IN_ROW);
+        ASSERT_EQ(scm_param.GetNTilesInRow(), NUM_TILES_IN_ROW);
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), NUM_TILES_IN_COL);
+        ASSERT_EQ(scm_param.GetNTilesInCol(), NUM_TILES_IN_COL);
 
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -985,12 +985,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1112,12 +1112,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1224,12 +1224,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1361,12 +1361,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1473,12 +1473,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1629,12 +1629,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1744,12 +1744,12 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1880,12 +1880,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -1992,12 +1992,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2138,12 +2138,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2332,12 +2332,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2469,12 +2469,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2582,12 +2582,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2738,12 +2738,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -2907,12 +2907,12 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3120,19 +3120,19 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
         {
             std::string out_path = gitRootDir + "/tmp/encoded/contact/IntraSCM_Raw_SingleTile/";
             {
                 std::ofstream tmp_writer(out_path + "case01-scm_payload.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_payload.write(tmp_bitwriter);
+                scm_payload.Write(tmp_bitwriter);
             }
             {
                 std::ofstream tmp_writer(out_path + "case01-scm_param.bin", std::ios::binary);
                 genie::util::BitWriter tmp_bitwriter(&tmp_writer);
-                scm_param.write(tmp_bitwriter);
+                scm_param.Write(tmp_bitwriter);
             }
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
@@ -3141,10 +3141,10 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             }
         }
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3252,12 +3252,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3360,12 +3360,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3472,12 +3472,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3588,12 +3588,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3700,12 +3700,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3808,12 +3808,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -3921,12 +3921,12 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        scm_payload.write(bitwriter);
+        scm_payload.Write(bitwriter);
 
-        ASSERT_EQ(scm_payload.getSampleID(), REC.getSampleID());
-        ASSERT_EQ(scm_payload.getNTilesInRow(), scm_param.getNTilesInRow());
-        ASSERT_EQ(scm_payload.getNTilesInCol(), scm_param.getNTilesInCol());
-        ASSERT_EQ(scm_payload.getSize(), obj_payload.str().size());
+        ASSERT_EQ(scm_payload.GetSampleID(), REC.getSampleID());
+        ASSERT_EQ(scm_payload.GetNTilesInRow(), scm_param.GetNTilesInRow());
+        ASSERT_EQ(scm_payload.GetNTilesInCol(), scm_param.GetNTilesInCol());
+        ASSERT_EQ(scm_payload.GetSize(), obj_payload.str().size());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);

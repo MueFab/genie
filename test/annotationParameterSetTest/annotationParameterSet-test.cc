@@ -51,7 +51,7 @@ TEST_F(AnnotationParameterSetTests, AnnotationParameterSetRandom) {  // NOLINT(c
     genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     annotationParameterSet.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     annotationParameterSetCheck.read(strreader);
     std::stringstream testOut;
     genie::core::Writer teststrwriter(&testOut);

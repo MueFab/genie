@@ -69,15 +69,15 @@ void BlockPayload::read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t
 
 void BlockPayload::write(core::Writer& writer) const {
     if (generic_payload_stream.str().size() > 0)
-        writer.write(const_cast<std::stringstream*>(&generic_payload_stream));
+      writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
     else
-    for (const auto& byte : generic_payload) writer.write(byte, 8, true);
-    writer.flush();
+    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
+    writer.Flush();
 }
 
 size_t BlockPayload::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 }  // namespace annotation_access_unit

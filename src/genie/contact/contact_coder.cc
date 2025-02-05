@@ -94,19 +94,19 @@ void decode_scm_masks(
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 ){
-    auto row_nentries = cm_param.getNumBinEntries(scm_param.getChr1ID());
-    auto col_nentries = cm_param.getNumBinEntries(scm_param.getChr2ID());
+    auto row_nentries = cm_param.getNumBinEntries(scm_param.GetChr1ID());
+    auto col_nentries = cm_param.getNumBinEntries(scm_param.GetChr2ID());
 
-    if (scm_param.getRowMaskExistsFlag()){
-        decode_scm_mask_payload(scm_payload.getRowMaskPayload(), row_nentries, row_mask);
+    if (scm_param.GetRowMaskExistsFlag()){
+        decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
     } else {
         row_mask = xt::ones<bool>({row_nentries});
     }
 
-    if (scm_param.isIntraSCM()){
+    if (scm_param.IsIntraSCM()){
         col_mask = row_mask;
-    } else if (scm_param.getColMaskExistsFlag()){
-        decode_scm_mask_payload(scm_payload.getColMaskPayload(), col_nentries, col_mask);
+    } else if (scm_param.GetColMaskExistsFlag()){
+        decode_scm_mask_payload(scm_payload.GetColMaskPayload(), col_nentries, col_mask);
     } else {
         col_mask = xt::ones<bool>({col_nentries});
     }
@@ -373,7 +373,7 @@ void dense_to_sparse(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sort_by_row_ids(
+[[maybe_unused]] void sort_by_row_ids(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts
@@ -996,13 +996,13 @@ void decode_scm(
     );
 
     // Input parameters retrieved from parameter set
-    auto chr1_ID = scm_param.getChr1ID();
-    auto chr2_ID = scm_param.getChr2ID();
-    auto is_intra_scm = scm_param.isIntraSCM();
+    auto chr1_ID = scm_param.GetChr1ID();
+    auto chr2_ID = scm_param.GetChr2ID();
+    auto is_intra_scm = scm_param.IsIntraSCM();
 
-    auto codec_ID = scm_param.getCodecID();
-    auto row_mask_exists = scm_param.getRowMaskExistsFlag();
-    auto col_mask_exists = scm_param.getColMaskExistsFlag();
+    auto codec_ID = scm_param.GetCodecID();
+    auto row_mask_exists = scm_param.GetRowMaskExistsFlag();
+    auto col_mask_exists = scm_param.GetColMaskExistsFlag();
 
     auto chr1_len = cm_param.getChromosomeLength(chr1_ID);
     auto chr1_num_bin_entries = cm_param.getNumBinEntries(chr1_ID);
@@ -1039,8 +1039,8 @@ void decode_scm(
             UIntVecDtype tile_counts;
 
             // Assign
-            auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
-            auto& tile_payload = scm_payload.getTilePayload(i_tile, j_tile);
+            auto& tile_param = scm_param.GetTileParameter(i_tile, j_tile);
+            auto& tile_payload = scm_payload.GetTilePayload(i_tile, j_tile);
             auto binarization_mode = tile_param.binarization_mode;
             auto diag_transform_mode = tile_param.diag_tranform_mode;
             bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
@@ -1148,7 +1148,7 @@ void decode_scm(
         }
     }
 
-    auto sample_ID = scm_payload.getSampleID();
+    auto sample_ID = scm_payload.GetSampleID();
     rec.setSampleID(sample_ID);
     auto sample_name = std::string(cm_param.getSampleName(sample_ID));
     rec.setSampleName(std::move(sample_name));
@@ -1198,20 +1198,20 @@ void encode_scm(
     auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
 
     cm_param.upsertSample(rec.getSampleID(), rec.getSampleName());
-    scm_payload.setSampleID(rec.getSampleID());
+    scm_payload.SetSampleId(rec.getSampleID());
 
-    scm_param.setChr1ID(chr1_ID);
-    scm_payload.setChr1ID(chr1_ID);
+    scm_param.SetChr1ID(chr1_ID);
+    scm_payload.SetChr1Id(chr1_ID);
 
-    scm_param.setChr2ID(chr2_ID);
-    scm_payload.setChr2ID(chr2_ID);
+    scm_param.SetChr2ID(chr2_ID);
+    scm_payload.SetChr2Id(chr2_ID);
 
-    auto is_intra_scm = scm_param.isIntraSCM();
+    auto is_intra_scm = scm_param.IsIntraSCM();
 
-    scm_param.setCodecID(codec_ID);
+    scm_param.SetCodecID(codec_ID);
 
-    scm_param.setNumTiles(ntiles_in_row, ntiles_in_col);
-    scm_payload.setNumTiles(ntiles_in_row, ntiles_in_col);
+    scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
+    scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
 
     UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
     row_ids /= interval;
@@ -1256,15 +1256,11 @@ void encode_scm(
                         );
 
                     // set row and mask to scm_payload
-                    scm_payload.setRowMaskPayload(
-                        std::move(row_mask_payload)
-                    );
-                    scm_param.setRowMaskExistsFlag(true);
+                    scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
+                    scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
-                    scm_payload.setColMaskPayload(
-                        std::move(col_mask_payload)
-                    );
-                    scm_param.setColMaskExistsFlag(true);
+                    scm_payload.SetColMaskPayload(std::move(col_mask_payload));
+                    scm_param.SetColMaskExistsFlag(true);
                 }
                 else { // if is_intra_scm is true
                     RunLengthEncodingData symmetricalRLEData;
@@ -1278,10 +1274,9 @@ void encode_scm(
                         );
 
                     // set row and mask to scm_payload
-                    scm_payload.setRowMaskPayload(
-                        std::move(symmetrical_mask_payload)
-                    );
-                    scm_param.setRowMaskExistsFlag(true);
+                    scm_payload.SetRowMaskPayload(
+                        std::move(symmetrical_mask_payload));
+                    scm_param.SetRowMaskESetRowMaskExistsFlag(true);
                 }
             }
         } else {
@@ -1289,19 +1284,15 @@ void encode_scm(
                 std::move(row_mask)
             );
 
-            scm_payload.setRowMaskPayload(
-                std::move(row_mask)
-            );
-            scm_param.setRowMaskExistsFlag(true);
+            scm_payload.SetRowMaskPayload(std::move(row_mask));
+            scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
             auto col_mask_payload = SubcontactMatrixMaskPayload(
                 std::move(col_mask)
             );
 
-            scm_payload.setColMaskPayload(
-                std::move(col_mask)
-            );
-            scm_param.setColMaskExistsFlag(true);
+            scm_payload.SetColMaskPayload(std::move(col_mask));
+            scm_param.SetColMaskExistsFlag(true);
         }
     }
 
@@ -1319,7 +1310,7 @@ void encode_scm(
             uint32_t tile_nrows, tile_ncols;
 
             // Assign
-            auto& tile_param = scm_param.getTileParameter(i_tile, j_tile);
+            auto& tile_param = scm_param.GetTileParameter(i_tile, j_tile);
             auto& diag_transform_mode = tile_param.diag_tranform_mode;
             auto& binarization_mode = tile_param.binarization_mode;
             bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
@@ -1414,11 +1405,8 @@ void encode_scm(
                         tile_payload
                     );
 
-                    scm_payload.setTilePayload(
-                        i_tile,
-                        j_tile,
-                        std::move(tile_payload)
-                    );
+                    scm_payload.SetTilePayload(i_tile, j_tile,
+                                               std::move(tile_payload));
 
                 // BinarizationMode::NONE
                 } else {
@@ -1516,36 +1504,36 @@ void set_rle_information_from_mask(
 //        auto rec_bin_size = rec.getBinSize();
 //        UTILS_DIE_IF(rec_bin_size != opt.bin_size, "Found record with different bin_size!");
 //
-//        if (rec.getChr1ID() > rec.getChr2ID())
+//        if (rec.GetChr1ID() > rec.GetChr2ID())
 //            rec.transposeCM();
 //
-//        uint8_t chr1_ID = rec.getChr1ID();
-//        uint8_t chr2_ID = rec.getChr2ID();
+//        uint8_t chr1_ID_ = rec.GetChr1ID();
+//        uint8_t chr2_ID_ = rec.GetChr2ID();
 //
 //        auto sample_name = std::string(rec.getSampleName());
-//        params.addSample(rec.getSampleID(), std::move(sample_name));
+//        params.addSample(rec.GetSampleID(), std::move(sample_name));
 //        auto chr1_name = std::string(rec.getChr1Name());
 //        params.upsertChromosome(
-//            chr1_ID,
+//            chr1_ID_,
 //            std::move(chr1_name),
 //            rec.getChr1Length()
 //        );
 //        auto chr2_name = std::string(rec.getChr2Name());
 //        params.upsertChromosome(
-//            chr2_ID,
+//            chr2_ID_,
 //            std::move(chr2_name),
 //            rec.getChr2Length()
 //        );
 //
 //        auto scm_payload = genie::contact::SubcontactMatrixPayload(
-//            0, //TODO(yeremia): change the default parameter_set_ID
-//            rec.getSampleID(),
-//            chr1_ID,
-//            chr2_ID
+//            0, //TODO(yeremia): change the default parameter_set_ID_
+//            rec.GetSampleID(),
+//            chr1_ID_,
+//            chr2_ID_
 //        );
 //
 ////        encode_scm(
-////            codec_ID,
+////            codec_ID_,
 ////            params,
 ////            rec,
 ////            scm_payload

@@ -50,7 +50,7 @@ TEST(Genotype, Decompose) {
         false,                                       // transpose_mat;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
+        genie::core::AlgoID::JBIG                    // codec_ID_;
     };
 
     genie::genotype::EncodingBlock block{};

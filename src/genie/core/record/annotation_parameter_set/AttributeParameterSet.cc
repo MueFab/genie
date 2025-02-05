@@ -167,42 +167,43 @@ void AttributeParameterSet::read(util::BitReader& reader) {
 
 void AttributeParameterSet::write(core::Writer& writer) const {
     ArrayType curType;
-    writer.write(attribute_ID, 16);
-    writer.write(attribute_name_len, 8);
-    writer.write(attribute_name);
-    writer.write(static_cast<uint8_t>(attribute_type), 8);
-    writer.write(attribute_num_array_dims, 2);
-    for (auto attribute_dim : attribute_array_dims) writer.write(attribute_dim, 8);
+    writer.Write(attribute_ID, 16);
+    writer.Write(attribute_name_len, 8);
+    writer.Write(attribute_name);
+    writer.Write(static_cast<uint8_t>(attribute_type), 8);
+    writer.Write(attribute_num_array_dims, 2);
+    for (auto attribute_dim : attribute_array_dims)
+      writer.Write(attribute_dim, 8);
     curType.toFile(attribute_type, attribute_default_val, writer);
 
-    writer.write(attribute_miss_val_flag, 1);
+    writer.Write(attribute_miss_val_flag, 1);
     if (attribute_miss_val_flag) {
-        writer.write(attribute_miss_default_flag, 1);
+      writer.Write(attribute_miss_default_flag, 1);
         if (!attribute_miss_default_flag) curType.toFile(attribute_type, attribute_miss_val, writer);
-        writer.write(attribute_miss_str);
-        writer.write_reserved(8);
+        writer.Write(attribute_miss_str);
+        writer.WriteReserved(8);
     }
 
-    writer.write(compressor_ID, 8);
-    writer.write(n_steps_with_dependencies, 4);
+    writer.Write(compressor_ID, 8);
+    writer.Write(n_steps_with_dependencies, 4);
     for (auto i = 0; i < n_steps_with_dependencies; ++i) {
-        writer.write(dependency_step_ID[i], 4);
-        writer.write(n_dependencies[i], 4);
+      writer.Write(dependency_step_ID[i], 4);
+        writer.Write(n_dependencies[i], 4);
         for (auto j = 0; j < n_dependencies[i]; ++j) {
-            writer.write(dependency_var_ID[i][j], 4);
-            writer.write(dependency_is_attribute[i][j], 1);
+          writer.Write(dependency_var_ID[i][j], 4);
+            writer.Write(dependency_is_attribute[i][j], 1);
             if (dependency_is_attribute[i][j])
-                writer.write(dependency_ID[i][j], 16);
+              writer.Write(dependency_ID[i][j], 16);
             else
-                writer.write(dependency_ID[i][j], 7);
+              writer.Write(dependency_ID[i][j], 7);
         }
     }
-    writer.flush();
+    writer.Flush();
 }
 
 size_t AttributeParameterSet::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

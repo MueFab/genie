@@ -150,7 +150,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
             genie::core::record::data_unit::Record AAU_dataUnit(aau);
             AAU_dataUnit.write(dataUnitWriter);
         }
-        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
+        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.GetBitsWritten() / 8) << std::endl;
         outputFile.close();
         if (testOutput) {
             genie::core::Writer txtWriter(&txtFile, true);
@@ -159,7 +159,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
                 genie::core::record::data_unit::Record AAU_dataUnit(aau);
                 AAU_dataUnit.write(txtWriter);
             }
-            txtWriter.flush();
+            txtWriter.Flush();
             txtFile.close();
         }
     } else {
@@ -194,7 +194,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         false,                                       // transpose_mat;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
+        genie::core::AlgoID::JBIG                    // codec_ID_;
     };
 
     auto genotypeData = genie::genotype::encode_block(genotype_opt, recs);
@@ -268,7 +268,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
         APS_dataUnit.write(dataUnitWriter);
         AAU_dataUnit.write(dataUnitWriter);
 
-        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.getBitsWritten() / 8) << std::endl;
+        std::cerr << "bytes written: " << std::to_string(dataUnitWriter.GetBitsWritten() / 8) << std::endl;
         outputFile.close();
     } else {
         std::cerr << "Failed to open file : " << SYSERROR() << std::endl;

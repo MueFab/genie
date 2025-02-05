@@ -71,7 +71,7 @@ TEST_F(LikelihoodTests, Likelihoodtestrandom) {  // NOLINT(cert-err58-cpp)
     genie::core::Writer strwriter(&outputfile);
     genie::util::BitReader strreader(outputfile);
     likelihoodParameters.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     likelihoodParametersCheck.read(strreader);
 
 //    EXPECT_EQ(likelihoodParameters.getDtypeID(), likelihoodParametersCheck.getDtypeID());

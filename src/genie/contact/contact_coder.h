@@ -28,12 +28,12 @@ namespace contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct EncodingOptions {
-    uint32_t bin_size = 0;
+//    uint32_t bin_size = 0;
     uint32_t tile_size = 0;
-    bool multi_intervals = false;
-    bool diag_transform = true;
-    bool binarize = true;
-    genie::core::AlgoID codec = genie::core::AlgoID::JBIG;
+//    bool multi_intervals = false;
+//    bool diag_transform = true;
+//    bool binarize = true;
+//    genie::core::AlgoID codec = genie::core::AlgoID::JBIG;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ void dense_to_sparse(
  * @param col_ids A reference to the vector of column IDs to be sorted.
  * @param counts A reference to the vector of counts to be sorted accordingly.
  */
-void sort_by_row_ids(
+[[maybe_unused]] void sort_by_row_ids(
     UInt64VecDtype& row_ids,
     UInt64VecDtype& col_ids,
     UIntVecDtype& counts

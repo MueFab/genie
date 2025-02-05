@@ -56,29 +56,29 @@ class Writer {
     explicit Writer(std::ostream* writer, bool log = false)
         : logwriter(writer), binwriter(writer), writingLog(log), getWriteSize(false), writeBitSize(0) {}
 
-    bool isLogWriter() const { return writingLog; }
-    util::BitWriter& getBinWriter() { return binwriter; }
+    bool IsLogWriter() const { return writingLog; }
+    util::BitWriter& GetBinWriter() { return binwriter; }
     /**
      * @brief Write a specified number of bits, reserved are not written to log
      * @param value Data to write. The LSBs will be written.
      * @param bits How many bits to write, range 1 to 64
      */
-    void write(uint64_t value, uint8_t bits, bool reserved) {
+    void Write(uint64_t value, uint8_t bits, bool reserved) {
         if (getWriteSize) {
             writeBitSize += bits;
         } else if (reserved) {
-            if (!writingLog) write(value, bits);
+            if (!writingLog) Write(value, bits);
         } else {
-            write(value, bits);
+          Write(value, bits);
         }
     }
-    void write_reserved(uint8_t bits) { write(0, bits, true); }
+    void WriteReserved(uint8_t bits) { Write(0, bits, true); }
     /**
      * @brief Write a specified number of bits
      * @param value Data to write. The LSBs will be written.
      * @param bits How many bits to write, range 1 to 64
      */
-    void write(uint64_t value, uint8_t bits) {
+    void Write(uint64_t value, uint8_t bits) {
         if (getWriteSize) {
             writeBitSize += bits;
         } else if (writingLog) {
@@ -92,7 +92,7 @@ class Writer {
      * @brief Write all characters of string to the stream.
      * @param string String to write.
      */
-    void write(const std::string& str) {
+    void Write(const std::string& str) {
         if (getWriteSize) {
             writeBitSize += str.size() * 8;
         } else if (writingLog) {
@@ -108,7 +108,7 @@ class Writer {
      * @brief Write the whole data from another stream. Basically appending the data to this stream.
      * @param in Data source
      */
-    void write(std::istream* in) {
+    void Write(std::istream* in) {
         uint8_t byte;
         if (getWriteSize) {
             in->seekg(0, in->end);
@@ -125,7 +125,7 @@ class Writer {
      * @brief Writes all buffered bits to the output stream. If there is no full byte available, the missing bits for
      * one full byte are filled with zeros. If no bits are currently buffered, nothing is written (not even zeros).
      */
-    void flush() {
+    void Flush() {
         if (getWriteSize) {
             if (writeBitSize % 8 != 0) writeBitSize += (8 - writeBitSize % 8);
         } else if (!writingLog) {
@@ -137,7 +137,7 @@ class Writer {
      * @brief Reveals the already written number of bits.
      * @return m_bitsWritten is returned.
      */
-    uint64_t getBitsWritten() const {
+    uint64_t GetBitsWritten() const {
         if (getWriteSize) {
             return writeBitSize;
         } else if (!writingLog) {

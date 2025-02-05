@@ -119,12 +119,12 @@ TEST_F(AttributeParameterSetTests, AttributeParameterSetRandom) {  // NOLINT(cer
     genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     attributeParameterSet.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     attributeParameterSetCheck.read(strreader);
     std::stringstream TestOut;
     genie::core::Writer teststrwriter(&TestOut);
     attributeParameterSetCheck.write(teststrwriter);
-    teststrwriter.flush();
+    teststrwriter.Flush();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
 

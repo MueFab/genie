@@ -90,37 +90,44 @@ bool GenotypeParameters::getPhaseValue() const { return phasing_value; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GenotypeParameters::write(core::Writer& writer) const {
-    writer.write(max_ploidy, 8);
-    writer.write(no_reference_flag, 1);
-    writer.write(not_available_flag, 1);
-    writer.write(static_cast<uint8_t>(binarization_ID), 3);
+  writer.Write(max_ploidy, 8);
+    writer.Write(no_reference_flag, 1);
+    writer.Write(not_available_flag, 1);
+    writer.Write(static_cast<uint8_t>(binarization_ID), 3);
     if (binarization_ID == BinarizationID::BIT_PLANE) {
-        writer.write(getNumBitPlanes(), 8);// was getNumVariantsPayloads
-        writer.write(static_cast<uint8_t>(concat_axis), 8);
+      writer.Write(getNumBitPlanes(), 8);// was getNumVariantsPayloads
+        writer.Write(static_cast<uint8_t>(concat_axis), 8);
     }
 
     for (auto i = 0u; i < getNumVariantsPayloads(); ++i) {
-        writer.write(variants_payload_params[i].sort_rows_flag, 1);
-        writer.write(variants_payload_params[i].sort_cols_flag, 1);
-        writer.write(variants_payload_params[i].transpose_mat_flag, 1);
-        writer.write(static_cast<uint8_t>(variants_payload_params[i].variants_codec_ID), 8);
+      writer.Write(variants_payload_params[i].sort_rows_flag, 1);
+        writer.Write(variants_payload_params[i].sort_cols_flag, 1);
+        writer.Write(variants_payload_params[i].transpose_mat_flag, 1);
+        writer.Write(
+            static_cast<uint8_t>(variants_payload_params[i].variants_codec_ID),
+            8);
     }
-    writer.write(encode_phases_data_flag, 1);
+    writer.Write(encode_phases_data_flag, 1);
     if (encode_phases_data_flag) {
-        writer.write(phases_payload_params.sort_rows_flag, 1);                  // sort_phases_rows_flag
-        writer.write(phases_payload_params.sort_cols_flag, 1);                  // sort_phases_cols_flag
-        writer.write(phases_payload_params.transpose_mat_flag, 1);              // transpose_phases_mat_flag
-        writer.write(static_cast<uint8_t>(phases_payload_params.variants_codec_ID), 8);  // phases_codec_ID
+      writer.Write(phases_payload_params.sort_rows_flag,
+                   1);                  // sort_phases_rows_flag
+        writer.Write(phases_payload_params.sort_cols_flag,
+                     1);                  // sort_phases_cols_flag
+        writer.Write(phases_payload_params.transpose_mat_flag,
+                     1);              // transpose_phases_mat_flag
+        writer.Write(
+            static_cast<uint8_t>(phases_payload_params.variants_codec_ID),
+            8);  // phases_codec_ID
     } else {
-        writer.write(phasing_value, 1);
+      writer.Write(phasing_value, 1);
     }
-    writer.flush();
+    writer.Flush();
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t GenotypeParameters::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

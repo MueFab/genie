@@ -39,7 +39,7 @@ Record::Record(annotation_access_unit::Record& _annotationAccessUnit) : data_uni
 }
 
 void Record::write(core::Writer& writer, uint64_t writeSize) const {
-    writer.write(data_unit_type, 8);
+  writer.Write(data_unit_type, 8);
     switch (data_unit_type) {
         case 0:
             break;
@@ -48,13 +48,13 @@ void Record::write(core::Writer& writer, uint64_t writeSize) const {
         case 2:
             break;
         case 3:
-            writer.write_reserved(10);
-            writer.write(writeSize, 22);
+          writer.WriteReserved(10);
+            writer.Write(writeSize, 22);
             annotationParameterSet.write(writer);
             break;
         case 4:
-            writer.write_reserved(3);
-            writer.write(writeSize, 29);
+          writer.WriteReserved(3);
+            writer.Write(writeSize, 29);
             annotationAccessUnit.write(writer);
             break;
         default:
@@ -63,7 +63,7 @@ void Record::write(core::Writer& writer, uint64_t writeSize) const {
 }
 
 uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) const {
-    writer.write(data_unit_type, 8);
+  writer.Write(data_unit_type, 8);
     uint64_t writesize = 0;
     switch (data_unit_type) {
         case 0:
@@ -73,15 +73,15 @@ uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) con
         case 2:
             break;
         case 3:
-            writer.write_reserved(10);
+          writer.WriteReserved(10);
             writesize = (annotationParameterSet.getSize() + 40) / 8;
-            writer.write(writesize, 22);
+            writer.Write(writesize, 22);
             annotationParameterSet.write(writer);
             break;
         case 4:
-            writer.write_reserved(3);
+          writer.WriteReserved(3);
             writesize = (annotationAccessUnit.getSize() + 40) / 8;
-            writer.write(writesize, 29);
+            writer.Write(writesize, 29);
             annotationAccessUnit.write(writer);
             break;
         default:

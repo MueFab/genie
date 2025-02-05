@@ -103,7 +103,7 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
         false,                  // transpose_mat;
         testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        testparams.algID        // codec_ID;
+        testparams.algID        // codec_ID_;
     };
 
     std::string set1 = "compressor 1 0 BSC {32 128 1 1}";

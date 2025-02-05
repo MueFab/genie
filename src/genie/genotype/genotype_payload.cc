@@ -43,9 +43,9 @@ BinMatPayload::BinMatPayload(BinMatDtype binMat, core::AlgoID _codecID) : codecI
 }
 
 void BinMatPayload::write(core::Writer& writer) const {
-    writer.write(nrows, 32);
-    writer.write(ncols, 32);
-    for (auto byte : payload) writer.write(byte, 8);
+  writer.Write(nrows, 32);
+    writer.Write(ncols, 32);
+    for (auto byte : payload) writer.Write(byte, 8);
 }
 
 void BinMatPayload::writeCompressed(core::Writer& writer) const {
@@ -54,61 +54,62 @@ void BinMatPayload::writeCompressed(core::Writer& writer) const {
 
     std::stringstream compressedStream;
     if (codecID != genie::core::AlgoID::JBIG) {
-        writer.write(nrows, 32);
-        writer.write(ncols, 32);
+      writer.Write(nrows, 32);
+        writer.Write(ncols, 32);
     }
 
     switch (codecID) {
         case genie::core::AlgoID::LZMA: {
             genie::entropy::lzma::LZMAEncoder encoder;
             encoder.encode(payloadStream, compressedStream);
-            writer.write(&compressedStream);
+            writer.Write(&compressedStream);
         } break;
         case genie::core::AlgoID::ZSTD: {
             genie::entropy::zstd::ZSTDEncoder encoder;
             encoder.encode(payloadStream, compressedStream);
-            writer.write(&compressedStream);
+            writer.Write(&compressedStream);
         } break;
         case genie::core::AlgoID::BSC: {
             genie::entropy::bsc::BSCEncoder encoder;
             encoder.encode(payloadStream, compressedStream);
-            writer.write(&compressedStream);
+            writer.Write(&compressedStream);
         } break;
         case genie::core::AlgoID::JBIG: {
             genie::entropy::jbig::JBIGEncoder encoder;
             encoder.encode(payloadStream, compressedStream, ncols, nrows);
-            writer.write(&compressedStream);
+            writer.Write(&compressedStream);
         } break;
         default:
-            writer.write(&payloadStream);
+          writer.Write(&payloadStream);
             break;
     }
 }
 
 void RowColIdsPayload::write(core::Writer& writer) const {
     for (uint64_t i = 0; i < nelements; ++i) {
-        writer.write(row_col_ids_elements[i], static_cast<uint8_t>(nbits_per_elem));
+      writer.Write(row_col_ids_elements[i],
+                   static_cast<uint8_t>(nbits_per_elem));
     }
     uint8_t bitsLeftOver = static_cast<uint8_t>(sizeInBytes * 8 - nelements * nbits_per_elem);
-    writer.write_reserved(bitsLeftOver);
+    writer.WriteReserved(bitsLeftOver);
 }
 
 void AmaxPayload::write(core::Writer& writer) const {
     uint64_t sizeInBits = 32 + 4;
-    writer.write(nelems, 32);
-    writer.write(nbits_per_elem, 4);
+    writer.Write(nelems, 32);
+    writer.Write(nbits_per_elem, 4);
     for (uint32_t i = 0; i < nelements; ++i) {
         sizeInBits++;
         if (amax_elements[i] == 0) {
-            writer.write(1, 1);
+          writer.Write(1, 1);
         } else {
-            writer.write(0, 1);
-            writer.write(amax_elements[i] - 1, nbits_per_elem);
+          writer.Write(0, 1);
+            writer.Write(amax_elements[i] - 1, nbits_per_elem);
             sizeInBits += nbits_per_elem;
         }
     }
     uint8_t remain = sizeInBits % 8;
-    if (remain != 0) writer.write_reserved(8 - remain);
+    if (remain != 0) writer.WriteReserved(8 - remain);
 }
 
 GenotypePayload::GenotypePayload(genie::genotype::EncodingBlock& datablock,
@@ -171,23 +172,23 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
         core::Writer writesize(&tempstream);
         variants_payload[i].writeCompressed(writesize);
         auto variantssize = tempstream.str().size();
-        writer.write(variantssize, 32);
+        writer.Write(variantssize, 32);
         variants_payload[i].writeCompressed(writer);
         auto variantsPayloadsParams = genotypeParameters.getVariantsPayloadParams();
         if (variantsPayloadsParams[i].sort_rows_flag) {
             uint32_t size = sort_variants_row_ids_payload[indecRowIds].getWriteSizeInBytes();
-            writer.write(size, 32);
+            writer.Write(size, 32);
             sort_variants_row_ids_payload[indecRowIds].write(writer);
             ++indecRowIds;
         }
         if (variantsPayloadsParams[i].sort_cols_flag) {
             auto size = sort_variants_col_ids_payload[indecColIds].getWriteSizeInBytes();
-            writer.write(size, 32);
+            writer.Write(size, 32);
             sort_variants_col_ids_payload[indecColIds].write(writer);
             ++indecColIds;
         }
         if (genotypeParameters.getBinarizationID() == BinarizationID::ROW_BIN) {
-            writer.write(variants_amax_payload.sizeInBytes(), 32);
+          writer.Write(variants_amax_payload.sizeInBytes(), 32);
             variants_amax_payload.write(writer);
         }
     }
@@ -196,7 +197,7 @@ void genie::genotype::GenotypePayload::write(core::Writer& writer) const {
         core::Writer writesize(&tempstream);
         phases_payload.writeCompressed(writesize);
         auto phasesSize = tempstream.str().size();
-        writer.write(phasesSize, 32);
+        writer.Write(phasesSize, 32);
         phases_payload.writeCompressed(writer);
     }
 }

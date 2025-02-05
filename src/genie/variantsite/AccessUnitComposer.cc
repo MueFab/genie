@@ -92,7 +92,7 @@ void AccessUnitComposer::setAccessUnit(
         std::stringstream data;
         genie::core::Writer writer(&data);
         tile.second.write(writer);
-        writer.flush();
+        writer.Flush();
         auto attributeID = _attributeInfo[tile.first].getAttributeID();
         core::record::annotation_access_unit::BlockData blockInfo(core::AnnotDesc::ATTRIBUTE, attributeID, data);
         genie::core::record::annotation_access_unit::Block block;

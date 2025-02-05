@@ -431,24 +431,20 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         auto NTILES_IN_COL = ORIG_CM_PARAM.getNumTiles(CHR2_ID, MULTIPLIER);
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
-        ORIG_SCM_PARAM.setCodecID(CODEC_ID);
-        ORIG_SCM_PARAM.setChr1ID(CHR1_ID);
-        ORIG_SCM_PARAM.setChr2ID(CHR2_ID);
-        ORIG_SCM_PARAM.setNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
+        ORIG_SCM_PARAM.SetCodecID(CODEC_ID);
+        ORIG_SCM_PARAM.SetChr1ID(CHR1_ID);
+        ORIG_SCM_PARAM.SetChr2ID(CHR2_ID);
+        ORIG_SCM_PARAM.SetNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
 
-                if (!(i>j && ORIG_SCM_PARAM.isIntraSCM())){
+                if (!(i>j && ORIG_SCM_PARAM.IsIntraSCM())){
                     auto tile_param = genie::contact::TileParameter();
                     tile_param.binarization_mode = BINARIZATION_MODE;
                     tile_param.diag_tranform_mode = DIAG_MODE;
 
-                    ORIG_SCM_PARAM.setTileParameter(
-                        i,
-                        j,
-                        tile_param
-                    );
+                    ORIG_SCM_PARAM.SetTileParameter(i, j, tile_param);
                 }
             }
         }
@@ -457,9 +453,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -468,17 +464,17 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
             ORIG_CM_PARAM
         );
 
-        ASSERT_EQ(recon_obj.getChr1ID(), CHR1_ID);
-        ASSERT_EQ(recon_obj.getChr2ID(), CHR2_ID);
-        ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(recon_obj.getNTilesInRow(), NTILES_IN_ROW);
-        ASSERT_EQ(recon_obj.getNTilesInCol(), NTILES_IN_COL);
+        ASSERT_EQ(recon_obj.GetChr1ID(), CHR1_ID);
+        ASSERT_EQ(recon_obj.GetChr2ID(), CHR2_ID);
+        ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(recon_obj.GetNTilesInRow(), NTILES_IN_ROW);
+        ASSERT_EQ(recon_obj.GetNTilesInCol(), NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                if (!(i>j && orig_obj.isIntraSCM())){
-                    auto& orig_tile_param = orig_obj.getTileParameter(i, j);
-                    auto& recon_tile_param = orig_obj.getTileParameter(i, j);
+                if (!(i>j && orig_obj.IsIntraSCM())){
+                    auto& orig_tile_param = orig_obj.GetTileParameter(i, j);
+                    auto& recon_tile_param = orig_obj.GetTileParameter(i, j);
 
                     ASSERT_EQ(
                         orig_tile_param.diag_tranform_mode,
@@ -528,24 +524,20 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         auto NTILES_IN_COL = ORIG_CM_PARAM.getNumTiles(CHR2_ID, MULTIPLIER);
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
-        ORIG_SCM_PARAM.setCodecID(CODEC_ID);
-        ORIG_SCM_PARAM.setChr1ID(CHR1_ID);
-        ORIG_SCM_PARAM.setChr2ID(CHR2_ID);
-        ORIG_SCM_PARAM.setNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
+        ORIG_SCM_PARAM.SetCodecID(CODEC_ID);
+        ORIG_SCM_PARAM.SetChr1ID(CHR1_ID);
+        ORIG_SCM_PARAM.SetChr2ID(CHR2_ID);
+        ORIG_SCM_PARAM.SetNumTiles(NTILES_IN_ROW, NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
 
-                if (!(i>j && ORIG_SCM_PARAM.isIntraSCM())){
+                if (!(i>j && ORIG_SCM_PARAM.IsIntraSCM())){
                     auto tile_param = genie::contact::TileParameter();
                     tile_param.binarization_mode = BINARIZATION_MODE;
                     tile_param.diag_tranform_mode = DIAG_MODE;
 
-                    ORIG_SCM_PARAM.setTileParameter(
-                        i,
-                        j,
-                        tile_param
-                    );
+                    ORIG_SCM_PARAM.SetTileParameter(i, j, tile_param);
                 }
             }
         }
@@ -556,9 +548,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -567,17 +559,17 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
             ORIG_CM_PARAM
         );
 
-        ASSERT_EQ(recon_obj.getChr1ID(), CHR1_ID);
-        ASSERT_EQ(recon_obj.getChr2ID(), CHR2_ID);
-        ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(recon_obj.getNTilesInRow(), NTILES_IN_ROW);
-        ASSERT_EQ(recon_obj.getNTilesInCol(), NTILES_IN_COL);
+        ASSERT_EQ(recon_obj.GetChr1ID(), CHR1_ID);
+        ASSERT_EQ(recon_obj.GetChr2ID(), CHR2_ID);
+        ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(recon_obj.GetNTilesInRow(), NTILES_IN_ROW);
+        ASSERT_EQ(recon_obj.GetNTilesInCol(), NTILES_IN_COL);
 
         for (size_t i = 0u; i<NTILES_IN_ROW; i++){
             for (size_t j = 0u; j<NTILES_IN_COL; j++){
-                if (!(i>j && orig_obj.isIntraSCM())){
-                    auto& orig_tile_param = orig_obj.getTileParameter(i, j);
-                    auto& recon_tile_param = orig_obj.getTileParameter(i, j);
+                if (!(i>j && orig_obj.IsIntraSCM())){
+                    auto& orig_tile_param = orig_obj.GetTileParameter(i, j);
+                    auto& recon_tile_param = orig_obj.GetTileParameter(i, j);
 
                     ASSERT_EQ(
                         orig_tile_param.diag_tranform_mode,

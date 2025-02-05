@@ -131,47 +131,48 @@ void ContactMatrixParameters::read(util::BitReader& reader) {
 }
 
 void ContactMatrixParameters::write(core::Writer& writer) const {
-    writer.write(num_samples, 8);
+  writer.Write(num_samples, 8);
     for (auto i = 0; i < num_samples; ++i) {
-        writer.write(sample_ID[i], 8);
+      writer.Write(sample_ID[i], 8);
         for (auto byte : sample_name[i]) {
-            writer.write(byte, 8);
+          writer.Write(byte, 8);
         }
-        writer.write_reserved(8);
+        writer.WriteReserved(8);
     }
-    writer.write(num_chrs, 8);
+    writer.Write(num_chrs, 8);
     for (auto i = 0; i < num_chrs; ++i) {
-        writer.write(chr_ID[i], 8);
+      writer.Write(chr_ID[i], 8);
         for (auto byte : chr_name[i]) {
-            writer.write(byte, 8);
+          writer.Write(byte, 8);
         }
-        writer.write_reserved(8);
-        writer.write(chr_length[i], 64);
+        writer.WriteReserved(8);
+        writer.Write(chr_length[i], 64);
     }
-    writer.write(interval, 32);
-    writer.write(tile_size, 32);
-    writer.write(num_interval_multipliers, 8);
-    for (auto i = 0; i < num_interval_multipliers; ++i) writer.write(interval_multiplier[i], 32);
+    writer.Write(interval, 32);
+    writer.Write(tile_size, 32);
+    writer.Write(num_interval_multipliers, 8);
+    for (auto i = 0; i < num_interval_multipliers; ++i)
+      writer.Write(interval_multiplier[i], 32);
 
-    writer.write(num_norm_methods, 8);
+    writer.Write(num_norm_methods, 8);
     for (auto i = 0; i < num_norm_methods; ++i) {
-        writer.write(norm_method_ID[i], 8);
-        for (auto byte : norm_method_name[i]) writer.write(byte, 8);
-        writer.write_reserved(8);
-        writer.write(norm_method_mult_flag[i], 1);
-        writer.write_reserved(7);
+      writer.Write(norm_method_ID[i], 8);
+        for (auto byte : norm_method_name[i]) writer.Write(byte, 8);
+        writer.WriteReserved(8);
+        writer.Write(norm_method_mult_flag[i], 1);
+        writer.WriteReserved(7);
     }
-    writer.write(num_norm_matrices, 8);
+    writer.Write(num_norm_matrices, 8);
     for (auto i = 0; i < num_norm_matrices; ++i) {
-        writer.write(norm_matrix_ID[i], 8);
-        for (auto byte : norm_matrix_name[i]) writer.write(byte, 8);
-        writer.write_reserved(8);
+      writer.Write(norm_matrix_ID[i], 8);
+        for (auto byte : norm_matrix_name[i]) writer.Write(byte, 8);
+        writer.WriteReserved(8);
     }
 }
 
 size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
