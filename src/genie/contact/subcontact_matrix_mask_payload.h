@@ -13,8 +13,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,10 +35,10 @@ enum class TransformID : uint8_t {
 
 class SubcontactMatrixMaskPayload{
  private:
-    TransformID transform_ID;
-    std::optional<std::vector<bool>> mask_array;
-    bool first_val;
-    std::optional<std::vector<uint32_t>> rl_entries;
+    TransformID transform_ID_;
+    std::optional<std::vector<bool>> mask_array_;
+    bool first_val_{};
+    std::optional<std::vector<uint32_t>> rl_entries_;
 
  public:
     /**
@@ -98,7 +97,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param mask_array The moveable mask array.
      */
-    SubcontactMatrixMaskPayload(
+    explicit SubcontactMatrixMaskPayload(
         BinVecDtype&& mask_array
     );
 
@@ -135,7 +134,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Transform ID.
      */
-    TransformID getTransformID() const;
+    [[nodiscard]] TransformID GetTransformID() const;
 
     /**
     * @brief Checks if a mask array exists.
@@ -144,7 +143,7 @@ class SubcontactMatrixMaskPayload{
     *
     * @return True if a mask array exists, false otherwise.
     */
-    bool anyMaskArray() const;
+    [[nodiscard]] bool AnyMaskArray() const;
 
     /**
      * @brief Get the Mask Array.
@@ -153,7 +152,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Mask Array.
      */
-    const std::vector<bool>& getMaskArray() const;
+    [[nodiscard]] const std::vector<bool>& GetMaskArray() const;
 
     /**
      *  @brief Get the First Value.
@@ -162,7 +161,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The First Value.
      */
-    bool getFirstVal() const;
+    [[nodiscard]] bool GetFirstVal() const;
 
     /**
      * @brief Checks if run-length encoded entries exist.
@@ -171,7 +170,7 @@ class SubcontactMatrixMaskPayload{
      *
      * @return True if run-length encoded entries exist, false otherwise.
      */
-    bool anyRLEntries() const;
+    [[nodiscard]] bool AnyRlEntries() const;
 
     /**
      *  @brief Get the Run-Length Entries.
@@ -180,7 +179,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @return The Run-Length Entries.
      */
-    const std::vector<uint32_t>& getRLEntries() const;
+    [[nodiscard]] const std::vector<uint32_t>& GetRlEntries() const;
 
     /**
      *  @brief Set the Transform ID.
@@ -189,7 +188,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param id The new Transform ID.
      */
-    void setTransformID(TransformID id);
+    void SetTransformId(TransformID id);
 
     /**
      *  @brief Set the Mask Array.
@@ -198,7 +197,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param opt_array The new Mask Array.
      */
-    void setMaskArray(const std::optional<BinVecDtype>& opt_array);
+    void SetMaskArray(const std::optional<BinVecDtype>& opt_array);
 
     /**
      *  @brief Set the First Value.
@@ -207,7 +206,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param val The new First Value.
      */
-    void setFirstVal(bool val);
+    [[maybe_unused]] void SetFirstVal(bool val);
 
     /**
      *  @brief Set the Run-Length Entries.
@@ -216,7 +215,7 @@ class SubcontactMatrixMaskPayload{
      *
      *  @param _rl_entries The new Run-Length Entries.
      */
-    void setRLEntries(
+    void SetRlEntries(
         TransformID _transform_ID,
         bool _first_val,
         const std::optional<UIntVecDtype>& _rl_entries
@@ -227,9 +226,9 @@ class SubcontactMatrixMaskPayload{
      *
      * This function returns the size of this structure.
      *
-     * @return The size of the payload.
+     * @return The size of the payload_.
      */
-    size_t getSize() const;
+    [[nodiscard]] size_t GetSize() const;
 
     /**
      * @brief Writes the object to a writer.
@@ -238,14 +237,13 @@ class SubcontactMatrixMaskPayload{
      *
      * @param writer The writer to write to.
      */
-    void write(util::BitWriter &writer) const;
+    void Write(util::BitWriter &writer) const;
 };
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contact
-}  // namespace genie
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

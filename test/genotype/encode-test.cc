@@ -512,7 +512,7 @@ TEST(Genotype, RoundTrip_JBIG) {
 //    encoder.decode(compressed_output, uncompressed_output, output_ncols, output_nrows);
 //
 //    std::vector<uint8_t> mem_data_source(3 * ORIG_PAYLOAD_LEN);
-//    uint8_t* payload = &mem_data_source[0];
+//    uint8_t* payload_ = &mem_data_source[0];
 //    size_t payload_len;
 
 }

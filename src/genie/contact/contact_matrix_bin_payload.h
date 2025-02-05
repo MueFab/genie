@@ -25,12 +25,12 @@ namespace contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 //TODO(yeremia): Docstring
-class ContactMatrixBinPayload {
+class [[maybe_unused]] ContactMatrixBinPayload {
  private:
-    uint16_t sample_ID;
-    uint8_t  chr_ID;
-    uint32_t bin_size_multiplier;
-    std::vector<std::vector<double_t>> weight_value;
+    uint16_t sample_ID_;
+    uint8_t chr_ID_;
+    uint32_t bin_size_multiplier_;
+    std::vector<std::vector<double_t>> weight_value_;
 
  public:
     ContactMatrixBinPayload();
@@ -43,17 +43,17 @@ class ContactMatrixBinPayload {
 
     explicit ContactMatrixBinPayload(util::BitReader &reader);
 
-    uint16_t getSampleID() const;
-    uint8_t getChrID() const;
-    uint32_t getBinSizeMultiplier() const;
-    const std::vector<std::vector<double_t>>& getWeightValue() const;
+    uint16_t GetSampleID() const;
+    uint8_t GetChrId() const;
+    uint32_t GetBinSizeMultiplier() const;
+    const std::vector<std::vector<double_t>>& GetWeightValue() const;
 
-    void setSampleID(uint16_t sample_ID);
-    void setChrID(uint8_t chr_ID);
-    void setBinSizeMultipler(uint32_t bin_size_multiplier);
-    void setWeightValue(std::vector<std::vector<double_t>>&& weight_value);
+    void SetSampleID(uint16_t sample_ID);
+    void SetChrID(uint8_t chr_ID);
+    void SetBinSizeMultipler(uint32_t bin_size_multiplier);
+    void SetWeightValue(std::vector<std::vector<double_t>>&& weight_value);
 
-    void write(util::BitWriter& writer) const;
+    void Write(util::BitWriter& writer) const;
 
 };
 

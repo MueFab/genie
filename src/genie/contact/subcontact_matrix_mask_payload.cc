@@ -19,31 +19,31 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     util::BitReader& reader,
     uint32_t num_bin_entries
 ) {
-    transform_ID = reader.Read<TransformID>(TRANSFORM_ID_BLEN);
+  transform_ID_ = reader.Read<TransformID>(TRANSFORM_ID_BLEN);
 
-    if (transform_ID == TransformID::ID_0){
+    if (transform_ID_ == TransformID::ID_0){
         BinVecDtype tmp_mask_array = xt::empty<bool>({num_bin_entries}); // Not part of the spec
         for (auto i = 0u; i<num_bin_entries; i++){
             tmp_mask_array[i] = reader.Read<bool>(MASK_ARR_BLEN);
         }
-        setMaskArray(tmp_mask_array);
-        first_val = mask_array->at(0);
+        SetMaskArray(tmp_mask_array);
+        first_val_ = mask_array_->at(0);
 
     } else {
-        first_val = reader.Read<bool>(FIRST_VAL_BLEN);
+      first_val_ = reader.Read<bool>(FIRST_VAL_BLEN);
 
         auto num_rl_entries = reader.Read<uint32_t>();
         UIntVecDtype tmp_rl_entries = xt::empty<uint32_t>({num_rl_entries}); // Not part of the spec
 
-        if (transform_ID == TransformID::ID_1){
+        if (transform_ID_ == TransformID::ID_1){
             for (auto i = 0u; i<num_rl_entries; i++){
                 tmp_rl_entries[i] = reader.Read<uint8_t>();
             }
-        } else if (transform_ID == TransformID::ID_2){
+        } else if (transform_ID_ == TransformID::ID_2){
             for (auto i = 0u; i<num_rl_entries; i++){
                 tmp_rl_entries[i] = reader.Read<uint16_t>();
             }
-        } else if (transform_ID == TransformID::ID_3){
+        } else if (transform_ID_ == TransformID::ID_3){
             for (auto i = 0u; i<num_rl_entries; i++){
                 tmp_rl_entries[i] = reader.Read<uint32_t>();
             }
@@ -51,11 +51,7 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
             UTILS_DIE("This should never be reached!");
         }
 
-        setRLEntries(
-            transform_ID,
-            first_val,
-            tmp_rl_entries
-        );
+        SetRlEntries(transform_ID_, first_val_, tmp_rl_entries);
     }
 
     reader.FlushHeldBits();
@@ -66,12 +62,12 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
 SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     BinVecDtype&& _mask_array
 )
-    : transform_ID(TransformID::ID_0),
-      mask_array(),
-      first_val(),
-      rl_entries()
+    : transform_ID_(TransformID::ID_0),
+      mask_array_(),
+      first_val_(),
+      rl_entries_()
 {
-    setMaskArray(_mask_array);
+  SetMaskArray(_mask_array);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -81,71 +77,69 @@ SubcontactMatrixMaskPayload::SubcontactMatrixMaskPayload(
     bool _first_val,
     UIntVecDtype& _rl_entries
 )
-    : transform_ID(_transform_ID),
-      mask_array(),
-      first_val(_first_val)
+    : transform_ID_(_transform_ID), mask_array_(), first_val_(_first_val)
 {
-    UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "Invalid transform_ID!");
-    rl_entries = std::vector<uint32_t>(_rl_entries.begin(), _rl_entries.end());
+    UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "Invalid transform_ID_!");
+    rl_entries_ = std::vector<uint32_t>(_rl_entries.begin(), _rl_entries.end());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SubcontactMatrixMaskPayload::operator==(const SubcontactMatrixMaskPayload& other) {
-    return transform_ID == other.transform_ID &&
-           mask_array == other.mask_array &&
-           first_val == other.first_val &&
-           rl_entries == other.rl_entries;
+    return transform_ID_ == other.transform_ID_ &&
+         mask_array_ == other.mask_array_ && first_val_ == other.first_val_ &&
+         rl_entries_ == other.rl_entries_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformID SubcontactMatrixMaskPayload::getTransformID() const { return transform_ID; }
+TransformID SubcontactMatrixMaskPayload::GetTransformID() const { return transform_ID_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SubcontactMatrixMaskPayload::anyMaskArray() const{ return mask_array.has_value();}
+bool SubcontactMatrixMaskPayload::AnyMaskArray() const{ return mask_array_.has_value();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<bool>& SubcontactMatrixMaskPayload::getMaskArray() const{
+const std::vector<bool>& SubcontactMatrixMaskPayload::GetMaskArray() const{
     UTILS_DIE_IF(
-        !anyMaskArray(),
-        "mask_array is not set!"
+        !AnyMaskArray(),
+        "mask_array_ is not set!"
     );
-    return *mask_array;
+    return *mask_array_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SubcontactMatrixMaskPayload::getFirstVal() const { return first_val; }
+bool SubcontactMatrixMaskPayload::GetFirstVal() const { return first_val_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SubcontactMatrixMaskPayload::anyRLEntries() const{ return rl_entries.has_value();}
+bool SubcontactMatrixMaskPayload::AnyRlEntries() const{ return rl_entries_.has_value();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint32_t>& SubcontactMatrixMaskPayload::getRLEntries() const {
+const std::vector<uint32_t>& SubcontactMatrixMaskPayload::GetRlEntries() const {
     UTILS_DIE_IF(
-        !anyRLEntries(),
-        "mask_array is not set!"
+        !AnyRlEntries(),
+        "mask_array_ is not set!"
     );
-    return *rl_entries;
+    return *rl_entries_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::setTransformID(TransformID id) { transform_ID = id; }
+void SubcontactMatrixMaskPayload::SetTransformId(TransformID id) {
+  transform_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::setMaskArray(
+void SubcontactMatrixMaskPayload::SetMaskArray(
     const std::optional<BinVecDtype>& opt_array
 ) {
-    transform_ID = TransformID::ID_0;
-    if (rl_entries.has_value()){
-        rl_entries = {};
+  transform_ID_ = TransformID::ID_0;
+    if (rl_entries_.has_value()){
+      rl_entries_ = {};
     }
 
     if (opt_array.has_value()){
@@ -153,37 +147,36 @@ void SubcontactMatrixMaskPayload::setMaskArray(
 
         auto& array = opt_array.value();
         auto std_array = std::vector<bool>(array.begin(), array.end());
-        first_val = std_array[0];
-        mask_array = std::move(std_array);
+        first_val_ = std_array[0];
+        mask_array_ = std::move(std_array);
     } else {
-        first_val = false;
-        mask_array = {};
+      first_val_ = false;
+        mask_array_ = {};
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::setFirstVal(bool val) {
-    UTILS_DIE_IF(
-        transform_ID == TransformID::ID_0,
-        "first_val can only be set manually for transform_ID 1-3!"
+[[maybe_unused]] void SubcontactMatrixMaskPayload::SetFirstVal(bool val) {
+    UTILS_DIE_IF(transform_ID_ == TransformID::ID_0,
+        "first_val_ can only be set manually for transform_ID_ 1-3!"
     );
 
-    first_val = val;
+    first_val_ = val;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::setRLEntries(
+void SubcontactMatrixMaskPayload::SetRlEntries(
     TransformID _transform_ID,
     bool _first_val,
     const std::optional<UIntVecDtype>& _rl_entries
 ) {
-    UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "transform_ID 0 is not allowed here!");
-    transform_ID = _transform_ID;
+    UTILS_DIE_IF(_transform_ID == TransformID::ID_0, "transform_ID_ 0 is not allowed here!");
+    transform_ID_ = _transform_ID;
 
-    if (mask_array.has_value()){
-        mask_array = {};
+    if (mask_array_.has_value()){
+      mask_array_ = {};
     }
 
     if (_rl_entries.has_value()){
@@ -191,26 +184,26 @@ void SubcontactMatrixMaskPayload::setRLEntries(
 
         auto& array = _rl_entries.value();
         auto std_array = std::vector<uint32_t>(array.begin(), array.end());
-        first_val = _first_val;
-        rl_entries = std::move(std_array);
+        first_val_ = _first_val;
+        rl_entries_ = std::move(std_array);
     } else {
-        first_val = false;
-        rl_entries = {};
+      first_val_ = false;
+      rl_entries_ = {};
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t SubcontactMatrixMaskPayload::getSize() const{
-    size_t size_bits = TRANSFORM_ID_BLEN; // transform_ID
-    if (transform_ID == TransformID::ID_0){
-        UTILS_DIE_IF(!mask_array.has_value(), "mask_array is missing?");
-        size_bits += mask_array.value().size();
+size_t SubcontactMatrixMaskPayload::GetSize() const{
+    size_t size_bits = TRANSFORM_ID_BLEN; // transform_ID_
+    if (transform_ID_ == TransformID::ID_0){
+        UTILS_DIE_IF(!mask_array_.has_value(), "mask_array_ is missing?");
+        size_bits += mask_array_.value().size();
     } else {
-        UTILS_DIE_IF(!rl_entries.has_value(), "rl_entries is missing?");
+        UTILS_DIE_IF(!rl_entries_.has_value(), "rl_entries_ is missing?");
         size_bits += FIRST_VAL_BLEN;
         size_bits += NUM_RL_ENTRIES_BLEN;
-        size_bits += rl_entries.value().size() * (4u << static_cast<uint8_t>(transform_ID));
+        size_bits += rl_entries_.value().size() * (4u << static_cast<uint8_t>(transform_ID_));
     };
 
     return static_cast<size_t>(ceil(static_cast<double>(size_bits) / 8));
@@ -218,10 +211,10 @@ size_t SubcontactMatrixMaskPayload::getSize() const{
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
+void SubcontactMatrixMaskPayload::Write(util::BitWriter &writer) const{
     UTILS_DIE_IF(
-        !mask_array.has_value() && !rl_entries.has_value(),
-        "Both mask_array and rl_entries are empty!"
+        !mask_array_.has_value() && !rl_entries_.has_value(),
+        "Both mask_array_ and rl_entries_ are empty!"
     );
 
     // Write everything on-memory before dumping it to the writer
@@ -229,25 +222,25 @@ void SubcontactMatrixMaskPayload::write(util::BitWriter &writer) const{
     std::ostream& _writer = payload;
     auto onmem_writer = genie::util::BitWriter(&_writer);
 
-    onmem_writer.WriteBits(static_cast<uint64_t>(transform_ID), TRANSFORM_ID_BLEN);
+    onmem_writer.WriteBits(static_cast<uint64_t>(transform_ID_), TRANSFORM_ID_BLEN);
 
-    if (transform_ID == TransformID::ID_0){
-        UTILS_DIE_IF(!mask_array.has_value(), "mask_array is missing?");
-        auto num_bin_entries = mask_array->size();
+    if (transform_ID_ == TransformID::ID_0){
+        UTILS_DIE_IF(!mask_array_.has_value(), "mask_array_ is missing?");
+        auto num_bin_entries = mask_array_->size();
 
         for (auto i = 0u; i < num_bin_entries; i++){
-            auto _mask_array = mask_array.value();
-            uint64_t val = mask_array->at(i);
+            auto _mask_array = mask_array_.value();
+            uint64_t val = mask_array_->at(i);
             onmem_writer.WriteBits(val, 1);
         }
     } else {
-        UTILS_DIE_IF(!rl_entries.has_value(), "rl_entries is missing?");
-        onmem_writer.WriteBits(first_val, FIRST_VAL_BLEN);
-        auto num_rl_entries = rl_entries->size();
+        UTILS_DIE_IF(!rl_entries_.has_value(), "rl_entries_ is missing?");
+        onmem_writer.WriteBits(first_val_, FIRST_VAL_BLEN);
+        auto num_rl_entries = rl_entries_->size();
         onmem_writer.WriteBits(num_rl_entries, NUM_RL_ENTRIES_BLEN);
         for (auto i = 0u; i < num_rl_entries; i++){
-            auto nbits = static_cast<uint8_t>(4u << static_cast<uint8_t>(transform_ID));
-            auto val = static_cast<uint64_t>(rl_entries->at(i));
+            auto nbits = static_cast<uint8_t>(4u << static_cast<uint8_t>(transform_ID_));
+            auto val = static_cast<uint64_t>(rl_entries_->at(i));
             onmem_writer.WriteBits(val, nbits);
         }
     }

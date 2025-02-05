@@ -111,8 +111,8 @@ class SubcontactMatrixPayload {
      * @param chr1_ID The ID of the first chromosome.
      * @param chr2_ID The ID of the second chromosome.
      * @param tile_payloads The tile payloads.
-     * @param row_mask_payload The row mask payload.
-     * @param col_mask_payload The column mask payload.
+     * @param row_mask_payload The row mask payload_.
+     * @param col_mask_payload The column mask payload_.
      */
     [[maybe_unused]] SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
@@ -209,40 +209,40 @@ class SubcontactMatrixPayload {
    [[maybe_unused]] [[nodiscard]] size_t GetNumNormMatrices() const;
 
    /**
-   * @brief Checks if a row mask payload exists.
+   * @brief Checks if a row mask payload_ exists.
    *
-   * Returns true if a row mask payload is present in the SubcontactMatrixPayload object, otherwise false.
+   * Returns true if a row mask payload_ is present in the SubcontactMatrixPayload object, otherwise false.
    *
-   * @return True if a row mask payload exists, false otherwise.
+   * @return True if a row mask payload_ exists, false otherwise.
    */
    [[nodiscard]] bool AnyRowMaskPayload() const;
 
    /**
-   * @brief Gets the row mask payload.
+   * @brief Gets the row mask payload_.
    *
-   * Returns the row mask payload if it exists, otherwise throws an error.
+   * Returns the row mask payload_ if it exists, otherwise throws an error.
    *
-   * @return A constant reference to the row mask payload.
-   * @throws std::runtime_error If the row mask payload does not exist.
+   * @return A constant reference to the row mask payload_.
+   * @throws std::runtime_error If the row mask payload_ does not exist.
    */
    [[nodiscard]] const SubcontactMatrixMaskPayload& GetRowMaskPayload() const;
 
    /**
-   * @brief Checks if a column mask payload exists.
+   * @brief Checks if a column mask payload_ exists.
    *
-   * Returns true if a column mask payload is present in the SubcontactMatrixPayload object, otherwise false.
+   * Returns true if a column mask payload_ is present in the SubcontactMatrixPayload object, otherwise false.
    *
-   * @return True if a row mask payload exists, false otherwise.
+   * @return True if a row mask payload_ exists, false otherwise.
    */
    [[nodiscard]] bool AnyColMaskPayload() const;
 
    /**
-   * @brief Gets the column mask payload.
+   * @brief Gets the column mask payload_.
    *
-   * Returns the column mask payload if it exists, otherwise throws an error.
+   * Returns the column mask payload_ if it exists, otherwise throws an error.
    *
-   * @return A constant reference to the column mask payload.
-   * @throws std::runtime_error If the column mask payload does not exist.
+   * @return A constant reference to the column mask payload_.
+   * @throws std::runtime_error If the column mask payload_ does not exist.
    */
    [[nodiscard]] const SubcontactMatrixMaskPayload& GetColMaskPayload() const;
 
@@ -292,22 +292,22 @@ class SubcontactMatrixPayload {
    [[maybe_unused]] void SetTilePayloads(const TilePayloads& payloads);
 
    /**
-    * @brief Sets the payload for the row mask.
+    * @brief Sets the payload_ for the row mask.
     *
-    * This function sets the payload for the row mask. The payload is an optional object of type `SubcontactMatrixMaskPayload`.
+    * This function sets the payload_ for the row mask. The payload_ is an optional object of type `SubcontactMatrixMaskPayload`.
     *
-    * @param payload The payload to set for the row mask.
+    * @param payload The payload_ to set for the row mask.
     */
-   void SetRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void SetRowMaskPayload(SubcontactMatrixMaskPayload&& payload);
 
    /**
-    * @brief Sets the payload for the column mask.
+    * @brief Sets the payload_ for the column mask.
     *
-    * This function sets the payload for the column mask. The payload is an optional object of type `SubcontactMatrixMaskPayload`.
+    * This function sets the payload_ for the column mask. The payload_ is an optional object of type `SubcontactMatrixMaskPayload`.
     *
-    * @param payload The payload to set for the column mask.
+    * @param payload The payload_ to set for the column mask.
     */
-   void SetColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void SetColMaskPayload(SubcontactMatrixMaskPayload&& payload);
 
    /**
    * @brief Sets the number of tiles in the SubcontactMatrixPayload and resizes the internal storage accordingly.
@@ -330,13 +330,13 @@ class SubcontactMatrixPayload {
    );
 
    /**
-     * @brief Adds a tile payload.
+     * @brief Adds a tile payload_.
      *
-     * This method adds a tile payload at the given indices.
+     * This method adds a tile payload_ at the given indices.
      *
      * @param i_tile The index of the first dimension.
      * @param j_tile The index of the second dimension.
-     * @param tile_payload The tile payload to set.
+     * @param tile_payload The tile payload_ to set.
     */
    void SetTilePayload(
        size_t i_tile,
@@ -377,7 +377,7 @@ class SubcontactMatrixPayload {
      *
      * This function returns the size of this structure.
      *
-     * @return The size of the payload.
+     * @return The size of the payload_.
     */
    [[nodiscard]] size_t GetSize() const;
 

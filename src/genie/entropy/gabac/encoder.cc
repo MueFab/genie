@@ -36,7 +36,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
 
     if (num_streams == 0) {
         auto ret_empty = core::AccessUnit::Descriptor(desc.getID());
-        // add empty payload
+        // add empty payload_
         ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), (uint16_t)0}, util::DataBlock(0, 1)));
         return ret_empty;
     }
@@ -115,7 +115,7 @@ core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor
         for (auto &subdesc : std::get<1>(ret)) {
             if (!subdesc.isEmpty()) {
                 const auto &conf = configSet.getConfAsGabac(subdesc.getID());
-                // add compressed payload
+                // add compressed payload_
                 auto id = subdesc.getID();
 
                 std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
@@ -134,7 +134,7 @@ core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor
                         std::get<1>(ret).get(id.second).getRawSize());
                 }
             } else {
-                // add empty payload
+                // add empty payload_
                 std::get<1>(ret).set(subdesc.getID().second,
                                      core::AccessUnit::Subsequence(subdesc.getID(), util::DataBlock(0, 1)));
             }

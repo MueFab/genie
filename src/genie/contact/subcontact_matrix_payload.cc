@@ -80,8 +80,8 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
         "chr2_ID_ differs"
     );
 
-    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID_, MULT);
-    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID_, MULT);
+    auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID_, MULT);
+    auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID_, MULT);
 
     UTILS_DIE_IF(ntiles_in_row != scm_param.GetNTilesInRow(), "chr1_ID_ differs");
     UTILS_DIE_IF(ntiles_in_col != scm_param.GetNTilesInCol(), "chr2_ID_ differs");
@@ -95,7 +95,7 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
                 auto tile_payload_size = reader.ReadAlignedInt<uint32_t>();
                 auto tile_payload = ContactMatrixTilePayload(reader, tile_payload_size);
                 UTILS_DIE_IF(
-                    tile_payload_size != tile_payload.getSize(),
+                    tile_payload_size != tile_payload.GetSize(),
                     "Invalid tile_payload size!"
                 );
                 SetTilePayload(i, j, std::move(tile_payload));
@@ -107,27 +107,27 @@ SubcontactMatrixPayload::SubcontactMatrixPayload(
     //TODO(yeremia): Missing norm_matrices
 
     if (scm_param.GetRowMaskExistsFlag()){
-        auto num_entries = static_cast<uint32_t>(cm_param.getNumBinEntries(chr1_ID_, MULT));
+        auto num_entries = static_cast<uint32_t>(cm_param.GetNumBinEntries(chr1_ID_, MULT));
         auto mask_payload_size = reader.ReadAlignedInt<uint32_t>();
         auto mask_payload = SubcontactMatrixMaskPayload(
             reader,
             num_entries
         );
         UTILS_DIE_IF(
-            mask_payload_size != mask_payload.getSize(),
+            mask_payload_size != mask_payload.GetSize(),
             "Invalid mask_payload_size"
         );
         SetRowMaskPayload(std::move(mask_payload));
     }
     if (!IsIntraScm() && scm_param.GetColMaskExistsFlag()){
-        auto num_entries = cm_param.getNumBinEntries(chr2_ID_, MULT);
+        auto num_entries = cm_param.GetNumBinEntries(chr2_ID_, MULT);
         auto mask_payload_size = reader.ReadAlignedInt<uint32_t>();
         auto mask_payload = SubcontactMatrixMaskPayload(
             reader,
             static_cast<uint32_t>(num_entries)
         );
         UTILS_DIE_IF(
-            mask_payload_size != mask_payload.getSize(),
+            mask_payload_size != mask_payload.GetSize(),
             "Invalid mask_payload_size"
         );
         SetColMaskPayload(std::move(mask_payload));
@@ -235,13 +235,13 @@ void SubcontactMatrixPayload::SetTilePayloads(const TilePayloads& payloads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) {
+void SubcontactMatrixPayload::SetRowMaskPayload(SubcontactMatrixMaskPayload&& payload) {
   row_mask_payload_ = payload;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload) {
+void SubcontactMatrixPayload::SetColMaskPayload(SubcontactMatrixMaskPayload&& payload) {
     // Set the column mask is only allowed for inter SCM
     if (!IsIntraScm()){
       col_mask_payload_ = payload;
@@ -320,7 +320,7 @@ size_t SubcontactMatrixPayload::GetSize() const{
         for (auto j = 0u; j< ntiles_in_col; j++){
             if (!IsIntraScm() || i<=j){
                 size += TILE_PAYLOAD_SIZE_LEN;
-                size += tile_payloads_[i][j].getSize();
+                size += tile_payloads_[i][j].GetSize();
             }
         }
     }
@@ -329,12 +329,12 @@ size_t SubcontactMatrixPayload::GetSize() const{
 
     if (row_mask_payload_.has_value()) {
         size += MASK_PAYLOAD_SIZE_LEN;
-        size += row_mask_payload_->getSize();
+        size += row_mask_payload_->GetSize();
     }
 
     if (!IsIntraScm() && col_mask_payload_.has_value()) {
         size += MASK_PAYLOAD_SIZE_LEN;
-        size += col_mask_payload_->getSize();
+        size += col_mask_payload_->GetSize();
     }
 
     return size;
@@ -352,11 +352,11 @@ void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
         for (auto j = 0u; j< GetNTilesInCol(); j++){
             if (!IsIntraScm() || i<=j){
                 auto& tile_payload = tile_payloads_[i][j];
-                auto tile_payload_size = tile_payload.getSize();
+                auto tile_payload_size = tile_payload.GetSize();
 
                 writer.WriteBypassBE(static_cast<uint32_t>(tile_payload_size));
 
-                tile_payload.write(writer);
+                tile_payload.Write(writer);
             }
         }
     }
@@ -367,15 +367,15 @@ void SubcontactMatrixPayload::Write(util::BitWriter &writer) const{
 //    }
 
     if (row_mask_payload_.has_value()){
-        auto row_mask_payload_size = row_mask_payload_->getSize();
+        auto row_mask_payload_size = row_mask_payload_->GetSize();
         writer.WriteBypassBE(static_cast<uint32_t>(row_mask_payload_size));
-        row_mask_payload_->write(writer);
+        row_mask_payload_->Write(writer);
     }
 
     if (!IsIntraScm() && col_mask_payload_.has_value()){
-        auto col_mask_payload_size = col_mask_payload_->getSize();
+        auto col_mask_payload_size = col_mask_payload_->GetSize();
         writer.WriteBypassBE(static_cast<uint32_t>(col_mask_payload_size));
-        col_mask_payload_->write(writer);
+        col_mask_payload_->Write(writer);
     }
 }
 

@@ -593,7 +593,7 @@ ZSTDLIB_API size_t ZSTD_readSkippableFrame(void* dst, size_t dstCapacity, unsign
     RETURN_ERROR_IF(skippableFrameSize < ZSTD_SKIPPABLEHEADERSIZE || skippableFrameSize > srcSize, srcSize_wrong, "");
     RETURN_ERROR_IF(skippableContentSize > dstCapacity, dstSize_tooSmall, "");
 
-    /* deliver payload */
+    /* deliver payload_ */
     if (skippableContentSize > 0  && dst != NULL)
         ZSTD_memcpy(dst, (const BYTE *)src + ZSTD_SKIPPABLEHEADERSIZE, skippableContentSize);
     if (magicVariant != NULL)
