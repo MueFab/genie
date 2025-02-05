@@ -30,7 +30,7 @@ class Decoder : public core::EntropyDecoder {
     /**
      * @brief Execute gabac library
      * @param conf Gabac configuration to use
-     * @param in subsequence payload
+     * @param in subsequence payload_
      * @param mmCoderEnabled if mismatch coder is enabled
      */
     static core::AccessUnit::Subsequence decompress(const gabac::EncodingConfiguration& conf,

@@ -101,7 +101,7 @@ struct EncodingBlock {
  * @brief Generates genotype parameters from an encoding block and options.
  *
  * Creates genotype parameters based on the given encoding options and block.
- * It sets up the parameters for variants and phases payload, including sorting and codec settings.
+ * It sets up the parameters for variants and phases payload_, including sorting and codec settings.
  *
  * @param opt The encoding options.
  * @param block The encoding block.
@@ -364,7 +364,7 @@ void bin_mat_to_bytes(
  * @param nrows The number of rows in the binary matrix.
  * @param ncols The number of columns in the binary matrix.
  * @param bin_mat The output binary matrix.
- * @throws std::runtime_error If the payload length is invalid.
+ * @throws std::runtime_error If the payload_ length is invalid.
  */
 void bin_mat_from_bytes(
     // Inputs

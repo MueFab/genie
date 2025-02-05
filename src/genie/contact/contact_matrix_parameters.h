@@ -19,8 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -143,7 +142,7 @@ class ContactMatrixParameters {
      *
      * @return The number of samples.
      */
-    uint16_t getNumSamples() const;
+    uint16_t GetNumSamples() const;
 
     /**
      * @brief Adds a sample.
@@ -152,7 +151,7 @@ class ContactMatrixParameters {
      *
      * @param sample_info The information of the sample to add.
      */
-    void addSample(SampleInformation&& sample_info);
+    [[maybe_unused]] void AddSample(SampleInformation&& sample_info);
 
     /**
      * @brief Adds a sample.
@@ -163,7 +162,7 @@ class ContactMatrixParameters {
      * @param name The name of the sample.
      * @param exist_ok If true, allows the addition if the sample already exists.
      */
-    void addSample(uint16_t ID, std::string&& name, bool exist_ok=true);
+    void AddSample(uint16_t ID, std::string&& name, bool exist_ok= true);
 
     /**
      * @brief Gets the samples.
@@ -172,20 +171,19 @@ class ContactMatrixParameters {
      *
      * @return A constant reference to the samples.
      */
-    const std::unordered_map<uint16_t, SampleInformation>& getSamples() const;
+    [[maybe_unused]] const std::unordered_map<uint16_t, SampleInformation>& GetSamples() const;
 
     /**
     * @brief Gets the sample name corresponding to the given sample ID.
     *
     * Retrieves the sample name from the sample information map using the provided sample ID.
     *
-    * @param _sample_ID The sample ID to retrieve the name for.
+    * @param sample_ID The sample ID to retrieve the name for.
     * @return A constant reference to the sample name.
     * @throws std::runtime_error If the sample ID does not exist in the sample information map.
     */
-    const std::string& getSampleName(
-        uint16_t
-    ) const;
+    const std::string& GetSampleName(
+        uint16_t sample_ID) const;
 
     /**
     * @brief Upserts a sample in the contact matrix parameters.
@@ -196,11 +194,10 @@ class ContactMatrixParameters {
     * @param name The sample name to upsert.
     * @param exist_ok If true, allows the sample to be updated if it already exists.
     */
-    void upsertSample(
+    void UpsertSample(
         uint16_t ID,
         const std::string& name,
-        bool exist_ok=true
-    );
+        bool exist_ok= true);
 
     /**
     * @brief Upserts a sample in the contact matrix parameters.
@@ -213,11 +210,10 @@ class ContactMatrixParameters {
     * @param exist_ok If true, allows the sample to be updated if it already exists.
     * @throws std::runtime_error If the sample ID already exists and exist_ok is false.
     */
-    void upsertSample(
+    void UpsertSample(
         uint16_t ID,
         std::string&& name,
-        bool exist_ok=true
-    );
+        bool exist_ok= true);
 
     /**
      * @brief Gets the number of chromosomes.
@@ -226,7 +222,7 @@ class ContactMatrixParameters {
      *
      * @return The number of chromosomes.
      */
-    uint8_t getNumChromosomes() const;
+    uint8_t GetNumChromosomes() const;
 
     /**
      * @brief Adds a chromosome.
@@ -235,7 +231,7 @@ class ContactMatrixParameters {
      *
      * @param chr_info The information of the chromosome to add.
      */
-    void addChromosome(ChromosomeInformation&& chr_info);
+    [[maybe_unused]] void AddChromosome(ChromosomeInformation&& chr_info);
 
     /**
      * @brief Upserts a chromosome.
@@ -247,19 +243,17 @@ class ContactMatrixParameters {
      * @param length The length of the chromosome
      *  @param exist_ok If true, allows the upsert if the chromosome already exists.
      */
-    void upsertChromosome(
+    void UpsertChromosome(
         uint8_t ID,
         const std::string& name,
         uint64_t length,
-        bool exist_ok=true
-    );
+        bool exist_ok= true);
 
-    void upsertChromosome(
+    void UpsertChromosome(
         uint8_t ID,
         std::string&& name,
         uint64_t length,
-        bool exist_ok=true
-    );
+        bool exist_ok= true);
 
     /**
      * @brief Gets the chromosomes.
@@ -268,7 +262,7 @@ class ContactMatrixParameters {
      *
      *  @return A constant reference to the chromosomes.
      */
-    const std::unordered_map<uint8_t, ChromosomeInformation>& getChromosomes() const;
+    const std::unordered_map<uint8_t, ChromosomeInformation>& GetChromosomes() const;
 
     /**
     * @brief Gets the length of a chromosome.
@@ -279,7 +273,7 @@ class ContactMatrixParameters {
     * @return The length of the chromosome.
     * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
     */
-    uint64_t getChromosomeLength(
+    uint64_t GetChromosomeLength(
         uint8_t chr_ID
     ) const;
 
@@ -290,7 +284,7 @@ class ContactMatrixParameters {
      *
      *  @return The bin size.
      */
-    uint32_t getBinSize() const;
+    uint32_t GetBinSize() const;
 
     /**
      * @brief Sets the bin size.
@@ -299,7 +293,7 @@ class ContactMatrixParameters {
      *
      *  @param _bin_size The bin size to set.
      */
-    void setBinSize(uint32_t _bin_size);
+    void SetBinSize(uint32_t _bin_size);
 
     /**
      * @brief Gets the tile size.
@@ -308,7 +302,7 @@ class ContactMatrixParameters {
      *
      *  @return The tile size.
      */
-    uint32_t getTileSize() const;
+    uint32_t GetTileSize() const;
 
     /**
      * @brief Sets the tile size.
@@ -317,7 +311,7 @@ class ContactMatrixParameters {
      *
      *  @param tile_size The tile size to set.
      */
-    void setTileSize(uint32_t tile_size);
+    void SetTileSize(uint32_t tile_size);
 
     /**
      * @brief Gets the number of interval multipliers.
@@ -326,9 +320,9 @@ class ContactMatrixParameters {
      *
      *  @return The number of interval multipliers.
      */
-    uint8_t getNumBinSizeMultipliers() const;
+    [[maybe_unused]] uint8_t GetNumBinSizeMultipliers() const;
 
-    void upsertBinSizeMultiplier(
+    void UpsertBinSizeMultiplier(
         size_t bin_size_multiplier
     );
 
@@ -341,7 +335,7 @@ class ContactMatrixParameters {
     * @return The length of the chromosome.
     * @throws std::runtime_error If the bin size is not set or the chromosome ID does not exist.
     */
-    bool isBinSizeMultiplierValid(
+    bool IsBinSizeMultiplierValid(
         size_t target_interv_mult
     ) const;
 
@@ -352,7 +346,7 @@ class ContactMatrixParameters {
      *
      *  @return The number of normalization methods.
      */
-    uint8_t getNumNormMethods() const;
+    uint8_t GetNumNormMethods() const;
 
     /**
      * @brief Adds a normalization method.
@@ -362,7 +356,7 @@ class ContactMatrixParameters {
      *  @param ID The ID of the normalization method.
      *  @param norm_method_info The information of the normalization method to add.
      */
-    void addNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
+    [[maybe_unused]] void AddNormMethod(uint8_t ID, NormalizationMethodInformation&& norm_method_info);
 
     /**
      * @brief Gets the normalization methods.
@@ -371,7 +365,7 @@ class ContactMatrixParameters {
      *
      * @return A constant reference to the normalization methods.
      */
-    const std::unordered_map<uint8_t, NormalizationMethodInformation>& getNormMethods() const;
+    [[maybe_unused]] const std::unordered_map<uint8_t, NormalizationMethodInformation>& GetNormMethods() const;
 
     /**
      * @brief Gets the number of normalized matrices.
@@ -380,7 +374,7 @@ class ContactMatrixParameters {
      *
      *   @return The number of normalized matrices.
      */
-    uint8_t getNumNormMats() const;
+    uint8_t GetNumNormMats() const;
 
     /**
      * @brief Adds a normalized matrix.
@@ -390,7 +384,7 @@ class ContactMatrixParameters {
      *  @param ID The ID of the normalized matrix.
      *  @param norm_mat_info The information of the normalized matrix to add.
      */
-    void addNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
+    [[maybe_unused]] void AddNormMat(uint8_t ID, NormalizedMatrixInformations&& norm_mat_info);
 
     /**
      * @brief Gets the normalized matrices.
@@ -399,7 +393,7 @@ class ContactMatrixParameters {
      *
      *   @return A constant reference to the normalized matrices.
      */
-    const std::unordered_map<uint8_t, NormalizedMatrixInformations>& getNormMats() const;
+    [[maybe_unused]] const std::unordered_map<uint8_t, NormalizedMatrixInformations>& GetNormMats() const;
 
     /**
      * @brief Gets the number of bin entries.
@@ -411,10 +405,9 @@ class ContactMatrixParameters {
      *
      * @return The number of bin entries.
      */
-    uint64_t getNumBinEntries(
+    uint64_t GetNumBinEntries(
         uint8_t chr_ID,
-        uint32_t interv_mult=1
-    );
+        uint32_t interv_mult= 1);
 
     /**
      * @brief Gets the number of tiles.
@@ -426,10 +419,9 @@ class ContactMatrixParameters {
      *
      * @return The number of tiles.
      */
-    uint32_t getNumTiles(
+    uint32_t GetNumTiles(
         uint8_t chr_ID,
-        uint32_t interv_mult=1
-    );
+        uint32_t interv_mult= 1);
 
     /**
      * @brief Gets the size of the object when written to a writer in bytes.
@@ -438,7 +430,7 @@ class ContactMatrixParameters {
      *
      * @return The size of the object when written to the writer.
      */
-    size_t getSize() const;
+    size_t GetSize() const;
 
     /**
      * @brief Writes the object to a writer.
@@ -447,7 +439,7 @@ class ContactMatrixParameters {
      *
      * @param writer The writer to write to.
      */
-    void write(core::Writer& writer) const;
+    void Write(core::Writer& writer) const;
 
     /**
      * @brief Overloaded operator to compare two ContactMatrixParameters objects
@@ -476,8 +468,7 @@ class ContactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contact
-}  // namespace genie
+}  // genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

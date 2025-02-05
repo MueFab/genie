@@ -22,8 +22,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +54,7 @@ struct RunLengthEncodingData {
 /**
  * @brief Extract run length encoding relevant information from mask.
  *
- * This function computes the relevant information for run-length encoding such as the rl_entries and transformID.
+ * This function computes the relevant information for run-length encoding such as the rl_entries_ and transformID.
  *
  * @param rleData The empty RunLengthEncodingData struct.
  * @param scm_mask The subcontact matrix mask.
@@ -116,7 +115,7 @@ void compute_masks(
 *
 * @param cm_param The contact matrix parameters.
 * @param scm_param The subcontact matrix parameters.
-* @param scm_payload The subcontact matrix payload to decode masks from.
+* @param scm_payload The subcontact matrix payload_ to decode masks from.
 * @param row_mask The output vector for the row mask.
 * @param col_mask The output vector for the column mask.
 */
@@ -133,13 +132,13 @@ void decode_scm_masks(
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Decodes a mask payload into a binary vector.
+ * @brief Decodes a mask payload_ into a binary vector.
  *
- * Decodes the mask payload into a binary vector based on the transform ID.
+ * Decodes the mask payload_ into a binary vector based on the transform ID.
  * If the transform ID is 0, it directly copies the mask array.
  * Otherwise, it decodes the run-length encoded entries and assigns the values accordingly.
  *
- * @param mask_payload The mask payload to decode.
+ * @param mask_payload The mask payload_ to decode.
  * @param num_entries The number of entries in the output mask.
  * @param mask The output binary vector for the decoded mask.
  * @throws std::runtime_error If the number of entries and the size of the mask array differ, or if the start index exceeds the number of entries.
@@ -368,7 +367,7 @@ void comp_start_end_ids(
 /**
  * @brief Converts a binary matrix to a byte array.
  *
- * This function takes a binary matrix (bin_mat) and converts it into a byte array (payload).
+ * This function takes a binary matrix (bin_mat) and converts it into a byte array (payload_).
  * The length of the byte array is stored in payload_len.
  *
  * @param bin_mat The binary matrix to be converted.
@@ -388,7 +387,7 @@ void bin_mat_to_bytes(
 /**
  * @brief Converts a byte array to a binary matrix.
  *
- * This function takes a byte array (payload) and converts it into a binary matrix (bin_mat).
+ * This function takes a byte array (payload_) and converts it into a binary matrix (bin_mat).
  * The byte array is assumed to be of length (payload_len) and represents a binary matrix with
  * (nrows) rows and (ncols) columns.
  *
@@ -413,7 +412,7 @@ void bin_mat_from_bytes(
 /**
  * @brief Encodes a binary matrix into a ContactMatrixTilePayload.
  *
- * Encodes the binary matrix using the specified codec ID and stores the result in the output tile payload.
+ * Encodes the binary matrix using the specified codec ID and stores the result in the output tile payload_.
  * Currently, only JBIG codec is supported.
  *
  * @param bin_mat The binary matrix to encode.
@@ -434,7 +433,7 @@ void encode_cm_tile(
 /**
  * @brief Decodes a ContactMatrixTilePayload into a binary matrix.
  *
- * Decodes the tile payload using the specified codec ID and stores the result in the output binary matrix.
+ * Decodes the tile payload_ using the specified codec ID and stores the result in the output binary matrix.
  * Currently, only JBIG codec is supported.
  *
  * @param tile_payload The ContactMatrixTilePayload object to decode.
@@ -517,7 +516,7 @@ void decode_scm(
  * @brief Encodes a subcontact matrix.
  *
  * This function encodes a subcontact matrix from a contact matrix. The function takes a contact matrix parameters object,
- * a contact record, and outputs a subcontact matrix parameters object and a subcontact matrix payload. The function also
+ * a contact record, and outputs a subcontact matrix parameters object and a subcontact matrix payload_. The function also
  * takes several options to remove unaligned regions, transform masks, enable diagonal transform, enable binarization,
  * and specify the codec ID. The default values for these options are true, true, true, true, and core::AlgoID::JBIG,
  * respectively.
@@ -525,7 +524,7 @@ void decode_scm(
  *     @param cm_param The contact matrix parameters.
  *     @param rec The contact record.
  *     @param scm_param The subcontact matrix parameters.
- *     @param scm_payload The subcontact matrix payload.
+ *     @param scm_payload The subcontact matrix payload_.
  *     @param remove_unaligned_region A flag indicating whether to remove unaligned regions. Default is true.
  *     @param transform_mask A flag indicating whether to transform the mask. Default is true.
  *     @param ena_diag_transform A flag indicating whether to enable diagonal transform. Default is true.
@@ -585,8 +584,7 @@ void encode_scm(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contact
-}  // namespace genie
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

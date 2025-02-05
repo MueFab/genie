@@ -65,10 +65,10 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, 
     : parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
       chr1_ID_(reader.ReadAlignedInt<uint8_t>()),
       chr2_ID_(reader.ReadAlignedInt<uint8_t>()) {
-    auto ntiles_in_row = cm_params.getNumTiles(chr1_ID_, 1);
+    auto ntiles_in_row = cm_params.GetNumTiles(chr1_ID_, 1);
     tile_parameters_.resize(ntiles_in_row);
 
-    auto ntiles_in_col = cm_params.getNumTiles(chr2_ID_, 1);
+    auto ntiles_in_col = cm_params.GetNumTiles(chr2_ID_, 1);
     for (auto& v : tile_parameters_) v.resize(ntiles_in_col);
 
     auto flags = reader.ReadAlignedInt<uint8_t>();

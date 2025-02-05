@@ -185,7 +185,7 @@ int mpegg_lzma_decompress(
         ec = 1; goto error;
     }
 
-    // finalize payload: set as null-terminated
+    // finalize payload_: set as null-terminated
     *(dstPtr + recLen) = '\0';
 
     // set vars to be returned

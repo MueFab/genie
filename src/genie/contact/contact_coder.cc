@@ -94,8 +94,8 @@ void decode_scm_masks(
     BinVecDtype& row_mask,
     BinVecDtype& col_mask
 ){
-    auto row_nentries = cm_param.getNumBinEntries(scm_param.GetChr1ID());
-    auto col_nentries = cm_param.getNumBinEntries(scm_param.GetChr2ID());
+    auto row_nentries = cm_param.GetNumBinEntries(scm_param.GetChr1ID());
+    auto col_nentries = cm_param.GetNumBinEntries(scm_param.GetChr2ID());
 
     if (scm_param.GetRowMaskExistsFlag()){
         decode_scm_mask_payload(scm_payload.GetRowMaskPayload(), row_nentries, row_mask);
@@ -121,19 +121,19 @@ void decode_scm_mask_payload(
     // Outputs
     BinVecDtype& mask
 ) {
-    auto transform_ID = mask_payload.getTransformID();
+    auto transform_ID = mask_payload.GetTransformID();
     if (transform_ID == TransformID::ID_0){
-        auto& mask_array = mask_payload.getMaskArray();
+        auto& mask_array = mask_payload.GetMaskArray();
         UTILS_DIE_IF(
             num_entries != mask_array.size(),
-            "num_entries and the size of mask_array differ!"
+            "num_entries and the size of mask_array_ differ!"
         );
         mask = xt::adapt(mask_array, {mask_array.size()});
     } else {
         mask.resize({num_entries});
 
-        bool first_val = mask_payload.getFirstVal();
-        auto& rl_entries = mask_payload.getRLEntries();
+        bool first_val = mask_payload.GetFirstVal();
+        auto& rl_entries = mask_payload.GetRlEntries();
 
         size_t start_idx = 0;
         size_t end_idx = 0;
@@ -778,8 +778,8 @@ void decode_cm_tile(
     unsigned long tile_ncols;
 
     if (codec_ID == core::AlgoID::JBIG){
-        compressed_data_len = tile_payload.getPayloadSize();
-        auto& payload = tile_payload.getPayload();
+        compressed_data_len = tile_payload.GetPayloadSize();
+        auto& payload = tile_payload.GetPayload();
 
         compressed_data = (uint8_t*)malloc(compressed_data_len * sizeof(uint8_t));
         memcpy(compressed_data, payload.data(), compressed_data_len);
@@ -807,8 +807,8 @@ void decode_cm_tile(
 
     } else {
 
-        tile_nrows = tile_payload.getTileNRows();
-        tile_ncols = tile_payload.getTileNCols();
+        tile_nrows = tile_payload.GetTileNRows();
+        tile_ncols = tile_payload.GetTileNCols();
 
         UTILS_DIE("Not yet implemented");
     }
@@ -986,12 +986,12 @@ void decode_scm(
     std::vector<uint64_t> end2;
     std::vector<uint32_t> counts;
 
-    auto bin_size = cm_param.getBinSize();
+    auto bin_size = cm_param.GetBinSize();
     auto target_bin_size = bin_size * bin_size_mult;
-    auto tile_size = cm_param.getTileSize();
+    auto tile_size = cm_param.GetTileSize();
 
     UTILS_DIE_IF(
-        !cm_param.isBinSizeMultiplierValid(bin_size_mult),
+        !cm_param.IsBinSizeMultiplierValid(bin_size_mult),
         "Bin size multiplier is invalid!"
     );
 
@@ -1004,15 +1004,15 @@ void decode_scm(
     auto row_mask_exists = scm_param.GetRowMaskExistsFlag();
     auto col_mask_exists = scm_param.GetColMaskExistsFlag();
 
-    auto chr1_len = cm_param.getChromosomeLength(chr1_ID);
-    auto chr1_num_bin_entries = cm_param.getNumBinEntries(chr1_ID);
-    auto chr2_len = cm_param.getChromosomeLength(chr2_ID);
-    auto chr2_num_bin_entries = cm_param.getNumBinEntries(chr2_ID);
-    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
-    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
+    auto chr1_len = cm_param.GetChromosomeLength(chr1_ID);
+    auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
+    auto chr2_len = cm_param.GetChromosomeLength(chr2_ID);
+    auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
+    auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
+    auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
     UTILS_DIE_IF(
-        !cm_param.isBinSizeMultiplierValid(bin_size_mult),
+        !cm_param.IsBinSizeMultiplierValid(bin_size_mult),
         "Bin size multiplier is not supported!"
     );
 
@@ -1045,7 +1045,7 @@ void decode_scm(
             auto diag_transform_mode = tile_param.diag_tranform_mode;
             bool is_intra_tile = is_intra_scm && (i_tile == j_tile);
 
-            if (tile_payload.getPayloadSize() == 0){
+            if (tile_payload.GetPayloadSize() == 0){
                 continue;
             }
 
@@ -1150,7 +1150,7 @@ void decode_scm(
 
     auto sample_ID = scm_payload.GetSampleID();
     rec.setSampleID(sample_ID);
-    auto sample_name = std::string(cm_param.getSampleName(sample_ID));
+    auto sample_name = std::string(cm_param.GetSampleName(sample_ID));
     rec.setSampleName(std::move(sample_name));
     rec.setChr1ID(chr1_ID);
     rec.setChr2ID(chr2_ID);
@@ -1187,17 +1187,17 @@ void encode_scm(
     BinVecDtype row_mask;
     BinVecDtype col_mask;
 
-    auto interval = cm_param.getBinSize();
-    auto tile_size = cm_param.getTileSize();
+    auto interval = cm_param.GetBinSize();
+    auto tile_size = cm_param.GetTileSize();
     auto num_entries = rec.getNumEntries();
     auto chr1_ID = rec.getChr1ID();
-    auto chr1_num_bin_entries = cm_param.getNumBinEntries(chr1_ID);
-    auto ntiles_in_row = cm_param.getNumTiles(chr1_ID);
+    auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
+    auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
     auto chr2_ID = rec.getChr2ID();
-    auto chr2_num_bin_entries = cm_param.getNumBinEntries(chr2_ID);
-    auto ntiles_in_col = cm_param.getNumTiles(chr2_ID);
+    auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
+    auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
-    cm_param.upsertSample(rec.getSampleID(), rec.getSampleName());
+    cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
     scm_payload.SetSampleId(rec.getSampleID());
 
     scm_param.SetChr1ID(chr1_ID);
@@ -1284,14 +1284,14 @@ void encode_scm(
                 std::move(row_mask)
             );
 
-            scm_payload.SetRowMaskPayload(std::move(row_mask));
+            scm_payload.SetRowMaskPayload(std::move(row_mask_payload));
             scm_param.SetRowMaskESetRowMaskExistsFlag(true);
 
             auto col_mask_payload = SubcontactMatrixMaskPayload(
                 std::move(col_mask)
             );
 
-            scm_payload.SetColMaskPayload(std::move(col_mask));
+            scm_payload.SetColMaskPayload(std::move(col_mask_payload));
             scm_param.SetColMaskExistsFlag(true);
         }
     }
@@ -1495,13 +1495,13 @@ void set_rle_information_from_mask(
 //) {
 //
 //    auto params = ContactMatrixParameters();
-//    params.setBinSize(opt.bin_size);
-//    params.setTileSize(opt.tile_size);
+//    params.SetBinSize(opt.bin_size);
+//    params.SetTileSize(opt.tile_size);
 //    std::map<uint8_t, SampleInformation> samples;
 //    std::map<uint8_t, ChromosomeInformation> chrs;
 //
 //    for (auto& rec: recs){
-//        auto rec_bin_size = rec.getBinSize();
+//        auto rec_bin_size = rec.GetBinSize();
 //        UTILS_DIE_IF(rec_bin_size != opt.bin_size, "Found record with different bin_size!");
 //
 //        if (rec.GetChr1ID() > rec.GetChr2ID())
@@ -1510,16 +1510,16 @@ void set_rle_information_from_mask(
 //        uint8_t chr1_ID_ = rec.GetChr1ID();
 //        uint8_t chr2_ID_ = rec.GetChr2ID();
 //
-//        auto sample_name = std::string(rec.getSampleName());
-//        params.addSample(rec.GetSampleID(), std::move(sample_name));
+//        auto sample_name = std::string(rec.GetSampleName());
+//        params.AddSample(rec.GetSampleID(), std::move(sample_name));
 //        auto chr1_name = std::string(rec.getChr1Name());
-//        params.upsertChromosome(
+//        params.UpsertChromosome(
 //            chr1_ID_,
 //            std::move(chr1_name),
 //            rec.getChr1Length()
 //        );
 //        auto chr2_name = std::string(rec.getChr2Name());
-//        params.upsertChromosome(
+//        params.UpsertChromosome(
 //            chr2_ID_,
 //            std::move(chr2_name),
 //            rec.getChr2Length()

@@ -21,25 +21,24 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
  * @class ContactMatrixTilePayload
  *
- * @brief This class represents a payload for a contact matrix tile.
+ * @brief This class represents a payload_ for a contact matrix tile.
  *
- * This class encapsulates the payload for a contact matrix tile.
- * It includes the codec ID, the number of rows and columns in the tile, and the payload itself.
+ * This class encapsulates the payload_ for a contact matrix tile.
+ * It includes the codec ID, the number of rows and columns in the tile, and the payload_ itself.
  */
 class ContactMatrixTilePayload {
   private:
-    core::AlgoID codec_ID;
-    uint32_t tile_nrows;
-    uint32_t tile_ncols;
-    std::vector<uint8_t> payload;
+    core::AlgoID codec_ID_;
+    uint32_t tile_nrows_;
+    uint32_t tile_ncols_;
+    std::vector<uint8_t> payload_;
 
   public:
 
@@ -108,7 +107,7 @@ class ContactMatrixTilePayload {
      * @param codec_ID The codec ID.
      * @param tile_nrows The number of rows in the tile.
      * @param tile_ncols The number of columns in the tile.
-     * @param payload The payload.
+     * @param payload The payload_.
      */
     ContactMatrixTilePayload(
         core::AlgoID codec_ID,
@@ -125,8 +124,8 @@ class ContactMatrixTilePayload {
      * @param codec_ID The codec ID.
      * @param tile_nrows The number of rows in the tile.
      * @param tile_ncols The number of columns in the tile.
-     * @param payload The address of the address of the payload.
-     * @param payload_len The length of the payload.
+     * @param payload The address of the address of the payload_.
+     * @param payload_len The length of the payload_.
      */
     ContactMatrixTilePayload(
         core::AlgoID codec_ID,
@@ -143,7 +142,7 @@ class ContactMatrixTilePayload {
      *
      * @return The Codec ID.
      */
-    core::AlgoID getCodecID() const;
+    [[nodiscard]] core::AlgoID GetCodecID() const;
 
     /**
      * @brief Get the number of rows in the tile.
@@ -152,7 +151,7 @@ class ContactMatrixTilePayload {
      *
      * @return The number of rows in the tile.
      */
-    uint32_t getTileNRows() const;
+    [[nodiscard]] uint32_t GetTileNRows() const;
 
     /**
      * @brief Get the number of columns in the tile.
@@ -161,16 +160,16 @@ class ContactMatrixTilePayload {
      *
      * @return The number of columns in the tile.
      */
-    uint32_t getTileNCols() const;
+    [[nodiscard]] uint32_t GetTileNCols() const;
 
     /**
-     * @brief Get the payload.
+     * @brief Get the payload_.
      *
-     * This function returns the payload.
+     * This function returns the payload_.
      *
-     * @return The payload.
+     * @return The payload_.
      */
-    const std::vector<uint8_t>& getPayload() const;
+    [[nodiscard]] const std::vector<uint8_t>& GetPayload() const;
 
     /**
      * @brief Set the Codec ID.
@@ -179,7 +178,7 @@ class ContactMatrixTilePayload {
      *
      * @param id The new Codec ID.
      */
-    void setCodecID(core::AlgoID id);
+    [[maybe_unused]] void SetCodecID(core::AlgoID id);
 
     /**
      * @brief Set the number of rows in the tile.
@@ -188,7 +187,7 @@ class ContactMatrixTilePayload {
      *
      * @param rows The new number of rows.
      */
-    void setTileNRows(uint32_t rows);
+    [[maybe_unused]] void SetTileNRows(uint32_t rows);
 
     /**
      * @brief Set the number of columns in the tile.
@@ -197,34 +196,34 @@ class ContactMatrixTilePayload {
      *
      * @param cols The new number of columns.
      */
-    void setTileNCols(uint32_t cols);
+    [[maybe_unused]] void SetTileNCols(uint32_t cols);
 
     /**
-     * @brief Set the payload.
+     * @brief Set the payload_.
      *
-     * This function sets the payload.
+     * This function sets the payload_.
      *
-     * @param data The new payload.
+     * @param data The new payload_.
      */
-    void setPayload(const std::vector<uint8_t>& data);
+    [[maybe_unused]] void SetPayload(const std::vector<uint8_t>& data);
 
     /**
-     * @brief Gets the size of the payload.
+     * @brief Gets the size of the payload_.
      *
-     * This function returns the size of the payload.
+     * This function returns the size of the payload_.
      *
-     * @return The size of the payload.
+     * @return The size of the payload_.
      */
-    size_t getPayloadSize() const;
+    [[nodiscard]] size_t GetPayloadSize() const;
 
     /**
      * @brief Gets the size of this structure.
      *
      * This function returns the size of this structure.
      *
-     * @return The size of the payload.
+     * @return The size of the payload_.
      */
-    size_t getSize() const;
+    [[nodiscard]] size_t GetSize() const;
 
     /**
      * @brief Writes the object to a writer.
@@ -233,13 +232,12 @@ class ContactMatrixTilePayload {
      *
      * @param writer The writer to write to.
      */
-    void write(util::BitWriter &writer) const;
+    void Write(util::BitWriter &writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-} // contact
-} // genie
+} // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -44,19 +44,19 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
             std::move(payload)
         );
 
-        ASSERT_EQ(orig_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(orig_obj.getTileNRows(), 0u);
-        ASSERT_EQ(orig_obj.getTileNCols(), 0u);
-        ASSERT_EQ(orig_obj.getPayloadSize(), PAYLOAD_SIZE);
-        ASSERT_EQ(orig_obj.getPayload(), PAYLOAD);
+        ASSERT_EQ(orig_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(orig_obj.GetTileNRows(), 0u);
+        ASSERT_EQ(orig_obj.GetTileNCols(), 0u);
+        ASSERT_EQ(orig_obj.GetPayloadSize(), PAYLOAD_SIZE);
+        ASSERT_EQ(orig_obj.GetPayload(), PAYLOAD);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
         auto tile_payload_size = obj_payload.str().size();
-        ASSERT_EQ(tile_payload_size, orig_obj.getSize());
+        ASSERT_EQ(tile_payload_size, orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -65,11 +65,11 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
             tile_payload_size
         );
 
-        ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(recon_obj.getTileNRows(), 0u);
-        ASSERT_EQ(recon_obj.getTileNCols(), 0u);
-        ASSERT_EQ(recon_obj.getPayloadSize(), PAYLOAD_SIZE);
-        ASSERT_EQ(recon_obj.getPayload(), PAYLOAD);
+        ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(recon_obj.GetTileNRows(), 0u);
+        ASSERT_EQ(recon_obj.GetTileNCols(), 0u);
+        ASSERT_EQ(recon_obj.GetPayloadSize(), PAYLOAD_SIZE);
+        ASSERT_EQ(recon_obj.GetPayload(), PAYLOAD);
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
@@ -94,19 +94,19 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
             std::move(payload)
         );
 
-        ASSERT_EQ(orig_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(orig_obj.getTileNRows(), NROWS);
-        ASSERT_EQ(orig_obj.getTileNCols(), NCOLS);
-        ASSERT_EQ(orig_obj.getPayloadSize(), PAYLOAD_SIZE);
-        ASSERT_EQ(orig_obj.getPayload(), PAYLOAD);
+        ASSERT_EQ(orig_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(orig_obj.GetTileNRows(), NROWS);
+        ASSERT_EQ(orig_obj.GetTileNCols(), NCOLS);
+        ASSERT_EQ(orig_obj.GetPayloadSize(), PAYLOAD_SIZE);
+        ASSERT_EQ(orig_obj.GetPayload(), PAYLOAD);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
         auto tile_payload_size = obj_payload.str().size();
-        ASSERT_EQ(tile_payload_size, orig_obj.getSize());
+        ASSERT_EQ(tile_payload_size, orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -115,11 +115,11 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
             tile_payload_size
         );
 
-        ASSERT_EQ(recon_obj.getCodecID(), CODEC_ID);
-        ASSERT_EQ(recon_obj.getTileNRows(), NROWS);
-        ASSERT_EQ(recon_obj.getTileNCols(), NCOLS);
-        ASSERT_EQ(recon_obj.getPayloadSize(), PAYLOAD_SIZE);
-        ASSERT_EQ(recon_obj.getPayload(), PAYLOAD);
+        ASSERT_EQ(recon_obj.GetCodecID(), CODEC_ID);
+        ASSERT_EQ(recon_obj.GetTileNRows(), NROWS);
+        ASSERT_EQ(recon_obj.GetTileNCols(), NCOLS);
+        ASSERT_EQ(recon_obj.GetPayloadSize(), PAYLOAD_SIZE);
+        ASSERT_EQ(recon_obj.GetPayload(), PAYLOAD);
 
         ASSERT_TRUE(orig_obj == recon_obj);
     }
@@ -142,15 +142,15 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             genie::contact::BinVecDtype orig_mask_arr = genie::contact::BinVecDtype(MASK_ARRAY);
 
             auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-            orig_obj.setTransformID(TRANSFORM_ID);
-            orig_obj.setMaskArray(orig_mask_arr);
+            orig_obj.SetTransformId(TRANSFORM_ID);
+            orig_obj.SetMaskArray(orig_mask_arr);
 
             auto obj_payload = std::stringstream();
             std::ostream& writer = obj_payload;
             auto bitwriter = genie::util::BitWriter(&writer);
-            orig_obj.write(bitwriter);
+            orig_obj.Write(bitwriter);
 
-            ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+            ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
             std::istream& reader = obj_payload;
             auto bitreader = genie::util::BitReader(reader);
@@ -159,12 +159,12 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
                 NUM_BIN_ENTRIES
             );
 
-            ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
+            ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.getMaskArray()[i], MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
             }
-            ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
-            ASSERT_EQ(recon_obj.anyRLEntries(), false);
+            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.AnyRlEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
         }
@@ -180,9 +180,9 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             auto obj_payload = std::stringstream();
             std::ostream& writer = obj_payload;
             auto bitwriter = genie::util::BitWriter(&writer);
-            orig_obj.write(bitwriter);
+            orig_obj.Write(bitwriter);
 
-            ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+            ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
             std::istream& reader = obj_payload;
             auto bitreader = genie::util::BitReader(reader);
@@ -191,12 +191,12 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
                 NUM_BIN_ENTRIES
             );
 
-            ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
+            ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
             for (auto i = 0u; i < NUM_BIN_ENTRIES; i++){
-                ASSERT_EQ(recon_obj.getMaskArray()[i], MASK_ARRAY(i));
+                ASSERT_EQ(recon_obj.GetMaskArray()[i], MASK_ARRAY(i));
             }
-            ASSERT_EQ(recon_obj.getFirstVal(), MASK_ARRAY(0));
-            ASSERT_EQ(recon_obj.anyRLEntries(), false);
+            ASSERT_EQ(recon_obj.GetFirstVal(), MASK_ARRAY(0));
+            ASSERT_EQ(recon_obj.AnyRlEntries(), false);
 
             ASSERT_TRUE(orig_obj == recon_obj);
         }
@@ -219,18 +219,14 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setRLEntries(
-            TRANSFORM_ID,
-            FIRST_VAL,
-            orig_rl_entries
-        );
+        orig_obj.SetRlEntries(TRANSFORM_ID, FIRST_VAL, orig_rl_entries);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -239,11 +235,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             NUM_BIN_ENTRIES
         );
 
-        ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.anyMaskArray());
-        ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
+        ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
+        ASSERT_FALSE(recon_obj.AnyMaskArray());
+        ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -266,17 +262,13 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setRLEntries(
-            TRANSFORM_ID,
-            FIRST_VAL,
-            orig_rl_entries
-        );
+        orig_obj.SetRlEntries(TRANSFORM_ID, FIRST_VAL, orig_rl_entries);
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -285,11 +277,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             NUM_BIN_ENTRIES
         );
 
-        ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.anyMaskArray());
-        ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
+        ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
+        ASSERT_FALSE(recon_obj.AnyMaskArray());
+        ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -312,18 +304,14 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
         auto orig_rl_entries = genie::contact::UIntVecDtype(RL_ENTRIES);
 
         auto orig_obj = genie::contact::SubcontactMatrixMaskPayload();
-        orig_obj.setRLEntries(
-            TRANSFORM_ID,
-            FIRST_VAL,
-            orig_rl_entries
-        );
+        orig_obj.SetRlEntries(TRANSFORM_ID, FIRST_VAL, orig_rl_entries);
 
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        orig_obj.write(bitwriter);
+        orig_obj.Write(bitwriter);
 
-        ASSERT_EQ(obj_payload.str().size(), orig_obj.getSize());
+        ASSERT_EQ(obj_payload.str().size(), orig_obj.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitreader = genie::util::BitReader(reader);
@@ -332,11 +320,11 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
             NUM_BIN_ENTRIES
         );
 
-        ASSERT_EQ(recon_obj.getTransformID(), TRANSFORM_ID);
-        ASSERT_FALSE(recon_obj.anyMaskArray());
-        ASSERT_EQ(recon_obj.getFirstVal(), FIRST_VAL);
+        ASSERT_EQ(recon_obj.GetTransformID(), TRANSFORM_ID);
+        ASSERT_FALSE(recon_obj.AnyMaskArray());
+        ASSERT_EQ(recon_obj.GetFirstVal(), FIRST_VAL);
         for (auto i = 0u; i < NUM_RL_ENTRIES; i++){
-            ASSERT_EQ(recon_obj.getRLEntries()[i], RL_ENTRIES(i));
+            ASSERT_EQ(recon_obj.GetRlEntries()[i], RL_ENTRIES(i));
         }
 
         ASSERT_TRUE(orig_obj == recon_obj);
@@ -366,39 +354,39 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
         // uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
-        ORIG_CM_PARAM.upsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
-        ORIG_CM_PARAM.upsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
-        ORIG_CM_PARAM.setBinSize(BIN_SIZE);
-        ORIG_CM_PARAM.setTileSize(TILE_SIZE);
-        ORIG_CM_PARAM.addSample(SAMPLE1_ID, std::string(SAMPLE1_NAME), true);
-        ORIG_CM_PARAM.addSample(SAMPLE2_ID, std::string(SAMPLE2_NAME), true);
+        ORIG_CM_PARAM.UpsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
+        ORIG_CM_PARAM.UpsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
+        ORIG_CM_PARAM.SetBinSize(BIN_SIZE);
+        ORIG_CM_PARAM.SetTileSize(TILE_SIZE);
+        ORIG_CM_PARAM.AddSample(SAMPLE1_ID, std::string(SAMPLE1_NAME), true);
+        ORIG_CM_PARAM.AddSample(SAMPLE2_ID, std::string(SAMPLE2_NAME), true);
 
-        ASSERT_EQ(ORIG_CM_PARAM.getBinSize(), BIN_SIZE);
-        ASSERT_EQ(ORIG_CM_PARAM.getTileSize(), TILE_SIZE);
-        ASSERT_EQ(ORIG_CM_PARAM.getNumSamples(), 2u);
-        ASSERT_EQ(ORIG_CM_PARAM.getChromosomeLength(CHR1_ID), CHR1_LEN);
-        ASSERT_EQ(ORIG_CM_PARAM.getChromosomeLength(CHR2_ID), CHR2_LEN);
-        ASSERT_EQ(ORIG_CM_PARAM.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
-        ASSERT_EQ(ORIG_CM_PARAM.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+        ASSERT_EQ(ORIG_CM_PARAM.GetBinSize(), BIN_SIZE);
+        ASSERT_EQ(ORIG_CM_PARAM.GetTileSize(), TILE_SIZE);
+        ASSERT_EQ(ORIG_CM_PARAM.GetNumSamples(), 2u);
+        ASSERT_EQ(ORIG_CM_PARAM.GetChromosomeLength(CHR1_ID), CHR1_LEN);
+        ASSERT_EQ(ORIG_CM_PARAM.GetChromosomeLength(CHR2_ID), CHR2_LEN);
+        ASSERT_EQ(ORIG_CM_PARAM.GetSampleName(SAMPLE1_ID), SAMPLE1_NAME);
+        ASSERT_EQ(ORIG_CM_PARAM.GetSampleName(SAMPLE2_ID), SAMPLE2_NAME);
 
         std::stringstream obj_payload;
         std::ostream& writer = obj_payload;
         auto CMWriter = genie::core::Writer(&writer);
-        ORIG_CM_PARAM.write(CMWriter);
+        ORIG_CM_PARAM.Write(CMWriter);
 
-        ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.getSize());
+        ASSERT_EQ(obj_payload.str().size(), ORIG_CM_PARAM.GetSize());
 
         std::istream& reader = obj_payload;
         auto bitReader = genie::util::BitReader(reader);
         auto recon_obj = genie::contact::ContactMatrixParameters(bitReader);
 
-        ASSERT_EQ(recon_obj.getBinSize(), BIN_SIZE);
-        ASSERT_EQ(recon_obj.getTileSize(), TILE_SIZE);
-        ASSERT_EQ(recon_obj.getNumSamples(), 2u);
-        ASSERT_EQ(recon_obj.getChromosomeLength(CHR1_ID), CHR1_LEN);
-        ASSERT_EQ(recon_obj.getChromosomeLength(CHR2_ID), CHR2_LEN);
-        ASSERT_EQ(recon_obj.getSampleName(SAMPLE1_ID), SAMPLE1_NAME);
-        ASSERT_EQ(recon_obj.getSampleName(SAMPLE2_ID), SAMPLE2_NAME);
+        ASSERT_EQ(recon_obj.GetBinSize(), BIN_SIZE);
+        ASSERT_EQ(recon_obj.GetTileSize(), TILE_SIZE);
+        ASSERT_EQ(recon_obj.GetNumSamples(), 2u);
+        ASSERT_EQ(recon_obj.GetChromosomeLength(CHR1_ID), CHR1_LEN);
+        ASSERT_EQ(recon_obj.GetChromosomeLength(CHR2_ID), CHR2_LEN);
+        ASSERT_EQ(recon_obj.GetSampleName(SAMPLE1_ID), SAMPLE1_NAME);
+        ASSERT_EQ(recon_obj.GetSampleName(SAMPLE2_ID), SAMPLE2_NAME);
 
         ASSERT_TRUE(ORIG_CM_PARAM==recon_obj);
     }
@@ -423,12 +411,12 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
-        ORIG_CM_PARAM.upsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
-        ORIG_CM_PARAM.upsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
-        ORIG_CM_PARAM.setBinSize(BIN_SIZE);
-        ORIG_CM_PARAM.setTileSize(TILE_SIZE);
-        auto NTILES_IN_ROW = ORIG_CM_PARAM.getNumTiles(CHR1_ID, MULTIPLIER);
-        auto NTILES_IN_COL = ORIG_CM_PARAM.getNumTiles(CHR2_ID, MULTIPLIER);
+        ORIG_CM_PARAM.UpsertChromosome(CHR1_ID, CHR1_NAME, CHR1_LEN);
+        ORIG_CM_PARAM.UpsertChromosome(CHR2_ID, CHR2_NAME, CHR2_LEN);
+        ORIG_CM_PARAM.SetBinSize(BIN_SIZE);
+        ORIG_CM_PARAM.SetTileSize(TILE_SIZE);
+        auto NTILES_IN_ROW = ORIG_CM_PARAM.GetNumTiles(CHR1_ID, MULTIPLIER);
+        auto NTILES_IN_COL = ORIG_CM_PARAM.GetNumTiles(CHR2_ID, MULTIPLIER);
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
         ORIG_SCM_PARAM.SetCodecID(CODEC_ID);
@@ -508,20 +496,14 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
         uint32_t MULTIPLIER = 1u;
 
         auto ORIG_CM_PARAM = genie::contact::ContactMatrixParameters();
-        ORIG_CM_PARAM.setBinSize(BIN_SIZE);
-        ORIG_CM_PARAM.setTileSize(TILE_SIZE);
-        ORIG_CM_PARAM.upsertChromosome(
-            static_cast<uint8_t>(CHR1_ID),
-            CHR1_NAME,
-            CHR1_LEN
-        );
-        ORIG_CM_PARAM.upsertChromosome(
-            static_cast<uint8_t>(CHR2_ID),
-            CHR2_NAME,
-            CHR2_LEN
-        );
-        auto NTILES_IN_ROW = ORIG_CM_PARAM.getNumTiles(CHR1_ID, MULTIPLIER);
-        auto NTILES_IN_COL = ORIG_CM_PARAM.getNumTiles(CHR2_ID, MULTIPLIER);
+        ORIG_CM_PARAM.SetBinSize(BIN_SIZE);
+        ORIG_CM_PARAM.SetTileSize(TILE_SIZE);
+        ORIG_CM_PARAM.UpsertChromosome(static_cast<uint8_t>(CHR1_ID), CHR1_NAME,
+                                       CHR1_LEN);
+        ORIG_CM_PARAM.UpsertChromosome(static_cast<uint8_t>(CHR2_ID), CHR2_NAME,
+                                       CHR2_LEN);
+        auto NTILES_IN_ROW = ORIG_CM_PARAM.GetNumTiles(CHR1_ID, MULTIPLIER);
+        auto NTILES_IN_COL = ORIG_CM_PARAM.GetNumTiles(CHR2_ID, MULTIPLIER);
 
         auto ORIG_SCM_PARAM = genie::contact::SubcontactMatrixParameters();
         ORIG_SCM_PARAM.SetCodecID(CODEC_ID);

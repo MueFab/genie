@@ -77,7 +77,7 @@ void DescriptorConfiguration::write(core::Writer& writer) const {
     } else if (descriptor_ID == AnnotDesc::LIKELIHOOD) {
         likelihood_parameters.write(writer);
     } else if (descriptor_ID == AnnotDesc::CONTACT) {
-        contact_matrix_parameters.write(writer);
+      contact_matrix_parameters.Write(writer);
         writer.Write(subcontract_matrix_parameters.size(), 16);
         for (auto& scm_params : subcontract_matrix_parameters)
           scm_params.Write(writer);

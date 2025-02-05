@@ -15,10 +15,9 @@ namespace contact {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ContactMatrixTilePayload::ContactMatrixTilePayload()
-    : codec_ID(core::AlgoID::JBIG),
-      tile_nrows(0),
-      tile_ncols(0),
-      payload()
+    : codec_ID_(core::AlgoID::JBIG), tile_nrows_(0),
+      tile_ncols_(0),
+      payload_()
 {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -26,14 +25,14 @@ ContactMatrixTilePayload::ContactMatrixTilePayload()
 ContactMatrixTilePayload::ContactMatrixTilePayload(
     const ContactMatrixTilePayload& other
 )
-    : codec_ID(other.codec_ID),
-      tile_nrows(other.tile_nrows),
-      tile_ncols(other.tile_ncols),
-      payload(other.payload) {
+    : codec_ID_(other.codec_ID_),
+      tile_nrows_(other.tile_nrows_),
+      tile_ncols_(other.tile_ncols_),
+      payload_(other.payload_) {
 
-    if (codec_ID == core::AlgoID::JBIG){
-        tile_nrows = 0;
-        tile_ncols = 0;
+    if (codec_ID_ == core::AlgoID::JBIG){
+      tile_nrows_ = 0;
+      tile_ncols_ = 0;
     }
 }
 
@@ -42,15 +41,15 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
 ContactMatrixTilePayload::ContactMatrixTilePayload(
     ContactMatrixTilePayload&& other
 ) noexcept
-    : codec_ID(other.codec_ID),
-      tile_nrows(other.tile_nrows),
-      tile_ncols(other.tile_ncols),
-      payload(std::move(other.payload))
+    : codec_ID_(other.codec_ID_),
+      tile_nrows_(other.tile_nrows_),
+      tile_ncols_(other.tile_ncols_),
+      payload_(std::move(other.payload_))
 {
 
-    if (codec_ID == core::AlgoID::JBIG){
-        tile_nrows = 0;
-        tile_ncols = 0;
+    if (codec_ID_ == core::AlgoID::JBIG){
+      tile_nrows_ = 0;
+      tile_ncols_ = 0;
     }
 }
 
@@ -61,10 +60,10 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 ) noexcept
 {
     if (this != &other) {
-        codec_ID = other.codec_ID;
-        tile_nrows = other.tile_nrows;
-        tile_ncols = other.tile_ncols;
-        payload = std::move(other.payload);
+      codec_ID_ = other.codec_ID_;
+      tile_nrows_ = other.tile_nrows_;
+      tile_ncols_ = other.tile_ncols_;
+      payload_ = std::move(other.payload_);
     }
     return *this;
 }
@@ -74,21 +73,21 @@ ContactMatrixTilePayload& ContactMatrixTilePayload::operator=(
 ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader, size_t payload_size){
     UTILS_DIE_IF(!reader.IsByteAligned(), "Must be byte-aligned");
 
-    codec_ID = reader.ReadAlignedInt<core::AlgoID>();
+    codec_ID_ = reader.ReadAlignedInt<core::AlgoID>();
     payload_size -= sizeof(uint8_t);
 
-    if (codec_ID == core::AlgoID::JBIG){
-        tile_nrows = 0;
-        tile_ncols = 0;
+    if (codec_ID_ == core::AlgoID::JBIG){
+      tile_nrows_ = 0;
+      tile_ncols_ = 0;
     } else {
-        tile_nrows = reader.ReadAlignedInt<uint32_t>();
-        tile_ncols = reader.ReadAlignedInt<uint32_t>();
+      tile_nrows_ = reader.ReadAlignedInt<uint32_t>();
+      tile_ncols_ = reader.ReadAlignedInt<uint32_t>();
         payload_size -= sizeof(uint32_t);
         payload_size -= sizeof(uint32_t);
     }
 
-    payload.resize(payload_size);
-    for (auto &v: payload){
+    payload_.resize(payload_size);
+    for (auto &v: payload_){
         v = reader.ReadAlignedInt<uint8_t>();
     }
 }
@@ -96,15 +95,15 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(util::BitReader &reader, size
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ContactMatrixTilePayload::operator==(const ContactMatrixTilePayload& other) const {
-    if (codec_ID != other.codec_ID)
+    if (codec_ID_ != other.codec_ID_)
         return false;
-    if (tile_nrows != other.tile_nrows)
+    if (tile_nrows_ != other.tile_nrows_)
         return false;
-    if (tile_ncols != other.tile_ncols)
+    if (tile_ncols_ != other.tile_ncols_)
         return false;
-    if (getPayloadSize() != other.getPayloadSize())
+    if (GetPayloadSize() != other.GetPayloadSize())
         return false;
-    if (payload != other.payload)
+    if (payload_ != other.payload_)
         return false;
 
     return true;
@@ -117,14 +116,14 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     uint32_t _tile_nrows,
     uint32_t _tile_ncols,
     std::vector<uint8_t>&& _payload
-): codec_ID(_codec_ID),
-   tile_nrows(_tile_nrows),
-   tile_ncols(_tile_ncols),
-   payload(std::move(_payload))
+): codec_ID_(_codec_ID),
+      tile_nrows_(_tile_nrows),
+      tile_ncols_(_tile_ncols),
+      payload_(std::move(_payload))
 {
-    if (codec_ID == core::AlgoID::JBIG){
-        tile_nrows = 0;
-        tile_ncols = 0;
+    if (codec_ID_ == core::AlgoID::JBIG){
+      tile_nrows_ = 0;
+      tile_ncols_ = 0;
     }
 }
 
@@ -136,50 +135,53 @@ ContactMatrixTilePayload::ContactMatrixTilePayload(
     uint32_t _tile_ncols,
     uint8_t** _payload,
     size_t _payload_len
-):  codec_ID(_codec_ID),
-    tile_nrows(_tile_nrows),
-    tile_ncols(_tile_ncols),
-    payload(*_payload, *(_payload) + _payload_len)
+): codec_ID_(_codec_ID),
+      tile_nrows_(_tile_nrows),
+      tile_ncols_(_tile_ncols),
+      payload_(*_payload, *(_payload) + _payload_len)
 {
     free(*_payload);
 
-    if (codec_ID == core::AlgoID::JBIG){
-        tile_nrows = 0;
-        tile_ncols = 0;
+    if (codec_ID_ == core::AlgoID::JBIG){
+      tile_nrows_ = 0;
+      tile_ncols_ = 0;
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AlgoID ContactMatrixTilePayload::getCodecID() const { return codec_ID; }
+core::AlgoID ContactMatrixTilePayload::GetCodecID() const { return codec_ID_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactMatrixTilePayload::getTileNRows() const { return tile_nrows; }
+uint32_t ContactMatrixTilePayload::GetTileNRows() const { return tile_nrows_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ContactMatrixTilePayload::getTileNCols() const { return tile_ncols; }
+uint32_t ContactMatrixTilePayload::GetTileNCols() const { return tile_ncols_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t>& ContactMatrixTilePayload::getPayload() const { return payload; }
+const std::vector<uint8_t>& ContactMatrixTilePayload::GetPayload() const { return payload_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::setCodecID(core::AlgoID id) { codec_ID = id; }
+[[maybe_unused]] void ContactMatrixTilePayload::SetCodecID(core::AlgoID id) { codec_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::setTileNRows(uint32_t rows) { tile_nrows = rows; }
+[[maybe_unused]] void ContactMatrixTilePayload::SetTileNRows(uint32_t rows) {
+  tile_nrows_ = rows; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::setTileNCols(uint32_t cols) { tile_ncols = cols; }
+[[maybe_unused]] void ContactMatrixTilePayload::SetTileNCols(uint32_t cols) {
+  tile_ncols_ = cols; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::setPayload(const std::vector<uint8_t>& data) {payload = data; }
+[[maybe_unused]] void ContactMatrixTilePayload::SetPayload(const std::vector<uint8_t>& data) {
+  payload_ = data; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -187,49 +189,49 @@ void ContactMatrixTilePayload::setPayload(const std::vector<uint8_t>& data) {pay
 //    uint8_t** _payload,
 //    size_t _payload_len
 //) {
-//    payload = std::move(*_payload, )
+//    payload_ = std::move(*_payload, )
 //    codec_ID_ = core::AlgoID::JBIG;
 //
 //    free(*_payload);
 //
 //    if (codec_ID_ == core::AlgoID::JBIG){
-//        tile_nrows = 0;
-//        tile_ncols = 0;
+//        tile_nrows_ = 0;
+//        tile_ncols_ = 0;
 //    }
 //}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ContactMatrixTilePayload::getPayloadSize() const { return payload.size(); }
+size_t ContactMatrixTilePayload::GetPayloadSize() const { return payload_.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t ContactMatrixTilePayload::getSize() const {
+size_t ContactMatrixTilePayload::GetSize() const {
     size_t size = 0;
     size += sizeof(uint8_t); // codec_ID_
 
-    if (codec_ID != core::AlgoID::JBIG){
-        // Adds tile_nrows, tile_ncols, and payload_size
-        size += sizeof(uint32_t); // tile_nrows
-        size += sizeof(uint32_t); // tile_ncols
+    if (codec_ID_ != core::AlgoID::JBIG){
+        // Adds tile_nrows_, tile_ncols_, and payload_size
+        size += sizeof(uint32_t); // tile_nrows_
+        size += sizeof(uint32_t); // tile_ncols_
     }
 
-    size += getPayloadSize();
+    size += GetPayloadSize();
     return size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ContactMatrixTilePayload::write(util::BitWriter &writer) const {
-    writer.WriteBypassBE(codec_ID);
+void ContactMatrixTilePayload::Write(util::BitWriter &writer) const {
+    writer.WriteBypassBE(codec_ID_);
 
-    if (codec_ID != core::AlgoID::JBIG){
-        writer.WriteBypassBE(tile_nrows);
-        writer.WriteBypassBE(tile_ncols);
+    if (codec_ID_ != core::AlgoID::JBIG){
+        writer.WriteBypassBE(tile_nrows_);
+        writer.WriteBypassBE(tile_ncols_);
     }
 
-    //writer.WriteBypassBE(static_cast<uint32_t>(getPayloadSize()));
-    for (auto v: payload) writer.WriteBypassBE<uint8_t>(v);
+    //writer.WriteBypassBE(static_cast<uint32_t>(GetPayloadSize()));
+    for (auto v: payload_) writer.WriteBypassBE<uint8_t>(v);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

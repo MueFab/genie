@@ -19787,7 +19787,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         // check that passed value is valid
         other.assert_invariant(false);
 
-        // invalidate payload
+        // invalidate payload_
         other.m_type = value_t::null;
         other.m_value = {};
 

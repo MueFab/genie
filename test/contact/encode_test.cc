@@ -814,26 +814,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -872,7 +863,7 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
                 genie::core::Writer tmp_corewriter(&tmp_writer);
-                cm_param.write(tmp_corewriter);
+                cm_param.Write(tmp_corewriter);
             }
         }
 
@@ -944,26 +935,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1071,26 +1053,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1183,26 +1156,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1320,26 +1284,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1432,26 +1387,17 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_All_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1587,27 +1533,18 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1702,27 +1639,18 @@ TEST(ContactCoder, RoundTrip_Coding_IntraSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1839,26 +1767,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -1951,26 +1870,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTile) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2096,27 +2006,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2171,10 +2072,10 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             size_t recon_num_entries = recon_rec.getNumEntries();
 
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_num_entries});
-            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_num_entries});
-            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype recon_counts = xt::adapt(recon_rec.getCounts(), {recon_num_entries});
 
@@ -2193,10 +2094,10 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
             size_t lr_num_entries = LR_REC.getNumEntries();
 
             genie::contact::UInt64VecDtype lr_start1 = xt::adapt(LR_REC.getStartPos1(), {lr_num_entries});
-            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype lr_start2 = xt::adapt(LR_REC.getStartPos2(), {lr_num_entries});
-            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype lr_counts = xt::adapt(LR_REC.getCounts(), {lr_num_entries});
 
@@ -2216,10 +2117,10 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
                 size_t hr_num_entries = REC.getNumEntries();
 
                 genie::contact::UInt64VecDtype hr_start1 = xt::adapt(REC.getStartPos1(), {hr_num_entries});
-                genie::contact::UInt64VecDtype hr_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+                genie::contact::UInt64VecDtype hr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
                 genie::contact::UInt64VecDtype hr_start2 = xt::adapt(REC.getStartPos2(), {hr_num_entries});
-                genie::contact::UInt64VecDtype hr_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+                genie::contact::UInt64VecDtype hr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
                 genie::contact::UInt64VecDtype hr_counts = xt::adapt(REC.getCounts(), {hr_num_entries});
 
@@ -2290,27 +2191,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_SingleTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2428,26 +2320,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2541,26 +2424,17 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2696,27 +2570,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -2771,10 +2636,10 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             size_t recon_num_entries = recon_rec.getNumEntries();
 
             genie::contact::UInt64VecDtype recon_start1 = xt::adapt(recon_rec.getStartPos1(), {recon_num_entries});
-            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype recon_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype recon_start2 = xt::adapt(recon_rec.getStartPos2(), {recon_num_entries});
-            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype recon_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype recon_counts = xt::adapt(recon_rec.getCounts(), {recon_num_entries});
 
@@ -2793,10 +2658,10 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
             size_t lr_num_entries = LR_REC.getNumEntries();
 
             genie::contact::UInt64VecDtype lr_start1 = xt::adapt(LR_REC.getStartPos1(), {lr_num_entries});
-            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype lr_row_ids = recon_start1 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype lr_start2 = xt::adapt(LR_REC.getStartPos2(), {lr_num_entries});
-            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.getBinSize() / MULT;
+            genie::contact::UInt64VecDtype lr_col_ids = recon_start2 / cm_param.GetBinSize() / MULT;
 
             genie::contact::UInt64VecDtype lr_counts = xt::adapt(LR_REC.getCounts(), {lr_num_entries});
 
@@ -2865,27 +2730,18 @@ TEST(ContactCoder, RoundTrip_Coding_InterSCM_Raw_MultTiles_Downscale){
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
-        cm_param.upsertBinSizeMultiplier(MULT);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
+        cm_param.UpsertBinSizeMultiplier(MULT);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3001,26 +2857,29 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
 
         // Configure transformID, FirstVal, etc. for scm_mask_payload
         auto test_scm_mask_payload = genie::contact::SubcontactMatrixMaskPayload();
-        test_scm_mask_payload.setMaskArray(dummy_mask);
-        test_scm_mask_payload.setRLEntries(test_rle_data.transformID, test_rle_data.firstVal, test_rle_data.rl_entries);
+        test_scm_mask_payload.SetMaskArray(dummy_mask);
+        test_scm_mask_payload.SetRlEntries(test_rle_data.transformID,
+                                           test_rle_data.firstVal,
+                                           test_rle_data.rl_entries);
 
         // recast
         std::vector<uint32_t> rleEntriesAsVector(test_rle_data.rl_entries.data(),
             test_rle_data.rl_entries.data() + test_rle_data.rl_entries.size());
 
         // various preliminary structural checks
-        ASSERT_EQ(test_scm_mask_payload.getFirstVal(), test_rle_data.firstVal);
-        //ASSERT_EQ(test_scm_mask_payload.getMaskArray(), test_vector);
-        ASSERT_EQ(test_scm_mask_payload.getTransformID(), test_rle_data.transformID);
-        ASSERT_EQ(test_scm_mask_payload.getRLEntries(), rleEntriesAsVector);
+        ASSERT_EQ(test_scm_mask_payload.GetFirstVal(), test_rle_data.firstVal);
+        //ASSERT_EQ(test_scm_mask_payload.GetMaskArray(), test_vector);
+        ASSERT_EQ(test_scm_mask_payload.GetTransformID(), test_rle_data.transformID);
+        ASSERT_EQ(test_scm_mask_payload.GetRlEntries(), rleEntriesAsVector);
 
         // Write scm mask paylaod into stringstream
         auto obj_payload = std::stringstream();
         std::ostream& writer = obj_payload;
         auto bitwriter = genie::util::BitWriter(&writer);
-        test_scm_mask_payload.write(bitwriter);
+        test_scm_mask_payload.Write(bitwriter);
 
-        ASSERT_TRUE(obj_payload.str().size() == test_scm_mask_payload.getSize());
+        ASSERT_TRUE(obj_payload.str().size() ==
+                    test_scm_mask_payload.GetSize());
 
         // Read
         std::istream& reader = obj_payload;
@@ -3029,9 +2888,11 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             bitreader, static_cast < uint32_t>(test_vector.size())
         );
 
-        ASSERT_EQ(test_scm_mask_payload.getFirstVal(), recon_obj.getFirstVal());
-        ASSERT_EQ(test_scm_mask_payload.getTransformID(), recon_obj.getTransformID());
-        ASSERT_EQ(test_scm_mask_payload.getRLEntries(), recon_obj.getRLEntries());
+        ASSERT_EQ(test_scm_mask_payload.GetFirstVal(), recon_obj.GetFirstVal());
+        ASSERT_EQ(test_scm_mask_payload.GetTransformID(),
+                  recon_obj.GetTransformID());
+        ASSERT_EQ(test_scm_mask_payload.GetRlEntries(),
+                  recon_obj.GetRlEntries());
 
         // Decode the RLE in scm_mask_payload
         genie::contact::BinVecDtype recon_mask_array;
@@ -3078,26 +2939,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3137,7 +2989,7 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
             {
                 std::ofstream tmp_writer(out_path + "case01-cm_param.bin", std::ios::binary);
                 genie::core::Writer tmp_corewriter(&tmp_writer);
-                cm_param.write(tmp_corewriter);
+                cm_param.Write(tmp_corewriter);
             }
         }
 
@@ -3211,26 +3063,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3319,26 +3162,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3431,26 +3265,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3547,26 +3372,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3659,26 +3475,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec : RECS) {
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3767,26 +3574,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
@@ -3880,26 +3678,17 @@ TEST(ContactCoder, RoundTrip_Coding_RLESubcontactMatrixPayload) {
         auto scm_param = genie::contact::SubcontactMatrixParameters();
         auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-        cm_param.setBinSize(RECS.front().getBinSize());
-        cm_param.setTileSize(TILE_SIZE);
+        cm_param.SetBinSize(RECS.front().getBinSize());
+        cm_param.SetTileSize(TILE_SIZE);
 
         for (auto& rec: RECS){
-            cm_param.upsertSample(
-                rec.getSampleID(),
-                rec.getSampleName()
-            );
+          cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
 
-            cm_param.upsertChromosome(
-                rec.getChr1ID(),
-                rec.getChr1Name(),
-                rec.getChr1Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
+                                      rec.getChr1Length());
 
-            cm_param.upsertChromosome(
-                rec.getChr2ID(),
-                rec.getChr2Name(),
-                rec.getChr2Length()
-            );
+            cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
+                                      rec.getChr2Length());
         }
 
         auto& REC = RECS.front();
