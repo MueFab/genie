@@ -20,6 +20,7 @@
 
 #include "genie/read/basecoder/encoder_stub.h"
 
+#include <iostream>
 #include <string>
 #include <utility>
 

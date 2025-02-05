@@ -3,11 +3,14 @@ project("genie-sam")
 set(source_files
         exporter.cc
         importer.cc
-        sam_to_mgrec/sam_group.cc
-        sam_to_mgrec/sam_reader.cc
-        sam_to_mgrec/sam_record.cc
-        sam_to_mgrec/sorter.cc
-        sam_to_mgrec/transcoder.cc
+        sam_reader.cc
+        sam_record.cc
+        sam_sorter.cc
+        pair_matcher.h
+        pair_matcher.cc
+        unmapped_record_matcher.h
+        unmapped_record_matcher.cc
+        record_queue.impl.h
 )
 
 add_library(genie-sam ${source_files})

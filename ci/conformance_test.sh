@@ -63,7 +63,7 @@ if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; t
     echo "*** SAM"
     # Get sam file
     curl -L \
-        https://seafile.cloud.uni-hannover.de/f/ed4f5f9570d14c9b9d24/?dl=1  \
+        https://seafile.cloud.uni-hannover.de/f/5d75e956fdbc4d3486c4/?dl=1  \
         --output /tmp/NA12878_S1_chr22_trunc.sam.gz \
         || { echo 'Could not download sam file!' ; exit 1; }
     gzip -df /tmp/NA12878_S1_chr22_trunc.sam.gz
