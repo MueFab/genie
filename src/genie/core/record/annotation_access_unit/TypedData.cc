@@ -91,26 +91,27 @@ void TypedData::convertToTypedData(std::vector<std::vector<std::vector<CustomTyp
 }
 
 void TypedData::write(core::Writer& outputWriter) const {
-    outputWriter.write(static_cast<uint8_t>(data_type_ID), 8);
-    outputWriter.write(num_array_dims, 2);
+  outputWriter.Write(static_cast<uint8_t>(data_type_ID), 8);
+    outputWriter.Write(num_array_dims, 2);
     uint64_t n_elements = 1;
     for (uint64_t i = 0; i < num_array_dims; ++i) {
-        outputWriter.write(array_dims[i], 32);
+      outputWriter.Write(array_dims[i], 32);
         n_elements = n_elements * array_dims[i];
     }
 
     if (!compressedDataStream.str().empty()) {
         bool encoded = true;
-        outputWriter.write(encoded, 1);
+        outputWriter.Write(encoded, 1);
         auto size = compressedDataStream.str().size();
-        outputWriter.write(size, 32);
-        outputWriter.write(const_cast<std::stringstream*>(&compressedDataStream));
+        outputWriter.Write(size, 32);
+        outputWriter.Write(
+            const_cast<std::stringstream*>(&compressedDataStream));
     } else {
         bool encoded = false;
-        outputWriter.write(encoded, 1);
-        outputWriter.write(const_cast<std::stringstream*>(&dataStream));
+        outputWriter.Write(encoded, 1);
+        outputWriter.Write(const_cast<std::stringstream*>(&dataStream));
     }
-    outputWriter.flush();
+    outputWriter.Flush();
 }
 
 }  // namespace annotation_access_unit

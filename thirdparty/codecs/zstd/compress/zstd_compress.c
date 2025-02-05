@@ -5682,7 +5682,7 @@ size_t ZSTD_compressStream2( ZSTD_CCtx* cctx,
                     break;
             } else {
                 assert(endOp == ZSTD_e_flush || endOp == ZSTD_e_end);
-                /* We require maximal progress. We're done when the flush is complete or the
+                /* We require maximal progress. We're done when the Flush is complete or the
                  * output buffer is full.
                  */
                 if (flushMin == 0 || output->pos == output->size)

@@ -70,7 +70,7 @@ void Block::set(BlockData& blockData) {
 
 size_t Block::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 }  // namespace annotation_access_unit

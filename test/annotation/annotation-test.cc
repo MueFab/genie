@@ -188,7 +188,7 @@ TEST_P(AnnotationTests, annotationGeno) {
         false,                                       // transpose_mat;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
-        genie::core::AlgoID::JBIG                    // codec_ID;
+        genie::core::AlgoID::JBIG                    // codec_ID_;
     };
 
     ASSERT_FALSE(!std::filesystem::is_regular_file(inputFilename));

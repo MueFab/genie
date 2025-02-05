@@ -111,7 +111,7 @@ TEST_F(TileStructureTests, TileStructureRandom) {  // NOLINT(cert-err58-cpp)
     genie::util::BitReader testReader(InOut);
 
     tileStructure.write(testWriter);
-    testWriter.flush();
+    testWriter.Flush();
     tileStructureCheck.read(testReader, ATCoordSize, two_dimensional);
 
     std::stringstream checkOut;

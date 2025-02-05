@@ -93,7 +93,7 @@ class TypedData {
     std::stringstream& getDataStream() { return dataStream; }
 
     std::stringstream& getdata() {
-        writer.flush();
+      writer.Flush();
         return dataStream;
     }
     std::stringstream& getCompresseddata() { return compressedDataStream; }
@@ -102,12 +102,13 @@ class TypedData {
         compressedDataStream.str("");
         compressedDataStream.clear();
         genie::core::Writer compressedWriter(const_cast<std::stringstream*>(&compressedDataStream));
-        compressedWriter.write(&_compressed_data_block);
+        compressedWriter.Write(&_compressed_data_block);
     }
 
     void setCompressedData(std::vector<uint8_t>& _compressed_data_block) {
         genie::core::Writer compressedWriter(&compressedDataStream);
-        for (auto byte : _compressed_data_block) compressedWriter.write(byte, 8);
+        for (auto byte : _compressed_data_block)
+          compressedWriter.Write(byte, 8);
     }
 
     void write(core::Writer& writer) const;

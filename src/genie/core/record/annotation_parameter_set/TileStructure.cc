@@ -119,25 +119,26 @@ void TileStructure::read(util::BitReader& reader) {
 }
 
 void TileStructure::write(core::Writer& writer) const {
-    writer.write_reserved(7);
-    writer.write(variable_size_tiles, 1);
-    writer.write(n_tiles, coordSizeInBits(ATCoordSize));
+  writer.WriteReserved(7);
+    writer.Write(variable_size_tiles, 1);
+    writer.Write(n_tiles, coordSizeInBits(ATCoordSize));
 
     auto dimensions = two_dimensional ? 2 : 1;
     if (variable_size_tiles) {
         for (uint64_t i = 0; i < n_tiles; ++i)
             for (auto j = 0; j < dimensions; ++j) {
-                writer.write(start_index[i][j], coordSizeInBits(ATCoordSize));
-                writer.write(end_index[i][j], coordSizeInBits(ATCoordSize));
+              writer.Write(start_index[i][j], coordSizeInBits(ATCoordSize));
+                writer.Write(end_index[i][j], coordSizeInBits(ATCoordSize));
             }
     } else {
-        for (auto j = 0; j < dimensions; ++j) writer.write(tile_size[j], coordSizeInBits(ATCoordSize));
+        for (auto j = 0; j < dimensions; ++j)
+          writer.Write(tile_size[j], coordSizeInBits(ATCoordSize));
     }
 }
 
 size_t TileStructure::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

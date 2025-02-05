@@ -660,7 +660,7 @@ typedef struct ZSTD_outBuffer_s {
 *  flush operation is the same, and follows same rules as calling ZSTD_compressStream2() with ZSTD_e_flush.
 *  You must continue calling ZSTD_compressStream2() with ZSTD_e_end until it returns 0, at which point you are free to
 *  start a new frame.
-*  note: ZSTD_e_end will flush as much output as possible, meaning when compressing with multiple threads, it will
+*  note: ZSTD_e_end will Flush as much output as possible, meaning when compressing with multiple threads, it will
 *        block until the FlushHeldBits is complete or the output buffer is full.
 *  @return : 0 if frame fully completed and fully flushed,
 *            >0 if some data still present within internal buffer (the value is minimal estimation of remaining size),
@@ -680,12 +680,12 @@ typedef enum {
     ZSTD_e_flush=1,    /* FlushHeldBits any data provided so far,
                         * it creates (at least) one new block, that can be decoded immediately on reception;
                         * frame will continue: any future data can still reference previously compressed data, improving compression.
-                        * note : multithreaded compression will block to flush as much output as possible. */
+                        * note : multithreaded compression will block to Flush as much output as possible. */
     ZSTD_e_end=2       /* FlushHeldBits any remaining data _and_ close current frame.
                         * note that frame is only closed after compressed data is fully flushed (return value == 0).
                         * After that point, any additional data starts a new frame.
                         * note : each frame is independent (does not reference any content from previous frame).
-                        : note : multithreaded compression will block to flush as much output as possible. */
+                        : note : multithreaded compression will block to Flush as much output as possible. */
 } ZSTD_EndDirective;
 
 /*! ZSTD_compressStream2() : Requires v1.4.0+
@@ -777,7 +777,7 @@ ZSTDLIB_API size_t ZSTD_endStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output);
 *  The function will update both `pos` fields.
 *  If `input.pos < input.size`, some input has not been consumed.
 *  It's up to the caller to present again remaining data.
-*  The function tries to flush all data decoded immediately, respecting output buffer size.
+*  The function tries to Flush all data decoded immediately, respecting output buffer size.
 *  If `output.pos < output.size`, decoder has flushed everything it could.
 *  But if `output.pos == output.size`, there might be some data left within internal buffers.,
 *  In which case, call ZSTD_decompressStream() again to FlushHeldBits whatever remains in the buffer.
@@ -1832,7 +1832,7 @@ ZSTDLIB_STATIC_API size_t ZSTD_CCtx_refPrefix_advanced(ZSTD_CCtx* cctx, const vo
  * Tells the compressor that the ZSTD_inBuffer will ALWAYS be the same
  * between calls, except for the modifications that zstd makes to pos (the
  * caller must not modify pos). This is checked by the compressor, and
- * compression will fail if it ever changes. This means the only flush
+ * compression will fail if it ever changes. This means the only Flush
  * mode that makes sense is ZSTD_e_end, so zstd will error if ZSTD_e_end
  * is not used. The data in the ZSTD_inBuffer in the range [src, src + pos)
  * MUST not be modified during compression or you will get data corruption.

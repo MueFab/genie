@@ -54,14 +54,14 @@ class AttributeTile {
 
     std::stringstream& getTile(uint64_t tilenr) {
         if (tilenr == tiles.size() - 1) {
-            writers.back().flush();
+          writers.back().Flush();
         }
         return tiles.at(tilenr);
     }
 
     void write(std::vector<std::vector<uint8_t>> value);
 
-    uint64_t getCurrentsize() const {return  writers.back().getBitsWritten(); }
+    uint64_t getCurrentsize() const {return writers.back().GetBitsWritten(); }
     void writeMissing();
 
     std::vector<std::stringstream> convertTilesToTypedData();

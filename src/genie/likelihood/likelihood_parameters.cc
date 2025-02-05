@@ -42,15 +42,15 @@ void LikelihoodParameters::read(util::BitReader& reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LikelihoodParameters::write(genie::core::Writer& writer) const {
-    writer.write(num_gl_per_sample, 8);
-    writer.write(transform_flag, 1);
-    if (transform_flag) writer.write(static_cast<uint8_t>(dtype_id), 8);
+  writer.Write(num_gl_per_sample, 8);
+    writer.Write(transform_flag, 1);
+    if (transform_flag) writer.Write(static_cast<uint8_t>(dtype_id), 8);
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t LikelihoodParameters::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

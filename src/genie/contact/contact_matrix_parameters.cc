@@ -135,19 +135,19 @@ ContactMatrixParameters::ContactMatrixParameters(util::BitReader& reader){
 
 //    auto num_scm = reader.ReadAlignedInt<uint16_t>();
 //    for (uint16_t i = 0; i<num_scm; i++){
-//        auto chr1_ID = reader.ReadAlignedInt<uint8_t>();
-//        auto chr2_ID = reader.ReadAlignedInt<uint8_t>();
+//        auto chr1_ID_ = reader.ReadAlignedInt<uint8_t>();
+//        auto chr2_ID_ = reader.ReadAlignedInt<uint8_t>();
 
 //        auto scm_param =
 //            SubcontactMatrixParameters(
 //            reader,
-//            chr1_ID,
-//            chr2_ID,
-//            getNumTiles(chr1_ID),
-//            getNumTiles(chr2_ID)
+//            chr1_ID_,
+//            chr2_ID_,
+//            getNumTiles(chr1_ID_),
+//            getNumTiles(chr2_ID_)
 //        );
 //
-//        auto chr_pair = ChrIDPair(chr1_ID, chr2_ID);
+//        auto chr_pair = ChrIDPair(chr1_ID_, chr2_ID_);
 //        UTILS_DIE_IF(scm_params.find(chr_pair) != scm_params.end(), "Chromosome pair already exist!");
 //        scm_params.emplace(chr_pair, std::move(scm_param));
 //    }
@@ -160,7 +160,7 @@ uint16_t ContactMatrixParameters::getNumSamples() const { return static_cast<uin
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ContactMatrixParameters::addSample(SampleInformation&& sample_info) {
-    UTILS_DIE_IF(sample_infos.find(sample_info.ID) != sample_infos.end(), "sample_ID already exists!");
+    UTILS_DIE_IF(sample_infos.find(sample_info.ID) != sample_infos.end(), "sample_ID_ already exists!");
     sample_infos.emplace(sample_info.ID, std::move(sample_info));
 }
 
@@ -173,9 +173,9 @@ void ContactMatrixParameters::addSample(uint16_t ID, std::string&& name, bool ex
         sample_infos.emplace(ID, std::move(sample_info));
     } else if (exist_ok){
         UTILS_DIE_IF(it->second.name != name,
-                     "name differs for the same sample_ID");
+                     "name differs for the same sample_ID_");
     } else{
-        UTILS_DIE("sample_ID already exists!");
+        UTILS_DIE("sample_ID_ already exists!");
     }
 }
 
@@ -189,7 +189,7 @@ const std::string& ContactMatrixParameters::getSampleName(
     uint16_t _sample_ID
 ) const{
     auto sample_obj = sample_infos.find(_sample_ID);
-    UTILS_DIE_IF(sample_obj == sample_infos.end(), "sample_ID does not exist!");
+    UTILS_DIE_IF(sample_obj == sample_infos.end(), "sample_ID_ does not exist!");
 
     return sample_obj->second.name;
 }
@@ -486,43 +486,43 @@ size_t ContactMatrixParameters::getSize() const {
 
 //TODO(yeremia): use util::Bitwriter instead of core::Writer
 void ContactMatrixParameters::write(core::Writer& writer) const {
-    writer.write(static_cast<uint16_t>(sample_infos.size()),16);
+  writer.Write(static_cast<uint16_t>(sample_infos.size()), 16);
     for(const auto& sample_info : sample_infos) {
-        writer.write(sample_info.second.ID, 16);
-        writer.write(static_cast<uint16_t>(sample_info.second.name.size()), 8);
-        writer.write(sample_info.second.name);
+      writer.Write(sample_info.second.ID, 16);
+        writer.Write(static_cast<uint16_t>(sample_info.second.name.size()), 8);
+        writer.Write(sample_info.second.name);
     }
 
-    writer.write(static_cast<uint8_t>(chr_infos.size()),8);
+    writer.Write(static_cast<uint8_t>(chr_infos.size()), 8);
     for(const auto& chr_info : chr_infos) {
-        writer.write(chr_info.second.ID, 8);
-        writer.write(static_cast<uint16_t>(chr_info.second.name.size()), 8);
-        writer.write(chr_info.second.name);
-        writer.write(chr_info.second.length, 64);
+      writer.Write(chr_info.second.ID, 8);
+        writer.Write(static_cast<uint16_t>(chr_info.second.name.size()), 8);
+        writer.Write(chr_info.second.name);
+        writer.Write(chr_info.second.length, 64);
     }
 
-    writer.write(bin_size, 32);
-    writer.write(tile_size, 32);
+    writer.Write(bin_size, 32);
+    writer.Write(tile_size, 32);
 
-    writer.write(static_cast<uint8_t>(bin_size_multipliers.size()),8);
+    writer.Write(static_cast<uint8_t>(bin_size_multipliers.size()), 8);
     for(const auto& bin_size_multiplier : bin_size_multipliers) {
-        writer.write(bin_size_multiplier, 32);
+      writer.Write(bin_size_multiplier, 32);
     }
 
-    writer.write(static_cast<uint8_t>(norm_method_infos.size()),8);
+    writer.Write(static_cast<uint8_t>(norm_method_infos.size()), 8);
     for(const auto& method_info : norm_method_infos) {
-        writer.write(method_info.second.ID, 8);
-        writer.write(static_cast<uint16_t>(method_info.second.name.size()), 8);
-        writer.write(method_info.second.name);
-        writer.write_reserved(7);
-        writer.write(method_info.second.mult_flag, 1);
+      writer.Write(method_info.second.ID, 8);
+        writer.Write(static_cast<uint16_t>(method_info.second.name.size()), 8);
+        writer.Write(method_info.second.name);
+        writer.WriteReserved(7);
+        writer.Write(method_info.second.mult_flag, 1);
     }
 
-    writer.write(static_cast<uint8_t>(norm_mat_infos.size()),8);
+    writer.Write(static_cast<uint8_t>(norm_mat_infos.size()), 8);
     for(const auto& mat_info : norm_mat_infos) {
-        writer.write(mat_info.second.ID, 8);
-        writer.write(static_cast<uint16_t>(mat_info.second.name.size()), 8);
-        writer.write(mat_info.second.name);
+      writer.Write(mat_info.second.ID, 8);
+        writer.Write(static_cast<uint16_t>(mat_info.second.name.size()), 8);
+        writer.Write(mat_info.second.name);
     }
 }
 

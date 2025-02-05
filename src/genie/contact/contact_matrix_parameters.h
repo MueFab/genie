@@ -467,12 +467,12 @@ class ContactMatrixParameters {
 // *
 // * This function checks if a pair of chromosomes is symmetrical. It takes the IDs of the two chromosomes as parameters.
 // *
-// * @param chr1_ID The ID of the first chromosome.
-// * @param chr2_ID The ID of the second chromosome.
+// * @param chr1_ID_ The ID of the first chromosome.
+// * @param chr2_ID_ The ID of the second chromosome.
 // *
 // * @return True if the pair of chromosomes is symmetrical, false otherwise.
 // */
-//bool isIntraSCM(uint8_t chr1_ID, uint8_t chr2_ID);
+//bool IsIntraSCM(uint8_t chr1_ID_, uint8_t chr2_ID_);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -481,6 +481,6 @@ class ContactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTACT_CONTACT_PARAMETERS_H
+#endif  // GENIE_CONTACT_CONTACT_MATRIX_PARAMETERS_H
 
 // ---------------------------------------------------------------------------------------------------------------------

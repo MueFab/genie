@@ -188,11 +188,11 @@ void ContactMatrixTilePayload::setPayload(const std::vector<uint8_t>& data) {pay
 //    size_t _payload_len
 //) {
 //    payload = std::move(*_payload, )
-//    codec_ID = core::AlgoID::JBIG;
+//    codec_ID_ = core::AlgoID::JBIG;
 //
 //    free(*_payload);
 //
-//    if (codec_ID == core::AlgoID::JBIG){
+//    if (codec_ID_ == core::AlgoID::JBIG){
 //        tile_nrows = 0;
 //        tile_ncols = 0;
 //    }
@@ -206,7 +206,7 @@ size_t ContactMatrixTilePayload::getPayloadSize() const { return payload.size();
 
 size_t ContactMatrixTilePayload::getSize() const {
     size_t size = 0;
-    size += sizeof(uint8_t); // codec_ID
+    size += sizeof(uint8_t); // codec_ID_
 
     if (codec_ID != core::AlgoID::JBIG){
         // Adds tile_nrows, tile_ncols, and payload_size

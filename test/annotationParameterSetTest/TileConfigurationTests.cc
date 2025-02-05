@@ -84,12 +84,12 @@ TEST_F(TileConfigurationTests, TileConfigurationRandom) {  // NOLINT(cert-err58-
     genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     tileConfiguration.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     tileConfigurationCheck.read(strreader);
     std::stringstream CheckOut;
     genie::core::Writer checkWriter(&CheckOut);
     tileConfigurationCheck.write(checkWriter);
-    checkWriter.flush();
+    checkWriter.Flush();
 
         genie::core::Writer writeSize;
     auto size = tileConfiguration.getSize(writeSize);
@@ -149,7 +149,7 @@ TEST_F(TileConfigurationTests, TileConfigurationRandomSimpleStructure) {  // NOL
     genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     tileConfiguration.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     tileConfigurationCheck.read(strreader);
 
         genie::core::Writer writeSize;

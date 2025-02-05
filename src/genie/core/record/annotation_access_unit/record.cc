@@ -87,11 +87,11 @@ void Record::read(util::BitReader& reader, bool attributeContiguity, bool twoDim
 }
 
 void Record::write(core::Writer& writer) const {
-    writer.write(AT_ID, 8);
-    writer.write(static_cast<uint8_t>(AT_type), 4);
-    writer.write(AT_subtype, 4);
-    writer.write(AG_class, 3);
-    writer.write_reserved(5);
+  writer.Write(AT_ID, 8);
+    writer.Write(static_cast<uint8_t>(AT_type), 4);
+    writer.Write(AT_subtype, 4);
+    writer.Write(AG_class, 3);
+    writer.WriteReserved(5);
     annotation_access_unit_header.write(writer);
     for (auto& blocki : block) blocki.write(writer);
 }
@@ -103,7 +103,7 @@ size_t Record::getSize() const {
 
 size_t Record::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 Record& Record::operator=(const Record& rec) {

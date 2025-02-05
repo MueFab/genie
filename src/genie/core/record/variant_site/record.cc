@@ -29,48 +29,48 @@ namespace variant_site {
 Record::Record(util::BitReader& reader) { read(reader); }
 
 void Record::write(core::Writer& writer) {
-    writer.write(variant_index, 64);
-    writer.write(seq_ID, 16);
-    writer.write(pos, 40);
-    writer.write(strand, 8);
-    writer.write(ID_len, 8);
-    writer.write(ID);
-    writer.write(description_len, 8);
-    writer.write(description);
-    writer.write(ref_len, 32);
-    writer.write(ref);
+  writer.Write(variant_index, 64);
+    writer.Write(seq_ID, 16);
+    writer.Write(pos, 40);
+    writer.Write(strand, 8);
+    writer.Write(ID_len, 8);
+    writer.Write(ID);
+    writer.Write(description_len, 8);
+    writer.Write(description);
+    writer.Write(ref_len, 32);
+    writer.Write(ref);
 
-    writer.write(alt_count, 8);
+    writer.Write(alt_count, 8);
     for (auto i = 0; i < alt_count; ++i) {
-        writer.write(alt_len[i], 32);
-        writer.write(altern[i]);
+      writer.Write(alt_len[i], 32);
+        writer.Write(altern[i]);
     }
-    writer.write(depth, 32);
-    writer.write(seq_qual, 32);
-    writer.write(map_qual, 32);
-    writer.write(map_num_qual_0, 32);
-    writer.write(filters_len, 8);
-    writer.write(filters);
+    writer.Write(depth, 32);
+    writer.Write(seq_qual, 32);
+    writer.Write(map_qual, 32);
+    writer.Write(map_num_qual_0, 32);
+    writer.Write(filters_len, 8);
+    writer.Write(filters);
 
     auto info_tag = info.getFields();
-    writer.write(static_cast<uint8_t>(info_tag.size()), 8);
+    writer.Write(static_cast<uint8_t>(info_tag.size()), 8);
     for (auto i = 0u; i < info_tag.size(); ++i) {
-        writer.write(info_tag[i].tag.size(), 8);
-        writer.write(info_tag[i].tag);
-        writer.write(static_cast<uint8_t>(info_tag[i].type), 8);
-        writer.write(info_tag[i].values.size(), 8);
+      writer.Write(info_tag[i].tag.size(), 8);
+        writer.Write(info_tag[i].tag);
+        writer.Write(static_cast<uint8_t>(info_tag[i].type), 8);
+        writer.Write(info_tag[i].values.size(), 8);
         ArrayType writeType;
         for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
             writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
-            if (info_tag[i].type == DataType::STRING) writer.write_reserved(8);
+            if (info_tag[i].type == DataType::STRING) writer.WriteReserved(8);
         }
     }
-    writer.write_reserved(7);
-    writer.write(linked_record, 1);
+    writer.WriteReserved(7);
+    writer.Write(linked_record, 1);
     if (linked_record) {
-        writer.write(link_name_len, 8);
-        writer.write(link_name);
-        writer.write(reference_box_ID, 8);
+      writer.Write(link_name_len, 8);
+        writer.Write(link_name);
+        writer.Write(reference_box_ID, 8);
     }
 }
 

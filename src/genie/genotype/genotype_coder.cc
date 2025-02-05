@@ -486,7 +486,7 @@ void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, 
                                     static_cast<unsigned long>(bin_mat.shape(0)),
                                     static_cast<unsigned long>(bin_mat.shape(1)));
     } else {
-        UTILS_DIE("Invalid codec_ID for entropy coding!");
+        UTILS_DIE("Invalid codec_ID_ for entropy coding!");
     }
 
     payload = std::vector<uint8_t>(compressed_data, compressed_data + compressed_data_len);

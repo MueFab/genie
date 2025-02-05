@@ -68,13 +68,13 @@ void AlgorithmParameters::read(util::BitReader& reader) {
 
 void AlgorithmParameters::write(core::Writer& writer) const {
     ArrayType types;
-    writer.write(n_pars, 4);
+    writer.Write(n_pars, 4);
     for (auto i = 0; i < n_pars; ++i) {
-        writer.write(par_ID[i], 4);
-        writer.write(static_cast<uint8_t>(par_type[i]), 8);
-        writer.write(par_num_array_dims[i], 2);
+      writer.Write(par_ID[i], 4);
+        writer.Write(static_cast<uint8_t>(par_type[i]), 8);
+        writer.Write(par_num_array_dims[i], 2);
         for (auto j = 0; j < par_num_array_dims[i]; ++j) {
-            writer.write(par_array_dims[i][j], 8);
+          writer.Write(par_array_dims[i][j], 8);
         }
         for (auto j : par_val[i])
             for (auto k : j)
@@ -84,7 +84,7 @@ void AlgorithmParameters::write(core::Writer& writer) const {
 
 size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 std::vector<std::vector<std::vector<std::vector<uint8_t>>>> AlgorithmParameters::resizeVector(

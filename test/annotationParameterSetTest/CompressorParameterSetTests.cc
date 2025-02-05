@@ -139,7 +139,7 @@ TEST_F(CompressorParameterSetTests, CompressorParameterSetRandom) {  // NOLINT(c
     genie::util::BitReader strreader(InOut);
     compressorParameterSet.write(strwriter);
     compressorParameterSet.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     compressorParameterSetCheck.read(strreader);
     compressorParameterSetCheck2.read(strreader);
 

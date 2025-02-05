@@ -104,7 +104,7 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersFixedValues) {  // NOLINT(ce
     std::stringstream InOut;
     genie::core::Writer strwriter(&InOut);
     algorithmParameters.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
 
     genie::core::Writer writesize;
     auto size = algorithmParameters.getSize(writesize);
@@ -129,12 +129,12 @@ TEST_F(AlgorithmParametersTests, AlgorithmParametersRandom) {  // NOLINT(cert-er
     genie::core::Writer strwriter(&InOut);
     genie::util::BitReader strreader(InOut);
     algorithmParameters.write(strwriter);
-    strwriter.flush();
+    strwriter.Flush();
     algorithmParametersCheck.read(strreader);
     std::stringstream TestOut;
     genie::core::Writer teststrwriter(&TestOut);
     algorithmParametersCheck.write(teststrwriter);
-    teststrwriter.flush();
+    teststrwriter.Flush();
 
     EXPECT_EQ(InOut.str(), TestOut.str());
 

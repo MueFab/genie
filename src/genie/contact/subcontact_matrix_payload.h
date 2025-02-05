@@ -21,8 +21,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +38,14 @@ using NormTilePayloads = std::vector<std::vector<uint8_t>>;
 
 class SubcontactMatrixPayload {
   private:
-      uint8_t parameter_set_ID;
-      uint16_t sample_ID;
-      uint8_t chr1_ID;
-      uint8_t chr2_ID;
-      TilePayloads tile_payloads;
-      std::vector<NormTilePayloads> norm_tile_payloads;
-      std::optional<SubcontactMatrixMaskPayload> row_mask_payload;
-      std::optional<SubcontactMatrixMaskPayload> col_mask_payload;
+      uint8_t parameter_set_ID_;
+      uint16_t sample_ID_;
+      uint8_t chr1_ID_;
+      uint8_t chr2_ID_;
+      TilePayloads tile_payloads_;
+      std::vector<NormTilePayloads> norm_tile_payloads_;
+      std::optional<SubcontactMatrixMaskPayload> row_mask_payload_;
+      std::optional<SubcontactMatrixMaskPayload> col_mask_payload_;
 
   public:
     /**
@@ -85,8 +84,6 @@ class SubcontactMatrixPayload {
         const SubcontactMatrixPayload& other
     ) = default;
 
-
-
     /**
      * @brief Parameterized constructor for SubcontactMatrixPayload.
      *
@@ -97,7 +94,7 @@ class SubcontactMatrixPayload {
      * @param chr1_ID The ID of the first chromosome.
      * @param chr2_ID The ID of the second chromosome.
      */
-    SubcontactMatrixPayload(
+    [[maybe_unused]] SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
         uint16_t sample_ID,
         uint8_t chr1_ID,
@@ -117,7 +114,7 @@ class SubcontactMatrixPayload {
      * @param row_mask_payload The row mask payload.
      * @param col_mask_payload The column mask payload.
      */
-    SubcontactMatrixPayload(
+    [[maybe_unused]] SubcontactMatrixPayload(
         uint8_t parameter_set_ID,
         uint16_t sample_ID,
         uint8_t chr1_ID,
@@ -164,7 +161,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the parameter set.
     */
-   uint8_t getParameterSetID() const;
+    [[maybe_unused]] [[nodiscard]] uint8_t GetParameterSetId() const;
 
    /**
     * @brief Get the Sample ID.
@@ -173,7 +170,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the sample.
     */
-   uint16_t getSampleID() const;
+   [[nodiscard]] uint16_t GetSampleID() const;
 
    /**
     * @brief Get the Chromosome 1 ID.
@@ -182,7 +179,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the first chromosome.
     */
-   uint8_t getChr1ID() const;
+   [[nodiscard]] uint8_t GetChr1ID() const;
 
    /**
     * @brief Get the Chromosome 2 ID.
@@ -191,7 +188,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the second chromosome.
     */
-   uint8_t getChr2ID() const;
+   [[nodiscard]] uint8_t GetChr2ID() const;
 
    /**
     * @brief Gets the tile payloads.
@@ -200,7 +197,7 @@ class SubcontactMatrixPayload {
     *
     * @return A constant reference to the tile payloads.
     */
-   const TilePayloads& getTilePayloads() const;
+   [[maybe_unused]] [[nodiscard]] const TilePayloads& GetTilePayloads() const;
 
    /**
     * @brief Gets the number of normalization tile payloads.
@@ -209,7 +206,7 @@ class SubcontactMatrixPayload {
     *
     * @return The number of normalization tile payloads.
     */
-   size_t getNumNormMatrices() const;
+   [[maybe_unused]] [[nodiscard]] size_t GetNumNormMatrices() const;
 
    /**
    * @brief Checks if a row mask payload exists.
@@ -218,7 +215,7 @@ class SubcontactMatrixPayload {
    *
    * @return True if a row mask payload exists, false otherwise.
    */
-   bool anyRowMaskPayload() const;
+   [[nodiscard]] bool AnyRowMaskPayload() const;
 
    /**
    * @brief Gets the row mask payload.
@@ -228,7 +225,7 @@ class SubcontactMatrixPayload {
    * @return A constant reference to the row mask payload.
    * @throws std::runtime_error If the row mask payload does not exist.
    */
-   const SubcontactMatrixMaskPayload& getRowMaskPayload() const;
+   [[nodiscard]] const SubcontactMatrixMaskPayload& GetRowMaskPayload() const;
 
    /**
    * @brief Checks if a column mask payload exists.
@@ -237,7 +234,7 @@ class SubcontactMatrixPayload {
    *
    * @return True if a row mask payload exists, false otherwise.
    */
-   bool anyColMaskPayload() const;
+   [[nodiscard]] bool AnyColMaskPayload() const;
 
    /**
    * @brief Gets the column mask payload.
@@ -247,7 +244,7 @@ class SubcontactMatrixPayload {
    * @return A constant reference to the column mask payload.
    * @throws std::runtime_error If the column mask payload does not exist.
    */
-   const SubcontactMatrixMaskPayload& getColMaskPayload() const;
+   [[nodiscard]] const SubcontactMatrixMaskPayload& GetColMaskPayload() const;
 
    /**
     * @brief Set the Parameter Set ID.
@@ -256,7 +253,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the parameter set.
     */
-   void setParameterSetID(uint8_t id);
+   [[maybe_unused]] void SetParameterSetId(uint8_t id);
 
    /**
     * @brief Set the Sample ID.
@@ -265,7 +262,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the sample.
     */
-   void setSampleID(uint16_t id);
+   void SetSampleId(uint16_t id);
 
    /**
     * @brief Set the Chromosome 1 ID.
@@ -274,7 +271,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the first chromosome.
     */
-   void setChr1ID(uint8_t id);
+   void SetChr1Id(uint8_t id);
 
    /**
     * @brief Set the Chromosome 2 ID.
@@ -283,7 +280,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the second chromosome.
     */
-   void setChr2ID(uint8_t id);
+   void SetChr2Id(uint8_t id);
 
    /**
     * @brief Set the Tile Payloads.
@@ -292,7 +289,7 @@ class SubcontactMatrixPayload {
     *
     *  @param payloads The new Tile Payloads.
     */
-   void setTilePayloads(const TilePayloads& payloads);
+   [[maybe_unused]] void SetTilePayloads(const TilePayloads& payloads);
 
    /**
     * @brief Sets the payload for the row mask.
@@ -301,7 +298,7 @@ class SubcontactMatrixPayload {
     *
     * @param payload The payload to set for the row mask.
     */
-   void setRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void SetRowMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
    /**
     * @brief Sets the payload for the column mask.
@@ -310,7 +307,7 @@ class SubcontactMatrixPayload {
     *
     * @param payload The payload to set for the column mask.
     */
-   void setColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
+   void SetColMaskPayload(const std::optional<SubcontactMatrixMaskPayload>& payload);
 
    /**
    * @brief Sets the number of tiles in the SubcontactMatrixPayload and resizes the internal storage accordingly.
@@ -322,13 +319,12 @@ class SubcontactMatrixPayload {
    * @param ntiles_in_col The new number of tiles in a column.
    * @param free_mem If true, frees the memory allocated for the current tile payloads before resizing.
    */
-   void setNumTiles(
+   void SetNumTiles(
        size_t ntiles_in_row,
        size_t ntiles_in_col,
-       bool free_mem=true
-   );
+       bool free_mem= true);
 
-   ContactMatrixTilePayload& getTilePayload(
+   ContactMatrixTilePayload& GetTilePayload(
        size_t i_tile,
        size_t j_tile
    );
@@ -342,7 +338,7 @@ class SubcontactMatrixPayload {
      * @param j_tile The index of the second dimension.
      * @param tile_payload The tile payload to set.
     */
-   void setTilePayload(
+   void SetTilePayload(
        size_t i_tile,
        size_t j_tile,
        ContactMatrixTilePayload&& tile_payload
@@ -355,7 +351,7 @@ class SubcontactMatrixPayload {
      *
      * @return The number of tiles in a row.
     */
-   size_t getNTilesInRow() const;
+   [[nodiscard]] size_t GetNTilesInRow() const;
 
    /**
      * @brief Get the number of tiles in a column.
@@ -364,7 +360,7 @@ class SubcontactMatrixPayload {
      *
      * @return The number of tiles in a column.
     */
-   size_t getNTilesInCol() const;
+   [[nodiscard]] size_t GetNTilesInCol() const;
 
    /**
     * @brief Checks if the subcontact matrix matrix is intra subcontact matrix.
@@ -374,7 +370,7 @@ class SubcontactMatrixPayload {
     *
     * @return True if the subcontact matrix is intra, false otherwise.
     */
-   bool isIntraSCM() const;
+   [[nodiscard]] bool IsIntraScm() const;
 
    /**
      * @brief Gets the size of this structure.
@@ -383,7 +379,7 @@ class SubcontactMatrixPayload {
      *
      * @return The size of the payload.
     */
-   size_t getSize() const;
+   [[nodiscard]] size_t GetSize() const;
 
    /**
      * @brief Writes the object to a writer.
@@ -392,13 +388,12 @@ class SubcontactMatrixPayload {
      *
      * @param writer The writer to write to.
     */
-   void write(util::BitWriter &writer) const;
+   void Write(util::BitWriter &writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contact
-}  // namespace genie
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

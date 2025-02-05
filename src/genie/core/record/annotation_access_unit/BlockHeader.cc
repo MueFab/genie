@@ -46,17 +46,16 @@ void BlockHeader::read(genie::util::BitReader& reader) {
 }
 
 void BlockHeader::write(core::Writer& writer) const {
-    writer.write(static_cast<uint8_t>(descriptor_ID), 8);
-    if (descriptor_ID == AnnotDesc::ATTRIBUTE)
-        writer.write(attribute_ID, 16);
-    writer.write_reserved(2);
-    writer.write(indexed, 1);
-    writer.write(block_payload_size, 29);
+  writer.Write(static_cast<uint8_t>(descriptor_ID), 8);
+    if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.Write(attribute_ID, 16);
+    writer.WriteReserved(2);
+    writer.Write(indexed, 1);
+    writer.Write(block_payload_size, 29);
 }
 
 size_t BlockHeader::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 }  // namespace annotation_access_unit
 }  // namespace record

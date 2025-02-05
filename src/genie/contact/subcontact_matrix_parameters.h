@@ -24,8 +24,8 @@ namespace contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define ENA_TRANSFORM_BLEN 1
-#define CODEC_ID_BLEN 5
+//#define ENA_TRANSFORM_BLEN 1
+//#define CODEC_ID_BLEN 5
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,13 +60,13 @@ using TileParameters = std::vector<std::vector<TileParameter>>;
 
 class SubcontactMatrixParameters {
  private:
-    uint8_t parameter_set_ID;
-    uint8_t chr1_ID;
-    uint8_t chr2_ID;
-    core::AlgoID codec_ID;
-    TileParameters tile_parameters;
-    bool row_mask_exists_flag;
-    bool col_mask_exists_flag;
+    uint8_t parameter_set_ID_;
+    uint8_t chr1_ID_;
+    uint8_t chr2_ID_;
+    core::AlgoID codec_ID_;
+    TileParameters tile_parameters_;
+    bool row_mask_exists_flag_;
+    bool col_mask_exists_flag_;
 
  public:
     // Default constructor
@@ -84,13 +84,13 @@ class SubcontactMatrixParameters {
 
     // Constructor from move
 //    SubcontactMatrixParameters(
-//        uint8_t parameter_set_ID,
-//        uint8_t chr1_ID,
-//        uint8_t chr2_ID,
-//        core::AlgoID codec_ID,
-//        TileParameters&& tile_parameters,
-//        bool row_mask_exists_flag,
-//        bool col_mask_exists_flag
+//        uint8_t parameter_set_ID_,
+//        uint8_t chr1_ID_,
+//        uint8_t chr2_ID_,
+//        core::AlgoID codec_ID_,
+//        TileParameters&& tile_parameters_,
+//        bool row_mask_exists_flag_,
+//        bool col_mask_exists_flag_
 //    ) noexcept;
 
     SubcontactMatrixParameters(
@@ -113,7 +113,7 @@ class SubcontactMatrixParameters {
      *
      * @return The parameter set ID.
      */
-    uint8_t getParameterSetID() const;
+    [[nodiscard]] uint8_t GetParameterSetID() const;
 
     /**
      * @brief Get the first chromosome ID.
@@ -122,7 +122,7 @@ class SubcontactMatrixParameters {
      *
      * @return The first chromosome ID.
      */
-    uint8_t getChr1ID() const;
+    [[nodiscard]] uint8_t GetChr1ID() const;
 
     /**
      * @brief Get the second chromosome ID.
@@ -131,17 +131,17 @@ class SubcontactMatrixParameters {
      *
      * @return The second chromosome ID.
      */
-    uint8_t getChr2ID() const;
+    [[nodiscard]] uint8_t GetChr2ID() const;
 
-    core::AlgoID getCodecID() const;
+    [[nodiscard]] core::AlgoID GetCodecID() const;
 
-//    const std::vector<std::vector<TileParameter>>& getTileParameters() const;
+//    const std::vector<std::vector<TileParameter>>& GetTileParameters() const;
      /**
      * returns a constant reference to the tile parameters.
      *
      * @return A constant reference to TileParameter.
      */
-    const TileParameters& getTileParameters() const;
+    [[nodiscard]] const TileParameters& GetTileParameters() const;
 
     /**
      * @brief Get the row mask exists flag.
@@ -150,7 +150,7 @@ class SubcontactMatrixParameters {
      *
      * @return The row mask exists flag.
      */
-    bool getRowMaskExistsFlag() const;
+    bool GetRowMaskExistsFlag() const;
 
     /**
      * @brief Get the column mask exists flag.
@@ -159,7 +159,7 @@ class SubcontactMatrixParameters {
      *
      * @return The column mask exists flag.
      */
-    bool getColMaskExistsFlag() const;
+    bool GetColMaskExistsFlag() const;
 
     // Setters
     /**
@@ -169,7 +169,7 @@ class SubcontactMatrixParameters {
      *
      * @param id The new parameter set ID.
      */
-    void setParameterSetID(uint8_t ID);
+    [[maybe_unused]] void SetParameterSetID(uint8_t ID);
 
     /**
      * @brief Set the first chromosome ID.
@@ -178,7 +178,7 @@ class SubcontactMatrixParameters {
      *
      * @param id The new first chromosome ID.
      */
-    void setChr1ID(uint8_t ID);
+    void SetChr1ID(uint8_t ID);
 
     /**
      * @brief Set the second chromosome ID.
@@ -187,9 +187,9 @@ class SubcontactMatrixParameters {
      *
      * @param id The new second chromosome ID.
      */
-    void setChr2ID(uint8_t ID);
+    void SetChr2ID(uint8_t ID);
 
-    void setCodecID(core::AlgoID codec_ID);
+    void SetCodecID(core::AlgoID codec_ID);
 
     /**
      * @brief Set the tile parameters.
@@ -198,7 +198,7 @@ class SubcontactMatrixParameters {
      *
      * @param parameters The new tile parameters.
      */
-    void setTileParameters(TileParameters&& parameters);
+    [[maybe_unused]] void SetTileParameters(TileParameters&& parameters);
 
     /**
      * @brief Set the row mask exists flag.
@@ -207,7 +207,7 @@ class SubcontactMatrixParameters {
      *
      *  @param flag The new row mask exists flag.
      */
-    void setRowMaskExistsFlag(bool flag);
+    void SetRowMaskESetRowMaskExistsFlag(bool flag);
 
     /**
      * @brief Set the column mask exists flag.
@@ -216,7 +216,7 @@ class SubcontactMatrixParameters {
      *
      *  @param flag The new column mask exists flag.
      */
-    void setColMaskExistsFlag(bool flag);
+    void SetColMaskExistsFlag(bool flag);
 
     /**
     * @brief Sets the number of tiles in the subcontact matrix parameters and resizes the internal storage accordingly.
@@ -225,11 +225,10 @@ class SubcontactMatrixParameters {
     * @param ntiles_in_col The new number of tiles in a column.
     * @param free_mem If true, frees the memory allocated for the current tile parameters before resizing.
     */
-    void setNumTiles(
+    void SetNumTiles(
         size_t ntiles_in_row,
         size_t ntiles_in_col,
-        bool free_mem=true
-    );
+        bool free_mem= true);
 
     /**
     * @brief Retrieves a tile parameter from the subcontact matrix parameters.
@@ -237,10 +236,10 @@ class SubcontactMatrixParameters {
     * @param i_tile The row index of the tile parameter.
     * @param j_tile The column index of the tile parameter.
     * @return A reference to the tile parameter at the specified indices.
-    * @throws std::runtime_error If i_tile is out of bounds (i.e., i_tile >= getNTilesInRow()) or j_tile is out of bounds (i.e., j_tile >= getNTilesInCol()).
-    * @throws std::runtime_error If i_tile > j_tile and isIntraSCM() is true, indicating an attempt to access the lower triangle of an intra SCM, which is not allowed.
+    * @throws std::runtime_error If i_tile is out of bounds (i.e., i_tile >= GetNTilesInRow()) or j_tile is out of bounds (i.e., j_tile >= GetNTilesInCol()).
+    * @throws std::runtime_error If i_tile > j_tile and IsIntraSCM() is true, indicating an attempt to access the lower triangle of an intra SCM, which is not allowed.
     */
-    TileParameter& getTileParameter(
+    TileParameter& GetTileParameter(
         size_t i_tile,
         size_t j_tile
     );
@@ -252,7 +251,7 @@ class SubcontactMatrixParameters {
      * @param j_tile index of the tile in the column
      * @param tile_parameter
      */
-    void setTileParameter(
+    void SetTileParameter(
         size_t i_tile,
         size_t j_tile,
         TileParameter tile_parameter
@@ -265,7 +264,7 @@ class SubcontactMatrixParameters {
      *
      * @return The number of tiles in a row.
      */
-    size_t getNTilesInRow() const;
+    [[nodiscard]] size_t GetNTilesInRow() const;
 
     /**
      * @brief Get the number of tiles in a column.
@@ -274,7 +273,7 @@ class SubcontactMatrixParameters {
      *
      * @return The number of tiles in a column.
      */
-    size_t getNTilesInCol() const;
+    [[nodiscard]] size_t GetNTilesInCol() const;
 
     /**
      * @brief Check if the subcontact matrix is symmetrical.
@@ -284,7 +283,7 @@ class SubcontactMatrixParameters {
      *
      * @return True if the subcontact matrix is symmetrical, false otherwise.
      */
-    bool isIntraSCM() const;
+    bool IsIntraSCM() const;
 
     /**
      * @brief Computes the size of the object in bytes.
@@ -294,7 +293,7 @@ class SubcontactMatrixParameters {
      *
      * @return The size of the object in bytes.
      */
-    size_t getSize() const;
+    [[nodiscard]] size_t GetSize() const;
 
     /**
      * @brief Writes the object to a BitWriter.
@@ -304,8 +303,8 @@ class SubcontactMatrixParameters {
      *
      * @param writer The BitWriter to write to.
      */
-    void write(util::BitWriter& writer) const;
-    void write(core::Writer& writer) const;
+    void Write(util::BitWriter& writer) const;
+    void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,13 @@ class NDArray {
      */
     NDArray();
 
-    // Constructor from dimensions
+    /**
+     * @brief Constructor from dimensions.
+     *
+     * Initializes an NDArray with the given dimensions and default-initialized elements.
+     *
+     * @param dims The dimensions of the array.
+     */
     NDArray(const std::vector<size_t>& dims);
 
     /**

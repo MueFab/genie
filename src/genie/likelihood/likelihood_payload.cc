@@ -92,27 +92,25 @@ void LikelihoodPayload::setPayload(const std::vector<uint8_t>& _payload) { paylo
 
 // -----------------------------------------------------------------------------
 
-void LikelihoodPayload::write(core::Writer& writer) const { 
-    writer.write(nrows, 32u);
-    writer.write(ncols, 32u);
+void LikelihoodPayload::write(core::Writer& writer) const {
+  writer.Write(nrows, 32u);
+    writer.Write(ncols, 32u);
 
     if (!payload.empty()) {
-        writer.write(payload.size(), 32u);
-        for(unsigned char i : payload)
-            writer.write(i,8);
+      writer.Write(payload.size(), 32u);
+        for(unsigned char i : payload) writer.Write(i, 8);
         if (transform_flag) {
-            writer.write(additionalPayload.size(), 32u);
-            for (unsigned char val : additionalPayload)
-                writer.write(val, 8);
+          writer.Write(additionalPayload.size(), 32u);
+            for (unsigned char val : additionalPayload) writer.Write(val, 8);
         }
     } else{
-        writer.write(payloadStream.str().size(), 32);
+      writer.Write(payloadStream.str().size(), 32);
         std::istream writestream(payloadStream.rdbuf());
-        writer.write(&writestream);
+        writer.Write(&writestream);
         if (transform_flag) {
-            writer.write(additionalPayloadStream.str().size(), 32);
+          writer.Write(additionalPayloadStream.str().size(), 32);
             std::istream additionalWritestream(additionalPayloadStream.rdbuf());
-            writer.write(&additionalWritestream);
+            writer.Write(&additionalWritestream);
         }
     }
 

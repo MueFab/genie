@@ -184,26 +184,26 @@ void TileConfiguration::read(util::BitReader& reader) {
 }
 
 void TileConfiguration::write(core::Writer& writer) const {
-    writer.write(AG_class, 3);
-    writer.write(attribute_contiguity, 1);
-    writer.write(two_dimensional, 1);
+  writer.Write(AG_class, 3);
+    writer.Write(attribute_contiguity, 1);
+    writer.Write(two_dimensional, 1);
     if (two_dimensional) {
-        writer.write_reserved(6);
-        writer.write(column_major_tile_order, 1);
-        writer.write(symmetry_mode, 3);
-        writer.write(symmetry_minor_diagonal, 1);
+      writer.WriteReserved(6);
+        writer.Write(column_major_tile_order, 1);
+        writer.Write(symmetry_mode, 3);
+        writer.Write(symmetry_minor_diagonal, 1);
     } else {
-        writer.write_reserved(3);
+      writer.WriteReserved(3);
     }
-    writer.write(attribute_dependent_tiles, 1);
+    writer.Write(attribute_dependent_tiles, 1);
     default_tile_structure.write(writer);
     if (attribute_dependent_tiles) {
-        writer.write(n_add_tile_structures, 16);
+      writer.Write(n_add_tile_structures, 16);
         for (auto i = 0; i < n_add_tile_structures; ++i) {
-            writer.write(n_attributes[i], 16);
-            for (auto ID : attribute_ID[i]) writer.write(ID, 16);
-            writer.write(n_descriptors[i], 7);
-            for (auto ID : descriptor_ID[i]) writer.write(ID, 7);
+          writer.Write(n_attributes[i], 16);
+            for (auto ID : attribute_ID[i]) writer.Write(ID, 16);
+            writer.Write(n_descriptors[i], 7);
+            for (auto ID : descriptor_ID[i]) writer.Write(ID, 7);
             additional_tile_structure[i].write(writer);
         }
     }
@@ -211,7 +211,7 @@ void TileConfiguration::write(core::Writer& writer) const {
 
 size_t TileConfiguration::getSize(core::Writer& writesize) const {
     write(writesize);
-    return writesize.getBitsWritten();
+    return writesize.GetBitsWritten();
 }
 
 }  // namespace annotation_parameter_set
