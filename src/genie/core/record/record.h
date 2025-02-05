@@ -32,6 +32,41 @@ namespace genie::core::record {
  *  @brief
  */
 class Record {
+ public:
+  struct Flags {
+    bool duplicate : 1;
+    bool quality_check_fail : 1;
+    bool proper_mapped_pair : 1;
+    bool not_primary_alignment : 1;
+    bool supplementary_alignment : 1;
+
+    Flags()
+        : duplicate(false),
+          quality_check_fail(false),
+          proper_mapped_pair(false),
+          not_primary_alignment(false),
+          supplementary_alignment(false) {}
+
+    explicit Flags(const uint8_t flags) {
+      duplicate = (flags & 0x01) != 0;
+      quality_check_fail = (flags & 0x02) != 0;
+      proper_mapped_pair = (flags & 0x04) != 0;
+      not_primary_alignment = (flags & 0x08) != 0;
+      supplementary_alignment = (flags & 0x10) != 0;
+    }
+
+    [[nodiscard]] uint8_t Get() const {
+      uint8_t flags = 0;
+      flags |= duplicate ? 0x01 : 0;
+      flags |= quality_check_fail ? 0x02 : 0;
+      flags |= proper_mapped_pair ? 0x04 : 0;
+      flags |= not_primary_alignment ? 0x08 : 0;
+      flags |= supplementary_alignment ? 0x10 : 0;
+      return flags;
+    }
+  };
+
+ private:
   uint8_t number_of_template_segments_{};      //!< @brief
   std::vector<Segment> reads_;                 //!< @brief
   std::vector<AlignmentBox> alignment_info_;   //!< @brief

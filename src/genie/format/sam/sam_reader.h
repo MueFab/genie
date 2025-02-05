@@ -5,75 +5,85 @@
  * https://github.com/MueFab/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
-#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_READER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_READER_H_
 
 // -----------------------------------------------------------------------------
 
-#include <fstream>
+#include <htslib/sam.h>
+
 #include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "genie/core/record/record.h"
-#include "genie/util/bit_reader.h"
+#include "genie/format/sam/sam_record.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 /**
  * @brief
  */
-class SubfileReader {
-  std::ifstream reader_;                     //!< @brief
-  util::BitReader bitreader_;                //!< @brief
-  std::optional<core::record::Record> rec_;  //!< @brief
-  std::string path_;                         //!< @brief
+class SamReader {
+  samFile* sam_file_;      //!< @brief
+  bam_hdr_t* sam_header;   //!< @brief
+  bam1_t* sam_alignment_;  //!< @brief
+  kstring_t header_info;   //!< @brief
+
+  std::optional<SamRecord> buffer_;  //!< @brief
+
+  void InternalRead();
 
  public:
   /**
    * @brief
    * @param fpath
    */
-  explicit SubfileReader(const std::string& fpath);
+  explicit SamReader(const std::string& fpath);
 
   /**
    * @brief
    */
-  ~SubfileReader();
-
-  /**
-   * @brief
-   * @return
-   */
-  core::record::Record MoveRecord();
+  ~SamReader();
 
   /**
    * @brief
    * @return
    */
-  const std::optional<core::record::Record>& GetRecord() const;
+  [[nodiscard]] std::vector<std::pair<std::string, size_t>> GetRefs() const;
 
   /**
    * @brief
    * @return
    */
-  bool good();
+  bool IsReady();
 
   /**
    * @brief
    * @return
    */
-  std::string GetPath() const { return path_; }
+  bool IsValid();
+
+  /**
+   * @brief
+   * @param sr
+   * @return
+   */
+  void Read();
+
+  [[nodiscard]] const std::optional<SamRecord>& Peek() const;
+  std::optional<SamRecord> Move();
 };
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SORTER_H_
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_READER_H_
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

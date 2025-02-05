@@ -12,15 +12,23 @@
 
 // -----------------------------------------------------------------------------
 
-#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
-#include "genie/format/sam/sam_to_mgrec/sam_record.h"
+#include "genie/format/sam/sam_reader.h"
+#include "genie/format/sam/sam_record.h"
 #include "genie/util/runtime_exception.h"
 
 // -----------------------------------------------------------------------------
 
-namespace genie::format::sam::sam_to_mgrec {
+namespace genie::format::sam {
 
 // -----------------------------------------------------------------------------
+
+void SamReader::InternalRead() {
+  if (sam_read1(sam_file_, sam_header, sam_alignment_) >= 0) {
+    buffer_ = SamRecord(sam_alignment_);
+  } else {
+    buffer_.reset();
+  }
+}
 
 SamReader::SamReader(const std::string& fpath)
     : sam_file_(nullptr),           // open bam file
@@ -32,6 +40,10 @@ SamReader::SamReader(const std::string& fpath)
   } else {
     sam_file_ = hts_open(fpath.c_str(), "r");
   }
+  UTILS_DIE_IF(!sam_file_, "Could not open file: " + fpath);
+  sam_header = sam_hdr_read(sam_file_);
+  UTILS_DIE_IF(!sam_header, "Could not read header from file: " + fpath);
+  InternalRead();
 }
 
 // -----------------------------------------------------------------------------
@@ -85,38 +97,21 @@ bool SamReader::IsValid() {
 
 // -----------------------------------------------------------------------------
 
-int SamReader::ReadSamQuery(std::vector<SamRecord>& sr) {
-  sr.clear();
-  if (buffered_rec_) {
-    sr.push_back(std::move(buffered_rec_.value()));
-    buffered_rec_.reset();
-  } else {
-    if (const auto res = sam_read1(sam_file_, sam_header, sam_alignment_);
-        res >= 0) {
-      sr.emplace_back(sam_alignment_);
-    } else {
-      return res;
-    }
-  }
-
-  while (true) {
-    if (const auto res = sam_read1(sam_file_, sam_header, sam_alignment_);
-        res >= 0) {
-      buffered_rec_ = SamRecord(sam_alignment_);
-    } else {
-      return res;
-    }
-    if (buffered_rec_->qname_ != sr.front().qname_) {
-      return 0;
-    }
-    sr.push_back(std::move(buffered_rec_.value()));
-    buffered_rec_.reset();
+void SamReader::Read() {
+  if (buffer_) {
+    InternalRead();
   }
 }
 
 // -----------------------------------------------------------------------------
 
-}  // namespace genie::format::sam::sam_to_mgrec
+const std::optional<SamRecord>& SamReader::Peek() const { return buffer_; }
+
+std::optional<SamRecord> SamReader::Move() { return std::move(buffer_); }
+
+// -----------------------------------------------------------------------------
+
+}  // namespace genie::format::sam
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
