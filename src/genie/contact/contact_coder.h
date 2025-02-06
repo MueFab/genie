@@ -61,7 +61,7 @@ struct RunLengthEncodingData {
  */
 void set_rle_information_from_mask(
     RunLengthEncodingData& rleData,
-    const BinVecDtype scm_mask
+    const BinVecDtype& scm_mask
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
