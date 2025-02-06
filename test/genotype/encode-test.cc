@@ -269,6 +269,45 @@ TEST(Genotype, RoundTrip_BinarizeBitPlane) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(Genotype, RoundTrip_BinarizeRowBin_BinaryMatrix) {
+  size_t NROWS = 3;
+  size_t NCOLS = 3;
+  size_t BIN_NROWS = 3;
+
+  genie::genotype::Int8MatDtype allele_mat;
+  std::vector<genie::genotype::BinMatDtype> bin_mats;
+  genie::genotype::UIntVecDtype amax_vec;
+
+  genie::genotype::Int8MatDtype ALLELE_MAT = {{0, 0, 0},
+                                              {1, 0, 1},
+                                              {1, 0, 0}};
+
+  allele_mat = ALLELE_MAT;
+
+  genie::genotype::binarize_row_bin(
+      allele_mat,
+      bin_mats,
+      amax_vec
+  );
+
+  ASSERT_EQ(bin_mats.size(), 1);
+  ASSERT_EQ(bin_mats[0].shape(0), BIN_NROWS);
+  ASSERT_EQ(bin_mats[0].shape(1), NCOLS);
+  ASSERT_EQ(amax_vec.shape(0), NROWS);
+  ASSERT_EQ(xt::sum(amax_vec)(0), BIN_NROWS);
+
+  genie::genotype::debinarize_row_bin(
+      bin_mats,
+      amax_vec,
+      allele_mat
+  );
+
+  ASSERT_TRUE(allele_mat == ALLELE_MAT);
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(Genotype, RoundTrip_BinarizeRowBin) {
     size_t NROWS = 100;
     size_t NCOLS = 200;

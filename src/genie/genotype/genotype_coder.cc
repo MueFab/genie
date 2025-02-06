@@ -224,10 +224,13 @@ void binarize_row_bin(Int8MatDtype& allele_mat, std::vector<BinMatDtype>& bin_ma
     auto nrows = allele_mat.shape(0);
     auto ncols = allele_mat.shape(1);
 
-    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, 1) + 1)));
-    auto new_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
+    amax_vec = xt::cast<uint8_t>(xt::ceil(xt::log2(xt::amax(allele_mat, {1}) + 1)));
+    // Handle the case where maximum value is 0 -> log2(1) = 0 bits
+    xt::filter(amax_vec, xt::equal(amax_vec, 0u)) = 1;
 
-    BinMatDtype bin_mat = xt::zeros<bool>({new_nrows, ncols});
+    auto bin_mat_nrows = static_cast<size_t>(xt::sum(amax_vec)(0));
+
+    BinMatDtype bin_mat = xt::zeros<bool>({bin_mat_nrows, ncols});
 
     size_t i2 = 0;
     for (size_t i = 0; i < nrows; i++) {
