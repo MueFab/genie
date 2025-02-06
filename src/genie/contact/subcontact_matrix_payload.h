@@ -179,7 +179,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the first chromosome.
     */
-   [[nodiscard]] uint8_t GetChr1ID() const;
+   [[maybe_unused]] [[nodiscard]] uint8_t GetChr1ID() const;
 
    /**
     * @brief Get the Chromosome 2 ID.
@@ -188,7 +188,7 @@ class SubcontactMatrixPayload {
     *
     * @return The ID of the second chromosome.
     */
-   [[nodiscard]] uint8_t GetChr2ID() const;
+   [[maybe_unused]] [[nodiscard]] uint8_t GetChr2ID() const;
 
    /**
     * @brief Gets the tile payloads.

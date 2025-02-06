@@ -35,7 +35,7 @@ enum class TransformID : uint8_t {
 
 class SubcontactMatrixMaskPayload{
  private:
-    TransformID transform_ID_;
+    TransformID transform_ID_{};
     std::optional<std::vector<bool>> mask_array_;
     bool first_val_{};
     std::optional<std::vector<uint32_t>> rl_entries_;

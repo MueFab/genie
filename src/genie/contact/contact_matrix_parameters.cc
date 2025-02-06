@@ -352,8 +352,7 @@ bool ContactMatrixParameters::IsBinSizeMultiplierValid(
     } else {
         return false;
     }
-};
-
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -522,11 +521,13 @@ bool mapsEqual(const std::unordered_map<KeyType, T>& current, const std::unorder
     if (current.size() != other.size()) {
         return false;
     }
+    //TODO(yeremia): Improve this
     for (const auto& pair : current) {
         auto iter = other.find(pair.first);
         if (iter == other.end()) {
             return false;
         }
+        //TODO(yeremia): operator != does not work
         if (!(pair.second == iter->second)){
             return false;
         }
