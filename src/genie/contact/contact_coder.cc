@@ -7,15 +7,12 @@
 #include "contact_coder.h"
 #include <codecs/include/mpegg-codecs.h>
 #include <genie/core/record/contact/record.h>
-#include <genie/genotype/genotype_coder.h>
 #include <genie/util/runtime_exception.h>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
-#include <xtensor/xrandom.hpp>
 #include <xtensor/xsort.hpp>
 #include "contact_matrix_parameters.h"
 #include "contact_matrix_tile_payload.h"
@@ -23,8 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -898,10 +894,10 @@ void conv_noop_on_sparse_mat(
     UIntVecDtype lr_tile_counts = xt::empty<uint32_t>({lr_num_entries});
 
     auto i_entry = 0u;
-    for (auto it = lr_sparse_tile.cbegin(); it != lr_sparse_tile.cend(); ++it){
-        lr_tile_row_ids(i_entry) = (it->first).first;
-        lr_tile_col_ids(i_entry) = (it->first).second;
-        lr_tile_counts(i_entry) = it->second;
+    for (const auto & it : lr_sparse_tile){
+        lr_tile_row_ids(i_entry) = (it.first).first;
+        lr_tile_col_ids(i_entry) = (it.first).second;
+        lr_tile_counts(i_entry) = it.second;
         i_entry++;
     }
 
@@ -1452,7 +1448,7 @@ void encode_scm(
 
 void set_rle_information_from_mask(
     RunLengthEncodingData& rleData,
-    const BinVecDtype scm_mask
+    const BinVecDtype& scm_mask
 )   {
     bool prevValue;
     uint32_t count = 1;
@@ -1496,7 +1492,7 @@ void set_rle_information_from_mask(
 //
 //    auto params = ContactMatrixParameters();
 //    params.SetBinSize(opt.bin_size);
-//    params.SetTileSize(opt.tile_size);
+//    params.SetTileSize(opt.tile_size_);
 //    std::map<uint8_t, SampleInformation> samples;
 //    std::map<uint8_t, ChromosomeInformation> chrs;
 //
@@ -1551,7 +1547,6 @@ void set_rle_information_from_mask(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}
-}
+} // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------

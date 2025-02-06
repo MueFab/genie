@@ -4,5 +4,5 @@
 * https://github.com/mitogen/genie for more details.
 */
 
-#include "contact_matrix_bin_payload.h"
+//#include "contact_matrix_bin_payload.h"
 

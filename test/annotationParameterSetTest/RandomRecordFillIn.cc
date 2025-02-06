@@ -237,7 +237,7 @@ RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
     for (auto& length : chr_length) length = randomU64();
 
     uint32_t interval = randomU32();
-    uint32_t tile_size = randomU32();
+    uint32_t tile_size_ = randomU32();
     uint8_t num_interval_multipliers = randomU8();
     std::vector<uint32_t> interval_multiplier(num_interval_multipliers, 0);
     for (auto& intMult : interval_multiplier) intMult = randomU32();
@@ -256,7 +256,7 @@ RandomAnnotationEncodingParameters::randomContactMatrixParameters() {
     for (auto& name : norm_matrix_name) name = randomString(randomU4() + 2);
 
     return genie::core::record::annotation_parameter_set::ContactMatrixParameters(
-        num_samples, sample_ID_, sample_name, num_chrs, chr_ID_, chr_name, chr_length, interval, tile_size,
+        num_samples, sample_ID_, sample_name, num_chrs, chr_ID_, chr_name, chr_length, interval, tile_size_,
         num_interval_multipliers, interval_multiplier, num_norm_methods, norm_method_ID, norm_method_name,
         norm_method_mult_flag, num_norm_matrices, norm_matrix_ID, norm_matrix_name);
 }
