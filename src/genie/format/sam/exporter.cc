@@ -8,6 +8,7 @@
 #include "genie/format/sam/exporter.h"
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -131,9 +132,9 @@ std::string ECigar2Cigar(const std::string& ecigar) {
 
 void ProcessSecondMappedSegment(const size_t s,
                                 const core::record::Record& record,
-                                int64_t& tlen, uint16_t& flags,
-                                std::string& pnext, std::string& rnext,
-                                const RefInfo& refinfo) {
+                                std::pair<uint64_t, uint64_t>& mapped_range,
+                                uint16_t& flags, std::string& pnext,
+                                std::string& rnext, const RefInfo& refinfo) {
   // According to SAM standard, primary alignments only
   const auto split_type =
       record.GetClassId() == core::record::ClassType::kClassHm
@@ -143,7 +144,14 @@ void ProcessSecondMappedSegment(const size_t s,
       split_type == core::record::AlignmentSplit::Type::kUnpaired) {
     // Paired read is first read
     pnext = std::to_string(record.GetAlignments()[0].GetPosition() + 1);
-    tlen += static_cast<int64_t>(record.GetAlignments()[0].GetPosition() + 1);
+    mapped_range.first = std::min(
+        mapped_range.first,
+        static_cast<uint64_t>(record.GetAlignments()[0].GetPosition()));
+    mapped_range.second = std::max(
+        mapped_range.second,
+        record.GetAlignments()[0].GetPosition() +
+            MappedLength(ECigar2Cigar(
+                record.GetAlignments()[0].GetAlignment().GetECigar())));
     rnext = refinfo.IsValid()
                 ? refinfo.GetMgr()->Id2Ref(
                       record.GetAlignmentSharedData().GetSeqId())
@@ -159,9 +167,13 @@ void ProcessSecondMappedSegment(const size_t s,
               *record.GetAlignments()[0].GetAlignmentSplits().front().get());
       pnext = std::to_string(record.GetAlignments()[0].GetPosition() +
                              split.GetDelta() + 1);
-      tlen += static_cast<int64_t>(
-          record.GetAlignments()[0].GetPosition() + split.GetDelta() + 1 +
-          MappedLength(ECigar2Cigar(split.GetAlignment().GetECigar())));
+      mapped_range.first =
+          std::min(mapped_range.first,
+                   record.GetAlignments()[0].GetPosition() + split.GetDelta());
+      mapped_range.second = std::max(
+          mapped_range.second,
+          record.GetAlignments()[0].GetPosition() + split.GetDelta() +
+              MappedLength(ECigar2Cigar(split.GetAlignment().GetECigar())));
 
       rnext = refinfo.IsValid()
                   ? refinfo.GetMgr()->Id2Ref(
@@ -177,9 +189,9 @@ void ProcessSecondMappedSegment(const size_t s,
       rnext = refinfo.IsValid() ? refinfo.GetMgr()->Id2Ref(split.GetNextSeq())
                                 : std::to_string(split.GetNextSeq());
       pnext = std::to_string(split.GetNextPos() + 1);
-      tlen = 0;  // Not available without reading second record
+      mapped_range = {0, 0};
     } else {
-      tlen = 0;
+      mapped_range = {0, 0};
     }
   }
 }
@@ -229,9 +241,9 @@ uint16_t ComputeSamFlags(const size_t s, const size_t a,
 void ProcessFirstMappedSegment(const size_t s, const size_t a,
                                const core::record::Record& record,
                                std::string& rname, std::string& pos,
-                               int64_t& tlen, std::string& mapping_qual,
-                               std::string& cigar, uint16_t& flags,
-                               const RefInfo& refinfo) {
+                               std::pair<uint64_t, uint64_t>& mapped_bases,
+                               std::string& mapping_qual, std::string& cigar,
+                               uint16_t& flags, const RefInfo& refinfo) {
   // This read is mapped, process mapping
   rname =
       refinfo.IsValid()
@@ -240,7 +252,14 @@ void ProcessFirstMappedSegment(const size_t s, const size_t a,
   if (s == 0) {
     // First segment is in primary alignment
     pos = std::to_string(record.GetAlignments()[a].GetPosition() + 1);
-    tlen -= static_cast<int64_t>(record.GetAlignments()[a].GetPosition() + 1);
+    mapped_bases.first = std::min(
+        mapped_bases.first,
+        static_cast<uint64_t>(record.GetAlignments()[a].GetPosition()));
+    mapped_bases.second = std::max(
+        mapped_bases.second,
+        record.GetAlignments()[a].GetPosition() +
+            MappedLength(ECigar2Cigar(
+                record.GetAlignments()[a].GetAlignment().GetECigar())));
     mapping_qual =
         record.GetAlignments()[a].GetAlignment().GetMappingScores().empty()
             ? "0"
@@ -260,8 +279,13 @@ void ProcessFirstMappedSegment(const size_t s, const size_t a,
     cigar = ECigar2Cigar(split.GetAlignment().GetECigar());
     pos = std::to_string(record.GetAlignments()[a].GetPosition() +
                          split.GetDelta() + 1);
-    tlen -= static_cast<int64_t>(record.GetAlignments()[a].GetPosition() +
-                                 split.GetDelta() + 1 + MappedLength(cigar));
+    mapped_bases.first =
+        std::min(mapped_bases.first,
+                 static_cast<uint64_t>(record.GetAlignments()[a].GetPosition() +
+                                       split.GetDelta()));
+    mapped_bases.second = std::max(mapped_bases.second,
+                                   record.GetAlignments()[a].GetPosition() +
+                                       split.GetDelta() + MappedLength(cigar));
     mapping_qual =
         split.GetAlignment().GetMappingScores().empty()
             ? "0"
@@ -321,10 +345,11 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
         std::string cigar = "*";
         std::string rnext = "*";
         std::string pnext = "0";
-        int64_t tlen = 0;
+        auto mapped_range_1 = std::make_pair(
+            std::numeric_limits<uint64_t>::max(), static_cast<uint64_t>(0));
         if (mapped) {
           // First segment is mapped
-          ProcessFirstMappedSegment(s, a, record, rname, pos, tlen,
+          ProcessFirstMappedSegment(s, a, record, rname, pos, mapped_range_1,
                                     mapping_qual, cigar, flags, refinf);
         } else if (record.GetClassId() == core::record::ClassType::kClassHm) {
           // According to SAM standard, HM-like records should have
@@ -341,14 +366,29 @@ void Exporter::FlowIn(core::record::Chunk&& records, const util::Section& id) {
             continue;
           }
         }
-
+        int64_t tlen = 0;
+        auto mapped_range_2 = std::make_pair(
+            std::numeric_limits<uint64_t>::max(), static_cast<uint64_t>(0));
         if (other_mapped && record.GetNumberOfTemplateSegments() == 2) {
-          ProcessSecondMappedSegment(s, record, tlen, flags, pnext, rnext,
-                                     refinf);
+          ProcessSecondMappedSegment(s, record, mapped_range_2, flags, pnext,
+                                     rnext, refinf);
+          tlen = static_cast<int64_t>(
+              std::max(mapped_range_1.second, mapped_range_2.second) -
+              std::min(mapped_range_1.first, mapped_range_2.first));
+          if (mapped_range_1.first > mapped_range_2.first) {
+            tlen = -tlen;
+          } else if (mapped_range_1.first == mapped_range_2.first) {
+            if (mapped_range_1.second > mapped_range_2.second) {
+              tlen = -tlen;
+            } else if (mapped_range_1.second == mapped_range_2.second) {
+              if (s == 1) {
+                tlen = -tlen;
+              }
+            }
+          }
         } else {
           rnext = rname;
           pnext = pos;
-          tlen = 0;
         }
 
         // Use "=" shorthand
