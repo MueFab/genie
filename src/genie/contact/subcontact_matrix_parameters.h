@@ -19,8 +19,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace contact {
+namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -141,7 +140,7 @@ class SubcontactMatrixParameters {
      *
      * @return A constant reference to TileParameter.
      */
-    [[nodiscard]] const TileParameters& GetTileParameters() const;
+    [[maybe_unused]] [[nodiscard]] const TileParameters& GetTileParameters() const;
 
     /**
      * @brief Get the row mask exists flag.
@@ -150,7 +149,7 @@ class SubcontactMatrixParameters {
      *
      * @return The row mask exists flag.
      */
-    bool GetRowMaskExistsFlag() const;
+    [[nodiscard]] bool GetRowMaskExistsFlag() const;
 
     /**
      * @brief Get the column mask exists flag.
@@ -159,7 +158,7 @@ class SubcontactMatrixParameters {
      *
      * @return The column mask exists flag.
      */
-    bool GetColMaskExistsFlag() const;
+    [[nodiscard]] bool GetColMaskExistsFlag() const;
 
     // Setters
     /**
@@ -283,7 +282,7 @@ class SubcontactMatrixParameters {
      *
      * @return True if the subcontact matrix is symmetrical, false otherwise.
      */
-    bool IsIntraSCM() const;
+    [[nodiscard]] bool IsIntraSCM() const;
 
     /**
      * @brief Computes the size of the object in bytes.
@@ -309,8 +308,7 @@ class SubcontactMatrixParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace contact
-}  // namespace genie
+}  // namespace genie::contact
 
 // ---------------------------------------------------------------------------------------------------------------------
 

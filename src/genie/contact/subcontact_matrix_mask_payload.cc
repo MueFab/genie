@@ -203,7 +203,7 @@ size_t SubcontactMatrixMaskPayload::GetSize() const{
         size_bits += FIRST_VAL_BLEN;
         size_bits += NUM_RL_ENTRIES_BLEN;
         size_bits += rl_entries_.value().size() * (4u << static_cast<uint8_t>(transform_ID_));
-    };
+    }
 
     return static_cast<size_t>(ceil(static_cast<double>(size_bits) / 8));
 }

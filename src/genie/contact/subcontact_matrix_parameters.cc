@@ -162,7 +162,7 @@ void SubcontactMatrixParameters::SetCodecID(core::AlgoID codec_ID) { codec_ID_ =
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TileParameters& SubcontactMatrixParameters::GetTileParameters() const { return tile_parameters_; }
+[[maybe_unused]] const TileParameters& SubcontactMatrixParameters::GetTileParameters() const { return tile_parameters_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

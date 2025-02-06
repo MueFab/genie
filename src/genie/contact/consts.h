@@ -24,7 +24,7 @@ namespace genie::contact {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-using CountsDtype = uint32_t;
+//using CountsDtype = uint32_t;
 using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
 using UInt8VecDtype = xt::xtensor<uint8_t, 1, xt::layout_type::row_major>;
@@ -37,12 +37,12 @@ using Int64VecDtype = xt::xtensor<int64_t, 1, xt::layout_type::row_major>;
 
 using DoubleVecDtype = xt::xtensor<double_t, 1, xt::layout_type::row_major>;
 
-using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
+//using VecShapeDtype = xt::xtensor<size_t, 1>::shape_type;
 using MatShapeDtype = xt::xtensor<size_t, 2>::shape_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-using ContactRecords = std::list<genie::core::record::ContactRecord>;
+//using ContactRecords = std::list<genie::core::record::ContactRecord>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

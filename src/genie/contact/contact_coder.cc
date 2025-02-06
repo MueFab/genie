@@ -658,7 +658,7 @@ void transform_row_bin(
     auto ncols = mat.shape(1);
 
     UInt8VecDtype nbits_per_row = xt::cast<uint8_t>(xt::ceil(
-        xt::log2(xt::amax(mat, {1}) + 1)
+        xt::log2(xt::amax(mat, {1}) + 1u)
     ));
     // Handle the case where maximum value is 0 -> log2(1) = 0 bits
     xt::filter(nbits_per_row, xt::equal(nbits_per_row, 0u)) = 1;
@@ -1425,7 +1425,7 @@ void encode_scm(
             // argwhere row_ids equal to col_ids
             auto main_diag_positions = xt::argwhere(xt::equal(row_ids, col_ids));
             int num_norms = rec.getNumNormCounts();
-            for (auto i_norm = 0; i_norm < num_norms; i_norm++){
+            for (auto i_norm = 0u; i_norm < num_norms; i_norm++){
                 DoubleVecDtype norm_counts = xt::adapt(rec.getNormCounts()[i_norm], {num_entries});
                 auto norm_main_diag_counts = xt::view(norm_counts, main_diag_positions);
                 auto weights = xt::view(norm_counts, main_diag_positions) / xt::view(counts, main_diag_positions);
