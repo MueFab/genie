@@ -33,11 +33,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
         genoAnnotation.setCompressors(compressors);
         genoAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = genoAnnotation.parseGenotype(inputfile, numBitPlanes);
-        std::ofstream nbp_file;
-        nbp_file.open(num_bit_plane_filename + ".txt", std::ios::out);
-        for (auto& nbp : numBitPlanes)   {
-            nbp_file << std::to_string(nbp.first) << "," << std::to_string(nbp.second) << std::endl;
-        }
+
         for (auto& dataunit : dataunits) {
             annotationParameterSet.push_back(dataunit.annotationParameterSet);
             annotationAccessUnit.insert(annotationAccessUnit.end(), dataunit.annotationAccessUnit.begin(),
@@ -62,6 +58,7 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 }
 
 void Annotation::writeToFile(std::string& outputFileName) {
+  std::cerr << " start of writeToFile... " << std::endl;
     std::ofstream testfile;
     std::string filename = outputFileName;
     testfile.open(filename + ".bin", std::ios::binary | std::ios::out);
@@ -77,7 +74,7 @@ void Annotation::writeToFile(std::string& outputFileName) {
         APS_dataUnit.write(txtwriter, sizeSofar);
     }
     for (auto& aau : annotationAccessUnit) {
-        genie::core::record::data_unit::Record AAU_dataUnit(aau);
+      genie::core::record::data_unit::Record AAU_dataUnit(aau);
         sizeSofar = AAU_dataUnit.write(testwriter);
         AAU_dataUnit.write(txtwriter, sizeSofar);
     }

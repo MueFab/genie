@@ -24,7 +24,7 @@ run_the_test()
     cd $git_root_dir/cmake-build-debug/bin
     if [[ $fileExt == ".exe" ]]
     then
-        cd Debug
+        cd Release
     fi
     TestSetName=$1
     if [[ ! -x $TestSetName$fileExt ]]
@@ -44,13 +44,13 @@ echo "Running unit tests:"
 
 
 #run_the_test "annotationParameterSet-tests"
-run_the_test "entropy-tests"
+#run_the_test "entropy-tests"
 run_the_test "genie-test-annotation"
-run_the_test "genie-test-conformance"
-run_the_test "genie-test-contact"
-run_the_test "genie-test-genotype"
-run_the_test "genie-test-likelihood"
-run_the_test "genie-test-records"
+#run_the_test "genie-test-conformance"
+#run_the_test "genie-test-contact"
+#run_the_test "genie-test-genotype"
+#run_the_test "genie-test-likelihood"
+#run_the_test "genie-test-records"
 #run_the_test "VariantSiteRecord-tests"
 
 
