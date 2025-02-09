@@ -14,8 +14,8 @@
 #include "genie/util/runtime_exception.h"
 #include "site_annotation.h"
 
-#include "AnnotationEncoder.h"
-#include "ParameterSetComposer.h"
+#include "annotation_encoder.h"
+#include "parameterset_composer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

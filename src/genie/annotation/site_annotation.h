@@ -10,7 +10,7 @@
 #include <fstream>
 #include <map>
 #include <sstream>
-#include "genie/annotation/JsonAttributeParser.h"
+#include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
 #include "genie/variantsite/accessunit_composer.h"
 #include "genie/variantsite/parameterset_composer.h"

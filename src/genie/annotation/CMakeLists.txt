@@ -7,10 +7,10 @@ set(source_files
 		geno_annotation.cc
 		site_annotation.cc
 		contact_annotation.cc
-        JsonAttributeParser.cc
-        Compressors.cc
-		ParametersetComposer.cc
-		AnnotationEncoder.cc
+        compressors.cc
+		parameterset_composer.cc
+		annotation_encoder.cc
+		json_attribute_parser.cc
 )
 
 

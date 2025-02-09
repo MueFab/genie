@@ -13,8 +13,8 @@
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 
-#include "AnnotationEncoder.h"
-#include "ParameterSetComposer.h"
+#include "annotation_encoder.h"
+#include "parameterSet_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
