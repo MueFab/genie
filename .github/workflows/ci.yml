@@ -142,12 +142,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: genie-debug-ubuntu2404-${{ github.sha }}
+          path: cmake-build-debug/bin
 
-      - name: Copy Debug Binaries
-        run: |
-          mkdir -p cmake-build-debug/bin
-          mv genie-debug-ubuntu2404-${{ github.sha }} cmake-build-debug/bin
-          chmod +x cmake-build-debug/bin/*
+      - name: Make Debug Binaries Executable
+        run: chmod +x cmake-build-debug/bin/*
 
       - name: Run Unit Tests
         run: ci/unit_test.sh
