@@ -19,7 +19,7 @@
 #include "genie/entropy/zstd/encoder.h"
 #include "genie/genotype/genotype_payload.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/AccessUnitComposer.h"
+#include "genie/variantsite/accessunit_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

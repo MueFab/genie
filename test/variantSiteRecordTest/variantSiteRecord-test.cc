@@ -21,9 +21,9 @@
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
 #include "genie/core/record/variant_site/record.h"
-#include "genie/variantsite/AccessUnitComposer.h"
-#include "genie/variantsite/ParameterSetComposer.h"
-#include "genie/variantsite/VariantSiteParser.h"
+#include "genie/variantsite/accessunit_composer.h"
+#include "genie/variantsite/parameterset_composer.h"
+#include "genie/variantsite/variantsite_parser.h"
 
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"

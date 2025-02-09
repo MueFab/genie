@@ -13,7 +13,7 @@
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/Tiles.h"
+#include "genie/variantsite/tiles.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
