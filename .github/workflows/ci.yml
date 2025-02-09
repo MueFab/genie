@@ -139,7 +139,7 @@ jobs:
           sudo make install
 
       - name: Download Debug Binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: genie-debug-ubuntu2404-${{ github.sha }}
 
@@ -221,7 +221,7 @@ jobs:
           make --jobs
 
       - name: Download Release Binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: genie-release-ubuntu2404-${{ github.sha }}
 
