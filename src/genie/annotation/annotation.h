@@ -11,14 +11,10 @@
 #include <fstream>
 #include <list>
 #include <map>
-#include <optional>
 #include <sstream>
 #include <tuple>
-#include "genie/annotation/JsonAttributeParser.h"
+
 #include "genie/core/constants.h"
-#include "genie/variantsite/AccessUnitComposer.h"
-#include "genie/variantsite/ParameterSetComposer.h"
-#include "genie/variantsite/VariantSiteParser.h"
 
 #include "geno_annotation.h"
 #include "site_annotation.h"
@@ -46,7 +42,6 @@ class Annotation {
         siteAnnotation.setTileSize(_defaultTileSizeHeight);
     }
 
-  //  void setInfoFields(std::string jsonFileName);
     void startStream(RecType recType, std::string recordInputFileName, std::string outputFileName);
 
     void writeToFile(std::string& outputFileName);
@@ -61,7 +56,6 @@ class Annotation {
     genie::annotation::Compressor compressors;
     std::map<std::string, InfoField> attributeInfo;
 
-    genie::variant_site::AccessUnitComposer accessUnitcomposer;
     std::vector<genie::core::record::annotation_parameter_set::Record> annotationParameterSet;
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit;
 

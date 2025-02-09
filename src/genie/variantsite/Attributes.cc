@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 #include "genie/variantsite/Attributes.h"

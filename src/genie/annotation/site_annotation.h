@@ -12,9 +12,9 @@
 #include <sstream>
 #include "genie/annotation/JsonAttributeParser.h"
 #include "genie/core/constants.h"
-#include "genie/variantsite/AccessUnitComposer.h"
-#include "genie/variantsite/ParameterSetComposer.h"
-#include "genie/variantsite/VariantSiteParser.h"
+#include "genie/variantsite/accessunit_composer.h"
+#include "genie/variantsite/parameterset_composer.h"
+#include "genie/variantsite/variantsite_parser.h"
 
 #include "genie/annotation/Compressors.h"
 #include "genie/core/record/data_unit/record.h"

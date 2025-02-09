@@ -11,9 +11,8 @@
 #include "genie/core/arrayType.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/Descriptors.h"
+#include "genie/variantsite/descriptors.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

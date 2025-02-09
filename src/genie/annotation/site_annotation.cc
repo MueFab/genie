@@ -8,7 +8,7 @@
 #include <codecs/include/mpegg-codecs.h>
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
-#include "genie/variantsite/AccessUnitComposer.h"
+#include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
