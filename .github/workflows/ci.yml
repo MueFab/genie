@@ -153,19 +153,19 @@ jobs:
         run: ci/unit_test.sh
 
       - name: Upload Utils Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: utils-ubuntu2404-${{ github.sha }}
           path: cmake-build-debug/bin/utils_test.xml
 
       - name: Upload Coding Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coding-ubuntu2404-${{ github.sha }}
           path: cmake-build-debug/bin/coding_test.xml
 
       - name: Upload Gabac Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gabac-ubuntu2404-${{ github.sha }}
           path: cmake-build-debug/bin/gabac_test.xml
@@ -224,12 +224,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: genie-release-ubuntu2404-${{ github.sha }}
+          path: cmake-build-release/bin
 
-      - name: Copy Release Binaries
-        run: |
-          mkdir -p cmake-build-release/bin
-          mv genie-release-ubuntu2404-${{ github.sha }} cmake-build-release/bin
-          chmod +x cmake-build-release/bin/*
+      - name: Make Release Binaries Executable
+        run: chmod +x cmake-build-release/bin/*
+
 
       - name: Run Conformance Tests
         run: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
