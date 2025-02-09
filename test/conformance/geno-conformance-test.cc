@@ -26,7 +26,7 @@
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/data_unit/record.h"
-#include "genie/variantsite/AccessUnitComposer.h"
+#include "genie/variantsite/accessunit_composer.h"
 
 #include "genie/annotation/annotation.h"
 #include "genie/likelihood/likelihood_coder.h"

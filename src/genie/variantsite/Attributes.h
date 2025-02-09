@@ -30,6 +30,10 @@
 namespace genie {
 namespace variant_site {
 
+
+
+
+
 class AttributeTile {
  public:
     AttributeTile(uint64_t _rowsPerTile, genie::core::record::annotation_parameter_set::AttributeData _info)
