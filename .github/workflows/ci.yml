@@ -54,13 +54,13 @@ jobs:
         run: ./ci/build.sh debug
 
       - name: Upload Debug Binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: genie-debug-ubuntu2404-${{ github.sha }}
           path: cmake-build-debug/bin
 
       - name: Upload Documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: genie-documentation-${{ github.sha }}
           path: cmake-build-debug/documentation/html
@@ -105,7 +105,7 @@ jobs:
         run: ./ci/build.sh release
 
       - name: Upload Release Binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: genie-release-ubuntu2404-${{ github.sha }}
           path: cmake-build-release/bin
