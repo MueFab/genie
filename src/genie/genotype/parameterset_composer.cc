@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "genie/core/constants.h"
-#include "genie/genotype/ParameterSetComposer.h"
+#include "genie/genotype/parameterset_composer.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

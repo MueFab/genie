@@ -8,8 +8,8 @@
 
 #include <codecs/include/mpegg-codecs.h>
 
-#include "AnnotationEncoder.h"
-#include "ParameterSetComposer.h"
+#include "annotation_encoder.h"
+#include "parameterset_composer.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"

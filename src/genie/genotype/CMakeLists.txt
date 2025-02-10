@@ -10,7 +10,7 @@ set(source_files
         genotype_coder.cc
         genotype_parameters.cc
         genotype_payload.cc
-        ParameterSetComposer.cc
+        parameterset_composer.cc
 )
 
 add_library(${PROJECT_NAME} ${source_files})

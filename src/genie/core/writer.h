@@ -33,7 +33,7 @@ class FilePos {
         substracted.first = a.first - b.first;
         if (a.second < b.second) {
             substracted.first--;
-            substracted.second = (8 + a.second - b.second);
+            substracted.second = static_cast<uint8_t>(8 + a.second - b.second);
         } else {
             substracted.second = a.second - b.second;
         }

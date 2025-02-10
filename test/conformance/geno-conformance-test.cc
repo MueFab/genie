@@ -18,7 +18,7 @@
 
 #include "genie/core/record/annotation_parameter_set/AlgorithmParameters.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
-#include "genie/genotype/ParameterSetComposer.h"
+#include "genie/genotype/parameterset_composer.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/genotype/genotype_payload.h"
 

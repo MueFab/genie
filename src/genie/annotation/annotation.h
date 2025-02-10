@@ -15,7 +15,7 @@
 #include <tuple>
 
 #include "contact_annotation.h"
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/data_unit/record.h"
 #include "geno_annotation.h"

@@ -14,7 +14,7 @@
 #include "genie/core/record/contact/record.h"
 
 #include "annotation_encoder.h"
-#include "parameterSet_composer.h"
+#include "parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

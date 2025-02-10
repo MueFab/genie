@@ -25,7 +25,7 @@
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
 
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/genotype/genotype_parameters.h"

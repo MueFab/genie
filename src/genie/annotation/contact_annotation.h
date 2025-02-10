@@ -15,7 +15,7 @@
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/variant_genotype/record.h"
 
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
