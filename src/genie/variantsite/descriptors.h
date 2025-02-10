@@ -21,7 +21,7 @@
 #include "genie/core/record/variant_site/record.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
-#include "genie/variantsite/Tiles.h"
+#include "genie/variantsite/tiles.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

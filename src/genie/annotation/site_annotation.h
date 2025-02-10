@@ -16,7 +16,7 @@
 #include "genie/variantsite/parameterset_composer.h"
 #include "genie/variantsite/variantsite_parser.h"
 
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 #include "genie/core/record/data_unit/record.h"
 // -----------------------------------------------------------------------------
 

@@ -22,7 +22,7 @@
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 #include "genie/core/record/annotation_parameter_set/AnnotationEncodingParameters.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
 #include "genie/core/record/annotation_parameter_set/record.h"

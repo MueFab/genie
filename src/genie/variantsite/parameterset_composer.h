@@ -24,7 +24,7 @@
 
 #include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/annotation_parameter_set/AttributeData.h"
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

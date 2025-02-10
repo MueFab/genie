@@ -17,7 +17,7 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "Compressors.h"
+#include "compressors.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"

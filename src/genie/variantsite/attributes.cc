@@ -12,7 +12,7 @@
 #include "attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/Attributes.h"
+#include "genie/variantsite/attributes.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

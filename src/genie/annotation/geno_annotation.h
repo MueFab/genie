@@ -21,7 +21,7 @@
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
 
-#include "genie/annotation/Compressors.h"
+#include "genie/annotation/compressors.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
