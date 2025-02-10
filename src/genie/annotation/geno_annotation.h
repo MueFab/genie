@@ -4,19 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ANNOTATION_GENO_ANNOTATION_H
-#define GENIE_ANNOTATION_GENO_ANNOTATION_H
+#ifndef SRC_GENIE_ANNOTATION_GENO_ANNOTATION_H_
+#define SRC_GENIE_ANNOTATION_GENO_ANNOTATION_H_
 
 #include <fstream>
 #include <list>
 #include <map>
 #include <utility>
 #include <sstream>
+#include <vector>
 #include "genie/core/constants.h"
 
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/variant_genotype/record.h"
-//#include "genie/genotype/ParameterSetComposer.h"
+// #include "genie/genotype/ParameterSetComposer.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/likelihood/likelihood_coder.h"
 #include "genie/likelihood/likelihood_payload.h"
@@ -111,4 +112,4 @@ class GenoAnnotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_ANNOTATION_GENO_ANNOTATION_H
+#endif  // SRC_GENIE_ANNOTATION_GENO_ANNOTATION_H_

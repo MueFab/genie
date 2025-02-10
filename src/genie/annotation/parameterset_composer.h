@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
-#define SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
+#ifndef SRC_GENIE_ANNOTATION_PARAMETERSET_COMPOSER_H_
+#define SRC_GENIE_ANNOTATION_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -43,9 +43,8 @@ class ParameterSetComposer {
         uint8_t AT_ID, uint8_t AG_class, std::pair<uint64_t, uint64_t> tile_Size,
                          core::record::annotation_parameter_set::AnnotationEncodingParameters& annotationEncodingpars);
 
- 
- private:
 
+ private:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,7 +54,7 @@ class ParameterSetComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ANNOTATION_PARAMETERSETCOMPOSER_H_
+#endif  // SRC_GENIE_ANNOTATION_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

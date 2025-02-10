@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "geno_annotation.h"
+#include "genie/annotation/geno_annotation.h"
 
 #include <codecs/include/mpegg-codecs.h>
+#include <string>
+#include <tuple>
 
-#include "annotation_encoder.h"
-#include "parameterset_composer.h"
+#include "genie/annotation/annotation_encoder.h"
+#include "genie/annotation/parameterset_composer.h"
 #include "genie/core/arrayType.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/annotation_access_unit/TypedData.h"

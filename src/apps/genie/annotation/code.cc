@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <istream>
@@ -116,7 +117,7 @@ void encodeVariantSite(const std::string& _inputFileName, const std::string& _ou
     std::vector<genie::core::record::annotation_access_unit::Record> annotationAccessUnit(parser.getNrOfTiles());
 
     genie::variant_site::AccessUnitComposer accessUnit;
-   // uint8_t AT_ID = 1;
+    // uint8_t AT_ID = 1;
 
     for (uint64_t i = 0; i < parser.getNrOfTiles(); ++i) {
         std::map<genie::core::AnnotDesc, std::stringstream> desc;

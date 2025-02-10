@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ANNOTATION_ANNOTATIONENCODER_H_
-#define SRC_GENIE_ANNOTATION_ANNOTATIONENCODER_H_
+#ifndef SRC_GENIE_ANNOTATION_ANNOTATION_ENCODER_H_
+#define SRC_GENIE_ANNOTATION_ANNOTATION_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -106,7 +107,7 @@ class AnnotationEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ANNOTATION_ANNOTATIONENCODER_H_
+#endif  // SRC_GENIE_ANNOTATION_ANNOTATION_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

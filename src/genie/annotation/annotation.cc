@@ -5,12 +5,13 @@
  */
 
 #include <codecs/include/mpegg-codecs.h>
-#include "annotation.h"
+#include <utility>
+#include "genie/annotation/annotation.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 
-//#include "genie/variantsite/parameterset_composer.h"
-//#include "genie/variantsite/variantsite_parser.h"
+// #include "genie/variantsite/parameterset_composer.h"
+// #include "genie/variantsite/variantsite_parser.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,9 +19,7 @@ namespace genie {
 namespace annotation {
 
 void genie::annotation::Annotation::startStream(RecType recType, std::string recordInputFileName,
-                                                std::string outputFileName)
-
-{
+                                                std::string outputFileName) {
     std::ifstream inputfile;
     inputfile.open(recordInputFileName, std::ios::in | std::ios::binary);
 

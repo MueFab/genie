@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include <chrono>
+// #include <chrono>
 
 #include <codecs/include/mpegg-codecs.h>
 
@@ -12,10 +12,10 @@
 
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
-#include "site_annotation.h"
+#include "genie/annotation/site_annotation.h"
 
-#include "annotation_encoder.h"
-#include "parameterset_composer.h"
+#include "genie/annotation/annotation_encoder.h"
+#include "genie/annotation/parameterset_composer.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -62,10 +62,10 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
     annotationParameterSet =
         parameterset.Compose(AT_ID, AG_class, {defaultTileSizeHeight, 0}, annotationEncodingParameters);
 
-      genie::variant_site::ParameterSetComposer encodeParameters;
- 
-      genie::variant_site::AccessUnitComposer accessUnit;
-      accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS,1);
+    genie::variant_site::ParameterSetComposer encodeParameters;
+
+    genie::variant_site::AccessUnitComposer accessUnit;
+    accessUnit.setATtype(core::record::annotation_access_unit::AnnotationType::VARIANTS, 1);
     accessUnit.setCompressors(compressors);
     annotationAccessUnit.resize(parser.getNrOfTiles());
     uint64_t rowIndex = 0;

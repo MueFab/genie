@@ -9,10 +9,9 @@
 #include <utility>
 #include <vector>
 
-#include "attributes.h"
+#include "genie/variantsite/attributes.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/attributes.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -111,11 +110,11 @@ void AttributeTile::setCompressedData(uint64_t tilenr, std::stringstream& compre
     (void)compressedData;
 }
 
-void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)//, std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
+void Attributes::add(std::vector<genie::core::record::variant_site::InfoFields::Field> tags)  // , std::vector<std::vector<std::vector<uint8_t>>> infoValues) {
 {
     size_t index = 0;
     for (const auto& tag : tags) {
-        attributeTiles[tag.tag].write(tag.values);// infoValues.at(index));
+        attributeTiles[tag.tag].write(tag.values);  // infoValues.at(index));
         attrWritten[tag.tag] = true;
         index++;
     }

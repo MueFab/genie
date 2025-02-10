@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include "variantsite_parser.h"
+#include "genie/variantsite/parameterset_composer.h"
 
 #include <algorithm>
 #include <string>
@@ -15,7 +15,7 @@
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-//#include "genie/contact/contact_matrix_parameters.h"
+// #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
 #include "genie/core/record/annotation_parameter_set/TileConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/TileStructure.h"
@@ -24,7 +24,7 @@
 #include "genie/entropy/zstd/encoder.h"
 #include "genie/genotype/genotype_parameters.h"
 #include "genie/likelihood/likelihood_parameters.h"
-#include "genie/variantsite/parameterset_composer.h"
+#include "genie/variantsite/variantsite_parser.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setP
         bscParameters.compressorParameterSet(1), lzmaParameters.compressorParameterSet(2),
         zstdParameters.compressorParameterSet(3)};
 
-    return setParameterSet(descrList, info, compressor_parameter_set, defaultTileSize,AT_ID);
+    return setParameterSet(descrList, info, compressor_parameter_set, defaultTileSize, AT_ID);
 }
 
 genie::core::record::annotation_parameter_set::Record ParameterSetComposer::setParameterSet(

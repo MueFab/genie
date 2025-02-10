@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
-#define SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_PARAMETERSET_COMPOSER_H_
+#define SRC_GENIE_VARIANTSITE_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -51,7 +51,7 @@ class ParameterSetComposer {
         genie::annotation::Compressor compressors,
         uint64_t defaultTileSize);
 
-private:
+ private:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ private:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANTSITE_PARAMETERSETCOMPOSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_PARAMETERSET_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

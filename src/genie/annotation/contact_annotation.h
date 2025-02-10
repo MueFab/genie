@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ANNOTATION_CONTACT_ANNOTATION_H
-#define GENIE_ANNOTATION_CONTACT_ANNOTATION_H
+#ifndef SRC_GENIE_ANNOTATION_CONTACT_ANNOTATION_H_
+#define SRC_GENIE_ANNOTATION_CONTACT_ANNOTATION_H_
 
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <vector>
 #include "genie/core/constants.h"
 
 #include "genie/contact/contact_coder.h"
@@ -63,4 +64,4 @@ class CMAnnotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_ANNOTATION_CONTACT_ANNOTATION_H
+#endif  // SRC_GENIE_ANNOTATION_CONTACT_ANNOTATION_H_

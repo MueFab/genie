@@ -6,6 +6,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include "genie/annotation/compressors.h"
+
 #include <cctype>
 #include <cstdint>
 #include <memory>
@@ -17,7 +19,6 @@
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
-#include "compressors.h"
 #include "genie/entropy/bsc/encoder.h"
 #include "genie/entropy/lzma/encoder.h"
 #include "genie/entropy/zstd/encoder.h"
@@ -62,9 +63,9 @@ void Compressor::compress(std::stringstream& input, std::stringstream& output, u
         if (compressor.getCompressorID() == compressorID) comp = compressor;
 
     for (uint8_t i = 0; i < comp.getNumberOfCompressorSteps(); ++i) {
-        if (i == 0)
+        if (i == 0) {
             intermediateIn << input.rdbuf();
-        else {
+        } else {
             intermediateIn.str("");
             intermediateIn.clear();
             intermediateIn << intermediateOut.rdbuf();
@@ -105,62 +106,62 @@ class Parameter {
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<uint8_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, bool& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<bool>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, genie::core::AlgoID& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = genie::core::stringToAlgoID(parameterIn);
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, uint16_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<uint16_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, uint32_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<uint32_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, uint64_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         std::istringstream iss(parameterIn);
         iss >> parameterOut;
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, int8_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<int8_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, int16_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<int16_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, int32_t& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = static_cast<int32_t>(std::stoi(parameterIn));
         return lastParameter;
-    };
+    }
     bool read(std::string parameterIn, std::string& parameterOut) {
         if (parameterIn.empty()) return true;
         bool lastParameter = stripAndIfLast(parameterIn);
         parameterOut = parameterIn;
         return lastParameter;
-    };
+    }
 
  private:
     bool stripAndIfLast(std::string& parameter) {

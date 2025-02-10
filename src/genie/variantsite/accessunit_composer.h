@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
-#define SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_ACCESSUNIT_COMPOSER_H_
+#define SRC_GENIE_VARIANTSITE_ACCESSUNIT_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <iostream>
@@ -42,7 +42,7 @@ class AccessUnitComposer {
     void setATtype(core::record::annotation_access_unit::AnnotationType ATtype, uint8_t ATsubtype) {
         AT_type = ATtype;
         AT_subtype = ATsubtype;
-    };
+    }
 
 
     void setAccessUnit(std::map<core::AnnotDesc, std::stringstream>& descriptorStream,
@@ -104,7 +104,7 @@ class AccessUnitComposer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANTSITE_ACCESSUNITCOMPOSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_ACCESSUNIT_COMPOSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

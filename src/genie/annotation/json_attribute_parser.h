@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_ANNOTATION_JSONINFOFIELDPARSER_H_
-#define SRC_GENIE_ANNOTATION_JSONINFOFIELDPARSER_H_
+#ifndef SRC_GENIE_ANNOTATION_JSON_ATTRIBUTE_PARSER_H_
+#define SRC_GENIE_ANNOTATION_JSON_ATTRIBUTE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -69,7 +69,7 @@ class JsonAttributeParser {
     std::map<std::string, uint8_t> infoFieldType;
 
     void ParseInfoFields();
-    void ParseFormatFields(){};
+    void ParseFormatFields() {}
     genie::core::DataType InterpretType(std::string type) const;
     uint8_t InterpretSize(std::string size) const;
 };
@@ -81,7 +81,7 @@ class JsonAttributeParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_ANNOTATION_JSONINFOFIELDPARSER_H_
+#endif  // SRC_GENIE_ANNOTATION_JSON_ATTRIBUTE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

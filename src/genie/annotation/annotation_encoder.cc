@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "annotation_encoder.h"
+#include "genie/annotation/annotation_encoder.h"
 #include "genie/core/constants.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"

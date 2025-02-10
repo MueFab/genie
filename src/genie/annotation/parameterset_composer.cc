@@ -14,7 +14,7 @@
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-#include "parameterset_composer.h"
+#include "genie/annotation/parameterset_composer.h"
 
 // #include "genie/contact/contact_matrix_parameters.h"
 #include "genie/core/record/annotation_parameter_set/CompressorParameterSet.h"
