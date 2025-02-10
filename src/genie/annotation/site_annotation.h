@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SITE_ANNOTATION_ANNOTATION_H
-#define GENIE_SITE_ANNOTATION_ANNOTATION_H
+#ifndef SRC_GENIE_ANNOTATION_SITE_ANNOTATION_H_
+#define SRC_GENIE_ANNOTATION_SITE_ANNOTATION_H_
 
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 #include "genie/annotation/json_attribute_parser.h"
 #include "genie/core/constants.h"
 #include "genie/variantsite/accessunit_composer.h"
@@ -50,7 +52,7 @@ class SiteAnnotation {
         genie::core::AnnotDesc::NAME,       genie::core::AnnotDesc::DESCRIPTION,    genie::core::AnnotDesc::LINKNAME,
         genie::core::AnnotDesc::LINKID,     genie::core::AnnotDesc::DEPTH,          genie::core::AnnotDesc::SEQQUALITY,
         genie::core::AnnotDesc::MAPQUALITY, genie::core::AnnotDesc::MAPNUMQUALITY0, genie::core::AnnotDesc::REFERENCE,
-        genie::core::AnnotDesc::ALTERN,     genie::core::AnnotDesc::FILTER}        ;
+        genie::core::AnnotDesc::ALTERN,     genie::core::AnnotDesc::FILTER};
 
 
     genie::variant_site::AccessUnitComposer accessUnitcomposer;
@@ -65,4 +67,4 @@ class SiteAnnotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_SITE_ANNOTATION_ANNOTATION_H
+#endif  // SRC_GENIE_ANNOTATION_SITE_ANNOTATION_H_

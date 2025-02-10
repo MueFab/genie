@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include "variantsite_parser.h"
+#include "genie/variantsite/accessunit_composer.h"
 
 #include <algorithm>
 #include <string>
@@ -14,7 +14,7 @@
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
-#include "genie/variantsite/accessunit_composer.h"
+#include "genie/variantsite/variantsite_parser.h"
 
 #include "genie/core/record/variant_genotype/record.h"
 #include "genie/core/record/variant_site/record.h"
@@ -49,7 +49,7 @@ void AccessUnitComposer::setAccessUnit(
     std::vector<genie::core::record::annotation_access_unit::Block> blocks;
     AT_ID = _AT_ID;
     AG_class = _AG_class;
-    if (AG_class == 0 || AG_class == 2) //genotype or contact
+    if (AG_class == 0 || AG_class == 2)  // genotype or contact
         tile_index_2_exists = true;
     else
         tile_index_2_exists = false;
@@ -124,9 +124,9 @@ void AccessUnitComposer::compress(
     for (auto encodingpar : descriptorConfigurations) {
         if (encodingpar.getDescriptorID() == genie::core::AnnotDesc::GENOTYPE ||
             encodingpar.getDescriptorID() == genie::core::AnnotDesc::LIKELIHOOD ||
-            encodingpar.getDescriptorID() == genie::core::AnnotDesc::CONTACT)
+            encodingpar.getDescriptorID() == genie::core::AnnotDesc::CONTACT) {
             encodedDescriptors[encodingpar.getDescriptorID()] << inputstream[encodingpar.getDescriptorID()].rdbuf();
-        else
+        } else {
             switch (encodingpar.getEncodingModeID()) {
                 case genie::core::AlgoID::BSC:
                     bscEncoder.encode(inputstream[encodingpar.getDescriptorID()],
@@ -144,6 +144,7 @@ void AccessUnitComposer::compress(
                 default:
                     break;
             }
+        }
     }
 }
 

@@ -53,7 +53,7 @@ genie::core::DataType JsonAttributeParser::InterpretType(std::string type) const
     if (type == "INT32") return genie::core::DataType::INT32;
     if (type == "UINT32") return genie::core::DataType::UINT32;*/
     return static_cast<genie::core::DataType>(stoi(type));
-   // return genie::core::DataType::UINT64;
+    // return genie::core::DataType::UINT64;
 }
 
 uint8_t JsonAttributeParser::InterpretSize(std::string size) const {

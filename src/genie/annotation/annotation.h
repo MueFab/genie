@@ -4,22 +4,24 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ANNOTATION_ANNOTATION_H
-#define GENIE_ANNOTATION_ANNOTATION_H
+#ifndef SRC_GENIE_ANNOTATION_ANNOTATION_H_
+#define SRC_GENIE_ANNOTATION_ANNOTATION_H_
 
 #include <cstdint>
 #include <fstream>
 #include <list>
 #include <map>
 #include <sstream>
+#include <string>
 #include <tuple>
+#include <vector>
 
-#include "contact_annotation.h"
+#include "genie/annotation/contact_annotation.h"
 #include "genie/annotation/compressors.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/data_unit/record.h"
-#include "geno_annotation.h"
-#include "site_annotation.h"
+#include "genie/annotation/geno_annotation.h"
+#include "genie/annotation/site_annotation.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {
@@ -84,4 +86,4 @@ class Annotation {
 
 // -----------------------------------------------------------------------------
 
-#endif  // GENIE_ANNOTATION_ANNOTATION_H
+#endif  // SRC_GENIE_ANNOTATION_ANNOTATION_H_

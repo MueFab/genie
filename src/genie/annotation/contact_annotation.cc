@@ -5,16 +5,17 @@
  */
 
 #include <codecs/include/mpegg-codecs.h>
-#include "annotation.h"
+#include <string>
+#include "genie/annotation/annotation.h"
 #include "genie/core/arrayType.h"
 #include "genie/util/runtime_exception.h"
 
-#include "contact_annotation.h"
+#include "genie/annotation/contact_annotation.h"
 #include "genie/contact/contact_coder.h"
 #include "genie/core/record/contact/record.h"
 
-#include "annotation_encoder.h"
-#include "parameterset_composer.h"
+#include "genie/annotation/annotation_encoder.h"
+#include "genie/annotation/parameterset_composer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

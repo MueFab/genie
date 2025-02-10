@@ -40,7 +40,7 @@ class Compressor {
  public:
     Compressor();
     void parseConfig(std::stringstream& config);
-    uint8_t getNrOfCompressorIDs() const { return static_cast<uint8_t>(compressorParameters.size()); };
+    uint8_t getNrOfCompressorIDs() const { return static_cast<uint8_t>(compressorParameters.size()); }
 
     void compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID);
 

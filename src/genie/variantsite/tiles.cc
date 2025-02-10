@@ -27,11 +27,9 @@ void TiledStream::write(std::string value) {
 
 void TiledStream::setTile() {
     if (rowsPerTile == 0) {
-    }
-    else if (rowInTile < rowsPerTile) {
+    } else if (rowInTile < rowsPerTile) {
         rowInTile++;
-    }
-    else {
+    } else {
       tiles.tileWriter.back().Flush();
         tiles.tileData.emplace_back("");
         tiles.tileWriter.emplace_back(&tiles.tileData.back());

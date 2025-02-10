@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
-#define SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
+#ifndef SRC_GENIE_VARIANTSITE_VARIANTSITE_PARSER_H_
+#define SRC_GENIE_VARIANTSITE_VARIANTSITE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 #include <cstdint>
@@ -87,7 +87,7 @@ class VariantSiteParser {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_VARIANTSITE_VARIANTSITEPARSER_H_
+#endif  // SRC_GENIE_VARIANTSITE_VARIANTSITE_PARSER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
