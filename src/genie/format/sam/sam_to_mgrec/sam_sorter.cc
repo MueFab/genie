@@ -1,3 +1,9 @@
+/**
+* @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "genie/format/sam/sam_to_mgrec/sam_sorter.h"
 
 #include <fcntl.h>
@@ -5,8 +11,9 @@
 
 #include <algorithm>
 #include <iostream>
-#include <mutex>
-#include <thread>
+#include <mutex> //NOLINT
+#include <thread> //NOLINT
+#include <limits>
 
 namespace genie::format::sam::sam_to_mgrec {
 
@@ -153,5 +160,3 @@ void SamSorter::endFile() {
 }
 
 }  // namespace genie::format::sam::sam_to_mgrec
-
-//

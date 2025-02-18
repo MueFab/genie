@@ -16,7 +16,6 @@
 #include "genie/transcode-fasta/main.h"
 #include "genie/transcode-fastq/main.h"
 #include "genie/transcode-sam/main.h"
-#include "genie/sam_sort_test/main.h"
 
 #include "genie/util/runtime-exception.h"
 
@@ -78,8 +77,6 @@ int main(int argc, char* argv[]) {
             genieapp::capsulator::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
-        } else if (operation == "sort") {
-            genieapp::sam_sort_test::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {
             UTILS_DIE("Unknown operation " + operation + "! Type \"genie help\" for a list of operations.");
         }

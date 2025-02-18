@@ -43,7 +43,7 @@ class Importer : public core::FormatImporter {
      * @param _file_list Where to read data from (2 streams in paired mode)
      * @return Data extracted from the fastq files, not converted yet
      */
-    static std::vector<std::array<std::string, LINES_PER_RECORD>> readData(
+     std::vector<std::array<std::string, LINES_PER_RECORD>> readData(
         const std::vector<std::istream *> &_file_list);
 
     /**

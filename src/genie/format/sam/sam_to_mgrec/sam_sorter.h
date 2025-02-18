@@ -1,15 +1,18 @@
-//
-// Created by sophie on 04.12.24.
-//
+/**
+* @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#ifndef SAM_SORTER_H
-#define SAM_SORTER_H
+#ifndef SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_
+#define SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_
 
 #include <list>
+#include <vector>
 #include <queue>
 
-#include "sam_reader.h"
-#include "sam_record.h"
+#include "genie/format/sam/sam_to_mgrec/sam_reader.h"
+#include "genie/format/sam/sam_to_mgrec/sam_record.h"
 
 namespace genie::format::sam::sam_to_mgrec {
 
@@ -22,13 +25,16 @@ struct CmpCompete {
 };
 
 class SamSorter {
-
     //!< @brief queries that can be returned at any moment
     std::vector<std::vector<sam_to_mgrec::SamRecord>> queries;
     //!< @brief automatically sorted by p_next because priority queue
-    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>, CmpOpen> open_queries;
+    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>,
+                        CmpOpen>
+        open_queries;
     //!< @brief automatically sorted by position of primary alignment because priority queue
-    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>, CmpCompete> completed_queries;
+    std::priority_queue<std::vector<sam_to_mgrec::SamRecord>, std::vector<std::vector<sam_to_mgrec::SamRecord>>,
+                        CmpCompete>
+        completed_queries;
     //!< @brief mapping position of the next ready query
     uint64_t cur_alignment_position = 0;
     //!< @brief all positions of primary alignments
@@ -48,9 +54,8 @@ class SamSorter {
      ***/
     void try_appending_to_queries(std::vector<SamRecord> cur_query);
 
-    public:
+ public:
     explicit SamSorter(uint32_t max_waiting_distance);
-
 
     /** Function for sorting one Record.
      ***/
@@ -61,14 +66,12 @@ class SamSorter {
      ***/
     std::vector<std::vector<sam_to_mgrec::SamRecord>> getQueries();
 
-
     /** Function to signal end of data
      * clears all member variables (open_queries and complete_queries)
      * and puts remaining records to queries **/
     void endFile();
-
 };
 
 }  // namespace genie::format::sam::sam_to_mgrec
 
-#endif //SAM_SORTER_H
+#endif  // SRC_GENIE_FORMAT_SAM_SAM_TO_MGREC_SAM_SORTER_H_

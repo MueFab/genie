@@ -5,6 +5,9 @@
  */
 
 #include "genie/format/fastq/importer.h"
+
+#include <zlib.h>
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -33,10 +36,12 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     size_t size_seq = 0;
     size_t size_qual = 0;
     size_t size_name = 0;
+
     bool eof = false;
     {
         for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
             auto data = readData(file_list);
+
             if (data.empty()) {
                 eof = true;
                 break;
@@ -90,7 +95,6 @@ std::vector<std::array<std::string, Importer::LINES_PER_RECORD>> Importer::readD
                 return data;
             }
         }
-
         sanityCheck(data[cur_file]);
     }
     return data;

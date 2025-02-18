@@ -5,6 +5,8 @@
  */
 
 #include "genie/format/fastq/exporter.h"
+
+#include <iostream>
 #include <string>
 #include <utility>
 #include "genie/util/ordered-section.h"
