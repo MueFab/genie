@@ -98,8 +98,8 @@ TEST_P(GenotypeConformanceTest, GenoConformanceTests) {
 
     genie::genotype::EncodingOptions genotype_opt = {
         BLOCK_SIZE,             // block_size;
-        testparams.binID,       // genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        testparams.concatAxis,  // concat_axis;
+        testparams.binID,       // genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID_;
+        testparams.concatAxis,  // concat_axis_;
         false,                  // transpose_mat;
         testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         testparams.sortingID,   // genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
