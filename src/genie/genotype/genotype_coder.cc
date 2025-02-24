@@ -277,7 +277,7 @@ void binarize_allele_mat(Int8MatDtype& allele_mat, const BinarizationID binariza
             break;
         }
         default:
-            UTILS_DIE("Invalid binarization_ID!");
+            UTILS_DIE("Invalid binarization_ID_!");
     }
 
     // TODO(Yeremia): Free memory of allele_mat

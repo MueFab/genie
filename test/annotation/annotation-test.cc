@@ -183,8 +183,8 @@ TEST_P(AnnotationTests, annotationGeno) {
 
     genie::genotype::EncodingOptions genotype_opt = {
         BLOCK_SIZE,                                  // block_size;
-        genie::genotype::BinarizationID::ROW_BIN,//BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+        genie::genotype::BinarizationID::ROW_BIN,//BIT_PLANE,  // binarization_ID_;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis_;
         false,                                       // transpose_mat;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;

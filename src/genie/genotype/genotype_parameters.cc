@@ -14,121 +14,201 @@ namespace genotype {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters::GenotypeParameters()
-    : max_ploidy(0),
-      no_reference_flag(false),
-      not_available_flag(false),
-      binarization_ID(BinarizationID::UNDEFINED),
-      num_bit_plane(0),
-      concat_axis(ConcatAxis::UNDEFINED),
-      variants_payload_params(),
-      encode_phases_data_flag(false),
-      phases_payload_params(),
-      phasing_value(false) {}
+    : max_ploidy_(0),
+      no_reference_flag_(false),
+      not_available_flag_(false),
+      binarization_ID_(BinarizationID::UNDEFINED),
+      num_bit_plane_(0),
+      concat_axis_(ConcatAxis::UNDEFINED),
+      variants_payload_params_(),
+      encode_phases_data_flag_(false),
+      phases_payload_params_(),
+      phasing_value_(false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenotypeParameters::GenotypeParameters(uint8_t _max_ploidy, bool _no_reference_flag, bool _not_available_flag,
-                                       BinarizationID _binarization_ID, uint8_t _num_bit_planes, ConcatAxis _concat_axis,
-                                       std::vector<GenotypeBinMatParameters>&& _variants_payload_params,
-                                       bool _encode_phases_data_flag, GenotypeBinMatParameters _phases_payload_params,
-                                       bool _phases_value)
-    : max_ploidy(_max_ploidy),
-      no_reference_flag(_no_reference_flag),
-      not_available_flag(_not_available_flag),
-      binarization_ID(_binarization_ID),
-      num_bit_plane(_num_bit_planes),
-      concat_axis(_concat_axis),
-      variants_payload_params(_variants_payload_params),
-      encode_phases_data_flag(_encode_phases_data_flag),
-      phases_payload_params(_phases_payload_params),
-      phasing_value(_phases_value) {}
+// Parameterized constructor
+GenotypeParameters::GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
+  BinarizationID binarization_ID, uint8_t num_bit_planes, ConcatAxis concat_axis,
+  std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
+  GenotypeBinMatParameters phases_payload_params, bool phases_value)
+: max_ploidy_(max_ploidy),
+      no_reference_flag_(no_reference_flag),
+      not_available_flag_(not_available_flag),
+      binarization_ID_(binarization_ID),
+      num_bit_plane_(num_bit_planes),
+      concat_axis_(concat_axis),
+      variants_payload_params_(std::move(variants_payload_params)),
+      encode_phases_data_flag_(encode_phases_data_flag),
+      phases_payload_params_(std::move(phases_payload_params)),
+      phasing_value_(phases_value) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getMaxPloidy() const { return max_ploidy; }
+// Move constructor
+GenotypeParameters::GenotypeParameters(GenotypeParameters&& other) noexcept
+    : max_ploidy_(other.max_ploidy_),
+      no_reference_flag_(other.no_reference_flag_),
+      not_available_flag_(other.not_available_flag_),
+      binarization_ID_(other.binarization_ID_),
+      num_bit_plane_(other.num_bit_plane_),
+      concat_axis_(other.concat_axis_),
+      variants_payload_params_(std::move(other.variants_payload_params_)),
+      encode_phases_data_flag_(other.encode_phases_data_flag_),
+      phases_payload_params_(std::move(other.phases_payload_params_)),
+      phasing_value_(other.phasing_value_) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getNoRerefernceFlag() const { return no_reference_flag; }
+// Copy constructor
+GenotypeParameters::GenotypeParameters(const GenotypeParameters& other)
+    : max_ploidy_(other.max_ploidy_),
+      no_reference_flag_(other.no_reference_flag_),
+      not_available_flag_(other.not_available_flag_),
+      binarization_ID_(other.binarization_ID_),
+      num_bit_plane_(other.num_bit_plane_),
+      concat_axis_(other.concat_axis_),
+      variants_payload_params_(other.variants_payload_params_),
+      encode_phases_data_flag_(other.encode_phases_data_flag_),
+      phases_payload_params_(other.phases_payload_params_),
+      phasing_value_(other.phasing_value_) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getNotAvailableFlag() const { return not_available_flag; }
+// Move assignment operator
+GenotypeParameters& GenotypeParameters::operator=(GenotypeParameters&& other) noexcept {
+  if (this != &other) {
+    max_ploidy_ = other.max_ploidy_;
+    no_reference_flag_ = other.no_reference_flag_;
+    not_available_flag_ = other.not_available_flag_;
+    binarization_ID_ = other.binarization_ID_;
+    num_bit_plane_ = other.num_bit_plane_;
+    concat_axis_ = other.concat_axis_;
+    variants_payload_params_ = std::move(other.variants_payload_params_);
+    encode_phases_data_flag_ = other.encode_phases_data_flag_;
+    phases_payload_params_ = std::move(other.phases_payload_params_);
+    phasing_value_ = other.phasing_value_;
+  }
+  return *this;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationID GenotypeParameters::getBinarizationID() const { return binarization_ID; }
+// Copy assignment operator
+GenotypeParameters& GenotypeParameters::operator=(const GenotypeParameters& other) {
+  if (this != &other) {
+    max_ploidy_ = other.max_ploidy_;
+    no_reference_flag_ = other.no_reference_flag_;
+    not_available_flag_ = other.not_available_flag_;
+    binarization_ID_ = other.binarization_ID_;
+    num_bit_plane_ = other.num_bit_plane_;
+    concat_axis_ = other.concat_axis_;
+    variants_payload_params_ = other.variants_payload_params_;
+    encode_phases_data_flag_ = other.encode_phases_data_flag_;
+    phases_payload_params_ = other.phases_payload_params_;
+    phasing_value_ = other.phasing_value_;
+  }
+  return *this;
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getNumBitPlanes() const { return num_bit_plane; }
+uint8_t GenotypeParameters::GetMaxPloidy() const { return max_ploidy_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ConcatAxis GenotypeParameters::getConcatAxis() const { return concat_axis; }
+bool GenotypeParameters::GetNoReferenceFlag() const { return no_reference_flag_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getNumVariantsPayloads() const {return static_cast<uint8_t>(variants_payload_params.size());}
+bool GenotypeParameters::GetNotAvailableFlag() const { return not_available_flag_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<GenotypeBinMatParameters>& GenotypeParameters::getVariantsPayloadParams() const {return variants_payload_params;}
+BinarizationID GenotypeParameters::GetBinarizationID() const { return binarization_ID_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::isPhaseEncoded() const { return encode_phases_data_flag; }
+uint8_t GenotypeParameters::GetNumBitPlanes() const { return num_bit_plane_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenotypeBinMatParameters& GenotypeParameters::getPhasesPayloadParams() const { return phases_payload_params; }
+ConcatAxis GenotypeParameters::GetConcatAxis() const { return concat_axis_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getPhaseValue() const { return phasing_value; }
+uint8_t GenotypeParameters::GetNumVariantsPayloads() const {return static_cast<uint8_t>(variants_payload_params_.size());}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GenotypeParameters::write(core::Writer& writer) const {
-  writer.Write(max_ploidy, 8);
-    writer.Write(no_reference_flag, 1);
-    writer.Write(not_available_flag, 1);
-    writer.Write(static_cast<uint8_t>(binarization_ID), 3);
-    if (binarization_ID == BinarizationID::BIT_PLANE) {
-      writer.Write(getNumBitPlanes(), 8);// was getNumVariantsPayloads
-        writer.Write(static_cast<uint8_t>(concat_axis), 8);
+const std::vector<GenotypeBinMatParameters>& GenotypeParameters::GetVariantsPayloadParams() const {return variants_payload_params_;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::IsPhaseEncoded() const { return encode_phases_data_flag_; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const GenotypeBinMatParameters& GenotypeParameters::GetPhasesPayloadParams() const { return phases_payload_params_; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::GetPhaseValue() const { return phasing_value_; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GenotypeParameters::Write(core::Writer& writer) const {
+  writer.Write(max_ploidy_, 8);
+    writer.Write(no_reference_flag_, 1);
+    writer.Write(not_available_flag_, 1);
+    writer.Write(static_cast<uint8_t>(binarization_ID_), 3);
+    if (binarization_ID_ == BinarizationID::BIT_PLANE) {
+      writer.Write(GetNumBitPlanes(), 8);// was GetNumVariantsPayloads
+        writer.Write(static_cast<uint8_t>(concat_axis_), 8);
     }
 
-    for (auto i = 0u; i < getNumVariantsPayloads(); ++i) {
-      writer.Write(variants_payload_params[i].sort_rows_flag, 1);
-        writer.Write(variants_payload_params[i].sort_cols_flag, 1);
-        writer.Write(variants_payload_params[i].transpose_mat_flag, 1);
+    for (auto i = 0u; i < GetNumVariantsPayloads(); ++i) {
+      writer.Write(variants_payload_params_[i].sort_rows_flag, 1);
+        writer.Write(variants_payload_params_[i].sort_cols_flag, 1);
+        writer.Write(variants_payload_params_[i].transpose_mat_flag, 1);
         writer.Write(
-            static_cast<uint8_t>(variants_payload_params[i].variants_codec_ID),
+            static_cast<uint8_t>(variants_payload_params_[i].variants_codec_ID),
             8);
     }
-    writer.Write(encode_phases_data_flag, 1);
-    if (encode_phases_data_flag) {
-      writer.Write(phases_payload_params.sort_rows_flag,
+    writer.Write(encode_phases_data_flag_, 1);
+    if (encode_phases_data_flag_) {
+      writer.Write(phases_payload_params_.sort_rows_flag,
                    1);                  // sort_phases_rows_flag
-        writer.Write(phases_payload_params.sort_cols_flag,
+        writer.Write(phases_payload_params_.sort_cols_flag,
                      1);                  // sort_phases_cols_flag
-        writer.Write(phases_payload_params.transpose_mat_flag,
+        writer.Write(phases_payload_params_.transpose_mat_flag,
                      1);              // transpose_phases_mat_flag
         writer.Write(
-            static_cast<uint8_t>(phases_payload_params.variants_codec_ID),
+            static_cast<uint8_t>(phases_payload_params_.variants_codec_ID),
             8);  // phases_codec_ID
     } else {
-      writer.Write(phasing_value, 1);
+      writer.Write(phasing_value_, 1);
     }
     writer.Flush();
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t GenotypeParameters::getSize(core::Writer& writesize) const {
-    write(writesize);
+size_t GenotypeParameters::GetSize(core::Writer& writesize) const {
+  Write(writesize);
     return writesize.GetBitsWritten();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Read from BitReader
+void GenotypeParameters::read(util::BitReader& reader) {
+  // Placeholder implementation
+  // Actual reading logic should be implemented here
+  (void)reader;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genotype

@@ -65,8 +65,8 @@ class RowColIdsPayload {
           sizeInBytes(static_cast<uint32_t>(_nbits_per_elem * _nelements + 7) / 8) {}
     size_t payloadSize() const { return row_col_ids_elements.size(); }
 
-    uint32_t getWriteSizeInBytes() const { return sizeInBytes; }
-    void write(core::Writer& writer) const;
+    uint32_t GetSize() const { return sizeInBytes; }
+    void Write(core::Writer& writer) const;
 };
 
 class AmaxPayload {
@@ -80,7 +80,7 @@ class AmaxPayload {
     AmaxPayload(uint32_t _nelems, uint8_t _nbits_per_elem, uint32_t _nelements, std::vector<uint64_t> _amax_elements)
         : nelems(_nelems), nbits_per_elem(_nbits_per_elem), nelements(_nelements), amax_elements(_amax_elements) {}
 
-    uint32_t sizeInBytes() const {
+    uint32_t GetSize() const {
         uint32_t sizeInBits = 32 + 4;  // size of nelems + size of nbits_per_elem
         for (uint32_t i = 0; i < nelements; ++i) {
             sizeInBits++;  // size of is_one_flag
@@ -91,7 +91,7 @@ class AmaxPayload {
         return static_cast<uint32_t>((sizeInBits + 7) / 8);
     }
 
-    void write(core::Writer& writer) const;
+    void Write(core::Writer& writer) const;
 };
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ class GenotypePayload {
     AmaxPayload variants_amax_payload;  // amax_payload 6.4.4.3.2.4
 
  public:
-    GenotypePayload(GenotypeParameters _genotypeParameters, std::vector<BinMatPayload> _variants_payload,
+    GenotypePayload(GenotypeParameters& _genotypeParameters, std::vector<BinMatPayload> _variants_payload,
                     BinMatPayload _phases_payload, std::vector<RowColIdsPayload> _sort_variants_row_ids_payload,
                     std::vector<RowColIdsPayload> _sort_variants_col_ids_payload, AmaxPayload _variants_amax_payload)
         : genotypeParameters(_genotypeParameters),
@@ -123,7 +123,7 @@ class GenotypePayload {
     GenotypePayload(genie::genotype::EncodingBlock& dataBlock,
                     genie::genotype::GenotypeParameters& genotpyParameters);  // build from datablock
 
-    void write(core::Writer& writer) const;
+    void Write(core::Writer& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

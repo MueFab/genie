@@ -34,7 +34,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
   uint8_t AT_ID = 1;
   constexpr uint8_t AG_class = 0;
 
-  // workaround for different num_bit_plane
+  // workaround for different num_bit_plane_
   std::vector<GenoUnits> dataunits;
   likelihood_opt.block_size = static_cast<uint32_t>(defaultTileSizeHeight);
 
@@ -103,7 +103,7 @@ std::vector<GenoUnits> GenoAnnotation::parseGenotype(
           parWBlocks.genotypePars);
       genie::core::Writer writer(
           &descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-      genotypePayload.write(writer);
+      genotypePayload.Write(writer);
     }
     variant_site::AccessUnitComposer accessUnitcomposer;
     accessUnitcomposer.setATtype(

@@ -37,7 +37,7 @@ namespace genotype {
 
 //using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
-//using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
+using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
 using Int8MatDtype = xt::xtensor<int8_t, 2, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 

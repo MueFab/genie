@@ -58,50 +58,72 @@ struct GenotypeBinMatParameters {
 
 class GenotypeParameters {
  private:
-    uint8_t max_ploidy;
-    bool no_reference_flag;
-    bool not_available_flag;
-    BinarizationID binarization_ID;
+    uint8_t max_ploidy_;
+    bool no_reference_flag_;
+    bool not_available_flag_;
+    BinarizationID binarization_ID_;
 
-    uint8_t num_bit_plane;
-    ConcatAxis concat_axis;
+    uint8_t num_bit_plane_;
+    ConcatAxis concat_axis_;
 
-    std::vector<GenotypeBinMatParameters> variants_payload_params;
+    std::vector<GenotypeBinMatParameters> variants_payload_params_;
 
-    bool encode_phases_data_flag;
-    GenotypeBinMatParameters phases_payload_params;
-    bool phasing_value;
+    bool encode_phases_data_flag_;
+    GenotypeBinMatParameters phases_payload_params_;
+    bool phasing_value_;
 
  public:
+    // Default constructor
     GenotypeParameters();
 
+    // Parameterized constructor
     GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
                        BinarizationID binarization_ID, uint8_t num_bit_planes, ConcatAxis concat_axis,
                        std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
                        GenotypeBinMatParameters phases_payload_params, bool phases_value);
 
-    //    GenotypeParameters(GenotypeParameters&& other);
+    // Move constructor
+    GenotypeParameters(GenotypeParameters&& other) noexcept;
 
-    uint8_t getMaxPloidy() const;
-    bool getNoRerefernceFlag() const;
-    bool getNotAvailableFlag() const;
-    BinarizationID getBinarizationID() const;
-    uint8_t getNumBitPlanes() const;
-    ConcatAxis getConcatAxis() const;
-    const std::vector<GenotypeBinMatParameters>& getVariantsPayloadParams() const;
+    // Copy constructor
+    GenotypeParameters(const GenotypeParameters& other);
 
-    bool isPhaseEncoded() const;
-    // IF encode_phases_data_flag
-    const GenotypeBinMatParameters& getPhasesPayloadParams() const;
-    uint8_t getNumVariantsPayloads() const;
-    // ELSE
-    bool getPhaseValue() const;
+    // Move assignment operator
+    GenotypeParameters& operator=(GenotypeParameters&& other) noexcept;
 
-    void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+    // Copy assignment operator
+    GenotypeParameters& operator=(const GenotypeParameters& other);
+
+    // Getters
+    uint8_t GetMaxPloidy() const;
+    bool GetNoReferenceFlag() const;
+    bool GetNotAvailableFlag() const;
+    BinarizationID GetBinarizationID() const;
+    uint8_t GetNumBitPlanes() const;
+    ConcatAxis GetConcatAxis() const;
+    uint8_t GetNumVariantsPayloads() const;
+    const std::vector<GenotypeBinMatParameters>& GetVariantsPayloadParams() const;
+    bool IsPhaseEncoded() const;
+    const GenotypeBinMatParameters& GetPhasesPayloadParams() const;
+    bool GetPhaseValue() const;
+
+    // Setters
+    void SetMaxPloidy(uint8_t value);
+    void SetNoReferenceFlag(bool value);
+    void SetNotAvailableFlag(bool value);
+    void SetBinarizationID(BinarizationID value);
+    void SetNumBitPlanes(uint8_t value);
+    void SetConcatAxis(ConcatAxis value);
+    void SetVariantsPayloadParams(std::vector<GenotypeBinMatParameters>&& value);
+    void SetEncodePhasesDataFlag(bool value);
+    void SetPhasesPayloadParams(GenotypeBinMatParameters&& value);
+    void SetPhaseValue(bool value);
+
+    void Write(core::Writer& writer) const;
+    size_t GetSize(core::Writer& writesize) const;
 
     //TODO: Why we have read function here instead of a constructor?
-    void read(util::BitReader& reader) { (void)reader; }
+    void read(util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

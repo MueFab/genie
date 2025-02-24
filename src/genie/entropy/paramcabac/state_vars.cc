@@ -191,7 +191,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                  binarization_ID <= BinarizationParameters::BinarizationId::SDTU) ||
                 codingOrder == 0 || (1u << codingSubsymSize) > MAX_LUT_SIZE) {
                 UTILS_THROW_RUNTIME_EXCEPTION(
-                    "LUT_TRANSFORM not supported with given configuration: coding_order = 0, binarization_ID = " +
+                    "LUT_TRANSFORM not supported with given configuration: coding_order = 0, binarization_ID_ = " +
                     std::to_string((uint8_t)binarization_ID) +
                     ", coding_subsym_size = " + std::to_string(codingSubsymSize));
             } else {
