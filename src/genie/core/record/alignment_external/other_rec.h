@@ -11,74 +11,69 @@
 
 #include <cstdint>
 #include <memory>
+
 #include "genie/core/record/alignment_external.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_external {
+namespace genie::core::record::alignment_external {
 
 /**
  * @brief
  */
-class OtherRec : public AlignmentExternal {
-    uint64_t next_pos;     //!< @brief
-    uint16_t next_seq_ID;  //!< @brief
+class OtherRec final : public AlignmentExternal {
+  uint64_t next_pos_;     //!< @brief
+  uint16_t next_seq_id_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param _next_pos
-     * @param _next_seq_ID
-     */
-    OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
+  /**
+   * @brief
+   * @param next_pos
+   * @param next_seq_id
+   */
+  OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getNextPos() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint64_t GetNextPos() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getNextSeq() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint16_t GetNextSeq() const;
 
-    /**
-     * @brief
-     */
-    OtherRec();
+  /**
+   * @brief
+   */
+  OtherRec();
 
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit OtherRec(util::BitReader &reader);
+  /**
+   * @brief
+   * @param reader
+   */
+  explicit OtherRec(util::BitReader &reader);
 
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter &writer) const override;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter &writer) const override;
 
-    /**
-     * @brief
-     * @return
-     */
-    std::unique_ptr<AlignmentExternal> clone() const override;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::unique_ptr<AlignmentExternal> Clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_external
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_external
 
 // ---------------------------------------------------------------------------------------------------------------------
 
