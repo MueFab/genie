@@ -41,8 +41,8 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
 
 bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
     for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size() + 1; ++i) {
-        if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->getType() !=
-                         genie::core::record::AlignmentSplit::Type::SAME_REC) {
+        if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->GetType() !=
+                         genie::core::record::AlignmentSplit::Type::kSameRec) {
             continue;
         }
         auto pos = r.getPosition(0, i);
@@ -268,8 +268,8 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             if (refBased) {
                 size_t end = 0;
                 if (r.getAlignments().front().getAlignmentSplits().empty() ||
-                    r.getAlignments().front().getAlignmentSplits().front()->getType() !=
-                        core::record::AlignmentSplit::Type::SAME_REC) {
+                    r.getAlignments().front().getAlignmentSplits().front()->GetType() !=
+                        core::record::AlignmentSplit::Type::kSameRec) {
                     end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 0);
                 } else {
                     end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 1) +

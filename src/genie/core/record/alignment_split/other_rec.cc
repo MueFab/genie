@@ -1,69 +1,68 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "other-rec.h"
+#include "genie/core/record/alignment_split/other_rec.h"
+
 #include <memory>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_split {
+namespace genie::core::record::alignment_split {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
-    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(_split_pos), split_seq_ID(_split_seq_ID) {}
+OtherRec::OtherRec(const uint64_t split_pos,const uint16_t split_seq_id)
+    : AlignmentSplit(Type::kOtherRec),
+      split_pos_(split_pos),
+      split_seq_id_(split_seq_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(util::BitReader &reader)
-    : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
-      split_pos(reader.ReadAlignedInt<uint64_t, 5>()),
-      split_seq_ID(reader.ReadAlignedInt<uint16_t>()) {}
+    : AlignmentSplit(AlignmentSplit::Type::kOtherRec),
+      split_pos_(reader.ReadAlignedInt<uint64_t, 5>()),
+      split_seq_id_(reader.ReadAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec() : AlignmentSplit(AlignmentSplit::Type::OTHER_REC), split_pos(0), split_seq_ID(0) {}
+OtherRec::OtherRec()
+    : AlignmentSplit(Type::kOtherRec), split_pos_(0), split_seq_id_(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t OtherRec::getNextPos() const { return split_pos; }
+uint64_t OtherRec::GetNextPos() const { return split_pos_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t OtherRec::getNextSeq() const { return split_seq_ID; }
+uint16_t OtherRec::GetNextSeq() const { return split_seq_id_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OtherRec::write(util::BitWriter &writer) const {
-    AlignmentSplit::write(writer);
-    writer.WriteBypassBE<uint64_t, 5>(split_pos);
-    writer.WriteBypassBE(split_seq_ID);
+void OtherRec::Write(util::BitWriter &writer) const {
+    AlignmentSplit::Write(writer);
+    writer.WriteBypassBE<uint64_t, 5>(split_pos_);
+    writer.WriteBypassBE(split_seq_id_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> OtherRec::clone() const {
-    auto ret = util::make_unique<OtherRec>();
-    ret->split_pos = this->split_pos;
-    ret->split_seq_ID = this->split_seq_ID;
+    auto ret = std::make_unique<OtherRec>();
+    ret->split_pos_ = this->split_pos_;
+    ret->split_seq_id_ = this->split_seq_id_;
     return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_split
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

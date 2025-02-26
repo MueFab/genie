@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
@@ -11,6 +12,7 @@
 
 #include <cstdint>
 #include <memory>
+
 #include "genie/core/record/alignment.h"
 #include "genie/core/record/alignment_split.h"
 #include "genie/util/bit_reader.h"
@@ -18,18 +20,15 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_split {
+namespace genie::core::record::alignment_split {
 
 /**
  * @brief
  */
-class SameRec : public AlignmentSplit {
+class SameRec final : public AlignmentSplit {
  private:
-    int64_t delta;        //!< @brief
-    Alignment alignment;  //!< @brief
+    int64_t delta_;        //!< @brief
+    Alignment alignment_;  //!< @brief
 
  public:
     /**
@@ -39,10 +38,10 @@ class SameRec : public AlignmentSplit {
 
     /**
      * @brief
-     * @param _delta
-     * @param _alignment
+     * @param delta
+     * @param alignment
      */
-    SameRec(int64_t _delta, Alignment _alignment);
+    SameRec(int64_t delta, Alignment alignment);
 
     /**
      * @brief
@@ -55,33 +54,30 @@ class SameRec : public AlignmentSplit {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const override;
+    void Write(util::BitWriter& writer) const override;
 
     /**
      * @brief
      * @return
      */
-    const Alignment& getAlignment() const;
+    [[nodiscard]] const Alignment& GetAlignment() const;
 
     /**
      * @brief
      * @return
      */
-    int64_t getDelta() const;
+    [[nodiscard]]  int64_t getDelta() const;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<AlignmentSplit> clone() const override;
+    [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_split
 
 // ---------------------------------------------------------------------------------------------------------------------
 
