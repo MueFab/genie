@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
@@ -11,23 +12,27 @@
 
 #include <cstdint>
 #include <memory>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
  */
-class AlignmentSharedData {
-    uint16_t seq_ID;   //!< @brief
-    uint8_t as_depth;  //!< @brief
+class AlignmentSharedData final {
+    uint16_t seq_id_;   //!< @brief
+    uint8_t as_depth_;  //!< @brief
 
  public:
+    /**
+     * @brief
+     */
+    virtual ~AlignmentSharedData() = default;
+
     /**
      * @brief
      */
@@ -35,10 +40,10 @@ class AlignmentSharedData {
 
     /**
      * @brief
-     * @param _seq_ID
-     * @param _as_depth
+     * @param seq_id
+     * @param as_depth
      */
-    AlignmentSharedData(uint16_t _seq_ID, uint8_t _as_depth);
+    AlignmentSharedData(uint16_t seq_id, uint8_t as_depth);
 
     /**
      * @brief
@@ -50,26 +55,24 @@ class AlignmentSharedData {
      * @brief
      * @param write
      */
-    virtual void write(util::BitWriter &write) const;
+    virtual void Write(util::BitWriter &write) const;
 
     /**
      * @brief
      * @return
      */
-    uint16_t getSeqID() const;
+    [[nodiscard]] uint16_t GetSeqId() const;
 
     /**
      * @brief
      * @return
      */
-    uint8_t getAsDepth() const;
+    [[nodiscard]] uint8_t GetAsDepth() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 
