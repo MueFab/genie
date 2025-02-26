@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_SEGMENT_H_
@@ -9,17 +10,15 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
 #include <string>
 #include <vector>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,8 +26,8 @@ namespace record {
  * @brief
  */
 class Segment {
-    std::string sequence;                     //!< @brief
-    std::vector<std::string> quality_values;  //!< @brief
+    std::string sequence_;                     //!< @brief
+    std::vector<std::string> quality_values_;  //!< @brief
 
  public:
     /**
@@ -54,32 +53,30 @@ class Segment {
      * @brief
      * @return
      */
-    const std::string& getSequence() const;
+    [[nodiscard]] const std::string& GetSequence() const;
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::string>& getQualities() const;
+    [[nodiscard]] const std::vector<std::string>& GetQualities() const;
 
     /**
      * @brief
      * @param qv
      */
-    void addQualities(std::string&& qv);
+    void AddQualities(std::string&& qv);
 
     /**
      * @brief
      * @param write
      */
-    void write(util::BitWriter& write) const;
+    void Write(util::BitWriter& write) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

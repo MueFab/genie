@@ -54,7 +54,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
         if (chunk.getData().empty()) {
             return 2;
         }
-        if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
+        if (chunk.getData().front().getClassID() == genie::core::record::ClassType::kClassU) {
             if (chunk.isReferenceOnly() ||
                 chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
                 return 2;
@@ -123,7 +123,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
                     break;
             }
         } else {
-            if (au.getClassType() == core::record::ClassType::CLASS_U) {
+            if (au.getClassType() == core::record::ClassType::kClassU) {
                 return 2;
             } else {
                 return 0;

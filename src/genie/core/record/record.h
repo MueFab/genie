@@ -39,7 +39,7 @@ class Record {
     uint8_t number_of_template_segments{};    //!< @brief
     std::vector<Segment> reads;               //!< @brief
     std::vector<AlignmentBox> alignmentInfo;  //!< @brief
-    ClassType class_ID{ClassType::NONE};      //!< @brief
+    ClassType class_ID{ClassType::kNone};      //!< @brief
     std::string read_group;                   //!< @brief
     bool read_1_first{};                      //!< @brief
     AlignmentSharedData sharedAlignmentInfo;  //!< @brief

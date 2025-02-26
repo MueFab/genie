@@ -310,7 +310,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
          {{GenSub::RTYPE,
            "rtype",
            false,
-           {std::numeric_limits<uint8_t>::min(), static_cast<uint8_t>(genie::core::record::ClassType::COUNT)}}}},
+           {std::numeric_limits<uint8_t>::min(), static_cast<uint8_t>(genie::core::record::ClassType::kCount)}}}},
 
         {GenDesc::RGROUP,
          "rgroup",
