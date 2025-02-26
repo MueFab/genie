@@ -362,7 +362,7 @@ struct SimpleSegmentStatistics {
     std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> splicesNumber;        //!< @brief
     std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> splicesLength;        //!< @brief
     std::array<uint64_t, uint8_t(StatisticsIndex::COUNT)> alignmentScore;       //!< @brief
-    std::array<uint64_t, uint8_t(genie::core::record::ClassType::COUNT)> classSegmentDistribution;  //!< @brief
+    std::array<uint64_t, uint8_t(genie::core::record::ClassType::kCount)> classSegmentDistribution;  //!< @brief
     std::array<uint64_t, uint8_t(ClipTypeCombination::COUNT)> clippedSegmentDistribution;           //!< @brief
     uint64_t opticalDuplicatesNumber;                                                               //!< @brief
     uint64_t chimerasNumber;                                                                        //!< @brief
@@ -418,7 +418,7 @@ struct AdvancedSegmentStatistics {
  */
 struct SimpleFilter {
     std::vector<std::string> groupNames;                                //!< @brief
-    std::array<bool, uint8_t(core::record::ClassType::COUNT)> classID;  //!< @brief
+    std::array<bool, uint8_t(core::record::ClassType::kCount)> classID;  //!< @brief
     uint64_t sequenceID;                                                //!< @brief
     uint64_t startPos;                                                  //!< @brief
     uint64_t endPos;                                                    //!< @brief

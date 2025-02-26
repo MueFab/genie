@@ -51,21 +51,21 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addReadCoder(
         genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true, writeRawStreams));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
-        if (chunk.getData().empty()) {
+        if (chunk.GetData().empty()) {
             return 2;
         }
-        if (chunk.getData().front().getClassID() == genie::core::record::ClassType::kClassU) {
-            if (chunk.isReferenceOnly() ||
-                chunk.getData().front().getNumberOfTemplateSegments() != chunk.getData().front().getSegments().size()) {
+        if (chunk.GetData().front().getClassID() == genie::core::record::ClassType::kClassU) {
+            if (chunk.IsReferenceOnly() ||
+                chunk.GetData().front().getNumberOfTemplateSegments() != chunk.GetData().front().getSegments().size()) {
                 return 2;
             }
-            if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {
+            if (chunk.GetData().front().getNumberOfTemplateSegments() > 1) {
                 return 4;
             } else {
                 return 3;
             }
         } else {
-            if (chunk.getRef().isEmpty()) {
+            if (chunk.GetRef().isEmpty()) {
                 return 1;
             } else {
                 return 0;

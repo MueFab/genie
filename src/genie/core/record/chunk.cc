@@ -1,72 +1,76 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "chunk.h"
+#include "genie/core/record/chunk.h"
+
 #include <utility>
 #include <vector>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt& Chunk::getRef() { return reference; }
+ReferenceManager::ReferenceExcerpt& Chunk::GetRef() { return reference_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Chunk::addRefToWrite(size_t start, size_t end) { refToWrite.emplace_back(start, end); }
+void Chunk::AddRefToWrite(size_t start, size_t end) {
+  ref_to_write_.emplace_back(start, end);
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<std::pair<size_t, size_t>>& Chunk::getRefToWrite() const { return refToWrite; }
+const std::vector<std::pair<size_t, size_t>>& Chunk::GetRefToWrite() const {
+  return ref_to_write_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const ReferenceManager::ReferenceExcerpt& Chunk::getRef() const { return reference; }
+const ReferenceManager::ReferenceExcerpt& Chunk::GetRef() const {
+  return reference_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Chunk::setRefID(size_t id) { refID = id; }
+void Chunk::SetRefId(const size_t id) { ref_id_ = id; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-size_t Chunk::getRefID() const { return refID; }
+size_t Chunk::GetRefId() const { return ref_id_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-std::vector<Record>& Chunk::getData() { return data; }
+std::vector<Record>& Chunk::GetData() { return data_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const std::vector<Record>& Chunk::getData() const { return data; }
+const std::vector<Record>& Chunk::GetData() const { return data_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-stats::PerfStats& Chunk::getStats() { return stats; }
+stats::PerfStats& Chunk::GetStats() { return stats_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Chunk::setStats(stats::PerfStats&& s) { stats = std::move(s); }
+void Chunk::SetStats(stats::PerfStats&& s) { stats_ = std::move(s); }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Chunk::isReferenceOnly() const { return referenceOnly; }
+bool Chunk::IsReferenceOnly() const { return reference_only_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Chunk::setReferenceOnly(bool ref) { referenceOnly = ref; }
+void Chunk::SetReferenceOnly(const bool ref) { reference_only_ = ref; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -25,13 +25,13 @@ bool FormatImporter::Pump(uint64_t& id, std::mutex& lock) {
         std::unique_lock<std::mutex> guard(lock);
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
-        for (const auto& r : chunk.getData()) {
+        for (const auto& r : chunk.GetData()) {
             segment_count += uint32_t(r.getSegments().size());
         }
-        if (chunk.getData().empty()) {
+        if (chunk.GetData().empty()) {
             segment_count = 1;
         }
-        if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
+        if (!chunk.GetData().empty() || !chunk.GetRefToWrite().empty()) {
             sec = {size_t(id), segment_count, true};
             id += segment_count;
         } else {
@@ -47,7 +47,7 @@ bool FormatImporter::Pump(uint64_t& id, std::mutex& lock) {
             }
         }
     }
-    if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
+    if (!chunk.GetData().empty() || !chunk.GetRefToWrite().empty()) {
         Source<record::Chunk>::FlowOut(std::move(chunk), sec);
     }
     return true;
