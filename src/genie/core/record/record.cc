@@ -27,7 +27,7 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::patchRefID(size_t refID) {
-    sharedAlignmentInfo = AlignmentSharedData(static_cast<uint16_t>(refID), sharedAlignmentInfo.getAsDepth());
+    sharedAlignmentInfo = AlignmentSharedData(static_cast<uint16_t>(refID), sharedAlignmentInfo.GetAsDepth());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ Record::Record(util::BitReader &reader)
         ++index;
     }
     for (auto &a : alignmentInfo) {
-        a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
+        a = AlignmentBox(class_ID, sharedAlignmentInfo.GetAsDepth(), uint8_t(number_of_template_segments), reader);
     }
     flags = reader.ReadAlignedInt<uint8_t>();
     moreAlignmentInfo = AlignmentExternal::Factory(reader);
@@ -154,11 +154,11 @@ void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
     if (alignmentInfo.empty()) {
         sharedAlignmentInfo = AlignmentSharedData(_seq_id, uint8_t(rec.getAlignment().GetMappingScores().size()));
     } else {
-        UTILS_DIE_IF(rec.getAlignment().GetMappingScores().size() != sharedAlignmentInfo.getAsDepth(),
+        UTILS_DIE_IF(rec.getAlignment().GetMappingScores().size() != sharedAlignmentInfo.GetAsDepth(),
                      "Incompatible AS depth");
         UTILS_DIE_IF(rec.getNumberOfTemplateSegments() != number_of_template_segments,
                      "Incompatible number_of_template_segments");
-        UTILS_DIE_IF(_seq_id != sharedAlignmentInfo.getSeqID(), "Incompatible seq id");
+        UTILS_DIE_IF(_seq_id != sharedAlignmentInfo.GetSeqId(), "Incompatible seq id");
     }
     alignmentInfo.push_back(std::move(rec));
 }
@@ -200,7 +200,7 @@ void Record::Write(util::BitWriter &writer) const {
     writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(read_group.length()));
     writer.WriteBypassBE(read_1_first);
     if (!alignmentInfo.empty()) {
-        sharedAlignmentInfo.write(writer);
+        sharedAlignmentInfo.Write(writer);
     }
     for (const auto &a : reads) {
         writer.WriteBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.GetSequence().length()));

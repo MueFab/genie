@@ -279,7 +279,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                     end = std::max(static_cast<uint64_t>(end),
                                    r.getAlignments().front().getPosition() + r.getMappedLength(0, 0));
                 }
-                record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().getSeqID()),
+                record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().GetSeqId()),
                                                       r.getAlignments().front().getPosition(), end);
             }
         }
