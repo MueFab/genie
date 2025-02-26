@@ -11,14 +11,13 @@
 
 #include <cstdint>
 #include <memory>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
  * @brief
@@ -28,13 +27,13 @@ class AlignmentSplit {
     /**
      * @brief
      */
-    enum class Type : uint8_t { SAME_REC = 0, OTHER_REC = 1, UNPAIRED = 2 };
+    enum class Type : uint8_t { kSameRec = 0, kOtherRec = 1, kUnpaired = 2 };
 
     /**
      * @brief
-     * @param _split_alignment
+     * @param split_alignment
      */
-    explicit AlignmentSplit(Type _split_alignment);
+    explicit AlignmentSplit(Type split_alignment);
 
     /**
      * @brief
@@ -45,7 +44,7 @@ class AlignmentSplit {
      * @brief
      * @param writer
      */
-    virtual void write(util::BitWriter &writer) const;
+    virtual void Write(util::BitWriter& writer) const;
 
     /**
      * @brief
@@ -53,29 +52,28 @@ class AlignmentSplit {
      * @param reader
      * @return
      */
-    static std::unique_ptr<AlignmentSplit> factory(uint8_t as_depth, util::BitReader &reader);
+    static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth,
+                                                   util::BitReader& reader);
 
     /**
      * @brief
      * @return
      */
-    virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
 
     /**
      * @brief
      * @return
      */
-    Type getType() const;
+    [[nodiscard]] Type GetType() const;
 
  protected:
-    Type split_alignment;  //!< @brief
+    Type split_alignment_;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -16,8 +16,8 @@ set(source_files
 
         record/alignment_external/none.cc
         record/alignment_external/other_rec.cc
-        record/alignment_split/other-rec.cc
-        record/alignment_split/same-rec.cc
+        record/alignment_split/other_rec.cc
+        record/alignment_split/same_rec.cc
         record/alignment_split/unpaired.cc
         record/segment.cc
         record/record.cc

@@ -19,7 +19,7 @@
 #include "alignment_shared_data.h"
 #include "class_type.h"
 #include "genie/core/constants.h"
-#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/stats/perf-stats.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -155,7 +155,7 @@ class Record {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter& writer) const;
+    void Write(util::BitWriter& writer) const;
 
     /**
      * @brief
