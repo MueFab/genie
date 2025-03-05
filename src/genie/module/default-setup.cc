@@ -54,12 +54,12 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
         if (chunk.GetData().empty()) {
             return 2;
         }
-        if (chunk.GetData().front().getClassID() == genie::core::record::ClassType::kClassU) {
+        if (chunk.GetData().front().GetClassID() == genie::core::record::ClassType::kClassU) {
             if (chunk.IsReferenceOnly() ||
-                chunk.GetData().front().getNumberOfTemplateSegments() != chunk.GetData().front().getSegments().size()) {
+                chunk.GetData().front().GetNumberOfTemplateSegments() != chunk.GetData().front().GetSegments().size()) {
                 return 2;
             }
-            if (chunk.GetData().front().getNumberOfTemplateSegments() > 1) {
+            if (chunk.GetData().front().GetNumberOfTemplateSegments() > 1) {
                 return 4;
             } else {
                 return 3;

@@ -1,5 +1,5 @@
 /**
-* Copyright 2018-2024 The Genie Authors.
+ * Copyright 2018-2024 The Genie Authors.
  * @file
  * @copyright This file is part of Genie. See LICENSE and/or
  * https://github.com/MueFab/genie for more details.
@@ -27,7 +27,7 @@ class AlignmentSharedData final {
   uint16_t seq_id_;   //!< @brief
   uint8_t as_depth_;  //!< @brief
 
-public:
+ public:
   /**
    * @brief
    */

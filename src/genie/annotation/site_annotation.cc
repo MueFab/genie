@@ -27,8 +27,8 @@ void SiteAnnotation::parseInfoTags(std::string& recordInputFileName) {
     genie::util::BitReader bitreader(readForTags);
     std::vector<genie::core::record::variant_site::InfoFields::Field> infoTag;
     genie::core::record::variant_site::Record recs;
-    while (recs.read(bitreader)) {
-        infoTag = recs.getInfoTag();
+    while (recs.Read(bitreader)) {
+        infoTag = recs.GetInfoTag();
         for (const auto& tag : infoTag) {
             InfoField infoField(tag.tag, tag.type, static_cast<uint8_t>(tag.values.size()));
             genie::core::record::variant_site::Info_tag infotag{static_cast<uint8_t>(tag.tag.size()), tag.tag, tag.type,

@@ -39,15 +39,15 @@ CMUnits CMAnnotation::parseContact(std::ifstream& inputfile) {
     auto scm_param = genie::contact::SubcontactMatrixParameters();
     auto scm_payload = genie::contact::SubcontactMatrixPayload();
 
-    cm_param.SetBinSize(RECS.front().getBinSize());
+    cm_param.SetBinSize(RECS.front().GetBinSize());
     cm_param.SetTileSize(contactMatrixParameters.TILE_SIZE);
 
     for (auto& rec : RECS) {
-      cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
-        cm_param.UpsertChromosome(rec.getChr1ID(), rec.getChr1Name(),
-                                  rec.getChr1Length());
-        cm_param.UpsertChromosome(rec.getChr2ID(), rec.getChr2Name(),
-                                  rec.getChr2Length());
+      cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+        cm_param.UpsertChromosome(rec.GetChr1ID(), rec.GetChr1Name(),
+                                  rec.GetChr1Length());
+        cm_param.UpsertChromosome(rec.GetChr2ID(), rec.GetChr2Name(),
+                                  rec.GetChr2Length());
     }
 
     auto& REC = RECS.front();

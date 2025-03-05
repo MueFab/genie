@@ -22,118 +22,117 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
- * @brief ExternalAlignment
+ * @brief Class representing an external alignment box
+ *
+ * Contains alignment information and optional split alignment data.
  */
 class AlignmentBox {
-    uint64_t mapping_pos{};                                           //!< @brief
-    Alignment alignment;                                              //!< @brief
-    std::vector<std::unique_ptr<AlignmentSplit>> splitAlignmentInfo;  //!< @brief
+ private:
+  uint64_t mapping_pos_{};                                             //!< @brief
+  Alignment alignment_;                                                //!< @brief
+  std::vector<std::unique_ptr<AlignmentSplit>> split_alignment_info_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param writer
-     */
-    void write(util::BitWriter& writer) const;
+  /**
+   * @brief Default constructor
+   */
+  void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @param type
-     * @param as_depth
-     * @param number_of_template_segments
-     * @param reader
-     */
-    explicit AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
-                          util::BitReader& reader);
+  /**
+   * @brief Constructs an alignment box by reading from a bit stream
+   * @param type The class type
+   * @param as_depth The alignment split depth
+   * @param number_of_template_segments The number of template segments
+   * @param reader The bit reader to read from
+   */
+  explicit AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
+                        util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param _mapping_pos
-     * @param _alignment
-     */
-    AlignmentBox(uint64_t _mapping_pos, Alignment&& _alignment);
+  /**
+   * @brief Constructs an alignment box with specified parameters
+   * @param mapping_pos The mapping position
+   * @param alignment The alignment information
+   */
+  AlignmentBox(uint64_t mapping_pos, Alignment&& alignment);
 
-    /**
-     * @brief
-     * @param container
-     */
-    AlignmentBox(const AlignmentBox& container);
+  /**
+   * @brief Copy constructor
+   * @param container The alignment box to copy from
+   */
+  AlignmentBox(const AlignmentBox& container);
 
-    /**
-     * @brief
-     * @param container
-     */
-    AlignmentBox(AlignmentBox&& container) noexcept;
+  /**
+   * @brief Move constructor
+   * @param container The alignment box to move from
+   */
+  AlignmentBox(AlignmentBox&& container) noexcept;
 
-    /**
-     * @brief
-     */
-    ~AlignmentBox() = default;
+  /**
+   * @brief Default destructor
+   */
+  ~AlignmentBox() = default;
 
-    /**
-     * @brief
-     * @param container
-     * @return
-     */
-    AlignmentBox& operator=(const AlignmentBox& container);
+  /**
+   * @brief Copy assignment operator
+   * @param container The alignment box to copy from
+   * @return Reference to this alignment box
+   */
+  AlignmentBox& operator=(const AlignmentBox& container);
 
-    /**
-     * @brief
-     * @param container
-     * @return
-     */
-    AlignmentBox& operator=(AlignmentBox&& container) noexcept;
+  /**
+   * @brief Move assignment operator
+   * @param container The alignment box to move from
+   * @return Reference to this alignment box
+   */
+  AlignmentBox& operator=(AlignmentBox&& container) noexcept;
 
-    /**
-     * @brief
-     * @param _alignment
-     */
-    void addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment);
+  /**
+   * @brief Adds a split alignment to this alignment box
+   * @param alignment The split alignment to add
+   */
+  void AddAlignmentSplit(std::unique_ptr<AlignmentSplit> alignment);
 
-    /**
-     * @brief
-     */
-    AlignmentBox();
+  /**
+   * @brief Gets the mapping position
+   * @return The mapping position
+   */
+  AlignmentBox();
 
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getPosition() const;
+  /**
+   * @brief Gets the mapping position
+   * @return The mapping position
+   */
+  [[nodiscard]] uint64_t GetPosition() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const Alignment& getAlignment() const;
+  /**
+   * @brief Gets the alignment information
+   * @return Constant reference to the alignment
+   */
+  [[nodiscard]] const Alignment& GetAlignment() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<std::unique_ptr<AlignmentSplit>>& getAlignmentSplits() const;
+  /**
+   * @brief Gets the split alignment information
+   * @return Constant reference to the split alignments
+   */
+  [[nodiscard]] const std::vector<std::unique_ptr<AlignmentSplit>>& GetAlignmentSplits() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getNumberOfTemplateSegments() const;
+  /**
+   * @brief Gets the number of template segments
+   * @return The number of template segments
+   */
+  [[nodiscard]] uint8_t GetNumberOfTemplateSegments() const;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------

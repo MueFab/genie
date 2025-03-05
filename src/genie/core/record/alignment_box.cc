@@ -11,113 +11,120 @@
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+namespace genie::core::record {
 
-namespace genie {
-namespace core {
-namespace record {
+// -------------------------------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AlignmentBox::write(util::BitWriter& writer) const {
-    writer.WriteBypassBE<uint64_t, 5>(mapping_pos);
-    alignment.Write(writer);
-    for (const auto& a : splitAlignmentInfo) {
-        a->Write(writer);
-    }
+void AlignmentBox::Write(util::BitWriter& writer) const {
+  writer.WriteBypassBE<uint64_t, 5>(mapping_pos_);
+  alignment_.Write(writer);
+  for (const auto& a : split_alignment_info_) {
+    a->Write(writer);
+  }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
                            util::BitReader& reader)
-    : splitAlignmentInfo(type == ClassType::kClassHm ? 0 : number_of_template_segments - 1) {
-    mapping_pos = reader.ReadAlignedInt<uint64_t, 5>();
-    alignment = Alignment(as_depth, reader);
+    : split_alignment_info_(type == ClassType::kClassHm ? 0 : number_of_template_segments - 1) {
+  mapping_pos_ = reader.ReadAlignedInt<uint64_t, 5>();
+  alignment_ = Alignment(as_depth, reader);
 
-    if (type == ClassType::kClassHm) {
-        return;
-    }
-    for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
-        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::Factory(as_depth, reader);
-    }
+  if (type == ClassType::kClassHm) {
+    return;
+  }
+  for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
+    split_alignment_info_[tSeg - 1] = AlignmentSplit::Factory(as_depth, reader);
+  }
 }
 
-//------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox() : mapping_pos(0), alignment(), splitAlignmentInfo(0) {}
+AlignmentBox::AlignmentBox() : mapping_pos_(0), alignment_(), split_alignment_info_(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-void AlignmentBox::addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment) {
-    if (_alignment->GetType() == AlignmentSplit::Type::kSameRec) {
-        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).GetAlignment().GetMappingScores().size() !=
-                         alignment.GetMappingScores().size(),
-                     "AS depth incompatible");
-    }
-    splitAlignmentInfo.push_back(std::move(_alignment));
+void AlignmentBox::AddAlignmentSplit(std::unique_ptr<AlignmentSplit> alignment) {
+  if (alignment->GetType() == AlignmentSplit::Type::kSameRec) {
+    UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*alignment)
+                         .GetAlignment()
+                         .GetMappingScores()
+                         .size() != alignment_.GetMappingScores().size(),
+                 "AS depth incompatible");
+  }
+  split_alignment_info_.push_back(std::move(alignment));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-uint8_t AlignmentBox::getNumberOfTemplateSegments() const { return uint8_t(splitAlignmentInfo.size() + 1); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t AlignmentBox::getPosition() const { return mapping_pos; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const Alignment& AlignmentBox::getAlignment() const { return alignment; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<std::unique_ptr<AlignmentSplit>>& AlignmentBox::getAlignmentSplits() const {
-    return splitAlignmentInfo;
+uint8_t AlignmentBox::GetNumberOfTemplateSegments() const {
+  return uint8_t(split_alignment_info_.size() + 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(uint64_t _mapping_pos, Alignment&& _alignment)
-    : mapping_pos(_mapping_pos), alignment(std::move(_alignment)) {}
+uint64_t AlignmentBox::GetPosition() const {
+  return mapping_pos_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(const AlignmentBox& container) { *this = container; }
+const Alignment& AlignmentBox::GetAlignment() const {
+  return alignment_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-AlignmentBox::AlignmentBox(AlignmentBox&& container) noexcept { *this = container; }
+const std::vector<std::unique_ptr<AlignmentSplit>>& AlignmentBox::GetAlignmentSplits() const {
+  return split_alignment_info_;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+AlignmentBox::AlignmentBox(uint64_t mapping_pos, Alignment&& alignment)
+    : mapping_pos_(mapping_pos), alignment_(std::move(alignment)) {}
+
+// -------------------------------------------------------------------------------------------------
+
+AlignmentBox::AlignmentBox(const AlignmentBox& container) {
+  *this = container;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+AlignmentBox::AlignmentBox(AlignmentBox&& container) noexcept {
+  *this = container;
+}
+
+// -------------------------------------------------------------------------------------------------
 
 AlignmentBox& AlignmentBox::operator=(const AlignmentBox& container) {
-    if (this == &container) {
-        return *this;
-    }
-    this->mapping_pos = container.mapping_pos;
-    this->alignment = container.alignment;
-    this->splitAlignmentInfo.clear();
-    for (const auto& a : container.splitAlignmentInfo) {
-        this->splitAlignmentInfo.emplace_back(a->clone());
-    }
+  if (this == &container) {
     return *this;
+  }
+  this->mapping_pos_ = container.mapping_pos_;
+  this->alignment_ = container.alignment_;
+  this->split_alignment_info_.clear();
+  for (const auto& a : container.split_alignment_info_) {
+    this->split_alignment_info_.emplace_back(a->clone());
+  }
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 AlignmentBox& AlignmentBox::operator=(AlignmentBox&& container) noexcept {
-    this->mapping_pos = container.mapping_pos;
-    this->alignment = container.alignment;
-    this->splitAlignmentInfo = std::move(container.splitAlignmentInfo);
-    return *this;
+  this->mapping_pos_ = container.mapping_pos_;
+  this->alignment_ = container.alignment_;
+  this->split_alignment_info_ = std::move(container.split_alignment_info_);
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------

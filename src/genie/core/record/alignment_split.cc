@@ -23,8 +23,7 @@ namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSplit::AlignmentSplit(const Type split_alignment)
-    : split_alignment_(split_alignment) {}
+AlignmentSplit::AlignmentSplit(const Type split_alignment) : split_alignment_(split_alignment) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +33,7 @@ void AlignmentSplit::Write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
-    uint8_t as_depth, util::BitReader &reader) {
+std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(uint8_t as_depth, util::BitReader& reader) {
   switch (reader.ReadAlignedInt<Type>()) {
     case Type::kSameRec:
       return std::make_unique<alignment_split::SameRec>(as_depth, reader);

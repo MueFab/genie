@@ -16,7 +16,9 @@ namespace genie::core::record {
 
 // -----------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt& Chunk::GetRef() { return reference_; }
+ReferenceManager::ReferenceExcerpt& Chunk::GetRef() {
+  return reference_;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -38,35 +40,51 @@ const ReferenceManager::ReferenceExcerpt& Chunk::GetRef() const {
 
 // -----------------------------------------------------------------------------
 
-void Chunk::SetRefId(const size_t id) { ref_id_ = id; }
+void Chunk::SetRefId(const size_t id) {
+  ref_id_ = id;
+}
 
 // -----------------------------------------------------------------------------
 
-size_t Chunk::GetRefId() const { return ref_id_; }
+size_t Chunk::GetRefId() const {
+  return ref_id_;
+}
 
 // -----------------------------------------------------------------------------
 
-std::vector<Record>& Chunk::GetData() { return data_; }
+std::vector<Record>& Chunk::GetData() {
+  return data_;
+}
 
 // -----------------------------------------------------------------------------
 
-const std::vector<Record>& Chunk::GetData() const { return data_; }
+const std::vector<Record>& Chunk::GetData() const {
+  return data_;
+}
 
 // -----------------------------------------------------------------------------
 
-stats::PerfStats& Chunk::GetStats() { return stats_; }
+stats::PerfStats& Chunk::GetStats() {
+  return stats_;
+}
 
 // -----------------------------------------------------------------------------
 
-void Chunk::SetStats(stats::PerfStats&& s) { stats_ = std::move(s); }
+void Chunk::SetStats(stats::PerfStats&& s) {
+  stats_ = std::move(s);
+}
 
 // -----------------------------------------------------------------------------
 
-bool Chunk::IsReferenceOnly() const { return reference_only_; }
+bool Chunk::IsReferenceOnly() const {
+  return reference_only_;
+}
 
 // -----------------------------------------------------------------------------
 
-void Chunk::SetReferenceOnly(const bool ref) { reference_only_ = ref; }
+void Chunk::SetReferenceOnly(const bool ref) {
+  reference_only_ = ref;
+}
 
 // -----------------------------------------------------------------------------
 

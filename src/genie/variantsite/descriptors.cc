@@ -19,21 +19,21 @@ namespace genie {
 namespace variant_site {
 
 void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
-    tiles[genie::core::AnnotDesc::SEQUENCEID].write(variantSite.getSeqID(), 16);
-    tiles[genie::core::AnnotDesc::STARTPOS].write(variantSite.getPos(), 64);
-    tiles[genie::core::AnnotDesc::STRAND].write(variantSite.getStrand(), 2);
-    tiles[genie::core::AnnotDesc::NAME].write(variantSite.getID());
-    tiles[genie::core::AnnotDesc::DESCRIPTION].write(variantSite.getDescription());
+    tiles[genie::core::AnnotDesc::SEQUENCEID].write(variantSite.GetSeqId(), 16);
+    tiles[genie::core::AnnotDesc::STARTPOS].write(variantSite.GetPos(), 64);
+    tiles[genie::core::AnnotDesc::STRAND].write(variantSite.GetStrand(), 2);
+    tiles[genie::core::AnnotDesc::NAME].write(variantSite.GetId());
+    tiles[genie::core::AnnotDesc::DESCRIPTION].write(variantSite.GetDescription());
 
     std::vector<uint8_t> reference;
-    for (const auto& ref : variantSite.getRef()) reference.emplace_back(AlternTranslate(ref));
+    for (const auto& ref : variantSite.GetRef()) reference.emplace_back(AlternTranslate(ref));
     reference.emplace_back(alternEnd);
     tiles[genie::core::AnnotDesc::REFERENCE].write(reference, 3);
 
-    const auto& altArray = variantSite.getAlt();
+    const auto& altArray = variantSite.GetAlt();
     // look for <DEL>
     bool foundDel = false;
-    for (auto i = 0; i < variantSite.getAltCount(); ++i) {
+    for (auto i = 0; i < variantSite.GetAltCount(); ++i) {
         const auto& altern = altArray[i];
         if (!altern.find("<DEL>")) {
             foundDel = true;
@@ -42,7 +42,7 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
 
     std::vector<uint8_t> altern;
     if (!foundDel) {
-        for (auto i = 0; i < variantSite.getAltCount(); ++i) {
+        for (auto i = 0; i < variantSite.GetAltCount(); ++i) {
             const auto& altString = altArray[i];
             for (const auto& alt : altString) {
                 altern.emplace_back(AlternTranslate(alt));
@@ -53,15 +53,15 @@ void Descriptors::write(genie::core::record::variant_site::Record variantSite) {
     altern.emplace_back(alternEnd);
     tiles[genie::core::AnnotDesc::ALTERN].write(altern, 3);
 
-    tiles[genie::core::AnnotDesc::DEPTH].write(variantSite.getDepth(), 32);
-    tiles[genie::core::AnnotDesc::SEQQUALITY].write(variantSite.getSeqQual(), 32);
-    tiles[genie::core::AnnotDesc::MAPQUALITY].write(variantSite.getMapQual(), 32);
-    tiles[genie::core::AnnotDesc::MAPNUMQUALITY0].write(variantSite.getMapNumQual0(), 32);
-    auto filters = FilterTranslate(variantSite.getFilters());
+    tiles[genie::core::AnnotDesc::DEPTH].write(variantSite.GetDepth(), 32);
+    tiles[genie::core::AnnotDesc::SEQQUALITY].write(variantSite.GetSeqQual(), 32);
+    tiles[genie::core::AnnotDesc::MAPQUALITY].write(variantSite.GetMapQual(), 32);
+    tiles[genie::core::AnnotDesc::MAPNUMQUALITY0].write(variantSite.GetMapNumQual0(), 32);
+    auto filters = FilterTranslate(variantSite.GetFilters());
     tiles[genie::core::AnnotDesc::FILTER].write(filters, 8);
-    if (variantSite.isLinkedRecord()) {
-        tiles[genie::core::AnnotDesc::LINKNAME].write(variantSite.getLinkName());
-        tiles[genie::core::AnnotDesc::LINKID].write(variantSite.getReferenceBoxID(), 8);
+    if (variantSite.IsLinkedRecord()) {
+        tiles[genie::core::AnnotDesc::LINKNAME].write(variantSite.GetLinkName());
+        tiles[genie::core::AnnotDesc::LINKID].write(variantSite.GetReferenceBoxID(), 8);
     } else {
     //    std::string emptystr = "";
     //    tiles[genie::core::AnnotDesc::LINKNAME].write(emptystr);

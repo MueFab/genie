@@ -64,7 +64,7 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
-    uint32_t num_samples = recs.front().getNumSamples();
+    uint32_t num_samples = recs.front().GetNumSamples();
 
     uint32_t i_rec = 0;
     auto& max_ploidy = block.max_ploidy;
@@ -72,9 +72,9 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
     for (i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
 
-        UTILS_DIE_IF(num_samples != rec.getNumSamples(), "Number of samples is not constant within a block!");
+        UTILS_DIE_IF(num_samples != rec.GetNumSamples(), "Number of samples is not constant within a block!");
 
-        auto tmp_p = static_cast<uint8_t>(rec.getNumberOfAllelesPerSample());
+        auto tmp_p = static_cast<uint8_t>(rec.GetNumberOfAllelesPerSample());
         max_ploidy = max_ploidy > tmp_p ? max_ploidy : tmp_p;
     }
 
@@ -92,15 +92,15 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
 
         // Check and update num_samples;
         if (num_samples == 0) {
-            num_samples = rec.getNumSamples();
+            num_samples = rec.GetNumSamples();
         } else {
-            UTILS_DIE_IF(num_samples != rec.getNumSamples(), "Number of samples is not constant within a block!");
+            UTILS_DIE_IF(num_samples != rec.GetNumSamples(), "Number of samples is not constant within a block!");
         }
 
-        auto& rec_alleles = rec.getAlleles();
+        auto& rec_alleles = rec.GetAlleles();
         for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
             // Iterate only until given number of allele of the current record
-            for (uint8_t k_allele = 0; k_allele < rec.getNumberOfAllelesPerSample(); k_allele++) {
+            for (uint8_t k_allele = 0; k_allele < rec.GetNumberOfAllelesPerSample(); k_allele++) {
                 allele_mat(i_rec, j_sample * max_ploidy + k_allele) =
                     static_cast<int8_t>(rec_alleles[j_sample][k_allele]);
             }
@@ -108,10 +108,10 @@ void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<cor
 
         if (max_ploidy - 1 > 0) {
             unsigned int phasing_ploidy = max_ploidy - 1;
-            auto& rec_phasings = rec.getPhasing();
+            auto& rec_phasings = rec.GetPhasing();
             for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
                 // Iterate only until given number of allele of the current record
-                for (uint8_t k_allele = 0; k_allele < rec.getNumberOfAllelesPerSample() - 1; k_allele++) {
+                for (uint8_t k_allele = 0; k_allele < rec.GetNumberOfAllelesPerSample() - 1; k_allele++) {
                     phasing_mat(i_rec, j_sample * phasing_ploidy + k_allele) = rec_phasings[j_sample][k_allele];
                 }
             }
@@ -452,11 +452,11 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
     uint8_t AttributeID = 25;
 
     // fill all attribute data
-    for (const auto& format : recs.at(0).getFormats()) {
-        const auto& formatName = format.getFormat();
+    for (const auto& format : recs.at(0).GetFormats()) {
+        const auto& formatName = format.GetFormat();
         block.attributeData[formatName].resize(block_size);
         block.attributeInfo[formatName] = core::record::annotation_parameter_set::AttributeData(
-            static_cast<uint8_t>(formatName.size()), formatName, format.getType(), format.getArrayLength(),
+            static_cast<uint8_t>(formatName.size()), formatName, format.GetType(), format.GetArrayLength(),
             AttributeID);
         AttributeID++;
     }
@@ -464,9 +464,9 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
     // add values
     for (auto i_rec = 0u; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
-        for (const auto& format : rec.getFormats()) {
-            auto formatName = format.getFormat();
-            std::vector<std::vector<AttrType>> formatValue = format.getValue();
+        for (const auto& format : rec.GetFormats()) {
+            auto formatName = format.GetFormat();
+            std::vector<std::vector<AttrType>> formatValue = format.GetValue();
             block.attributeData[formatName].at(i_rec) = formatValue;
         }
     }

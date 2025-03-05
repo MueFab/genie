@@ -22,7 +22,7 @@ namespace genie::core::record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AlignmentExternal::AlignmentExternal(Type more_alignment_info_type)
-  : more_alignment_info_type_(more_alignment_info_type) {}
+    : more_alignment_info_type_(more_alignment_info_type) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,8 +32,7 @@ void AlignmentExternal::Write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentExternal> AlignmentExternal::Factory(
-  util::BitReader &reader) {
+std::unique_ptr<AlignmentExternal> AlignmentExternal::Factory(util::BitReader &reader) {
   switch (reader.ReadAlignedInt<Type>()) {
     case Type::kNone:
       return std::make_unique<alignment_external::None>();

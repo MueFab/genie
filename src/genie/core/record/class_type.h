@@ -20,14 +20,14 @@ namespace genie::core::record {
  * @brief
  */
 enum class ClassType : uint8_t {
-    kNone = 0,
-    kClassP = 1,
-    kClassN = 2,
-    kClassM = 3,
-    kClassI = 4,
-    kClassHm = 5,
-    kClassU = 6,
-    kCount = 6
+  kNone = 0,
+  kClassP = 1,
+  kClassN = 2,
+  kClassM = 3,
+  kClassI = 4,
+  kClassHm = 5,
+  kClassU = 6,
+  kCount = 6
 };
 
 // -----------------------------------------------------------------------------

@@ -29,8 +29,7 @@ Segment::Segment(std::string&& sequence) : sequence_(std::move(sequence)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Segment::Segment(const uint32_t length, const uint8_t qv_depth,
-                 util::BitReader& reader)
+Segment::Segment(const uint32_t length, const uint8_t qv_depth, util::BitReader& reader)
     : sequence_(length, 0), quality_values_(qv_depth, std::string(length, 0)) {
   reader.ReadAlignedBytes(&this->sequence_[0], length);
   for (auto& q : quality_values_) {
@@ -40,7 +39,9 @@ Segment::Segment(const uint32_t length, const uint8_t qv_depth,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& Segment::GetSequence() const { return sequence_; }
+const std::string& Segment::GetSequence() const {
+  return sequence_;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +73,6 @@ void Segment::Write(util::BitWriter& writer) const {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
 
 }  // namespace genie::core::record
 
