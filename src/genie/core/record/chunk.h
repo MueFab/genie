@@ -25,87 +25,86 @@ namespace genie::core::record {
  * @brief
  */
 class Chunk {
-    std::vector<Record> data_;                           //!< @brief
-    ReferenceManager::ReferenceExcerpt reference_;       //!< @brief
-    std::vector<std::pair<size_t, size_t>> ref_to_write_;  //!< @brief
-    size_t ref_id_{};                                     //!< @brief
-    stats::PerfStats stats_;                             //!< @brief
-    bool reference_only_{false};                          //!< @brief
+  std::vector<Record> data_;                             //!< @brief
+  ReferenceManager::ReferenceExcerpt reference_;         //!< @brief
+  std::vector<std::pair<size_t, size_t>> ref_to_write_;  //!< @brief
+  size_t ref_id_{};                                      //!< @brief
+  stats::PerfStats stats_;                               //!< @brief
+  bool reference_only_{false};                           //!< @brief
 
  public:
-    /**
-     * @brief
-     * @return
-     */
-    std::vector<Record>& GetData();
+  /**
+   * @brief
+   * @return
+   */
+  std::vector<Record>& GetData();
 
-    /**
-     * @brief
-     * @return
-     */
-    ReferenceManager::ReferenceExcerpt& GetRef();
+  /**
+   * @brief
+   * @return
+   */
+  ReferenceManager::ReferenceExcerpt& GetRef();
 
-    /**
-     * @brief
-     * @param start
-     * @param end
-     */
-    void AddRefToWrite(size_t start, size_t end);
+  /**
+   * @brief
+   * @param start
+   * @param end
+   */
+  void AddRefToWrite(size_t start, size_t end);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::vector<std::pair<size_t, size_t>>& GetRefToWrite()
-        const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<std::pair<size_t, size_t>>& GetRefToWrite() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const ReferenceManager::ReferenceExcerpt& GetRef() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const ReferenceManager::ReferenceExcerpt& GetRef() const;
 
-    /**
-     * @brief
-     * @param id
-     */
-    void SetRefId(size_t id);
+  /**
+   * @brief
+   * @param id
+   */
+  void SetRefId(size_t id);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] size_t GetRefId() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] size_t GetRefId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::vector<Record>& GetData() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<Record>& GetData() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    stats::PerfStats& GetStats();
+  /**
+   * @brief
+   * @return
+   */
+  stats::PerfStats& GetStats();
 
-    /**
-     * @brief
-     * @param s
-     */
-    void SetStats(stats::PerfStats&& s);
+  /**
+   * @brief
+   * @param s
+   */
+  void SetStats(stats::PerfStats&& s);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] bool IsReferenceOnly() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsReferenceOnly() const;
 
-    /**
-     * @brief
-     * @param ref
-     */
-    void SetReferenceOnly(bool ref);
+  /**
+   * @brief
+   * @param ref
+   */
+  void SetReferenceOnly(bool ref);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

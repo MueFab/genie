@@ -40,13 +40,13 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
-    for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size() + 1; ++i) {
-        if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->GetType() !=
+    for (size_t i = 0; i < r.GetAlignments().front().GetAlignmentSplits().size() + 1; ++i) {
+        if (i > 0 && r.GetAlignments().front().GetAlignmentSplits()[i - 1]->GetType() !=
                          genie::core::record::AlignmentSplit::Type::kSameRec) {
             continue;
         }
-        auto pos = r.getPosition(0, i);
-        if (!isCovered(pos, pos + r.getMappedLength(0, i))) {
+        auto pos = r.GetPosition(0, i);
+        if (!isCovered(pos, pos + r.GetMappedLength(0, i))) {
             return false;
         }
     }
@@ -80,7 +80,7 @@ void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
                         seq = seq.substr(0, length - i * refMgr->getChunkSize());
                     }
                     core::record::Segment segment(std::move(seq));
-                    rec.addSegment(std::move(segment));
+                    rec.AddSegment(std::move(segment));
                     refChunk.GetData().push_back(std::move(rec));
                     finishedChunks.push_back(std::move(refChunk));
                 }
@@ -167,7 +167,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                                 0, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize() - cov.second);
                         }
                         core::record::Segment segment(std::move(ref_seq));
-                        rec.addSegment(std::move(segment));
+                        rec.AddSegment(std::move(segment));
                         refChunk.GetData().push_back(std::move(rec));
                     }
 
@@ -237,7 +237,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             for (auto& pairblock : refblock) {
                 for (auto& classblock : pairblock) {
                     if (classblock.GetData().empty() ||
-                        classblock.GetData().front().getClassID() == record::ClassType::kClassU) {
+                        classblock.GetData().front().GetClassID() == record::ClassType::kClassU) {
                         continue;
                     }
                     queueFinishedChunk(classblock);
@@ -247,12 +247,12 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     }
 
     for (auto& r : chunk.GetData()) {
-        auto classtype = r.getClassID();  // Only look at the ecigar for first classification
-        bool paired = r.getNumberOfTemplateSegments() > 1;
+        auto classtype = r.GetClassID();  // Only look at the ecigar for first classification
+        bool paired = r.GetNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
-        if (r.getClassID() == core::record::ClassType::kClassU &&
-            r.getNumberOfTemplateSegments() != r.getSegments().size()) {
+        if (r.GetClassID() == core::record::ClassType::kClassU &&
+            r.GetNumberOfTemplateSegments() != r.GetSegments().size()) {
             current_unpaired_u_Chunk.GetData().emplace_back(std::move(r));
             if (current_unpaired_u_Chunk.GetData().size() >= auSize) {
                 queueFinishedChunk(current_unpaired_u_Chunk);
@@ -267,20 +267,20 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             refBased = isCovered(r);
             if (refBased) {
                 size_t end = 0;
-                if (r.getAlignments().front().getAlignmentSplits().empty() ||
-                    r.getAlignments().front().getAlignmentSplits().front()->GetType() !=
+                if (r.GetAlignments().front().GetAlignmentSplits().empty() ||
+                    r.GetAlignments().front().GetAlignmentSplits().front()->GetType() !=
                         core::record::AlignmentSplit::Type::kSameRec) {
-                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 0);
+                    end = r.GetAlignments().front().GetPosition() + r.GetMappedLength(0, 0);
                 } else {
-                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 1) +
+                    end = r.GetAlignments().front().GetPosition() + r.GetMappedLength(0, 1) +
                           dynamic_cast<const core::record::alignment_split::SameRec&>(
-                              *r.getAlignments().front().getAlignmentSplits().front())
+                              *r.GetAlignments().front().GetAlignmentSplits().front())
                               .getDelta();
                     end = std::max(static_cast<uint64_t>(end),
-                                   r.getAlignments().front().getPosition() + r.getMappedLength(0, 0));
+                                   r.GetAlignments().front().GetPosition() + r.GetMappedLength(0, 0));
                 }
-                record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().GetSeqId()),
-                                                      r.getAlignments().front().getPosition(), end);
+                record_reference = this->refMgr->load(refMgr->ID2Ref(r.GetAlignmentSharedData().GetSeqId()),
+                                                      r.GetAlignments().front().GetPosition(), end);
             }
         }
 

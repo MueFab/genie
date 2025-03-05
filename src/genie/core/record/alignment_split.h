@@ -24,51 +24,50 @@ namespace genie::core::record {
  */
 class AlignmentSplit {
  public:
-    /**
-     * @brief
-     */
-    enum class Type : uint8_t { kSameRec = 0, kOtherRec = 1, kUnpaired = 2 };
+  /**
+   * @brief
+   */
+  enum class Type : uint8_t { kSameRec = 0, kOtherRec = 1, kUnpaired = 2 };
 
-    /**
-     * @brief
-     * @param split_alignment
-     */
-    explicit AlignmentSplit(Type split_alignment);
+  /**
+   * @brief
+   * @param split_alignment
+   */
+  explicit AlignmentSplit(Type split_alignment);
 
-    /**
-     * @brief
-     */
-    virtual ~AlignmentSplit() = default;
+  /**
+   * @brief
+   */
+  virtual ~AlignmentSplit() = default;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void Write(util::BitWriter& writer) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  virtual void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @param as_depth
-     * @param reader
-     * @return
-     */
-    static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth,
-                                                   util::BitReader& reader);
+  /**
+   * @brief
+   * @param as_depth
+   * @param reader
+   * @return
+   */
+  static std::unique_ptr<AlignmentSplit> Factory(uint8_t as_depth, util::BitReader& reader);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] virtual std::unique_ptr<AlignmentSplit> clone() const = 0;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] Type GetType() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] Type GetType() const;
 
  protected:
-    Type split_alignment_;  //!< @brief
+  Type split_alignment_;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

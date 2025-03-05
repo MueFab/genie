@@ -21,8 +21,8 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
-    uint32_t num_samples = recs.front().getNumSamples();
-    uint8_t num_likelihoods = recs.front().getNumberOfLikelihoods();
+    uint32_t num_samples = recs.front().GetNumSamples();
+    uint8_t num_likelihoods = recs.front().GetNumberOfLikelihoods();
 
     auto& likelihood_mat = block.likelihood_mat;
 
@@ -32,10 +32,10 @@ void extract_likelihoods(const EncodingOptions& opt, EncodingBlock& block, std::
     for (uint32_t i_rec = 0; i_rec < block_size; i_rec++) {
         auto& rec = recs[i_rec];
 
-        UTILS_DIE_IF(num_samples != rec.getNumSamples(), "Number of samples is not constant within a block!");
-        UTILS_DIE_IF(num_likelihoods != rec.getNumberOfLikelihoods(), "Number of likelihoods is not constant within a block!");
+        UTILS_DIE_IF(num_samples != rec.GetNumSamples(), "Number of samples is not constant within a block!");
+        UTILS_DIE_IF(num_likelihoods != rec.GetNumberOfLikelihoods(), "Number of likelihoods is not constant within a block!");
 
-        auto& rec_likelihoods = rec.getLikelihoods();
+        auto& rec_likelihoods = rec.GetLikelihoods();
         for (uint32_t j_sample = 0; j_sample < num_samples; j_sample++) {
             for (uint8_t k_likelihood = 0; k_likelihood < num_likelihoods; k_likelihood++) {
                 likelihood_mat(i_rec, j_sample * num_likelihoods + k_likelihood) = rec_likelihoods[j_sample][k_likelihood];
@@ -221,7 +221,7 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
     genie::likelihood::serialize_mat(block.idx_mat, block.dtype_id, block.nrows, block.ncols, block.serialized_mat);
     genie::likelihood::serialize_arr(block.lut, block.nelems, block.serialized_arr);
     block.serialized_mat.seekp(0, std::ios::end);
-    if (recs.at(0).getNumberOfLikelihoods() > 0)
+    if (recs.at(0).GetNumberOfLikelihoods() > 0)
     {
         genie::entropy::lzma::LZMAEncoder lzmaEncoder;
         std::stringstream compressedData;
@@ -235,7 +235,7 @@ std::tuple<genie::likelihood::LikelihoodParameters, genie::likelihood::EncodingB
         block.serialized_mat.str("");
         block.serialized_mat << compressedData.rdbuf();
     }
-    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).getNumberOfLikelihoods()),
+    genie::likelihood::LikelihoodParameters parameters(static_cast<uint8_t>(recs.at(0).GetNumberOfLikelihoods()),
         TRANSFORM_MODE, block.dtype_id);
     return std::make_tuple(parameters, block);
 }

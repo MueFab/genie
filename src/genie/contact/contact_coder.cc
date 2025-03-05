@@ -1145,12 +1145,12 @@ void decode_scm(
     }
 
     auto sample_ID = scm_payload.GetSampleID();
-    rec.setSampleID(sample_ID);
+    rec.SetSampleId(sample_ID);
     auto sample_name = std::string(cm_param.GetSampleName(sample_ID));
-    rec.setSampleName(std::move(sample_name));
-    rec.setChr1ID(chr1_ID);
-    rec.setChr2ID(chr2_ID);
-    rec.setBinSize(bin_size);
+    rec.SetSampleName(std::move(sample_name));
+    rec.SetChr1ID(chr1_ID);
+    rec.SetChr2ID(chr2_ID);
+    rec.SetBinSize(bin_size);
     rec.SetCMValues(
         std::move(start1),
         std::move(end1),
@@ -1185,16 +1185,16 @@ void encode_scm(
 
     auto interval = cm_param.GetBinSize();
     auto tile_size = cm_param.GetTileSize();
-    auto num_entries = rec.getNumEntries();
-    auto chr1_ID = rec.getChr1ID();
+    auto num_entries = rec.GetNumEntries();
+    auto chr1_ID = rec.GetChr1ID();
     auto chr1_num_bin_entries = cm_param.GetNumBinEntries(chr1_ID);
     auto ntiles_in_row = cm_param.GetNumTiles(chr1_ID);
-    auto chr2_ID = rec.getChr2ID();
+    auto chr2_ID = rec.GetChr2ID();
     auto chr2_num_bin_entries = cm_param.GetNumBinEntries(chr2_ID);
     auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
-    cm_param.UpsertSample(rec.getSampleID(), rec.getSampleName());
-    scm_payload.SetSampleId(rec.getSampleID());
+    cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
+    scm_payload.SetSampleId(rec.GetSampleID());
 
     scm_param.SetChr1ID(chr1_ID);
     scm_payload.SetChr1Id(chr1_ID);
@@ -1209,13 +1209,13 @@ void encode_scm(
     scm_param.SetNumTiles(ntiles_in_row, ntiles_in_col);
     scm_payload.SetNumTiles(ntiles_in_row, ntiles_in_col);
 
-    UInt64VecDtype row_ids = xt::adapt(rec.getStartPos1(), {num_entries});
+    UInt64VecDtype row_ids = xt::adapt(rec.GetStartPos1(), {num_entries});
     row_ids /= interval;
 
-    UInt64VecDtype col_ids = xt::adapt(rec.getStartPos2(), {num_entries});
+    UInt64VecDtype col_ids = xt::adapt(rec.GetStartPos2(), {num_entries});
     col_ids /= interval;
 
-    UIntVecDtype counts = xt::adapt(rec.getCounts(), {num_entries});
+    UIntVecDtype counts = xt::adapt(rec.GetCounts(), {num_entries});
 
     if (remove_unaligned_region){
         // Compute mask for
@@ -1424,9 +1424,9 @@ void encode_scm(
         if (norm_as_weight){
             // argwhere row_ids equal to col_ids
             auto main_diag_positions = xt::argwhere(xt::equal(row_ids, col_ids));
-            int num_norms = rec.getNumNormCounts();
+            int num_norms = rec.GetNumNormCounts();
             for (auto i_norm = 0u; i_norm < num_norms; i_norm++){
-                DoubleVecDtype norm_counts = xt::adapt(rec.getNormCounts()[i_norm], {num_entries});
+                DoubleVecDtype norm_counts = xt::adapt(rec.GetNormCounts()[i_norm], {num_entries});
                 auto norm_main_diag_counts = xt::view(norm_counts, main_diag_positions);
                 auto weights = xt::view(norm_counts, main_diag_positions) / xt::view(counts, main_diag_positions);
 

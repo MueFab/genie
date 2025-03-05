@@ -35,7 +35,7 @@ VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::stringstre
     util::BitReader reader(siteMGrecs);
     while (fillRecord(reader)) {
         descriptors.write(variantSite);
-        attributes.add(variantSite.getInfoTag());
+        attributes.add(variantSite.GetInfoTag());
         numberOfRows++;
     }
     descriptors.writeDanglingBits();
@@ -56,7 +56,7 @@ VariantSiteParser::VariantSiteParser(std::istream& _site_MGrecs, std::vector<gen
     util::BitReader reader(siteMGrecs);
     while (fillRecord(reader)) {
         descriptors.write(variantSite);
-        attributes.add(variantSite.getInfoTag());
+        attributes.add(variantSite.GetInfoTag());
         numberOfRows++;
     }
     descriptors.writeDanglingBits();
@@ -93,7 +93,7 @@ void VariantSiteParser::init() {
 }
 
 bool VariantSiteParser::fillRecord(util::BitReader reader) {
-    if (!variantSite.read(reader)) return false;
+    if (!variantSite.Read(reader)) return false;
     // for (auto field : variantSite.getInfoTag()) tags[field.info_tag].infoValue = field.infoValue;
     return true;
 }

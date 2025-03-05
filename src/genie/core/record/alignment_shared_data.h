@@ -24,50 +24,50 @@ namespace genie::core::record {
  * @brief
  */
 class AlignmentSharedData final {
-    uint16_t seq_id_;   //!< @brief
-    uint8_t as_depth_;  //!< @brief
+  uint16_t seq_id_;   //!< @brief
+  uint8_t as_depth_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     */
-    virtual ~AlignmentSharedData() = default;
+  /**
+   * @brief
+   */
+  virtual ~AlignmentSharedData() = default;
 
-    /**
-     * @brief
-     */
-    AlignmentSharedData();
+  /**
+   * @brief
+   */
+  AlignmentSharedData();
 
-    /**
-     * @brief
-     * @param seq_id
-     * @param as_depth
-     */
-    AlignmentSharedData(uint16_t seq_id, uint8_t as_depth);
+  /**
+   * @brief
+   * @param seq_id
+   * @param as_depth
+   */
+  AlignmentSharedData(uint16_t seq_id, uint8_t as_depth);
 
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit AlignmentSharedData(util::BitReader &reader);
+  /**
+   * @brief
+   * @param reader
+   */
+  explicit AlignmentSharedData(util::BitReader &reader);
 
-    /**
-     * @brief
-     * @param write
-     */
-    virtual void Write(util::BitWriter &write) const;
+  /**
+   * @brief
+   * @param write
+   */
+  virtual void Write(util::BitWriter &write) const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint16_t GetSeqId() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint16_t GetSeqId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] uint8_t GetAsDepth() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetAsDepth() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

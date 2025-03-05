@@ -15,13 +15,13 @@
 void check_row_col_uniqueness(
     genie::core::record::ContactRecord& rec
 ){
-    size_t num_entries = rec.getNumEntries();
+    size_t num_entries = rec.GetNumEntries();
 
-    auto& starts1 = rec.getStartPos1();
-    auto& starts2 = rec.getStartPos2();
-    auto& ends1 = rec.getEndPos1();
-    auto& ends2 = rec.getEndPos2();
-    auto& counts = rec.getCounts();
+    auto& starts1 = rec.GetStartPos1();
+    auto& starts2 = rec.GetStartPos2();
+    auto& ends1 = rec.GetEndPos1();
+    auto& ends2 = rec.GetEndPos2();
+    auto& counts = rec.GetCounts();
 
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> sparse_mat1;
     std::map<std::pair<uint64_t, uint64_t>, uint32_t> sparse_mat2;
@@ -74,30 +74,30 @@ TEST(ContactRecord, IntraContactRecord_LR_Raw) {
 
     auto& rec = recs.front();
 
-    ASSERT_EQ(rec.getSampleID(), 0u);
-    ASSERT_EQ(rec.getSampleName(), "Test01");
-    ASSERT_EQ(rec.getChr1ID(), 21u);
-    ASSERT_EQ(rec.getChr1Name(), "22");
-    ASSERT_EQ(rec.getChr2ID(), 21u);
-    ASSERT_EQ(rec.getChr2Name(), "22");
-    ASSERT_EQ(rec.getNumEntries(), 9812u);
-    ASSERT_EQ(rec.getNumNormCounts(), 0u);
-    ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-    ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
-    ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
-    ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
-    ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
-    ASSERT_EQ(rec.getStartPos2().back(), 51000000u);
-    ASSERT_EQ(rec.getEndPos2().front(), 16250000u);
-    ASSERT_EQ(rec.getEndPos2().back(), 51250000u);
-    ASSERT_EQ(rec.getCounts().front(), 16u);
-    ASSERT_EQ(rec.getCounts().back(), 68156u);
+    ASSERT_EQ(rec.GetSampleID(), 0u);
+    ASSERT_EQ(rec.GetSampleName(), "Test01");
+    ASSERT_EQ(rec.GetChr1ID(), 21u);
+    ASSERT_EQ(rec.GetChr1Name(), "22");
+    ASSERT_EQ(rec.GetChr2ID(), 21u);
+    ASSERT_EQ(rec.GetChr2Name(), "22");
+    ASSERT_EQ(rec.GetNumEntries(), 9812u);
+    ASSERT_EQ(rec.GetNumNormCounts(), 0u);
+    ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+    ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
+    ASSERT_EQ(rec.GetEndPos1().front(), 16250000u);
+    ASSERT_EQ(rec.GetEndPos1().back(), 51250000u);
+    ASSERT_EQ(rec.GetStartPos2().front(), 16000000u);
+    ASSERT_EQ(rec.GetStartPos2().back(), 51000000u);
+    ASSERT_EQ(rec.GetEndPos2().front(), 16250000u);
+    ASSERT_EQ(rec.GetEndPos2().back(), 51250000u);
+    ASSERT_EQ(rec.GetCounts().front(), 16u);
+    ASSERT_EQ(rec.GetCounts().back(), 68156u);
 
     {
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);
@@ -134,33 +134,33 @@ TEST(ContactRecord, IntraContactRecord_LR_All) {
     {
         auto& rec = recs.front();
 
-        ASSERT_EQ(rec.getSampleID(), 0u);
-        ASSERT_EQ(rec.getSampleName(), "Test01");
-        ASSERT_EQ(rec.getChr1ID(), 21u);
-        ASSERT_EQ(rec.getChr1Name(), "22");
-        ASSERT_EQ(rec.getChr2ID(), 21u);
-        ASSERT_EQ(rec.getChr2Name(), "22");
-        ASSERT_EQ(rec.getNumEntries(), 9623u);
-        ASSERT_EQ(rec.getNumNormCounts(), 7u);
-        ASSERT_EQ(rec.getStartPos1().front(), 16000000u);
-        ASSERT_EQ(rec.getStartPos1().back(), 51000000u);
-        ASSERT_EQ(rec.getEndPos1().front(), 16250000u);
-        ASSERT_EQ(rec.getEndPos1().back(), 51250000u);
-        ASSERT_EQ(rec.getStartPos2().front(), 16000000u);
-        ASSERT_EQ(rec.getStartPos2().back(), 51000000u);
-        ASSERT_EQ(rec.getEndPos2().front(), 16250000u);
-        ASSERT_EQ(rec.getEndPos2().back(), 51250000u);
-        ASSERT_EQ(rec.getCounts().front(), 16u);
-        ASSERT_EQ(rec.getCounts().back(), 68156u);
-        ASSERT_EQ(rec.getNormCountNames().front(), "GW_KR");
-        ASSERT_EQ(rec.getNormCountNames().back(), "VC_SQRT");
-        ASSERT_TRUE(abs(rec.getNormCounts()[0].front() - 0.002699L) < 1e-5L);
-        ASSERT_TRUE(abs(rec.getNormCounts()[0].back() - 70297.121260L) < 1e-5L);
+        ASSERT_EQ(rec.GetSampleID(), 0u);
+        ASSERT_EQ(rec.GetSampleName(), "Test01");
+        ASSERT_EQ(rec.GetChr1ID(), 21u);
+        ASSERT_EQ(rec.GetChr1Name(), "22");
+        ASSERT_EQ(rec.GetChr2ID(), 21u);
+        ASSERT_EQ(rec.GetChr2Name(), "22");
+        ASSERT_EQ(rec.GetNumEntries(), 9623u);
+        ASSERT_EQ(rec.GetNumNormCounts(), 7u);
+        ASSERT_EQ(rec.GetStartPos1().front(), 16000000u);
+        ASSERT_EQ(rec.GetStartPos1().back(), 51000000u);
+        ASSERT_EQ(rec.GetEndPos1().front(), 16250000u);
+        ASSERT_EQ(rec.GetEndPos1().back(), 51250000u);
+        ASSERT_EQ(rec.GetStartPos2().front(), 16000000u);
+        ASSERT_EQ(rec.GetStartPos2().back(), 51000000u);
+        ASSERT_EQ(rec.GetEndPos2().front(), 16250000u);
+        ASSERT_EQ(rec.GetEndPos2().back(), 51250000u);
+        ASSERT_EQ(rec.GetCounts().front(), 16u);
+        ASSERT_EQ(rec.GetCounts().back(), 68156u);
+        ASSERT_EQ(rec.GetNormCountNames().front(), "GW_KR");
+        ASSERT_EQ(rec.GetNormCountNames().back(), "VC_SQRT");
+        ASSERT_TRUE(abs(rec.GetNormCounts()[0].front() - 0.002699L) < 1e-5L);
+        ASSERT_TRUE(abs(rec.GetNormCounts()[0].back() - 70297.121260L) < 1e-5L);
 
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);
@@ -195,12 +195,12 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
 
     auto& rec = recs.front();
 
-    ASSERT_EQ(rec.getSampleID(), 0u);
-    ASSERT_EQ(rec.getSampleName(), "Test01");
-    ASSERT_EQ(rec.getChr1ID(), 21u);
-    ASSERT_EQ(rec.getChr1Name(), "22");
-    ASSERT_EQ(rec.getChr2ID(), 21u);
-    ASSERT_EQ(rec.getChr2Name(), "22");
+    ASSERT_EQ(rec.GetSampleID(), 0u);
+    ASSERT_EQ(rec.GetSampleName(), "Test01");
+    ASSERT_EQ(rec.GetChr1ID(), 21u);
+    ASSERT_EQ(rec.GetChr1Name(), "22");
+    ASSERT_EQ(rec.GetChr2ID(), 21u);
+    ASSERT_EQ(rec.GetChr2Name(), "22");
     //TODO: Complete all with the correct values
     //    ASSERT_EQ(rec.getNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
@@ -219,7 +219,7 @@ TEST(ContactRecord, IntraContactRecord_HR_Raw) {
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);
@@ -254,12 +254,12 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
 
     auto& rec = recs.front();
 
-    ASSERT_EQ(rec.getSampleID(), 0u);
-    ASSERT_EQ(rec.getSampleName(), "Test01");
-    ASSERT_EQ(rec.getChr1ID(), 21u);
-    ASSERT_EQ(rec.getChr1Name(), "22");
-    ASSERT_EQ(rec.getChr2ID(), 21u);
-    ASSERT_EQ(rec.getChr2Name(), "22");
+    ASSERT_EQ(rec.GetSampleID(), 0u);
+    ASSERT_EQ(rec.GetSampleName(), "Test01");
+    ASSERT_EQ(rec.GetChr1ID(), 21u);
+    ASSERT_EQ(rec.GetChr1Name(), "22");
+    ASSERT_EQ(rec.GetChr2ID(), 21u);
+    ASSERT_EQ(rec.GetChr2Name(), "22");
     //TODO: Complete all with the correct values
     //    ASSERT_EQ(rec.getNumEntries(), 9812u);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
@@ -278,7 +278,7 @@ TEST(ContactRecord, IntraContactRecord_HR_All) {
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);
@@ -313,12 +313,12 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
 
     auto& rec = recs.front();
 
-    ASSERT_EQ(rec.getSampleID(), 0u);
-    ASSERT_EQ(rec.getSampleName(), "Test01");
-    ASSERT_EQ(rec.getChr1ID(), 21u);
-    ASSERT_EQ(rec.getChr1Name(), "22");
-    ASSERT_EQ(rec.getChr2ID(), 22u);
-    ASSERT_EQ(rec.getChr2Name(), "X");
+    ASSERT_EQ(rec.GetSampleID(), 0u);
+    ASSERT_EQ(rec.GetSampleName(), "Test01");
+    ASSERT_EQ(rec.GetChr1ID(), 21u);
+    ASSERT_EQ(rec.GetChr1Name(), "22");
+    ASSERT_EQ(rec.GetChr2ID(), 22u);
+    ASSERT_EQ(rec.GetChr2Name(), "X");
     //TODO: Complete all with the correct values
 //    ASSERT_EQ(rec.getNumEntries(), 59740);
 //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
@@ -337,7 +337,7 @@ TEST(ContactRecord, InterContactRecord_LR_Raw) {
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);
@@ -372,12 +372,12 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
 
     auto& rec = recs.front();
 
-    ASSERT_EQ(rec.getSampleID(), 0u);
-    ASSERT_EQ(rec.getSampleName(), "Test01");
-    ASSERT_EQ(rec.getChr1ID(), 21u);
-    ASSERT_EQ(rec.getChr1Name(), "22");
-    ASSERT_EQ(rec.getChr2ID(), 22u);
-    ASSERT_EQ(rec.getChr2Name(), "X");
+    ASSERT_EQ(rec.GetSampleID(), 0u);
+    ASSERT_EQ(rec.GetSampleName(), "Test01");
+    ASSERT_EQ(rec.GetChr1ID(), 21u);
+    ASSERT_EQ(rec.GetChr1Name(), "22");
+    ASSERT_EQ(rec.GetChr2ID(), 22u);
+    ASSERT_EQ(rec.GetChr2Name(), "X");
     //TODO: Complete all with the correct values
     //    ASSERT_EQ(rec.getNumEntries(), 59740);
     //    ASSERT_EQ(rec.getNumNormCounts(), 0u);
@@ -396,7 +396,7 @@ TEST(ContactRecord, InterContactRecord_HR_Raw) {
         std::stringstream ss;
         genie::util::BitWriter writer(&ss);
 
-        rec.write(writer);
+        rec.Write(writer);
 
         genie::util::BitReader bitreader(ss);
         auto recon_rec = genie::core::record::ContactRecord(bitreader);

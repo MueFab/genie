@@ -27,256 +27,254 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 /**
- *  @brief
+ * @brief Class representing a genomic record
+ *
+ * Contains segments, alignments, and metadata for one or more template segments.
  */
 class Record {
  private:
-    uint8_t number_of_template_segments{};    //!< @brief
-    std::vector<Segment> reads;               //!< @brief
-    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
-    ClassType class_ID{ClassType::kNone};      //!< @brief
-    std::string read_group;                   //!< @brief
-    bool read_1_first{};                      //!< @brief
-    AlignmentSharedData sharedAlignmentInfo;  //!< @brief
-    uint8_t qv_depth{};                       //!< @brief
-    std::string read_name;                    //!< @brief
-    uint8_t flags{};                          //!< @brief
+  uint8_t number_of_template_segments_{};    //!< @brief
+  std::vector<Segment> reads_;               //!< @brief
+  std::vector<AlignmentBox> alignment_info_;  //!< @brief
+  ClassType class_id_{ClassType::kNone};     //!< @brief
+  std::string read_group_;                   //!< @brief
+  bool read_1_first_{};                      //!< @brief
+  AlignmentSharedData shared_alignment_info_;  //!< @brief
+  uint8_t qv_depth_{};                       //!< @brief
+  std::string read_name_;                    //!< @brief
+  uint8_t flags_{};                          //!< @brief
 
-    std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief
+  std::unique_ptr<AlignmentExternal> more_alignment_info_;  //!< @brief
 
  public:
-    /**
-     * @brief
-     */
-    void patchRefID(size_t refID);
+  /**
+   * @brief
+   */
+  void PatchRefID(size_t refID);
 
-    /**
-     * @brief
-     */
-    Record();
+  /**
+   * @brief
+   */
+  Record();
 
-    /**
-     * @brief
-     * @param _number_of_template_segments
-     * @param _auTypeCfg
-     * @param _read_name
-     * @param _read_group
-     * @param _flags
-     * @param _is_read_1_first
-     */
-    Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
+  /**
+   * @brief
+   * @param _number_of_template_segments
+   * @param _auTypeCfg
+   * @param _read_name
+   * @param _read_group
+   * @param _flags
+   * @param _is_read_1_first
+   */
+  Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
+         std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
 
-    /**
-     * @brief
-     * @param rec
-     */
-    Record(const Record& rec);
+  /**
+   * @brief
+   * @param rec
+   */
+  Record(const Record& rec);
 
-    /**
-     * @brief
-     * @param rec
-     */
-    Record(Record&& rec) noexcept;
+  /**
+   * @brief
+   * @param rec
+   */
+  Record(Record&& rec) noexcept;
 
-    /**
-     * @brief
-     */
-    ~Record() = default;
+  /**
+   * @brief
+   */
+  ~Record() = default;
 
-    /**
-     * @brief
-     * @param rec
-     * @return
-     */
-    Record& operator=(const Record& rec);
+  /**
+   * @brief
+   * @param rec
+   * @return
+   */
+  Record& operator=(const Record& rec);
 
-    /**
-     * @brief
-     * @param rec
-     * @return
-     */
-    Record& operator=(Record&& rec) noexcept;
+  /**
+   * @brief
+   * @param rec
+   * @return
+   */
+  Record& operator=(Record&& rec) noexcept;
 
-    /**
-     * @brief
-     * @param reader
-     */
-    explicit Record(util::BitReader& reader);
+  /**
+   * @brief
+   * @param reader
+   */
+  explicit Record(util::BitReader& reader);
 
-    /**
-     * @brief
-     * @param rec
-     */
-    void addSegment(Segment&& rec);
+  /**
+   * @brief
+   * @param rec
+   */
+  void AddSegment(Segment&& rec);
 
-    /**
-     * @brief
-     * @param _seq_id
-     * @param rec
-     */
-    void addAlignment(uint16_t _seq_id, AlignmentBox&& rec);
+  /**
+   * @brief
+   * @param _seq_id
+   * @param rec
+   */
+  void AddAlignment(uint16_t _seq_id, AlignmentBox&& rec);
 
-    /**
-     * @brief
-     * @return
-     */
-    std::vector<Segment>& getSegments();
+  /**
+   * @brief
+   * @return
+   */
+  std::vector<Segment>& GetSegments();
 
-    /**
-     * @brief
-     */
-    void swapSegmentOrder();
+  /**
+   * @brief
+   */
+  void SwapSegmentOrder();
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<Segment>& getSegments() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<Segment>& GetSegments() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    size_t getNumberOfTemplateSegments() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] size_t GetNumberOfTemplateSegments() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<AlignmentBox>& getAlignments() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::vector<AlignmentBox>& GetAlignments() const;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    void Write(util::BitWriter& writer) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  void Write(util::BitWriter& writer) const;
 
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getFlags() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] uint8_t GetFlags() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    ClassType getClassID() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] ClassType GetClassID() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getName() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetName() const;
 
-    /**
-     * @brief
-     * @param _name
-     */
-    void setName(const std::string& _name);
+  /**
+   * @brief
+   * @param _name
+   */
+  void SetName(const std::string& _name);
 
-    /**
-     * @brief
-     * @param depth
-     */
-    void setQVDepth(uint8_t depth);
+  /**
+   * @brief
+   * @param depth
+   */
+  void SetQVDepth(uint8_t depth);
 
-    /**
-     * @brief
-     * @param val
-     */
-    void setRead1First(bool val);
+  /**
+   * @brief
+   * @param val
+   */
+  void SetRead1First(bool val);
 
-    /**
-     * @brief
-     * @param type
-     */
-    void setClassType(ClassType type);
+  /**
+   * @brief
+   * @param type
+   */
+  void SetClassType(ClassType type);
 
-    /**
-     * @brief
-     * @return
-     */
-    const std::string& getGroup() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const std::string& GetGroup() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const AlignmentSharedData& getAlignmentSharedData() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const AlignmentSharedData& GetAlignmentSharedData() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    const AlignmentExternal& getAlignmentExternal() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] const AlignmentExternal& GetAlignmentExternal() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    bool isRead1First() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool IsRead1First() const;
 
-    /**
-     * @brief
-     * @param cigar
-     * @return
-     */
-    static uint64_t getLengthOfCigar(const std::string& cigar);
+  /**
+   * @brief
+   * @param cigar
+   * @return
+   */
+  static uint64_t GetLengthOfCigar(const std::string& cigar);
 
-    /**
-     * @brief
-     * @param alignment
-     * @param split
-     * @return
-     */
-    size_t getMappedLength(size_t alignment, size_t split) const;
+  /**
+   * @brief
+   * @param alignment
+   * @param split
+   * @return
+   */
+  [[nodiscard]] size_t GetMappedLength(size_t alignment, size_t split) const;
 
-    /**
-     * @brief
-     * @param id
-     * @param b
-     */
-    void setAlignment(size_t id, AlignmentBox&& b);
+  /**
+   * @brief
+   * @param id
+   * @param b
+   */
+  void SetAlignment(size_t id, AlignmentBox&& b);
 
-    /**
-     * @brief
-     * @return
-     */
-    std::pair<size_t, size_t> getTemplatePosition() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] std::pair<size_t, size_t> GetTemplatePosition() const;
 
-    /**
-     * @brief
-     * @param alignment
-     * @param split
-     * @return
-     */
-    size_t getPosition(size_t alignment, size_t split) const;
+  /**
+   * @brief
+   * @param alignment
+   * @param split
+   * @return
+   */
+  [[nodiscard]] size_t GetPosition(size_t alignment, size_t split) const;
 
-    /**
-     * @brief
-     * @return
-     */
-    bool getRead1First() const;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] bool GetRead1First() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    void setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
+  /**
+   * @brief
+   * @return
+   */
+  void SetMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 

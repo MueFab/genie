@@ -185,32 +185,32 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
   }
   if (varGenoType.empty()) return 0;
   // extract format fields
-  std::map<std::string, genie::core::record::format_field> formatList;
+  std::map<std::string, genie::core::record::FormatField> formatList;
   for (auto& rec : varGenoType)
-    for (const auto& field : rec.getFormats()) {
-      formatList[field.getFormat()] = field;
+    for (const auto& field : rec.GetFormats()) {
+      formatList[field.GetFormat()] = field;
       genie::core::ArrayType convertArray;
       auto defaultValue = convertArray.toArray(
-          field.getType(), convertArray.getDefaultValue(field.getType()));
+          field.GetType(), convertArray.getDefaultValue(field.GetType()));
       std::vector<std::vector<std::vector<uint8_t>>> formatvalue(
-          field.getSampleCount(), std::vector<std::vector<uint8_t>>(
-                                      field.getArrayLength(), defaultValue));
-      formatList[field.getFormat()].setValue(formatvalue);
+          field.GetSampleCount(), std::vector<std::vector<uint8_t>>(
+                                      field.GetArrayLength(), defaultValue));
+      formatList[field.GetFormat()].setValue(formatvalue);
     }
 
   // fill every missing value of format field
   for (auto& rec : varGenoType) {
-    auto formats = rec.getFormats();
+    auto formats = rec.GetFormats();
     for (const auto& availableFormats : formatList) {
       bool available = false;
       for (auto& currentFormat : formats)
-        if (currentFormat.getFormat() == availableFormats.first) {
+        if (currentFormat.GetFormat() == availableFormats.first) {
           available = true;
           break;
         }
       if (!available) formats.push_back(availableFormats.second);
     }
-    rec.setFormats(formats);
+    rec.SetFormats(formats);
   }
 
   std::tuple<genie::genotype::GenotypeParameters,
@@ -224,10 +224,10 @@ size_t genie::annotation::GenoAnnotation::readOneBlock(
       likelihoodData =
           genie::likelihood::encode_block(likelihood_opt, varGenoType);
 
-  uint32_t _numSamples = varGenoType.front().getNumSamples();
-  uint8_t _formatCount = varGenoType.front().getFormatCount();
+  uint32_t _numSamples = varGenoType.front().GetNumSamples();
+  uint8_t _formatCount = varGenoType.front().GetFormatCount();
   uint32_t rowStart =
-      static_cast<uint32_t>(varGenoType.front().getVariantIndex());
+      static_cast<uint32_t>(varGenoType.front().GetVariantIndex());
   recData.set(rowStart, 0,
               std::get<genie::genotype::EncodingBlock>(genotypeData),
               std::get<genie::likelihood::EncodingBlock>(likelihoodData),

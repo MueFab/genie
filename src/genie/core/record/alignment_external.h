@@ -25,43 +25,43 @@ namespace genie::core::record {
  */
 class AlignmentExternal {
  public:
-    /**
-     * @brief
-     */
-    enum class Type : uint8_t { kNone, kOtherRec };
+  /**
+   * @brief
+   */
+  enum class Type : uint8_t { kNone, kOtherRec };
 
-    /**
-     * @brief
-     * @param more_alignment_info_type
-     */
-    explicit AlignmentExternal(Type more_alignment_info_type);
+  /**
+   * @brief
+   * @param more_alignment_info_type
+   */
+  explicit AlignmentExternal(Type more_alignment_info_type);
 
-    /**
-     * @brief
-     */
-    virtual ~AlignmentExternal() = default;
+  /**
+   * @brief
+   */
+  virtual ~AlignmentExternal() = default;
 
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void Write(util::BitWriter &writer) const;
+  /**
+   * @brief
+   * @param writer
+   */
+  virtual void Write(util::BitWriter &writer) const;
 
-    /**
-     * @brief
-     * @param reader
-     * @return
-     */
-    static std::unique_ptr<AlignmentExternal> Factory(util::BitReader &reader);
+  /**
+   * @brief
+   * @param reader
+   * @return
+   */
+  static std::unique_ptr<AlignmentExternal> Factory(util::BitReader &reader);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] virtual std::unique_ptr<AlignmentExternal> Clone() const = 0;
+  /**
+   * @brief
+   * @return
+   */
+  [[nodiscard]] virtual std::unique_ptr<AlignmentExternal> Clone() const = 0;
 
  protected:
-    Type more_alignment_info_type_;  //!< @brief
+  Type more_alignment_info_type_;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
