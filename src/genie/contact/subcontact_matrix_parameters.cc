@@ -7,11 +7,11 @@
 #include "subcontact_matrix_parameters.h"
 #include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::contact {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 SubcontactMatrixParameters::SubcontactMatrixParameters()
     : parameter_set_ID_(0),
@@ -22,7 +22,43 @@ SubcontactMatrixParameters::SubcontactMatrixParameters()
       row_mask_exists_flag_(false),
       col_mask_exists_flag_(false) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+// Parameterized constructor
+SubcontactMatrixParameters::SubcontactMatrixParameters(
+    uint8_t parameter_set_ID,
+    uint8_t chr1_ID,
+    uint8_t chr2_ID,
+    core::AlgoID codec_ID,
+    TileParameters&& tile_parameters,
+    bool row_mask_exists_flag,
+    bool col_mask_exists_flag)
+    : parameter_set_ID_(parameter_set_ID),
+      chr1_ID_(chr1_ID),
+      chr2_ID_(chr2_ID),
+      codec_ID_(codec_ID),
+      tile_parameters_(std::move(tile_parameters)),
+      row_mask_exists_flag_(row_mask_exists_flag),
+      col_mask_exists_flag_(col_mask_exists_flag) {
+}
+
+// -----------------------------------------------------------------------------
+
+//SubcontactMatrixParameters::SubcontactMatrixParameters(const SubcontactMatrixParameters& other) noexcept = default;
+SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
+    const SubcontactMatrixParameters& other) {
+  if (this == &other) return *this;
+  parameter_set_ID_ = other.parameter_set_ID_;
+  chr1_ID_ = other.chr1_ID_;
+  chr2_ID_ = other.chr2_ID_;
+  codec_ID_ = other.codec_ID_;
+  tile_parameters_ = other.tile_parameters_;
+  row_mask_exists_flag_ = other.row_mask_exists_flag_;
+  col_mask_exists_flag_ = other.col_mask_exists_flag_;
+  return *this;
+}
+
+// -----------------------------------------------------------------------------
 
 SubcontactMatrixParameters::SubcontactMatrixParameters(SubcontactMatrixParameters&& other) noexcept
     : parameter_set_ID_(other.parameter_set_ID_),
@@ -33,33 +69,23 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(SubcontactMatrixParameter
       row_mask_exists_flag_(other.row_mask_exists_flag_),
       col_mask_exists_flag_(other.col_mask_exists_flag_) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-SubcontactMatrixParameters::SubcontactMatrixParameters(const SubcontactMatrixParameters& other) noexcept
-    : parameter_set_ID_(other.parameter_set_ID_),
-      chr1_ID_(other.chr1_ID_),
-      chr2_ID_(other.chr2_ID_),
-      codec_ID_(other.codec_ID_),
-      tile_parameters_(other.tile_parameters_),
-      row_mask_exists_flag_(other.row_mask_exists_flag_),
-      col_mask_exists_flag_(other.col_mask_exists_flag_) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(const SubcontactMatrixParameters& other) {
-    if (this != &other) {
-      parameter_set_ID_ = other.parameter_set_ID_;
-      chr1_ID_ = other.chr1_ID_;
-      chr2_ID_ = other.chr2_ID_;
-      codec_ID_ = other.codec_ID_;
-      tile_parameters_ = other.tile_parameters_;
-      row_mask_exists_flag_ = other.row_mask_exists_flag_;
-      col_mask_exists_flag_ = other.col_mask_exists_flag_;
-    }
+// Move assignment operator
+SubcontactMatrixParameters& SubcontactMatrixParameters::operator=(
+    SubcontactMatrixParameters&& other) noexcept {
+    if (this == &other) return *this;
+    parameter_set_ID_ = std::move(other.parameter_set_ID_);
+    chr1_ID_ = std::move(other.chr1_ID_);
+    chr2_ID_ = std::move(other.chr2_ID_);
+    codec_ID_ = std::move(other.codec_ID_);
+    tile_parameters_ = std::move(other.tile_parameters_);
+    row_mask_exists_flag_ = std::move(other.row_mask_exists_flag_);
+    col_mask_exists_flag_ = std::move(other.col_mask_exists_flag_);
     return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, ContactMatrixParameters& cm_params)
     : parameter_set_ID_(reader.ReadAlignedInt<uint8_t>()),
@@ -95,7 +121,7 @@ SubcontactMatrixParameters::SubcontactMatrixParameters(util::BitReader& reader, 
     reader.FlushHeldBits();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool SubcontactMatrixParameters::operator==(const SubcontactMatrixParameters& other) {
     bool ret = parameter_set_ID_ == other.parameter_set_ID_ &&
@@ -127,68 +153,68 @@ bool SubcontactMatrixParameters::operator==(const SubcontactMatrixParameters& ot
     return ret;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 uint8_t SubcontactMatrixParameters::GetParameterSetID() const { return parameter_set_ID_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 uint8_t SubcontactMatrixParameters::GetChr1ID() const { return chr1_ID_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 uint8_t SubcontactMatrixParameters::GetChr2ID() const { return chr2_ID_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 core::AlgoID SubcontactMatrixParameters::GetCodecID() const { return codec_ID_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 [[maybe_unused]] void SubcontactMatrixParameters::SetParameterSetID(uint8_t ID) {
   parameter_set_ID_ = ID; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetChr1ID(uint8_t ID) { chr1_ID_ = ID; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetChr2ID(uint8_t ID) { chr2_ID_ = ID; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetCodecID(core::AlgoID codec_ID) { codec_ID_ = codec_ID; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 [[maybe_unused]] const TileParameters& SubcontactMatrixParameters::GetTileParameters() const { return tile_parameters_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 [[maybe_unused]] void SubcontactMatrixParameters::SetTileParameters(TileParameters&& parameters) {
   tile_parameters_ = std::move(parameters);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool SubcontactMatrixParameters::GetRowMaskExistsFlag() const { return row_mask_exists_flag_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetRowMaskESetRowMaskExistsFlag(bool flag) {
   row_mask_exists_flag_ = flag; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool SubcontactMatrixParameters::GetColMaskExistsFlag() const { return col_mask_exists_flag_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetColMaskExistsFlag(bool flag) {
   col_mask_exists_flag_ = flag; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetNumTiles(size_t ntiles_in_row, size_t ntiles_in_col, bool free_mem) {
     if (free_mem) {
@@ -201,7 +227,7 @@ void SubcontactMatrixParameters::SetNumTiles(size_t ntiles_in_row, size_t ntiles
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 TileParameter& SubcontactMatrixParameters::GetTileParameter(size_t i_tile, size_t j_tile) {
     UTILS_DIE_IF(i_tile >= GetNTilesInRow(), "Invalid i_tile!");
@@ -211,7 +237,7 @@ TileParameter& SubcontactMatrixParameters::GetTileParameter(size_t i_tile, size_
     return tile_parameters_[i_tile][j_tile];
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::SetTileParameter(size_t i_tile, size_t j_tile, TileParameter tile_parameter) {
     //    UTILS_DIE_IF(i_tile >= GetNTilesInRow(), "Invalid i_tile!");
@@ -221,11 +247,11 @@ void SubcontactMatrixParameters::SetTileParameter(size_t i_tile, size_t j_tile, 
     GetTileParameter(i_tile, j_tile) = tile_parameter;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 size_t SubcontactMatrixParameters::GetNTilesInRow() const { return tile_parameters_.size(); }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 size_t SubcontactMatrixParameters::GetNTilesInCol() const {
     if (GetNTilesInRow() > 0)
@@ -234,11 +260,11 @@ size_t SubcontactMatrixParameters::GetNTilesInCol() const {
         return 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 bool SubcontactMatrixParameters::IsIntraSCM() const { return chr1_ID_ == chr2_ID_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 size_t SubcontactMatrixParameters::GetSize() const {
     size_t size = 0;
@@ -266,7 +292,7 @@ size_t SubcontactMatrixParameters::GetSize() const {
     return size;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     writer.WriteBypassBE(parameter_set_ID_);
@@ -300,7 +326,7 @@ void SubcontactMatrixParameters::Write(util::BitWriter& writer) const {
     writer.FlushBits();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void SubcontactMatrixParameters::Write(core::Writer& writer) const {
   writer.Write(parameter_set_ID_, 8);
@@ -329,8 +355,8 @@ void SubcontactMatrixParameters::Write(core::Writer& writer) const {
     writer.Write(col_mask_exists_flag_, 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::contact
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
