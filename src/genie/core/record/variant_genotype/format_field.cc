@@ -1,45 +1,54 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "format_field.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t FormatField::getFormatLen() const { return static_cast<uint8_t>(format_name.size()); }
+uint8_t FormatField::GetFormatLen() const {
+  return static_cast<uint8_t>(format_name_.size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& FormatField::getFormatName() const { return format_name; }
+const std::string& FormatField::GetFormatName() const {
+  return format_name_;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataType FormatField::getFormatType() const { return format_type; }
+DataType FormatField::GetFormatType() const {
+  return format_type_;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t FormatField::getSampleCount() const { return static_cast<uint32_t>(format_value.size()); }
+uint32_t FormatField::GetSampleCount() const {
+  return static_cast<uint32_t>(format_value_.size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t FormatField::getFormatArrayLen() const { return static_cast<uint8_t>(format_value[0].size()); }
+uint8_t FormatField::GetFormatArrayLen() const {
+  return static_cast<uint8_t>(format_value_[0].size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::vector<DynamicDataType>>& FormatField::getFormatValue() const { return format_value; }
+const std::vector<std::vector<DynamicDataType>>& FormatField::GetFormatValue() const {
+  return format_value_;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
