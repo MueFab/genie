@@ -318,7 +318,8 @@ enum class AlgoID : uint8_t {
     SPARSE = 18,
     DEL = 19,
     RLE = 20,
-    SER = 21
+    SER = 21,
+    UNDEFINED = 22
 };
 
 AlgoID stringToAlgoID(std::string& algostring);
