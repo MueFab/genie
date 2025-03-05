@@ -4,6 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/core/record/annotation_parameter_set/record.h"
+
 #include <algorithm>
 #include <cstring>
 #include <sstream>
@@ -11,159 +13,164 @@
 #include <utility>
 
 #include "genie/core/arrayType.h"
-#include "genie/core/record/annotation_parameter_set/record.h"
 #include "genie/core/record/variant_site/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
 #include "genie/util/runtime_exception.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace variant_site {
+namespace genie::core::record::variant_site {
 
+// -------------------------------------------------------------------------------------------------
 
-Record::Record(util::BitReader& reader) { read(reader); }
-
-void Record::write(core::Writer& writer) {
-  writer.Write(variant_index, 64);
-    writer.Write(seq_ID, 16);
-    writer.Write(pos, 40);
-    writer.Write(strand, 8);
-    writer.Write(ID_len, 8);
-    writer.Write(ID);
-    writer.Write(description_len, 8);
-    writer.Write(description);
-    writer.Write(ref_len, 32);
-    writer.Write(ref);
-
-    writer.Write(alt_count, 8);
-    for (auto i = 0; i < alt_count; ++i) {
-      writer.Write(alt_len[i], 32);
-        writer.Write(altern[i]);
-    }
-    writer.Write(depth, 32);
-    writer.Write(seq_qual, 32);
-    writer.Write(map_qual, 32);
-    writer.Write(map_num_qual_0, 32);
-    writer.Write(filters_len, 8);
-    writer.Write(filters);
-
-    auto info_tag = info.getFields();
-    writer.Write(static_cast<uint8_t>(info_tag.size()), 8);
-    for (auto i = 0u; i < info_tag.size(); ++i) {
-      writer.Write(info_tag[i].tag.size(), 8);
-        writer.Write(info_tag[i].tag);
-        writer.Write(static_cast<uint8_t>(info_tag[i].type), 8);
-        writer.Write(info_tag[i].values.size(), 8);
-        ArrayType writeType;
-        for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
-            writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
-            if (info_tag[i].type == DataType::STRING) writer.WriteReserved(8);
-        }
-    }
-    writer.WriteReserved(7);
-    writer.Write(linked_record, 1);
-    if (linked_record) {
-      writer.Write(link_name_len, 8);
-        writer.Write(link_name);
-        writer.Write(reference_box_ID, 8);
-    }
+Record::Record(util::BitReader& reader) {
+  Read(reader);
 }
 
-bool Record::read(genie::util::BitReader& reader) {
-    clearData();
-    variant_index = reader.ReadBits(64);
-    if (!reader.IsStreamGood()) return false;
-    seq_ID = static_cast<uint16_t>(reader.ReadBits(16));
-    pos = reader.ReadBits(40);
-    strand = static_cast<uint8_t>(reader.ReadBits(8));
-    ID_len = static_cast<uint8_t>(reader.ReadBits(8));
-    if (ID_len > 0) {
-        ID.resize(ID_len);
-        reader.ReadAlignedBytes(&ID[0], ID_len);
-    }
-    description_len = static_cast<uint8_t>(reader.ReadBits(8));
+// -------------------------------------------------------------------------------------------------
 
-    if (description_len > 0) {
-        description.resize(description_len);
-        reader.ReadAlignedBytes(&description[0], description_len);
-    }
-    ref_len = static_cast<uint32_t>(reader.ReadBits(32));
-    if (ref_len > 0) {
-        ref.resize(ref_len);
-        reader.ReadAlignedBytes(&ref[0], ref_len);
-    }
-    alt_count = static_cast<uint8_t>(reader.ReadBits(8));
-    for (auto i = 0; i < alt_count; ++i) {
-        alt_len.push_back(static_cast<uint32_t>(reader.ReadBits(32)));
-        std::string altlist(alt_len.back(), 0);
-        for (auto& item : altlist) item = static_cast<char>(reader.ReadBits(8));
-        altern.push_back(altlist);
-    }
+void Record::Write(core::Writer& writer) {
+  writer.Write(variant_index_, 64);
+  writer.Write(seq_id_, 16);
+  writer.Write(pos_, 40);
+  writer.Write(strand_, 8);
+  writer.Write(id_len_, 8);
+  writer.Write(id_);
+  writer.Write(description_len_, 8);
+  writer.Write(description_);
+  writer.Write(ref_len_, 32);
+  writer.Write(ref_);
 
-    depth = static_cast<uint32_t>(reader.ReadBits(32));
+  writer.Write(alt_count_, 8);
+  for (auto i = 0; i < alt_count_; ++i) {
+    writer.Write(alt_len_[i], 32);
+    writer.Write(altern_[i]);
+  }
+  writer.Write(depth_, 32);
+  writer.Write(seq_qual_, 32);
+  writer.Write(map_qual_, 32);
+  writer.Write(map_num_qual_0_, 32);
+  writer.Write(filters_len_, 8);
+  writer.Write(filters_);
 
-    seq_qual = static_cast<uint32_t>(reader.ReadBits(32));
-    map_qual = static_cast<uint32_t>(reader.ReadBits(32));
-    map_num_qual_0 = static_cast<uint32_t>(reader.ReadBits(32));
-
-    filters_len = static_cast<uint8_t>(reader.ReadBits(8));
-    if (filters_len > 0) {
-        filters.resize(filters_len);
-        reader.ReadAlignedBytes(&filters[0], filters_len);
+  auto info_tag = info_.GetFields();
+  writer.Write(static_cast<uint8_t>(info_tag.size()), 8);
+  for (auto i = 0u; i < info_tag.size(); ++i) {
+    writer.Write(info_tag[i].tag.size(), 8);
+    writer.Write(info_tag[i].tag);
+    writer.Write(static_cast<uint8_t>(info_tag[i].type), 8);
+    writer.Write(info_tag[i].values.size(), 8);
+    ArrayType writeType;
+    for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
+      writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
+      if (info_tag[i].type == DataType::STRING)
+        writer.WriteReserved(8);
     }
-
-    info.read(reader);
- 
-    linked_record = static_cast<uint8_t>(reader.ReadBits(8));
-    if (linked_record) {
-        link_name_len = static_cast<uint8_t>(reader.ReadBits(8));
-        if (link_name_len > 0) {
-            link_name.resize(link_name_len);
-            reader.ReadAlignedBytes(&link_name[0], link_name_len);
-        }
-        reference_box_ID = static_cast<uint8_t>(reader.ReadBits(8));
-    }
-    return true;
+  }
+  writer.WriteReserved(7);
+  writer.Write(linked_record_, 1);
+  if (linked_record_) {
+    writer.Write(link_name_len_, 8);
+    writer.Write(link_name_);
+    writer.Write(reference_box_id_, 8);
+  }
 }
 
-void Record::clearData() {
-    variant_index = 0;
-    seq_ID = 0;
-    pos = 0;
-    strand = 0;
-    ID_len = 0;
-    ID = "";
-    description_len = 0;
-    description = "";
-    ref_len = 0;
-    ref = "";
-    alt_count = 0;
-    alt_len = {};
-    altern = {};
-    depth = 0;
-    seq_qual = 0;
-    map_qual = 0;
-    map_num_qual_0 = 0;
-    filters_len = 0;
-    filters = "";
- 
-    info.clear();
-    
-    linked_record = 0;
-    link_name_len = 0;
-    link_name = "";
-    reference_box_ID = 0;
+// -------------------------------------------------------------------------------------------------
+
+bool Record::Read(genie::util::BitReader& reader) {
+  ClearData();
+  variant_index_ = reader.ReadBits(64);
+  if (!reader.IsStreamGood())
+    return false;
+  seq_id_ = static_cast<uint16_t>(reader.ReadBits(16));
+  pos_ = reader.ReadBits(40);
+  strand_ = static_cast<uint8_t>(reader.ReadBits(8));
+  id_len_ = static_cast<uint8_t>(reader.ReadBits(8));
+  if (id_len_ > 0) {
+    id_.resize(id_len_);
+    reader.ReadAlignedBytes(&id_[0], id_len_);
+  }
+  description_len_ = static_cast<uint8_t>(reader.ReadBits(8));
+
+  if (description_len_ > 0) {
+    description_.resize(description_len_);
+    reader.ReadAlignedBytes(&description_[0], description_len_);
+  }
+  ref_len_ = static_cast<uint32_t>(reader.ReadBits(32));
+  if (ref_len_ > 0) {
+    ref_.resize(ref_len_);
+    reader.ReadAlignedBytes(&ref_[0], ref_len_);
+  }
+  alt_count_ = static_cast<uint8_t>(reader.ReadBits(8));
+  for (auto i = 0; i < alt_count_; ++i) {
+    alt_len_.push_back(static_cast<uint32_t>(reader.ReadBits(32)));
+    std::string altlist(alt_len_.back(), 0);
+    for (auto& item : altlist)
+      item = static_cast<char>(reader.ReadBits(8));
+    altern_.push_back(altlist);
+  }
+
+  depth_ = static_cast<uint32_t>(reader.ReadBits(32));
+
+  seq_qual_ = static_cast<uint32_t>(reader.ReadBits(32));
+  map_qual_ = static_cast<uint32_t>(reader.ReadBits(32));
+  map_num_qual_0_ = static_cast<uint32_t>(reader.ReadBits(32));
+
+  filters_len_ = static_cast<uint8_t>(reader.ReadBits(8));
+  if (filters_len_ > 0) {
+    filters_.resize(filters_len_);
+    reader.ReadAlignedBytes(&filters_[0], filters_len_);
+  }
+
+  info_.Read(reader);
+
+  linked_record_ = static_cast<uint8_t>(reader.ReadBits(8));
+  if (linked_record_) {
+    link_name_len_ = static_cast<uint8_t>(reader.ReadBits(8));
+    if (link_name_len_ > 0) {
+      link_name_.resize(link_name_len_);
+      reader.ReadAlignedBytes(&link_name_[0], link_name_len_);
+    }
+    reference_box_id_ = static_cast<uint8_t>(reader.ReadBits(8));
+  }
+  return true;
 }
 
-}  // namespace variant_site
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+// -------------------------------------------------------------------------------------------------
+
+void Record::ClearData() {
+  variant_index_ = 0;
+  seq_id_ = 0;
+  pos_ = 0;
+  strand_ = 0;
+  id_len_ = 0;
+  id_ = "";
+  description_len_ = 0;
+  description_ = "";
+  ref_len_ = 0;
+  ref_ = "";
+  alt_count_ = 0;
+  alt_len_ = {};
+  altern_ = {};
+  depth_ = 0;
+  seq_qual_ = 0;
+  map_qual_ = 0;
+  map_num_qual_0_ = 0;
+  filters_len_ = 0;
+  filters_ = "";
+
+  info_.Clear();
+
+  linked_record_ = 0;
+  link_name_len_ = 0;
+  link_name_ = "";
+  reference_box_id_ = 0;
+}
+
+}  // namespace genie::core::record::variant_site
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
