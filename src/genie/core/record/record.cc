@@ -89,7 +89,7 @@ Record::Record(util::BitReader &reader)
         a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
     }
     flags = reader.ReadAlignedInt<uint8_t>();
-    moreAlignmentInfo = AlignmentExternal::factory(reader);
+    moreAlignmentInfo = AlignmentExternal::Factory(reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ Record &Record::operator=(const Record &rec) {
     this->reads = rec.reads;
     this->alignmentInfo = rec.alignmentInfo;
     this->flags = rec.flags;
-    this->moreAlignmentInfo = rec.moreAlignmentInfo->clone();
+    this->moreAlignmentInfo = rec.moreAlignmentInfo->Clone();
     return *this;
 }
 
@@ -192,7 +192,7 @@ const std::vector<AlignmentBox> &Record::getAlignments() const { return alignmen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::write(util::BitWriter &writer) const {
+void Record::Write(util::BitWriter &writer) const {
     writer.WriteBypassBE(number_of_template_segments);
     writer.WriteBypassBE<uint8_t>(static_cast<uint8_t>(reads.size()));
     writer.WriteBypassBE<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
@@ -216,7 +216,7 @@ void Record::write(util::BitWriter &writer) const {
         a.write(writer);
     }
     writer.WriteBypassBE(flags);
-    moreAlignmentInfo->write(writer);
+    moreAlignmentInfo->Write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ size_t Record::getMappedLength(size_t alignment, size_t split) const {
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().GetECigar()));
+    return static_cast<size_t>(getLengthOfCigar(s2.GetAlignment().GetECigar()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

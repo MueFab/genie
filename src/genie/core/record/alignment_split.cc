@@ -1,12 +1,16 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "alignment_split.h"
-#include "genie/core/record/alignment_split/other-rec.h"
-#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split.h"
+
+#include <memory>
+
+#include "genie/core/record/alignment_split/other_rec.h"
+#include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
@@ -15,43 +19,44 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
+namespace genie::core::record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSplit::AlignmentSplit(Type _split_alignment) : split_alignment(_split_alignment) {}
+AlignmentSplit::AlignmentSplit(const Type split_alignment)
+    : split_alignment_(split_alignment) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentSplit::write(util::BitWriter &writer) const { writer.WriteBypassBE(split_alignment); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
-    Type type = reader.ReadAlignedInt<Type>();
-    switch (type) {
-        case Type::SAME_REC:
-            return util::make_unique<alignment_split::SameRec>(as_depth, reader);
-        case Type::OTHER_REC:
-            return util::make_unique<alignment_split::OtherRec>(reader);
-        case Type::UNPAIRED:
-            return util::make_unique<alignment_split::Unpaired>();
-        default:
-            UTILS_DIE("Invalid SplitAlignmentType");
-    }
+void AlignmentSplit::Write(util::BitWriter& writer) const {
+  writer.WriteBypassBE(split_alignment_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentSplit::Type AlignmentSplit::getType() const { return split_alignment; }
+std::unique_ptr<AlignmentSplit> AlignmentSplit::Factory(
+    uint8_t as_depth, util::BitReader &reader) {
+  switch (reader.ReadAlignedInt<Type>()) {
+    case Type::kSameRec:
+      return std::make_unique<alignment_split::SameRec>(as_depth, reader);
+    case Type::kOtherRec:
+      return std::make_unique<alignment_split::OtherRec>(reader);
+    case Type::kUnpaired:
+      return std::make_unique<alignment_split::Unpaired>();
+    default:
+      UTILS_DIE("Invalid SplitAlignmentType");
+  }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+AlignmentSplit::Type AlignmentSplit::GetType() const {
+  return split_alignment_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace genie::core::record
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 
 #include "alignment_box.h"
 #include <utility>
-#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/same_rec.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"
@@ -23,7 +23,7 @@ void AlignmentBox::write(util::BitWriter& writer) const {
     writer.WriteBypassBE<uint64_t, 5>(mapping_pos);
     alignment.Write(writer);
     for (const auto& a : splitAlignmentInfo) {
-        a->write(writer);
+        a->Write(writer);
     }
 }
 
@@ -39,7 +39,7 @@ AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_t
         return;
     }
     for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
-        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::factory(as_depth, reader);
+        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::Factory(as_depth, reader);
     }
 }
 
@@ -50,8 +50,8 @@ AlignmentBox::AlignmentBox() : mapping_pos(0), alignment(), splitAlignmentInfo(0
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentBox::addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment) {
-    if (_alignment->getType() == AlignmentSplit::Type::SAME_REC) {
-        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).getAlignment().GetMappingScores().size() !=
+    if (_alignment->GetType() == AlignmentSplit::Type::kSameRec) {
+        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).GetAlignment().GetMappingScores().size() !=
                          alignment.GetMappingScores().size(),
                      "AS depth incompatible");
     }

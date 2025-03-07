@@ -7,6 +7,8 @@
 #ifndef GENIE_GENOTYPE_PARAMETERS_H
 #define GENIE_GENOTYPE_PARAMETERS_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
@@ -20,14 +22,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace genotype {
+namespace genie::genotype {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum class BinarizationID : uint8_t {
     BIT_PLANE = 0,
-    ROW_BIN = 1,  // should be ROW_SPLIT?
+    ROW_BIN = 1,
     UNDEFINED = 2,
 };
 
@@ -42,72 +43,91 @@ enum class ConcatAxis : uint8_t {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct GenotypeBinMatParameters {
-    bool sort_rows_flag;
-    bool sort_cols_flag;
-    bool transpose_mat_flag;
-    genie::core::AlgoID variants_codec_ID;
-    GenotypeBinMatParameters()
-        : sort_rows_flag(false),
-          sort_cols_flag(false),
-          transpose_mat_flag(false),
-          variants_codec_ID(genie::core::AlgoID::BSC) {}
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 class GenotypeParameters {
  private:
-    uint8_t max_ploidy;
-    bool no_reference_flag;
-    bool not_available_flag;
-    BinarizationID binarization_ID;
-
-    uint8_t num_bit_plane;
-    ConcatAxis concat_axis;
-
-    std::vector<GenotypeBinMatParameters> variants_payload_params;
-
-    bool encode_phases_data_flag;
-    GenotypeBinMatParameters phases_payload_params;
-    bool phasing_value;
+  BinarizationID binarization_ID_;
+  ConcatAxis concat_axis_;
+  bool transpose_alleles_mat_flag_;
+  bool sort_alleles_rows_flag_;
+  bool sort_alleles_cols_flag_;
+  genie::core::AlgoID alleles_codec_ID_;
+  bool encode_phases_data_flag_;
+  bool transpose_phases_mat_flag_;
+  bool sort_phases_rows_flag_;
+  bool sort_phases_cols_flag_;
+  genie::core::AlgoID phases_codec_ID_;
 
  public:
-    GenotypeParameters();
+  // Default constructor
+  GenotypeParameters();
 
-    GenotypeParameters(uint8_t max_ploidy, bool no_reference_flag, bool not_available_flag,
-                       BinarizationID binarization_ID, uint8_t num_bit_planes, ConcatAxis concat_axis,
-                       std::vector<GenotypeBinMatParameters>&& variants_payload_params, bool encode_phases_data_flag,
-                       GenotypeBinMatParameters phases_payload_params, bool phases_value);
+  // Constructor with all variables
+  GenotypeParameters(
+      BinarizationID binarization_id,
+      ConcatAxis concat_axis,
+      bool transpose_alleles_mat_flag,
+      bool sort_alleles_rows_flag,
+      bool sort_alleles_cols_flag,
+      genie::core::AlgoID alleles_codec_id,
+      bool encode_phases_data_flag,
+      bool transpose_phases_mat_flag,
+      bool sort_phases_rows_flag,
+      bool sort_phases_cols_flag,
+      genie::core::AlgoID phases_codec_id
+  );
 
-    //    GenotypeParameters(GenotypeParameters&& other);
+  // Copy constructor
+  GenotypeParameters(const GenotypeParameters& other);
 
-    uint8_t getMaxPloidy() const;
-    bool getNoRerefernceFlag() const;
-    bool getNotAvailableFlag() const;
-    BinarizationID getBinarizationID() const;
-    uint8_t getNumBitPlanes() const;
-    ConcatAxis getConcatAxis() const;
-    const std::vector<GenotypeBinMatParameters>& getVariantsPayloadParams() const;
+  // Move constructor
+  GenotypeParameters(GenotypeParameters&& other) noexcept;
 
-    bool isPhaseEncoded() const;
-    // IF encode_phases_data_flag
-    const GenotypeBinMatParameters& getPhasesPayloadParams() const;
-    uint8_t getNumVariantsPayloads() const;
-    // ELSE
-    bool getPhaseValue() const;
+  // Copy assignment operator
+  GenotypeParameters& operator=(const GenotypeParameters& other);
 
-    void write(core::Writer& writer) const;
-    size_t getSize(core::Writer& writesize) const;
+  // Move assignment operator
+  GenotypeParameters& operator=(GenotypeParameters&& other) noexcept;
 
-    //TODO: Why we have read function here instead of a constructor?
-    void read(util::BitReader& reader) { (void)reader; }
+  // Constructor from bitreader
+  explicit GenotypeParameters(genie::util::BitReader& reader);
+
+  // Getters
+  [[maybe_unused]] BinarizationID GetBinarizationID() const;
+  [[maybe_unused]] ConcatAxis GetConcatAxis() const;
+  bool GetTransposeAllelesMatFlag() const;
+  bool GetSortAllelesRowsFlag() const;
+  bool GetSortAllelesColsFlag() const;
+  genie::core::AlgoID GetAllelesCodecID() const;
+  bool GetEncodePhasesDataFlag() const;
+  [[maybe_unused]] bool GetTransposePhasesMatFlag() const;
+  [[maybe_unused]] bool GetSortPhasesRowsFlag() const;
+  [[maybe_unused]] bool GetSortPhasesColsFlag() const;
+  [[maybe_unused]] genie::core::AlgoID GetPhasesCodecID() const;
+
+  // Setters
+  [[maybe_unused]] void SetBinarizationID(BinarizationID binarization_id);
+  [[maybe_unused]] void SetConcatAxis(ConcatAxis concat_axis);
+  [[maybe_unused]] void SetTransposeAllelesMatFlag(bool flag);
+  [[maybe_unused]] void SetSortAllelesRowsFlag(bool flag);
+  [[maybe_unused]] void SetSortAllelesColsFlag(bool flag);
+  [[maybe_unused]] void SetAllelesCodecID(genie::core::AlgoID codec_id);
+  [[maybe_unused]] void SetEncodePhasesDataFlag(bool flag);
+  [[maybe_unused]] void SetTransposePhasesMatFlag(bool flag);
+  [[maybe_unused]] void SetSortPhasesRowsFlag(bool flag);
+  [[maybe_unused]] void SetSortPhasesColsFlag(bool flag);
+  [[maybe_unused]] void SetPhasesCodecID(genie::core::AlgoID codec_id);
+
+  static size_t GetSize() ;
+  void Write(util::BitWriter& writer) const;
+  void Write(core::Writer& writer) const;
+
+  //TODO: Why we have read function here instead of a constructor?
+  void read(util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace genotype
-}  // namespace genie
+}  // namespace genie::genotype
 
 // ---------------------------------------------------------------------------------------------------------------------
 

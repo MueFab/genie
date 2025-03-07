@@ -1,69 +1,68 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
-#include "other-rec.h"
+#include "other_rec.h"
+
 #include <memory>
+
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
-#include "genie/util/make_unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_external {
+namespace genie::core::record::alignment_external {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)
-    : AlignmentExternal(AlignmentExternal::Type::OTHER_REC), next_pos(_next_pos), next_seq_ID(_next_seq_ID) {}
+OtherRec::OtherRec(const uint64_t _next_pos, const uint16_t next_seq_id)
+    : AlignmentExternal(AlignmentExternal::Type::kOtherRec),
+      next_pos_(_next_pos),
+      next_seq_id_(next_seq_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(util::BitReader &reader)
-    : AlignmentExternal(AlignmentExternal::Type::OTHER_REC),
-      next_pos(reader.ReadAlignedInt<uint64_t, 5>()),
-      next_seq_ID(reader.ReadAlignedInt<uint16_t>()) {}
+    : AlignmentExternal(AlignmentExternal::Type::kOtherRec),
+      next_pos_(reader.ReadAlignedInt<uint64_t, 5>()),
+      next_seq_id_(reader.ReadAlignedInt<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OtherRec::OtherRec() : AlignmentExternal(AlignmentExternal::Type::OTHER_REC), next_pos(0), next_seq_ID(0) {}
+OtherRec::OtherRec()
+    : AlignmentExternal(AlignmentExternal::Type::kOtherRec), next_pos_(0), next_seq_id_(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t OtherRec::getNextPos() const { return next_pos; }
+uint64_t OtherRec::GetNextPos() const { return next_pos_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t OtherRec::getNextSeq() const { return next_seq_ID; }
+uint16_t OtherRec::GetNextSeq() const { return next_seq_id_; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void OtherRec::write(util::BitWriter &writer) const {
-    AlignmentExternal::write(writer);
-    writer.WriteBypassBE<uint64_t, 5>(next_pos);
-    writer.WriteBypassBE(next_seq_ID);
+void OtherRec::Write(util::BitWriter &writer) const {
+  AlignmentExternal::Write(writer);
+  writer.WriteBypassBE<uint64_t, 5>(next_pos_);
+  writer.WriteBypassBE(next_seq_id_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AlignmentExternal> OtherRec::clone() const {
-    auto ret = util::make_unique<OtherRec>();
-    ret->next_pos = this->next_pos;
-    ret->next_seq_ID = this->next_seq_ID;
-    return ret;
+std::unique_ptr<AlignmentExternal> OtherRec::Clone() const {
+  auto ret = std::make_unique<OtherRec>();
+  ret->next_pos_ = this->next_pos_;
+  ret->next_seq_id_ = this->next_seq_id_;
+  return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_external
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_external
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

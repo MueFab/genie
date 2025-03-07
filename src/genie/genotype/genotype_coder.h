@@ -37,7 +37,7 @@ namespace genotype {
 
 //using BinVecDtype = xt::xtensor<bool, 1, xt::layout_type::row_major>;
 using BinMatDtype = xt::xtensor<bool, 2, xt::layout_type::row_major>;
-//using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
+using UInt8MatDtype = xt::xtensor<uint8_t, 2, xt::layout_type::row_major>;
 using Int8MatDtype = xt::xtensor<int8_t, 2, xt::layout_type::row_major>;
 using UIntVecDtype = xt::xtensor<uint32_t, 1, xt::layout_type::row_major>;
 
@@ -119,7 +119,7 @@ GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, cons
  * @param block The encoding block.
  * @return The number of binary matrices.
  */
-uint8_t getNumBinMats(const EncodingBlock& block);
+uint8_t GetNumBinMats(const EncodingBlock& block);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -379,7 +379,7 @@ void bin_mat_from_bytes(
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO (Yeremia,Stefanie): Move and refactor this function to the parsing function
-void sort_format(
+[[maybe_unused]] void sort_format(
     const std::vector<core::record::VariantGenotype>& recs,
     size_t block_size,
     std::map<std::string,
@@ -389,7 +389,7 @@ void sort_format(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(
+[[maybe_unused]] void entropy_encode_bin_mat(
     BinMatDtype& bin_mat,
     genie::core::AlgoID codec_ID,
     std::vector<uint8_t>& payload

@@ -23,44 +23,45 @@ namespace genotype {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters generate_genotype_parameters(const EncodingOptions& opt, const EncodingBlock& block) {
-    auto num_bin_mat = getNumBinMats(block);
-    std::vector<GenotypeBinMatParameters> variants_payload_params(num_bin_mat);
-    for (auto i = 0u; i < num_bin_mat; i++) {
-        variants_payload_params[i].sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        variants_payload_params[i].sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        variants_payload_params[i].transpose_mat_flag = opt.transpose_mat;
-        variants_payload_params[i].variants_codec_ID = opt.codec_ID;
-    }
-    bool phase_value = false;
-    bool encode_phases_data_flag = false;
-    auto unique_phasing_vals = xt::unique(block.phasing_mat);
-    if (unique_phasing_vals.size() > 0) {
-        phase_value = unique_phasing_vals.at(0);
-        encode_phases_data_flag = unique_phasing_vals.shape(0) > 1;
-    }
-    GenotypeBinMatParameters phases_payload_param;
-    if (encode_phases_data_flag) {
-        phases_payload_param.sort_rows_flag = opt.sort_row_method != SortingAlgoID::NO_SORTING;
-        phases_payload_param.sort_cols_flag = opt.sort_col_method != SortingAlgoID::NO_SORTING;
-        phases_payload_param.transpose_mat_flag = opt.transpose_mat;
-        phases_payload_param.variants_codec_ID = opt.codec_ID;
-    }
+  // Determine if phase data needs to be encoded
+  auto unique_phasing_vals = xt::unique(block.phasing_mat);
+  bool encode_phases_data_flag = false;
 
-    // TODO (Yeremia): Fix this
-    auto params = GenotypeParameters(block.max_ploidy, block.dot_flag, block.na_flag, opt.binarization_ID,
-                                     block.num_bit_planes, opt.concat_axis, std::move(variants_payload_params),
-                                     encode_phases_data_flag, phases_payload_param, phase_value);
+  if (unique_phasing_vals.size() == 1) {
+    encode_phases_data_flag = true;
+  }
 
-    return params;
+  // Create GenotypeParameters object
+  auto parameters = GenotypeParameters(
+      opt.binarization_ID,
+      opt.concat_axis,
+      opt.transpose_mat,
+      opt.sort_row_method != SortingAlgoID::NO_SORTING,
+      opt.sort_col_method != SortingAlgoID::NO_SORTING,
+      opt.codec_ID,
+      encode_phases_data_flag,
+      opt.transpose_mat,
+      opt.sort_row_method != SortingAlgoID::NO_SORTING,
+      opt.sort_col_method != SortingAlgoID::NO_SORTING,
+      opt.codec_ID
+  );
+
+  return parameters;
+}
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t GetNumBinMats(const EncodingBlock& block) {
+    return static_cast<uint8_t>(block.allele_bin_mat_vect.size()); 
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t getNumBinMats(const EncodingBlock& block) { return static_cast<uint8_t>(block.allele_bin_mat_vect.size()); }
+void decompose(
+    const EncodingOptions& opt,
+    EncodingBlock& block,
+    std::vector<core::record::VariantGenotype>& recs
+) {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void decompose(const EncodingOptions& opt, EncodingBlock& block, std::vector<core::record::VariantGenotype>& recs) {
     UTILS_DIE_IF(recs.empty(), "No records found for the process!");
 
     auto block_size = opt.block_size < recs.size() ? opt.block_size : recs.size();
@@ -277,7 +278,7 @@ void binarize_allele_mat(Int8MatDtype& allele_mat, const BinarizationID binariza
             break;
         }
         default:
-            UTILS_DIE("Invalid binarization_ID!");
+            UTILS_DIE("Invalid binarization_ID_!");
     }
 
     // TODO(Yeremia): Free memory of allele_mat
@@ -378,7 +379,7 @@ void invert_sort_bin_mat(BinMatDtype& bin_mat, UIntVecDtype& row_ids, UIntVecDty
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sort_block(const EncodingOptions& opt, EncodingBlock& block) {
-    auto num_bin_mats = getNumBinMats(block);
+    auto num_bin_mats = GetNumBinMats(block);
 
     block.allele_row_ids_vect.resize(num_bin_mats);
     block.allele_col_ids_vect.resize(num_bin_mats);
@@ -474,7 +475,7 @@ void sort_format(const std::vector<core::record::VariantGenotype>& recs, size_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t>& payload) {
+[[maybe_unused]] void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, std::vector<uint8_t>& payload) {
     uint8_t* raw_data;
     size_t raw_data_len;
     uint8_t* compressed_data;
@@ -495,40 +496,6 @@ void entropy_encode_bin_mat(BinMatDtype& bin_mat, genie::core::AlgoID codec_ID, 
     payload = std::vector<uint8_t>(compressed_data, compressed_data + compressed_data_len);
 
     free(raw_data);
-
-    //    //#ifdef DEBUG
-    //
-    //    unsigned long nrows;
-    //    unsigned long ncols;
-    //
-    //    mpegg_jbig_decompress_default(&raw_data, &raw_data_len, compressed_data, compressed_data_len, &nrows,
-    //    &ncols);
-    //
-    //    BinMatDtype recon_bin_mat;
-    //
-    //    // recon_bin_mat must be initialized first with the correct size
-    //    bin_mat_from_bytes(
-    //        raw_data,
-    //        raw_data_len,
-    //        nrows,
-    //        ncols,
-    //        recon_bin_mat
-    //    );
-    //
-    //    //#endif
-    //
-    //    free(compressed_data);
-    //
-    //    UTILS_DIE_IF(bin_mat.shape() != recon_bin_mat.shape(), "Error");
-    //    auto equality_check = xt::equal(bin_mat, recon_bin_mat);
-    //    if (!xt::all(equality_check)) {
-    //        for (auto i = 0u; i < nrows; i++) {
-    //            for (auto j = 0u; j < ncols; j++) {
-    //                auto val = equality_check(i, j);
-    //                std::cerr << val;
-    //            }
-    //        }
-    //    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

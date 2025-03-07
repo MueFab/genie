@@ -133,7 +133,7 @@ uint8_t VariantGenotype::getNumberOfAllelesPerSample() const {
         return static_cast<uint8_t>(alleles.front().size());
     } else {
         //        return 0;
-        UTILS_DIE("max_ploidy does not exist in the record!");
+        UTILS_DIE("max_ploidy_ does not exist in the record!");
     }
 }
 
@@ -171,11 +171,11 @@ const std::vector<format_field>& VariantGenotype::getFormats() const { return fo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// uint8_t VariantGenotype::getMaxPloidy() const {
+// uint8_t VariantGenotype::GetMaxPloidy() const {
 //    if (isGenotypePresent()){
 //        return alleles.front().size();
 //    } else {
-//        UTILS_DIE("max_ploidy does not exist in the record!");
+//        UTILS_DIE("max_ploidy_ does not exist in the record!");
 //    }
 //}
 
