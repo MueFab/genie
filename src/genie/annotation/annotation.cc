@@ -30,8 +30,6 @@ void genie::annotation::Annotation::startStream(RecType recType, std::string rec
 
     if (recType == RecType::GENO_FILE) {
         std::vector<std::pair<uint64_t, uint8_t>> numBitPlanes;
-        std::string num_bit_plane_filename =  outputFileName+"_numBitPlane";
-        if (std::filesystem::exists(num_bit_plane_filename)) std::filesystem::remove(num_bit_plane_filename);
         genoAnnotation.setCompressors(compressors);
         genoAnnotation.setTileSize(defaultTileSizeHeight, defaultTileSizeWidth);
         auto dataunits = genoAnnotation.parseGenotype(inputfile, numBitPlanes);
