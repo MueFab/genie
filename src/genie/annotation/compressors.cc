@@ -52,13 +52,13 @@ void Compressor::parseConfig(std::stringstream& config) {
 }
 
 void Compressor::compress(std::stringstream& input, std::stringstream& output, uint8_t compressorID = 0) {
-    UTILS_DIE_IF(compressorID >= compressorParameters.size(), "not that much compressors defined");
+    UTILS_DIE_IF(compressorID > compressorParameters.size(), "not that much compressors defined");
     selectedCompressorID = compressorID;
 
     std::stringstream intermediateIn;
     std::stringstream intermediateOut;
 
-    auto& comp = compressorParameters.at(compressorID);
+    auto& comp = compressorParameters.at(0);
     for (auto& compressor : compressorParameters)
         if (compressor.getCompressorID() == compressorID) comp = compressor;
 
