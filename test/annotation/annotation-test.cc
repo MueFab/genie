@@ -201,10 +201,22 @@ TEST_P(AnnotationTests, annotationGeno) {
   uint32_t BLOCK_SIZE = testParams.defaultTileHeight;
   bool TRANSFORM_MODE = true;
 
+<<<<<<< HEAD
   genie::likelihood::EncodingOptions likelihood_opt = {
       BLOCK_SIZE,      // block_size
       TRANSFORM_MODE,  // transform_flag;
   };
+=======
+    genie::genotype::EncodingOptions genotype_opt = {
+        BLOCK_SIZE,                                  // block_size;
+        genie::genotype::BinarizationID::ROW_BIN,//BIT_PLANE,  // binarization_ID_;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis_;
+        false,                                       // transpose_mat;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
+        genie::core::AlgoID::JBIG                    // codec_ID_;
+    };
+>>>>>>> 36419877ffb46c23b528f13cc26f58fe128e06d6
 
   genie::genotype::EncodingOptions genotype_opt = {
       BLOCK_SIZE,                                  // block_size;

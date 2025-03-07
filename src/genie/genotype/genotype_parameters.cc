@@ -6,6 +6,8 @@
 
 #include "genotype_parameters.h"
 
+#include "genie/util/runtime_exception.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -14,121 +16,286 @@ namespace genotype {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenotypeParameters::GenotypeParameters()
-    : max_ploidy(0),
-      no_reference_flag(false),
-      not_available_flag(false),
-      binarization_ID(BinarizationID::UNDEFINED),
-      num_bit_plane(0),
-      concat_axis(ConcatAxis::UNDEFINED),
-      variants_payload_params(),
-      encode_phases_data_flag(false),
-      phases_payload_params(),
-      phasing_value(false) {}
+    : binarization_ID_(BinarizationID::UNDEFINED),
+      concat_axis_(ConcatAxis::UNDEFINED),
+      transpose_alleles_mat_flag_(false),
+      sort_alleles_rows_flag_(false),
+      sort_alleles_cols_flag_(false),
+      alleles_codec_ID_(genie::core::AlgoID::JBIG),
+      encode_phases_data_flag_(false),
+      transpose_phases_mat_flag_(false),
+      sort_phases_rows_flag_(false),
+      sort_phases_cols_flag_(false),
+      phases_codec_ID_(genie::core::AlgoID::JBIG) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenotypeParameters::GenotypeParameters(uint8_t _max_ploidy, bool _no_reference_flag, bool _not_available_flag,
-                                       BinarizationID _binarization_ID, uint8_t _num_bit_planes, ConcatAxis _concat_axis,
-                                       std::vector<GenotypeBinMatParameters>&& _variants_payload_params,
-                                       bool _encode_phases_data_flag, GenotypeBinMatParameters _phases_payload_params,
-                                       bool _phases_value)
-    : max_ploidy(_max_ploidy),
-      no_reference_flag(_no_reference_flag),
-      not_available_flag(_not_available_flag),
-      binarization_ID(_binarization_ID),
-      num_bit_plane(_num_bit_planes),
-      concat_axis(_concat_axis),
-      variants_payload_params(_variants_payload_params),
-      encode_phases_data_flag(_encode_phases_data_flag),
-      phases_payload_params(_phases_payload_params),
-      phasing_value(_phases_value) {}
+GenotypeParameters::GenotypeParameters(
+    BinarizationID binarization_id,
+    ConcatAxis concat_axis,
+    bool transpose_alleles_mat_flag,
+    bool sort_alleles_rows_flag,
+    bool sort_alleles_cols_flag,
+    genie::core::AlgoID alleles_codec_id,
+    bool encode_phases_data_flag,
+    bool transpose_phases_mat_flag,
+    bool sort_phases_rows_flag,
+    bool sort_phases_cols_flag,
+    genie::core::AlgoID phases_codec_id)
+    : binarization_ID_(binarization_id),
+      concat_axis_(concat_axis),
+      transpose_alleles_mat_flag_(transpose_alleles_mat_flag),
+      sort_alleles_rows_flag_(sort_alleles_rows_flag),
+      sort_alleles_cols_flag_(sort_alleles_cols_flag),
+      alleles_codec_ID_(alleles_codec_id),
+      encode_phases_data_flag_(encode_phases_data_flag),
+      transpose_phases_mat_flag_(transpose_phases_mat_flag),
+      sort_phases_rows_flag_(sort_phases_rows_flag),
+      sort_phases_cols_flag_(sort_phases_cols_flag),
+      phases_codec_ID_(phases_codec_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getMaxPloidy() const { return max_ploidy; }
+// Copy constructor
+GenotypeParameters::GenotypeParameters(const GenotypeParameters& other) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getNoRerefernceFlag() const { return no_reference_flag; }
+// Move constructor
+GenotypeParameters::GenotypeParameters(GenotypeParameters&& other) noexcept = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool GenotypeParameters::getNotAvailableFlag() const { return not_available_flag; }
+// Copy assignment operator
+GenotypeParameters& GenotypeParameters::operator=(const GenotypeParameters& other) = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationID GenotypeParameters::getBinarizationID() const { return binarization_ID; }
+// Move assignment operator
+GenotypeParameters& GenotypeParameters::operator=(GenotypeParameters&& other) noexcept = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t GenotypeParameters::getNumBitPlanes() const { return num_bit_plane; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-ConcatAxis GenotypeParameters::getConcatAxis() const { return concat_axis; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t GenotypeParameters::getNumVariantsPayloads() const {return static_cast<uint8_t>(variants_payload_params.size());}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<GenotypeBinMatParameters>& GenotypeParameters::getVariantsPayloadParams() const {return variants_payload_params;}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool GenotypeParameters::isPhaseEncoded() const { return encode_phases_data_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const GenotypeBinMatParameters& GenotypeParameters::getPhasesPayloadParams() const { return phases_payload_params; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool GenotypeParameters::getPhaseValue() const { return phasing_value; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void GenotypeParameters::write(core::Writer& writer) const {
-  writer.Write(max_ploidy, 8);
-    writer.Write(no_reference_flag, 1);
-    writer.Write(not_available_flag, 1);
-    writer.Write(static_cast<uint8_t>(binarization_ID), 3);
-    if (binarization_ID == BinarizationID::BIT_PLANE) {
-      writer.Write(getNumBitPlanes(), 8);// was getNumVariantsPayloads
-        writer.Write(static_cast<uint8_t>(concat_axis), 8);
-    }
-
-    for (auto i = 0u; i < getNumVariantsPayloads(); ++i) {
-      writer.Write(variants_payload_params[i].sort_rows_flag, 1);
-        writer.Write(variants_payload_params[i].sort_cols_flag, 1);
-        writer.Write(variants_payload_params[i].transpose_mat_flag, 1);
-        writer.Write(
-            static_cast<uint8_t>(variants_payload_params[i].variants_codec_ID),
-            8);
-    }
-    writer.Write(encode_phases_data_flag, 1);
-    if (encode_phases_data_flag) {
-      writer.Write(phases_payload_params.sort_rows_flag,
-                   1);                  // sort_phases_rows_flag
-        writer.Write(phases_payload_params.sort_cols_flag,
-                     1);                  // sort_phases_cols_flag
-        writer.Write(phases_payload_params.transpose_mat_flag,
-                     1);              // transpose_phases_mat_flag
-        writer.Write(
-            static_cast<uint8_t>(phases_payload_params.variants_codec_ID),
-            8);  // phases_codec_ID
-    } else {
-      writer.Write(phasing_value, 1);
-    }
-    writer.Flush();
+GenotypeParameters::GenotypeParameters(genie::util::BitReader& reader) {
+  binarization_ID_ = static_cast<BinarizationID>(reader.ReadBits(8));
+  concat_axis_ = static_cast<ConcatAxis>(reader.ReadBits(8));
+  transpose_alleles_mat_flag_ = reader.ReadBits(1);
+  sort_alleles_rows_flag_ = reader.ReadBits(1);
+  sort_alleles_cols_flag_ = reader.ReadBits(1);
+  alleles_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
+  encode_phases_data_flag_ = reader.ReadBits(1);
+  transpose_phases_mat_flag_ = reader.ReadBits(1);
+  sort_phases_rows_flag_ = reader.ReadBits(1);
+  sort_phases_cols_flag_ = reader.ReadBits(1);
+  phases_codec_ID_ = static_cast<genie::core::AlgoID>(reader.ReadBits(5));
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t GenotypeParameters::getSize(core::Writer& writesize) const {
-    write(writesize);
-    return writesize.GetBitsWritten();
+[[maybe_unused]] BinarizationID GenotypeParameters::GetBinarizationID() const {
+  return binarization_ID_;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] ConcatAxis GenotypeParameters::GetConcatAxis() const {
+  return concat_axis_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::GetTransposeAllelesMatFlag() const {
+  return transpose_alleles_mat_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::GetSortAllelesRowsFlag() const {
+  return sort_alleles_rows_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::GetSortAllelesColsFlag() const {
+  return sort_alleles_cols_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::AlgoID GenotypeParameters::GetAllelesCodecID() const {
+  return alleles_codec_ID_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool GenotypeParameters::GetEncodePhasesDataFlag() const {
+  return encode_phases_data_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] bool GenotypeParameters::GetTransposePhasesMatFlag() const {
+  return transpose_phases_mat_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] bool GenotypeParameters::GetSortPhasesRowsFlag() const {
+  return sort_phases_rows_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] bool GenotypeParameters::GetSortPhasesColsFlag() const {
+  return sort_phases_cols_flag_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] genie::core::AlgoID GenotypeParameters::GetPhasesCodecID() const {
+  return phases_codec_ID_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetBinarizationID(BinarizationID binarization_id) {
+  binarization_ID_ = binarization_id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetConcatAxis(ConcatAxis concat_axis) {
+  concat_axis_ = concat_axis;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetTransposeAllelesMatFlag(bool flag) {
+  transpose_alleles_mat_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetSortAllelesRowsFlag(bool flag) {
+  sort_alleles_rows_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetSortAllelesColsFlag(bool flag) {
+  sort_alleles_cols_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetAllelesCodecID(genie::core::AlgoID codec_id) {
+  alleles_codec_ID_ = codec_id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetEncodePhasesDataFlag(bool flag) {
+  encode_phases_data_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetTransposePhasesMatFlag(bool flag) {
+  transpose_phases_mat_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetSortPhasesRowsFlag(bool flag) {
+  sort_phases_rows_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+[[maybe_unused]] void GenotypeParameters::SetSortPhasesColsFlag(bool flag) {
+  sort_phases_cols_flag_ = flag;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t GenotypeParameters::GetSize() {
+  size_t size = 0u;
+
+  size+= 3; // reserved(3)
+  size+= 3; // binarization_ID(3)
+  size+= 2; // concat_axis(2)
+
+  size+= 2; // reserved(2)
+  size+= 1; // transpose_alleles_mat_flag_(1)
+  size+= 1; // sort_alleles_rows_flag_(1)
+  size+= 1; // sort_alleles_cols_flag_(1)
+  size+= 3; // alleles_codec_ID(3)
+
+  size+= 1; // reserved(1)
+  size+= 1; // encode_phase_data_flag(1)
+  size+= 1; // transpose_phases_mat_flag_(1)
+  size+= 1; // sort_phases_rows_flag_(1)
+  size+= 1; // sort_phases_cols_flag_(1)
+  size+= 3; // phases_codec_ID(3)
+
+  size <<= 3; // Bits to bytes
+  return size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GenotypeParameters::Write(util::BitWriter& writer) const{
+  writer.WriteBits(0u, 3); // reserved(3)
+  writer.WriteBits(static_cast<uint64_t>(binarization_ID_), 3);
+  writer.WriteBits(static_cast<uint64_t>(concat_axis_), 2);
+
+  writer.WriteBits(0u, 2); // reserved(2)
+  writer.WriteBits(GetTransposeAllelesMatFlag(), 1);
+  writer.WriteBits(GetSortAllelesRowsFlag(), 1);
+  writer.WriteBits(GetSortAllelesColsFlag(), 1);
+  writer.WriteBits(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+
+  writer.WriteBits(0u, 1); // reserved(1)
+  writer.WriteBits(GetEncodePhasesDataFlag(), 1);
+  writer.WriteBits(GetTransposeAllelesMatFlag(), 1);
+  writer.WriteBits(GetSortAllelesRowsFlag(), 1);
+  writer.WriteBits(GetSortAllelesColsFlag(), 1);
+  writer.WriteBits(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+
+  writer.FlushBits();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GenotypeParameters::Write(core::Writer& writer) const {
+  writer.Write(0u, 3); // reserved(3)
+  writer.Write(static_cast<uint64_t>(binarization_ID_), 3);
+  writer.Write(static_cast<uint64_t>(concat_axis_), 2);
+
+  writer.Write(0u, 2); // reserved(2)
+  writer.Write(GetTransposeAllelesMatFlag(), 1);
+  writer.Write(GetSortAllelesRowsFlag(), 1);
+  writer.Write(GetSortAllelesColsFlag(), 1);
+  writer.Write(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+
+  writer.Write(0u, 1); // reserved(1)
+  writer.Write(GetEncodePhasesDataFlag(), 1);
+  writer.Write(GetTransposeAllelesMatFlag(), 1);
+  writer.Write(GetSortAllelesRowsFlag(), 1);
+  writer.Write(GetSortAllelesColsFlag(), 1);
+  writer.Write(static_cast<uint64_t>(GetAllelesCodecID()), 3);
+  writer.Flush();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Read from BitReader
+void GenotypeParameters::read(util::BitReader& reader) {
+  // Placeholder implementation
+  // Actual reading logic should be implemented here
+  (void)reader;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace genotype

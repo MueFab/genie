@@ -20,7 +20,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixTilePayload){
 
     std::srand((unsigned)std::time(0)); // seed the random number generator
 
@@ -128,7 +128,7 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixTilePayload){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
+TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
     // TransformID 0
     {
@@ -333,7 +333,7 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixMaskPayload){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
+TEST(ContactStructure, RoundTrip_Structure_ContactMatrixParameter){
     {
         auto MULTS = std::vector<uint32_t>({1, 2, 4, 5});
         uint16_t SAMPLE1_ID = 10u;
@@ -394,7 +394,7 @@ TEST(ContactCoder, RoundTrip_Structure_ContactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
+TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixParameter){
     // Intra-SCM case
     {
         auto BINARIZATION_MODE = genie::contact::BinarizationMode::ROW_BINARIZATION;
@@ -572,7 +572,7 @@ TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixParameter){
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ContactCoder, RoundTrip_Structure_SubcontactMatrixPayload){
+TEST(ContactStructure, RoundTrip_Structure_SubcontactMatrixPayload){
     // Intra SCM
     {
 

@@ -213,24 +213,24 @@ const SubcontactMatrixMaskPayload& SubcontactMatrixPayload::GetColMaskPayload() 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-[[maybe_unused]] void SubcontactMatrixPayload::SetParameterSetId(uint8_t id) {
+[[maybe_unused]] void SubcontactMatrixPayload::SetParameterSetID(uint8_t id) {
   parameter_set_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetSampleId(uint16_t id) { sample_ID_ = id; }
+void SubcontactMatrixPayload::SetSampleID(uint16_t id) { sample_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetChr1Id(uint8_t id) { chr1_ID_ = id; }
+void SubcontactMatrixPayload::SetChr1ID(uint8_t id) { chr1_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetChr2Id(uint8_t id) { chr2_ID_ = id; }
+void SubcontactMatrixPayload::SetChr2ID(uint8_t id) { chr2_ID_ = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SubcontactMatrixPayload::SetTilePayloads(const TilePayloads& payloads) {}
+void SubcontactMatrixPayload::SetTilePayloads( [[maybe_unused]] const TilePayloads& payloads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

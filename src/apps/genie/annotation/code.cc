@@ -190,8 +190,8 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
 
     genie::genotype::EncodingOptions genotype_opt = {
         BLOCK_SIZE,                                  // block_size;
-        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID;
-        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis;
+        genie::genotype::BinarizationID::BIT_PLANE,  // binarization_ID_;
+        genie::genotype::ConcatAxis::DO_NOT_CONCAT,  // concat_axis_;
         false,                                       // transpose_mat;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
         genie::genotype::SortingAlgoID::NO_SORTING,  // sort_row_method;
@@ -236,7 +236,7 @@ void encodeVariantGenotype(const std::string& _input_fpath, const std::string& _
     {
         genie::genotype::GenotypePayload genotypePayload(datablock, genotypeParameters);
         genie::core::Writer writer(&descriptorStream[genie::core::AnnotDesc::GENOTYPE]);
-        genotypePayload.write(writer);
+        genotypePayload.Write(writer);
     }
 
     descriptorStream[genie::core::AnnotDesc::LIKELIHOOD];

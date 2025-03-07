@@ -1,7 +1,8 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
@@ -10,20 +11,18 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+
 #include "genie/core/record/alignment_split.h"
 #include "genie/util/bit_writer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
-namespace record {
-namespace alignment_split {
+namespace genie::core::record::alignment_split {
 
 /**
  * @brief
  */
-class Unpaired : public AlignmentSplit {
+class Unpaired final : public AlignmentSplit {
  public:
     /**
      * @brief
@@ -34,21 +33,18 @@ class Unpaired : public AlignmentSplit {
      * @brief
      * @param writer
      */
-    void write(util::BitWriter &writer) const override;
+    void Write(util::BitWriter &writer) const override;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<AlignmentSplit> clone() const override;
+    [[nodiscard]] std::unique_ptr<AlignmentSplit> clone() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace alignment_split
-}  // namespace record
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core::record::alignment_split
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -55,8 +55,8 @@ class GenoAnnotation {
 
     genie::likelihood::EncodingOptions likelihood_opt{200, true};
     genie::genotype::EncodingOptions genotype_opt{200,                                          // block size
-                                                  genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID;
-                                                  genie::genotype::ConcatAxis::DO_NOT_CONCAT,   // concat_axis;
+                                                  genie::genotype::BinarizationID::BIT_PLANE,   // binarization_ID_;
+                                                  genie::genotype::ConcatAxis::DO_NOT_CONCAT,   // concat_axis_;
                                                   false,                                        // transpose_mat;
                                                   genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
                                                   genie::genotype::SortingAlgoID::RANDOM_SORT,  // sort_row_method;
