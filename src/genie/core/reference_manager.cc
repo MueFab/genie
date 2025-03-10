@@ -95,7 +95,7 @@ size_t ReferenceManager::GetChunkSize() { return chunk_size_; }
 
 bool ReferenceManager::ReferenceExcerpt::IsEmpty() const {
   return std::none_of(data_.begin(), data_.end(),
-                      [](const auto& p) { return IsMapped(p); });
+                      [&](const auto& p) { return IsMapped(p); });
 }
 
 // -----------------------------------------------------------------------------
@@ -360,6 +360,7 @@ std::vector<std::string> ReferenceManager::GetSequences() const {
   std::vector<std::string> ret;
   ret.reserve(indices_.size());
   for (const auto& [kFst, kSnd] : indices_) {
+    (void) kFst;
     ret.push_back(kSnd);
   }
   return ret;
@@ -372,6 +373,7 @@ size_t ReferenceManager::GetLength(const std::string& name) const {
 
   size_t ret = 0;
   for (const auto& [kFst, kSnd] : cov) {
+    (void) kFst;
     ret = std::max(kSnd, ret);
   }
   return ret;

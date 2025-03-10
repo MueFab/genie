@@ -114,6 +114,7 @@ void FastaReader::hash(const FaiFile& fai, std::istream& fasta,
                        std::ostream& hash) {
   std::vector<std::pair<std::string, std::string>> hashes;
   for (const auto& [fst, snd] : fai.GetSequences()) {
+    (void) fst;
     const auto pos = fai.GetFilePosition(snd, 0);
     const auto length = fai.GetLength(snd);
     auto sha_value = Sha256File::hash(fasta, pos, length);
@@ -135,6 +136,7 @@ core::meta::Reference FastaReader::GetMeta() const {
   auto* f_ptr = f.get();
   core::meta::Reference ret(basename, 0, 0, 0, std::move(f), "");
   for (const auto& [fst, snd] : hash_file_.GetData()) {
+    (void) snd;
     ret.AddSequence(core::meta::Sequence(fst, fai_.GetLength(fst),
                                          static_cast<uint16_t>(id++)));
     f_ptr->AddChecksum(util::FromHex(snd));

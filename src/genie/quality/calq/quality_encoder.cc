@@ -89,6 +89,7 @@ void QualityEncoder::AddMappedRecordToBlock(EncodingRecord& record) {
       out_->code_books.emplace_back();
       out_->step_indices.emplace_back();
       for (const auto& [fst, snd] : map) {
+        (void) fst;
         out_->code_books.back().push_back(static_cast<uint8_t>(snd));
       }
     }
@@ -98,6 +99,7 @@ void QualityEncoder::AddMappedRecordToBlock(EncodingRecord& record) {
     out_->code_books.emplace_back();
     out_->step_indices.emplace_back();
     for (const auto& [fst, snd] : map) {
+      (void) fst;
       out_->code_books.back().push_back(static_cast<uint8_t>(snd));
     }
 

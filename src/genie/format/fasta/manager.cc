@@ -57,6 +57,7 @@ std::vector<std::unique_ptr<core::Reference>> Manager::GenerateRefHandles() {
   const auto seqs = GetSequences();
   std::vector<std::unique_ptr<core::Reference>> ret;
   for (const auto& [fst, snd] : seqs) {
+    (void) fst;
     size_t length = GetLength(snd);
     ret.emplace_back(std::make_unique<Reference>(snd, length, this));
   }

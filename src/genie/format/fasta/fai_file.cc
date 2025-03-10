@@ -113,9 +113,11 @@ std::ostream& operator<<(std::ostream& stream,
 std::ostream& operator<<(std::ostream& stream, const FaiFile& file) {
   std::map<uint64_t, FaiFile::FaiSequence> sorted_map;
   for (const auto& [fst, snd] : file.seqs_) {
+    (void) fst;
     sorted_map.insert(std::make_pair(snd.offset, snd));
   }
   for (const auto& [fst, snd] : sorted_map) {
+    (void) fst;
     stream << snd;
   }
   return stream;

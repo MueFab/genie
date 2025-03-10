@@ -27,6 +27,7 @@ UniformMinMaxQuantizer::UniformMinMaxQuantizer(const int& value_min,
   const size_t largest_index = nr_steps - 1;
 
   for (auto& [fst, snd] : lut_) {
+    (void) fst;
     const size_t current_index = snd.first;
     if (current_index == smallest_index) {
       snd.second = value_min;

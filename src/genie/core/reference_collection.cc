@@ -99,7 +99,8 @@ std::vector<std::pair<size_t, size_t>> ReferenceCollection::GetCoverage(
 std::vector<std::string> ReferenceCollection::GetSequences() const {
   std::vector<std::string> ret;
   ret.reserve(refs_.size());
-  for (const auto& [kFst, kSnd] : refs_) {
+  for (const auto& [kFst,kSnd] : refs_) {
+    (void) kSnd;
     ret.emplace_back(kFst);
   }
   return ret;

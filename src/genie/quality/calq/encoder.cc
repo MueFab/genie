@@ -182,6 +182,7 @@ void Encoder::EncodeUnaligned(const core::record::Chunk& chunk,
   // set codebook
   std::vector<uint8_t> codebook_vec;
   for (const auto& [fst, snd] : quantizer.InverseLut()) {
+    (void) fst;
     codebook_vec.push_back(static_cast<uint8_t>(snd));
   }
   auto codebook = CodebookFromVector(codebook_vec);

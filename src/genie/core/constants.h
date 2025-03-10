@@ -138,7 +138,7 @@ constexpr GenSubIndex kReadNameCabac0 = {GenDesc::kReadName, 0_u16};
 constexpr GenSubIndex kReadNameCabac1 = {GenDesc::kReadName, 1_u16};
 constexpr GenSubIndex kRefTransPosition = {GenDesc::kRefTransPosition, 0_u16};
 constexpr GenSubIndex kRefTransTransform = {GenDesc::kRefTransTransform, 0_u16};
-};  // namespace gen_sub
+}  // namespace gen_sub
 
 /**
  * @brief
@@ -170,7 +170,7 @@ constexpr uint8_t kRtypeClassM = 3;
 constexpr uint8_t kRtypeClassI = 4;
 constexpr uint8_t kRtypeClassU = 5;
 constexpr uint8_t kRtypeClassHm = 6;
-};  // namespace gen_const
+}  // namespace gen_const
 
 /**
  * @brief

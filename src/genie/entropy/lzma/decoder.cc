@@ -90,6 +90,7 @@ Decoder::Process(const core::parameter::DescriptorSubSequenceCfg& param,
       continue;
     }
     const auto [fst, snd] = subseq.GetId();
+    (void) fst;
 
     auto subseq_name = std::string();
     if (GetDescriptor(std::get<0>(desc).GetId()).token_type) {

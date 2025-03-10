@@ -141,6 +141,7 @@ int Genotyper::ComputeQuantizerIndex(const std::string& seq_pileup,
   double largest_genotype_likelihood = 0.0;
   double second_largest_genotype_likelihood = 0.0;
   for (const auto& [fst, snd] : genotype_likelihoods_) {
+    (void) fst;
     if (snd > second_largest_genotype_likelihood) {
       second_largest_genotype_likelihood = snd;
     }
@@ -195,10 +196,12 @@ void Genotyper::InitLikelihoods() {
 
 void Genotyper::ResetLikelihoods() {
   for (auto& [fst, snd] : genotype_likelihoods_) {
+    (void) fst;
     snd = 0.0;
   }
 
   for (auto& [fst, snd] : allele_likelihoods_) {
+    (void) fst;
     snd = 0.0;
   }
 }
@@ -241,10 +244,12 @@ void Genotyper::ComputeGenotypeLikelihoods(const std::string& seq_pileup,
   // Normalize the genotype likelihoods
   double cum = 0.0;
   for (auto& [fst, snd] : genotype_likelihoods_) {
+    (void) fst;
     snd = exp(snd);
     cum += snd;
   }
   for (auto& [fst, snd] : genotype_likelihoods_) {
+    (void) fst;
     snd /= cum;
   }
 }
