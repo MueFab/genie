@@ -70,7 +70,7 @@ Record::Record(util::BitReader &reader)
       read_group_(reader.ReadAlignedInt<uint8_t>(), 0),
       read_1_first_(reader.ReadAlignedInt<uint8_t>()),
       shared_alignment_info_(!alignment_info_.empty() ? AlignmentSharedData(reader)
-                                                 : AlignmentSharedData()) {
+                                                      : AlignmentSharedData()) {
   std::vector<uint32_t> readSizes(reads_.size());
   for (auto &s : readSizes) {
     s = reader.ReadAlignedInt<uint32_t, 3>();
@@ -160,8 +160,9 @@ void Record::AddAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
     shared_alignment_info_ =
         AlignmentSharedData(_seq_id, uint8_t(rec.GetAlignment().GetMappingScores().size()));
   } else {
-    UTILS_DIE_IF(rec.GetAlignment().GetMappingScores().size() != shared_alignment_info_.GetAsDepth(),
-                 "Incompatible AS depth");
+    UTILS_DIE_IF(
+        rec.GetAlignment().GetMappingScores().size() != shared_alignment_info_.GetAsDepth(),
+        "Incompatible AS depth");
     UTILS_DIE_IF(rec.GetNumberOfTemplateSegments() != number_of_template_segments_,
                  "Incompatible number_of_template_segments");
     UTILS_DIE_IF(_seq_id != shared_alignment_info_.GetSeqId(), "Incompatible seq id");
