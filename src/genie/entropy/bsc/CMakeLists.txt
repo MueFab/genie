@@ -4,7 +4,12 @@ set(source_files
         decoder.cc
         encoder.cc
         param_decoder.cc
-        subsequence.cc)
+        subsequence.cc
+        ../zlib/zlibstreambuffer.cc
+        ../zlib/zlibstreambuffer.h
+        ../zlib/zlibistream.h
+        ../zlib/zlibistream.cc
+        ../zlib/zlibostream.cc)
 
 if (${GABAC_BUILD_SHARED_LIB})
     add_library(genie-bsc SHARED ${source_files})

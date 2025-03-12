@@ -54,6 +54,7 @@ curl -L \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
 
+$git_root_dir/ci/fastq_tools/fastq_gzip_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
 $git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
 rm /tmp/ERR174310_short_2.fastq
 rm /tmp/ERR174310_short_1.fastq
@@ -74,6 +75,7 @@ if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; t
         --output /tmp/hg19_custom.fa.gz \
         || { echo 'Could not download sam file!' ; exit 1; }
     gzip -df /tmp/hg19_custom.fa.gz
+
 
     $git_root_dir/ci/sam_tools/sam_transcoder_test.sh "/tmp/NA12878_S1_chr22_trunc.sam"
     $git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam" "/tmp/hg19_custom.fa"
