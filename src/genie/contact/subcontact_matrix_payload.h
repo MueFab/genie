@@ -253,7 +253,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the parameter set.
     */
-   [[maybe_unused]] void SetParameterSetId(uint8_t id);
+   [[maybe_unused]] void SetParameterSetID(uint8_t id);
 
    /**
     * @brief Set the Sample ID.
@@ -262,7 +262,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the sample.
     */
-   void SetSampleId(uint16_t id);
+   void SetSampleID(uint16_t id);
 
    /**
     * @brief Set the Chromosome 1 ID.
@@ -271,7 +271,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the first chromosome.
     */
-   void SetChr1Id(uint8_t id);
+   void SetChr1ID(uint8_t id);
 
    /**
     * @brief Set the Chromosome 2 ID.
@@ -280,7 +280,7 @@ class SubcontactMatrixPayload {
     *
     * @param id The ID of the second chromosome.
     */
-   void SetChr2Id(uint8_t id);
+   void SetChr2ID(uint8_t id);
 
    /**
     * @brief Set the Tile Payloads.

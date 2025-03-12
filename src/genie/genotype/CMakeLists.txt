@@ -11,6 +11,10 @@ set(source_files
         genotype_parameters.cc
         genotype_payload.cc
         parameterset_composer.cc
+        bin_mat_payload.cc
+        row_col_ids_payload.cc
+        amax_payload.cc
+        sorted_bin_mat_payload.cc
 )
 
 add_library(${PROJECT_NAME} ${source_files})

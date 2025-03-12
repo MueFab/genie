@@ -1194,13 +1194,13 @@ void encode_scm(
     auto ntiles_in_col = cm_param.GetNumTiles(chr2_ID);
 
     cm_param.UpsertSample(rec.GetSampleID(), rec.GetSampleName());
-    scm_payload.SetSampleId(rec.GetSampleID());
+    scm_payload.SetSampleID(rec.GetSampleID());
 
     scm_param.SetChr1ID(chr1_ID);
-    scm_payload.SetChr1Id(chr1_ID);
+    scm_payload.SetChr1ID(chr1_ID);
 
     scm_param.SetChr2ID(chr2_ID);
-    scm_payload.SetChr2Id(chr2_ID);
+    scm_payload.SetChr2ID(chr2_ID);
 
     auto is_intra_scm = scm_param.IsIntraSCM();
 
