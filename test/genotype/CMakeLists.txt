@@ -13,6 +13,7 @@ message(STATUS "xtensor: ${xtensor_INCLUDE_DIRS}")
 set(source_files
         helpers.cc
         encode-test.cc
+        structure_test.cc
 )
 
 add_executable(${PROJECT_NAME} ${source_files})
@@ -40,7 +41,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE xtensor xtensor::optimize)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-util)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-genotype)
-target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
+#target_link_libraries(${PROJECT_NAME} PRIVATE genie-vsite)
 target_link_libraries(${PROJECT_NAME} PRIVATE genie-jbig)
 
 

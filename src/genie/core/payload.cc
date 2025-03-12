@@ -1,110 +1,112 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/payload.h"
+
 #include <utility>
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-namespace genie {
-namespace core {
+namespace genie::core {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie::util::DataBlock Payload::_internal_loadPayload(util::BitReader& reader) const {
-    auto pos = reader.GetStreamPosition();
-    reader.SetStreamPosition(payloadPosition);
-    genie::util::DataBlock tmp;
-    tmp.Resize(payloadSize);
-    reader.ReadAlignedBytes(tmp.GetData(), payloadSize);
-    reader.SetStreamPosition(pos);
-    return tmp;
+util::DataBlock Payload::InternalLoadPayload(util::BitReader& reader) const {
+  const auto pos = reader.GetStreamPosition();
+  reader.SetStreamPosition(payload_position_);
+  util::DataBlock tmp;
+  tmp.Resize(payload_size_);
+  reader.ReadAlignedBytes(tmp.GetData(), payload_size_);
+  reader.SetStreamPosition(pos);
+  return tmp;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint64_t Payload::getPayloadSize() const {
-    if (isPayloadLoaded()) {
-        return block_payload.GetRawSize();
-    } else {
-        return payloadSize;
-    }
+uint64_t Payload::GetPayloadSize() const {
+  if (IsPayloadLoaded()) {
+    return block_payload_.GetRawSize();
+  }
+  return payload_size_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Payload::loadPayload() {
-    block_payload = _internal_loadPayload(*internal_reader);
-    payloadLoaded = true;
+void Payload::LoadPayload() {
+  block_payload_ = InternalLoadPayload(*internal_reader_);
+  payload_loaded_ = true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Payload::unloadPayload() {
-    payloadLoaded = false;
-    block_payload.Clear();
+void Payload::UnloadPayload() {
+  payload_loaded_ = false;
+  block_payload_.Clear();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool Payload::isPayloadLoaded() const { return payloadLoaded; }
+bool Payload::IsPayloadLoaded() const { return payload_loaded_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const genie::util::DataBlock& Payload::getPayload() const { return block_payload; }
+const util::DataBlock& Payload::GetPayload() const { return block_payload_; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-genie::util::DataBlock&& Payload::movePayload() {
-    payloadLoaded = false;
-    return std::move(block_payload);
+util::DataBlock&& Payload::MovePayload() {
+  payload_loaded_ = false;
+  return std::move(block_payload_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Payload::Payload(genie::util::DataBlock payload)
-    : block_payload(std::move(payload)),
-      payloadLoaded(true),
-      payloadPosition(-1),
-      payloadSize(payload.GetRawSize()),
-      internal_reader(nullptr) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Payload::Payload(util::BitReader& reader, uint64_t size)
-    : block_payload(),
-      payloadLoaded(false),
-      payloadPosition(reader.GetStreamPosition()),
-      payloadSize(size),
-      internal_reader(&reader) {
-    reader.SkipAlignedBytes(size);
+Payload::Payload(util::DataBlock payload)
+    : payload_loaded_(true),
+      payload_position_(0),
+      payload_size_(payload.GetRawSize()),
+      internal_reader_(nullptr) {
+  block_payload_ = std::move(payload);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Payload::write(genie::util::BitWriter& writer) const {
-    if (!isPayloadLoaded() && internal_reader) {
-        auto tmp = _internal_loadPayload(*internal_reader);
-        writer.WriteAlignedBytes(tmp.GetData(), tmp.GetRawSize());
-    } else {
-        writer.WriteAlignedBytes(block_payload.GetData(), block_payload.GetRawSize());
-    }
+Payload::Payload(util::BitReader& reader, const uint64_t size)
+    : payload_loaded_(false),
+      payload_position_(reader.GetStreamPosition()),
+      payload_size_(size),
+      internal_reader_(&reader) {
+  reader.SkipAlignedBytes(size);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void Payload::Write(util::BitWriter& writer) const {
+  if (!IsPayloadLoaded() && internal_reader_) {
+    auto tmp = InternalLoadPayload(*internal_reader_);
+    writer.WriteAlignedBytes(tmp.GetData(), tmp.GetRawSize());
+  } else {
+    writer.WriteAlignedBytes(block_payload_.GetData(),
+                             block_payload_.GetRawSize());
+  }
+}
+
+// -----------------------------------------------------------------------------
 
 bool Payload::operator==(const Payload& other) const {
-    return payloadSize == other.payloadSize && payloadPosition == other.payloadPosition &&
-           payloadLoaded == other.payloadLoaded && block_payload == other.block_payload;
+  return payload_size_ == other.payload_size_ &&
+         payload_position_ == other.payload_position_ &&
+         payload_loaded_ == other.payload_loaded_ &&
+         block_payload_ == other.block_payload_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-}  // namespace core
-}  // namespace genie
+}  // namespace genie::core
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
