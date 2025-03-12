@@ -1,110 +1,127 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @brief Defines the Label class for managing label metadata within MPEG-G
+ * files.
+ * @details This file provides the implementation of the `Label` class, which
+ * represents a collection of dataset-specific label information within an
+ * MPEG-G file. The Label class includes methods for adding, retrieving, and
+ * serializing dataset-related labels, as well as methods for extracting
+ * metadata labels for use in external contexts.
+ * @copyright This file is part of Genie.
+ *            See LICENSE and/or https://github.com/MueFab/genie for more
+ * details.
  */
 
 #ifndef SRC_GENIE_FORMAT_MGG_LABEL_H_
 #define SRC_GENIE_FORMAT_MGG_LABEL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <string>
 #include <vector>
+
 #include "genie/core/meta/label.h"
 #include "genie/format/mgg/gen_info.h"
 #include "genie/format/mgg/label_dataset.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 namespace genie::format::mgg {
 
 /**
- * @brief
+ * @brief Class representing a label metadata element within an MPEG-G file.
+ * @details The `Label` class stores information about a specific label,
+ * including its identifier and the list of datasets associated with it. Each
+ * dataset is represented using the `LabelDataset` class, which manages regions
+ * associated with the label for a particular dataset. This class provides
+ * functionality for serializing and deserializing label metadata and includes
+ * operations for retrieving metadata for external use.
  */
-class Label : public GenInfo {
- private:
-    std::string label_ID;                     //!< @brief
-    std::vector<LabelDataset> dataset_infos;  //!< @brief
+class Label final : public GenInfo {
+  std::string label_id_;  //!< @brief Identifier for the label.
+  std::vector<LabelDataset>
+      dataset_infos_;  //!< @brief List of datasets associated with this label.
 
  public:
-    /**
-     * @brief
-     * @param dataset
-     * @return
-     */
-    core::meta::Label decapsulate(uint16_t dataset);
+  /**
+   * @brief Extract metadata label information for a given dataset.
+   * @param dataset Dataset ID for which to extract label metadata.
+   * @return A `core::meta::Label` object containing the extracted metadata.
+   */
+  core::meta::Label Decapsulate(uint16_t dataset);
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::string& getKey() const override;
+  /**
+   * @brief Retrieve the unique key identifier for the label.
+   * @return A reference to the label ID string.
+   */
+  [[nodiscard]] const std::string& GetKey() const override;
 
-    /**
-     * @brief
-     * @param info
-     * @return
-     */
-    bool operator==(const GenInfo& info) const override;
+  /**
+   * @brief Compare this label with another `GenInfo` object for equality.
+   * @param info The other `GenInfo` object to compare against.
+   * @return True if both labels are equivalent, false otherwise.
+   */
+  bool operator==(const GenInfo& info) const override;
 
-    /**
-     * @brief
-     */
-    Label();
+  /**
+   * @brief Construct a new Label object with default parameters.
+   */
+  Label();
 
-    /**
-     *
-     * @param _label_ID
-     */
-    explicit Label(std::string _label_ID);
+  /**
+   * @brief Construct a new Label object with a specified label ID.
+   * @param label_id The label ID to associate with this Label object.
+   */
+  explicit Label(std::string label_id);
 
-    /**
-     *
-     * @param reader
-     */
-    explicit Label(util::BitReader& reader);
+  /**
+   * @brief Construct a new Label object by reading from a `BitReader`.
+   * @param reader The `BitReader` to extract the label data from.
+   */
+  explicit Label(util::BitReader& reader);
 
-    /**
-     *
-     * @param _ds_info
-     */
-    void addDataset(LabelDataset _ds_info);
+  /**
+   * @brief Add a new dataset to the label.
+   * @param ds_info The `LabelDataset` object to add.
+   */
+  void AddDataset(LabelDataset ds_info);
 
-    /**
-     *
-     * @return
-     */
-    [[nodiscard]] const std::string& getLabelID() const;
+  /**
+   * @brief Retrieve the label ID for this label.
+   * @return A reference to the label ID string.
+   */
+  [[nodiscard]] const std::string& GetLabelId() const;
 
-    /**
-     * @brief
-     * @return
-     */
-    [[nodiscard]] const std::vector<LabelDataset>& getDatasets() const;
+  /**
+   * @brief Retrieve the list of datasets associated with this label.
+   * @return A reference to the vector of `LabelDataset` objects.
+   */
+  [[nodiscard]] const std::vector<LabelDataset>& GetDatasets() const;
 
-    /**
-     *
-     * @param bit_writer
-     */
-    void box_write(genie::util::BitWriter& bit_writer) const override;
+  /**
+   * @brief Serialize the label metadata to a `BitWriter`.
+   * @param bit_writer The `BitWriter` to serialize the data to.
+   */
+  void BoxWrite(util::BitWriter& bit_writer) const override;
 
-    /**
-     * @brief
-     * @param output
-     * @param depth
-     * @param max_depth
-     */
-    void print_debug(std::ostream& output, uint8_t depth, uint8_t max_depth) const override;
+  /**
+   * @brief Print debug information for the label.
+   * @param output The output stream to write the debug information to.
+   * @param depth Current depth level in the debug hierarchy.
+   * @param max_depth Maximum depth to print in the debug output.
+   */
+  void PrintDebug(std::ostream& output, uint8_t depth,
+                  uint8_t max_depth) const override;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgg
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #endif  // SRC_GENIE_FORMAT_MGG_LABEL_H_
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

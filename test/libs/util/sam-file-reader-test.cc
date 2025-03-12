@@ -115,7 +115,7 @@ TEST(SAM, SamReaderReference) {  // NOLINT(cert-err-cpp)
     // Valid RName
     {
         std::ifstream f(gitRootDir + "/data/sam/pair_reads.sam");
-        UTILS_DIE_IF(!f.good(), "Cannot read file");
+        UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
         genie::format::sam::Reader reader(f);
 
@@ -131,7 +131,7 @@ TEST(SAM, SamReaderReference) {  // NOLINT(cert-err-cpp)
     // Invalid RName
     {
         std::ifstream f(gitRootDir + "/data/sam/invalid_rname.sam");
-        UTILS_DIE_IF(!f.good(), "Cannot read file");
+        UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
         genie::format::sam::Reader reader(f);
         auto& refs = reader.getRefs();
@@ -150,7 +150,7 @@ TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/unmapped_reads.sam");
-    UTILS_DIE_IF(!f.good(), "Cannot read file");
+    UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
     genie::format::sam::Reader reader(f);
 
@@ -192,7 +192,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/pair_reads_multi_alignments.sam");
-    UTILS_DIE_IF(!f.good(), "Cannot read file");
+    UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
     genie::format::sam::Reader reader(f);
 
@@ -273,7 +273,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/pair_reads_multi_alignments.sam");
-    UTILS_DIE_IF(!f.good(), "Cannot read file");
+    UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
     genie::format::sam::Reader reader(f);
 
@@ -439,7 +439,7 @@ TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
 //    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[22]);
 
     std::ifstream f(gitRootDir + "/data/sam/thirteen-records.sam");
-    UTILS_DIE_IF(!f.good(), "Cannot read file");
+    UTILS_DIE_IF_(!f.good(), "Cannot read file");
 
     genie::format::sam::Reader reader(f);
 
@@ -478,7 +478,7 @@ TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
 
         auto minPos = genie::format::sam::Importer::getMinPos(record);
 
-        UTILS_DIE_IF(minPos < last_position, "Records not properly ordered");
+        UTILS_DIE_IF_(minPos < last_position, "Records not properly ordered");
         last_position = minPos;
     }
 
@@ -557,7 +557,7 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 
 //    std::ifstream f("/home/adhisant/tmp/data/testdata/" + fnames2[3]);
 
-    UTILS_DIE_IF(f.fail(), "File not found!");
+    UTILS_DIE_IF_(f.fail(), "File not found!");
     std::vector<genie::format::sam::Record> recs;
     genie::format::sam::ReadTemplateGroup tg;
 
@@ -570,7 +570,7 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 
     std::list<genie::format::sam::ReadTemplate> ts;
     tg.getTemplates(ts, 20);
-    UTILS_DIE_IF(!(ts.begin())->isValid(), "invalid");
+    UTILS_DIE_IF_(!(ts.begin())->isValid(), "invalid");
 
     EXPECT_EQ(7, 7);
 
@@ -612,7 +612,7 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //
 //        std::getline(f, qname, '\t');
 //
-//        UTILS_DIE_IF(!std::regex_match(qname, REGEX_QNAME), "Invalid QNAME");
+//        UTILS_DIE_IF_(!std::regex_match(qname, REGEX_QNAME), "Invalid QNAME");
 //
 //        if (alignment_table.find(qname) == alignment_table.end()) {
 //            alignment_table.emplace(qname, std::vector<int>());

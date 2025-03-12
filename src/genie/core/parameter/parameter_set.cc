@@ -1,523 +1,571 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/core/parameter/parameter_set.h"
+
 #include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
-#include "genie/core/global-cfg.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/core/global_cfg.h"
+
+// -----------------------------------------------------------------------------
 
 namespace genie::core::parameter {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool EncodingSet::SignatureCfg::operator==(const SignatureCfg &cfg) const {
-    return signature_length == cfg.signature_length;
+bool EncodingSet::SignatureCfg::operator==(const SignatureCfg& cfg) const {
+  return signature_length == cfg.signature_length;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(util::BitReader &bitReader) {
-    dataset_type = bitReader.read<DataUnit::DatasetType>(4);
-    alphabet_ID = bitReader.read<AlphabetID>();
-    read_length = bitReader.read<uint32_t>(24);
-    number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
-    bitReader.readBits(6);
-    max_au_data_unit_size = bitReader.read<uint32_t>(29);
-    pos_40_bits_flag = bitReader.read<bool>(1);
-    qv_depth = bitReader.read<uint8_t>(3);
-    as_depth = bitReader.read<uint8_t>(3);
-    auto num_classes = bitReader.read<uint8_t>(4);
-    for (size_t i = 0; i < num_classes; ++i) {
-        class_IDs.push_back(bitReader.read<record::ClassType>(4));
+EncodingSet::EncodingSet(util::BitReader& bit_reader) {
+  dataset_type_ = bit_reader.Read<DataUnit::DatasetType>(4);
+  alphabet_id_ = bit_reader.Read<AlphabetId>();
+  read_length_ = bit_reader.Read<uint32_t>(24);
+  number_of_template_segments_minus1_ = bit_reader.Read<uint8_t>(2);
+  bit_reader.ReadBits(6);
+  max_au_data_unit_size_ = bit_reader.Read<uint32_t>(29);
+  pos_40_bits_flag_ = bit_reader.Read<bool>(1);
+  qv_depth_ = bit_reader.Read<uint8_t>(3);
+  as_depth_ = bit_reader.Read<uint8_t>(3);
+  auto num_classes = bit_reader.Read<uint8_t>(4);
+  for (size_t i = 0; i < num_classes; ++i) {
+    class_i_ds_.push_back(bit_reader.Read<record::ClassType>(4));
+  }
+  for (size_t i = 0; i < GetDescriptors().size(); ++i) {
+    descriptors_.emplace_back(num_classes, static_cast<GenDesc>(i), bit_reader);
+  }
+  const auto num_groups = bit_reader.Read<uint16_t>();
+  for (size_t i = 0; i < num_groups; ++i) {
+    read_group_index_ds_.emplace_back();
+    char c = 0;
+    do {
+      c = static_cast<char>(bit_reader.Read<uint8_t>());
+      read_group_index_ds_.back().push_back(c);
+    } while (c);
+  }
+  multiple_alignments_flag_ = bit_reader.Read<bool>(1);
+  spliced_reads_flag_ = bit_reader.Read<bool>(1);
+  reserved_ = bit_reader.Read<uint32_t>(30);
+  if (bit_reader.Read<bool>(1)) {
+    signature_cfg_ = SignatureCfg();
+    if (bit_reader.Read<bool>(1)) {
+      signature_cfg_->signature_length = bit_reader.Read<uint8_t>(8);
     }
-    for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(num_classes, GenDesc(i), bitReader);
+  }
+  for (size_t i = 0; i < num_classes; ++i) {
+    if (const auto mode = bit_reader.Read<uint8_t>(4); mode == 1) {
+      qv_coding_configs_.emplace_back(
+          GlobalCfg::GetSingleton()
+              .GetIndustrialPark()
+              .Construct<QualityValues>(mode, GenDesc::kQv, bit_reader));
+    } else {
+      bit_reader.Read<uint8_t>(1);
     }
-    auto num_groups = bitReader.read<uint16_t>();
-    for (size_t i = 0; i < num_groups; ++i) {
-        rgroup_IDs.emplace_back();
-        char c = 0;
-        do {
-            c = bitReader.read<uint8_t>();
-            rgroup_IDs.back().push_back(c);
-        } while (c);
-    }
-    multiple_alignments_flag = bitReader.read<bool>(1);
-    spliced_reads_flag = bitReader.read<bool>(1);
-    reserved = bitReader.read<uint32_t>(30);
-    bool sig_flag = bitReader.read<bool>(1);
-    if (sig_flag) {
-        signature_cfg = SignatureCfg();
-        bool const_flag = bitReader.read<bool>(1);
-        if (const_flag) {
-            signature_cfg->signature_length = bitReader.read<uint8_t>(8);
-        }
-    }
-    for (size_t i = 0; i < num_classes; ++i) {
-        auto mode = bitReader.read<uint8_t>(4);
-        if (mode == 1) {
-            qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
-                mode, genie::core::GenDesc::QV, bitReader));
-        } else {
-            bitReader.read<uint8_t>(1);
-        }
-    }
-    auto crps_flag = bitReader.read<bool>(1);
-    if (crps_flag) {
-        parameter_set_crps = ComputedRef(bitReader);
-    }
-    bitReader.flushHeldBits();
+  }
+  if (bit_reader.Read<bool>(1)) {
+    computed_reference_ = ComputedRef(bit_reader);
+  }
+  bit_reader.FlushHeldBits();
 }
 
-//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(DataUnit::DatasetType _dataset_type, AlphabetID _alphabet_id, uint32_t _read_length,
-                         bool _paired_end, bool _pos_40_bits_flag, uint8_t _qv_depth, uint8_t _as_depth,
-                         bool _multiple_alignments_flag, bool _spliced_reads_flag)
-    : dataset_type(_dataset_type),
-      alphabet_ID(_alphabet_id),
-      read_length(_read_length),
-      number_of_template_segments_minus1(static_cast<uint8_t>(_paired_end)),
-      max_au_data_unit_size(0),
-      pos_40_bits_flag(_pos_40_bits_flag),
-      qv_depth(_qv_depth),
-      as_depth(_as_depth),
-      class_IDs(0),
-      descriptors(18),
-      rgroup_IDs(0),
-      multiple_alignments_flag(_multiple_alignments_flag),
-      spliced_reads_flag(_spliced_reads_flag),
-      qv_coding_configs(0),
-      parameter_set_crps() {}
+EncodingSet::EncodingSet(const DataUnit::DatasetType dataset_type,
+                         const AlphabetId alphabet_id,
+                         const uint32_t read_length, const bool paired_end,
+                         const bool pos_40_bits_flag, const uint8_t qv_depth,
+                         const uint8_t as_depth,
+                         const bool multiple_alignments_flag,
+                         const bool spliced_reads_flag)
+    : dataset_type_(dataset_type),
+      alphabet_id_(alphabet_id),
+      read_length_(read_length),
+      number_of_template_segments_minus1_(static_cast<uint8_t>(paired_end)),
+      max_au_data_unit_size_(0),
+      pos_40_bits_flag_(pos_40_bits_flag),
+      qv_depth_(qv_depth),
+      as_depth_(as_depth),
+      class_i_ds_(0),
+      descriptors_(18),
+      read_group_index_ds_(0),
+      multiple_alignments_flag_(multiple_alignments_flag),
+      spliced_reads_flag_(spliced_reads_flag),
+      qv_coding_configs_(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 EncodingSet::EncodingSet()
-    : dataset_type(DataUnit::DatasetType::ALIGNED),
-      alphabet_ID(AlphabetID::ACGTN),
-      read_length(0),
-      number_of_template_segments_minus1(0),
-      max_au_data_unit_size(0),
-      pos_40_bits_flag(false),
-      qv_depth(0),
-      as_depth(0),
-      class_IDs(0),
-      descriptors(18),
-      rgroup_IDs(0),
-      multiple_alignments_flag(false),
-      spliced_reads_flag(false),
-      qv_coding_configs(0),
-      parameter_set_crps() {}
+    : dataset_type_(DataUnit::DatasetType::kAligned),
+      alphabet_id_(AlphabetId::kAcgtn),
+      read_length_(0),
+      number_of_template_segments_minus1_(0),
+      max_au_data_unit_size_(0),
+      pos_40_bits_flag_(false),
+      qv_depth_(0),
+      as_depth_(0),
+      class_i_ds_(0),
+      descriptors_(18),
+      read_group_index_ds_(0),
+      multiple_alignments_flag_(false),
+      spliced_reads_flag_(false),
+      qv_coding_configs_(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ParameterSet::write(util::BitWriter &writer) const {
-    DataUnit::write(writer);
-    writer.writeBits(0, 10);  // reserved
+void ParameterSet::Write(util::BitWriter& writer) const {
+  DataUnit::Write(writer);
+  writer.WriteBits(0, 10);  // reserved
 
-    // Calculate size and write structure to tmp buffer
-    std::stringstream ss;
-    util::BitWriter tmp_writer(ss);
-    tmp_writer.writeBits(parameter_set_ID, 8);
-    tmp_writer.writeBits(parent_parameter_set_ID, 8);
-    set.write(tmp_writer);
-    tmp_writer.flushBits();
-    uint64_t bits = tmp_writer.getTotalBitsWritten();
-    const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
-    bits += TYPE_SIZE_SIZE;
-    uint64_t bytes = bits / 8 + ((bits % 8) ? 1 : 0);
+  // Calculate Size and write structure to tmp buffer
+  std::stringstream ss;
+  util::BitWriter tmp_writer(ss);
+  tmp_writer.WriteBits(parameter_set_id_, 8);
+  tmp_writer.WriteBits(parent_parameter_set_id_, 8);
+  set_.Write(tmp_writer);
+  tmp_writer.FlushBits();
+  uint64_t bits = tmp_writer.GetTotalBitsWritten();
+  constexpr uint64_t type_size_size =
+      8 + 10 + 22;  // data_unit_type, reserved, data_unit_size
+  bits += type_size_size;
+  const uint64_t bytes = bits / 8 + (bits % 8 ? 1 : 0);
 
-    // Now size is known, write to final destination
-    writer.writeBits(bytes, 22);
-    writer.writeAlignedStream(ss);
+  // Now Size is known, write to final destination
+  writer.WriteBits(bytes, 22);
+  writer.WriteAlignedStream(ss);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint64_t ParameterSet::getLength() const {
-    std::stringstream ss;
-    util::BitWriter tmp_writer(ss);
-    tmp_writer.writeBits(parameter_set_ID, 8);
-    tmp_writer.writeBits(parent_parameter_set_ID, 8);
-    set.write(tmp_writer);
+uint64_t ParameterSet::GetLength() const {
+  std::stringstream ss;
+  util::BitWriter tmp_writer(ss);
+  tmp_writer.WriteBits(parameter_set_id_, 8);
+  tmp_writer.WriteBits(parent_parameter_set_id_, 8);
+  set_.Write(tmp_writer);
 
-    uint64_t len = tmp_writer.getTotalBitsWritten() / 8;
+  const uint64_t len = tmp_writer.GetTotalBitsWritten() / 8;
 
-    return len;
+  return len;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void EncodingSet::activateSignature() { signature_cfg = SignatureCfg(); }
+void EncodingSet::ActivateSignature() { signature_cfg_ = SignatureCfg(); }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool EncodingSet::isSignatureActivated() const { return signature_cfg != std::nullopt; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool EncodingSet::isSignatureConstLength() const {
-    return isSignatureActivated() && signature_cfg->signature_length != std::nullopt;
+bool EncodingSet::IsSignatureActivated() const {
+  return signature_cfg_ != std::nullopt;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t EncodingSet::getSignatureConstLength() const { return *signature_cfg->signature_length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void EncodingSet::setSignatureLength(uint8_t length) {
-    UTILS_DIE_IF(!isSignatureActivated(), "Signature not activated");
-    signature_cfg->signature_length = length;
+bool EncodingSet::IsSignatureConstLength() const {
+  return IsSignatureActivated() &&
+         signature_cfg_->signature_length != std::nullopt;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void EncodingSet::write(util::BitWriter &writer) const {
-    writer.writeBits(uint8_t(dataset_type), 4);
-    writer.writeBits(uint8_t(alphabet_ID), 8);
-    writer.writeBits(read_length, 24);
-    writer.writeBits(number_of_template_segments_minus1, 2);
-    writer.writeBits(0, 6);  // reserved_2
-    writer.writeBits(max_au_data_unit_size, 29);
-    writer.writeBits(static_cast<uint8_t>(pos_40_bits_flag), 1);
-    writer.writeBits(qv_depth, 3);
-    writer.writeBits(as_depth, 3);
-    writer.writeBits(class_IDs.size(), 4);  // num_classes
-    for (auto &i : class_IDs) {
-        writer.writeBits(uint8_t(i), 4);
-    }
-    for (auto &i : descriptors) {
-        i.write(writer);
-    }
-    writer.writeBits(rgroup_IDs.size(), 16);  // num_groups
-    for (auto &i : rgroup_IDs) {
-        for (auto &j : i) {
-            writer.writeBits(static_cast<uint8_t>(j), 8);
-        }
-        writer.writeBits('\0', 8);  // NULL termination
-    }
-    writer.writeBits(static_cast<uint8_t>(multiple_alignments_flag), 1);
-    writer.writeBits(static_cast<uint8_t>(spliced_reads_flag), 1);
-    writer.writeBits(reserved, 30);
-    writer.writeBits(signature_cfg != std::nullopt, 1);
-    if (signature_cfg != std::nullopt) {
-        writer.writeBits(signature_cfg->signature_length != std::nullopt, 1);
-        if (signature_cfg->signature_length != std::nullopt) {
-            writer.writeBits(*signature_cfg->signature_length, 8);
-        }
-    }
-    for (auto &i : qv_coding_configs) {
-        i->write(writer);
-    }
-    writer.writeBits(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
-    if (parameter_set_crps) {
-        parameter_set_crps->write(writer);
-    }
-    writer.flushBits();
+uint8_t EncodingSet::GetSignatureConstLength() const {
+  return *signature_cfg_->signature_length;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const ComputedRef &EncodingSet::getComputedRef() const { return *parameter_set_crps; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-size_t EncodingSet::getNumberTemplateSegments() const { return number_of_template_segments_minus1 + 1; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool EncodingSet::isComputedReference() const { return this->parameter_set_crps.has_value(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void EncodingSet::setComputedRef(ComputedRef &&_parameter_set_crps) {
-    parameter_set_crps = std::move(_parameter_set_crps);
+void EncodingSet::SetSignatureLength(uint8_t length) {
+  UTILS_DIE_IF(!IsSignatureActivated(), "Signature not activated");
+  signature_cfg_->signature_length = length;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void EncodingSet::addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf) {
-    for (auto &a : descriptors) {
-        if (a.isClassSpecific()) {
-            UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
-        }
+void EncodingSet::Write(util::BitWriter& writer) const {
+  writer.WriteBits(static_cast<uint8_t>(dataset_type_), 4);
+  writer.WriteBits(static_cast<uint8_t>(alphabet_id_), 8);
+  writer.WriteBits(read_length_, 24);
+  writer.WriteBits(number_of_template_segments_minus1_, 2);
+  writer.WriteBits(0, 6);  // reserved_2
+  writer.WriteBits(max_au_data_unit_size_, 29);
+  writer.WriteBits(pos_40_bits_flag_, 1);
+  writer.WriteBits(qv_depth_, 3);
+  writer.WriteBits(as_depth_, 3);
+  writer.WriteBits(class_i_ds_.size(), 4);  // num_classes
+  for (auto& i : class_i_ds_) {
+    writer.WriteBits(static_cast<uint8_t>(i), 4);
+  }
+  for (auto& i : descriptors_) {
+    i.Write(writer);
+  }
+  writer.WriteBits(read_group_index_ds_.size(), 16);  // num_groups
+  for (auto& i : read_group_index_ds_) {
+    for (auto& j : i) {
+      writer.WriteBits(static_cast<uint8_t>(j), 8);
     }
-    for (const auto &a : class_IDs) {
-        if (class_id == a) {
-            UTILS_THROW_RUNTIME_EXCEPTION("Class already added");
-        }
+    writer.WriteBits('\0', 8);  // NULL termination
+  }
+  writer.WriteBits(multiple_alignments_flag_, 1);
+  writer.WriteBits(spliced_reads_flag_, 1);
+  writer.WriteBits(reserved_, 30);
+  writer.WriteBits(signature_cfg_ != std::nullopt, 1);
+  if (signature_cfg_ != std::nullopt) {
+    writer.WriteBits(signature_cfg_->signature_length != std::nullopt, 1);
+    if (signature_cfg_->signature_length != std::nullopt) {
+      writer.WriteBits(*signature_cfg_->signature_length, 8);
     }
-    class_IDs.push_back(class_id);
-    qv_coding_configs.push_back(std::move(conf));
+  }
+  for (auto& i : qv_coding_configs_) {
+    i->Write(writer);
+  }
+  writer.WriteBits(static_cast<bool>(computed_reference_), 1);
+  if (computed_reference_) {
+    computed_reference_->Write(writer);
+  }
+  writer.FlushBits();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void EncodingSet::setDescriptor(GenDesc index, DescriptorSubseqCfg &&descriptor) {
-    descriptors[uint8_t(index)] = std::move(descriptor);
+const ComputedRef& EncodingSet::GetComputedRef() const {
+  return *computed_reference_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const DescriptorSubseqCfg &EncodingSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)]; }
+size_t EncodingSet::GetNumberTemplateSegments() const {
+  return number_of_template_segments_minus1_ + 1;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void EncodingSet::addGroup(std::string &&rgroup_id) { rgroup_IDs.emplace_back(std::move(rgroup_id)); }
+bool EncodingSet::IsComputedReference() const {
+  return this->computed_reference_.has_value();
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ParameterSet::DatasetType EncodingSet::getDatasetType() const { return dataset_type; }
+void EncodingSet::SetComputedRef(const ComputedRef& computed_reference) {
+  computed_reference_ = computed_reference;
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-uint8_t EncodingSet::getPosSize() const { return pos_40_bits_flag ? uint8_t(40) : uint8_t(32); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool EncodingSet::hasMultipleAlignments() const { return multiple_alignments_flag; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t ParameterSet::getID() const { return parameter_set_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t EncodingSet::getReadLength() const { return read_length; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-EncodingSet &EncodingSet::operator=(const EncodingSet &other) {
-    if (this == &other) {
-        return *this;
+void EncodingSet::AddClass(const record::ClassType class_id,
+                           std::unique_ptr<QualityValues> conf) {
+  for (auto& a : descriptors_) {
+    if (a.IsClassSpecific()) {
+      UTILS_THROW_RUNTIME_EXCEPTION(
+          "Adding classes not allowed once class specific descriptor "
+          "configs enabled");
     }
-    dataset_type = other.dataset_type;
-    alphabet_ID = other.alphabet_ID;
-    read_length = other.read_length;
-    number_of_template_segments_minus1 = other.number_of_template_segments_minus1;
-    max_au_data_unit_size = other.max_au_data_unit_size;
-    pos_40_bits_flag = other.pos_40_bits_flag;
-    qv_depth = other.qv_depth;
-    as_depth = other.as_depth;
-    class_IDs = other.class_IDs;
-    descriptors = other.descriptors;
-    rgroup_IDs = other.rgroup_IDs;
-    multiple_alignments_flag = other.multiple_alignments_flag;
-    spliced_reads_flag = other.spliced_reads_flag;
-    signature_cfg = other.signature_cfg;
-    qv_coding_configs.clear();
-    for (const auto &c : other.qv_coding_configs) {
-        qv_coding_configs.emplace_back(c->clone());
+  }
+  for (const auto& a : class_i_ds_) {
+    if (class_id == a) {
+      UTILS_THROW_RUNTIME_EXCEPTION("Class already added");
     }
-    parameter_set_crps = other.parameter_set_crps;
+  }
+  class_i_ds_.push_back(class_id);
+  qv_coding_configs_.push_back(std::move(conf));
+}
+
+// -----------------------------------------------------------------------------
+
+void EncodingSet::SetDescriptor(GenDesc index,
+                                DescriptorSubSequenceCfg&& descriptor) {
+  descriptors_[static_cast<uint8_t>(index)] = std::move(descriptor);
+}
+
+// -----------------------------------------------------------------------------
+
+const DescriptorSubSequenceCfg& EncodingSet::GetDescriptor(
+    GenDesc index) const {
+  return descriptors_[static_cast<uint8_t>(index)];
+}
+
+// -----------------------------------------------------------------------------
+
+void EncodingSet::AddGroup(std::string&& read_group_id) {
+  read_group_index_ds_.emplace_back(std::move(read_group_id));
+}
+
+// -----------------------------------------------------------------------------
+
+ParameterSet::DatasetType EncodingSet::GetDatasetType() const {
+  return dataset_type_;
+}
+
+// -----------------------------------------------------------------------------
+
+uint8_t EncodingSet::GetPosSize() const {
+  return pos_40_bits_flag_ ? 40_u8 : 32_u8;
+}
+
+// -----------------------------------------------------------------------------
+
+bool EncodingSet::HasMultipleAlignments() const {
+  return multiple_alignments_flag_;
+}
+
+// -----------------------------------------------------------------------------
+
+uint8_t ParameterSet::GetId() const { return parameter_set_id_; }
+
+// -----------------------------------------------------------------------------
+
+uint32_t EncodingSet::GetReadLength() const { return read_length_; }
+
+// -----------------------------------------------------------------------------
+
+EncodingSet& EncodingSet::operator=(const EncodingSet& other) {
+  if (this == &other) {
     return *this;
+  }
+  dataset_type_ = other.dataset_type_;
+  alphabet_id_ = other.alphabet_id_;
+  read_length_ = other.read_length_;
+  number_of_template_segments_minus1_ =
+      other.number_of_template_segments_minus1_;
+  max_au_data_unit_size_ = other.max_au_data_unit_size_;
+  pos_40_bits_flag_ = other.pos_40_bits_flag_;
+  qv_depth_ = other.qv_depth_;
+  as_depth_ = other.as_depth_;
+  class_i_ds_ = other.class_i_ds_;
+  descriptors_ = other.descriptors_;
+  read_group_index_ds_ = other.read_group_index_ds_;
+  multiple_alignments_flag_ = other.multiple_alignments_flag_;
+  spliced_reads_flag_ = other.spliced_reads_flag_;
+  signature_cfg_ = other.signature_cfg_;
+  qv_coding_configs_.clear();
+  for (const auto& c : other.qv_coding_configs_) {
+    qv_coding_configs_.emplace_back(c->Clone());
+  }
+  computed_reference_ = other.computed_reference_;
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-EncodingSet &EncodingSet::operator=(EncodingSet &&other) noexcept {
-    dataset_type = other.dataset_type;
-    alphabet_ID = other.alphabet_ID;
-    read_length = other.read_length;
-    number_of_template_segments_minus1 = other.number_of_template_segments_minus1;
-    max_au_data_unit_size = other.max_au_data_unit_size;
-    pos_40_bits_flag = other.pos_40_bits_flag;
-    qv_depth = other.qv_depth;
-    as_depth = other.as_depth;
-    class_IDs = std::move(other.class_IDs);
-    descriptors = std::move(other.descriptors);
-    rgroup_IDs = std::move(other.rgroup_IDs);
-    multiple_alignments_flag = other.multiple_alignments_flag;
-    spliced_reads_flag = other.spliced_reads_flag;
-    signature_cfg = other.signature_cfg;
-    qv_coding_configs = std::move(other.qv_coding_configs);
-    parameter_set_crps = std::move(other.parameter_set_crps);
-    return *this;
+EncodingSet& EncodingSet::operator=(EncodingSet&& other) noexcept {
+  dataset_type_ = other.dataset_type_;
+  alphabet_id_ = other.alphabet_id_;
+  read_length_ = other.read_length_;
+  number_of_template_segments_minus1_ =
+      other.number_of_template_segments_minus1_;
+  max_au_data_unit_size_ = other.max_au_data_unit_size_;
+  pos_40_bits_flag_ = other.pos_40_bits_flag_;
+  qv_depth_ = other.qv_depth_;
+  as_depth_ = other.as_depth_;
+  class_i_ds_ = std::move(other.class_i_ds_);
+  descriptors_ = std::move(other.descriptors_);
+  read_group_index_ds_ = std::move(other.read_group_index_ds_);
+  multiple_alignments_flag_ = other.multiple_alignments_flag_;
+  spliced_reads_flag_ = other.spliced_reads_flag_;
+  signature_cfg_ = other.signature_cfg_;
+  qv_coding_configs_ = std::move(other.qv_coding_configs_);
+  computed_reference_ = other.computed_reference_;
+  return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(const EncodingSet &other)
-    : dataset_type(DataUnit::DatasetType::ALIGNED),
-      alphabet_ID(AlphabetID::ACGTN),
-      read_length(0),
-      number_of_template_segments_minus1(0),
-      max_au_data_unit_size(0),
-      pos_40_bits_flag(false),
-      qv_depth(0),
-      as_depth(0),
-      class_IDs(0),
-      descriptors(18),
-      rgroup_IDs(0),
-      multiple_alignments_flag(false),
-      spliced_reads_flag(false),
-      qv_coding_configs(0),
-      parameter_set_crps() {
-    *this = other;
+EncodingSet::EncodingSet(const EncodingSet& other)
+    : dataset_type_(DataUnit::DatasetType::kAligned),
+      alphabet_id_(AlphabetId::kAcgtn),
+      read_length_(0),
+      number_of_template_segments_minus1_(0),
+      max_au_data_unit_size_(0),
+      pos_40_bits_flag_(false),
+      qv_depth_(0),
+      as_depth_(0),
+      class_i_ds_(0),
+      descriptors_(18),
+      read_group_index_ds_(0),
+      multiple_alignments_flag_(false),
+      spliced_reads_flag_(false),
+      qv_coding_configs_(0) {
+  *this = other;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-EncodingSet::EncodingSet(EncodingSet &&other) noexcept
-    : dataset_type(DataUnit::DatasetType::ALIGNED),
-      alphabet_ID(AlphabetID::ACGTN),
-      read_length(0),
-      number_of_template_segments_minus1(0),
-      max_au_data_unit_size(0),
-      pos_40_bits_flag(false),
-      qv_depth(0),
-      as_depth(0),
-      class_IDs(0),
-      descriptors(18),
-      rgroup_IDs(0),
-      multiple_alignments_flag(false),
-      spliced_reads_flag(false),
-      qv_coding_configs(0),
-      parameter_set_crps() {
-    *this = std::move(other);
+EncodingSet::EncodingSet(EncodingSet&& other) noexcept
+    : dataset_type_(DataUnit::DatasetType::kAligned),
+      alphabet_id_(AlphabetId::kAcgtn),
+      read_length_(0),
+      number_of_template_segments_minus1_(0),
+      max_au_data_unit_size_(0),
+      pos_40_bits_flag_(false),
+      qv_depth_(0),
+      as_depth_(0),
+      class_i_ds_(0),
+      descriptors_(18),
+      read_group_index_ds_(0),
+      multiple_alignments_flag_(false),
+      spliced_reads_flag_(false),
+      qv_coding_configs_(0) {
+  *this = std::move(other);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-const QualityValues &EncodingSet::getQVConfig(record::ClassType type) const {
-    for (size_t i = 0; i < class_IDs.size(); ++i) {
-        if (class_IDs[i] == type) {
-            return *(qv_coding_configs[i]);
-        }
+const QualityValues& EncodingSet::GetQvConfig(record::ClassType type) const {
+  for (size_t i = 0; i < class_i_ds_.size(); ++i) {
+    if (class_i_ds_[i] == type) {
+      return *qv_coding_configs_[i];
     }
-    UTILS_DIE("No matching qv config " + std::to_string(static_cast<int>(type)) + " in parameter set");
+  }
+  UTILS_DIE("No matching qv config " + std::to_string(static_cast<int>(type)) +
+            " in parameter set");
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ParameterSet::setID(uint8_t id) { parameter_set_ID = id; }
+void ParameterSet::SetId(const uint8_t id) { parameter_set_id_ = id; }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint8_t ParameterSet::getParentID() const { return parent_parameter_set_ID; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void EncodingSet::setQVDepth(uint8_t qv) { qv_depth = qv; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool EncodingSet::operator==(const EncodingSet &ps) const {
-    return dataset_type == ps.dataset_type && alphabet_ID == ps.alphabet_ID && read_length == ps.read_length &&
-           number_of_template_segments_minus1 == ps.number_of_template_segments_minus1 &&
-           max_au_data_unit_size == ps.max_au_data_unit_size && pos_40_bits_flag == ps.pos_40_bits_flag &&
-           qv_depth == ps.qv_depth && as_depth == ps.as_depth && class_IDs == ps.class_IDs &&
-           descriptors == ps.descriptors && rgroup_IDs == ps.rgroup_IDs &&
-           multiple_alignments_flag == ps.multiple_alignments_flag && spliced_reads_flag == ps.spliced_reads_flag &&
-           signature_cfg == ps.signature_cfg && qual_cmp(ps) && parameter_set_crps == ps.parameter_set_crps;
+void ParameterSet::SetParentId(const uint8_t id) {
+  parent_parameter_set_id_ = id;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool EncodingSet::qual_cmp(const EncodingSet &ps) const {
-    if (ps.qv_coding_configs.size() != qv_coding_configs.size()) {
-        return false;
+uint8_t ParameterSet::GetParentId() const { return parent_parameter_set_id_; }
+
+// -----------------------------------------------------------------------------
+
+void EncodingSet::SetQvDepth(const uint8_t qv) { qv_depth_ = qv; }
+
+// -----------------------------------------------------------------------------
+
+bool EncodingSet::operator==(const EncodingSet& ps) const {
+  return dataset_type_ == ps.dataset_type_ && alphabet_id_ == ps.alphabet_id_ &&
+         read_length_ == ps.read_length_ &&
+         number_of_template_segments_minus1_ ==
+             ps.number_of_template_segments_minus1_ &&
+         max_au_data_unit_size_ == ps.max_au_data_unit_size_ &&
+         pos_40_bits_flag_ == ps.pos_40_bits_flag_ &&
+         qv_depth_ == ps.qv_depth_ && as_depth_ == ps.as_depth_ &&
+         class_i_ds_ == ps.class_i_ds_ && descriptors_ == ps.descriptors_ &&
+         read_group_index_ds_ == ps.read_group_index_ds_ &&
+         multiple_alignments_flag_ == ps.multiple_alignments_flag_ &&
+         spliced_reads_flag_ == ps.spliced_reads_flag_ &&
+         signature_cfg_ == ps.signature_cfg_ && QualityValueCmp(ps) &&
+         computed_reference_ == ps.computed_reference_;
+}
+
+// -----------------------------------------------------------------------------
+
+bool EncodingSet::QualityValueCmp(const EncodingSet& ps) const {
+  if (ps.qv_coding_configs_.size() != qv_coding_configs_.size()) {
+    return false;
+  }
+  for (size_t i = 0; i < ps.qv_coding_configs_.size(); ++i) {
+    if (!qv_coding_configs_[i]->Equals(ps.qv_coding_configs_[i].get())) {
+      return false;
     }
-    for (size_t i = 0; i < ps.qv_coding_configs.size(); ++i) {
-        if (!(qv_coding_configs[i]->equals(ps.qv_coding_configs[i].get()))) {
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
-    bitReader.read<uint16_t>(10);
-    bitReader.read<uint32_t>(22);
-    parameter_set_ID = bitReader.read<uint8_t>(8);
-    parent_parameter_set_ID = bitReader.read<uint8_t>(8);
-    set = EncodingSet(bitReader);
+ParameterSet::ParameterSet(util::BitReader& bit_reader)
+    : DataUnit(DataUnitType::kParameterSet) {
+  bit_reader.Read<uint16_t>(10);
+  bit_reader.Read<uint32_t>(22);
+  parameter_set_id_ = bit_reader.Read<uint8_t>(8);
+  parent_parameter_set_id_ = bit_reader.Read<uint8_t>(8);
+  set_ = EncodingSet(bit_reader);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
-                           AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
-                           uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
-                           bool _spliced_reads_flag)
-    : DataUnit(DataUnitType::PARAMETER_SET),
-      parameter_set_ID(_parameter_set_ID),
-      parent_parameter_set_ID(_parent_parameter_set_ID),
-      set(_dataset_type, _alphabet_id, _read_length, _paired_end, _pos_40_bits_flag, _qv_depth, _as_depth,
-          _multiple_alignments_flag, _spliced_reads_flag) {}
+ParameterSet::ParameterSet(
+    const uint8_t parameter_set_id, const uint8_t parent_parameter_set_id,
+    const DatasetType dataset_type, const AlphabetId alphabet_id,
+    const uint32_t read_length, const bool paired_end,
+    const bool pos_40_bits_flag, const uint8_t qv_depth, const uint8_t as_depth,
+    const bool multiple_alignments_flag, const bool spliced_reads_flag)
+    : DataUnit(DataUnitType::kParameterSet),
+      parameter_set_id_(parameter_set_id),
+      parent_parameter_set_id_(parent_parameter_set_id),
+      set_(dataset_type, alphabet_id, read_length, paired_end, pos_40_bits_flag,
+           qv_depth, as_depth, multiple_alignments_flag, spliced_reads_flag) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 ParameterSet::ParameterSet()
-    : DataUnit(DataUnitType::PARAMETER_SET), parameter_set_ID(0), parent_parameter_set_ID(0), set() {}
+    : DataUnit(DataUnitType::kParameterSet),
+      parameter_set_id_(0),
+      parent_parameter_set_id_(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, EncodingSet _set)
-    : DataUnit(DataUnitType::PARAMETER_SET),
-      parameter_set_ID(_parameter_set_ID),
-      parent_parameter_set_ID(_parent_parameter_set_ID),
-      set(std::move(_set)) {}
+ParameterSet::ParameterSet(uint8_t parameter_set_id,
+                           uint8_t parent_parameter_set_id, EncodingSet set)
+    : DataUnit(DataUnitType::kParameterSet),
+      parameter_set_id_(parameter_set_id),
+      parent_parameter_set_id_(parent_parameter_set_id),
+      set_(std::move(set)) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-bool ParameterSet::operator==(const ParameterSet &pset) const { return set == pset.set; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ParameterSet::print_debug(std::ostream &output, uint8_t, uint8_t) const {
-    output << "* Parameter set " << uint32_t(getID());
-    if (getEncodingSet().isComputedReference()) {
-        switch (getEncodingSet().getComputedRef().getAlgorithm()) {
-            case core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY:
-                output << ", local assembly";
-                break;
-            case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                output << ", global assembly";
-                break;
-            case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
-                output << ", ref transform";
-                break;
-            case core::parameter::ComputedRef::Algorithm::PUSH_IN:
-                output << ", push in";
-                break;
-            case core::parameter::ComputedRef::Algorithm::RESERVED:
-                output << ", reserved";
-                break;
-        }
-    } else {
-        output << ", reference based";
-    }
-    switch (getEncodingSet().getAlphabetID()) {
-        case core::AlphabetID::ACGTN:
-            output << ", alphabet ACTGN";
-            break;
-        case core::AlphabetID::ACGTRYSWKMBDHVN_:
-            output << ", alphabet ACGTRYSWKMBDHVN_";
-            break;
-        default:
-            UTILS_DIE("Unknown alphabet ID");
-    }
-    output << ", " << getEncodingSet().getNumberTemplateSegments() << " segments" << std::endl;
+bool ParameterSet::operator==(const ParameterSet& parameter_set) const {
+  return set_ == parameter_set.set_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void ParameterSet::PrintDebug(std::ostream& output, uint8_t, uint8_t) const {
+  output << "* Parameter set " << static_cast<uint32_t>(GetId());
+  if (GetEncodingSet().IsComputedReference()) {
+    switch (GetEncodingSet().GetComputedRef().GetAlgorithm()) {
+      case ComputedRef::Algorithm::kLocalAssembly:
+        output << ", local assembly";
+        break;
+      case ComputedRef::Algorithm::kGlobalAssembly:
+        output << ", global assembly";
+        break;
+      case ComputedRef::Algorithm::kRefTransform:
+        output << ", ref transform";
+        break;
+      case ComputedRef::Algorithm::kPushIn:
+        output << ", push in";
+        break;
+      case ComputedRef::Algorithm::kReserved:
+        output << ", reserved";
+        break;
+    }
+  } else {
+    output << ", reference based";
+  }
+  switch (GetEncodingSet().GetAlphabetId()) {
+    case AlphabetId::kAcgtn:
+      output << ", alphabet ACTGN";
+      break;
+    case AlphabetId::kAcgtryswkmbdhvn:
+      output << ", alphabet ACGTRYSWKMBDHVN_";
+      break;
+    default:
+      UTILS_DIE("Unknown alphabet ID");
+  }
+  output << ", " << GetEncodingSet().GetNumberTemplateSegments() << " segments"
+         << std::endl;
+}
+
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::core::parameter
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

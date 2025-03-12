@@ -1,104 +1,128 @@
 /**
+ * Copyright 2018-2024 The Genie Authors.
  * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
+ * @copyright This file is part of Genie. See LICENSE and/or
+ * https://github.com/MueFab/genie for more details.
  */
 
 #include "genie/format/mgb/exporter.h"
+
 #include <iostream>
 #include <string>
 #include <utility>
-#include "genie/format/mgb/raw_reference.h"
-#include "genie/util/stop-watch.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include "genie/format/mgb/raw_reference.h"
+#include "genie/util/log.h"
+#include "genie/util/stop_watch.h"
+
+// -----------------------------------------------------------------------------
+
+
+constexpr auto kLogModuleName = "Mgb";
 
 namespace genie::format::mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream* _file) : writer(*_file), id_ctr(0) {}
+Exporter::Exporter(std::ostream* file) : writer(*file), id_ctr(0) {}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
-    util::Watch watch;
-    core::AccessUnit data = std::move(t);
-    util::OrderedSection section(&lock, id);
-    getStats().add(data.getStats());
-    auto parameter_id = static_cast<uint8_t>(parameter_stash.size());
-    core::parameter::ParameterSet out_set(parameter_id, parameter_id, std::move(data.getParameters()));
-    mgb::RawReference ref;
-    for (const auto& p : data.getRefToWrite()) {
-        auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
-        auto substr = string.substr(p.first % core::ReferenceManager::getChunkSize());
-        substr = string.substr(0, p.second - p.first);
-        mgb::RawReferenceSequence refseq(data.getReference(), p.first, std::move(substr));
-        ref.addSequence(std::move(refseq));
+void Exporter::FlowIn(core::AccessUnit&& t, const util::Section& id) {
+  util::Watch watch;
+  core::AccessUnit data = std::move(t);
+  [[maybe_unused]] util::OrderedSection section(&lock, id);
+  GetStats().Add(data.GetStats());
+  auto parameter_id = static_cast<uint8_t>(parameter_stash.size());
+  core::parameter::ParameterSet out_set(parameter_id, parameter_id,
+                                        std::move(data.GetParameters()));
+  RawReference ref;
+  for (const auto& [fst, snd] : data.GetRefToWrite()) {
+    auto string = *data.GetReferenceExcerpt().GetChunkAt(fst);
+    auto substr = string.substr(fst % core::ReferenceManager::GetChunkSize());
+    substr = string.substr(0, snd - fst);
+    RawReferenceSequence refseq(data.GetReference(), fst, std::move(substr));
+    ref.AddSequence(std::move(refseq));
+  }
+  if (!ref.IsEmpty()) {
+    for (auto& r : ref) {
+      UTILS_LOG(util::Logger::Severity::INFO,
+                "Writing Ref " + std::to_string(r.GetSeqId()) + ":" +
+                    std::to_string(r.GetStart()) + "-" +
+                    std::to_string(r.GetEnd()));
     }
-    if (!ref.isEmpty()) {
-        for (auto& r : ref) {
-            std::cerr << "Writing Ref " << r.getSeqID() << ":" << r.getStart() << "-" << r.getEnd() << "..."
-                      << std::endl;
-        }
-        ref.write(writer);
-        ref = mgb::RawReference();
-    }
+    ref.Write(writer);
+    ref = RawReference();
+  }
 
-    if (data.getNumReads() == 0) {
-        return;
-    }
+  if (data.GetNumReads() == 0) {
+    return;
+  }
 
-    bool found = false;
-    for (const auto& p : parameter_stash) {
-        if (out_set == p) {
-            found = true;
-            parameter_id = p.getID();
-        }
+  bool found = false;
+  for (const auto& p : parameter_stash) {
+    if (out_set == p) {
+      found = true;
+      parameter_id = p.GetId();
     }
+  }
 
-    if (!found) {
-        std::cerr << "Writing PS " << uint32_t(out_set.getID()) << "..." << std::endl;
-        out_set.write(writer);
-        parameter_stash.push_back(out_set);
+  if (!found) {
+    UTILS_LOG(util::Logger::Severity::INFO,
+              "Writing parameter set " +
+                  std::to_string(static_cast<uint32_t>(out_set.GetId())));
+    out_set.Write(writer);
+    parameter_stash.push_back(out_set);
+  }
+
+  auto dataset_type = data.GetClassType() != core::record::ClassType::kClassU
+                         ? core::parameter::DataUnit::DatasetType::kAligned
+                     : data.IsReferenceOnly()
+                         ? core::parameter::DataUnit::DatasetType::kReference
+                         : core::parameter::DataUnit::DatasetType::kNonAligned;
+
+  AccessUnit au(static_cast<uint32_t>(id_ctr), parameter_id,
+                data.GetClassType(), static_cast<uint32_t>(data.GetNumReads()),
+                dataset_type, 32, false, core::AlphabetId::kAcgtn);
+  if (data.IsReferenceOnly()) {
+    au.GetHeader().SetRefCfg(
+        RefCfg(data.GetReference(), data.GetReferenceExcerpt().GetGlobalStart(),
+               data.GetReferenceExcerpt().GetGlobalEnd() - 1, 32));
+  }
+  if (au.GetHeader().GetClass() != core::record::ClassType::kClassU) {
+    au.GetHeader().SetAuTypeCfg(AuTypeCfg(data.GetReference(), data.GetMinPos(),
+                                          data.GetMaxPos(),
+                                          data.GetParameters().GetPosSize()));
+  }
+  for (uint8_t descriptor = 0;
+       descriptor < static_cast<uint8_t>(core::GetDescriptors().size());
+       ++descriptor) {
+    if (data.Get(static_cast<core::GenDesc>(descriptor)).IsEmpty()) {
+      continue;
     }
+    au.AddBlock(
+        Block(descriptor,
+              std::move(data.Get(static_cast<core::GenDesc>(descriptor)))));
+  }
 
-    auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
-                           ? core::parameter::DataUnit::DatasetType::ALIGNED
-                           : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
-                                                     : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
+  UTILS_LOG(util::Logger::Severity::INFO, "Writing access unit " +
+    au.DebugPrint(
+      parameter_stash[au.GetHeader().GetParameterId()].GetEncodingSet()));
 
-    mgb::AccessUnit au((uint32_t)id_ctr, parameter_id, data.getClassType(), (uint32_t)data.getNumReads(), datasetType,
-                       32, false, core::AlphabetID::ACGTN);
-    if (data.isReferenceOnly()) {
-        au.getHeader().setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
-                                        data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
-    }
-    if (au.getHeader().getClass() != core::record::ClassType::CLASS_U) {
-        au.getHeader().setAuTypeCfg(
-            AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
-    }
-    for (uint8_t descriptor = 0; descriptor < (uint8_t)core::getDescriptors().size(); ++descriptor) {
-        if (data.get(core::GenDesc(descriptor)).isEmpty()) {
-            continue;
-        }
-        au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
-    }
-
-    au.debugPrint(parameter_stash[au.getHeader().getParameterID()].getEncodingSet());
-
-    au.write(writer);
-    id_ctr++;
-    getStats().addDouble("time-mgb-export", watch.check());
+  au.Write(writer);
+  id_ctr++;
+  GetStats().AddDouble("time-mgb-export", watch.Check());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Exporter::skipIn(const genie::util::Section& id) { util::OrderedSection sec(&lock, id); }
+void Exporter::SkipIn(const util::Section& id) {
+  [[maybe_unused]] util::OrderedSection sec(&lock, id);
+}
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 }  // namespace genie::format::mgb
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

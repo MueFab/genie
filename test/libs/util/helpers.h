@@ -5,9 +5,8 @@
 
 namespace util_tests {
 
-//std::string exec(const std::string &cmd);
+// std::string exec(const std::string &cmd);
 
 }  // namespace util_tests
 
 #endif  // UTIL_TESTS_HELPERS_H_
-
