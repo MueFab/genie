@@ -7,10 +7,9 @@
 
 #define NOMINMAX  // NOLINT
 
-#include <zlib.h>
-
 #include "apps/genie/run/main.h"
 
+#include <zlib.h>
 #include <filesystem>  // NOLINT
 #include <iostream>
 #include <memory>
@@ -135,7 +134,12 @@ void AttachExporter(T& flow, const ProgramOptions& p_opts,
   }
   if (file_extension(p_opts.outputFile) == "fastq") {
     if (file_extension(p_opts.outputSupFile) == "fastq") {
-      if (p_opts.outputSupFile.substr(0, 2) != "-.") {
+      if (is_compressed(p_opts.outputSupFile)) {
+        output_files.emplace_back(
+            std::make_unique<genie::entropy::zlib::ZlibOutputStream>(
+                std::make_unique<genie::entropy::zlib::ZlibStreamBuffer>(
+                    p_opts.outputSupFile, true)));
+      } else {
         output_files.emplace_back(
             std::make_unique<std::ofstream>(p_opts.outputSupFile));
       }

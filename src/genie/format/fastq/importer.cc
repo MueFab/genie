@@ -25,10 +25,10 @@ namespace genie::format::fastq {
 
 Importer::Importer(const size_t block_size, std::istream& file_1)
     : block_size_(block_size), file_list_{&file_1} {
-  const auto pos = this->file_list_.front()->tellg();
+ /* const auto pos = this->file_list_.front()->tellg();
   file_list_.front()->seekg(0, std::ios::end);
   this->last_pos_ = this->file_list_.front()->tellg();
-  this->file_list_.front()->seekg(pos);
+  this->file_list_.front()->seekg(pos); */
 }
 
 // -----------------------------------------------------------------------------
@@ -36,10 +36,10 @@ Importer::Importer(const size_t block_size, std::istream& file_1)
 Importer::Importer(const size_t block_size, std::istream& file_1,
                    std::istream& file_2)
     : block_size_(block_size), file_list_{&file_1, &file_2} {
-  const auto pos = this->file_list_.front()->tellg();
+ /* const auto pos = this->file_list_.front()->tellg();
   file_list_.front()->seekg(0, std::ios::end);
   this->last_pos_ = this->file_list_.front()->tellg();
-  this->file_list_.front()->seekg(pos);
+  this->file_list_.front()->seekg(pos);*/
 }
 
 // -----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
   chunk.GetStats().AddInteger("size-fastq-filestruct",
                               static_cast<int64_t>(size_file_struct));
 
-  float progress =
+  /*float progress =
       static_cast<float>(file_list_.front()->tellg()) / static_cast<float>
       (last_pos_);
 
@@ -91,7 +91,7 @@ bool Importer::PumpRetrieve(core::Classifier* classifier) {
     UTILS_LOG(util::Logger::Severity::INFO,
               "Progress reading files: " +
                   std::to_string(static_cast<int>(last_progress_ * 100)) + "%");
-  }
+  }*/
 
   chunk.GetStats().AddInteger("size-fastq-sequence",
                               static_cast<int64_t>(size_seq));
