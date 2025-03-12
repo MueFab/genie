@@ -74,6 +74,7 @@ class AnnotationAccessUnitHeader {
               bool variable_size_tiles, uint8_t ATCoordSize);
 
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
     size_t getSize(core::Writer& writesize) const;
 
     bool ISAttribute() const { return is_attribute; }

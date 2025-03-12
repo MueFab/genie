@@ -47,6 +47,7 @@ class AlgorithmParameters {
 
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
     size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfPars() const { return n_pars; }

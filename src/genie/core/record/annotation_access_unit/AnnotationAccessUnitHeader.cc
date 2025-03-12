@@ -106,6 +106,30 @@ void AnnotationAccessUnitHeader::write(core::Writer& writer) const {
     writer.Flush();
 }
 
+void AnnotationAccessUnitHeader::write(util::BitWriter& writer) const {
+  uint8_t ATCoordBits = 8 << static_cast<uint8_t>(AT_coord_size);
+  if (attribute_contiguity) {
+    writer.WriteBits(is_attribute, 1);
+    if (is_attribute)
+      writer.WriteBits(attribute_ID, 16);
+    else
+      writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 7);
+    if (two_dimensional && !variable_size_tiles) {
+      if (column_major_tile_order)
+        writer.WriteBits(n_tiles_per_col, ATCoordBits);
+      else
+        writer.WriteBits(n_tiles_per_row, ATCoordBits);
+    }
+    writer.WriteBits(n_blocks, ATCoordBits);
+  } else {
+    writer.WriteBits(tile_index_1, ATCoordBits);
+    writer.WriteBits(tile_index_2_exists, 1);
+    if (tile_index_2_exists) writer.WriteBits(tile_index_2, ATCoordBits);
+    writer.WriteBits(n_blocks, 16);
+  }
+  writer.FlushBits();
+}
+
 size_t AnnotationAccessUnitHeader::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

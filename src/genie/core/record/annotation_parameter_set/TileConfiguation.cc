@@ -209,6 +209,32 @@ void TileConfiguration::write(core::Writer& writer) const {
     }
 }
 
+void TileConfiguration::write(util::BitWriter& writer) const {
+      writer.WriteBits(AG_class, 3);
+      writer.WriteBits(attribute_contiguity, 1);
+      writer.WriteBits(two_dimensional, 1);
+      if (two_dimensional) {
+        writer.WriteReserved(6);
+        writer.WriteBits(column_major_tile_order, 1);
+        writer.WriteBits(symmetry_mode, 3);
+        writer.WriteBits(symmetry_minor_diagonal, 1);
+      } else {
+        writer.WriteReserved(3);
+      }
+      writer.WriteBits(attribute_dependent_tiles, 1);
+      default_tile_structure.write(writer);
+      if (attribute_dependent_tiles) {
+        writer.WriteBits(n_add_tile_structures, 16);
+        for (auto i = 0; i < n_add_tile_structures; ++i) {
+          writer.WriteBits(n_attributes[i], 16);
+          for (auto ID : attribute_ID[i]) writer.WriteBits(ID, 16);
+          writer.WriteBits(n_descriptors[i], 7);
+          for (auto ID : descriptor_ID[i]) writer.WriteBits(ID, 7);
+          additional_tile_structure[i].write(writer);
+        }
+      }
+    }
+
 size_t TileConfiguration::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

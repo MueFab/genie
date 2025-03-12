@@ -68,6 +68,7 @@ class ContactMatrixParameters {
     void read(util::BitReader& reader);
 
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
     size_t getSize(core::Writer& writesize) const;
 
     uint8_t getNumberOfSamples() const { return num_samples; }

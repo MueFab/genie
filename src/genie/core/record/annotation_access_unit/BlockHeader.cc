@@ -53,6 +53,14 @@ void BlockHeader::write(core::Writer& writer) const {
     writer.Write(block_payload_size, 29);
 }
 
+void BlockHeader::write(util::BitWriter& writer) const {
+  writer.WriteBits(static_cast<uint8_t>(descriptor_ID), 8);
+  if (descriptor_ID == AnnotDesc::ATTRIBUTE) writer.WriteBits(attribute_ID, 16);
+  writer.WriteReserved(2);
+  writer.WriteBits(indexed, 1);
+  writer.WriteBits(block_payload_size, 29);
+}
+
 size_t BlockHeader::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

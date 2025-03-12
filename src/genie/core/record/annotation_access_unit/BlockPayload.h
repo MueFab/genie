@@ -54,6 +54,7 @@ class BlockPayload {
     void read(util::BitReader& reader);
     void read(util::BitReader& reader, AnnotDesc descriptorID, uint8_t numChrs);
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
     size_t getSize(core::Writer& writesize) const;
 
 

@@ -186,6 +186,44 @@ void AnnotationEncodingParameters::write(core::Writer& writer) const {
     writer.Flush();
 }
 
+void AnnotationEncodingParameters::write(util::BitWriter& writer) const {
+  writer.WriteBits(n_filter, 8);
+  for (auto i = 0; i < n_filter; ++i) {
+    writer.WriteBits(filter_ID_len[i], 6);
+    for (auto byte : filter_ID[i]) writer.WriteBits(byte, 8);
+    writer.WriteBits(desc_len[i], 10);
+    for (auto byte : description[i]) writer.WriteBits(byte, 8);
+  }
+  writer.WriteBits(n_features_names, 8);
+  for (auto i = 0; i < n_features_names; ++i) {
+    writer.WriteBits(feature_name_len[i], 6);
+    for (auto byte : feature_name[i]) writer.WriteBits(byte, 8);
+  }
+
+  writer.WriteBits(n_ontology_terms, 8);
+  for (auto i = 0; i < n_ontology_terms; ++i) {
+    writer.WriteBits(ontology_term_name_len[i], 6);
+    for (auto byte : ontology_term_name[i]) writer.WriteBits(byte, 8);
+  }
+
+  writer.WriteBits(n_descriptors, 8);
+  for (auto i = 0; i < n_descriptors; ++i) {
+    descriptor_configuration[i].write(writer);
+  }
+
+  writer.WriteBits(n_compressors, 8);
+  for (auto i = 0; i < n_compressors; ++i) {
+    compressor_parameter_set[i].write(writer);
+  }
+
+  writer.WriteBits(n_attributes, 8);
+  for (auto i = 0; i < n_attributes; ++i) {
+    attribute_parameter_set[i].write(writer);
+  }
+
+  writer.FlushBits();
+}
+
 size_t AnnotationEncodingParameters::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

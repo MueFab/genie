@@ -27,8 +27,9 @@ class ArrayType {
     std::vector<uint8_t> toArray(DataType type, util::BitReader& reader) const;
 
     void toFile(core::DataType type, std::vector<uint8_t> bytearray, core::Writer& writer) const;
+    void toFile(core::DataType type, std::vector<uint8_t> bytearray, util::BitWriter& writer) const;
     void toFile(core::DataType type, util::BitReader& reader, core::Writer& writer, uint64_t number) const;
-
+    void toFile(core::DataType type, util::BitReader& reader, util::BitWriter& writer, uint64_t number) const;
     std::string toString(core::DataType type, std::vector<uint8_t> value) const;
 
     uint8_t getDefaultBitsize(core::DataType type) const;

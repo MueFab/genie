@@ -56,6 +56,7 @@ class DescriptorConfiguration {
 
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
     size_t getSize(core::Writer& write_size) const;
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     AlgoID getEncodingModeID() const { return encoding_mode_ID; }

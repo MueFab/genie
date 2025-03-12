@@ -138,14 +138,14 @@ class Record {
    * @param writer The writer to write to
    * @return Number of bytes written
    */
-  uint64_t write(core::Writer& writer) const;
+  uint64_t Write(util::BitWriter& writer) const;
 
   /**
    * @brief Writes a specific amount of the record to a writer
    * @param writer The writer to write to
    * @param write_size The number of bytes to write
    */
-  void write(core::Writer& writer, uint64_t write_size) const;
+  void Write(util::BitWriter& writer, uint64_t write_size) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -75,6 +75,14 @@ void BlockPayload::write(core::Writer& writer) const {
     writer.Flush();
 }
 
+void BlockPayload::write(util::BitWriter& writer) const {
+  if (generic_payload_stream.str().size() > 0)
+    writer.Write(const_cast<std::stringstream*>(&generic_payload_stream));
+  else
+    for (const auto& byte : generic_payload) writer.Write(byte, 8, true);
+  writer.FlushBits();
+}
+
 size_t BlockPayload::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

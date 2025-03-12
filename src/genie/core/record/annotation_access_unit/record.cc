@@ -96,6 +96,16 @@ void Record::write(core::Writer& writer) const {
     for (auto& blocki : block) blocki.write(writer);
 }
 
+void Record::write(util::BitWriter& writer) const {
+  writer.WriteBits(AT_ID, 8);
+  writer.WriteBits(static_cast<uint8_t>(AT_type), 4);
+  writer.WriteBits(AT_subtype, 4);
+  writer.WriteBits(AG_class, 3);
+  writer.WriteReserved(5);
+  annotation_access_unit_header.write(writer);
+  for (auto& blocki : block) blocki.write(writer);
+}
+
 size_t Record::getSize() const {
     core::Writer writesize;
     return getSize(writesize);

@@ -56,6 +56,7 @@ class Record {
 
     void read(util::BitReader& reader);
     void write(Writer& writer) const;
+    void write(util::BitWriter& writer) const;
 
     size_t getSize() const;
     size_t getSize(core::Writer& writesize) const;

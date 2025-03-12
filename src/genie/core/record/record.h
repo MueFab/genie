@@ -36,16 +36,16 @@ namespace genie::core::record {
  */
 class Record {
  private:
-  uint8_t number_of_template_segments_{};    //!< @brief
-  std::vector<Segment> reads_;               //!< @brief
-  std::vector<AlignmentBox> alignment_info_;  //!< @brief
-  ClassType class_id_{ClassType::kNone};     //!< @brief
-  std::string read_group_;                   //!< @brief
-  bool read_1_first_{};                      //!< @brief
+  uint8_t number_of_template_segments_{};      //!< @brief
+  std::vector<Segment> reads_;                 //!< @brief
+  std::vector<AlignmentBox> alignment_info_;   //!< @brief
+  ClassType class_id_{ClassType::kNone};       //!< @brief
+  std::string read_group_;                     //!< @brief
+  bool read_1_first_{};                        //!< @brief
   AlignmentSharedData shared_alignment_info_;  //!< @brief
-  uint8_t qv_depth_{};                       //!< @brief
-  std::string read_name_;                    //!< @brief
-  uint8_t flags_{};                          //!< @brief
+  uint8_t qv_depth_{};                         //!< @brief
+  std::string read_name_;                      //!< @brief
+  uint8_t flags_{};                            //!< @brief
 
   std::unique_ptr<AlignmentExternal> more_alignment_info_;  //!< @brief
 
