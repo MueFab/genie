@@ -49,9 +49,6 @@ SiteUnits SiteAnnotation::parseSite(std::ifstream& inputfile) {
 
     for (const auto& infoField : infoFields) attributeInfo[infoField.ID] = infoField;
 
-    //      auto& descrStream = parser.getDescriptors().getTiles();
-    //   for (auto& tile : descrStream) descrList.push_back(tile.first);
-
     AnnotationEncoder encodingPars;
     encodingPars.setDescriptors(descrList);
     encodingPars.setCompressors(compressors);
