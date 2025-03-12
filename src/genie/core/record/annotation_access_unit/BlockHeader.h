@@ -46,6 +46,7 @@ class BlockHeader {
 
     void read(genie::util::BitReader& reader);
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
 
     AnnotDesc getDescriptorID() const { return descriptor_ID; }
     uint16_t getAttributeID() const { return attribute_ID; }

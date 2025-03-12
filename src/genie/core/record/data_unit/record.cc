@@ -52,8 +52,8 @@ Record::Record(annotation_access_unit::Record& _annotationAccessUnit)
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::write(core::Writer& writer, uint64_t write_size) const {
-  writer.Write(data_unit_type_, 8);
+void Record::Write(util::BitWriter& writer, uint64_t write_size) const {
+  writer.WriteBits(data_unit_type_, 8);
   switch (data_unit_type_) {
     case 0:
       break;
@@ -63,12 +63,12 @@ void Record::write(core::Writer& writer, uint64_t write_size) const {
       break;
     case 3:
       writer.WriteReserved(10);
-      writer.Write(write_size, 22);
+      writer.WriteBits(write_size, 22);
       annotation_parameter_set_.write(writer);
       break;
     case 4:
       writer.WriteReserved(3);
-      writer.Write(write_size, 29);
+      writer.WriteBits(write_size, 29);
       annotation_access_unit_.write(writer);
       break;
     default:
@@ -78,8 +78,8 @@ void Record::write(core::Writer& writer, uint64_t write_size) const {
 
 // -------------------------------------------------------------------------------------------------
 
-uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) const {
-  writer.Write(data_unit_type_, 8);
+uint64_t genie::core::record::data_unit::Record::Write(util::BitWriter& writer) const {
+  writer.WriteBits(data_unit_type_, 8);
   uint64_t writesize = 0;
   switch (data_unit_type_) {
     case 0:
@@ -91,13 +91,13 @@ uint64_t genie::core::record::data_unit::Record::write(core::Writer& writer) con
     case 3:
       writer.WriteReserved(10);
       writesize = (annotation_parameter_set_.getSize() + 40) / 8;
-      writer.Write(writesize, 22);
+      writer.WriteBits(writesize, 22);
       annotation_parameter_set_.write(writer);
       break;
     case 4:
       writer.WriteReserved(3);
       writesize = (annotation_access_unit_.getSize() + 40) / 8;
-      writer.Write(writesize, 29);
+      writer.WriteBits(writesize, 29);
       annotation_access_unit_.write(writer);
       break;
     default:

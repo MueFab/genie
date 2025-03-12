@@ -46,6 +46,14 @@ void LikelihoodParameters::write(genie::core::Writer& writer) const {
     writer.Write(transform_flag, 1);
     if (transform_flag) writer.Write(static_cast<uint8_t>(dtype_id), 8);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LikelihoodParameters::write(genie::util::BitWriter& writer) const {
+  writer.WriteBits(num_gl_per_sample, 8);
+  writer.WriteBits(transform_flag, 1);
+  if (transform_flag) writer.WriteBits(static_cast<uint8_t>(dtype_id), 8);
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t LikelihoodParameters::getSize(core::Writer& writesize) const {

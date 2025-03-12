@@ -74,6 +74,7 @@ class TileConfiguration {
     void read(util::BitReader& reader, uint8_t AT_coord_size);
     void read(util::BitReader& reader);
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
 
     void setAGClass(uint8_t AGClass) { AG_class = AGClass; }
     void setATCoordSize(uint8_t ATCoordSize) { AT_coord_size = ATCoordSize; }

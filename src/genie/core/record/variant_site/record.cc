@@ -31,37 +31,37 @@ Record::Record(util::BitReader& reader) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Record::Write(core::Writer& writer) {
-  writer.Write(variant_index_, 64);
-  writer.Write(seq_id_, 16);
-  writer.Write(pos_, 40);
-  writer.Write(strand_, 8);
-  writer.Write(id_len_, 8);
+void Record::Write(genie::util::BitWriter& writer) {
+  writer.WriteBits(variant_index_, 64);
+  writer.WriteBits(seq_id_, 16);
+  writer.WriteBits(pos_, 40);
+  writer.WriteBits(strand_, 8);
+  writer.WriteBits(id_len_, 8);
   writer.Write(id_);
-  writer.Write(description_len_, 8);
+  writer.WriteBits(description_len_, 8);
   writer.Write(description_);
-  writer.Write(ref_len_, 32);
+  writer.WriteBits(ref_len_, 32);
   writer.Write(ref_);
 
-  writer.Write(alt_count_, 8);
+  writer.WriteBits(alt_count_, 8);
   for (auto i = 0; i < alt_count_; ++i) {
-    writer.Write(alt_len_[i], 32);
+    writer.WriteBits(alt_len_[i], 32);
     writer.Write(altern_[i]);
   }
-  writer.Write(depth_, 32);
-  writer.Write(seq_qual_, 32);
-  writer.Write(map_qual_, 32);
-  writer.Write(map_num_qual_0_, 32);
-  writer.Write(filters_len_, 8);
+  writer.WriteBits(depth_, 32);
+  writer.WriteBits(seq_qual_, 32);
+  writer.WriteBits(map_qual_, 32);
+  writer.WriteBits(map_num_qual_0_, 32);
+  writer.WriteBits(filters_len_, 8);
   writer.Write(filters_);
 
   auto info_tag = info_.GetFields();
-  writer.Write(static_cast<uint8_t>(info_tag.size()), 8);
+  writer.WriteBits(static_cast<uint8_t>(info_tag.size()), 8);
   for (auto i = 0u; i < info_tag.size(); ++i) {
-    writer.Write(info_tag[i].tag.size(), 8);
+    writer.WriteBits(info_tag[i].tag.size(), 8);
     writer.Write(info_tag[i].tag);
-    writer.Write(static_cast<uint8_t>(info_tag[i].type), 8);
-    writer.Write(info_tag[i].values.size(), 8);
+    writer.WriteBits(static_cast<uint8_t>(info_tag[i].type), 8);
+    writer.WriteBits(info_tag[i].values.size(), 8);
     ArrayType writeType;
     for (auto j = 0u; j < info_tag[i].values.size(); ++j) {
       writeType.toFile(info_tag[i].type, info_tag.at(i).values.at(j), writer);
@@ -70,11 +70,11 @@ void Record::Write(core::Writer& writer) {
     }
   }
   writer.WriteReserved(7);
-  writer.Write(linked_record_, 1);
+  writer.WriteBits(linked_record_, 1);
   if (linked_record_) {
-    writer.Write(link_name_len_, 8);
+    writer.WriteBits(link_name_len_, 8);
     writer.Write(link_name_);
-    writer.Write(reference_box_id_, 8);
+    writer.WriteBits(reference_box_id_, 8);
   }
 }
 

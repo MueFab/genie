@@ -44,6 +44,11 @@ void Block::write(core::Writer& writer) const {
     block_payload.write(writer);
 }
 
+void Block::write(util::BitWriter& writer) const {
+  block_header.write(writer);
+  block_payload.write(writer);
+}
+
 void Block::set(BlockVectorData blockData) {
     numChrs = 0;
     const bool attribute_contiguity = false;

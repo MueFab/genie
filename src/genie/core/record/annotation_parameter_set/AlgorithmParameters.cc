@@ -82,6 +82,22 @@ void AlgorithmParameters::write(core::Writer& writer) const {
     }
 }
 
+void AlgorithmParameters::write(util::BitWriter& writer) const {
+  ArrayType types;
+  writer.WriteBits(n_pars, 4);
+  for (auto i = 0; i < n_pars; ++i) {
+    writer.WriteBits(par_ID[i], 4);
+    writer.WriteBits(static_cast<uint8_t>(par_type[i]), 8);
+    writer.WriteBits(par_num_array_dims[i], 2);
+    for (auto j = 0; j < par_num_array_dims[i]; ++j) {
+      writer.WriteBits(par_array_dims[i][j], 8);
+    }
+    for (auto j : par_val[i])
+      for (auto k : j)
+        for (auto l : k) types.toFile(par_type[i], l, writer);
+  }
+}
+
 size_t AlgorithmParameters::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

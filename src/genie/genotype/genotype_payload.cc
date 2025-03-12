@@ -141,7 +141,7 @@ GenotypePayload::GenotypePayload(
 
 // -----------------------------------------------------------------------------
 
-[[maybe_unused]] [[maybe_unused]] [[maybe_unused]] uint8_t GenotypePayload::GetMaxPloidy() const {
+[[maybe_unused]] uint8_t GenotypePayload::GetMaxPloidy() const {
   return max_ploidy_;
 }
 

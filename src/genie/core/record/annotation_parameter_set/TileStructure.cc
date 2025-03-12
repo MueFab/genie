@@ -136,6 +136,25 @@ void TileStructure::write(core::Writer& writer) const {
     }
 }
 
+void TileStructure::write(util::BitWriter& writer) const {
+  writer.WriteReserved(7);
+  writer.WriteBits(variable_size_tiles, 1);
+  writer.WriteBits(n_tiles, coordSizeInBits(ATCoordSize));
+
+  auto dimensions = two_dimensional ? 2 : 1;
+  if (variable_size_tiles) {
+    for (uint64_t i = 0; i < n_tiles; ++i)
+      for (auto j = 0; j < dimensions; ++j) {
+        writer.WriteBits(start_index[i][j], coordSizeInBits(ATCoordSize));
+        writer.WriteBits(end_index[i][j], coordSizeInBits(ATCoordSize));
+      }
+  } else {
+    for (auto j = 0; j < dimensions; ++j)
+      writer.WriteBits(tile_size[j], coordSizeInBits(ATCoordSize));
+  }
+}
+
+
 size_t TileStructure::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();

@@ -19,6 +19,8 @@
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
+#include "genie/util/bit_writer.h"
+#include "genie/util/bit_writer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -201,29 +203,12 @@ class Record {
    * @param link_name Link name string
    * @param reference_box_ID Reference box identifier
    */
-  Record(uint64_t variant_index,
-    uint16_t seq_id,
-    uint64_t pos,
-    uint8_t strand,
-    uint8_t id_len,
-    std::string& id,
-    uint8_t description_len,
-    std::string description,
-    uint32_t ref_len,
-    std::string ref,
-    uint8_t alt_count,
-    std::vector<uint32_t> alt_len,
-    std::vector<std::string> altern,
-    uint32_t depth,
-    uint32_t seq_qual,
-    uint32_t map_qual,
-    uint32_t map_num_qual_0,
-    uint8_t filters_len,
-    std::string filters,
-    uint8_t linked_record,
-    uint8_t link_name_len,
-    std::string link_name,
-    uint8_t reference_box_ID)
+  Record(uint64_t variant_index, uint16_t seq_id, uint64_t pos, uint8_t strand, uint8_t id_len,
+         std::string& id, uint8_t description_len, std::string description, uint32_t ref_len,
+         std::string ref, uint8_t alt_count, std::vector<uint32_t> alt_len,
+         std::vector<std::string> altern, uint32_t depth, uint32_t seq_qual, uint32_t map_qual,
+         uint32_t map_num_qual_0, uint8_t filters_len, std::string filters, uint8_t linked_record,
+         uint8_t link_name_len, std::string link_name, uint8_t reference_box_ID)
       : variant_index_(variant_index),
         seq_id_(seq_id),
         pos_(pos),
@@ -270,7 +255,7 @@ class Record {
    * @brief Writes record data to a writer
    * @param writer The writer to write to
    */
-  void Write(genie::core::Writer& writer);
+  void Write(genie::util::BitWriter& writer);
 
   /**
    * @brief Gets the variant index

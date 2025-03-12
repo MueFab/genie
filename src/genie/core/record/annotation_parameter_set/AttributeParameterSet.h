@@ -103,6 +103,7 @@ class AttributeParameterSet {
      * @param writer
      */
     void write(core::Writer& writer) const;
+    void write(util::BitWriter& writer) const;
 
     size_t getSize(core::Writer& writesize) const;
 

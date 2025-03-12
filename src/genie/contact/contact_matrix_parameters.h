@@ -442,6 +442,15 @@ class ContactMatrixParameters {
     void Write(core::Writer& writer) const;
 
     /**
+     * @brief Writes the object to a writer.
+     *
+     * This function writes the object to a writer.
+     *
+     * @param writer The writer to write to.
+     */
+    void Write(util::BitWriter& writer) const;
+
+    /**
      * @brief Overloaded operator to compare two ContactMatrixParameters objects
      *
      * This function compares two ContactMatrixParameters objects and then returns

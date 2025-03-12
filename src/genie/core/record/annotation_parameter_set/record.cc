@@ -69,6 +69,18 @@ void Record::write(Writer& writer) const {
     annotation_encoding_parameters.write(writer);
 }
 
+void Record::write(util::BitWriter& writer) const {
+  writer.WriteBits(parameter_set_ID, 8);
+  writer.WriteBits(AT_ID, 8);
+  writer.WriteBits(static_cast<uint8_t>(AT_alphabet_ID), 8);
+  writer.WriteReserved(2);
+  writer.WriteBits(AT_coord_size, 2);
+  writer.WriteBits(AT_pos_40_bits_flag, 1);
+  writer.WriteBits(n_aux_attribute_groups, 3);
+  for (auto tileConfiguration : tile_configuration) tileConfiguration.write(writer);
+  annotation_encoding_parameters.write(writer);
+}
+
 size_t Record::getSize() const {
     core::Writer writesize;
     return getSize(writesize);

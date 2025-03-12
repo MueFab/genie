@@ -170,6 +170,46 @@ void ContactMatrixParameters::write(core::Writer& writer) const {
     }
 }
 
+void ContactMatrixParameters::write(util::BitWriter& writer) const {
+  writer.WriteBits(num_samples, 8);
+  for (auto i = 0; i < num_samples; ++i) {
+    writer.WriteBits(sample_ID[i], 8);
+    for (auto byte : sample_name[i]) {
+      writer.WriteBits(byte, 8);
+    }
+    writer.WriteReserved(8);
+  }
+  writer.WriteBits(num_chrs, 8);
+  for (auto i = 0; i < num_chrs; ++i) {
+    writer.WriteBits(chr_ID[i], 8);
+    for (auto byte : chr_name[i]) {
+      writer.WriteBits(byte, 8);
+    }
+    writer.WriteReserved(8);
+    writer.WriteBits(chr_length[i], 64);
+  }
+  writer.WriteBits(interval, 32);
+  writer.WriteBits(tile_size, 32);
+  writer.WriteBits(num_interval_multipliers, 8);
+  for (auto i = 0; i < num_interval_multipliers; ++i)
+    writer.WriteBits(interval_multiplier[i], 32);
+
+  writer.WriteBits(num_norm_methods, 8);
+  for (auto i = 0; i < num_norm_methods; ++i) {
+    writer.WriteBits(norm_method_ID[i], 8);
+    for (auto byte : norm_method_name[i]) writer.WriteBits(byte, 8);
+    writer.WriteReserved(8);
+    writer.WriteBits(norm_method_mult_flag[i], 1);
+    writer.WriteReserved(7);
+  }
+  writer.WriteBits(num_norm_matrices, 8);
+  for (auto i = 0; i < num_norm_matrices; ++i) {
+    writer.WriteBits(norm_matrix_ID[i], 8);
+    for (auto byte : norm_matrix_name[i]) writer.WriteBits(byte, 8);
+    writer.WriteReserved(8);
+  }
+}
+
 size_t ContactMatrixParameters::getSize(core::Writer& writesize) const {
     write(writesize);
     return writesize.GetBitsWritten();
