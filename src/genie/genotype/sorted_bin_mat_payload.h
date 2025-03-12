@@ -16,6 +16,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 #include "genie/core/constants.h"
 #include "genie/core/writer.h"
 #include "genie/genotype/bin_mat_payload.h"
