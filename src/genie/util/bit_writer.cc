@@ -173,6 +173,14 @@ void BitWriter::SetStreamPosition(int64_t pos) { stream->seekp(pos, std::ios::be
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void BitWriter::WriteReserved(uint8_t bits) {  WriteBits(0, bits); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BitWriter::Write(uint64_t value, uint8_t bits, bool) { WriteBits(value, bits); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace util
 }  // namespace genie
 
