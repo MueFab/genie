@@ -87,7 +87,7 @@ void FlowGraphConvert::stop(bool abort) { mgr.Stop(abort); }
 core::stats::PerfStats FlowGraphConvert::getStats() {
     core::stats::PerfStats ret;
     for (auto& e : exporters) {
-        ret.add(e->getStats());
+        ret.Add(e->getStats());
     }
     return ret;
 }

@@ -170,8 +170,8 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::Proces
         }
 
         if (size) {
-            std::get<1>(desc).addInteger("size-gabac-total-comp", size);
-            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-comp",
+            std::get<1>(desc).AddInteger("size-gabac-total-comp", size);
+            std::get<1>(desc).AddInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-comp",
                                          size);
         }
 
@@ -183,8 +183,8 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::Proces
                              gabac::EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
 
         if (size) {
-            std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).begin()->getRawSize());
-            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-raw",
+            std::get<1>(desc).AddInteger("size-gabac-total-raw", std::get<0>(desc).begin()->getRawSize());
+            std::get<1>(desc).AddInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-raw",
                                          std::get<0>(desc).begin()->getRawSize());
         }
     } else {
@@ -198,8 +198,8 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::Proces
             auto conf0 = token_param.getSubsequenceCfg((uint8_t)d_id.second);
 
             if (!subseq.isEmpty()) {
-                std::get<1>(desc).addInteger("size-gabac-total-comp", subseq.getRawSize());
-                std::get<1>(desc).addInteger(
+                std::get<1>(desc).AddInteger("size-gabac-total-comp", subseq.getRawSize());
+                std::get<1>(desc).AddInteger(
                     "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
                         core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-comp",
                     subseq.getRawSize());
@@ -209,15 +209,15 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::Proces
                                                           std::move(subseq), mmCoderEnabled));
 
             if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
-                std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
-                std::get<1>(desc).addInteger(
+                std::get<1>(desc).AddInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
+                std::get<1>(desc).AddInteger(
                     "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
                         core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-raw",
                     std::get<0>(desc).get(d_id.second).getRawSize());
             }
         }
     }
-    std::get<1>(desc).addDouble("time-gabac", watch.Check());
+    std::get<1>(desc).AddDouble("time-gabac", watch.Check());
     return desc;
 }
 

@@ -51,7 +51,7 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* _entropycoder, AccessUnit
         auto encoded = _entropycoder->Process(d);
         au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
         au.set(d.getID(), std::move(std::get<1>(encoded)));
-        au.getStats().add(std::get<2>(encoded));
+        au.getStats().Add(std::get<2>(encoded));
     }
     return au;
 }

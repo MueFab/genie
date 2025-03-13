@@ -191,7 +191,7 @@ void FlowGraphEncode::stop(bool abort) { mgr.Stop(abort); }
 core::stats::PerfStats FlowGraphEncode::getStats() {
     core::stats::PerfStats ret;
     for (auto& e : exporters) {
-        ret.add(e->getStats());
+        ret.Add(e->getStats());
     }
     return ret;
 }

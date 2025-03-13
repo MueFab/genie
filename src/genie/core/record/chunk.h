@@ -15,7 +15,7 @@
 
 #include "genie/core/record/record.h"
 #include "genie/core/reference_manager.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 
 // -----------------------------------------------------------------------------
 

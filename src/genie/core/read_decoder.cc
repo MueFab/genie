@@ -31,7 +31,7 @@ AccessUnit ReadDecoder::entropyCodeAU(EntropySelector* select, AccessUnit&& a, b
     for (auto& d : au) {
         auto enc = select->Process(au.getParameters().getDescriptor(d.getID()), d, mmCoderEnabled);
         au.set(d.getID(), std::move(std::get<0>(enc)));
-        au.getStats().add(std::get<1>(enc));
+        au.getStats().Add(std::get<1>(enc));
     }
     return au;
 }
