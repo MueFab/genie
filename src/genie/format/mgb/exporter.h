@@ -14,7 +14,7 @@
 #include "genie/core/access_unit.h"
 #include "genie/core/format_exporter.h"
 #include "genie/core/format_exporter_compressed.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/format/mgb/access_unit.h"
 #include "genie/util/drain.h"
 #include "genie/util/ordered_lock.h"

@@ -17,7 +17,7 @@
 #include "genie/core/mismatch_decoder.h"
 #include "genie/core/parameter/parameter_set.h"
 #include "genie/core/reference_manager.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/util/data_block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

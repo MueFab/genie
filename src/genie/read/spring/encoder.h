@@ -11,7 +11,7 @@
 
 #include <string>
 #include "genie/core/read_encoder.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/read/spring/preprocess.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

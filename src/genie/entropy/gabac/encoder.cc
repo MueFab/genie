@@ -118,8 +118,8 @@ core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor
                 // add compressed payload_
                 auto id = subdesc.getID();
 
-                std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
-                std::get<2>(ret).addInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
+                std::get<2>(ret).AddInteger("size-gabac-total-raw", subdesc.getRawSize());
+                std::get<2>(ret).AddInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
                                                 core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name +
                                                 "-raw",
                                             subdesc.getRawSize());
@@ -127,8 +127,8 @@ core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor
                 std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
 
                 if (!std::get<1>(ret).get(id.second).isEmpty()) {
-                    std::get<2>(ret).addInteger("size-gabac-total-comp", std::get<1>(ret).get(id.second).getRawSize());
-                    std::get<2>(ret).addInteger(
+                    std::get<2>(ret).AddInteger("size-gabac-total-comp", std::get<1>(ret).get(id.second).getRawSize());
+                    std::get<2>(ret).AddInteger(
                         "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
                             core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
                         std::get<1>(ret).get(id.second).getRawSize());
@@ -151,15 +151,15 @@ core::EntropyEncoder::EntropyCoded Encoder::Process(core::AccessUnit::Descriptor
         configSet.storeParameters(std::get<1>(ret).getID(), std::get<0>(ret));
 
         if (size) {
-            std::get<2>(ret).addInteger("size-gabac-total-raw", size);
-            std::get<2>(ret).addInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-raw",
+            std::get<2>(ret).AddInteger("size-gabac-total-raw", size);
+            std::get<2>(ret).AddInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-raw",
                                         size);
-            std::get<2>(ret).addInteger("size-gabac-total-comp", std::get<1>(ret).begin()->getRawSize());
-            std::get<2>(ret).addInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-comp",
+            std::get<2>(ret).AddInteger("size-gabac-total-comp", std::get<1>(ret).begin()->getRawSize());
+            std::get<2>(ret).AddInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-comp",
                                         std::get<1>(ret).begin()->getRawSize());
         }
     }
-    std::get<2>(ret).addDouble("time-gabac", watch.Check());
+    std::get<2>(ret).AddDouble("time-gabac", watch.Check());
     return ret;
 }
 

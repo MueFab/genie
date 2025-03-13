@@ -62,7 +62,7 @@ set(source_files
         arrayType.cc
         writer.cc
 
-        stats/perf-stats.cc
+        stats/perf_stats.cc
 
         access_unit.cc
         classifier_bypass.cc

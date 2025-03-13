@@ -20,7 +20,7 @@
 #include "class_type.h"
 #include "genie/core/constants.h"
 #include "genie/core/record/alignment_split/same_rec.h"
-#include "genie/core/stats/perf-stats.h"
+#include "genie/core/stats/perf_stats.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "segment.h"

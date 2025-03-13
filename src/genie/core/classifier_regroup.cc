@@ -290,7 +290,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
             currentChunks[refBased][paired][(uint8_t)classtype - 1].GetRef().merge(record_reference);
         }
         if (!movedStats) {
-            currentChunks[refBased][paired][(uint8_t)classtype - 1].GetStats().add(chunk.GetStats());
+            currentChunks[refBased][paired][(uint8_t)classtype - 1].GetStats().Add(chunk.GetStats());
             movedStats = true;
         }
         currentChunks[refBased][paired][(uint8_t)classtype - 1].GetData().push_back(r);
