@@ -28,18 +28,18 @@ set(source_files
         record/alignment_box.cc
         record/alignment.cc
 
-        record/variant_site/record.cc
+        variant_site_record/record.cc
 
-        record/variant_genotype/record.cc
-        record/variant_genotype/format_field.cc
-        record/variant_genotype/format_field.h
+        variant_genotype_record/record.cc
+        variant_genotype_record/format_field.cc
+        variant_genotype_record/format_field.h
 
         record/linked_record/linked_record.h
         record/linked_record/linked_record.cc
 
-        record/contact/record.cc
+        record/contact_record/record.cc
 
-        record/data_unit/record.cc
+        record/data_unit_record/record.cc
 
         record/annotation_access_unit/record.cc
         record/annotation_access_unit/block.cc

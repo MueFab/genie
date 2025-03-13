@@ -12,7 +12,7 @@
 
 #include "genie/annotation/contact_annotation.h"
 #include "genie/contact/contact_coder.h"
-#include "genie/core/record/contact/record.h"
+#include "genie/core/record/contact_record/record.h"
 
 #include "genie/annotation/annotation_encoder.h"
 #include "genie/annotation/parameterset_composer.h"

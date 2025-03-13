@@ -18,7 +18,7 @@
 #include <xtensor/xview.hpp>
 #pragma GCC diagnostic pop
 
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "likelihood_parameters.h"
 
 // #include <xtensor/xstrided_view.hpp>

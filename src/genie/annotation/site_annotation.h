@@ -19,7 +19,7 @@
 #include "genie/variantsite/variantsite_parser.h"
 
 #include "genie/annotation/compressors.h"
-#include "genie/core/record/data_unit/record.h"
+#include "genie/core/record/data_unit_record/record.h"
 // -----------------------------------------------------------------------------
 
 namespace genie {

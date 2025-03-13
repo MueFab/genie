@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "genie/core/arrayType.h"
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/variant_site_record/record.h"
 #include "genie/util/bit_reader.h"
 #include "genie/util/bit_writer.h"
 #include "genie/util/make_unique.h"

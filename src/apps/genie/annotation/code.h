@@ -19,7 +19,7 @@
 #include "genie/core/record/annotation_access_unit/record.h"
 #include "genie/core/record/annotation_parameter_set/DescriptorConfiguration.h"
 #include "genie/core/record/annotation_parameter_set/record.h"
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/variant_site_record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

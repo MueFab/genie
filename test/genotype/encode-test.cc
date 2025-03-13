@@ -15,7 +15,7 @@
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
 #include "genie/core/constants.h"
-#include "genie/core/record/variant_genotype/record.h"
+#include "genie/core/variant_genotype_record/record.h"
 #include "genie/genotype/genotype_coder.h"
 #include "genie/util/bit_reader.h"
 #include "helpers.h"

@@ -22,7 +22,7 @@
 #include "genie/core/writer.h"
 #include "genie/util/bit_reader.h"
 
-#include "genie/core/record/variant_site/record.h"
+#include "genie/core/variant_site_record/record.h"
 
 #include "genie/core/record/annotation_access_unit/TypedData.h"
 // ---------------------------------------------------------------------------------------------------------------------
